@@ -421,11 +421,11 @@ namespace Contensive.Addons.Tools {
                         using (var db = new DbController(core, datasource.name)) {
                             db.createSQLTable(TableName);
                         }
-                        MetaController.createContentFromSQLTable(core,datasource, TableName, ContentName);
+                        ContentMetadataModel.createFromSQLTable(core,datasource, TableName, ContentName);
                         core.cache.invalidateAll();
                         core.clearMetaData();
-                        ContentID = Processor.Models.Domain.MetaModel.getContentId(core, ContentName);
-                        ParentNavID = MetaController.getRecordIdByUniqueName( core,Processor.Models.Db.NavigatorEntryModel.contentName, "Manage Site Content");
+                        ContentID = Processor.Models.Domain.ContentMetadataModel.getContentId(core, ContentName);
+                        ParentNavID = MetadataController.getRecordIdByUniqueName( core,Processor.Models.Db.NavigatorEntryModel.contentName, "Manage Site Content");
                         if (ParentNavID != 0) {
                             ParentNavID = 0;
                             using (var csSrc = new CsModel(core)) {
@@ -448,7 +448,7 @@ namespace Contensive.Addons.Tools {
                                 }
                             }
                         }
-                        ContentID = MetaModel.getContentId(core, ContentName);
+                        ContentID = ContentMetadataModel.getContentId(core, ContentName);
                         Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=\"?af=105&ContentID=" + ContentID + "\">Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>");
                     } else {
                         Stream.Add("<P>Error, a required field is missing. Content not created.</P>");
@@ -503,7 +503,7 @@ namespace Contensive.Addons.Tools {
                 if (ContentID != 0) {
                     ButtonList = ButtonCancel + "," + ButtonSaveandInvalidateCache;
                     string ContentName = Local_GetContentNameByID(ContentID);
-                    Processor.Models.Domain.MetaModel CDef = Processor.Models.Domain.MetaModel.create(core, ContentID, false, true);
+                    Processor.Models.Domain.ContentMetadataModel CDef = Processor.Models.Domain.ContentMetadataModel.create(core, ContentID, false, true);
                     string FieldName = null;
                     int ColumnWidthTotal = 0;
                     int fieldId = 0;
@@ -520,7 +520,7 @@ namespace Contensive.Addons.Tools {
                         //
                         if (FieldIDToAdd != 0) {
                             foreach (var keyValuePair in CDef.fields) {
-                                Processor.Models.Domain.MetaFieldModel field = keyValuePair.Value;
+                                Processor.Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
                                 if (field.id == FieldIDToAdd) {
                                     //If field.Name = FieldNameToAdd Then
                                     if (field.inherited) {
@@ -549,8 +549,8 @@ namespace Contensive.Addons.Tools {
                         //
                         int ColumnNumberMax = 0;
                         foreach (var keyValuePair in CDef.adminColumns) {
-                            Processor.Models.Domain.MetaModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
-                            Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
+                            Processor.Models.Domain.ContentMetadataModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
+                            Processor.Models.Domain.ContentFieldMetadataModel field = CDef.fields[adminColumn.Name];
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
@@ -586,8 +586,8 @@ namespace Contensive.Addons.Tools {
                                         columnPtr = 0;
                                         if (CDef.adminColumns.Count > 1) {
                                             foreach (var keyValuePair in CDef.adminColumns) {
-                                                Processor.Models.Domain.MetaModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
-                                                Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
+                                                Processor.Models.Domain.ContentMetadataModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
+                                                Processor.Models.Domain.ContentFieldMetadataModel field = CDef.fields[adminColumn.Name];
                                                 using (var csData = new CsModel(core)) {
                                                     csData.openRecord("Content Fields", field.id);
                                                     csData.set("IndexColumn", (columnPtr) * 10);
@@ -616,8 +616,8 @@ namespace Contensive.Addons.Tools {
                                     if (CDef.adminColumns.Count > 1) {
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns) {
-                                            Processor.Models.Domain.MetaModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
-                                            Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
+                                            Processor.Models.Domain.ContentMetadataModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.ContentFieldMetadataModel field = CDef.fields[adminColumn.Name];
                                             using (var csData = new CsModel(core)) {
                                                 csData.openRecord("Content Fields", field.id);
                                                 if (fieldId == TargetFieldID) {
@@ -644,8 +644,8 @@ namespace Contensive.Addons.Tools {
                                         MoveNextColumn = false;
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns) {
-                                            Processor.Models.Domain.MetaModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
-                                            Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
+                                            Processor.Models.Domain.ContentMetadataModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.ContentFieldMetadataModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             using (var csData = new CsModel(core)) {
                                                 csData.openRecord("Content Fields", field.id);
@@ -683,8 +683,8 @@ namespace Contensive.Addons.Tools {
                                         MoveNextColumn = false;
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns.Reverse()) {
-                                            Processor.Models.Domain.MetaModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
-                                            Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
+                                            Processor.Models.Domain.ContentMetadataModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.ContentFieldMetadataModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             using (var csData = new CsModel(core)) {
                                                 csData.openRecord("Content Fields", field.id);
@@ -717,7 +717,7 @@ namespace Contensive.Addons.Tools {
                         //
                         // Get a new copy of the content definition
                         //
-                        CDef = Processor.Models.Domain.MetaModel.create(core, ContentID, false, true);
+                        CDef = Processor.Models.Domain.ContentMetadataModel.create(core, ContentID, false, true);
                     }
                     if (Button == ButtonSaveandInvalidateCache) {
                         core.cache.invalidateAll();
@@ -769,7 +769,7 @@ namespace Contensive.Addons.Tools {
                         //
                         // Calc total width
                         //
-                        foreach (KeyValuePair<string, Processor.Models.Domain.MetaModel.MetaAdminColumnClass> kvp in CDef.adminColumns) {
+                        foreach (KeyValuePair<string, Processor.Models.Domain.ContentMetadataModel.MetaAdminColumnClass> kvp in CDef.adminColumns) {
                             ColumnWidthTotal += kvp.Value.Width;
                         }
                         //For ColumnCount = 0 To CDef.adminColumns.Count - 1
@@ -778,7 +778,7 @@ namespace Contensive.Addons.Tools {
                         if (ColumnWidthTotal > 0) {
                             Stream.Add("<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"90%\">");
                             int ColumnCount = 0;
-                            foreach (KeyValuePair<string, Processor.Models.Domain.MetaModel.MetaAdminColumnClass> kvp in CDef.adminColumns) {
+                            foreach (KeyValuePair<string, Processor.Models.Domain.ContentMetadataModel.MetaAdminColumnClass> kvp in CDef.adminColumns) {
                                 //
                                 // print column headers - anchored so they sort columns
                                 //
@@ -822,15 +822,15 @@ namespace Contensive.Addons.Tools {
                     } else {
                         Stream.Add(SpanClassAdminNormal + "<br>");
                         bool skipField = false;
-                        foreach (KeyValuePair<string, Processor.Models.Domain.MetaFieldModel> keyValuePair in CDef.fields) {
-                            Processor.Models.Domain.MetaFieldModel field = keyValuePair.Value;
+                        foreach (KeyValuePair<string, Processor.Models.Domain.ContentFieldMetadataModel> keyValuePair in CDef.fields) {
+                            Processor.Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
                             //
                             // test if this column is in use
                             //
                             skipField = false;
                             //ColumnPointer = CDef.adminColumns.Count
                             if (CDef.adminColumns.Count > 0) {
-                                foreach (KeyValuePair<string, Processor.Models.Domain.MetaModel.MetaAdminColumnClass> kvp in CDef.adminColumns) {
+                                foreach (KeyValuePair<string, Processor.Models.Domain.ContentMetadataModel.MetaAdminColumnClass> kvp in CDef.adminColumns) {
                                     if (field.nameLc == kvp.Value.Name) {
                                         skipField = true;
                                         break;
@@ -1062,7 +1062,7 @@ namespace Contensive.Addons.Tools {
                         // Create Definition
                         //
                         Stream.Add("<P>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]");
-                        MetaController.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
+                        MetadataController.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
                         //
                         Stream.Add("<br>Reloading Content Definitions...");
                         core.cache.invalidateAll();
@@ -1154,7 +1154,7 @@ namespace Contensive.Addons.Tools {
         private string GetForm_SyncTables() {
             string returnValue = "";
             try {
-                Processor.Models.Domain.MetaModel metadata = null;
+                Processor.Models.Domain.ContentMetadataModel metadata = null;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string[,] ContentNameArray = null;
                 int ContentNameCount = 0;
@@ -1174,14 +1174,14 @@ namespace Contensive.Addons.Tools {
                         csData.open("Content", "", "", false, 0, "id");
                         if (csData.ok()) {
                             do {
-                                metadata = Processor.Models.Domain.MetaModel.create(core, csData.getInteger("id"));
+                                metadata = Processor.Models.Domain.ContentMetadataModel.create(core, csData.getInteger("id"));
                                 TableName = metadata.tableName;
                                 Stream.Add("Synchronizing Content " + metadata.name + " to table " + TableName + "<br>");
                                 using( var db = new DbController( core, metadata.dataSourceName )) {
                                     db.createSQLTable(TableName);
                                     if (metadata.fields.Count > 0) {
                                         foreach (var keyValuePair in metadata.fields) {
-                                            MetaFieldModel field = keyValuePair.Value;
+                                            ContentFieldMetadataModel field = keyValuePair.Value;
                                             Stream.Add("...Field " + field.nameLc + "<br>");
                                             db.createSQLTableField(TableName, field.nameLc, field.fieldTypeId);
                                         }
@@ -2250,8 +2250,8 @@ namespace Contensive.Addons.Tools {
         //
         //
         //
-        private Processor.Models.Domain.MetaModel GetCDef(string ContentName) {
-            return Processor.Models.Domain.MetaModel.createByUniqueName(core, ContentName);
+        private Processor.Models.Domain.ContentMetadataModel GetCDef(string ContentName) {
+            return Processor.Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
         }
         //
         //=============================================================================

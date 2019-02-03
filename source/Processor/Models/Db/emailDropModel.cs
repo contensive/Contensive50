@@ -22,12 +22,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static EmailDropModel addDefault(CoreController core, Domain.MetaModel metaData) {
+        public static EmailDropModel addDefault(CoreController core, Domain.ContentMetadataModel metaData) {
             return addDefault<EmailDropModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static EmailDropModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+        public static EmailDropModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetadataModel metaData) {
             return addDefault<EmailDropModel>(core, metaData, ref callersCacheNameList);
         }
         //

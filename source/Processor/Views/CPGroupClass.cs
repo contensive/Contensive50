@@ -96,21 +96,21 @@ namespace Contensive.Processor {
         //
         public override int GetId(string GroupNameOrGuid) {
             if (GenericController.isGuid(GroupNameOrGuid)) {
-                return MetaController.getRecordId(core, "groups", GroupNameOrGuid);
+                return MetadataController.getRecordId(core, "groups", GroupNameOrGuid);
             }
-            return MetaController.getRecordIdByUniqueName(core, "groups", GroupNameOrGuid);
+            return MetadataController.getRecordIdByUniqueName(core, "groups", GroupNameOrGuid);
         }
         //
         //====================================================================================================
         //
         public override string GetName(string GroupIdOrGuid) {
             if (GroupIdOrGuid.IsNumeric()) {
-                return MetaController.getRecordName( core,"groups", GenericController.encodeInteger(GroupIdOrGuid));
+                return MetadataController.getRecordName( core,"groups", GenericController.encodeInteger(GroupIdOrGuid));
             } else {
-                return MetaController.getRecordName( core,"groups", GroupIdOrGuid);
+                return MetadataController.getRecordName( core,"groups", GroupIdOrGuid);
             }
         }
-        public override string GetName(int GroupId) => MetaController.getRecordName( core,"groups", GroupId);
+        public override string GetName(int GroupId) => MetadataController.getRecordName( core,"groups", GroupId);
         //
         //====================================================================================================
         //

@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="recordId"></param>
         /// <returns></returns>
         private static string getAuthoringControlCriteria(CoreController core, string contentName, int recordId) 
-            => getAuthoringControlCriteria(core, Models.Domain.MetaModel.createByUniqueName(core, contentName), recordId);
+            => getAuthoringControlCriteria(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, contentName), recordId);
         //
         //=====================================================================================================
         /// <summary>
@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cdef"></param>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        private static string getAuthoringControlCriteria(CoreController core, Models.Domain.MetaModel cdef, int recordId) {
+        private static string getAuthoringControlCriteria(CoreController core, Models.Domain.ContentMetadataModel cdef, int recordId) {
             if (cdef == null) return "(1=0)";
             var table = Models.Db.TableModel.createByUniqueName(core, cdef.tableName);
             if (table == null) return "(1=0)";
@@ -202,12 +202,12 @@ namespace Contensive.Processor.Controllers {
                 string Criteria = getAuthoringControlCriteria(core, ContentName, RecordID) + "And(ControlType=" + authoringControl + ")";
                 switch (authoringControl) {
                     case AuthoringControls.Editing:
-                        MetaController.deleteContentRecords(core, "Authoring Controls", Criteria + "And(CreatedBy=" + DbController.encodeSQLNumber(MemberID) + ")", MemberID);
+                        MetadataController.deleteContentRecords(core, "Authoring Controls", Criteria + "And(CreatedBy=" + DbController.encodeSQLNumber(MemberID) + ")", MemberID);
                         break;
                     case AuthoringControls.Submitted:
                     case AuthoringControls.Approved:
                     case AuthoringControls.Modified:
-                        MetaController.deleteContentRecords(core, "Authoring Controls", Criteria, MemberID);
+                        MetadataController.deleteContentRecords(core, "Authoring Controls", Criteria, MemberID);
                         break;
                 }
             } catch (Exception ex) {
@@ -244,7 +244,7 @@ namespace Contensive.Processor.Controllers {
                 if (RecordID > 0) {
                     //
                     // Get Workflow Locks
-                    Models.Domain.MetaModel CDef = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
+                    Models.Domain.ContentMetadataModel CDef = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
                     if (CDef.id > 0) {
                         var nameDict = new Dictionary<int, string>();
                         foreach (var recordLock in Models.Db.AuthoringControlModel.createList(core, getAuthoringControlCriteria(core, ContentName, RecordID))) {

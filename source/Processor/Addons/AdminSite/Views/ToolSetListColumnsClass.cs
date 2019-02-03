@@ -21,7 +21,7 @@ namespace Contensive.Addons.AdminSite {
             string result = "";
             try {
                 // todo refactor out
-                MetaModel adminContent = adminData.adminContent;
+                ContentMetadataModel adminContent = adminData.adminContent;
                 string Button = core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonOK) {
                     //
@@ -56,7 +56,7 @@ namespace Contensive.Addons.AdminSite {
                 //--------------------------------------------------------------------------------
                 //
                 if (adminContent.id != 0) {
-                    var CDef = MetaModel.create(core, adminContent.id);
+                    var CDef = ContentMetadataModel.create(core, adminContent.id);
                     int ColumnWidthTotal = 0;
                     if (ToolsAction != 0) {
                         //
@@ -71,8 +71,8 @@ namespace Contensive.Addons.AdminSite {
                         // Make sure the FieldNameToAdd is not-inherited, if not, create new field
                         //
                         if (FieldIDToAdd != 0) {
-                            foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminContent.fields) {
-                                MetaFieldModel field = keyValuePair.Value;
+                            foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminContent.fields) {
+                                ContentFieldMetadataModel field = keyValuePair.Value;
                                 if (field.id == FieldIDToAdd) {
                                     if (field.inherited) {
                                         SourceContentID = field.contentId;
@@ -99,7 +99,7 @@ namespace Contensive.Addons.AdminSite {
                         // Make sure all fields are not-inherited, if not, create new fields
                         //
                         foreach (var column in IndexConfig.columns) {
-                            MetaFieldModel field = adminContent.fields[column.Name.ToLowerInvariant()];
+                            ContentFieldMetadataModel field = adminContent.fields[column.Name.ToLowerInvariant()];
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
@@ -222,7 +222,7 @@ namespace Contensive.Addons.AdminSite {
                         if (reloadMetadata) {
                             core.clearMetaData();
                             core.cache.invalidateAll();
-                            CDef = MetaModel.createByUniqueName(core, adminContent.name);
+                            CDef = ContentMetadataModel.createByUniqueName(core, adminContent.name);
                         }
                         //
                         // save indexconfig
@@ -299,7 +299,7 @@ namespace Contensive.Addons.AdminSite {
                                 // print column headers - anchored so they sort columns
                                 //
                                 ColumnWidth = encodeInteger(100 * (column.Width / (double)ColumnWidthTotal));
-                                MetaFieldModel field = adminContent.fields[column.Name.ToLowerInvariant()];
+                                ContentFieldMetadataModel field = adminContent.fields[column.Name.ToLowerInvariant()];
                                 fieldId = field.id;
                                 Caption = field.caption;
                                 if (field.inherited) {
@@ -317,7 +317,7 @@ namespace Contensive.Addons.AdminSite {
                                 // print column headers - anchored so they sort columns
                                 //
                                 ColumnWidth = encodeInteger(100 * (column.Width / (double)ColumnWidthTotal));
-                                MetaFieldModel field = adminContent.fields[column.Name.ToLowerInvariant()];
+                                ContentFieldMetadataModel field = adminContent.fields[column.Name.ToLowerInvariant()];
                                 fieldId = field.id;
                                 Caption = field.caption;
                                 if (field.inherited) {
@@ -354,8 +354,8 @@ namespace Contensive.Addons.AdminSite {
                     if (CDef.fields.Count == 0) {
                         Stream.Add(SpanClassAdminNormal + "This Content Definition has no fields</span><br>");
                     } else {
-                        foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminContent.fields) {
-                            MetaFieldModel field = keyValuePair.Value;
+                        foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminContent.fields) {
+                            ContentFieldMetadataModel field = keyValuePair.Value;
                             //
                             // display the column if it is not in use
                             if ((IndexConfig.columns.Find(x => x.Name == field.nameLc) == null)) {

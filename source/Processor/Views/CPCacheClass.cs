@@ -136,7 +136,7 @@ namespace Contensive.Processor {
             if (!string.IsNullOrEmpty(ContentNameList)) {
                 List<string> tableNameList = new List<string>();
                 foreach (var contentName in new List<string>(ContentNameList.ToLowerInvariant().Split(','))) {
-                    string tableName = MetaController.getContentTablename(cp.core, contentName).ToLowerInvariant();
+                    string tableName = MetadataController.getContentTablename(cp.core, contentName).ToLowerInvariant();
                     if (!tableNameList.Contains(tableName)) {
                         tableNameList.Add(tableName);
                         cp.core.cache.invalidateAllKeysInTable(tableName);
@@ -158,7 +158,7 @@ namespace Contensive.Processor {
         }
         //
         public override void InvalidateContentRecord(string contentName, int recordId) {
-            cp.core.cache.invalidateDbRecord(recordId, MetaController.getContentTablename( cp.core,  contentName));
+            cp.core.cache.invalidateDbRecord(recordId, MetadataController.getContentTablename( cp.core,  contentName));
         }
         //
         //====================================================================================================

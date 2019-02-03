@@ -40,14 +40,14 @@ namespace Contensive.Addons.Tools {
                 int ContentID = cp.Doc.GetInteger("" + RequestNameToolContentID + "");
                 string dataSourceName = "default";
                 string ContentName = "";
-                MetaModel CDef = null;
+                ContentMetadataModel CDef = null;
                 string TableName = "";
                 if (ContentID > 0) {
                     ContentName = cp.Content.GetRecordName("content", ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         TableName = cp.Content.GetTable(ContentName);
                         dataSourceName = cp.Content.GetDataSource(ContentName);
-                        CDef = MetaModel.create(core, ContentID, true, true);
+                        CDef = ContentMetadataModel.create(core, ContentID, true, true);
                     }
                 }
                 int RecordCount = 0;
@@ -80,7 +80,7 @@ namespace Contensive.Addons.Tools {
                                     // problem - looking for the name in the Db using the form's name, but it could have changed.
                                     // have to look field up by id
                                     //
-                                    foreach (KeyValuePair<string, Processor.Models.Domain.MetaFieldModel> cdefFieldKvp in CDef.fields) {
+                                    foreach (KeyValuePair<string, Processor.Models.Domain.ContentFieldMetadataModel> cdefFieldKvp in CDef.fields) {
                                         if (cdefFieldKvp.Value.id == formFieldId) {
                                             //
                                             // Field was found in CDef
@@ -105,7 +105,7 @@ namespace Contensive.Addons.Tools {
                                                 // Was a field, make it inherit from it's parent
                                                 //
                                                 //CSTarget = CSTarget;
-                                                MetaController.deleteContentRecord( core,"Content Fields", formFieldId);
+                                                MetadataController.deleteContentRecord( core,"Content Fields", formFieldId);
                                                 ReloadCDef = true;
                                             } else if ((!cdefFieldKvp.Value.inherited) && (!formFieldInherited)) {
                                                 //
@@ -143,7 +143,7 @@ namespace Contensive.Addons.Tools {
                                                         //
                                                         // Field Type changed, must be done manually
                                                         //
-                                                        ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + MetaController.getRecordName(core, "content Field Types", (int)cdefFieldKvp.Value.fieldTypeId) + "] to [" + MetaController.getRecordName(core, "content Field Types", (int)formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
+                                                        ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + MetadataController.getRecordName(core, "content Field Types", (int)cdefFieldKvp.Value.fieldTypeId) + "] to [" + MetadataController.getRecordName(core, "content Field Types", (int)formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
                                                         int DataSourceTypeID = core.db.getDataSourceType();
                                                         switch (DataSourceTypeID) {
                                                             case DataSourceTypeODBCMySQL:
@@ -179,7 +179,7 @@ namespace Contensive.Addons.Tools {
                         if (ToolButton == ButtonAdd) {
                             //
                             // ----- Insert a blank Field
-                            var fieldMeta = MetaModel.createByUniqueName(core, ContentFieldModel.contentName);
+                            var fieldMeta = ContentMetadataModel.createByUniqueName(core, ContentFieldModel.contentName);
                             var field = ContentFieldModel.addDefault(core, fieldMeta);
                             field.name = "unnamedField" + field.id.ToString();
                             field.contentID = ContentID;
@@ -234,19 +234,19 @@ namespace Contensive.Addons.Tools {
                     Stream.Add(HtmlController.div("There was a problem saving these changes" + "<UL>" + ErrorMessage + "</UL>", "ccError"));
                 }
                 if (ReloadCDef) {
-                    CDef = Processor.Models.Domain.MetaModel.create(core, ContentID, true, true);
+                    CDef = Processor.Models.Domain.ContentMetadataModel.create(core, ContentID, true, true);
                 }
                 if (ContentID == 0) {
                     //
                     // content tables that have edit forms to Configure
                     bool isEmptyList = false;
-                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_LookupContent(core, RequestNameToolContentID, ContentID, MetaModel.getContentId(core, "Content"), ref isEmptyList)));
+                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_LookupContent(core, RequestNameToolContentID, ContentID, ContentMetadataModel.getContentId(core, "Content"), ref isEmptyList)));
                 } else {
                     //
                     // Configure edit form
                     Stream.Add(HtmlController.inputHidden(RequestNameToolContentID, ContentID));
                     Stream.Add(core.html.getPanelTop());
-                    ContentName = MetaController.getContentNameByID(core, ContentID);
+                    ContentName = MetadataController.getContentNameByID(core, ContentID);
                     ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK + "," + ButtonAdd;
                     //
                     // Get a new copy of the content definition
@@ -256,13 +256,13 @@ namespace Contensive.Addons.Tools {
                     //
                     int ParentContentID = CDef.parentID;
                     bool AllowCDefInherit = false;
-                    Processor.Models.Domain.MetaModel ParentCDef = null;
+                    Processor.Models.Domain.ContentMetadataModel ParentCDef = null;
                     if (ParentContentID == -1) {
                         AllowCDefInherit = false;
                     } else {
                         AllowCDefInherit = true;
-                        string ParentContentName = MetaController.getContentNameByID(core, ParentContentID);
-                        ParentCDef = Processor.Models.Domain.MetaModel.create(core, ParentContentID, true, true);
+                        string ParentContentName = MetadataController.getContentNameByID(core, ParentContentID);
+                        ParentCDef = Processor.Models.Domain.ContentMetadataModel.create(core, ParentContentID, true, true);
                     }
                     bool NeedFootNote1 = false;
                     bool NeedFootNote2 = false;
@@ -327,7 +327,7 @@ namespace Contensive.Addons.Tools {
                         }
                         fieldList.Sort((p1, p2) => p1.sort.CompareTo(p2.sort));
                         StringBuilderLegacyController StreamValidRows = new StringBuilderLegacyController();
-                        var contentFieldsCdef = Processor.Models.Domain.MetaModel.createByUniqueName(core, "content fields");
+                        var contentFieldsCdef = Processor.Models.Domain.ContentMetadataModel.createByUniqueName(core, "content fields");
                         foreach (FieldSortClass fieldsort in fieldList) {
                             StringBuilderLegacyController streamRow = new StringBuilderLegacyController();
                             bool rowValid = true;
@@ -359,12 +359,12 @@ namespace Contensive.Addons.Tools {
                                 //
                                 streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + HtmlController.checkbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
                             } else {
-                                Processor.Models.Domain.MetaFieldModel parentField = null;
+                                Processor.Models.Domain.ContentFieldMetadataModel parentField = null;
                                 //
                                 // CDef has a parent, but the field is non-inherited, test for a matching Parent Field
                                 //
                                 if (ParentCDef == null) {
-                                    foreach (KeyValuePair<string, Processor.Models.Domain.MetaFieldModel> kvp in ParentCDef.fields) {
+                                    foreach (KeyValuePair<string, Processor.Models.Domain.ContentFieldMetadataModel> kvp in ParentCDef.fields) {
                                         if (kvp.Value.nameLc == fieldsort.field.nameLc) {
                                             parentField = kvp.Value;
                                             break;
@@ -437,7 +437,7 @@ namespace Contensive.Addons.Tools {
                                     }
                                 }
                             } else if (FieldLocked) {
-                                streamRow.Add(MetaController.getRecordName(core, "content field types", (int)fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, (int)fieldsort.field.fieldTypeId));
+                                streamRow.Add(MetadataController.getRecordName(core, "content field types", (int)fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, (int)fieldsort.field.fieldTypeId));
                             } else {
                                 string TypeSelect = TypeSelectTemplate;
                                 TypeSelect = GenericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);
@@ -486,7 +486,7 @@ namespace Contensive.Addons.Tools {
                             //
                             // scramble
                             //
-                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaScramble." + RecordCount, fieldsort.field.Scramble, fieldsort.field.inherited));
+                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaScramble." + RecordCount, fieldsort.field.scramble, fieldsort.field.inherited));
                             //
                             // HTML Content
                             //
@@ -554,7 +554,7 @@ namespace Contensive.Addons.Tools {
         //
         private class FieldSortClass {
             public string sort;
-            public Processor.Models.Domain.MetaFieldModel field;
+            public Processor.Models.Domain.ContentFieldMetadataModel field;
         }
     }
 }

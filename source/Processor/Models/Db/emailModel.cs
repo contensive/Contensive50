@@ -41,12 +41,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static EmailModel addDefault(CoreController core, Domain.MetaModel metaData) {
+        public static EmailModel addDefault(CoreController core, Domain.ContentMetadataModel metaData) {
             return addDefault<EmailModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static EmailModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+        public static EmailModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetadataModel metaData) {
             return addDefault<EmailModel>(core, metaData, ref callersCacheNameList);
         }
         //

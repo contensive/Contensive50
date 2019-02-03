@@ -25,12 +25,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static StateModel addDefault(CoreController core, Domain.MetaModel metaData) {
+        public static StateModel addDefault(CoreController core, Domain.ContentMetadataModel metaData) {
             return addDefault<StateModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static StateModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+        public static StateModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetadataModel metaData) {
             return addDefault<StateModel>(core, metaData, ref callersCacheNameList);
         }
         //

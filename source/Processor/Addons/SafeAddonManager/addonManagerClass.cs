@@ -182,11 +182,11 @@ namespace Contensive.Addons.SafeAddonManager {
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                     if (core.docProperties.getBoolean("ac" + Ptr)) {
                                         TargetCollectionID = core.docProperties.getInteger("acID" + Ptr);
-                                        TargetCollectionName = MetaController.getRecordName( core,"Add-on Collections", TargetCollectionID);
+                                        TargetCollectionName = MetadataController.getRecordName( core,"Add-on Collections", TargetCollectionID);
                                         //
                                         // Delete any addons from this collection
                                         //
-                                        MetaController.deleteContentRecords(core, Processor.Models.Db.AddonModel.contentName, "collectionid=" + TargetCollectionID);
+                                        MetadataController.deleteContentRecords(core, Processor.Models.Db.AddonModel.contentName, "collectionid=" + TargetCollectionID);
 
                                         //                            '
                                         //                            ' Load all collections into local collection storage
@@ -431,11 +431,11 @@ namespace Contensive.Addons.SafeAddonManager {
                                             //
                                             // Now delete the Collection record
                                             //
-                                            MetaController.deleteContentRecord(core, "Add-on Collections", TargetCollectionID);
+                                            MetadataController.deleteContentRecord(core, "Add-on Collections", TargetCollectionID);
                                             //
                                             // Delete Navigator Entries set as installed by the collection (this may be all that is needed)
                                             //
-                                            MetaController.deleteContentRecords(core, Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + TargetCollectionID);
+                                            MetadataController.deleteContentRecords(core, Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + TargetCollectionID);
                                         }
                                     }
                                 }
@@ -449,7 +449,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             if (Cnt > 0) {
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                     if (core.docProperties.getBoolean("ao" + Ptr)) {
-                                        MetaController.deleteContentRecord(core, Processor.Models.Db.AddonModel.contentName, core.docProperties.getInteger("aoID" + Ptr));
+                                        MetadataController.deleteContentRecord(core, Processor.Models.Db.AddonModel.contentName, core.docProperties.getInteger("aoID" + Ptr));
                                     }
                                 }
                             }
@@ -930,7 +930,7 @@ namespace Contensive.Addons.SafeAddonManager {
                         }
                         csData.close();
                     }
-                    MetaController.deleteContentRecord(core,NavigatorEntryModel.contentName, EntryID);
+                    MetadataController.deleteContentRecord(core,NavigatorEntryModel.contentName, EntryID);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

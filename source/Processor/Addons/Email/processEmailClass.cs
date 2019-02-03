@@ -60,9 +60,9 @@ namespace Contensive.Addons.Email {
                 using (var CSEmail = new CsModel(core)) {
                     CSEmail.open("Email", Criteria);
                     if (CSEmail.ok()) {
-                        string SQLTablePeople = MetaController.getContentTablename(core, "People");
-                        string SQLTableMemberRules = MetaController.getContentTablename(core, "Member Rules");
-                        string SQLTableGroups = MetaController.getContentTablename(core, "Groups");
+                        string SQLTablePeople = MetadataController.getContentTablename(core, "People");
+                        string SQLTableMemberRules = MetadataController.getContentTablename(core, "Member Rules");
+                        string SQLTableGroups = MetadataController.getContentTablename(core, "Groups");
                         string BounceAddress = core.siteProperties.getText("EmailBounceAddress", "");
                         string PrimaryLink = "http://" + core.appConfig.domainList[0];
                         while (CSEmail.ok()) {
@@ -121,7 +121,7 @@ namespace Contensive.Addons.Email {
                                     int PeopleID = csPerson.getInteger("MemberID");
                                     string Email = csPerson.getText("Email");
                                     if (Email == LastEmail) {
-                                        string PeopleName = MetaController.getRecordName(core, "people", PeopleID);
+                                        string PeopleName = MetadataController.getRecordName(core, "people", PeopleID);
                                         if (string.IsNullOrEmpty(PeopleName)) {
                                             PeopleName = "user #" + PeopleID;
                                         }

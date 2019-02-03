@@ -35,12 +35,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static TemplateDomainRuleModel addDefault(CoreController core, Domain.MetaModel metaData) {
+        public static TemplateDomainRuleModel addDefault(CoreController core, Domain.ContentMetadataModel metaData) {
             return addDefault<TemplateDomainRuleModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static TemplateDomainRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+        public static TemplateDomainRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetadataModel metaData) {
             return addDefault<TemplateDomainRuleModel>(core, metaData, ref callersCacheNameList);
         }
         //

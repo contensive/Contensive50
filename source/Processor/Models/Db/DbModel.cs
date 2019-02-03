@@ -242,7 +242,7 @@ namespace Contensive.Processor.Models.Db {
         /// <typeparam name="T"></typeparam>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static T addDefault<T>(CoreController core, Domain.MetaModel metaData) where T : DbModel {
+        public static T addDefault<T>(CoreController core, Domain.ContentMetadataModel metaData) where T : DbModel {
             var callersCacheNameList = new List<string>();
             return addDefault<T>(core, metaData, ref callersCacheNameList);
         }
@@ -254,7 +254,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        public static T addDefault<T>(CoreController core, Domain.MetaModel metaData, ref List<string> callersCacheNameList) where T : DbModel {
+        public static T addDefault<T>(CoreController core, Domain.ContentMetadataModel metaData, ref List<string> callersCacheNameList) where T : DbModel {
             T result = default(T);
             try {
                 result = addEmpty<T>(core);
@@ -1110,6 +1110,91 @@ namespace Contensive.Processor.Models.Db {
             if ((core.serverConfig != null) && (core.appConfig != null)) { return false; }
             LogController.handleError(core, new GenericException("Cannot use data models without a valid server and application configuration."));
             return true;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return true if this type contains the field specified
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        public static bool containsField<T>(string fieldName) {
+            foreach (PropertyInfo instanceProperty in typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
+                if (instanceProperty.Name.ToLower() == "parentid") { return true; }
+            }
+            return false;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return true if this instance is a parent record of the provided child record, using this table's parentId
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="childRecordId"></param>
+        /// <returns></returns>
+        public bool isParentOf<T>(CoreController core, int childRecordId) {
+            if (id == childRecordId) { return true; }
+            var usedIdList = new List<int>();
+            return isParentOf<T>(core, id, childRecordId, new List<int>());
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return true if the parent record provided is heriarctical parent of hte child record provided.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="parentRecordId"></param>
+        /// <param name="childRecordId"></param>
+        /// <param name="childIdList"></param>
+        public static bool isParentOf<T>(CoreController core, int parentRecordId, int childRecordId, List<int> childIdList) {
+            if (parentRecordId == childRecordId) return true;
+            if (!containsField<T>("parentid")) { return false; }
+            if (childIdList.Contains(childRecordId)) { return false; }
+            using (var csData = new CsModel(core)) {
+                if (csData.openSql("select parentId from ccpagecontent where id=" + childRecordId)) {
+                    childIdList.Add(parentRecordId);
+                    return isParentOf<T>(core, parentRecordId, csData.getInteger("parentid"), childIdList);
+                }
+                return false;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return true if this instance is the child record of the provided parentid. (the parentid record is in the parent hierarchy)
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="parentRecordId"></param>
+        /// <returns></returns>
+        public bool isChildOf<T>(CoreController core, int parentRecordId) {
+            if (id == parentRecordId) { return true; }
+            var usedIdList = new List<int>();
+            return isChildOf<T>(core, id, parentRecordId, new List<int>());
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return true if the parent record provided is heriarctical parent of hte child record provided.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="parentRecordId"></param>
+        /// <param name="childRecordId"></param>
+        /// <param name="parentIdList"></param>
+        public static bool isChildOf<T>(CoreController core, int parentRecordId, int childRecordId, List<int> parentIdList) {
+            if (!containsField<T>("parentid")) { return false; }
+            if (parentIdList.Contains(childRecordId)) { return false; }
+            if (parentRecordId == childRecordId) return true;
+            using (var csData = new CsModel(core)) {
+                if (csData.openSql("select id from ccpagecontent where parentId=" + parentRecordId)) {
+                    parentIdList.Add(parentRecordId);
+                    do {
+                        if (isParentOf<T>(core, csData.getInteger("id"), childRecordId, parentIdList)) { return true; }
+                        csData.goNext();
+                    } while (csData.ok());
+                }
+                return false;
+            }
         }
     }
 }

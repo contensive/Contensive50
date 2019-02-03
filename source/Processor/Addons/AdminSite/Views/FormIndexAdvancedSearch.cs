@@ -25,7 +25,7 @@ namespace Contensive.Addons.AdminSite {
                 FindWordMatchEnum MatchOption = 0;
                 int FormFieldPtr = 0;
                 int FormFieldCnt = 0;
-                MetaModel CDef = null;
+                ContentMetadataModel CDef = null;
                 string FieldName = null;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 int FieldPtr = 0;
@@ -130,7 +130,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- List out all fields
                 //
-                CDef = MetaModel.createByUniqueName(core, adminData.adminContent.name);
+                CDef = ContentMetadataModel.createByUniqueName(core, adminData.adminContent.name);
                 FieldSize = 100;
                 Array.Resize(ref FieldNames, FieldSize + 1);
                 Array.Resize(ref FieldCaption, FieldSize + 1);
@@ -140,8 +140,8 @@ namespace Contensive.Addons.AdminSite {
                 Array.Resize(ref FieldMatchOptions, FieldSize + 1);
                 Array.Resize(ref FieldLookupContentName, FieldSize + 1);
                 Array.Resize(ref FieldLookupList, FieldSize + 1);
-                foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
-                    MetaFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
+                    ContentFieldMetadataModel field = keyValuePair.Value;
                     if (FieldPtr >= FieldSize) {
                         FieldSize = FieldSize + 100;
                         Array.Resize(ref FieldNames, FieldSize + 1);
@@ -161,7 +161,7 @@ namespace Contensive.Addons.AdminSite {
                     if (fieldTypeId[FieldPtr] == CPContentBaseClass.fileTypeIdEnum.Lookup) {
                         ContentID = field.lookupContentID;
                         if (ContentID > 0) {
-                            FieldLookupContentName[FieldPtr] = MetaController.getContentNameByID(core, ContentID);
+                            FieldLookupContentName[FieldPtr] = MetadataController.getContentNameByID(core, ContentID);
                         }
                         FieldLookupList[FieldPtr] = field.lookupList;
                     }

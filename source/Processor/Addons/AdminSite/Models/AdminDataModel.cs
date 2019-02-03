@@ -20,7 +20,7 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// the content metadata being edited
         /// </summary>
-        public MetaModel adminContent { get; set; }
+        public ContentMetadataModel adminContent { get; set; }
         /// <summary>
         /// the record being edited
         /// </summary>
@@ -383,7 +383,7 @@ namespace Contensive.Addons.AdminSite {
             try {
                 if (core.session.isAuthenticatedAdmin(core)) { return true; }
                 //
-                MetaModel cdef = MetaModel.create(core, ContentID);
+                ContentMetadataModel cdef = ContentMetadataModel.create(core, ContentID);
                 if (cdef != null) {
                     return core.session.isAuthenticatedContentManager(core, cdef.name);
                 }
@@ -435,16 +435,16 @@ namespace Contensive.Addons.AdminSite {
                 // adminContext.content init
                 requestedContentId = core.docProperties.getInteger("cid");
                 if (requestedContentId != 0) {
-                    adminContent = MetaModel.create(core, requestedContentId);
+                    adminContent = ContentMetadataModel.create(core, requestedContentId);
                     if (adminContent == null) {
-                        adminContent = new MetaModel();
+                        adminContent = new ContentMetadataModel();
                         adminContent.id = 0;
                         Processor.Controllers.ErrorController.addUserError(core, "There is no content with the requested id [" + requestedContentId + "]");
                         requestedContentId = 0;
                     }
                 }
                 if (adminContent == null) {
-                    adminContent = new MetaModel();
+                    adminContent = new ContentMetadataModel();
                 }
                 //
                 // determine user rights to this content
@@ -472,7 +472,7 @@ namespace Contensive.Addons.AdminSite {
                             int recordContentId = csData.getInteger("contentControlId");
                             //adminContent.id = csData.csGetInteger("contentControlId");
                             if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
-                                adminContent = MetaModel.create(core, recordContentId);
+                                adminContent = ContentMetadataModel.create(core, recordContentId);
                             }
                         }
                         csData.close();
@@ -783,7 +783,7 @@ namespace Contensive.Addons.AdminSite {
                 int Ptr = 0;
                 string defaultValue = null;
                 EditRecordFieldClass editRecordField = null;
-                MetaFieldModel field = null;
+                ContentFieldMetadataModel field = null;
                 editRecord.active = true;
                 editRecord.contentControlId = adminContent.id;
                 editRecord.contentControlId_Name = adminContent.name;
@@ -827,9 +827,9 @@ namespace Contensive.Addons.AdminSite {
                                         editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
                                     } else {
                                         if (field.lookupContentID != 0) {
-                                            LookupContentName = MetaController.getContentNameByID(core, field.lookupContentID);
+                                            LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentID);
                                             if (!string.IsNullOrEmpty(LookupContentName)) {
-                                                editRecord.fieldsLc[field.nameLc].value = MetaController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText);
+                                                editRecord.fieldsLc[field.nameLc].value = MetadataController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText);
                                             }
                                         } else if (field.lookupList != "") {
                                             UCaseDefaultValueText = GenericController.vbUCase(DefaultValueText);
@@ -894,7 +894,7 @@ namespace Contensive.Addons.AdminSite {
                 // todo refactor out
                 string DefaultValueText = null;
                 foreach (var keyValuePair in adminContent.fields) {
-                    MetaFieldModel field = keyValuePair.Value;
+                    ContentFieldMetadataModel field = keyValuePair.Value;
                     DefaultValueText = getWherePairValue(field.nameLc);
                     if (field.active & (!string.IsNullOrEmpty(DefaultValueText))) {
                         switch (field.fieldTypeId) {
@@ -1014,7 +1014,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             NullVariant = null;
                             foreach (var keyValuePair in adminContent.fields) {
-                                MetaFieldModel adminContentcontent = keyValuePair.Value;
+                                ContentFieldMetadataModel adminContentcontent = keyValuePair.Value;
                                 string fieldNameLc = adminContentcontent.nameLc;
                                 EditRecordFieldClass editRecordField = null;
                                 //
@@ -1117,7 +1117,7 @@ namespace Contensive.Addons.AdminSite {
                                         if (editRecord.contentControlId.Equals(0)) {
                                             editRecord.contentControlId = adminContent.id;
                                         }
-                                        editRecord.contentControlId_Name = MetaController.getContentNameByID(core, editRecord.contentControlId);
+                                        editRecord.contentControlId_Name = MetadataController.getContentNameByID(core, editRecord.contentControlId);
                                         break;
                                     case "ID":
                                         editRecord.id = csData.getInteger(adminContentcontent.nameLc);
@@ -1197,7 +1197,7 @@ namespace Contensive.Addons.AdminSite {
                     DataSourceModel datasource = DataSourceModel.create(core, adminContent.dataSourceId, ref tmpList);
                     //DataSourceName = core.db.getDataSourceNameByID(adminContext.content.dataSourceId)
                     foreach (var keyValuePair in adminContent.fields) {
-                        MetaFieldModel field = keyValuePair.Value;
+                        ContentFieldMetadataModel field = keyValuePair.Value;
                         LoadEditRecord_RequestField(core, field, datasource.name, FormFieldLcListToBeLoaded, FormEmptyFieldLcList);
                     }
                     //
@@ -1243,7 +1243,7 @@ namespace Contensive.Addons.AdminSite {
         // ====================================================================================================
         //   Read the Form into the fields array
         //
-        public void LoadEditRecord_RequestField(CoreController core, MetaFieldModel field, string ignore, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
+        public void LoadEditRecord_RequestField(CoreController core, ContentFieldMetadataModel field, string ignore, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
             try {
                 // todo
                 if (field.active) {
@@ -1586,7 +1586,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // ----- Do the unique check for this field
                                     //
-                                    string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + MetaController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + MetaController.getContentControlCriteria(core, adminContent.name) + ")";
+                                    string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + MetadataController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + MetadataController.getContentControlCriteria(core, adminContent.name) + ")";
                                     if (editRecord.id > 0) {
                                         //
                                         // --editing record

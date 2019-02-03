@@ -1066,7 +1066,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         public static string getDefaultEditor_LookupContent( CoreController core, string fieldName, int fieldValue, int lookupContentID, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
             string result = "";
             string LookupContentName = "";
-            if (lookupContentID != 0) LookupContentName = GenericController.encodeText(MetaController.getContentNameByID(core, lookupContentID));
+            if (lookupContentID != 0) LookupContentName = GenericController.encodeText(MetadataController.getContentNameByID(core, lookupContentID));
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
@@ -1242,21 +1242,21 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\">" + HtmlController.encodeHtml( recordName ) + "</a>]";
                     }
                 }
-                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + MetaModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
+                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + ContentMetadataModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
             }
             return EditorString;
         }
         //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_manyToMany(CoreController core, MetaFieldModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly = false, string WhyReadOnlyMsg = "" ) {
+        public static string getDefaultEditor_manyToMany(CoreController core, ContentFieldMetadataModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly = false, string WhyReadOnlyMsg = "" ) {
             string result = "";
             //
-            string MTMContent0 =   MetaController.getContentNameByID(core, field.contentId);
-            string MTMContent1 = MetaController.getContentNameByID(core, field.manyToManyContentID);
-            string MTMRuleContent = MetaController.getContentNameByID(core, field.manyToManyRuleContentID);
-            string MTMRuleField0 = field.ManyToManyRulePrimaryField;
-            string MTMRuleField1 = field.ManyToManyRuleSecondaryField;
+            string MTMContent0 =   MetadataController.getContentNameByID(core, field.contentId);
+            string MTMContent1 = MetadataController.getContentNameByID(core, field.manyToManyContentID);
+            string MTMRuleContent = MetadataController.getContentNameByID(core, field.manyToManyRuleContentID);
+            string MTMRuleField0 = field.manyToManyRulePrimaryField;
+            string MTMRuleField1 = field.manyToManyRuleSecondaryField;
             result += core.html.getCheckList(htmlName, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false, false, currentValueCommaList);
             //result += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1);
             result += WhyReadOnlyMsg;
@@ -1471,8 +1471,8 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="core"></param>
         /// <param name="cdef"></param>
         /// <returns></returns>
-        public static string getIconEditAdminLink(CoreController core, MetaModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
-        public static string getIconEditAdminLink(CoreController core, MetaModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(CoreController core, ContentMetadataModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(CoreController core, ContentMetadataModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
         //
         //====================================================================================================
         //
@@ -1559,7 +1559,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         throw (new GenericException("RecordID [" + recordID + "] is invalid"));
                     } else {
                         if (IsEditing) {
-                            var cdef = MetaModel.createByUniqueName(core, contentName);
+                            var cdef = ContentMetadataModel.createByUniqueName(core, contentName);
                             if ( cdef==null) {
                                 throw new GenericException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name.");
                             } else {
@@ -1611,7 +1611,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                                     if (ClipBoardArray.GetUpperBound(0) > 0) {
                                         int ClipboardContentID = GenericController.encodeInteger(ClipBoardArray[0]);
                                         int ClipChildRecordID = GenericController.encodeInteger(ClipBoardArray[1]);
-                                        if (MetaController.isWithinContent(core, ClipboardContentID, content.id)) {
+                                        if (content.isParentOf<ContentModel>(core, ClipboardContentID)) {
                                             int ParentID = 0;
                                             if (GenericController.vbInstr(1, presetNameValueList, "PARENTID=", 1) != 0) {
                                                 //
@@ -1623,7 +1623,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                                                 BufferString = BufferString.Replace(",", "&");
                                                 ParentID = encodeInteger(GenericController.main_GetNameValue_Internal(core, BufferString, "Parentid"));
                                             }
-                                            if ((ParentID != 0) && (!PageContentController.isChildRecord(core, contentName, ParentID, ClipChildRecordID))) {
+                                            if ((ParentID != 0) && (! DbModel.isChildOf<PageContentModel>(core,ParentID,0,new List<int>()))) {
                                                 //
                                                 // Can not paste as child of itself
                                                 //

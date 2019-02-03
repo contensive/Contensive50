@@ -80,7 +80,7 @@ namespace Contensive.Processor.Controllers {
                     if (_language == null) {
                         //
                         // -- add english to the table
-                        _language = LanguageModel.addDefault(core, Models.Domain.MetaModel.createByUniqueName( core, LanguageModel.contentName));
+                        _language = LanguageModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName( core, LanguageModel.contentName));
                         _language.name = "English";
                         _language.http_Accept_Language = "en";
                         _language.save(core);
@@ -625,14 +625,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAuthenticatedContentManager(CoreController core, MetaModel cdef) {
+        public bool isAuthenticatedContentManager(CoreController core, ContentMetadataModel contentMetadata) {
             bool returnIsContentManager = false;
             try {
                 if (core.session.isAuthenticatedAdmin(core)) { return true; }
                 if (!isAuthenticated) { return false; }
                 //
                 // -- for specific Content
-                returnIsContentManager = PermissionController.getUserContentPermissions(core, cdef).allowEdit;
+                returnIsContentManager = PermissionController.getUserContentPermissions(core, contentMetadata).allowEdit;
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 return false;
@@ -660,7 +660,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     //
                     // -- for specific Content
-                    MetaModel cdef = MetaModel.createByUniqueName(core, ContentName);
+                    ContentMetadataModel cdef = ContentMetadataModel.createByUniqueName(core, ContentName);
                     returnIsContentManager = PermissionController.getUserContentPermissions(core, cdef).allowEdit;
                 }
             } catch (Exception ex) {
@@ -723,7 +723,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.addSiteActivity(core, "logout", user.id, user.organizationID);
                 //
                 // new guest
-                user = PersonModel.addDefault(core, MetaModel.createByUniqueName( core, PersonModel.contentName));
+                user = PersonModel.addDefault(core, ContentMetadataModel.createByUniqueName( core, PersonModel.contentName));
                 visit.memberID = user.id;
                 visit.visitAuthenticated = false;
                 visit.save(core);
@@ -1027,7 +1027,11 @@ namespace Contensive.Processor.Controllers {
         //========================================================================
         //
         public bool isAuthenticatedMember(CoreController core) {
-            return visit.visitAuthenticated & (MetaController.isWithinContent(core, user.contentControlID, MetaModel.getContentId(core, "members")));
+            var userPeopleMetadata = ContentMetadataModel.create(core, user.contentControlID);
+            if (userPeopleMetadata == null) { return false; }
+            if (userPeopleMetadata.name.ToLower() == "members") { return true; }
+            var memberMetadata = ContentMetadataModel.createByUniqueName(core, "members");
+            return (memberMetadata.isParentOf(core, userPeopleMetadata.id));
         }
         //
         //========================================================================
@@ -1084,7 +1088,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.visitProperty.getBoolean("AllowEditing") || core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                             if (!string.IsNullOrEmpty(contentNameOrId)) {
                                 if (contentNameOrId.IsNumeric()) {
-                                    contentNameOrId = MetaController.getContentNameByID(core, encodeInteger(contentNameOrId));
+                                    contentNameOrId = MetadataController.getContentNameByID(core, encodeInteger(contentNameOrId));
                                 }
                             }
                             result = isAuthenticatedContentManager(core, contentNameOrId);

@@ -492,7 +492,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // forward to a replacement domain
                         //
-                        string forwardDomain = MetaController.getRecordName( core,"domains", core.domain.forwardDomainId);
+                        string forwardDomain = MetadataController.getRecordName( core,"domains", core.domain.forwardDomainId);
                         if (!string.IsNullOrEmpty(forwardDomain)) {
                             int pos = requestUrlSource.ToLowerInvariant().IndexOf( requestDomain.ToLowerInvariant() );
                             if (pos > 0) {
@@ -1074,8 +1074,8 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 LinkPrefix = core.webServer.requestContentWatchPrefix;
                                 contentId = csData.getInteger("ContentID");
-                                var contentMeta = MetaModel.create(core, contentId);
-                                contentMeta.name = MetaController.getContentNameByID(core, contentId);
+                                var contentMeta = ContentMetadataModel.create(core, contentId);
+                                contentMeta.name = MetadataController.getContentNameByID(core, contentId);
                                 if (string.IsNullOrEmpty(contentMeta.name)) {
                                     //
                                     // ----- Content Watch with a bad ContentID, mark inactive
@@ -1107,7 +1107,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // ----- if a content watch record is blocked, delete the content tracking
                                     //
-                                    MetaController.deleteContentRules(core, contentMeta, HostRecordID);
+                                    MetadataController.deleteContentRules(core, contentMeta, HostRecordID);
                                 }
                                 break;
                         }

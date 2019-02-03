@@ -48,12 +48,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static NavigatorEntryModel addDefault(CoreController core, Domain.MetaModel metaData) {
+        public static NavigatorEntryModel addDefault(CoreController core, Domain.ContentMetadataModel metaData) {
             return addDefault<NavigatorEntryModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static NavigatorEntryModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+        public static NavigatorEntryModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetadataModel metaData) {
             return addDefault<NavigatorEntryModel>(core, metaData, ref callersCacheNameList);
         }
         //

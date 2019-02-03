@@ -99,7 +99,7 @@ namespace Contensive.Addons.Housekeeping {
                     int DataSourceType = core.db.getDataSourceType();
                     //
                     string DefaultMemberName = "";
-                    int PeopleCID = MetaModel.getContentId(core, "people");
+                    int PeopleCID = ContentMetadataModel.getContentId(core, "people");
                     string SQL = "select defaultvalue from ccfields where name='name' and contentid=(" + PeopleCID + ")";
                     using (var csData = new CsModel(core)) {
                         csData.openSql(SQL, "Default");
@@ -676,13 +676,13 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 DateTime ArchiveEmailDropDate = default(DateTime);
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
-                MetaController.deleteContentRecords(core, "Email drops", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + ")");
+                MetadataController.deleteContentRecords(core, "Email drops", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + ")");
                 //
                 // delete email log entries not realted to a drop, older than archive.
                 //
                 logHousekeeping(core, "Deleting non-drop email logs older then " + EmailDropArchiveAgeDays + " days");
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
-                MetaController.deleteContentRecords(core, "Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + "))");
+                MetadataController.deleteContentRecords(core, "Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + "))");
                 //
                 // block duplicate redirect fields (match contentid+fieldtype+caption)
                 //
@@ -896,7 +896,7 @@ namespace Contensive.Addons.Housekeeping {
                 using (var csData = new CsModel(core)) {
                     csData.openSql(sql);
                     while (csData.ok()) {
-                        MetaController.deleteContentRecord(core, "Group Rules", csData.getInteger("ID"));
+                        MetadataController.deleteContentRecord(core, "Group Rules", csData.getInteger("ID"));
                         csData.goNext();
                     }
                 }
@@ -938,7 +938,7 @@ namespace Contensive.Addons.Housekeeping {
                         + " WHERE (ccContent.ID is null)or(ccContent.Active=0)or(ccContent.Active is null)";
                     csData.openSql(sql);
                     while (csData.ok()) {
-                        MetaController.deleteContentRecord(core, "Content Watch", csData.getInteger("ID"));
+                        MetadataController.deleteContentRecord(core, "Content Watch", csData.getInteger("ID"));
                         csData.goNext();
                     }
                 }
@@ -1126,7 +1126,7 @@ namespace Contensive.Addons.Housekeeping {
                 TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
                 //
-                SQLTablePeople = MetaController.getContentTablename(core, "People");
+                SQLTablePeople = MetadataController.getContentTablename(core, "People");
                 //
                 appName = core.appConfig.name;
                 DeleteBeforeDateSQL = DbController.encodeSQLDate(DeleteBeforeDate);
@@ -1184,7 +1184,7 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 // Set long timeout (30 min) needed for heavy work on big tables
                 core.db.sqlCommandTimeout = 1800;
-                string SQLTablePeople = MetaController.getContentTablename(core, "People");
+                string SQLTablePeople = MetadataController.getContentTablename(core, "People");
                 string DeleteBeforeDateSQL = DbController.encodeSQLDate(DeleteBeforeDate);
                 //
                 logHousekeeping(core, "Deleting members with  LastVisit before DeleteBeforeDate [" + DeleteBeforeDate + "], exactly one total visit, a null username and a null email address.");
@@ -1736,7 +1736,7 @@ namespace Contensive.Addons.Housekeeping {
                                             hint = 11;
                                             string PageName = "";
                                             if (string.IsNullOrEmpty(PageTitle)) {
-                                                PageName = MetaController.getRecordName(core, "page content", PageID);
+                                                PageName = MetadataController.getRecordName(core, "page content", PageID);
                                                 csPVS.set("name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageName);
                                                 csPVS.set("PageTitle", PageName);
                                             } else {

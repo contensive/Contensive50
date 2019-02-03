@@ -489,7 +489,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="recordCnt"></param>
         /// <param name="ContentAccessLimitMessage"></param>
         /// <returns></returns>
-        public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, MetaModel content, int recordCnt, string ContentAccessLimitMessage) {
+        public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, ContentMetadataModel content, int recordCnt, string ContentAccessLimitMessage) {
             //
             // ----- TitleBar
             //
@@ -517,7 +517,7 @@ namespace Contensive.Addons.AdminSite {
             foreach (var kvp in IndexConfig.findWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
-                    var fieldMeta = MetaModel.getField(core, content, findWord.Name);
+                    var fieldMeta = ContentMetadataModel.getField(core, content, findWord.Name);
                     string FieldCaption = fieldMeta.caption;
                     switch (findWord.MatchOption) {
                         case FindWordMatchEnum.MatchEmpty:
@@ -549,7 +549,7 @@ namespace Contensive.Addons.AdminSite {
                 }
             }
             if (IndexConfig.subCDefID > 0) {
-                string ContentName = MetaController.getContentNameByID(core, IndexConfig.subCDefID);
+                string ContentName = MetadataController.getContentNameByID(core, IndexConfig.subCDefID);
                 if (!string.IsNullOrEmpty(ContentName)) {
                     filterLine = filterLine + ", in Sub-content '" + ContentName + "'";
                 }
@@ -714,7 +714,7 @@ namespace Contensive.Addons.AdminSite {
                                                     if (IndexConfig.findWords.ContainsKey(FindName)) {
                                                         IndexConfig.findWords[FindName].Value = FindValue;
                                                     } else {
-                                                        MetaFieldModel field = adminData.adminContent.fields[FindName.ToLowerInvariant()];
+                                                        ContentFieldMetadataModel field = adminData.adminContent.fields[FindName.ToLowerInvariant()];
                                                         var findWord = new IndexConfigClass.IndexConfigFindWordClass {
                                                             Name = FindName,
                                                             Value = FindValue
@@ -972,14 +972,12 @@ namespace Contensive.Addons.AdminSite {
                 string SubQuery = null;
                 int GroupID = 0;
                 string GroupName = null;
-                string JoinTablename = null;
                 //Dim FieldName As String
                 int Ptr = 0;
                 bool IncludedInLeftJoin = false;
                 //  Dim SupportWorkflowFields As Boolean
                 int FieldPtr = 0;
                 bool IncludedInColumns = false;
-                string LookupContentName = null;
                 //Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
                 //
                 Return_AllowAccess = true;
@@ -991,8 +989,8 @@ namespace Contensive.Addons.AdminSite {
                 // ----- From Clause - build joins for Lookup fields in columns, in the findwords, and in sorts
                 //
                 return_sqlFrom = adminData.adminContent.tableName;
-                foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
-                    MetaFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
+                    ContentFieldMetadataModel field = keyValuePair.Value;
                     FieldPtr = field.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                     IncludedInColumns = false;
                     IncludedInLeftJoin = false;
@@ -1028,16 +1026,6 @@ namespace Contensive.Addons.AdminSite {
                     if ((field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.MemberSelect) || ((field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Lookup) && (field.lookupContentID != 0))) {
                         //
                         // This is a lookup field -- test if IncludedInLeftJoins
-                        //
-                        JoinTablename = "";
-                        if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.MemberSelect) {
-                            LookupContentName = "people";
-                        } else {
-                            LookupContentName = MetaController.getContentNameByID(core, field.lookupContentID);
-                        }
-                        if (!string.IsNullOrEmpty(LookupContentName)) {
-                            JoinTablename = MetaController.getContentTablename(core, LookupContentName);
-                        }
                         IncludedInLeftJoin = IncludedInColumns;
                         if (IndexConfig.findWords.Count > 0) {
                             //
@@ -1060,15 +1048,20 @@ namespace Contensive.Addons.AdminSite {
                         if (IncludedInLeftJoin) {
                             //
                             // include this lookup field
-                            //
-                            FieldUsedInColumns[field.nameLc] = true;
-                            if (!string.IsNullOrEmpty(JoinTablename)) {
+                            ContentMetadataModel lookupContentMetadata = null;
+                            if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.MemberSelect) {
+                                lookupContentMetadata = ContentMetadataModel.createByUniqueName(core, "people");
+                            } else {
+                                lookupContentMetadata = ContentMetadataModel.create(core, field.lookupContentID);
+                            }
+                            if (lookupContentMetadata != null) {
+                                FieldUsedInColumns[field.nameLc] = true;
                                 IsLookupFieldValid[field.nameLc] = true;
                                 return_sqlFieldList = return_sqlFieldList + ", LookupTable" + FieldPtr + ".Name AS LookupTable" + FieldPtr + "Name";
-                                return_sqlFrom = "(" + return_sqlFrom + " LEFT JOIN " + JoinTablename + " AS LookupTable" + FieldPtr + " ON " + adminData.adminContent.tableName + "." + field.nameLc + " = LookupTable" + FieldPtr + ".ID)";
+                                return_sqlFrom = "(" + return_sqlFrom + " LEFT JOIN " + lookupContentMetadata.tableName + " AS LookupTable" + FieldPtr + " ON " + adminData.adminContent.tableName + "." + field.nameLc + " = LookupTable" + FieldPtr + ".ID)";
                             }
-                            //End If
                         }
+                        //
                     }
                     if (IncludedInColumns) {
                         //
@@ -1082,8 +1075,8 @@ namespace Contensive.Addons.AdminSite {
                 // Sub CDef filter
                 //
                 if (IndexConfig.subCDefID > 0) {
-                    ContentName = MetaController.getContentNameByID(core, IndexConfig.subCDefID);
-                    return_SQLWhere += "AND(" + MetaController.getContentControlCriteria(core, ContentName) + ")";
+                    ContentName = MetadataController.getContentNameByID(core, IndexConfig.subCDefID);
+                    return_SQLWhere += "AND(" + MetadataController.getContentControlCriteria(core, ContentName) + ")";
                 }
                 //
                 // Return_sqlFrom and Where Clause for Groups filter
@@ -1095,7 +1088,7 @@ namespace Contensive.Addons.AdminSite {
                         for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
                             GroupName = IndexConfig.groupList[Ptr];
                             if (!string.IsNullOrEmpty(GroupName)) {
-                                GroupID = MetaController.getRecordIdByUniqueName( core,"Groups", GroupName);
+                                GroupID = MetadataController.getRecordIdByUniqueName( core,"Groups", GroupName);
                                 if (GroupID == 0 && GroupName.IsNumeric()) {
                                     GroupID = GenericController.encodeInteger(GroupName);
                                 }
@@ -1121,7 +1114,8 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // This person can see all the records
                     //
-                    return_SQLWhere += "AND(" + MetaController.getContentControlCriteria(core, adminData.adminContent.name) + ")";
+                    return_SQLWhere += "AND(" + adminData.adminContent.legacyContentControlCriteria + ")";
+                    //return_SQLWhere += "AND(" + MetadataController.getContentControlCriteria(core, adminData.adminContent.name) + ")";
                 } else {
                     //
                     // Limit the Query to what they can see
@@ -1144,7 +1138,7 @@ namespace Contensive.Addons.AdminSite {
                                     ContentID = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
                                     if (ContentID > 0 && (ContentID != adminData.adminContent.id) & AdminDataModel.userHasContentAccess(core, ContentID)) {
                                         SubQuery = SubQuery + "OR(" + adminData.adminContent.tableName + ".ContentControlID=" + ContentID + ")";
-                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + MetaController.getContentNameByID(core, ContentID) + "</a>'";
+                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + MetadataController.getContentNameByID(core, ContentID) + "</a>'";
                                         SubContactList += "," + ContentID;
                                         SubContentCnt = SubContentCnt + 1;
                                     }
@@ -1202,8 +1196,8 @@ namespace Contensive.Addons.AdminSite {
                         // Verify that the fieldname called out is in this table
                         //
                         if (adminData.adminContent.fields.Count > 0) {
-                            foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
-                                MetaFieldModel field = keyValuePair.Value;
+                            foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
+                                ContentFieldMetadataModel field = keyValuePair.Value;
                                 if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(adminData.WherePair[0, WCount])) {
                                     //
                                     // found it, add it in the sql
@@ -1234,8 +1228,8 @@ namespace Contensive.Addons.AdminSite {
                             // Get FieldType
                             //
                             if (adminData.adminContent.fields.Count > 0) {
-                                foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
-                                    MetaFieldModel field = keyValuePair.Value;
+                                foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
+                                    ContentFieldMetadataModel field = keyValuePair.Value;
                                     // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                                     FieldPtr = field.id;
                                     if (GenericController.vbLCase(field.nameLc) == FindWordName) {
@@ -1491,7 +1485,6 @@ namespace Contensive.Addons.AdminSite {
             string returnContent = "";
             try {
                 var IndexConfig = IndexConfigClass.get(core, adminData);
-                string ContentName = MetaController.getContentNameByID(core, adminData.adminContent.id);
                 string RQS = "cid=" + adminData.adminContent.id + "&af=1";
                 string Link = string.Empty;
                 string QS = string.Empty;
@@ -1544,7 +1537,7 @@ namespace Contensive.Addons.AdminSite {
                     string SubContentName = null;
                     SubFilterList = "";
                     if (IndexConfig.subCDefID > 0) {
-                        SubContentName = MetaController.getContentNameByID(core, IndexConfig.subCDefID);
+                        SubContentName = MetadataController.getContentNameByID(core, IndexConfig.subCDefID);
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveCDef", encodeText(IndexConfig.subCDefID));
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1683,9 +1676,8 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // people filters
                 //
-                string TableName = MetaController.getContentTablename(core, ContentName);
                 SubFilterList = "";
-                if (GenericController.vbLCase(TableName) == GenericController.vbLCase("ccMembers")) {
+                if (adminData.adminContent.tableName.ToLower() == GenericController.vbLCase("ccmembers")) {
                     using (var csData = new CsModel(core)) {
                         csData.openSql(core.db.getSQLSelect( "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
                         while (csData.ok()) {

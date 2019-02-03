@@ -53,12 +53,12 @@ namespace Contensive.Processor.Models.Db {
         public int resultDownloadId { get; set; }
         //
         //====================================================================================================
-        public static TaskModel addDefault(CoreController core, Domain.MetaModel metaData) {
+        public static TaskModel addDefault(CoreController core, Domain.ContentMetadataModel metaData) {
             return addDefault<TaskModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static TaskModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+        public static TaskModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetadataModel metaData) {
             return addDefault<TaskModel>(core, metaData, ref callersCacheNameList);
         }
         //

@@ -85,11 +85,11 @@ namespace Contensive.Addons.Tools {
                     if (string.IsNullOrEmpty(ContentName)) {
                         Stream.Add("Select a content before submitting. Fields were not changed.");
                     } else {
-                        int ContentID = MetaModel.getContentId(core, ContentName);
+                        int ContentID = ContentMetadataModel.getContentId(core, ContentName);
                         if (ContentID == 0) {
                             Stream.Add("GetContentID failed. Fields were not changed.");
                         } else {
-                            MetaController.deleteContentRecords(core, "Content Fields", "ContentID=" + DbController.encodeSQLNumber(ContentID));
+                            MetadataController.deleteContentRecords(core, "Content Fields", "ContentID=" + DbController.encodeSQLNumber(ContentID));
                             //
                             // todo -- looks like the tool code did not come with the migration ?
                             //

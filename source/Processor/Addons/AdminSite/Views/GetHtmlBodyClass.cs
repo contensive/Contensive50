@@ -292,7 +292,7 @@ namespace Contensive.Addons.AdminSite {
                         } else if (adminData.AdminForm == AdminFormDownloads) {
                             adminBody = (ToolDownloads.GetForm_Downloads(cp.core));
                         } else if (adminData.AdminForm == AdminformRSSControl) {
-                            adminBody = cp.core.webServer.redirect("?cid=" + MetaModel.getContentId(cp.core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
+                            adminBody = cp.core.webServer.redirect("?cid=" + ContentMetadataModel.getContentId(cp.core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
                         } else if (adminData.AdminForm == AdminFormImportWizard) {
                             adminBody = cp.core.addon.execute(addonGuidImportWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
@@ -422,9 +422,7 @@ namespace Contensive.Addons.AdminSite {
                             AddonName = csData.getText("Name");
                             AddonHelpCopy = csData.getText("help");
                             AddonDateAdded = csData.getDate("dateadded");
-                            if (MetaController.isContentFieldSupported(cp.core, Processor.Models.Db.AddonModel.contentName, "lastupdated")) {
-                                AddonLastUpdated = csData.getDate("lastupdated");
-                            }
+                            AddonLastUpdated = csData.getDate("lastupdated");
                             if (AddonLastUpdated == DateTime.MinValue) {
                                 AddonLastUpdated = AddonDateAdded;
                             }
@@ -502,12 +500,8 @@ namespace Contensive.Addons.AdminSite {
                             Collectionname = csData.getText("Name");
                             CollectionHelpCopy = csData.getText("help");
                             CollectionDateAdded = csData.getDate("dateadded");
-                            if (MetaController.isContentFieldSupported(cp.core, "Add-on Collections", "lastupdated")) {
-                                CollectionLastUpdated = csData.getDate("lastupdated");
-                            }
-                            if (MetaController.isContentFieldSupported(cp.core, "Add-on Collections", "helplink")) {
-                                CollectionHelpLink = csData.getText("helplink");
-                            }
+                            CollectionLastUpdated = csData.getDate("lastupdated");
+                            CollectionHelpLink = csData.getText("helplink");
                             if (CollectionLastUpdated == DateTime.MinValue) {
                                 CollectionLastUpdated = CollectionDateAdded;
                             }
@@ -714,24 +708,20 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.LoadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
                                         cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
-                                        if (!(cp.core.doc.debug_iUserError != "")) {
-                                            if (!MetaController.isWithinContent(cp.core, adminData.editRecord.contentControlId, MetaModel.getContentId(cp.core, "Group Email"))) {
-                                                Processor.Controllers.ErrorController.addUserError(cp.core, "The send action only supports Group Email.");
-                                            } else {
-                                                using (var csData = new CsModel(cp.core)) {
-                                                    csData.openRecord("Group Email", adminData.editRecord.id);
-                                                    if (!csData.ok()) {
-                                                        //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" &  adminContext.editRecord.id & "] could not be found in Group Email.")
-                                                    } else if (csData.getText("FromAddress") == "") {
-                                                        Processor.Controllers.ErrorController.addUserError(cp.core, "A 'From Address' is required before sending an email.");
-                                                    } else if (csData.getText("Subject") == "") {
-                                                        Processor.Controllers.ErrorController.addUserError(cp.core, "A 'Subject' is required before sending an email.");
-                                                    } else {
-                                                        csData.set("submitted", true);
-                                                        csData.set("ConditionID", 0);
-                                                        if (csData.getDate("ScheduleDate") == DateTime.MinValue) {
-                                                            csData.set("ScheduleDate", cp.core.doc.profileStartTime);
-                                                        }
+                                        if (string.IsNullOrEmpty(cp.core.doc.debug_iUserError)) {
+                                            using (var csData = new CsModel(cp.core)) {
+                                                csData.openRecord("Group Email", adminData.editRecord.id);
+                                                if (!csData.ok()) {
+                                                    //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" &  adminContext.editRecord.id & "] could not be found in Group Email.")
+                                                } else if (csData.getText("FromAddress") == "") {
+                                                    Processor.Controllers.ErrorController.addUserError(cp.core, "A 'From Address' is required before sending an email.");
+                                                } else if (csData.getText("Subject") == "") {
+                                                    Processor.Controllers.ErrorController.addUserError(cp.core, "A 'Subject' is required before sending an email.");
+                                                } else {
+                                                    csData.set("submitted", true);
+                                                    csData.set("ConditionID", 0);
+                                                    if (csData.getDate("ScheduleDate") == DateTime.MinValue) {
+                                                        csData.set("ScheduleDate", cp.core.doc.profileStartTime);
                                                     }
                                                 }
                                             }
@@ -749,19 +739,10 @@ namespace Contensive.Addons.AdminSite {
                                     } else {
                                         // no save, page was read only - Call ProcessActionSave
                                         adminData.LoadEditRecord(cp.core);
-                                        if (!(cp.core.doc.debug_iUserError != "")) {
-                                            if (!MetaController.isWithinContent(cp.core, adminData.editRecord.contentControlId, MetaModel.getContentId(cp.core, "Conditional Email"))) {
-                                                Processor.Controllers.ErrorController.addUserError(cp.core, "The deactivate action only supports Conditional Email.");
-                                            } else {
-                                                using (var csData = new CsModel(cp.core)) {
-                                                    csData.openRecord("Conditional Email", adminData.editRecord.id);
-                                                    if (!csData.ok()) {
-                                                        //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
-                                                    } else {
-                                                        csData.set("submitted", false);
-                                                    }
-                                                    csData.close();
-                                                }
+                                        if (string.IsNullOrEmpty(cp.core.doc.debug_iUserError)) {
+                                            using (var csData = new CsModel(cp.core)) {
+                                                if( csData.openRecord("Conditional Email", adminData.editRecord.id)) {  csData.set("submitted", false); }
+                                                csData.close();
                                             }
                                         }
                                     }
@@ -778,21 +759,17 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.LoadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
                                         cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
-                                        if (!(cp.core.doc.debug_iUserError != "")) {
-                                            if (!MetaController.isWithinContent(cp.core, adminData.editRecord.contentControlId, MetaModel.getContentId(cp.core, "Conditional Email"))) {
-                                                Processor.Controllers.ErrorController.addUserError(cp.core, "The activate action only supports Conditional Email.");
-                                            } else {
-                                                using (var csData = new CsModel(cp.core)) {
-                                                    csData.openRecord("Conditional Email", adminData.editRecord.id);
-                                                    if (!csData.ok()) {
-                                                        //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
-                                                    } else if (csData.getInteger("ConditionID") == 0) {
-                                                        Processor.Controllers.ErrorController.addUserError(cp.core, "A condition must be set.");
-                                                    } else {
-                                                        csData.set("submitted", true);
-                                                        if (csData.getDate("ScheduleDate") == DateTime.MinValue) {
-                                                            csData.set("ScheduleDate", cp.core.doc.profileStartTime);
-                                                        }
+                                        if (string.IsNullOrEmpty(cp.core.doc.debug_iUserError)) {
+                                            using (var csData = new CsModel(cp.core)) {
+                                                csData.openRecord("Conditional Email", adminData.editRecord.id);
+                                                if (!csData.ok()) {
+                                                    //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
+                                                } else if (csData.getInteger("ConditionID") == 0) {
+                                                    Processor.Controllers.ErrorController.addUserError(cp.core, "A condition must be set.");
+                                                } else {
+                                                    csData.set("submitted", true);
+                                                    if (csData.getDate("ScheduleDate") == DateTime.MinValue) {
+                                                        csData.set("ScheduleDate", cp.core.doc.profileStartTime);
                                                     }
                                                 }
                                             }
@@ -845,7 +822,7 @@ namespace Contensive.Addons.AdminSite {
                                                         //
                                                         // non-Workflow Delete
                                                         //
-                                                        ContentName = MetaController.getContentNameByID(cp.core, csData.getInteger("contentControlId"));
+                                                        ContentName = MetadataController.getContentNameByID(cp.core, csData.getInteger("contentControlId"));
                                                         cp.core.cache.invalidateDbRecord(RecordID, adminData.adminContent.tableName);
                                                         cp.core.processAfterSave(true, ContentName, RecordID, "", 0, UseContentWatchLink);
                                                         //
@@ -1328,7 +1305,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             bool fieldChanged = false;
                             foreach (var keyValuePair in adminData.adminContent.fields) {
-                                MetaFieldModel field = keyValuePair.Value;
+                                ContentFieldMetadataModel field = keyValuePair.Value;
                                 EditRecordFieldClass editRecordField = editRecord.fieldsLc[field.nameLc];
                                 object fieldValueObject = editRecordField.value;
                                 string FieldValueText = GenericController.encodeText(fieldValueObject);
@@ -1530,7 +1507,7 @@ namespace Contensive.Addons.AdminSite {
                                                 //MTMRuleContent = CdefController.getContentNameByID(cp.core,.manyToManyRuleContentID)
                                                 //MTMRuleField0 = .ManyToManyRulePrimaryField
                                                 //MTMRuleField1 = .ManyToManyRuleSecondaryField
-                                                cp.core.html.processCheckList("field" + field.id, MetaController.getContentNameByID(cp.core, field.contentId), encodeText(editRecord.id), MetaController.getContentNameByID(cp.core, field.manyToManyContentID), MetaController.getContentNameByID(cp.core, field.manyToManyRuleContentID), field.ManyToManyRulePrimaryField, field.ManyToManyRuleSecondaryField);
+                                                cp.core.html.processCheckList("field" + field.id, MetadataController.getContentNameByID(cp.core, field.contentId), encodeText(editRecord.id), MetadataController.getContentNameByID(cp.core, field.manyToManyContentID), MetadataController.getContentNameByID(cp.core, field.manyToManyRuleContentID), field.manyToManyRulePrimaryField, field.manyToManyRuleSecondaryField);
                                                 break;
                                             }
                                         default: {
@@ -1586,9 +1563,9 @@ namespace Contensive.Addons.AdminSite {
                                 // -- clear cache
                                 string tableName = "";
                                 if (editRecord.contentControlId == 0) {
-                                    tableName = MetaController.getContentTablename(cp.core, adminData.adminContent.name);
+                                    tableName = MetadataController.getContentTablename(cp.core, adminData.adminContent.name);
                                 } else {
-                                    tableName = MetaController.getContentTablename(cp.core, editRecord.contentControlId_Name);
+                                    tableName = MetadataController.getContentTablename(cp.core, editRecord.contentControlId_Name);
                                 }
                                 //todo  NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
                                 //							Select Case tableName.ToLowerInvariant()
@@ -1620,9 +1597,9 @@ namespace Contensive.Addons.AdminSite {
                             // ----- if admin content is changed, reload the adminContext.content data in case this is a save, and not an OK
                             //
                             if (recordChanged && SaveCCIDValue != 0) {
-                                MetaController.setContentControlId(cp.core, adminData.adminContent, editRecord.id, SaveCCIDValue);
-                                editRecord.contentControlId_Name = MetaController.getContentNameByID(cp.core, SaveCCIDValue);
-                                adminData.adminContent = MetaModel.createByUniqueName(cp.core, editRecord.contentControlId_Name);
+                                MetadataController.setContentControlId(cp.core, adminData.adminContent, editRecord.id, SaveCCIDValue);
+                                editRecord.contentControlId_Name = MetadataController.getContentNameByID(cp.core, SaveCCIDValue);
+                                adminData.adminContent = ContentMetadataModel.createByUniqueName(cp.core, editRecord.contentControlId_Name);
                                 adminData.adminContent.id = adminData.adminContent.id;
                                 adminData.adminContent.name = adminData.adminContent.name;
                             }
@@ -1696,7 +1673,7 @@ namespace Contensive.Addons.AdminSite {
                 Criteria = "(Active<>0)";
                 if (!string.IsNullOrEmpty(MenuContentName)) {
                     //ContentControlCriteria = cp.core.csv_GetContentControlCriteria(MenuContentName)
-                    Criteria = Criteria + "AND" + MetaController.getContentControlCriteria(cp.core, MenuContentName);
+                    Criteria = Criteria + "AND" + MetadataController.getContentControlCriteria(cp.core, MenuContentName);
                 }
                 iParentCriteria = GenericController.encodeEmpty(ParentCriteria, "");
                 if (cp.core.session.isAuthenticatedDeveloper(cp.core)) {
@@ -1720,7 +1697,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     string CMCriteria = null;
 
-                    editableCdefIdList = MetaController.getEditableMetaDataIdList(cp.core);
+                    editableCdefIdList = MetadataController.getEditableMetaDataIdList(cp.core);
                     if (editableCdefIdList.Count == 0) {
                         CMCriteria = "(1=0)";
                     } else if (editableCdefIdList.Count == 1) {
@@ -1833,12 +1810,12 @@ namespace Contensive.Addons.AdminSite {
                                 case ButtonCancel:
                                     adminData.Admin_Action = Constants.AdminActionNop;
                                     adminData.AdminForm = AdminFormRoot;
-                                    adminData.adminContent = new MetaModel();
+                                    adminData.adminContent = new ContentMetadataModel();
                                     break;
                                 case ButtonClose:
                                     adminData.Admin_Action = Constants.AdminActionNop;
                                     adminData.AdminForm = AdminFormRoot;
-                                    adminData.adminContent = new MetaModel();
+                                    adminData.adminContent = new ContentMetadataModel();
                                     break;
                                 case ButtonAdd:
                                     adminData.Admin_Action = Constants.AdminActionNop;
@@ -2290,8 +2267,8 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // block fields that must be unique
                                 //
-                                foreach (KeyValuePair<string, Contensive.Processor.Models.Domain.MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
-                                    MetaFieldModel field = keyValuePair.Value;
+                                foreach (KeyValuePair<string, Contensive.Processor.Models.Domain.ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
+                                    ContentFieldMetadataModel field = keyValuePair.Value;
                                     if (GenericController.vbLCase(field.nameLc) == "email") {
                                         if ((adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") && (GenericController.encodeBoolean(cp.core.siteProperties.getBoolean("allowemaillogin", false)))) {
                                             editRecord.fieldsLc[field.nameLc].value = "";
@@ -2445,7 +2422,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         ParentContentID = cp.core.docProperties.getInteger("ParentContentID");
                         if (ParentContentID == 0) {
-                            ParentContentID = MetaModel.getContentId(cp.core, "Page Content");
+                            ParentContentID = ContentMetadataModel.getContentId(cp.core, "Page Content");
                         }
                         AddAdminMenuEntry = true;
                         GroupID = 0;
@@ -2454,7 +2431,7 @@ namespace Contensive.Addons.AdminSite {
                         // Process input
                         //
                         ParentContentID = cp.core.docProperties.getInteger("ParentContentID");
-                        ParentContentName = MetaController.getContentNameByID(cp.core, ParentContentID);
+                        ParentContentName = MetadataController.getContentNameByID(cp.core, ParentContentID);
                         ChildContentName = cp.core.docProperties.getText("ChildContentName");
                         AddAdminMenuEntry = cp.core.docProperties.getBoolean("AddAdminMenuEntry");
                         GroupID = cp.core.docProperties.getInteger("GroupID");
@@ -2469,8 +2446,8 @@ namespace Contensive.Addons.AdminSite {
                             //
                             Description = Description + "<div>&nbsp;</div>"
                                 + "<div>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]</div>";
-                            MetaController.createContentChild(cp.core, ChildContentName, ParentContentName, cp.core.session.user.id);
-                            ChildContentID = MetaModel.getContentId(cp.core, ChildContentName);
+                            MetadataController.createContentChild(cp.core, ChildContentName, ParentContentName, cp.core.session.user.id);
+                            ChildContentID = ContentMetadataModel.getContentId(cp.core, ChildContentName);
                             //
                             // Create Group and Rule
                             //
@@ -2496,7 +2473,7 @@ namespace Contensive.Addons.AdminSite {
                                 using (var csData = new CsModel(cp.core)) {
                                     csData.insert("Group Rules");
                                     if (csData.ok()) {
-                                        Description = Description + "<div>Assigning group [" + MetaController.getRecordName(cp.core, "Groups", GroupID) + "] to edit content [" + ChildContentName + "].</div>";
+                                        Description = Description + "<div>Assigning group [" + MetadataController.getRecordName(cp.core, "Groups", GroupID) + "] to edit content [" + ChildContentName + "].</div>";
                                         csData.set("GroupID", GroupID);
                                         csData.set("ContentID", ChildContentID);
                                     }

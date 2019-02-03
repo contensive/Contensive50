@@ -26,12 +26,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static GroupModel addDefault(CoreController core, Domain.MetaModel metaData) {
+        public static GroupModel addDefault(CoreController core, Domain.ContentMetadataModel metaData) {
             return addDefault<GroupModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static GroupModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+        public static GroupModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetadataModel metaData) {
             return addDefault<GroupModel>(core, metaData, ref callersCacheNameList);
         }
         //
@@ -141,7 +141,7 @@ namespace Contensive.Processor.Models.Db {
                         result.save(core);
                     }
                 } else {
-                    var groupMetaData = Models.Domain.MetaModel.createByUniqueName(core, "groups");
+                    var groupMetaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, "groups");
                     result = Models.Db.GroupModel.addDefault(core, groupMetaData);
                     result.name = groupName;
                     result.caption = groupCaption;

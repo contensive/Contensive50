@@ -88,7 +88,7 @@ namespace Contensive.Addons.AdminSite {
                                 if (RowCnt > 0) {
                                     for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                         if (core.docProperties.getBoolean("Row" + RowPtr)) {
-                                            MetaController.deleteContentRecord(core, "Tasks", core.docProperties.getInteger("RowID" + RowPtr));
+                                            MetadataController.deleteContentRecord(core, "Tasks", core.docProperties.getInteger("RowID" + RowPtr));
                                         }
                                     }
                                 }
@@ -133,9 +133,9 @@ namespace Contensive.Addons.AdminSite {
                                     using (var csData = new CsModel(core)) {
                                         csData.insert("Tasks");
                                         if (csData.ok()) {
-                                            ContentName = MetaController.getContentNameByID(core, ContentID);
-                                            TableName = MetaController.getContentTablename(core, ContentName);
-                                            Criteria = MetaController.getContentControlCriteria(core, ContentName);
+                                            ContentName = MetadataController.getContentNameByID(core, ContentID);
+                                            TableName = MetadataController.getContentTablename(core, ContentName);
+                                            Criteria = MetadataController.getContentControlCriteria(core, ContentName);
                                             Name = "CSV Download, " + ContentName;
                                             Filename = GenericController.vbReplace(ContentName, " ", "") + "_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".csv";
                                             csData.set("Name", Name);
@@ -152,9 +152,9 @@ namespace Contensive.Addons.AdminSite {
                                     using (var csData = new CsModel(core)) {
                                         csData.insert("Tasks");
                                         if (csData.ok()) {
-                                            ContentName = MetaController.getContentNameByID(core, ContentID);
-                                            TableName = MetaController.getContentTablename(core, ContentName);
-                                            Criteria = MetaController.getContentControlCriteria(core, ContentName);
+                                            ContentName = MetadataController.getContentNameByID(core, ContentID);
+                                            TableName = MetadataController.getContentTablename(core, ContentName);
+                                            Criteria = MetadataController.getContentControlCriteria(core, ContentName);
                                             Name = "XML Download, " + ContentName;
                                             Filename = GenericController.vbReplace(ContentName, " ", "") + "_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".xml";
                                             csData.set("Name", Name);

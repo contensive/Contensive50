@@ -272,7 +272,7 @@ namespace Contensive.Processor.Controllers {
                                 } else if ((FieldContentID == ContentID) && (fieldId != LastFieldID)) {
                                     if (IncludeBaseFields || (",id,dateadded,createdby,modifiedby,ContentControlID,CreateKey,ModifiedDate,ccguid,".IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase) == -1)) {
                                         sb.Append("\r\n\t\t<Field");
-                                        string fieldType = MetaController.getFieldTypeNameFromFieldTypeId(core, (CPContentBaseClass.fileTypeIdEnum)encodeInteger(fieldMeta[f_Type, CFieldPtr]));
+                                        string fieldType = Models.Domain.ContentFieldMetadataModel.getFieldTypeNameFromFieldTypeId(core, (CPContentBaseClass.fileTypeIdEnum)encodeInteger(fieldMeta[f_Type, CFieldPtr]));
                                         sb.Append(" Name=\"" + xmlValueText(FieldName) + "\"");
                                         sb.Append(" active=\"" + xmlValueBoolean(fieldMeta[f_Active, CFieldPtr]) + "\"");
                                         sb.Append(" AdminOnly=\"" + xmlValueBoolean(fieldMeta[f_AdminOnly, CFieldPtr]) + "\"");
@@ -326,7 +326,7 @@ namespace Contensive.Processor.Controllers {
                                         RecordID = GenericController.encodeInteger(fieldMeta[f_MemberSelectGroupId, CFieldPtr]);
                                         RecordName = "";
                                         if (RecordID > 0) {
-                                            RecordName = MetaController.getRecordName(core, "groups", RecordID);
+                                            RecordName = MetadataController.getRecordName(core, "groups", RecordID);
                                         }
                                         sb.Append(" MemberSelectGroup=\"" + xmlValueText(fieldMeta[f_MemberSelectGroupId, CFieldPtr]) + "\"");
 
@@ -485,7 +485,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 string appName = core.appConfig.name;
-                int MenuContentID = MetaController.getRecordIdByUniqueName(core, "Content", Processor.Models.Db.NavigatorEntryModel.contentName);
+                int MenuContentID = MetadataController.getRecordIdByUniqueName(core, "Content", Processor.Models.Db.NavigatorEntryModel.contentName);
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 using (DataTable dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')")) {
                     if (dt.Rows.Count > 0) {
@@ -536,7 +536,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string appName = core.appConfig.name;
-                int MenuContentID = MetaController.getRecordIdByUniqueName(core, "Content", Processor.Models.Db.NavigatorEntryModel.contentName);
+                int MenuContentID = MetadataController.getRecordIdByUniqueName(core, "Content", Processor.Models.Db.NavigatorEntryModel.contentName);
                 using (DataTable dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')")) {
                     if (DbController.isDataTableOk(dt)) {
                         foreach (DataRow dr in dt.Rows) {

@@ -33,7 +33,7 @@ namespace Contensive.Processor.Controllers {
                 if (cs.ok()) {
                     remoteKey = getGUIDNaked();
                     cs.set("remotekey", remoteKey);
-                    cs.set("datasourceid", MetaController.getRecordIdByUniqueName(core, "Data Sources", dataSourceName));
+                    cs.set("datasourceid", MetadataController.getRecordIdByUniqueName(core, "Data Sources", dataSourceName));
                     cs.set("sqlquery", SQL);
                     cs.set("maxRows", maxRows);
                     cs.set("dateexpires", DbController.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));

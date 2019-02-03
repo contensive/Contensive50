@@ -79,12 +79,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonModel addDefault(CoreController core, Domain.MetaModel metaData) {
+        public static AddonModel addDefault(CoreController core, Domain.ContentMetadataModel metaData) {
             return addDefault<AddonModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static AddonModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+        public static AddonModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetadataModel metaData) {
             return addDefault<AddonModel>(core, metaData, ref callersCacheNameList);
         }
         //

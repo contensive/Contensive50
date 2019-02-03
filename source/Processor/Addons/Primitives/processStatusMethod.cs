@@ -42,7 +42,7 @@ namespace Contensive.Addons.Primitives {
                     if (TrapID == 0) {
                         //throw new GenericException("Unexpected exception"); // todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
                     } else {
-                        MetaController.deleteContentRecord(core, "Trap Log", TrapID);
+                        MetadataController.deleteContentRecord(core, "Trap Log", TrapID);
                     }
                 }
                 //

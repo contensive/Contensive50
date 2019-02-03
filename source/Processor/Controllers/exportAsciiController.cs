@@ -40,7 +40,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 core.webServer.setResponseContentType("text/plain");
                 core.html.enableOutputBuffer(false);
-                TableName = DbController.getDbObjectTableName(MetaController.getContentTablename(core, iContentName));
+                TableName = DbController.getDbObjectTableName(MetadataController.getContentTablename(core, iContentName));
                 switch (GenericController.vbUCase(TableName)) {
                     case "CCMEMBERS":
                         //

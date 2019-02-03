@@ -246,13 +246,13 @@ namespace Contensive.Processor.Controllers {
         //
         public void sendPublishSubmitNotice(string ContentName, int RecordID, string RecordName) {
             try {
-                Models.Domain.MetaModel CDef = null;
+                Models.Domain.ContentMetadataModel CDef = null;
                 string Copy = null;
                 string Link = null;
                 string FromAddress = null;
                 //
                 FromAddress = core.siteProperties.getText("EmailPublishSubmitFrom", core.siteProperties.emailAdmin);
-                CDef = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
+                CDef = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
                 Link = "/" + core.appConfig.adminRoute + "?af=" + AdminFormPublishing;
                 Copy = Msg_AuthoringSubmittedNotification;
                 Copy = GenericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + HtmlController.encodeHtml(Link) + "\">" + core.webServer.requestDomain + "</a>");
@@ -283,7 +283,7 @@ namespace Contensive.Processor.Controllers {
         public string getContentWatchLinkByName(string ContentName, int RecordID, string DefaultLink = "", bool IncrementClicks = true) {
             string result = "";
             try {
-                string ContentRecordKey = Models.Domain.MetaModel.getContentId(core, GenericController.encodeText(ContentName)) + "." + GenericController.encodeInteger(RecordID);
+                string ContentRecordKey = Models.Domain.ContentMetadataModel.getContentId(core, GenericController.encodeText(ContentName)) + "." + GenericController.encodeInteger(RecordID);
                 result = getContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -486,7 +486,7 @@ namespace Contensive.Processor.Controllers {
         //
         public void verifyRegistrationFormPage(CoreController core) {
             try {
-                MetaController.deleteContentRecords(core, "Form Pages", "name=" + DbController.encodeSQLText("Registration Form"));
+                MetadataController.deleteContentRecords(core, "Form Pages", "name=" + DbController.encodeSQLText("Registration Form"));
                 using (var csData = new CsModel(core)) {
                     if (!csData.open("Form Pages", "name=" + DbController.encodeSQLText("Registration Form"))) {
                         //

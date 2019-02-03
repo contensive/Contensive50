@@ -49,7 +49,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- save the content
                     //
-                    ContentName = MetaController.getContentNameByID(core, ContentID);
+                    ContentName = MetadataController.getContentNameByID(core, ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         using (var csData = new CsModel(core)) {
                             csData.open(ContentName, "ID=" + DbController.encodeSQLNumber(RecordID), "", false);
@@ -82,12 +82,12 @@ namespace Contensive.Processor.Controllers {
             strFieldName = GenericController.encodeText(FieldName);
             //
             EditorPanel = "";
-            ContentID = Models.Domain.MetaModel.getContentId(core, intContentName);
+            ContentID = Models.Domain.ContentMetadataModel.getContentId(core, intContentName);
             if ((ContentID < 1) || (intRecordId < 1) || (string.IsNullOrEmpty(strFieldName))) {
                 PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
                 EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
             } else {
-                intContentName = MetaController.getContentNameByID(core, ContentID);
+                intContentName = MetadataController.getContentNameByID(core, ContentID);
                 if (!string.IsNullOrEmpty(intContentName)) {
                     using (var csData = new CsModel(core)) {
                         csData.open(intContentName, "ID=" + intRecordId);

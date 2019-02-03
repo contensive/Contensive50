@@ -47,7 +47,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// If opened with a content name, this is that content's metadata
         /// </summary>
-        private Models.Domain.MetaModel contentMeta;
+        private Models.Domain.ContentMetadataModel contentMeta;
         /// <summary>
         /// data that needs to be written to the database on the next save
         /// </summary>
@@ -159,7 +159,7 @@ namespace Contensive.Processor {
                 if (destination.contentMeta == null) { throw new ArgumentException("copyRecord requires the source and destination datasets be created from an open or insert, not a sql."); }
                 //
                 foreach (var kvp in contentMeta.fields) {
-                    MetaFieldModel field = kvp.Value;
+                    ContentFieldMetadataModel field = kvp.Value;
                     switch (field.nameLc) {
                         case "id":
                             break;
@@ -262,7 +262,7 @@ namespace Contensive.Processor {
                 using (var db = new DbController(core, contentMeta.dataSourceName)) {
                     db.deleteTableRecord(recordId, contentMeta.tableName);
                 }
-                MetaController.deleteContentRules(core, contentMeta, recordId);
+                MetadataController.deleteContentRules(core, contentMeta, recordId);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -279,14 +279,14 @@ namespace Contensive.Processor {
             try {
                 if (isOpen) { close(); }
                 if (string.IsNullOrEmpty(contentName.Trim())) { throw new ArgumentException("Cannot insert new record because Content name is blank."); }
-                var meta = MetaModel.createByUniqueName(core, contentName);
+                var meta = ContentMetadataModel.createByUniqueName(core, contentName);
                 if (meta == null) { throw new GenericException("Cannot insert new record because Content meta data cannot be found."); }
                 if (meta.id <= 0) { throw new GenericException("Cannot insert new record because Content meta data is not valid."); }
                 //
                 // create default record in Live table
                 SqlFieldListClass sqlList = new SqlFieldListClass();
-                foreach (KeyValuePair<string, Models.Domain.MetaFieldModel> keyValuePair in meta.fields) {
-                    MetaFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, Models.Domain.ContentFieldMetadataModel> keyValuePair in meta.fields) {
+                    ContentFieldMetadataModel field = keyValuePair.Value;
                     if ((!string.IsNullOrEmpty(field.nameLc)) && (!string.IsNullOrEmpty(field.defaultValue))) {
                         switch (field.nameLc) {
                             case "createkey":
@@ -333,9 +333,9 @@ namespace Contensive.Processor {
                                             DefaultValueText = "null";
                                         } else {
                                             if (field.lookupContentID != 0) {
-                                                string LookupContentName = MetaController.getContentNameByID(core, field.lookupContentID);
+                                                string LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentID);
                                                 if (!string.IsNullOrEmpty(LookupContentName)) {
-                                                    DefaultValueText = MetaController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText).ToString();
+                                                    DefaultValueText = MetadataController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText).ToString();
                                                 }
                                             } else if (field.lookupList != "") {
                                                 string UCaseDefaultValueText = GenericController.vbUCase(DefaultValueText);
@@ -748,7 +748,7 @@ namespace Contensive.Processor {
                             //
                             // CS is SQL-based, use the contentname
                             //
-                            TableName = MetaController.getContentTablename(core, contentName);
+                            TableName = MetadataController.getContentTablename(core, contentName);
                         } else {
                             //
                             // no Contentname given
@@ -920,9 +920,9 @@ namespace Contensive.Processor {
                     string ContentName = null;
                     if (this.contentMeta.fields.ContainsKey("id")) {
                         RecordID = GenericController.encodeInteger(getRawData("id"));
-                        ContentName = MetaController.getContentNameByID(core, field.manyToManyRuleContentID);
-                        DbTable = MetaController.getContentTablename(core, ContentName);
-                        using (DataTable dt = core.db.executeQuery("Select " + field.ManyToManyRuleSecondaryField + " from " + DbTable + " where " + field.ManyToManyRulePrimaryField + "=" + RecordID)) {
+                        ContentName = MetadataController.getContentNameByID(core, field.manyToManyRuleContentID);
+                        DbTable = MetadataController.getContentTablename(core, ContentName);
+                        using (DataTable dt = core.db.executeQuery("Select " + field.manyToManyRuleSecondaryField + " from " + DbTable + " where " + field.manyToManyRulePrimaryField + "=" + RecordID)) {
                             if (DbController.isDataTableOk(dt)) {
                                 foreach (DataRow dr in dt.Rows) {
                                     result += "," + dr[0].ToString();
@@ -956,7 +956,7 @@ namespace Contensive.Processor {
                         // -- Lookup
                         if (!rawData.IsNumeric()) { return string.Empty; }
                         if (field.lookupContentID > 0) {
-                            string LookupContentName = MetaController.getContentNameByID(core, field.lookupContentID);
+                            string LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentID);
                             if (!string.IsNullOrEmpty(LookupContentName)) {
                                 //
                                 // -- First try Lookup Content
@@ -983,7 +983,7 @@ namespace Contensive.Processor {
                     case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
                         //
                         // -- member select
-                        if (rawData.IsNumeric()) { return MetaController.getRecordName(core, "people", GenericController.encodeInteger(rawData)); }
+                        if (rawData.IsNumeric()) { return MetadataController.getRecordName(core, "people", GenericController.encodeInteger(rawData)); }
                         return string.Empty;
                     case CPContentBaseClass.fileTypeIdEnum.Currency:
                         //
@@ -1048,7 +1048,7 @@ namespace Contensive.Processor {
                 if (string.IsNullOrEmpty(this.contentMeta.name)) { throw new GenericException("Cannot update a contentset created with invalid meta data."); }
                 string FieldNameLc = fieldName.Trim(' ').ToLowerInvariant();
                 if (!this.contentMeta.fields.ContainsKey(FieldNameLc)) { throw new ArgumentException("The field [" + fieldName + "] could Not be found In content [" + this.contentMeta.name + "]"); }
-                MetaFieldModel field = this.contentMeta.fields[FieldNameLc];
+                ContentFieldMetadataModel field = this.contentMeta.fields[FieldNameLc];
                 string rawValueForDb = fieldValue ?? string.Empty;
                 bool SetNeeded = false;
                 switch (field.fieldTypeId) {
@@ -1287,7 +1287,7 @@ namespace Contensive.Processor {
                             //
                             //recordInactive = (ucaseFieldName == "ACTIVE" && (!GenericController.encodeBoolean(writeCacheValue)));
                             FieldFoundCount += 1;
-                            Models.Domain.MetaFieldModel field = this.contentMeta.fields[fieldName.ToLowerInvariant()];
+                            Models.Domain.ContentFieldMetadataModel field = this.contentMeta.fields[fieldName.ToLowerInvariant()];
                             string SQLSetPair = "";
                             bool FieldReadOnly = field.readOnly;
                             bool FieldAdminAuthorable = ((!field.readOnly) && (!field.notEditable) && (field.authorable));
@@ -1319,7 +1319,7 @@ namespace Contensive.Processor {
                                     if (Copy.Length > 255) {
                                         Copy = Copy.Left(255);
                                     }
-                                    if (field.Scramble) {
+                                    if (field.scramble) {
                                         Copy = TextScramble(core, Copy);
                                     }
                                     SQLSetPair = fieldName + "=" + DbController.encodeSQLText(Copy);
@@ -1380,7 +1380,7 @@ namespace Contensive.Processor {
                                         case CPContentBaseClass.fileTypeIdEnum.ManyToMany:
                                             break;
                                         default:
-                                            SQLCriteriaUnique += "(" + field.nameLc + "=" + MetaController.encodeSQL(writeCacheValue, field.fieldTypeId) + ")";
+                                            SQLCriteriaUnique += "(" + field.nameLc + "=" + MetadataController.encodeSQL(writeCacheValue, field.fieldTypeId) + ")";
                                             break;
                                     }
                                 }
@@ -1626,7 +1626,7 @@ namespace Contensive.Processor {
         public string getRecordEditLink(bool allowCut) {
             try {
                 if (!ok()) { throw (new GenericException("Cannot create edit link because data set is not valid.")); }
-                string ContentName = MetaController.getContentNameByID(core, getInteger("contentcontrolid"));
+                string ContentName = MetadataController.getContentNameByID(core, getInteger("contentcontrolid"));
                 if (!string.IsNullOrEmpty(ContentName)) { return Addons.AdminSite.Controllers.AdminUIController.getRecordEditLink(core, ContentName, getInteger("ID"), allowCut, getText("Name"), core.session.isEditing(ContentName)); }
                 return string.Empty;
             } catch (Exception ex) {
@@ -1855,7 +1855,7 @@ namespace Contensive.Processor {
                 //
                 // -- verify arguments
                 if (string.IsNullOrEmpty(contentName)) { throw new ArgumentException("ContentName cannot be blank"); }
-                var contentMetaData = MetaModel.createByUniqueName(core, contentName);
+                var contentMetaData = ContentMetadataModel.createByUniqueName(core, contentName);
                 if (contentMetaData == null) { throw (new GenericException("No content found For [" + contentName + "]")); }
                 if (contentMetaData.id <= 0) { throw (new GenericException("No content found For [" + contentName + "]")); }
                 if (string.IsNullOrWhiteSpace(contentMetaData.tableName)) { throw (new GenericException("Content metadata [" + contentName + "] does not reference a valid table")); }

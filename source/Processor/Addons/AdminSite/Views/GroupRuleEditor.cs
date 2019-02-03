@@ -90,8 +90,8 @@ namespace Contensive.Addons.AdminSite {
                                     }
                                 }
                                 string relatedButtonList = "";
-                                relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Edit", "?af=4&cid=" + Processor.Models.Domain.MetaModel.getContentId(core, "Groups") + "&id=" + GroupID);
-                                relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Members", "?af=1&cid=" + Processor.Models.Domain.MetaModel.getContentId(core, "people") + "&IndexFilterAddGroup=" + GenericController.encodeURL(GroupName));
+                                relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Edit", "?af=4&cid=" + Processor.Models.Domain.ContentMetadataModel.getContentId(core, "Groups") + "&id=" + GroupID);
+                                relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Members", "?af=1&cid=" + Processor.Models.Domain.ContentMetadataModel.getContentId(core, "people") + "&IndexFilterAddGroup=" + GenericController.encodeURL(GroupName));
                                 //
                                 var row = new GroupRuleEditorRowModel() {
                                     idHidden = HtmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID),
@@ -111,7 +111,7 @@ namespace Contensive.Addons.AdminSite {
                 // -- add a row for group count and Add Group button
                 groupRuleEditor.rowList.Add(new GroupRuleEditorRowModel() {
                     idHidden = HtmlController.inputHidden("MemberRules.RowCount", GroupCount),
-                    checkboxInput = AdminUIController.getButtonPrimaryAnchor("Add Group", "?af=4&cid=" + MetaModel.getContentId(core, "Groups")),
+                    checkboxInput = AdminUIController.getButtonPrimaryAnchor("Add Group", "?af=4&cid=" + ContentMetadataModel.getContentId(core, "Groups")),
                     groupCaption = "",
                     expiresInput = "",
                     relatedButtonList = "",

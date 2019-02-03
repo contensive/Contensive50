@@ -1152,8 +1152,8 @@ namespace Contensive.Processor.Controllers {
                                                         }
                                                         collection.helpLink = CollectionHelpLink;
                                                         //
-                                                        MetaController.deleteContentRecords(core, "Add-on Collection CDef Rules", "CollectionID=" + collection.id);
-                                                        MetaController.deleteContentRecords(core, "Add-on Collection Parent Rules", "ParentID=" + collection.id);
+                                                        MetadataController.deleteContentRecords(core, "Add-on Collection CDef Rules", "CollectionID=" + collection.id);
+                                                        MetadataController.deleteContentRecords(core, "Add-on Collection Parent Rules", "ParentID=" + collection.id);
                                                         //
                                                         // Store all resource found, new way and compatibility way
                                                         //
@@ -1164,7 +1164,7 @@ namespace Contensive.Processor.Controllers {
                                                         // ----- remove any current navigator nodes installed by the collection previously
                                                         //
                                                         if (collection.id != 0) {
-                                                            MetaController.deleteContentRecords(core, Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + collection.id);
+                                                            MetadataController.deleteContentRecords(core, Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + collection.id);
                                                         }
                                                     }
                                                     //
@@ -1229,7 +1229,7 @@ namespace Contensive.Processor.Controllers {
                                                                             //
                                                                             // setup metadata rule
                                                                             //
-                                                                            int ContentID = MetaModel.getContentId(core, ContentName);
+                                                                            int ContentID = ContentMetadataModel.getContentId(core, ContentName);
                                                                             if (ContentID > 0) {
                                                                                 using (var csData = new CsModel(core)) {
                                                                                     csData.insert("Add-on Collection CDef Rules");
@@ -1279,7 +1279,7 @@ namespace Contensive.Processor.Controllers {
                                                                                         //
                                                                                         // create or update the record
                                                                                         //
-                                                                                        MetaModel metaData = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
+                                                                                        ContentMetadataModel metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
                                                                                         using (var csData = new CsModel(core)) {
                                                                                             if (!string.IsNullOrEmpty(ContentRecordGuid)) {
                                                                                                 csData.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
@@ -1592,7 +1592,7 @@ namespace Contensive.Processor.Controllers {
                                                                             string ContentRecordGuid =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
                                                                             string ContentRecordName =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
                                                                             if ((!string.IsNullOrEmpty(ContentRecordGuid)) || (!string.IsNullOrEmpty(ContentRecordName))) {
-                                                                                MetaModel metaData = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
+                                                                                ContentMetadataModel metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
                                                                                 using (var csData = new CsModel(core)) {
                                                                                     if (!string.IsNullOrEmpty(ContentRecordGuid)) {
                                                                                         csData.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
@@ -1609,7 +1609,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                 CPContentBaseClass.fileTypeIdEnum fieldTypeId = 0;
                                                                                                 int FieldLookupContentID = -1;
                                                                                                 foreach (var keyValuePair in metaData.fields) {
-                                                                                                    Models.Domain.MetaFieldModel field = keyValuePair.Value;
+                                                                                                    Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
                                                                                                     if (GenericController.vbLCase(field.nameLc) == FieldName) {
                                                                                                         fieldTypeId = field.fieldTypeId;
                                                                                                         FieldLookupContentID = field.lookupContentID;
@@ -1630,28 +1630,15 @@ namespace Contensive.Processor.Controllers {
                                                                                                                 //
                                                                                                                 // read in text value, if a guid, use it, otherwise assume name
                                                                                                                 if (FieldLookupContentID != 0) {
-                                                                                                                    string FieldLookupContentName = MetaController.getContentNameByID(core, FieldLookupContentID);
+                                                                                                                    string FieldLookupContentName = MetadataController.getContentNameByID(core, FieldLookupContentID);
                                                                                                                     if (!string.IsNullOrEmpty(FieldLookupContentName)) {
-                                                                                                                        if (isGuid(FieldValue) && MetaController.isContentFieldSupported(core, FieldLookupContentName, "ccguid")) {
-                                                                                                                            //
-                                                                                                                            // Lookup by guid
-                                                                                                                            int fieldLookupId = GenericController.encodeInteger(MetaController.getRecordId(core, FieldLookupContentName, FieldValue));
-                                                                                                                            if (fieldLookupId <= 0) {
-                                                                                                                                return_ErrorMessage = return_ErrorMessage + "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
-                                                                                                                            } else {
-                                                                                                                                csData.set(FieldName, fieldLookupId);
-                                                                                                                            }
+                                                                                                                        //
+                                                                                                                        // Lookup by guid
+                                                                                                                        int fieldLookupId = GenericController.encodeInteger(MetadataController.getRecordId(core, FieldLookupContentName, FieldValue));
+                                                                                                                        if (fieldLookupId <= 0) {
+                                                                                                                            return_ErrorMessage = return_ErrorMessage + "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
                                                                                                                         } else {
-                                                                                                                            //
-                                                                                                                            // lookup by name
-                                                                                                                            if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                                                                                int fieldLookupId = MetaController.getRecordIdByUniqueName(core, FieldLookupContentName, FieldValue);
-                                                                                                                                if (fieldLookupId <= 0) {
-                                                                                                                                    return_ErrorMessage = return_ErrorMessage + "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
-                                                                                                                                } else {
-                                                                                                                                    csData.set(FieldName, fieldLookupId);
-                                                                                                                                }
-                                                                                                                            }
+                                                                                                                            csData.set(FieldName, fieldLookupId);
                                                                                                                         }
                                                                                                                     }
                                                                                                                 } else if (FieldValue.IsNumeric()) {
@@ -2157,8 +2144,8 @@ namespace Contensive.Processor.Controllers {
                             //
                             //Call MetaController.deleteContentRecords(core, "Shared Styles Add-on Rules", "addonid=" & addonId)
                             //Call MetaController.deleteContentRecords(core, "Add-on Scripting Module Rules", "addonid=" & addonId)
-                            MetaController.deleteContentRecords(core, "Add-on Include Rules", "addonid=" + addonId);
-                            MetaController.deleteContentRecords(core, "Add-on Content Trigger Rules", "addonid=" + addonId);
+                            MetadataController.deleteContentRecords(core, "Add-on Include Rules", "addonid=" + addonId);
+                            MetadataController.deleteContentRecords(core, "Add-on Content Trigger Rules", "addonid=" + addonId);
                             //
                             cs.set("collectionid", CollectionID);
                             cs.set(AddonGuidFieldName, addonGuid);
@@ -2198,7 +2185,7 @@ namespace Contensive.Processor.Controllers {
                                                     switch (GenericController.vbLCase(TriggerNode.Name)) {
                                                         case "type":
                                                             fieldType = TriggerNode.InnerText;
-                                                            fieldTypeID = MetaController.getRecordIdByUniqueName(core, "Content Field Types", fieldType);
+                                                            fieldTypeID = MetadataController.getRecordIdByUniqueName(core, "Content Field Types", fieldType);
                                                             if (fieldTypeID > 0) {
                                                                 using (var CS2 = new CsModel(core)) {
                                                                     Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeID + ")";
@@ -2454,7 +2441,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // Bad field name - need to report it somehow
                                                     //
-                                                    LogController.handleError(core, new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + MetaController.getRecordName(core, "add-on collections", CollectionID) + "]"));
+                                                    LogController.handleError(core, new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + MetadataController.getRecordName(core, "add-on collections", CollectionID) + "]"));
                                                 } else {
                                                     cs.set(FieldName, FieldValue);
                                                 }

@@ -23,12 +23,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonIncludeRuleModel addDefault(CoreController core, Domain.MetaModel metaData) {
+        public static AddonIncludeRuleModel addDefault(CoreController core, Domain.ContentMetadataModel metaData) {
             return addDefault<AddonIncludeRuleModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static AddonIncludeRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+        public static AddonIncludeRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetadataModel metaData) {
             return addDefault<AddonIncludeRuleModel>(core, metaData, ref callersCacheNameList);
         }
         //

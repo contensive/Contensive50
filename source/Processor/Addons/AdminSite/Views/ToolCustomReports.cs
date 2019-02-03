@@ -88,7 +88,7 @@ namespace Contensive.Addons.AdminSite {
                                 if (RowCnt > 0) {
                                     for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                         if (core.docProperties.getBoolean("Row" + RowPtr)) {
-                                            MetaController.deleteContentRecord(core, "Custom Reports", core.docProperties.getInteger("RowID" + RowPtr));
+                                            MetadataController.deleteContentRecord(core, "Custom Reports", core.docProperties.getInteger("RowID" + RowPtr));
                                         }
                                     }
                                 }

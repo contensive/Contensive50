@@ -37,12 +37,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LinkForwardModel addDefault(CoreController core, Domain.MetaModel metaData) {
+        public static LinkForwardModel addDefault(CoreController core, Domain.ContentMetadataModel metaData) {
             return addDefault<LinkForwardModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static LinkForwardModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+        public static LinkForwardModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetadataModel metaData) {
             return addDefault<LinkForwardModel>(core, metaData, ref callersCacheNameList);
         }
         //

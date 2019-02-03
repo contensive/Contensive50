@@ -119,7 +119,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 const string MenuNameFPO = "<MenuName>";
                 const string NoneCaptionFPO = "<NoneCaption>";
-                Models.Domain.MetaModel metaData = null;
+                Models.Domain.ContentMetadataModel metaData = null;
                 string ContentControlCriteria = null;
                 string LcaseCriteria = null;
                 bool SelectedFound = false;
@@ -177,7 +177,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // This was commented out -- I really do not know why -- seems like the best way
                     //
-                    metaData = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
+                    metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
                     TableName = metaData.tableName;
                     DataSource = metaData.dataSourceName;
                     ContentControlCriteria = metaData.legacyContentControlCriteria;
@@ -477,7 +477,7 @@ namespace Contensive.Processor.Controllers {
                         // ----- Generate Drop Down Field Names
                         //
                         string DropDownFieldList = "name";
-                        var peopleMetaData = Models.Domain.MetaModel.createByUniqueName(core, "people");
+                        var peopleMetaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, "people");
                         if ( peopleMetaData != null ) DropDownFieldList = peopleMetaData.dropDownFieldList;
                         int DropDownFieldCount = 0;
                         string CharAllowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -1120,15 +1120,15 @@ namespace Contensive.Processor.Controllers {
                 int FieldLookupContentID = 0;
                 int FieldMemberSelectGroupID = 0;
                 string FieldLookupContentName = null;
-                Models.Domain.MetaModel Contentdefinition = null;
+                Models.Domain.ContentMetadataModel Contentdefinition = null;
                 bool FieldHTMLContent = false;
                 string FieldLookupList = "";
                 //
                 if (true) {
                     fieldFound = false;
-                    Contentdefinition = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
-                    foreach (KeyValuePair<string, Models.Domain.MetaFieldModel> keyValuePair in Contentdefinition.fields) {
-                        Models.Domain.MetaFieldModel field = keyValuePair.Value;
+                    Contentdefinition = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
+                    foreach (KeyValuePair<string, Models.Domain.ContentFieldMetadataModel> keyValuePair in Contentdefinition.fields) {
+                        Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
                         if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(fieldName)) {
                             FieldValueVariant = field.defaultValue;
                             fieldTypeId = field.fieldTypeId;
@@ -1277,7 +1277,7 @@ namespace Contensive.Processor.Controllers {
                                     break;
                                 case CPContentBaseClass.fileTypeIdEnum.Lookup:
                                     FieldValueInteger = GenericController.encodeInteger(FieldValueVariant);
-                                    FieldLookupContentName = MetaController.getContentNameByID(core, FieldLookupContentID);
+                                    FieldLookupContentName = MetadataController.getContentNameByID(core, FieldLookupContentID);
                                     if (!string.IsNullOrEmpty(FieldLookupContentName)) {
                                         //
                                         // Lookup into Content
@@ -1435,7 +1435,7 @@ namespace Contensive.Processor.Controllers {
                         // Personalization Tag
                         //
                         string selectOptions = "";
-                        var peopleMetaData = Models.Domain.MetaModel.createByUniqueName(core, "people");
+                        var peopleMetaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, "people");
                         if (peopleMetaData != null) selectOptions = string.Join("|", peopleMetaData.selectList);
                         IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" + selectOptions + "]";
                         IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
@@ -1761,7 +1761,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     //
                                     // ListField
-                                    int CID = Models.Domain.MetaModel.getContentId(core, ContentName);
+                                    int CID = Models.Domain.ContentMetadataModel.getContentId(core, ContentName);
                                     csData.open("Content Fields", "Contentid=" + CID, "name", true, 0, "ID,Name");
                                 }
 
@@ -2266,7 +2266,7 @@ namespace Contensive.Processor.Controllers {
                 // Clear Caches
                 //
                 if (!string.IsNullOrEmpty(ContentName)) {
-                    string contentTablename = MetaController.getContentTablename(core, ContentName);                    
+                    string contentTablename = MetadataController.getContentTablename(core, ContentName);                    
                     core.cache.invalidateAllKeysInTable(contentTablename);
                 }
             }
@@ -2342,7 +2342,7 @@ namespace Contensive.Processor.Controllers {
             string returnHtml = "";
             try {
                 bool CanSeeHiddenFields = false;
-                Models.Domain.MetaModel SecondaryMetaData = null;
+                Models.Domain.ContentMetadataModel SecondaryMetaData = null;
                 List<int> ContentIDList = new List<int>();
                 bool Found = false;
                 int RecordID = 0;
@@ -2371,8 +2371,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     //
-                    int PrimaryContentID = Models.Domain.MetaModel.getContentId(core, PrimaryContentName);
-                    SecondaryMetaData = Models.Domain.MetaModel.createByUniqueName(core, SecondaryContentName);
+                    int PrimaryContentID = Models.Domain.ContentMetadataModel.getContentId(core, PrimaryContentName);
+                    SecondaryMetaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, SecondaryContentName);
                     string SecondaryTablename = SecondaryMetaData.tableName;
                     int SecondaryContentID = SecondaryMetaData.id;
                     ContentIDList.Add(SecondaryContentID);
@@ -2380,7 +2380,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     //
                     //
-                    string rulesTablename = MetaController.getContentTablename(core, RulesContentName);
+                    string rulesTablename = MetadataController.getContentTablename(core, RulesContentName);
                     SingularPrefixHtmlEncoded = HtmlController.encodeHtml(GenericController.getSingular_Sortof(SecondaryContentName)) + "&nbsp;";
                     //
                     int main_MemberShipCount = 0;
@@ -3437,17 +3437,27 @@ namespace Contensive.Processor.Controllers {
             if (GroupCnt > 0) {
                 //
                 // Test if RuleCopy is supported
-                bool SupportRuleCopy = MetaController.isContentFieldSupported(core, rulesContentName, "RuleCopy");
+                var ruleContentMetadata = Models.Domain.ContentMetadataModel.createByUniqueName(core, rulesContentName);
+                if ( ruleContentMetadata==null) {
+                    LogController.logWarn(core, "processCheckList called and ruleContentName not found [" + rulesContentName + "]");
+                    return;
+                }
+                var secondaryContentMetadata = Models.Domain.ContentMetadataModel.createByUniqueName(core, secondaryContentName);
+                if (secondaryContentMetadata == null) {
+                    LogController.logWarn(core, "processCheckList called and secondaryContentName not found [" + secondaryContentName + "]");
+                    return;
+                }
+                bool SupportRuleCopy = ruleContentMetadata.containsField(core, "RuleCopy");
                 if (SupportRuleCopy) {
-                    SupportRuleCopy = SupportRuleCopy && MetaController.isContentFieldSupported(core, secondaryContentName, "AllowRuleCopy");
+                    SupportRuleCopy &= secondaryContentMetadata.containsField(core, "AllowRuleCopy");
                     if (SupportRuleCopy) {
-                        SupportRuleCopy = SupportRuleCopy && MetaController.isContentFieldSupported(core, secondaryContentName, "RuleCopyCaption");
+                        SupportRuleCopy &= secondaryContentMetadata.containsField(core, "RuleCopyCaption");
                     }
                 }
                 //
                 // Go through each checkbox and check for a rule
                 string dupRuleIdList = "";
-                string rulesTablename = MetaController.getContentTablename(core, rulesContentName);
+                string rulesTablename = MetadataController.getContentTablename(core, rulesContentName);
                 string SQL = "select " + rulesSecondaryFieldName + ",id from " + rulesTablename + " where (" + rulesPrimaryFieldname + "=" + primaryRecordID + ")and(active<>0) order by " + rulesSecondaryFieldName;
                 DataTable currentRules = core.db.executeQuery(SQL);
                 int currentRulesCnt = currentRules.Rows.Count; 
@@ -3518,7 +3528,7 @@ namespace Contensive.Processor.Controllers {
                 }
             }
             if (RuleContentChanged) {
-                string tablename = MetaController.getContentTablename(core, rulesContentName);
+                string tablename = MetadataController.getContentTablename(core, rulesContentName);
                 core.cache.invalidateAllKeysInTable(tablename);
             }
         }

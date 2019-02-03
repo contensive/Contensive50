@@ -40,7 +40,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Name dictionary of content definitions in the collection
         /// </summary>
-        public Dictionary<string, Models.Domain.MetaModel> metaData = new Dictionary<string, Models.Domain.MetaModel>();
+        public Dictionary<string, Models.Domain.ContentMetadataModel> metaData = new Dictionary<string, Models.Domain.ContentMetadataModel>();
         //
         //====================================================================================================
         /// <summary>
@@ -186,8 +186,8 @@ namespace Contensive.Processor.Models.Domain {
         private static MetaDataMiniCollectionModel installMetaDataMiniCollection_LoadXml(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, MetaDataMiniCollectionModel defaultCollection, string logPrefix, ref List<string> installedCollections) {
             MetaDataMiniCollectionModel result = null;
             try {
-                MetaModel DefaultMetaData = null;
-                MetaFieldModel DefaultMetaDataField = null;
+                ContentMetadataModel DefaultMetaData = null;
+                ContentFieldMetadataModel DefaultMetaDataField = null;
                 string contentNameLc = null;
                 string Collectionname = null;
                 string ContentTableName = null;
@@ -277,7 +277,7 @@ namespace Contensive.Processor.Models.Domain {
                                         if (defaultCollection.metaData.ContainsKey(contentNameLc)) {
                                             DefaultMetaData = defaultCollection.metaData[contentNameLc];
                                         } else {
-                                            DefaultMetaData = new Models.Domain.MetaModel() {
+                                            DefaultMetaData = new Models.Domain.ContentMetadataModel() {
                                                 active = true,
                                                 activeOnly = true,
                                                 aliasID = "id",
@@ -306,12 +306,12 @@ namespace Contensive.Processor.Models.Domain {
                                             // ----- Add metadata if not already there
                                             //
                                             if (!result.metaData.ContainsKey(ContentName.ToLowerInvariant())) {
-                                                result.metaData.Add(ContentName.ToLowerInvariant(), new Models.Domain.MetaModel());
+                                                result.metaData.Add(ContentName.ToLowerInvariant(), new Models.Domain.ContentMetadataModel());
                                             }
                                             //
                                             // Get metadata attributes
                                             //
-                                            Models.Domain.MetaModel targetMetaData = result.metaData[ContentName.ToLowerInvariant()];
+                                            Models.Domain.ContentMetadataModel targetMetaData = result.metaData[ContentName.ToLowerInvariant()];
                                             string activeDefaultText = "1";
                                             if (!(DefaultMetaData.active)) {
                                                 activeDefaultText = "0";
@@ -349,7 +349,7 @@ namespace Contensive.Processor.Models.Domain {
                                             targetMetaData.developerOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "DeveloperOnly", DefaultMetaData.developerOnly);
                                             targetMetaData.dropDownFieldList = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "DropDownFieldList", DefaultMetaData.dropDownFieldList);
                                             targetMetaData.editorGroupName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "EditorGroupName", DefaultMetaData.editorGroupName);
-                                            targetMetaData.fields = new Dictionary<string, Models.Domain.MetaFieldModel>();
+                                            targetMetaData.fields = new Dictionary<string, Models.Domain.ContentFieldMetadataModel>();
                                             targetMetaData.iconLink = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "IconLink", DefaultMetaData.iconLink);
                                             targetMetaData.iconHeight = XmlController.GetXMLAttributeInteger(core, Found, metaData_NodeWithinLoop, "IconHeight", DefaultMetaData.iconHeight);
                                             targetMetaData.iconWidth = XmlController.GetXMLAttributeInteger(core, Found, metaData_NodeWithinLoop, "IconWidth", DefaultMetaData.iconWidth);
@@ -379,11 +379,11 @@ namespace Contensive.Processor.Models.Domain {
                                                     if (DefaultMetaData.fields.ContainsKey(FieldName)) {
                                                         DefaultMetaDataField = DefaultMetaData.fields[FieldName];
                                                     } else {
-                                                        DefaultMetaDataField = new Models.Domain.MetaFieldModel();
+                                                        DefaultMetaDataField = new Models.Domain.ContentFieldMetadataModel();
                                                     }
                                                     //
                                                     if (!(result.metaData[ContentName.ToLowerInvariant()].fields.ContainsKey(FieldName.ToLowerInvariant()))) {
-                                                        result.metaData[ContentName.ToLowerInvariant()].fields.Add(FieldName.ToLowerInvariant(), new Models.Domain.MetaFieldModel());
+                                                        result.metaData[ContentName.ToLowerInvariant()].fields.Add(FieldName.ToLowerInvariant(), new Models.Domain.ContentFieldMetadataModel());
                                                     }
                                                     var metaDataField = result.metaData[ContentName.ToLowerInvariant()].fields[FieldName.ToLowerInvariant()];
                                                     metaDataField.nameLc = FieldName.ToLowerInvariant();
@@ -399,7 +399,7 @@ namespace Contensive.Processor.Models.Domain {
                                                     //
                                                     // Convert Field Descriptor (text) to field type (integer)
                                                     //
-                                                    string defaultFieldTypeName = MetaController.getFieldTypeNameFromFieldTypeId(core, DefaultMetaDataField.fieldTypeId);
+                                                    string defaultFieldTypeName = ContentFieldMetadataModel.getFieldTypeNameFromFieldTypeId(core, DefaultMetaDataField.fieldTypeId);
                                                     string fieldTypeName = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "FieldType", defaultFieldTypeName);
                                                     metaDataField.fieldTypeId = core.db.getFieldTypeIdFromFieldTypeName(fieldTypeName);
                                                     metaDataField.editSortPriority = XmlController.GetXMLAttributeInteger(core, Found, MetaDataChildNode, "EditSortPriority", DefaultMetaDataField.editSortPriority);
@@ -419,14 +419,14 @@ namespace Contensive.Processor.Models.Domain {
                                                     metaDataField.developerOnly = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "DeveloperOnly", DefaultMetaDataField.developerOnly);
                                                     metaDataField.readOnly = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "ReadOnly", DefaultMetaDataField.readOnly);
                                                     metaDataField.required = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Required", DefaultMetaDataField.required);
-                                                    metaDataField.RSSTitleField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "RSSTitle", DefaultMetaDataField.RSSTitleField);
-                                                    metaDataField.RSSDescriptionField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "RSSDescriptionField", DefaultMetaDataField.RSSDescriptionField);
+                                                    metaDataField.rssTitleField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "RSSTitle", DefaultMetaDataField.rssTitleField);
+                                                    metaDataField.rssDescriptionField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "RSSDescriptionField", DefaultMetaDataField.rssDescriptionField);
                                                     metaDataField.memberSelectGroupName_set(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "MemberSelectGroup", ""));
                                                     metaDataField.editTabName = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "EditTab", DefaultMetaDataField.editTabName);
-                                                    metaDataField.Scramble = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Scramble", DefaultMetaDataField.Scramble);
+                                                    metaDataField.scramble = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Scramble", DefaultMetaDataField.scramble);
                                                     metaDataField.lookupList = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "LookupList", DefaultMetaDataField.lookupList);
-                                                    metaDataField.ManyToManyRulePrimaryField = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRulePrimaryField", DefaultMetaDataField.ManyToManyRulePrimaryField);
-                                                    metaDataField.ManyToManyRuleSecondaryField = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRuleSecondaryField", DefaultMetaDataField.ManyToManyRuleSecondaryField);
+                                                    metaDataField.manyToManyRulePrimaryField = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRulePrimaryField", DefaultMetaDataField.manyToManyRulePrimaryField);
+                                                    metaDataField.manyToManyRuleSecondaryField = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRuleSecondaryField", DefaultMetaDataField.manyToManyRuleSecondaryField);
                                                     metaDataField.set_lookupContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "LookupContent", DefaultMetaDataField.get_lookupContentName(core)));
                                                     // isbase should be set if the base file is loading, regardless of the state of any isBaseField attribute -- which will be removed later
                                                     // case 1 - when the application collection is loaded from the exported xml file, isbasefield must follow the export file although the data is not the base collection
@@ -453,7 +453,7 @@ namespace Contensive.Processor.Models.Domain {
                                                         if (textMatch(FieldChildNode.Name, "HelpCustom")) {
                                                             metaDataField.helpCustom = FieldChildNode.InnerText;
                                                         }
-                                                        metaDataField.HelpChanged = setAllDataChanged;
+                                                        metaDataField.helpChanged = setAllDataChanged;
                                                     }
                                                 }
                                             }
@@ -687,7 +687,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (true) {
                     string UsedTables = "";
                     foreach (var keypairvalue in Collection.metaData) {
-                        MetaModel contentMetaData = keypairvalue.Value;
+                        ContentMetadataModel contentMetaData = keypairvalue.Value;
                         if (contentMetaData.dataChanged) {
                             LogController.logInfo(core, "creating sql table [" + contentMetaData.tableName + "], datasource [" + contentMetaData.dataSourceName + "]");
                             using (var db = new DbController(core, contentMetaData.dataSourceName)) {
@@ -699,7 +699,7 @@ namespace Contensive.Processor.Models.Domain {
                                         db.createSQLTable(contentMetaData.tableName);
                                     }
                                     foreach (var fieldNvp in contentMetaData.fields) {
-                                        MetaFieldModel field = fieldNvp.Value;
+                                        ContentFieldMetadataModel field = fieldNvp.Value;
                                         db.createSQLTableField(contentMetaData.tableName, field.nameLc, field.fieldTypeId);
                                     }
                                 }
@@ -760,7 +760,7 @@ namespace Contensive.Processor.Models.Domain {
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 foreach (var keypairvalue in Collection.metaData) {
-                    MetaModel metaData = keypairvalue.Value;
+                    ContentMetadataModel metaData = keypairvalue.Value;
                     bool fieldChanged = false;
                     if (!metaData.dataChanged) {
                         foreach (var field in metaData.fields) {
@@ -779,12 +779,12 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.logInfo(core, "metadata Load, stage 7: Verify all field help");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                int FieldHelpCID = MetaController.getRecordIdByUniqueName(core, "content", "Content Field Help");
+                int FieldHelpCID = MetadataController.getRecordIdByUniqueName(core, "content", "Content Field Help");
                 foreach (var keypairvalue in Collection.metaData) {
-                    MetaModel workingMetaData = keypairvalue.Value;
+                    ContentMetadataModel workingMetaData = keypairvalue.Value;
                     foreach (var fieldKeyValuePair in workingMetaData.fields) {
-                        MetaFieldModel workingField = fieldKeyValuePair.Value;
-                        if (workingField.HelpChanged) {
+                        ContentFieldMetadataModel workingField = fieldKeyValuePair.Value;
+                        if (workingField.helpChanged) {
                             int fieldId = 0;
                             using (var rs = core.db.executeQuery("select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" + DbController.encodeSQLText(workingField.nameLc) + ")and(c.name=" + DbController.encodeSQLText(workingMetaData.name) + ") order by f.id")) {
                                 if (DbController.isDataTableOk(rs)) {
@@ -955,14 +955,14 @@ namespace Contensive.Processor.Models.Domain {
             try {
                 string SrcFieldName = null;
                 bool updateDst = false;
-                MetaModel srcMetaData = null;
+                ContentMetadataModel srcMetaData = null;
                 //
                 // If the Src is the BaseCollection, the Dst must be the Application Collectio
                 //   in this case, reset any BaseContent or BaseField attributes in the application that are not in the base
                 //
                 if (srcCollection.isBaseCollection) {
                     foreach (var dstKeyValuePair in dstCollection.metaData) {
-                        Models.Domain.MetaModel dstWorkingMetaData = dstKeyValuePair.Value;
+                        Models.Domain.ContentMetadataModel dstWorkingMetaData = dstKeyValuePair.Value;
                         string contentName = dstWorkingMetaData.name;
                         if (dstCollection.metaData[contentName.ToLowerInvariant()].isBaseContent) {
                             //
@@ -976,7 +976,7 @@ namespace Contensive.Processor.Models.Domain {
                                 tempVar.isBaseContent = false;
                                 tempVar.dataChanged = true;
                                 foreach (var dstFieldKeyValuePair in tempVar.fields) {
-                                    Models.Domain.MetaFieldModel field = dstFieldKeyValuePair.Value;
+                                    Models.Domain.ContentFieldMetadataModel field = dstFieldKeyValuePair.Value;
                                     if (field.isBaseField) {
                                         field.isBaseField = false;
                                         //field.Changed = True
@@ -1006,12 +1006,12 @@ namespace Contensive.Processor.Models.Domain {
                     // Search for this metadata in the Dst
                     //
                     updateDst = false;
-                    MetaModel dstMetaData = null;
+                    ContentMetadataModel dstMetaData = null;
                     if (!dstCollection.metaData.ContainsKey(srcName.ToLowerInvariant())) {
                         //
                         // add src to dst
                         //
-                        dstMetaData = new Models.Domain.MetaModel();
+                        dstMetaData = new Models.Domain.ContentMetadataModel();
                         dstCollection.metaData.Add(srcName.ToLowerInvariant(), dstMetaData);
                         updateDst = true;
                     } else {
@@ -1092,7 +1092,7 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     //Call AppendClassLogFile(core.app.config.name,"Upgrademetadata_AddSrcToDst", "CollectionSrc.metadata[SrcPtr].fields.count=" & CollectionSrc.metadata[SrcPtr].fields.count)
                     foreach (var srcFieldKeyValuePair in srcMetaData.fields) {
-                        Models.Domain.MetaFieldModel srcMetaDataField = srcFieldKeyValuePair.Value;
+                        Models.Domain.ContentFieldMetadataModel srcMetaDataField = srcFieldKeyValuePair.Value;
                         SrcFieldName = srcMetaDataField.nameLc;
                         updateDst = false;
                         if (!dstCollection.metaData.ContainsKey(srcName.ToLowerInvariant())) {
@@ -1103,7 +1103,7 @@ namespace Contensive.Processor.Models.Domain {
                         } else {
                             dstMetaData = dstCollection.metaData[srcName.ToLowerInvariant()];
                             bool HelpChanged = false;
-                            Models.Domain.MetaFieldModel dstMetaDataField = null;
+                            Models.Domain.ContentFieldMetadataModel dstMetaDataField = null;
                             if (dstMetaData.fields.ContainsKey(SrcFieldName.ToLowerInvariant())) {
                                 //
                                 // Src field was found in Dst fields
@@ -1130,8 +1130,8 @@ namespace Contensive.Processor.Models.Domain {
                                     updateDst |= !textMatch(srcMetaDataField.lookupList, dstMetaDataField.lookupList);
                                     updateDst |= (srcMetaDataField.manyToManyContentID != dstMetaDataField.manyToManyContentID);
                                     updateDst |= (srcMetaDataField.manyToManyRuleContentID != dstMetaDataField.manyToManyRuleContentID);
-                                    updateDst |= !textMatch(srcMetaDataField.ManyToManyRulePrimaryField, dstMetaDataField.ManyToManyRulePrimaryField);
-                                    updateDst |= !textMatch(srcMetaDataField.ManyToManyRuleSecondaryField, dstMetaDataField.ManyToManyRuleSecondaryField);
+                                    updateDst |= !textMatch(srcMetaDataField.manyToManyRulePrimaryField, dstMetaDataField.manyToManyRulePrimaryField);
+                                    updateDst |= !textMatch(srcMetaDataField.manyToManyRuleSecondaryField, dstMetaDataField.manyToManyRuleSecondaryField);
                                     updateDst |= (srcMetaDataField.memberSelectGroupId_get(core) != dstMetaDataField.memberSelectGroupId_get(core));
                                     updateDst |= (srcMetaDataField.notEditable != dstMetaDataField.notEditable);
                                     updateDst |= (srcMetaDataField.password != dstMetaDataField.password);
@@ -1140,9 +1140,9 @@ namespace Contensive.Processor.Models.Domain {
                                     updateDst |= !textMatch(srcMetaDataField.redirectID, dstMetaDataField.redirectID);
                                     updateDst |= !textMatch(srcMetaDataField.redirectPath, dstMetaDataField.redirectPath);
                                     updateDst |= (srcMetaDataField.required != dstMetaDataField.required);
-                                    updateDst |= (srcMetaDataField.RSSDescriptionField != dstMetaDataField.RSSDescriptionField);
-                                    updateDst |= (srcMetaDataField.RSSTitleField != dstMetaDataField.RSSTitleField);
-                                    updateDst |= (srcMetaDataField.Scramble != dstMetaDataField.Scramble);
+                                    updateDst |= (srcMetaDataField.rssDescriptionField != dstMetaDataField.rssDescriptionField);
+                                    updateDst |= (srcMetaDataField.rssTitleField != dstMetaDataField.rssTitleField);
+                                    updateDst |= (srcMetaDataField.scramble != dstMetaDataField.scramble);
                                     updateDst |= (srcMetaDataField.textBuffered != dstMetaDataField.textBuffered);
                                     updateDst |= (GenericController.encodeText(srcMetaDataField.defaultValue) != GenericController.encodeText(dstMetaDataField.defaultValue));
                                     updateDst |= (srcMetaDataField.uniqueName != dstMetaDataField.uniqueName);
@@ -1163,7 +1163,7 @@ namespace Contensive.Processor.Models.Domain {
                                 //
                                 // field was not found in dst, add it and populate
                                 //
-                                dstMetaData.fields.Add(SrcFieldName.ToLowerInvariant(), new Models.Domain.MetaFieldModel());
+                                dstMetaData.fields.Add(SrcFieldName.ToLowerInvariant(), new Models.Domain.ContentFieldMetadataModel());
                                 dstMetaDataField = dstMetaData.fields[SrcFieldName.ToLowerInvariant()];
                                 updateDst = true;
                                 HelpChanged = true;
@@ -1194,8 +1194,8 @@ namespace Contensive.Processor.Models.Domain {
                                 dstMetaDataField.lookupList = srcMetaDataField.lookupList;
                                 dstMetaDataField.manyToManyContentID = srcMetaDataField.manyToManyContentID;
                                 dstMetaDataField.manyToManyRuleContentID = srcMetaDataField.manyToManyRuleContentID;
-                                dstMetaDataField.ManyToManyRulePrimaryField = srcMetaDataField.ManyToManyRulePrimaryField;
-                                dstMetaDataField.ManyToManyRuleSecondaryField = srcMetaDataField.ManyToManyRuleSecondaryField;
+                                dstMetaDataField.manyToManyRulePrimaryField = srcMetaDataField.manyToManyRulePrimaryField;
+                                dstMetaDataField.manyToManyRuleSecondaryField = srcMetaDataField.manyToManyRuleSecondaryField;
                                 dstMetaDataField.memberSelectGroupId_set(core, srcMetaDataField.memberSelectGroupId_get(core));
                                 dstMetaDataField.nameLc = srcMetaDataField.nameLc;
                                 dstMetaDataField.notEditable = srcMetaDataField.notEditable;
@@ -1205,9 +1205,9 @@ namespace Contensive.Processor.Models.Domain {
                                 dstMetaDataField.redirectID = srcMetaDataField.redirectID;
                                 dstMetaDataField.redirectPath = srcMetaDataField.redirectPath;
                                 dstMetaDataField.required = srcMetaDataField.required;
-                                dstMetaDataField.RSSDescriptionField = srcMetaDataField.RSSDescriptionField;
-                                dstMetaDataField.RSSTitleField = srcMetaDataField.RSSTitleField;
-                                dstMetaDataField.Scramble = srcMetaDataField.Scramble;
+                                dstMetaDataField.rssDescriptionField = srcMetaDataField.rssDescriptionField;
+                                dstMetaDataField.rssTitleField = srcMetaDataField.rssTitleField;
+                                dstMetaDataField.scramble = srcMetaDataField.scramble;
                                 dstMetaDataField.textBuffered = srcMetaDataField.textBuffered;
                                 dstMetaDataField.uniqueName = srcMetaDataField.uniqueName;
                                 dstMetaDataField.isBaseField = srcMetaDataField.isBaseField;
@@ -1222,7 +1222,7 @@ namespace Contensive.Processor.Models.Domain {
                             if (HelpChanged) {
                                 dstMetaDataField.helpCustom = srcMetaDataField.helpCustom;
                                 dstMetaDataField.helpDefault = srcMetaDataField.helpDefault;
-                                dstMetaDataField.HelpChanged = true;
+                                dstMetaDataField.helpChanged = true;
                             }
                         }
                     }
@@ -1501,41 +1501,40 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Update a table from a collection metadata node
         /// </summary>
-        internal static void installMetaDataMiniCollection_buildDb_saveMetaDataToDb(CoreController core, MetaModel metaData, string BuildVersion) {
+        internal static void installMetaDataMiniCollection_buildDb_saveMetaDataToDb(CoreController core, ContentMetadataModel contentMetadata, string BuildVersion) {
             try {
                 //
-                LogController.logInfo(core, "Update db metadata [" + metaData.name + "]");
+                LogController.logInfo(core, "Update db metadata [" + contentMetadata.name + "]");
                 //
                 // -- get contentid and protect content with IsBaseContent true
                 {
-                    if (metaData.dataChanged) {
+                    if (contentMetadata.dataChanged) {
                         //
                         // -- update definition (use SingleRecord as an update flag)
-                        var datasource = DataSourceModel.createByUniqueName(core, metaData.dataSourceName);
-                        MetaController.verifyContent_returnId(core, metaData);
+                        var datasource = DataSourceModel.createByUniqueName(core, contentMetadata.dataSourceName);
+                        ContentMetadataModel.verifyContent_returnId(core, contentMetadata);
                     }
                     //
                     // -- update Content Field Records and Content Field Help records
-                    MetaModel metaDataFieldHelp = MetaModel.createByUniqueName(core, ContentFieldHelpModel.contentName);
-                    foreach (var nameValuePair in metaData.fields) {
-                        MetaFieldModel field = nameValuePair.Value;
-                        int fieldId = 0;
-                        if (field.dataChanged) {
-                            fieldId = MetaController.verifyContentField_returnId(core, metaData.name, field);
+                    ContentMetadataModel metaDataFieldHelp = ContentMetadataModel.createByUniqueName(core, ContentFieldHelpModel.contentName);
+                    foreach (var nameValuePair in contentMetadata.fields) {
+                        ContentFieldMetadataModel fieldMetadata = nameValuePair.Value;
+                        if (fieldMetadata.dataChanged) {
+                            contentMetadata.verifyContentField(core, fieldMetadata, false);
                         }
                         //
                         // -- update content field help records
-                        if (field.HelpChanged) {
+                        if (fieldMetadata.helpChanged) {
                             //int FieldHelpID = 0;
                             ContentFieldHelpModel fieldHelp = null;
-                            var fieldHelpList = ContentFieldHelpModel.createList(core, "fieldid=" + fieldId);
+                            var fieldHelpList = ContentFieldHelpModel.createList(core, "fieldid=" + fieldMetadata.id);
                             if (fieldHelpList.Count == 0) {
                                 //
                                 // -- no current field help record, if adding help, create record
-                                if ((!string.IsNullOrWhiteSpace(field.helpDefault)) || (!string.IsNullOrWhiteSpace(field.helpCustom))) {
+                                if ((!string.IsNullOrWhiteSpace(fieldMetadata.helpDefault)) || (!string.IsNullOrWhiteSpace(fieldMetadata.helpCustom))) {
                                     fieldHelp = ContentFieldHelpModel.addEmpty(core);
-                                    fieldHelp.helpDefault = field.helpDefault;
-                                    fieldHelp.helpCustom = field.helpCustom;
+                                    fieldHelp.helpDefault = fieldMetadata.helpDefault;
+                                    fieldHelp.helpCustom = fieldMetadata.helpCustom;
                                     fieldHelp.save(core);
 
                                 }
@@ -1543,9 +1542,9 @@ namespace Contensive.Processor.Models.Domain {
                                 //
                                 // -- if help changed, save it
                                 fieldHelp = fieldHelpList.First();
-                                if ((!fieldHelp.helpCustom.Equals(field.helpCustom)) || !fieldHelp.helpDefault.Equals(field.helpDefault)) {
-                                    fieldHelp.helpDefault = field.helpDefault;
-                                    fieldHelp.helpCustom = field.helpCustom;
+                                if ((!fieldHelp.helpCustom.Equals(fieldMetadata.helpCustom)) || !fieldHelp.helpDefault.Equals(fieldMetadata.helpDefault)) {
+                                    fieldHelp.helpDefault = fieldMetadata.helpDefault;
+                                    fieldHelp.helpCustom = fieldMetadata.helpCustom;
                                     fieldHelp.save(core);
                                 }
                             }

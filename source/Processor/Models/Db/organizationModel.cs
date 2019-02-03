@@ -52,12 +52,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static OrganizationModel addDefault(CoreController core, Domain.MetaModel metaData) {
+        public static OrganizationModel addDefault(CoreController core, Domain.ContentMetadataModel metaData) {
             return addDefault<OrganizationModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static OrganizationModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+        public static OrganizationModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetadataModel metaData) {
             return addDefault<OrganizationModel>(core, metaData, ref callersCacheNameList);
         }
         //

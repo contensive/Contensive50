@@ -15,7 +15,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Permissions this user has for this content.
         /// </summary>
-        public static UserContentPermissions getUserContentPermissions(CoreController core, MetaModel cdef) {
+        public static UserContentPermissions getUserContentPermissions(CoreController core, ContentMetadataModel cdef) {
             var result = new UserContentPermissions() {
                 allowDelete = false,
                 allowAdd = false,
@@ -86,7 +86,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="usedContentIdList"></param>
         //========================================================================
         //
-        private static UserContentPermissions getUserAuthoringPermissions_ContentManager(CoreController core, MetaModel cdef, List<int> usedContentIdList) {
+        private static UserContentPermissions getUserAuthoringPermissions_ContentManager(CoreController core, ContentMetadataModel cdef, List<int> usedContentIdList) {
             var result = new UserContentPermissions() {
                 allowAdd = false,
                 allowDelete = false,
@@ -142,7 +142,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Not a content manager for this one, check the parent
                         if (cdef.parentID > 0) {
-                            var parentCdef = MetaModel.create(core, cdef.parentID);
+                            var parentCdef = ContentMetadataModel.create(core, cdef.parentID);
                             usedContentIdList.Add(cdef.id);
                             getUserAuthoringPermissions_ContentManager(core, cdef, usedContentIdList);
                         }

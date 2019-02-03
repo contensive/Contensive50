@@ -509,7 +509,7 @@ namespace Contensive.Processor.Controllers {
             if (!string.IsNullOrEmpty(ContentNameList)) {
                 List<string> tableNameList = new List<string>();
                 foreach (var contentName in new List<string>(ContentNameList.ToLowerInvariant().Split(','))) {
-                    string tableName = MetaController.getContentTablename(core, contentName).ToLowerInvariant();
+                    string tableName = MetadataController.getContentTablename(core, contentName).ToLowerInvariant();
                     if (!tableNameList.Contains(tableName)) {
                         tableNameList.Add(tableName);
                     }

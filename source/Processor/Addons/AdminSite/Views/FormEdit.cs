@@ -49,7 +49,7 @@ namespace Contensive.Addons.AdminSite {
                     // xx  I do not know why the following section says "reload even if it is loaded", but lets try this
                     //
                     foreach (var keyValuePair in adminData.adminContent.fields) {
-                        MetaFieldModel field = keyValuePair.Value;
+                        ContentFieldMetadataModel field = keyValuePair.Value;
                         if ((keyValuePair.Value.fieldTypeId== CPContentBaseClass.fileTypeIdEnum.File) || (keyValuePair.Value.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileImage)) {
                             adminData.editRecord.fieldsLc[field.nameLc].value = adminData.editRecord.fieldsLc[field.nameLc].dbValue;
                         }
@@ -261,8 +261,6 @@ namespace Contensive.Addons.AdminSite {
                     // -- email
                     bool EmailSubmitted = false;
                     bool EmailSent = false;
-                    int SystemEmailCID = MetaModel.getContentId(core, "System Email");
-                    int ConditionalEmailCID = MetaModel.getContentId(core, "Conditional Email");
                     DateTime LastSendTestDate = DateTime.MinValue;
                     bool AllowEmailSendWithoutTest = (core.siteProperties.getBoolean("AllowEmailSendWithoutTest", false));
                     if (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
@@ -272,7 +270,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // Must be admin
                         Stream.Add(AdminErrorController.get(core, "This edit form requires Member Administration access.", "This edit form requires Member Administration access."));
-                    } else if (MetaController.isWithinContent(core, adminData.editRecord.contentControlId, SystemEmailCID)) {
+                    } else if (adminData.adminContent.id == ContentMetadataModel.getContentId(core, "System Email")) {
                         //
                         LogController.logTrace(core, "getFormEdit, System email");
                         //
@@ -306,7 +304,7 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
-                    } else if (MetaController.isWithinContent(core, adminData.editRecord.contentControlId, ConditionalEmailCID)) {
+                    } else if (adminData.adminContent.id == ContentMetadataModel.getContentId(core, "Conditional Email")) {
                         //
                         // Conditional Email
                         EmailSubmitted = false;
@@ -406,7 +404,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Page Content
                     //
-                    int TableID = MetaController.getRecordIdByUniqueName( core,"Tables", "ccPageContent");
+                    int TableID = MetadataController.getRecordIdByUniqueName( core,"Tables", "ccPageContent");
                     string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
                         allowAdd = (allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd),
@@ -539,8 +537,8 @@ namespace Contensive.Addons.AdminSite {
                 } else {
                     //
                     // All other tables (User definined)
-                    bool IsPageContent = MetaController.isWithinContent(core, adminData.adminContent.id, MetaModel.getContentId(core, "Page Content"));
-                    bool HasChildRecords = MetaController.isContentFieldSupported(core, adminData.adminContent.name, "parentid");
+                    var pageContentMetadata = ContentMetadataModel.createByUniqueName(core, "page content");
+                    bool HasChildRecords = adminData.adminContent.containsField(core,  "parentid");
                     bool AllowMarkReviewed = core.db.isSQLTableField( adminData.adminContent.tableName, "DateReviewed");
                     string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
@@ -554,7 +552,7 @@ namespace Contensive.Addons.AdminSite {
                         allowSend = false,
                         allowSendTest = false,
                         hasChildRecords = HasChildRecords,
-                        isPageContent = IsPageContent
+                        isPageContent = pageContentMetadata.isParentOf( core, adminData.adminContent.id)
                     });
                     Stream.Add(EditSectionButtonBar);
                     Stream.Add(AdminUIController.getTitleBar(core, getTitle(core,adminData), titleBarDetails));
@@ -679,9 +677,9 @@ namespace Contensive.Addons.AdminSite {
                 } else {
                     //
                     // ----- Build an index to sort the fields by EditSortOrder
-                    Dictionary<string, MetaFieldModel> sortingFields = new Dictionary<string, MetaFieldModel>();
+                    Dictionary<string, ContentFieldMetadataModel> sortingFields = new Dictionary<string, ContentFieldMetadataModel>();
                     foreach (var keyValuePair in adminData.adminContent.fields) {
-                        MetaFieldModel field = keyValuePair.Value;
+                        ContentFieldMetadataModel field = keyValuePair.Value;
                         if (field.editTabName.ToLowerInvariant() == EditTab.ToLowerInvariant()) {
                             if (AdminDataModel.IsVisibleUserField(core, field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminData.adminContent.tableName)) {
                                 AlphaSort = GenericController.getIntegerString(field.editSortPriority, 10) + "-" + GenericController.getIntegerString(field.id, 10);
@@ -694,7 +692,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     AllowHelpIcon = core.visitProperty.getBoolean("AllowHelpIcon");
                     foreach (var kvp in sortingFields) {
-                        MetaFieldModel field = kvp.Value;
+                        ContentFieldMetadataModel field = kvp.Value;
                         fieldId = field.id;
                         WhyReadOnlyMsg = "";
                         fieldTypeId = field.fieldTypeId;
@@ -1572,8 +1570,8 @@ namespace Contensive.Addons.AdminSite {
                 // ----- read in help
                 //
                 IDList = "";
-                foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
-                    MetaFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
+                    ContentFieldMetadataModel field = keyValuePair.Value;
                     IDList = IDList + "," + field.id;
                 }
                 if (!string.IsNullOrEmpty(IDList)) {
@@ -1602,8 +1600,8 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 FormFieldList = ",";
-                foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
-                    MetaFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
+                    ContentFieldMetadataModel field = keyValuePair.Value;
                     if ((field.authorable) && (field.active) && (!TabsFound.Contains(field.editTabName.ToLowerInvariant()))) {
                         TabsFound.Add(field.editTabName.ToLowerInvariant());
                         fieldNameLc = field.nameLc;
