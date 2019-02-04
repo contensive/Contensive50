@@ -191,6 +191,7 @@
     <Compile Include="Controllers\CacheController.cs" />
     <Compile Include="Controllers\KeyPtrIndexController.cs" />
     <Compile Include="Controllers\ContentCmdController.cs" />
+    <Compile Include="Models\Db\ContentFieldTypeModel.cs" />
     <Compile Include="Models\Domain\CsModel.cs" />
     <Compile Include="Controllers\DbController.cs" />
     <Compile Include="Controllers\DbServerController.cs" />

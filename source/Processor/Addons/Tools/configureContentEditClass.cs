@@ -34,7 +34,7 @@ namespace Contensive.Addons.Tools {
             CoreController core = cp.core;
             try {
                 KeyPtrController Index = new KeyPtrController();
-                int ContentID = cp.Doc.GetInteger( RequestNameToolContentID );
+                int ContentID = cp.Doc.GetInteger(RequestNameToolContentID);
                 var contentMetadata = ContentMetadataModel.create(core, ContentID, true, true);
                 int RecordCount = 0;
                 int formFieldId = 0;
@@ -110,17 +110,17 @@ namespace Contensive.Addons.Tools {
                                                     //
                                                     string SQL = null;
                                                     //
-                                                    if ((!string.IsNullOrEmpty(formFieldName)) && (formFieldTypeId != 0) && ((cdefFieldKvp.Value.nameLc == "") || (cdefFieldKvp.Value.fieldTypeId == 0))) {
+                                                    if ((!string.IsNullOrEmpty(formFieldName)) && ((int)formFieldTypeId != 0) && ((cdefFieldKvp.Value.nameLc == "") || (cdefFieldKvp.Value.fieldTypeId == 0))) {
                                                         //
                                                         // Create Db field, Field is good but was not before
                                                         //
                                                         core.db.createSQLTableField(contentMetadata.tableName, formFieldName, formFieldTypeId);
                                                         StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was saved to this content definition and a database field was created in [" + contentMetadata.tableName + "].</LI>";
-                                                    } else if ((string.IsNullOrEmpty(formFieldName)) || (formFieldTypeId == 0)) {
+                                                    } else if ((string.IsNullOrEmpty(formFieldName)) || ((int)formFieldTypeId == 0)) {
                                                         //
                                                         // name blank or type=0 - do nothing but tell them
                                                         //
-                                                        if (string.IsNullOrEmpty(formFieldName) && formFieldTypeId == 0) {
+                                                        if (string.IsNullOrEmpty(formFieldName) && ((int)formFieldTypeId == 0)) {
                                                             ErrorMessage += "<LI>Field number " + (RecordPointer + 1) + " was saved to this content definition but no database field was created because a name and field type are required.</LI>";
                                                         } else if (formFieldName == "unnamedfield" + formFieldId.ToString()) {
                                                             ErrorMessage += "<LI>Field number " + (RecordPointer + 1) + " was saved to this content definition but no database field was created because a field name is required.</LI>";
@@ -131,7 +131,7 @@ namespace Contensive.Addons.Tools {
                                                         //
                                                         // Field Type changed, must be done manually
                                                         //
-                                                        ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + MetadataController.getRecordName(core, "content Field Types", (int)cdefFieldKvp.Value.fieldTypeId) + "] to [" + MetadataController.getRecordName(core, "content Field Types", (int)formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
+                                                        ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + DbModel.getRecordName<ContentFieldTypeModel>(core, (int)cdefFieldKvp.Value.fieldTypeId) + "] to [" + DbModel.getRecordName<ContentFieldTypeModel>(core, (int)formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
                                                         int DataSourceTypeID = core.db.getDataSourceType();
                                                         switch (DataSourceTypeID) {
                                                             case DataSourceTypeODBCMySQL:
@@ -144,20 +144,20 @@ namespace Contensive.Addons.Tools {
                                                         core.db.executeQuery(SQL);
                                                     }
                                                     SQL = "Update ccFields"
-                                                        + " Set name=" + DbController.encodeSQLText(formFieldName) 
-                                                        + ",type=" + formFieldTypeId 
-                                                        + ",caption=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) 
-                                                        + ",DefaultValue=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) 
-                                                        + ",EditSortPriority=" + DbController.encodeSQLText(GenericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) 
-                                                        + ",Active=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) 
-                                                        + ",ReadOnly=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) 
-                                                        + ",Authorable=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) 
-                                                        + ",Required=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) 
-                                                        + ",UniqueName=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) 
-                                                        + ",TextBuffered=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) 
-                                                        + ",Password=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) 
-                                                        + ",HTMLContent=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) 
-                                                        + ",EditTab=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) 
+                                                        + " Set name=" + DbController.encodeSQLText(formFieldName)
+                                                        + ",type=" + (int)formFieldTypeId
+                                                        + ",caption=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer))
+                                                        + ",DefaultValue=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer))
+                                                        + ",EditSortPriority=" + DbController.encodeSQLText(GenericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer)))
+                                                        + ",Active=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer))
+                                                        + ",ReadOnly=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer))
+                                                        + ",Authorable=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer))
+                                                        + ",Required=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer))
+                                                        + ",UniqueName=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer))
+                                                        + ",TextBuffered=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer))
+                                                        + ",Password=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer))
+                                                        + ",HTMLContent=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer))
+                                                        + ",EditTab=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer))
                                                         + ",Scramble=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
                                                     if (core.session.isAuthenticatedAdmin(core)) {
                                                         SQL += ",adminonly=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." + RecordPointer));
@@ -248,7 +248,7 @@ namespace Contensive.Addons.Tools {
                     //
                     // Configure edit form
                     Stream.Add(HtmlController.inputHidden(RequestNameToolContentID, ContentID));
-                    Stream.Add(core.html.getPanelTop());;
+                    Stream.Add(core.html.getPanelTop()); ;
                     ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK + "," + ButtonAdd;
                     //
                     // Get a new copy of the content definition
@@ -439,7 +439,7 @@ namespace Contensive.Addons.Tools {
                                     }
                                 }
                             } else if (FieldLocked) {
-                                streamRow.Add(MetadataController.getRecordName(core, "content field types", (int)fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, (int)fieldsort.field.fieldTypeId));
+                                streamRow.Add(DbModel.getRecordName<ContentFieldTypeModel>(core, (int)fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, (int)fieldsort.field.fieldTypeId));
                             } else {
                                 string TypeSelect = TypeSelectTemplate;
                                 TypeSelect = GenericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);
