@@ -154,15 +154,15 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void ErrorReport(string message) {
-            LogController.handleException(cp.core, new GenericException("Unexpected exception"), LogController.logLevel.Error, message, 2);
+            LogController.handleException(cp.core, new GenericException("Unexpected exception"), LogController.LogLevel.Error, message, 2);
         }
         //
         public override void ErrorReport(System.Exception ex, string message) {
-            LogController.handleException(cp.core, ex, LogController.logLevel.Error, message, 2);
+            LogController.handleException(cp.core, ex, LogController.LogLevel.Error, message, 2);
         }
         //
         public override void ErrorReport(System.Exception ex) {
-            LogController.handleException(cp.core, ex, LogController.logLevel.Error, "", 2);
+            LogController.handleException(cp.core, ex, LogController.LogLevel.Error, "", 2);
         }
         //
         //====================================================================================================

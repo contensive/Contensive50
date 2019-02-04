@@ -791,19 +791,22 @@ namespace Contensive.Processor.Models.Domain {
                                     fieldId = GenericController.encodeInteger(DbController.getDataRowFieldText(rs.Rows[0], "id"));
                                 }
                             }
-                            if (fieldId == 0) { throw (new GenericException("Unexpected exception")); }
-                            int FieldHelpID = 0;
-                            using (var rs = core.db.executeQuery("select id from ccfieldhelp where fieldid=" + fieldId + " order by id")) {
-                                if (DbController.isDataTableOk(rs)) {
-                                    FieldHelpID = GenericController.encodeInteger(rs.Rows[0]["id"]);
-                                } else {
-                                    FieldHelpID = core.db.insertTableRecordGetId("ccfieldhelp", 0);
+                            if (fieldId == 0) {
+                                LogController.logWarn(core, "Field help specified for a field that cannot be found, field [" + workingField.nameLc + "], content [" + workingMetaData.name + "]");
+                            } else {
+                                int FieldHelpID = 0;
+                                using (var rs = core.db.executeQuery("select id from ccfieldhelp where fieldid=" + fieldId + " order by id")) {
+                                    if (DbController.isDataTableOk(rs)) {
+                                        FieldHelpID = GenericController.encodeInteger(rs.Rows[0]["id"]);
+                                    } else {
+                                        FieldHelpID = core.db.insertTableRecordGetId("ccfieldhelp", 0);
+                                    }
                                 }
-                            }
-                            if (FieldHelpID != 0) {
-                                string Copy = workingField.helpCustom;
-                                if (string.IsNullOrEmpty(Copy)) { Copy = workingField.helpDefault; }
-                                core.db.executeQuery("update ccfieldhelp set active=1,contentcontrolid=" + FieldHelpCID + ",fieldid=" + fieldId + ",helpdefault=" + DbController.encodeSQLText(Copy) + " where id=" + FieldHelpID);
+                                if (FieldHelpID != 0) {
+                                    string Copy = workingField.helpCustom;
+                                    if (string.IsNullOrEmpty(Copy)) { Copy = workingField.helpDefault; }
+                                    core.db.executeQuery("update ccfieldhelp set active=1,contentcontrolid=" + FieldHelpCID + ",fieldid=" + fieldId + ",helpdefault=" + DbController.encodeSQLText(Copy) + " where id=" + FieldHelpID);
+                                }
                             }
                         }
                     }

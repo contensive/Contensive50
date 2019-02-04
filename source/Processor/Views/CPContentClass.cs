@@ -6,6 +6,8 @@ using Contensive.Processor.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
+using Contensive.Processor.Exceptions;
+using System.Data;
 
 namespace Contensive.Processor {
     public class CPContentClass : CPContentBaseClass, IDisposable {
@@ -65,34 +67,24 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetContentControlCriteria(string contentName) {
-            return MetadataController.getContentControlCriteria(cp.core, contentName);
+            var meta = ContentMetadataModel.createByUniqueName(cp.core, contentName);
+            if (meta != null) { return meta.legacyContentControlCriteria; }
+            return string.Empty;
         }
         //
         //====================================================================================================
         //
         [Obsolete("deprecated, instead create contentMeta, lookup field and use property of field", true)]
         public override string GetFieldProperty(string contentName, string fieldName, string propertyName) {
-            // todo expose meta and fieldmeta
-            //var meta = Contensive.Processor.Models.Domain.MetaModel.createByUniqueName(cp.core, contentName);
-            //if ( meta != null ) {
-            //    var fieldMeta = Contensive.Processor.Models.Domain.MetaModel.getField(cp.core, fieldName);
-            //    if ( fieldMeta != null ) {
-            //        return fieldMeta.
-            //    }
-            //}
-            return MetadataController.getContentFieldProperty(cp.core, contentName, fieldName, propertyName);
-        }
-        //
-        //====================================================================================================
-        //
-        public override int GetID(string contentName) {
-            return Models.Domain.ContentMetadataModel.getContentId(cp.core, contentName);
+            throw new GenericException("getContentFieldProperty deprecated, instead create contentMeta, lookup field and use property of field");
         }
         //
         //====================================================================================================
         //
         public override string GetDataSource(string contentName) {
-            return MetadataController.getContentDataSource(cp.core, contentName);
+            var meta = ContentMetadataModel.createByUniqueName(cp.core, contentName);
+            if (meta != null) { return meta.dataSourceName; }
+            return string.Empty;
         }
         //
         //====================================================================================================
@@ -140,13 +132,17 @@ namespace Contensive.Processor {
         /// <param name="recordID"></param>
         /// <returns></returns>
         public override string GetRecordName(string contentName, int recordID) {
-            return MetadataController.getRecordName(cp.core, contentName, recordID);
+            var meta = ContentMetadataModel.createByUniqueName(cp.core, contentName);
+            if (meta == null) { return string.Empty; }
+            return meta.getRecordName(cp.core, recordID);
         }
         //
         //====================================================================================================
         //
         public override string GetTable(string contentName) {
-            return MetadataController.getContentTablename(cp.core, contentName);
+            var meta = ContentMetadataModel.createByUniqueName(cp.core, contentName);
+            if (meta == null) { return string.Empty; }
+            return meta.tableName;
         }
         //
         //====================================================================================================
@@ -276,6 +272,15 @@ namespace Contensive.Processor {
         //
         public override string GetListLink(string contentName) {
             return AdminUIController.getIconEditAdminLink(cp.core, Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, contentName));
+        }
+        //
+        //====================================================================================================
+        //
+        public override int GetID(string ContentName) {
+            var content = ContentModel.createByUniqueName(cp.core, ContentName);
+            if (content != null) return content.id;
+            return 0;
+
         }
         //
         //====================================================================================================

@@ -69,7 +69,7 @@ Public Class ConfigurationClass
     End Function
     '
     Public Shared Sub loadRouteMap(cp As CPClass)
-        LogController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "]", LogController.logLevel.Trace)
+        LogController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "]", LogController.LogLevel.Trace)
         '
         ' test if route map needs to be loaded (routeMap.dateCreated <> application[routeMapDateCreated])
         If (Not cp.routeMap.dateCreated.Equals(HttpContext.Current.Application("RouteMapDateCreated"))) Then
@@ -78,7 +78,7 @@ Public Class ConfigurationClass
             For Each newRouteKeyValuePair In cp.routeMap.routeDictionary
                 Try
                     '
-                    LogController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRouteKeyValuePair.Value.virtualRoute + "], [" + newRouteKeyValuePair.Value.physicalRoute + "]", LogController.logLevel.Trace)
+                    LogController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRouteKeyValuePair.Value.virtualRoute + "], [" + newRouteKeyValuePair.Value.physicalRoute + "]", LogController.LogLevel.Trace)
                     '
                     RouteTable.Routes.Remove(RouteTable.Routes(newRouteKeyValuePair.Key))
                     RouteTable.Routes.MapPageRoute(newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.physicalRoute)

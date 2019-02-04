@@ -1597,7 +1597,7 @@ namespace Contensive.Addons.AdminSite {
                             // ----- if admin content is changed, reload the adminContext.content data in case this is a save, and not an OK
                             //
                             if (recordChanged && SaveCCIDValue != 0) {
-                                MetadataController.setContentControlId(cp.core, adminData.adminContent, editRecord.id, SaveCCIDValue);
+                                adminData.adminContent.setContentControlId(cp.core, editRecord.id, SaveCCIDValue);
                                 editRecord.contentControlId_Name = MetadataController.getContentNameByID(cp.core, SaveCCIDValue);
                                 adminData.adminContent = ContentMetadataModel.createByUniqueName(cp.core, editRecord.contentControlId_Name);
                                 adminData.adminContent.id = adminData.adminContent.id;
@@ -1656,76 +1656,76 @@ namespace Contensive.Addons.AdminSite {
             }
             return result;
         }
-        //
-        //========================================================================
-        // Get sql for menu
-        //   if MenuContentName is blank, it will select values from either cdef
-        //========================================================================
-        //
-        private string GetMenuSQL(CPClass cp, string ParentCriteria, string MenuContentName) {
-            string result = "";
-            try {
-                string iParentCriteria = null;
-                string Criteria = null;
-                string SelectList = null;
-                List<int> editableCdefIdList = null;
-                //
-                Criteria = "(Active<>0)";
-                if (!string.IsNullOrEmpty(MenuContentName)) {
-                    //ContentControlCriteria = cp.core.csv_GetContentControlCriteria(MenuContentName)
-                    Criteria = Criteria + "AND" + MetadataController.getContentControlCriteria(cp.core, MenuContentName);
-                }
-                iParentCriteria = GenericController.encodeEmpty(ParentCriteria, "");
-                if (cp.core.session.isAuthenticatedDeveloper(cp.core)) {
-                    //
-                    // ----- Developer
-                    //
-                } else if (cp.core.session.isAuthenticatedAdmin(cp.core)) {
-                    //
-                    // ----- Administrator
-                    //
-                    Criteria = Criteria + "AND((DeveloperOnly is null)or(DeveloperOnly=0))"
-                        + "AND(ID in ("
-                        + " SELECT AllowedEntries.ID"
-                        + " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentID = ccContent.ID"
-                        + " Where ((ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0)))"
-                            + "OR(ccContent.ID Is Null)"
-                        + "))";
-                } else {
-                    //
-                    // ----- Content Manager
-                    //
-                    string CMCriteria = null;
+        ////
+        ////========================================================================
+        //// Get sql for menu
+        ////   if MenuContentName is blank, it will select values from either cdef
+        ////========================================================================
+        ////
+        //private string GetMenuSQL(CPClass cp, string ParentCriteria, string MenuContentName) {
+        //    string result = "";
+        //    try {
+        //        string iParentCriteria = null;
+        //        string Criteria = null;
+        //        string SelectList = null;
+        //        List<int> editableCdefIdList = null;
+        //        //
+        //        Criteria = "(Active<>0)";
+        //        if (!string.IsNullOrEmpty(MenuContentName)) {
+        //            //ContentControlCriteria = cp.core.csv_GetContentControlCriteria(MenuContentName)
+        //            Criteria = Criteria + "AND" + MetadataController.getContentControlCriteria(cp.core, MenuContentName);
+        //        }
+        //        iParentCriteria = GenericController.encodeEmpty(ParentCriteria, "");
+        //        if (cp.core.session.isAuthenticatedDeveloper(cp.core)) {
+        //            //
+        //            // ----- Developer
+        //            //
+        //        } else if (cp.core.session.isAuthenticatedAdmin(cp.core)) {
+        //            //
+        //            // ----- Administrator
+        //            //
+        //            Criteria = Criteria + "AND((DeveloperOnly is null)or(DeveloperOnly=0))"
+        //                + "AND(ID in ("
+        //                + " SELECT AllowedEntries.ID"
+        //                + " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentID = ccContent.ID"
+        //                + " Where ((ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0)))"
+        //                    + "OR(ccContent.ID Is Null)"
+        //                + "))";
+        //        } else {
+        //            //
+        //            // ----- Content Manager
+        //            //
+        //            string CMCriteria = null;
 
-                    editableCdefIdList = MetadataController.getEditableMetaDataIdList(cp.core);
-                    if (editableCdefIdList.Count == 0) {
-                        CMCriteria = "(1=0)";
-                    } else if (editableCdefIdList.Count == 1) {
-                        CMCriteria = "(ccContent.ID=" + editableCdefIdList[0] + ")";
-                    } else {
-                        CMCriteria = "(ccContent.ID in (" + string.Join(",", editableCdefIdList) + "))";
-                    }
+        //            editableCdefIdList = MetadataController.getEditableMetaDataIdList(cp.core);
+        //            if (editableCdefIdList.Count == 0) {
+        //                CMCriteria = "(1=0)";
+        //            } else if (editableCdefIdList.Count == 1) {
+        //                CMCriteria = "(ccContent.ID=" + editableCdefIdList[0] + ")";
+        //            } else {
+        //                CMCriteria = "(ccContent.ID in (" + string.Join(",", editableCdefIdList) + "))";
+        //            }
 
-                    Criteria = Criteria + "AND((DeveloperOnly is null)or(DeveloperOnly=0))"
-                        + "AND((AdminOnly is null)or(AdminOnly=0))"
-                        + "AND(ID in ("
-                        + " SELECT AllowedEntries.ID"
-                        + " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentID = ccContent.ID"
-                        + " Where (" + CMCriteria + "and(ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0))And((ccContent.AdminOnly is null)or(ccContent.AdminOnly=0)))"
-                            + "OR(ccContent.ID Is Null)"
-                        + "))";
-                }
-                if (!string.IsNullOrEmpty(iParentCriteria)) {
-                    Criteria = "(" + iParentCriteria + ")AND" + Criteria;
-                }
-                SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle, HelpAddonID,HelpCollectionID,0 as collectionid";
-                result = "select " + SelectList + " from ccMenuEntries where " + Criteria + " order by ccMenuEntries.Name";
-            } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
-            }
-            return result;
-        }
-        //
+        //            Criteria = Criteria + "AND((DeveloperOnly is null)or(DeveloperOnly=0))"
+        //                + "AND((AdminOnly is null)or(AdminOnly=0))"
+        //                + "AND(ID in ("
+        //                + " SELECT AllowedEntries.ID"
+        //                + " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentID = ccContent.ID"
+        //                + " Where (" + CMCriteria + "and(ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0))And((ccContent.AdminOnly is null)or(ccContent.AdminOnly=0)))"
+        //                    + "OR(ccContent.ID Is Null)"
+        //                + "))";
+        //        }
+        //        if (!string.IsNullOrEmpty(iParentCriteria)) {
+        //            Criteria = "(" + iParentCriteria + ")AND" + Criteria;
+        //        }
+        //        SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle, HelpAddonID,HelpCollectionID,0 as collectionid";
+        //        result = "select " + SelectList + " from ccMenuEntries where " + Criteria + " order by ccMenuEntries.Name";
+        //    } catch (Exception ex) {
+        //        LogController.handleError(cp.core, ex);
+        //    }
+        //    return result;
+        //}
+        ////
         //========================================================================
         // Get Menu Link
         //========================================================================
@@ -2387,7 +2387,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 bool IsEmptyList = false;
                 int ParentContentID = 0;
-                string ParentContentName = null;
+                //string ParentContentName = null;
                 string ChildContentName = "";
                 int ChildContentID = 0;
                 bool AddAdminMenuEntry = false;
@@ -2431,22 +2431,23 @@ namespace Contensive.Addons.AdminSite {
                         // Process input
                         //
                         ParentContentID = cp.core.docProperties.getInteger("ParentContentID");
-                        ParentContentName = MetadataController.getContentNameByID(cp.core, ParentContentID);
+                        var parentContentMetadata = ContentMetadataModel.create(cp.core, ParentContentID);
                         ChildContentName = cp.core.docProperties.getText("ChildContentName");
                         AddAdminMenuEntry = cp.core.docProperties.getBoolean("AddAdminMenuEntry");
                         GroupID = cp.core.docProperties.getInteger("GroupID");
                         NewGroup = cp.core.docProperties.getBoolean("NewGroup");
                         NewGroupName = cp.core.docProperties.getText("NewGroupName");
                         //
-                        if ((string.IsNullOrEmpty(ParentContentName)) || (string.IsNullOrEmpty(ChildContentName))) {
+                        if ((parentContentMetadata==null) || (string.IsNullOrEmpty(ChildContentName))) {
                             Processor.Controllers.ErrorController.addUserError(cp.core, "You must select a parent and provide a child name.");
                         } else {
                             //
                             // Create Definition
                             //
                             Description = Description + "<div>&nbsp;</div>"
-                                + "<div>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]</div>";
-                            MetadataController.createContentChild(cp.core, ChildContentName, ParentContentName, cp.core.session.user.id);
+                                + "<div>Creating content [" + ChildContentName + "] from [" + parentContentMetadata.name + "]</div>";
+                            var childContentMetadata = parentContentMetadata.createContentChild(cp.core, ChildContentName, cp.core.session.user.id);
+
                             ChildContentID = ContentMetadataModel.getContentId(cp.core, ChildContentName);
                             //
                             // Create Group and Rule

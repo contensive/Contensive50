@@ -18,86 +18,41 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class MetadataController {
 
-        //       
-        //===========================================================================
-        /// <summary>
-        /// returns a comma delimited list of ContentIDs that the Member can author
-        /// </summary>
-        /// <param name="core"></param>
-        /// <returns></returns>
-        public static List<int> getEditableMetaDataIdList(CoreController core) {
-            try {
-                string SQL = "Select ccGroupRules.ContentID as ID"
-                + " FROM ((ccmembersrules"
-                + " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)"
-                + " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)"
-                + " WHERE"
-                    + " (ccMemberRules.MemberID=" + core.session.user.id + ")"
-                    + " AND(ccGroupRules.Active<>0)"
-                    + " AND(ccContent.Active<>0)"
-                    + " AND(ccMemberRules.Active<>0)";
-                DataTable cidDataTable = core.db.executeQuery(SQL);
-                int CIDCount = cidDataTable.Rows.Count;
-                List<int> returnList = new List<int>();
-                for (int CIDPointer = 0; CIDPointer < CIDCount; CIDPointer++) {
-                    int ContentID = encodeInteger(cidDataTable.Rows[CIDPointer][0]);
-                    returnList.Add(ContentID);
-                    var metaData = ContentMetadataModel.create(core, ContentID);
-                    if (metaData != null) {
-                        returnList.AddRange(metaData.childIdList(core));
-                    }
-                }
-                return returnList;
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
-            }
-        }
-        //
-        //=============================================================================
-        /// <summary>
-        /// Create a child content from a parent content
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="childContentName"></param>
-        /// <param name="parentContentName"></param>
-        /// <param name="memberID"></param>
-        public static void createContentChild(CoreController core, string childContentName, string parentContentName, int memberID) {
-            try {
-                //
-                // Get ContentID of parent
-                var content = ContentModel.createByUniqueName(core, parentContentName);
-                if (content == null) { throw (new GenericException("Can not create Child Content [" + childContentName + "] because the Parent Content [" + parentContentName + "] was not found.")); }
-                //
-                // -- test if the child already exists
-                var childContent = ContentModel.createByUniqueName(core, childContentName);
-                if (childContent != null) {
-                    if (childContent.parentID != content.id) { throw (new GenericException("Can not create Child Content [" + childContentName + "] because this content name is already in use.")); }
-                    //
-                    // -- this child already exists, mark createkey so upgrade will not delete it
-                    childContent.createKey = 0;
-                    childContent.save(core);
-                    return;
-                }
-                //
-                // -- convert this object to a child of the record it was opened with, and save
-                content.parentID = content.id;
-                content.name = childContentName;
-                content.createdBy = memberID;
-                content.modifiedBy = memberID;
-                content.dateAdded = content.modifiedDate = DateTime.Now;
-                content.ccguid = createGuid();
-                content.id = 0;
-                content.save(core);
-                //
-                // ----- Load metadata
-                //
-                core.cache.invalidateAll();
-                core.clearMetaData();
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-            }
-        }
+        ////       
+        ////===========================================================================
+        ///// <summary>
+        ///// returns a comma delimited list of ContentIDs that the Member can author
+        ///// </summary>
+        ///// <param name="core"></param>
+        ///// <returns></returns>
+        //public static List<int> getEditableMetaDataIdList(CoreController core) {
+        //    try {
+        //        string SQL = "Select ccGroupRules.ContentID as ID"
+        //        + " FROM ((ccmembersrules"
+        //        + " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)"
+        //        + " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)"
+        //        + " WHERE"
+        //            + " (ccMemberRules.MemberID=" + core.session.user.id + ")"
+        //            + " AND(ccGroupRules.Active<>0)"
+        //            + " AND(ccContent.Active<>0)"
+        //            + " AND(ccMemberRules.Active<>0)";
+        //        DataTable cidDataTable = core.db.executeQuery(SQL);
+        //        int CIDCount = cidDataTable.Rows.Count;
+        //        List<int> returnList = new List<int>();
+        //        for (int CIDPointer = 0; CIDPointer < CIDCount; CIDPointer++) {
+        //            int ContentID = encodeInteger(cidDataTable.Rows[CIDPointer][0]);
+        //            returnList.Add(ContentID);
+        //            var metaData = ContentMetadataModel.create(core, ContentID);
+        //            if (metaData != null) {
+        //                returnList.AddRange(metaData.childIdList(core));
+        //            }
+        //        }
+        //        return returnList;
+        //    } catch (Exception ex) {
+        //        LogController.handleError(core, ex);
+        //        throw;
+        //    }
+        //}
         //
         //========================================================================
         /// <summary>
@@ -116,24 +71,24 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-        //
-        //========================================================================
-        /// <summary>
-        /// Get a DataSource Name from its ContentName
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="contentName"></param>
-        /// <returns></returns>
-        public static string getContentDataSource(CoreController core, string contentName) {
-            try {
-                var meta = ContentMetadataModel.createByUniqueName(core, contentName);
-                if (meta != null) { return meta.dataSourceName; }
-                return string.Empty;
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
-            }
-        }
+        ////
+        ////========================================================================
+        ///// <summary>
+        ///// Get a DataSource Name from its ContentName
+        ///// </summary>
+        ///// <param name="core"></param>
+        ///// <param name="contentName"></param>
+        ///// <returns></returns>
+        //public static string getContentDataSource(CoreController core, string contentName) {
+        //    try {
+        //        var meta = ContentMetadataModel.createByUniqueName(core, contentName);
+        //        if (meta != null) { return meta.dataSourceName; }
+        //        return string.Empty;
+        //    } catch (Exception ex) {
+        //        LogController.handleError(core, ex);
+        //        throw;
+        //    }
+        //}
         //
         //========================================================================
         /// <summary>
@@ -152,125 +107,21 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
+        ////
+        ////========================================================================
+        ///// <summary>
+        ///// return the sql criteria required to return only records included in the content specified
+        ///// </summary>
+        ///// <param name="core"></param>
+        ///// <param name="contentName"></param>
+        ///// <returns></returns>
+        //public static string getContentControlCriteria(CoreController core, string contentName) {
+        //    var meta = ContentMetadataModel.createByUniqueName(core, contentName);
+        //    if (meta == null) { return ""; }
+        //    return meta.legacyContentControlCriteria;
+        //}
         //
-        //========================================================================
-        /// <summary>
-        /// Get a tables first ContentID from Tablename
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-        public static int getContentIdByTablename(CoreController core, string tableName) {
-            if (string.IsNullOrWhiteSpace(tableName)) { return 0; }
-            using (var dt = core.db.executeQuery("select top 1 ContentControlID from " + tableName + " where (contentcontrolid is not null) order by contentcontrolid;")) {
-                if (dt != null) { return DbController.getDataRowFieldInteger(dt.Rows[0], "contentcontrolid"); }
-            }
-
-            return 0;
-        }
         //
-        //========================================================================
-        /// <summary>
-        /// return the sql criteria required to return only records included in the content specified
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="contentName"></param>
-        /// <returns></returns>
-        public static string getContentControlCriteria(CoreController core, string contentName) {
-            var meta = ContentMetadataModel.createByUniqueName(core, contentName);
-            if (meta == null) { return ""; }
-            return meta.legacyContentControlCriteria;
-        }
-        //   
-        //============================================================================================================
-        /// <summary>
-        /// set the content control Id for a record, all potentially all its child records (if parentid field exists)
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="contentId"></param>
-        /// <param name="recordId"></param>
-        /// <param name="newContentControlID"></param>
-        /// <param name="UsedIDString"></param>
-        public static void setContentControlId(CoreController core, ContentMetadataModel contentMeta, int recordId, int newContentControlID, string UsedIDString = "") {
-            if (contentMeta == null) { return; }
-            //
-            // -- update the record
-            core.db.executeNonQuery("update " + contentMeta.tableName + " set contentcontrolid=" + newContentControlID + " where id=" + recordId);
-            //
-            // -- fix content watch
-            core.db.executeQuery("update ccContentWatch set ContentID=" + newContentControlID + ", ContentRecordKey='" + newContentControlID + "." + recordId + "' where ContentID=" + contentMeta.id + " and RecordID=" + recordId);
-            //
-            // -- if content includes a parentId field (like page content), update all child records to this meta.id
-            if (contentMeta.fields.ContainsKey("parentid")) {
-                using (var dt = core.db.executeQuery("select id from " + contentMeta.tableName + " where parentid=" + recordId)) {
-                    foreach (DataRow dr in dt.Rows) {
-                        setContentControlId(core, contentMeta, DbController.getDataRowFieldInteger(dr, "id"), newContentControlID, UsedIDString);
-                    }
-                }
-            }
-        }
-        //
-        [Obsolete("deprecated, instead create contentMeta, lookup field and use property of field", true)]
-        public static string getContentFieldProperty(CoreController core, string ContentName, string FieldName, string PropertyName) {
-            throw new GenericException("getContentFieldProperty deprecated, instead create contentMeta, lookup field and use property of field");
-            //string result = "";
-            //try {
-            //    ContentMetaDomainModel Contentdefinition = MetaModel.createByUniqueName(core, ContentName);
-            //    if ((string.IsNullOrEmpty(FieldName)) || (Contentdefinition.fields.Count < 1)) {
-            //        throw (new GenericException("Content Name [" + GenericController.encodeText(ContentName) + "] or FieldName [" + FieldName + "] was not valid"));
-            //    } else {
-            //        foreach (KeyValuePair<string, Models.Domain.metadataFieldModel> keyValuePair in Contentdefinition.fields) {
-            //            Models.Domain.metadataFieldModel field = keyValuePair.Value;
-            //            if (FieldName.ToLowerInvariant() == field.nameLc) {
-            //                switch (PropertyName.ToUpper()) {
-            //                    case "FIELDTYPE":
-            //                    case "TYPE":
-            //                        result = field.fieldTypeId.ToString();
-            //                        break;
-            //                    case "HTMLCONTENT":
-            //                        result = field.htmlContent.ToString();
-            //                        break;
-            //                    case "ADMINONLY":
-            //                        result = field.adminOnly.ToString();
-            //                        break;
-            //                    case "AUTHORABLE":
-            //                        result = field.authorable.ToString();
-            //                        break;
-            //                    case "CAPTION":
-            //                        result = field.caption;
-            //                        break;
-            //                    case "REQUIRED":
-            //                        result = field.required.ToString();
-            //                        break;
-            //                    case "UNIQUENAME":
-            //                        result = field.uniqueName.ToString();
-            //                        break;
-            //                    case "UNIQUE":
-            //                        //
-            //                        // fix for the uniquename screwup - it is not unique name, it is unique value
-            //                        //
-            //                        result = field.uniqueName.ToString();
-            //                        break;
-            //                    case "DEFAULT":
-            //                        result = GenericController.encodeText(field.defaultValue);
-            //                        break;
-            //                    case "MEMBERSELECTGROUPID":
-            //                        result = field.memberSelectGroupId_get(core).ToString();
-            //                        break;
-            //                    default:
-            //                        break;
-            //                }
-            //                break;
-            //            }
-            //        }
-            //    }
-            //} catch (Exception ex) {
-            //    LogController.handleError(core, ex);
-            //}
-            //return result;
-        }
-        //
-        // todo change contentname to contentMeta object
         //=============================================================
         /// <summary>
         /// Return a record name given the record id. If not record is found, blank is returned.
@@ -279,12 +130,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 var meta = ContentMetadataModel.createByUniqueName(core, ContentName);
                 if (meta == null) { return string.Empty; }
-                using (DataTable dt = core.db.executeQuery("select name from " + meta.tableName + " where id=" + recordID)) {
-                    foreach (DataRow dr in dt.Rows) {
-                        return DbController.getDataRowFieldText(dr, "name");
-                    }
-                }
-                return string.Empty;
+                return meta.getRecordName(core, recordID);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -309,37 +155,6 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError(core, ex);
                 throw;
             }
-        }
-        //
-        //=============================================================
-        /// <summary>
-        /// Legacy method to get a records id from either the guid or name
-        /// </summary>
-        [Obsolete("Use the methods specific to each field type", false)]
-        public static int getRecordId_Legacy(CoreController core, string contentName, string recordGuidOrName) {
-            if (isGuid(recordGuidOrName)) { return getRecordId(core, contentName, recordGuidOrName); }
-            return getRecordIdByUniqueName(core, contentName, recordGuidOrName);
-        }
-        //
-        //=============================================================
-        /// <summary>
-        /// get a record's id from its guid
-        /// </summary>
-        /// <param name="contentName"></param>
-        /// <param name="recordGuid"></param>
-        /// <returns></returns>
-        //=============================================================
-        //
-        public static int getRecordId(CoreController core, string contentName, string recordGuid) {
-            if (string.IsNullOrWhiteSpace(recordGuid)) { return 0; }
-            var meta = ContentMetadataModel.createByUniqueName(core, contentName);
-            if ((meta == null) || (string.IsNullOrWhiteSpace(meta.tableName))) { return 0; }
-            using (DataTable dt = core.db.executeQuery("select top 1 id from " + meta.tableName + " where ccguid=" + DbController.encodeSQLText(recordGuid) + " order by id")) {
-                foreach (DataRow dr in dt.Rows) {
-                    return DbController.getDataRowFieldInteger(dr, "id");
-                }
-            }
-            return 0;
         }
         //
         //=============================================================

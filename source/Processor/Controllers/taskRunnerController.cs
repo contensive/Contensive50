@@ -124,7 +124,7 @@ namespace Contensive.Processor.Controllers {
                 long workingSetMemory = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
                 long virtualMemory = System.Diagnostics.Process.GetCurrentProcess().VirtualMemorySize64;
                 long privateMemory = System.Diagnostics.Process.GetCurrentProcess().PrivateMemorySize64;
-                LogController.forceNLog("TaskRunner exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", LogController.logLevel.Info);
+                LogController.forceNLog("TaskRunner exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", LogController.LogLevel.Info);
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
                     LogController.handleError(cp.core,ex);
@@ -257,11 +257,11 @@ namespace Contensive.Processor.Controllers {
                         task.save(cp.core);
                         //
                         // -- info log the task running - so info state will log for memory leaks
-                        LogController.forceNLog("TaskRunner exit, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", LogController.logLevel.Info);
+                        LogController.forceNLog("TaskRunner exit, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", LogController.LogLevel.Info);
                     }
                 }
             } catch (Exception ex) {
-                LogController.forceNLog("TaskRunner exception, ex [" + ex.ToString()  + "]", LogController.logLevel.Error);
+                LogController.forceNLog("TaskRunner exception, ex [" + ex.ToString()  + "]", LogController.LogLevel.Error);
                 Console.WriteLine("Error: [" + ex.ToString() + "]");
             }
         }

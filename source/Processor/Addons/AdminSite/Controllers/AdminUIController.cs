@@ -1056,52 +1056,53 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="core"></param>
         /// <param name="fieldName"></param>
         /// <param name="fieldValue"></param>
-        /// <param name="lookupContentID"></param>
+        /// <param name="lookupContentId"></param>
         /// <param name="readOnly"></param>
         /// <param name="htmlId"></param>
         /// <param name="WhyReadOnlyMsg"></param>
         /// <param name="fieldRequired"></param>
         /// <param name="IsEmptyList"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_LookupContent( CoreController core, string fieldName, int fieldValue, int lookupContentID, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
+        public static string getDefaultEditor_LookupContent( CoreController core, string fieldName, int fieldValue, int lookupContentId, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
             string result = "";
-            string LookupContentName = "";
-            if (lookupContentID != 0) LookupContentName = GenericController.encodeText(MetadataController.getContentNameByID(core, lookupContentID));
+            ContentMetadataModel lookupContentMetacontent = ContentMetadataModel.create( core, lookupContentId );
+            if ( lookupContentMetacontent == null) {
+                LogController.logWarn(core, "Lookup content not set, field [" + fieldName + "], lookupContentId [" + lookupContentId + "]");
+                return string.Empty;
+            }
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
                 result += (HtmlController.inputHidden(fieldName, GenericController.encodeText(fieldValue)));
-                if (!string.IsNullOrEmpty(LookupContentName)) {
-                    using (var csData = new CsModel(core)) {
-                        csData.openRecord(LookupContentName, fieldValue, "Name,ContentControlID");
-                        if (csData.ok()) {
-                            if (csData.getText("Name") == "") {
-                                result += ("No Name");
-                            } else {
-                                result += (HtmlController.encodeHtml(csData.getText("Name")));
-                            }
-                            result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentID + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">View details in new window</a>]");
+                using (var csData = new CsModel(core)) {
+                    csData.openRecord(lookupContentMetacontent.name, fieldValue, "Name,ContentControlID");
+                    if (csData.ok()) {
+                        if (csData.getText("Name") == "") {
+                            result += ("No Name");
                         } else {
-                            result += ("None");
+                            result += (HtmlController.encodeHtml(csData.getText("Name")));
                         }
+                        result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentId + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">View details in new window</a>]");
+                    } else {
+                        result += ("None");
                     }
-                    result += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + lookupContentID + "\" target=\"_blank\">See all " + LookupContentName + "</a>]");
                 }
+                result += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + lookupContentId + "\" target=\"_blank\">See all " + lookupContentMetacontent.name + "</a>]");
                 result += WhyReadOnlyMsg;
             } else {
                 //
                 // -- not readonly
                 string nonLabel = (fieldRequired) ? "" : "None";
-                result += core.html.selectFromContent(fieldName, fieldValue, LookupContentName, sqlFilter, nonLabel, "", ref IsEmptyList, "select form-control");
+                result += core.html.selectFromContent(fieldName, fieldValue, lookupContentMetacontent.name, sqlFilter, nonLabel, "", ref IsEmptyList, "select form-control");
                 if (fieldValue != 0) {
                     using (var csData = new CsModel(core)) {
-                        if (csData.openRecord(LookupContentName, fieldValue, "ID")) {
-                            result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentID + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">Details</a>]");
+                        if (csData.openRecord(lookupContentMetacontent.name, fieldValue, "ID")) {
+                            result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentId + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">Details</a>]");
                         }
                         csData.close();
                     }
                 }
-                result += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + lookupContentID + "\" target=\"_blank\">See all " + LookupContentName + "</a>]");
+                result += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + lookupContentMetacontent.id + "\" target=\"_blank\">See all " + lookupContentMetacontent.name + "</a>]");
 
             }
             return result;

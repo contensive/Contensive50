@@ -111,7 +111,7 @@ namespace Contensive.Processor.Controllers {
                 long workingSetMemory = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
                 long virtualMemory = System.Diagnostics.Process.GetCurrentProcess().VirtualMemorySize64;
                 long privateMemory = System.Diagnostics.Process.GetCurrentProcess().PrivateMemorySize64;
-                LogController.forceNLog("TaskScheduler exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", LogController.logLevel.Info);
+                LogController.forceNLog("TaskScheduler exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", LogController.LogLevel.Info);
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
                     LogController.handleError(cp.core,ex);

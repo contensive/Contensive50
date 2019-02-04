@@ -1075,8 +1075,8 @@ namespace Contensive.Addons.AdminSite {
                 // Sub CDef filter
                 //
                 if (IndexConfig.subCDefID > 0) {
-                    ContentName = MetadataController.getContentNameByID(core, IndexConfig.subCDefID);
-                    return_SQLWhere += "AND(" + MetadataController.getContentControlCriteria(core, ContentName) + ")";
+                    var contentMetadata = Contensive.Processor.Models.Domain.ContentMetadataModel.create(core, IndexConfig.subCDefID);
+                    if ( contentMetadata != null ) { return_SQLWhere += "AND(" + contentMetadata.legacyContentControlCriteria + ")"; }
                 }
                 //
                 // Return_sqlFrom and Where Clause for Groups filter

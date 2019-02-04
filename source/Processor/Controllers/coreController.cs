@@ -435,7 +435,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp) {
             cp_forAddonExecutionOnly = cp;
-            LogController.forceNLog( "CoreController constructor-0, enter", LogController.logLevel.Trace);
+            LogController.forceNLog( "CoreController constructor-0, enter", LogController.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
             tableSchemaDictionary = null;
@@ -447,7 +447,7 @@ namespace Contensive.Processor.Controllers {
             this.serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
             webServer.iisContext = null;
             constructorInitialize(false);
-            LogController.forceNLog( "CoreController constructor-0, exit", LogController.logLevel.Trace);
+            LogController.forceNLog( "CoreController constructor-0, exit", LogController.LogLevel.Trace);
         }
         //
         //====================================================================================================
@@ -458,7 +458,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName) : base() {
             this.cp_forAddonExecutionOnly = cp;
-            LogController.forceNLog( "CoreController constructor-1, enter", LogController.logLevel.Trace);
+            LogController.forceNLog( "CoreController constructor-1, enter", LogController.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
             tableSchemaDictionary = null;
@@ -473,7 +473,7 @@ namespace Contensive.Processor.Controllers {
                 webServer.iisContext = null;
                 constructorInitialize(false);
             }
-            LogController.forceNLog( "CoreController constructor-1, exit", LogController.logLevel.Trace);
+            LogController.forceNLog( "CoreController constructor-1, exit", LogController.LogLevel.Trace);
         }
         //
         //====================================================================================================
@@ -511,7 +511,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig) : base() {
             cp_forAddonExecutionOnly = cp;
-            LogController.forceNLog( "CoreController constructor-2, enter", LogController.logLevel.Trace);
+            LogController.forceNLog( "CoreController constructor-2, enter", LogController.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
             tableSchemaDictionary = null;
@@ -525,7 +525,7 @@ namespace Contensive.Processor.Controllers {
             appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
             webServer.iisContext = null;
             constructorInitialize(false);
-            LogController.forceNLog( "CoreController constructor-2, exit", LogController.logLevel.Trace);
+            LogController.forceNLog( "CoreController constructor-2, exit", LogController.LogLevel.Trace);
         }
         //
         //====================================================================================================
@@ -536,7 +536,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
-            LogController.forceNLog( "CoreController constructor-3, enter", LogController.logLevel.Trace);
+            LogController.forceNLog( "CoreController constructor-3, enter", LogController.LogLevel.Trace);
             //
             // -- create default auth objects for non-user methods, or until auth is available
             session = new SessionController(this);
@@ -547,7 +547,7 @@ namespace Contensive.Processor.Controllers {
             this.appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
             webServer.initWebContext(httpContext);
             constructorInitialize(true);
-            LogController.forceNLog( "CoreController constructor-3, exit", LogController.logLevel.Trace);
+            LogController.forceNLog( "CoreController constructor-3, exit", LogController.LogLevel.Trace);
         }
         //====================================================================================================
         /// <summary>
@@ -555,7 +555,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public CoreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
-            LogController.forceNLog( "CoreController constructor-4, enter", LogController.logLevel.Trace);
+            LogController.forceNLog( "CoreController constructor-4, enter", LogController.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
             tableSchemaDictionary = null;
@@ -570,7 +570,7 @@ namespace Contensive.Processor.Controllers {
                 webServer.initWebContext(httpContext);
                 constructorInitialize(true);
             }
-            LogController.forceNLog( "CoreController constructor-4, exit", LogController.logLevel.Trace);
+            LogController.forceNLog( "CoreController constructor-4, exit", LogController.LogLevel.Trace);
         }
         //=============================================================================
         /// <summary>
@@ -587,7 +587,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             var sw = new Stopwatch();
             sw.Start();
-            LogController.forceNLog("CoreController executeRoute, enter", LogController.logLevel.Trace);
+            LogController.forceNLog("CoreController executeRoute, enter", LogController.LogLevel.Trace);
             try {
                 if (appConfig != null) {
                     //
@@ -921,7 +921,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( this,ex);
             } finally {
                 // if (doc.routeDictionaryChanges) { DefaultSite.configurationClass.loadRouteMap(cp))}
-                LogController.forceNLog("CoreController executeRoute, exit", LogController.logLevel.Trace);
+                LogController.forceNLog("CoreController executeRoute, exit", LogController.LogLevel.Trace);
             }
             return result;
         }
@@ -1452,7 +1452,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing) {
-            LogController.forceNLog("CoreController dispose, enter", LogController.logLevel.Trace);
+            LogController.forceNLog("CoreController dispose, enter", LogController.LogLevel.Trace);
             if (!this.disposed) {
                 this.disposed = true;
                 if (disposing) {
@@ -1467,7 +1467,7 @@ namespace Contensive.Processor.Controllers {
                     // -- save assemblySkipList
                     if (_assemblySkipList != null) {
                         if (_assemblySkipList.Count > _assemblySkipList_CountWhenLoaded) {
-                            LogController.forceNLog("CoreController dispose, save assemblySkipList to cache, _assemblySkipList.Count [" + _assemblySkipList.Count + "], _assemblySkipList_CountWhenLoaded [" + _assemblySkipList_CountWhenLoaded + "]", LogController.logLevel.Trace);
+                            LogController.forceNLog("CoreController dispose, save assemblySkipList to cache, _assemblySkipList.Count [" + _assemblySkipList.Count + "], _assemblySkipList_CountWhenLoaded [" + _assemblySkipList_CountWhenLoaded + "]", LogController.LogLevel.Trace);
                             cache.storeObject(cacheNameAssemblySkipList, _assemblySkipList);
                         }
                     }
@@ -1608,7 +1608,7 @@ namespace Contensive.Processor.Controllers {
                 // cleanup non-managed objects
                 //
             }
-            LogController.forceNLog("CoreController dispose, exit", LogController.logLevel.Trace);
+            LogController.forceNLog("CoreController dispose, exit", LogController.LogLevel.Trace);
         }
         //
         public void Dispose() {

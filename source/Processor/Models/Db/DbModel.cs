@@ -900,7 +900,7 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public static string getRecordName<T>(CoreController core, int recordId) where T : DbModel {
             try {
-                return getRecordName<DbModel>(core, create<DbModel>(core, recordId));
+                return getRecordName<T>(core, create<T>(core, recordId));
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -916,7 +916,7 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public static string getRecordName<T>(CoreController core, string guid) where T : DbModel {
             try {
-                return getRecordName<DbModel>(core, create<DbModel>(core, guid));
+                return getRecordName<T>(core, create<T>(core, guid));
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -932,7 +932,7 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public static int getRecordId<T>(CoreController core, string guid) where T : DbModel {
             try {
-                var record = create<DbModel>(core, guid);
+                var record = create<T>(core, guid);
                 if (record != null) { return record.id; }
                 return 0;
             } catch (Exception ex) {

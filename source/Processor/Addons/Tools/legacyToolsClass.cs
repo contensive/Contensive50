@@ -1036,7 +1036,7 @@ namespace Contensive.Addons.Tools {
             string result = "";
             try {
                 int ParentContentID = 0;
-                string ParentContentName = null;
+                //string ParentContentName = null;
                 string ChildContentName = "";
                 bool AddAdminMenuEntry = false;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
@@ -1050,19 +1050,20 @@ namespace Contensive.Addons.Tools {
                     // Process input
                     //
                     ParentContentID = core.docProperties.getInteger("ParentContentID");
-                    ParentContentName = Local_GetContentNameByID(ParentContentID);
+                    var parentContentMetadata = ContentMetadataModel.create(core, ParentContentID);
+                    //ParentContentName = Local_GetContentNameByID(ParentContentID);
                     ChildContentName = core.docProperties.getText("ChildContentName");
                     AddAdminMenuEntry = core.docProperties.getBoolean("AddAdminMenuEntry");
                     //
                     Stream.Add(SpanClassAdminSmall);
-                    if ((string.IsNullOrEmpty(ParentContentName)) || (string.IsNullOrEmpty(ChildContentName))) {
+                    if ((parentContentMetadata == null) || (string.IsNullOrEmpty(ChildContentName))) {
                         Stream.Add("<p>You must select a parent and provide a child name.</p>");
                     } else {
                         //
                         // Create Definition
                         //
-                        Stream.Add("<P>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]");
-                        MetadataController.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
+                        Stream.Add("<P>Creating content [" + ChildContentName + "] from [" + parentContentMetadata + "]");
+                        var childContentMetadata = parentContentMetadata.createContentChild(core, ChildContentName, core.session.user.id);
                         //
                         Stream.Add("<br>Reloading Content Definitions...");
                         core.cache.invalidateAll();

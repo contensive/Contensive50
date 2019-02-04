@@ -1618,7 +1618,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                     }
                                                                                                 }
                                                                                                 if (IsFieldFound) {
-                                                                                                    string FieldValue = FieldNode.InnerText;
+                                                                                                    string recordGuid = FieldNode.InnerText;
                                                                                                     switch (fieldTypeId) {
                                                                                                         case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
                                                                                                         case CPContentBaseClass.fileTypeIdEnum.Redirect: {
@@ -1630,26 +1630,24 @@ namespace Contensive.Processor.Controllers {
                                                                                                                 //
                                                                                                                 // read in text value, if a guid, use it, otherwise assume name
                                                                                                                 if (FieldLookupContentID != 0) {
-                                                                                                                    string FieldLookupContentName = MetadataController.getContentNameByID(core, FieldLookupContentID);
-                                                                                                                    if (!string.IsNullOrEmpty(FieldLookupContentName)) {
-                                                                                                                        //
-                                                                                                                        // Lookup by guid
-                                                                                                                        int fieldLookupId = GenericController.encodeInteger(MetadataController.getRecordId(core, FieldLookupContentName, FieldValue));
+                                                                                                                    var lookupContentMetadata = ContentMetadataModel.create(core, FieldLookupContentID);
+                                                                                                                    if ( lookupContentMetadata != null ) {
+                                                                                                                        int fieldLookupId = lookupContentMetadata.getRecordId(core, recordGuid);
                                                                                                                         if (fieldLookupId <= 0) {
                                                                                                                             return_ErrorMessage = return_ErrorMessage + "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
                                                                                                                         } else {
                                                                                                                             csData.set(FieldName, fieldLookupId);
                                                                                                                         }
                                                                                                                     }
-                                                                                                                } else if (FieldValue.IsNumeric()) {
+                                                                                                                } else if (recordGuid.IsNumeric()) {
                                                                                                                     //
                                                                                                                     // must be lookup list
-                                                                                                                    csData.set(FieldName, FieldValue);
+                                                                                                                    csData.set(FieldName, recordGuid);
                                                                                                                 }
                                                                                                                 break;
                                                                                                             }
                                                                                                         default: {
-                                                                                                                csData.set(FieldName, FieldValue);
+                                                                                                                csData.set(FieldName, recordGuid);
                                                                                                                 break;
                                                                                                             }
                                                                                                     }

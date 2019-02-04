@@ -18,7 +18,7 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public static class LogController {
         //
-        public enum logLevel {
+        public enum LogLevel {
             /// <summary>
             /// Begin method X, end method X etc
             /// </summary>
@@ -61,7 +61,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="message"></param>
         /// <remarks></remarks>
         public static void logDebug(CoreController core, string message) {
-            log(core, message, logLevel.Debug);
+            log(core, message, LogLevel.Debug);
         }
         //
         //=============================================================================
@@ -72,7 +72,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="message"></param>
         /// <remarks></remarks>
         public static void logError(CoreController core, string message) {
-            log(core, message, logLevel.Error);
+            log(core, message, LogLevel.Error);
         }
         //
         //=============================================================================
@@ -83,7 +83,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="message"></param>
         /// <remarks></remarks>
         public static void logFatal(CoreController core, string message) {
-            log(core, message, logLevel.Fatal);
+            log(core, message, LogLevel.Fatal);
         }
         //
         //=============================================================================
@@ -94,7 +94,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="message"></param>
         /// <remarks></remarks>
         public static void logInfo(CoreController core, string message) {
-            log(core, message, logLevel.Info);
+            log(core, message, LogLevel.Info);
         }
         //
         //=============================================================================
@@ -105,7 +105,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="message"></param>
         /// <remarks></remarks>
         public static void logTrace(CoreController core, string message) {
-            log(core, message, logLevel.Trace);
+            log(core, message, LogLevel.Trace);
         }
         //
         //=============================================================================
@@ -116,7 +116,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="message"></param>
         /// <remarks></remarks>
         public static void logWarn(CoreController core, string message) {
-            log(core, message, logLevel.Warn);
+            log(core, message, LogLevel.Warn);
         }
         //
         //=============================================================================
@@ -126,31 +126,31 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <param name="level"></param>
-        public static void forceNLog(string message, logLevel level ) {
+        public static void forceNLog(string message, LogLevel level ) {
             try {
                 string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
                 string logContent = level.ToString() + "\tthread:" + threadName + "\t" + message;
                 Logger nlogLogger = LogManager.GetCurrentClassLogger();
                 //
                 // -- decouple NLog types from internal enum
-                LogLevel nLogLevel = LogLevel.Info;
+                NLog.LogLevel nLogLevel = NLog.LogLevel.Info;
                 switch (level) {
-                    case logLevel.Trace:
+                    case LogLevel.Trace:
                         nLogLevel = NLog.LogLevel.Trace;
                         break;
-                    case logLevel.Debug:
+                    case LogLevel.Debug:
                         nLogLevel = NLog.LogLevel.Debug;
                         break;
-                    case logLevel.Info:
+                    case LogLevel.Info:
                         nLogLevel = NLog.LogLevel.Info;
                         break;
-                    case logLevel.Warn:
+                    case LogLevel.Warn:
                         nLogLevel = NLog.LogLevel.Warn;
                         break;
-                    case logLevel.Error:
+                    case LogLevel.Error:
                         nLogLevel = NLog.LogLevel.Error;
                         break;
-                    case logLevel.Fatal:
+                    case LogLevel.Fatal:
                         nLogLevel = NLog.LogLevel.Fatal;
                         break;
                 }
@@ -172,9 +172,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <param name="level"></param>
-        public static void log(CoreController core, string message, logLevel level) {
+        public static void log(CoreController core, string message, LogLevel level) {
             try {
-                if ((level >= logLevel.Error) || core.serverConfig.enableLogging) {
+                if ((level >= LogLevel.Error) || core.serverConfig.enableLogging) {
                     //
                     // -- logging enabled or trace log, append log
                     if (core.useNlog) {
@@ -414,7 +414,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="stackPtr">How far down in the stack to look for the method error. Pass 1 if the method calling has the error, 2 if there is an intermediate routine.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static void handleException(CoreController core, Exception ex, logLevel level, string cause, int stackPtr) {
+        public static void handleException(CoreController core, Exception ex, LogLevel level, string cause, int stackPtr) {
             if (!core._handlingExceptionRecursionBlock) {
                 core._handlingExceptionRecursionBlock = true;
                 StackFrame frame = new StackFrame(stackPtr);
@@ -445,37 +445,37 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public static void handleError(CoreController core, Exception ex, string cause) {
-            handleException(core, ex, logLevel.Error, cause, 2);
+            handleException(core, ex, LogLevel.Error, cause, 2);
         }
         //
         //====================================================================================================
         //
         public static void handleError(CoreController core, Exception ex) {
-            handleException(core, ex, logLevel.Error, "n/a", 2);
+            handleException(core, ex, LogLevel.Error, "n/a", 2);
         }
         //
         //====================================================================================================
         //
         public static void handleWarn(CoreController core, Exception ex, string cause) {
-            handleException(core, ex, logLevel.Warn, cause, 2);
+            handleException(core, ex, LogLevel.Warn, cause, 2);
         }
         //
         //====================================================================================================
         //
         public static void handleWarn(CoreController core, Exception ex) {
-            handleException(core, ex, logLevel.Warn, "n/a", 2);
+            handleException(core, ex, LogLevel.Warn, "n/a", 2);
         }
         //
         //====================================================================================================
         //
         public static void handleFatal(CoreController core, Exception ex, string cause) {
-            handleException(core, ex, logLevel.Fatal, cause, 2);
+            handleException(core, ex, LogLevel.Fatal, cause, 2);
         }
         //
         //====================================================================================================
         //
         public static void handleFatal(CoreController core, Exception ex) {
-            handleException(core, ex, logLevel.Fatal, "n/a", 2);
+            handleException(core, ex, LogLevel.Fatal, "n/a", 2);
         }
     }
 }

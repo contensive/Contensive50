@@ -67,7 +67,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// name of sort method to use as default for queries against this content
         /// </summary>
-        public string defaultSortMethod { get; set; } 
+        public string defaultSortMethod { get; set; }
         //
         /// <summary>
         /// 
@@ -92,7 +92,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Group of members who administer Workflow Authoring
         /// </summary>
-        public string editorGroupName { get; set; } 
+        public string editorGroupName { get; set; }
         //
         /// <summary>
         /// 
@@ -127,7 +127,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// deprecate - For admin edit page
         /// </summary>
-        public bool allowCalendarEvents { get; set; } 
+        public bool allowCalendarEvents { get; set; }
         //
         /// <summary>
         /// 
@@ -202,7 +202,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// string that changes if any record in Content Definition changes, in memory only
         /// </summary>
-        public string timeStamp { get; set; } 
+        public string timeStamp { get; set; }
         //
         /// <summary>
         /// fields for this content
@@ -228,7 +228,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Field list used in OpenCSContent calls (all active field definitions)
         /// </summary>
-        public string selectCommaList { get; set; } 
+        public string selectCommaList { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -237,7 +237,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="core"></param>
         /// <returns></returns>
         public List<int> childIdList(CoreController core) {
-            if ( _childIdList == null ) {
+            if (_childIdList == null) {
                 _childIdList = new List<int>();
                 using (DataTable dt = core.db.executeQuery("select id from cccontent where parentid=" + id)) {
                     foreach (DataRow row in dt.Rows) { _childIdList.Add(encodeInteger(row[0])); }
@@ -272,7 +272,7 @@ namespace Contensive.Processor.Models.Domain {
         public static ContentMetadataModel create(CoreController core, ContentModel content, bool loadInvalidFields, bool forceDbLoad) {
             ContentMetadataModel result = null;
             try {
-                if ( content == null ) { return null; }
+                if (content == null) { return null; }
                 if ((!forceDbLoad) && (core.metaDataDictionary.ContainsKey(content.id.ToString()))) { return core.metaDataDictionary[content.id.ToString()]; }
                 if (core.metaDataDictionary.ContainsKey(content.id.ToString())) {
                     //
@@ -308,16 +308,18 @@ namespace Contensive.Processor.Models.Domain {
                         + ", ccSortMethods.OrderByClause as DefaultSortMethod"
                         + ", ccGroups.Name as EditorGroupName"
                         + ", c.AllowContentTracking as AllowContentTracking"
-                        + ", c.AllowTopicRules as AllowTopicRules";
+                        + ", c.AllowTopicRules as AllowTopicRules"
+                        + ", ccAddonCollections.ccguid as addonCollectionGuid"
+                        + ", c.isBaseContent"
+                        + "";
                     //
                     sql += ""
-                        + " from (((((ccContent c"
+                        + " from ((((ccContent c"
                         + " left join ccTables AS ContentTable ON c.ContentTableID = ContentTable.ID)"
-                        + " left join ccTables AS AuthoringTable ON c.AuthoringTableID = AuthoringTable.ID)"
                         + " left join ccDataSources AS ContentDataSource ON ContentTable.DataSourceID = ContentDataSource.ID)"
-                        + " left join ccDataSources AS AuthoringDataSource ON AuthoringTable.DataSourceID = AuthoringDataSource.ID)"
                         + " left join ccSortMethods ON c.DefaultSortMethodID = ccSortMethods.ID)"
-                        + " left join ccGroups ON c.EditorGroupID = ccGroups.ID"
+                        + " left join ccGroups ON c.EditorGroupID = ccGroups.ID)"
+                        + " left join ccAddonCollections ON c.installedByCollectionID = ccAddonCollections.ID"
                         + " where (c.Active<>0)"
                         + " and(c.id=" + content.id.ToString() + ")";
                     using (DataTable dtContent = core.db.executeQuery(sql)) {
@@ -355,7 +357,9 @@ namespace Contensive.Processor.Models.Domain {
                                 allowTopicRules = GenericController.encodeBoolean(contentRow[20]),
                                 activeOnly = true,
                                 aliasID = "ID",
-                                aliasName = "NAME"
+                                aliasName = "NAME",
+                                installedByCollectionGuid = encodeText(contentRow[21]),
+                                isBaseContent = encodeBoolean(contentRow[22])
                             };
                             //
                             // load parent metadata fields first so we can overlay the current metadata field
@@ -602,9 +606,9 @@ namespace Contensive.Processor.Models.Domain {
             return create(core, content, loadInvalidFields, forceDbLoad);
         }
         //
-        public static ContentMetadataModel create(CoreController core, string contentGuid, bool loadInvalidFields) => create(core, contentGuid, loadInvalidFields, false );
+        public static ContentMetadataModel create(CoreController core, string contentGuid, bool loadInvalidFields) => create(core, contentGuid, loadInvalidFields, false);
         //
-        public static ContentMetadataModel create(CoreController core, string contentGuid) => create(core, contentGuid, false, false );
+        public static ContentMetadataModel create(CoreController core, string contentGuid) => create(core, contentGuid, false, false);
         //
         //====================================================================================================
         /// <summary>
@@ -738,7 +742,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -824,7 +828,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="meta"></param>
         /// <param name="fieldName"></param>
         /// <returns></returns>
-        public static ContentFieldMetadataModel getField( CoreController core, ContentMetadataModel meta, string fieldName  ) {
+        public static ContentFieldMetadataModel getField(CoreController core, ContentMetadataModel meta, string fieldName) {
             if (meta == null) return null;
             if (!meta.fields.ContainsKey(fieldName.ToLower())) return null;
             return meta.fields[fieldName.ToLower()];
@@ -1019,7 +1023,6 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="contentMetadata"></param>
         /// <returns></returns>
         public static int verifyContent_returnId(CoreController core, ContentMetadataModel contentMetadata) {
-            int returnContentId = 0;
             try {
                 if (string.IsNullOrWhiteSpace(contentMetadata.name)) { throw new GenericException("Content name can not be blank"); }
                 if (string.IsNullOrWhiteSpace(contentMetadata.tableName)) { throw new GenericException("Content table name can not be blank"); }
@@ -1035,7 +1038,7 @@ namespace Contensive.Processor.Models.Domain {
                         content.name = contentMetadata.name;
                         content.save(core);
                     }
-                    returnContentId = content.id;
+                    contentMetadata.id = content.id;
                     string contentGuid = content.ccguid;
                     bool ContentIsBaseContent = content.isBaseContent;
                     int ContentIDofContent = ContentMetadataModel.getContentId(core, "content");
@@ -1129,15 +1132,19 @@ namespace Contensive.Processor.Models.Domain {
                     sqlList.add("IconWidth", DbController.encodeSQLNumber(contentMetadata.iconWidth));
                     sqlList.add("IconSprites", DbController.encodeSQLNumber(contentMetadata.iconSprites));
                     sqlList.add("installedByCollectionid", DbController.encodeSQLNumber(InstalledByCollectionID));
-                    db.updateTableRecord("ccContent", "ID=" + returnContentId, sqlList);
-                    ContentModel.invalidateRecordCache(core, returnContentId);
+                    sqlList.add("isBaseContent", DbController.encodeSQLBoolean(contentMetadata.isBaseContent));
+                    db.updateTableRecord("ccContent", "ID=" + contentMetadata.id, sqlList);
+                    ContentModel.invalidateRecordCache(core, contentMetadata.id);
+                    //
+                    // -- reload metadata
+                    contentMetadata = ContentMetadataModel.create(core, contentMetadata.id);
                     //
                     // Verify Core Content Definition Fields
                     if (parentId < 1) {
                         //
                         // metadata does not inherit its fields, create what is needed for a non-inherited metadata
                         //
-                        if (!MetadataController.isMetadataField(core, returnContentId, "ID")) {
+                        if(!contentMetadata.fields.ContainsKey( "id" )) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "id",
                                 active = true,
@@ -1151,7 +1158,7 @@ namespace Contensive.Processor.Models.Domain {
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
                         //
-                        if (!MetadataController.isMetadataField(core, returnContentId, "name")) {
+                        if (!contentMetadata.fields.ContainsKey("name")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "name",
                                 active = true,
@@ -1165,7 +1172,7 @@ namespace Contensive.Processor.Models.Domain {
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
                         //
-                        if (!MetadataController.isMetadataField(core, returnContentId, "active")) {
+                        if(!contentMetadata.fields.ContainsKey( "active")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "active",
                                 active = true,
@@ -1179,7 +1186,7 @@ namespace Contensive.Processor.Models.Domain {
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
                         //
-                        if (!MetadataController.isMetadataField(core, returnContentId, "sortorder")) {
+                        if(!contentMetadata.fields.ContainsKey( "sortorder")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "sortorder",
                                 active = true,
@@ -1193,7 +1200,7 @@ namespace Contensive.Processor.Models.Domain {
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
                         //
-                        if (!MetadataController.isMetadataField(core, returnContentId, "dateadded")) {
+                        if(!contentMetadata.fields.ContainsKey( "dateadded")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "dateadded",
                                 active = true,
@@ -1206,7 +1213,7 @@ namespace Contensive.Processor.Models.Domain {
                             };
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        if (!MetadataController.isMetadataField(core, returnContentId, "createdby")) {
+                        if(!contentMetadata.fields.ContainsKey( "createdby")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "createdby",
                                 active = true,
@@ -1220,7 +1227,7 @@ namespace Contensive.Processor.Models.Domain {
                             fieldMetadata.isBaseField = contentMetadata.isBaseContent;
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        if (!MetadataController.isMetadataField(core, returnContentId, "modifieddate")) {
+                        if(!contentMetadata.fields.ContainsKey( "modifieddate")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "modifieddate",
                                 active = true,
@@ -1233,7 +1240,7 @@ namespace Contensive.Processor.Models.Domain {
                             };
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        if (!MetadataController.isMetadataField(core, returnContentId, "modifiedby")) {
+                        if(!contentMetadata.fields.ContainsKey( "modifiedby")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "modifiedby",
                                 active = true,
@@ -1247,7 +1254,7 @@ namespace Contensive.Processor.Models.Domain {
                             fieldMetadata.isBaseField = contentMetadata.isBaseContent;
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        if (!MetadataController.isMetadataField(core, returnContentId, "ContentControlId")) {
+                        if(!contentMetadata.fields.ContainsKey( "ContentControlId")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "contentcontrolid",
                                 active = true,
@@ -1261,7 +1268,7 @@ namespace Contensive.Processor.Models.Domain {
                             fieldMetadata.isBaseField = contentMetadata.isBaseContent;
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        if (!MetadataController.isMetadataField(core, returnContentId, "CreateKey")) {
+                        if(!contentMetadata.fields.ContainsKey( "CreateKey")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "createkey",
                                 active = true,
@@ -1274,7 +1281,7 @@ namespace Contensive.Processor.Models.Domain {
                             };
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        if (!MetadataController.isMetadataField(core, returnContentId, "ccGuid")) {
+                        if(!contentMetadata.fields.ContainsKey( "ccGuid")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "ccguid",
                                 active = true,
@@ -1288,7 +1295,7 @@ namespace Contensive.Processor.Models.Domain {
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
                         // -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
-                        if (!MetadataController.isMetadataField(core, returnContentId, "ContentCategoryId")) {
+                        if(!contentMetadata.fields.ContainsKey( "ContentCategoryId")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "contentcategoryid",
                                 active = true,
@@ -1313,7 +1320,7 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return returnContentId;
+            return contentMetadata.id;
         }
         //
 
@@ -1522,6 +1529,122 @@ namespace Contensive.Processor.Models.Domain {
         public bool containsField(CoreController core, string fieldName) {
             return fields.ContainsKey(fieldName.ToLowerInvariant());
         }
+        //
+        //=============================================================================
+        /// <summary>
+        /// Create a child content from a parent content
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="childContentName"></param>
+        /// <param name="parentContentName"></param>
+        /// <param name="memberID"></param>
+        public ContentMetadataModel createContentChild(CoreController core, string childContentName, int memberID) {
+            try {
+                //
+                // -- test if the child already exists
+                var childContent = ContentModel.createByUniqueName(core, childContentName);
+                if (childContent != null) {
+                    //
+                    // -- child content already exists
+                    if (childContent.parentID != id) { throw (new GenericException("Can not create Child Content [" + childContentName + "] because this content name is already in use.")); }
+                    return createByUniqueName(core, childContentName);
+                }
+                //
+                // -- convert this object to a child of the record it was opened with, and save
+                childContent = ContentModel.createByUniqueName(core, name);
+                childContent.parentID = childContent.id;
+                childContent.name = childContentName;
+                childContent.createdBy = childContent.modifiedBy = memberID;
+                childContent.dateAdded = childContent.modifiedDate = DateTime.Now;
+                childContent.ccguid = createGuid();
+                childContent.id = 0;
+                childContent.save(core);
+                //
+                // ----- Load metadata
+                //
+                core.cache.invalidateAll();
+                core.clearMetaData();
+                //
+                return create(core, childContent);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                return null;
+            }
+        }
+        //   
+        //============================================================================================================
+        /// <summary>
+        /// set the content control Id for a record, all potentially all its child records (if parentid field exists)
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="contentId"></param>
+        /// <param name="recordId"></param>
+        /// <param name="newContentControlID"></param>
+        /// <param name="UsedIDString"></param>
+        public void setContentControlId(CoreController core, int recordId, int newContentControlID, string UsedIDString = "") {
+            //
+            // -- update the record
+            core.db.executeNonQuery("update " + tableName + " set contentcontrolid=" + newContentControlID + " where id=" + recordId);
+            //
+            // -- fix content watch
+            core.db.executeQuery("update ccContentWatch set ContentID=" + newContentControlID + ", ContentRecordKey='" + newContentControlID + "." + recordId + "' where ContentID=" + id + " and RecordID=" + recordId);
+            //
+            // -- if content includes a parentId field (like page content), update all child records to this meta.id
+            if (fields.ContainsKey("parentid")) {
+                using (var dt = core.db.executeQuery("select id from " + tableName + " where parentid=" + recordId)) {
+                    foreach (DataRow dr in dt.Rows) {
+                        setContentControlId(core, DbController.getDataRowFieldInteger(dr, "id"), newContentControlID, UsedIDString);
+                    }
+                }
+            }
+        }
+        //
+        //=============================================================
+        /// <summary>
+        /// Return a record name given the record id. If not record is found, blank is returned.
+        /// </summary>
+        public string getRecordName(CoreController core, int recordID) {
+            try {
+                using (DataTable dt = core.db.executeQuery("select name from " + tableName + " where id=" + recordID)) {
+                    foreach (DataRow dr in dt.Rows) {
+                        return DbController.getDataRowFieldText(dr, "name");
+                    }
+                }
+                return string.Empty;
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
+        public int getRecordId(CoreController core, string recordGuid) {
+            try {
+                if(string.IsNullOrWhiteSpace(recordGuid)) { return 0; }
+                using (DataTable dt = core.db.executeQuery("select id from " + tableName + " where ccguid=" + DbController.encodeSQLText(recordGuid))) {
 
+                    foreach (DataRow dr in dt.Rows) {
+                        return DbController.getDataRowFieldInteger(dr, "id");
+                    }
+                }
+                return 0;
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
+        public int getRecordIdByUniqueName(CoreController core, string recordName) {
+            try {
+                using (DataTable dt = core.db.executeQuery("select id from " + tableName + " where name=" + DbController.encodeSqlTableName(recordName))) {
+                    foreach (DataRow dr in dt.Rows) {
+                        return DbController.getDataRowFieldInteger(dr, "id");
+                    }
+                }
+                return 0;
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
     }
 }

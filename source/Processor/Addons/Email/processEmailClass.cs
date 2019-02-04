@@ -97,7 +97,7 @@ namespace Contensive.Addons.Email {
                             using (var csPerson = new CsModel(core)) {
                                 //
                                 // Select all people in the groups for this email
-                                string SQL = "select Distinct ccMembers.ID as MemberID,ccMembers.email"
+                                string SQL = "select Distinct ccMembers.id,ccMembers.email, ccMembers.name"
                                     + " From ((((ccemail"
                                     + " left join ccEmailGroups on ccEmailGroups.EmailID=ccEmail.ID)"
                                     + " left join ccGroups on ccGroups.ID = ccEmailGroups.GroupID)"
@@ -118,18 +118,16 @@ namespace Contensive.Addons.Email {
                                 string LastEmail = null;
                                 LastEmail = "empty";
                                 while (csPerson.ok()) {
-                                    int PeopleID = csPerson.getInteger("MemberID");
-                                    string Email = csPerson.getText("Email");
-                                    if (Email == LastEmail) {
-                                        string PeopleName = MetadataController.getRecordName(core, "people", PeopleID);
-                                        if (string.IsNullOrEmpty(PeopleName)) {
-                                            PeopleName = "user #" + PeopleID;
-                                        }
-                                        EmailStatusList = EmailStatusList + "Not Sent to " + PeopleName + ", duplicate email address (" + Email + ")" + BR;
+                                    int peopleID = csPerson.getInteger("id");
+                                    string peopleEmail = csPerson.getText("Email");
+                                    string peopleName = csPerson.getText("name");
+                                    if (peopleEmail == LastEmail) {
+                                        if (string.IsNullOrEmpty(peopleName)) { peopleName = "user #" + peopleID; }
+                                        EmailStatusList = EmailStatusList + "Not Sent to " + peopleName + ", duplicate email address (" + peopleEmail + ")" + BR;
                                     } else {
-                                        EmailStatusList = EmailStatusList + queueEmailRecord(core, PeopleID, emailID, DateTime.MinValue, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, csPerson.getText("CopyFilename"), csPerson.getBoolean("AllowSpamFooter"), csPerson.getBoolean("AddLinkEID"), "") + BR;
+                                        EmailStatusList = EmailStatusList + queueEmailRecord(core, peopleID, emailID, DateTime.MinValue, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, csPerson.getText("CopyFilename"), csPerson.getBoolean("AllowSpamFooter"), csPerson.getBoolean("AddLinkEID"), "") + BR;
                                     }
-                                    LastEmail = Email;
+                                    LastEmail = peopleEmail;
                                     csPerson.goNext();
                                 }
                                 csPerson.close();

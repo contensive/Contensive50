@@ -307,26 +307,26 @@ namespace Contensive.Processor.Controllers {
                                             sb.Append(" IsBaseField=\"" + xmlValueBoolean(fieldMeta[f_IsBaseField, CFieldPtr]) + "\"");
                                         }
                                         //
-                                        int RecordID = GenericController.encodeInteger(fieldMeta[f_LookupContentID, CFieldPtr]);
-                                        string RecordName = cacheLookup(RecordID, Contents);
+                                        int recordId = GenericController.encodeInteger(fieldMeta[f_LookupContentID, CFieldPtr]);
+                                        string RecordName = cacheLookup(recordId, Contents);
                                         sb.Append(" LookupContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                         //
-                                        RecordID = GenericController.encodeInteger(fieldMeta[f_RedirectContentID, CFieldPtr]);
-                                        RecordName = cacheLookup(RecordID, Contents);
+                                        recordId = GenericController.encodeInteger(fieldMeta[f_RedirectContentID, CFieldPtr]);
+                                        RecordName = cacheLookup(recordId, Contents);
                                         sb.Append(" RedirectContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                         //
-                                        RecordID = GenericController.encodeInteger(fieldMeta[f_ManyToManyContentID, CFieldPtr]);
-                                        RecordName = cacheLookup(RecordID, Contents);
+                                        recordId = GenericController.encodeInteger(fieldMeta[f_ManyToManyContentID, CFieldPtr]);
+                                        RecordName = cacheLookup(recordId, Contents);
                                         sb.Append(" ManyToManyContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                         //
-                                        RecordID = GenericController.encodeInteger(fieldMeta[f_ManyToManyRuleContentID, CFieldPtr]);
-                                        RecordName = cacheLookup(RecordID, Contents);
+                                        recordId = GenericController.encodeInteger(fieldMeta[f_ManyToManyRuleContentID, CFieldPtr]);
+                                        RecordName = cacheLookup(recordId, Contents);
                                         sb.Append(" ManyToManyRuleContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                         //
-                                        RecordID = GenericController.encodeInteger(fieldMeta[f_MemberSelectGroupId, CFieldPtr]);
+                                        recordId = GenericController.encodeInteger(fieldMeta[f_MemberSelectGroupId, CFieldPtr]);
                                         RecordName = "";
-                                        if (RecordID > 0) {
-                                            RecordName = MetadataController.getRecordName(core, "groups", RecordID);
+                                        if (recordId > 0) {
+                                            RecordName = Models.Db.DbModel.getRecordName<Models.Db.GroupModel>(core, recordId);
                                         }
                                         sb.Append(" MemberSelectGroup=\"" + xmlValueText(fieldMeta[f_MemberSelectGroupId, CFieldPtr]) + "\"");
 

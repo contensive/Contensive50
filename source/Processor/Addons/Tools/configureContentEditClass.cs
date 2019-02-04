@@ -34,27 +34,15 @@ namespace Contensive.Addons.Tools {
             CoreController core = cp.core;
             try {
                 KeyPtrController Index = new KeyPtrController();
-                string ButtonList = ButtonCancel + "," + ButtonSelect;
-                string ToolButton = cp.Doc.GetText("Button");
-                bool ReloadCDef = cp.Doc.GetBoolean("ReloadCDef");
-                int ContentID = cp.Doc.GetInteger("" + RequestNameToolContentID + "");
-                string dataSourceName = "default";
-                string ContentName = "";
-                ContentMetadataModel CDef = null;
-                string TableName = "";
-                if (ContentID > 0) {
-                    ContentName = cp.Content.GetRecordName("content", ContentID);
-                    if (!string.IsNullOrEmpty(ContentName)) {
-                        TableName = cp.Content.GetTable(ContentName);
-                        dataSourceName = cp.Content.GetDataSource(ContentName);
-                        CDef = ContentMetadataModel.create(core, ContentID, true, true);
-                    }
-                }
+                int ContentID = cp.Doc.GetInteger( RequestNameToolContentID );
+                var contentMetadata = ContentMetadataModel.create(core, ContentID, true, true);
                 int RecordCount = 0;
                 int formFieldId = 0;
                 string StatusMessage = "";
                 string ErrorMessage = "";
-                if (CDef != null) {
+                bool ReloadCDef = cp.Doc.GetBoolean("ReloadCDef");
+                if (contentMetadata != null) {
+                    string ToolButton = cp.Doc.GetText("Button");
                     //
                     if (!string.IsNullOrEmpty(ToolButton)) {
                         bool AllowContentAutoLoad = false;
@@ -73,14 +61,14 @@ namespace Contensive.Addons.Tools {
                                 for (RecordPointer = 0; RecordPointer < RecordCount; RecordPointer++) {
                                     //
                                     string formFieldName = cp.Doc.GetText("dtfaName." + RecordPointer);
-                                    CPContentBaseClass.fileTypeIdEnum  formFieldTypeId = (CPContentBaseClass.fileTypeIdEnum)cp.Doc.GetInteger("dtfaType." + RecordPointer);
+                                    CPContentBaseClass.fileTypeIdEnum formFieldTypeId = (CPContentBaseClass.fileTypeIdEnum)cp.Doc.GetInteger("dtfaType." + RecordPointer);
                                     formFieldId = GenericController.encodeInteger(cp.Doc.GetInteger("dtfaID." + RecordPointer));
                                     bool formFieldInherited = cp.Doc.GetBoolean("dtfaInherited." + RecordPointer);
                                     //
                                     // problem - looking for the name in the Db using the form's name, but it could have changed.
                                     // have to look field up by id
                                     //
-                                    foreach (KeyValuePair<string, Processor.Models.Domain.ContentFieldMetadataModel> cdefFieldKvp in CDef.fields) {
+                                    foreach (KeyValuePair<string, Processor.Models.Domain.ContentFieldMetadataModel> cdefFieldKvp in contentMetadata.fields) {
                                         if (cdefFieldKvp.Value.id == formFieldId) {
                                             //
                                             // Field was found in CDef
@@ -94,8 +82,8 @@ namespace Contensive.Addons.Tools {
                                                         using (var CSSource = new CsModel(core)) {
                                                             if (CSSource.openRecord("Content Fields", formFieldId)) { CSSource.copyRecord(CSTarget); }
                                                         }
-                                                        formFieldId = CSTarget.getInteger( "ID");
-                                                        CSTarget.set( "ContentID", ContentID);
+                                                        formFieldId = CSTarget.getInteger("ID");
+                                                        CSTarget.set("ContentID", ContentID);
                                                     }
                                                     CSTarget.close();
                                                 }
@@ -105,7 +93,7 @@ namespace Contensive.Addons.Tools {
                                                 // Was a field, make it inherit from it's parent
                                                 //
                                                 //CSTarget = CSTarget;
-                                                MetadataController.deleteContentRecord( core,"Content Fields", formFieldId);
+                                                MetadataController.deleteContentRecord(core, "Content Fields", formFieldId);
                                                 ReloadCDef = true;
                                             } else if ((!cdefFieldKvp.Value.inherited) && (!formFieldInherited)) {
                                                 //
@@ -126,8 +114,8 @@ namespace Contensive.Addons.Tools {
                                                         //
                                                         // Create Db field, Field is good but was not before
                                                         //
-                                                        core.db.createSQLTableField( TableName, formFieldName, formFieldTypeId);
-                                                        StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was saved to this content definition and a database field was created in [" + CDef.tableName + "].</LI>";
+                                                        core.db.createSQLTableField(contentMetadata.tableName, formFieldName, formFieldTypeId);
+                                                        StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was saved to this content definition and a database field was created in [" + contentMetadata.tableName + "].</LI>";
                                                     } else if ((string.IsNullOrEmpty(formFieldName)) || (formFieldTypeId == 0)) {
                                                         //
                                                         // name blank or type=0 - do nothing but tell them
@@ -147,16 +135,30 @@ namespace Contensive.Addons.Tools {
                                                         int DataSourceTypeID = core.db.getDataSourceType();
                                                         switch (DataSourceTypeID) {
                                                             case DataSourceTypeODBCMySQL:
-                                                                SQL = "alter table " + CDef.tableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(formFieldTypeId) + ";";
+                                                                SQL = "alter table " + contentMetadata.tableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(formFieldTypeId) + ";";
                                                                 break;
                                                             default:
-                                                                SQL = "alter table " + CDef.tableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(formFieldTypeId) + ";";
+                                                                SQL = "alter table " + contentMetadata.tableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(formFieldTypeId) + ";";
                                                                 break;
                                                         }
                                                         core.db.executeQuery(SQL);
                                                     }
                                                     SQL = "Update ccFields"
-                                                + " Set name=" + DbController.encodeSQLText(formFieldName) + ",type=" + formFieldTypeId + ",caption=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) + ",DefaultValue=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) + ",EditSortPriority=" + DbController.encodeSQLText(GenericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) + ",Active=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) + ",ReadOnly=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) + ",Authorable=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) + ",Required=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) + ",UniqueName=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) + ",TextBuffered=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) + ",Password=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) + ",HTMLContent=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) + ",EditTab=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) + ",Scramble=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
+                                                        + " Set name=" + DbController.encodeSQLText(formFieldName) 
+                                                        + ",type=" + formFieldTypeId 
+                                                        + ",caption=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) 
+                                                        + ",DefaultValue=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) 
+                                                        + ",EditSortPriority=" + DbController.encodeSQLText(GenericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) 
+                                                        + ",Active=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) 
+                                                        + ",ReadOnly=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) 
+                                                        + ",Authorable=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) 
+                                                        + ",Required=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) 
+                                                        + ",UniqueName=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) 
+                                                        + ",TextBuffered=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) 
+                                                        + ",Password=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) 
+                                                        + ",HTMLContent=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) 
+                                                        + ",EditTab=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) 
+                                                        + ",Scramble=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
                                                     if (core.session.isAuthenticatedAdmin(core)) {
                                                         SQL += ",adminonly=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." + RecordPointer));
                                                     }
@@ -234,8 +236,9 @@ namespace Contensive.Addons.Tools {
                     Stream.Add(HtmlController.div("There was a problem saving these changes" + "<UL>" + ErrorMessage + "</UL>", "ccError"));
                 }
                 if (ReloadCDef) {
-                    CDef = Processor.Models.Domain.ContentMetadataModel.create(core, ContentID, true, true);
+                    contentMetadata = Processor.Models.Domain.ContentMetadataModel.create(core, ContentID, true, true);
                 }
+                string ButtonList = ButtonCancel + "," + ButtonSelect;
                 if (ContentID == 0) {
                     //
                     // content tables that have edit forms to Configure
@@ -245,16 +248,15 @@ namespace Contensive.Addons.Tools {
                     //
                     // Configure edit form
                     Stream.Add(HtmlController.inputHidden(RequestNameToolContentID, ContentID));
-                    Stream.Add(core.html.getPanelTop());
-                    ContentName = MetadataController.getContentNameByID(core, ContentID);
+                    Stream.Add(core.html.getPanelTop());;
                     ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK + "," + ButtonAdd;
                     //
                     // Get a new copy of the content definition
                     //
-                    Stream.Add(SpanClassAdminNormal + "<P><B>" + ContentName + "</b></P>");
+                    Stream.Add(SpanClassAdminNormal + "<P><B>" + contentMetadata.name + "</b></P>");
                     Stream.Add("<table border=\"0\" cellpadding=\"1\" cellspacing=\"1\" width=\"100%\">");
                     //
-                    int ParentContentID = CDef.parentID;
+                    int ParentContentID = contentMetadata.parentID;
                     bool AllowCDefInherit = false;
                     Processor.Models.Domain.ContentMetadataModel ParentCDef = null;
                     if (ParentContentID == -1) {
@@ -266,7 +268,7 @@ namespace Contensive.Addons.Tools {
                     }
                     bool NeedFootNote1 = false;
                     bool NeedFootNote2 = false;
-                    if (CDef.fields.Count > 0) {
+                    if (contentMetadata.fields.Count > 0) {
                         //
                         // -- header row
                         Stream.Add("<tr>");
@@ -304,8 +306,8 @@ namespace Contensive.Addons.Tools {
                         // Index the sort order
                         //
                         List<FieldSortClass> fieldList = new List<FieldSortClass>();
-                        int FieldCount = CDef.fields.Count;
-                        foreach (var keyValuePair in CDef.fields) {
+                        int FieldCount = contentMetadata.fields.Count;
+                        foreach (var keyValuePair in contentMetadata.fields) {
                             FieldSortClass fieldSort = new FieldSortClass();
                             //Dim field As New appServices_metaDataClass.CDefFieldClass
                             string sortOrder = "";

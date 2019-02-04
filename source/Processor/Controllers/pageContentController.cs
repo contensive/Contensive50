@@ -2285,62 +2285,50 @@ namespace Contensive.Processor.Controllers {
         //=============================================================================
         //
         public static string getSeeAlso(CoreController core, string ContentName, int RecordID) {
-            string result = "";
             try {
-                if (RecordID > 0) {
-                    int ContentID = Models.Domain.ContentMetadataModel.getContentId(core, ContentName);
-                    bool IsEditingLocal = false;
-                    if (ContentID > 0) {
-                        //
-                        // ----- Set authoring only for valid ContentName
-                        IsEditingLocal = core.session.isEditing(ContentName);
-                    } else {
-                        //
-                        // ----- if iContentName was bad, maybe they put table in, no authoring
-                        ContentID = MetadataController.getContentIdByTablename(core, ContentName);
-                    }
-                    int SeeAlsoCount = 0;
-                    if (ContentID > 0) {
-                        using (var csData = new CsModel(core)) {
-                            csData.open("See Also", "((active<>0)AND(ContentID=" + ContentID + ")AND(RecordID=" + RecordID + "))");
-                            while (csData.ok()) {
-                                string SeeAlsoLink = (csData.getText("Link"));
-                                if (!string.IsNullOrEmpty(SeeAlsoLink)) {
-                                    result += "\r<li class=\"ccListItem\">";
-                                    if (GenericController.vbInstr(1, SeeAlsoLink, "://") == 0) {
-                                        SeeAlsoLink = core.webServer.requestProtocol + SeeAlsoLink;
-                                    }
-                                    if (IsEditingLocal) {
-                                        result += AdminUIController.getRecordEditLink(core, "See Also", (csData.getInteger("ID")), false, "", core.session.isEditing("See Also"));
-                                    }
-                                    result += "<a href=\"" + HtmlController.encodeHtml(SeeAlsoLink) + "\" target=\"_blank\">" + (csData.getText("Name")) + "</A>";
-                                    string Copy = (csData.getText("Brief"));
-                                    if (!string.IsNullOrEmpty(Copy)) {
-                                        result += "<br>" + HtmlController.span(Copy, "ccListCopy");
-                                    }
-                                    SeeAlsoCount = SeeAlsoCount + 1;
-                                    result += "</li>";
-                                }
-                                csData.goNext();
+                if(RecordID==0) { return string.Empty; }
+                var contentMetadata = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
+                if (contentMetadata == null) { return string.Empty; }
+                bool isEditingLocal = core.session.isEditing(contentMetadata.name);
+                int SeeAlsoCount = 0;
+                string result = "";
+                using (var csData = new CsModel(core)) {
+                    while (csData.open("See Also", "((active<>0)AND(ContentID=" + contentMetadata.id + ")AND(RecordID=" + RecordID + "))")) {
+                        string SeeAlsoLink = csData.getText("Link");
+                        if (!string.IsNullOrEmpty(SeeAlsoLink)) {
+                            result += "\r<li class=\"ccListItem\">";
+                            if (GenericController.vbInstr(1, SeeAlsoLink, "://") == 0) {
+                                SeeAlsoLink = core.webServer.requestProtocol + SeeAlsoLink;
                             }
-                        }
-                        //
-                        if (IsEditingLocal) {
+                            if (isEditingLocal) {
+                                result += AdminUIController.getRecordEditLink(core, "See Also", (csData.getInteger("ID")), false, "", core.session.isEditing("See Also"));
+                            }
+                            result += "<a href=\"" + HtmlController.encodeHtml(SeeAlsoLink) + "\" target=\"_blank\">" + (csData.getText("Name")) + "</A>";
+                            string Copy = (csData.getText("Brief"));
+                            if (!string.IsNullOrEmpty(Copy)) {
+                                result += "<br>" + HtmlController.span(Copy, "ccListCopy");
+                            }
                             SeeAlsoCount = SeeAlsoCount + 1;
-                            result += "\r<li class=\"ccListItem\">" + AdminUIController.getRecordAddLink(core, "See Also", "RecordID=" + RecordID + ",ContentID=" + ContentID) + "</LI>";
+                            result += "</li>";
                         }
+                        csData.goNext();
                     }
-                    //
-                    if (SeeAlsoCount == 0) {
-                        result = "";
-                    } else {
-                        result = "<p>See Also\r<ul class=\"ccList\">" + GenericController.nop(result) + "\r</ul></p>";
-                    }
+                }
+                //
+                if (isEditingLocal) {
+                    SeeAlsoCount = SeeAlsoCount + 1;
+                    result += "\r<li class=\"ccListItem\">" + AdminUIController.getRecordAddLink(core, "See Also", "RecordID=" + RecordID + ",ContentID=" + contentMetadata.id) + "</LI>";
+                }
+                //
+                if (SeeAlsoCount == 0) {
+                    return string.Empty;
+                } else {
+                    return "<p>See Also\r<ul class=\"ccList\">" + result + "\r</ul></p>";
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
+                return string.Empty;
             }
-            return result;
         }
         //
         //========================================================================
