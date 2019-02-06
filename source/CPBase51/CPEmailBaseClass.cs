@@ -12,7 +12,7 @@ namespace Contensive.BaseClasses {
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public abstract string FromAddressDefault { get; }
+        public abstract string fromAddressDefault { get; }
         //
         //====================================================================================================
         /// <summary>
@@ -25,10 +25,10 @@ namespace Contensive.BaseClasses {
         /// <param name="sendImmediately"></param>
         /// <param name="bodyIsHTML"></param>
         /// <remarks></remarks>
-        public abstract bool Send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
-        public abstract bool Send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
-        public abstract bool Send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately);
-        public abstract bool Send(string toAddress, string fromAddress, string subject, string body);
+        public abstract bool send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        public abstract bool send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        public abstract bool send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately);
+        public abstract bool send(string toAddress, string fromAddress, string subject, string body);
         //
         //====================================================================================================
         /// <summary>
@@ -38,8 +38,8 @@ namespace Contensive.BaseClasses {
         /// <param name="FromAddress"></param>
         /// <param name="Subject"></param>
         /// <remarks></remarks>
-        public abstract bool SendForm(string toAddress, string fromAddress, string subject, ref string userErrorMessage);
-        public abstract bool SendForm(string toAddress, string fromAddress, string subject);
+        public abstract bool sendForm(string toAddress, string fromAddress, string subject, ref string userErrorMessage);
+        public abstract bool sendForm(string toAddress, string fromAddress, string subject);
         //
         //====================================================================================================
         /// <summary>
@@ -47,8 +47,8 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="userEmailAddress"></param>
         /// <remarks></remarks>
-        public abstract bool SendPassword(string userEmailAddress, ref string userErrorMessage);
-        public abstract bool SendPassword(string userEmailAddress);
+        public abstract bool sendPassword(string userEmailAddress, ref string userErrorMessage);
+        public abstract bool sendPassword(string userEmailAddress);
         //
         //====================================================================================================
         /// <summary>
@@ -111,53 +111,53 @@ namespace Contensive.BaseClasses {
         /// <param name="sendImmediately"></param>
         /// <param name="bodyIsHTML"></param>
         /// <remarks></remarks>
-        public abstract bool SendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
-        public abstract bool SendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
-        public abstract bool SendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately);
-        public abstract bool SendUser(int toUserId, string fromAddress, string subject, string body);
+        public abstract bool sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        public abstract bool sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        public abstract bool sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately);
+        public abstract bool sendUser(int toUserId, string fromAddress, string subject, string body);
         //
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("Use uppercase version", true)]
-        public abstract string fromAddressDefault { get; }
+        //[Obsolete("Use uppercase version", true)]
+        //public abstract string fromAddressDefault { get; }
+        ////
+        //[Obsolete("Use uppercase version", true)]
+        //public abstract void send(string ToAddress, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
+        ////
+        //[Obsolete("Use uppercase version", true)]
+        //public abstract void send(string ToAddress, string FromAddress, string Subject, string Body, bool SendImmediately);
+        ////
+        //[Obsolete("Use uppercase version", true)]
+        //public abstract void send(string ToAddress, string FromAddress, string Subject, string Body);
+        ////
+        //[Obsolete("Use uppercase version", true)]
+        //public abstract void sendForm(string ToAddress, string FromAddress, string Subject);
         //
-        [Obsolete("Use uppercase version", true)]
-        public abstract void send(string ToAddress, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
-        //
-        [Obsolete("Use uppercase version", true)]
-        public abstract void send(string ToAddress, string FromAddress, string Subject, string Body, bool SendImmediately);
-        //
-        [Obsolete("Use uppercase version", true)]
-        public abstract void send(string ToAddress, string FromAddress, string Subject, string Body);
-        //
-        [Obsolete("Use uppercase version", true)]
-        public abstract void sendForm(string ToAddress, string FromAddress, string Subject);
-        //
-        [Obsolete("Use uppercase version", true)]
+        [Obsolete("Use SendToGroup()", true)]
         public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
         //
-        [Obsolete("Use uppercase version", true)]
+        [Obsolete("Use SendToGroup()", true)]
         public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body, bool SendImmediately);
         //
-        [Obsolete("Use uppercase version", true)]
+        [Obsolete("Use SendToGroup()", true)]
         public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body);
 
-        //
-        [Obsolete("Use uppercase version", true)]
-        public abstract void sendPassword(string UserEmailAddress);
-        //
-        [Obsolete("Use uppercase version", true)]
-        public abstract void sendSystem(string EmailIdOrName, string AdditionalCopy = "", int AdditionalUserID = 0);
-        //
-        [Obsolete("Use uppercase version", true)]
-        public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
-        //
-        [Obsolete("Use uppercase version", true)]
-        public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body, bool SendImmediately);
-        //
-        [Obsolete("Use uppercase version", true)]
-        public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body);
+        ////
+        //[Obsolete("Use uppercase version", true)]
+        //public abstract void sendPassword(string UserEmailAddress);
+        ////
+        //[Obsolete("Use uppercase version", true)]
+        //public abstract void sendSystem(string EmailIdOrName, string AdditionalCopy = "", int AdditionalUserID = 0);
+        ////
+        //[Obsolete("Use uppercase version", true)]
+        //public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
+        ////
+        //[Obsolete("Use uppercase version", true)]
+        //public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body, bool SendImmediately);
+        ////
+        //[Obsolete("Use uppercase version", true)]
+        //public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body);
     }
 }
 

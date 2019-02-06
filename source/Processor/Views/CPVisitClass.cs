@@ -102,6 +102,22 @@ namespace Contensive.Processor {
             cp.core.visitProperty.setProperty(key, value);
         }
         //
+        public override void SetProperty(string key, int value) {
+            cp.core.visitProperty.setProperty(key, value);
+        }
+        //
+        public override void SetProperty(string key, double value) {
+            cp.core.visitProperty.setProperty(key, value);
+        }
+        //
+        public override void SetProperty(string key, bool value) {
+            cp.core.visitProperty.setProperty(key, value);
+        }
+        //
+        public override void SetProperty(string key, DateTime value) {
+            cp.core.visitProperty.setProperty(key, value);
+        }
+        //
         //=======================================================================================================
         //
         public override bool GetBoolean(string key, bool defaultValue) {

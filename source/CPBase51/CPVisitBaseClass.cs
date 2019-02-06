@@ -129,6 +129,10 @@ namespace Contensive.BaseClasses {
         /// <param name="value"></param>
         /// <param name="targetVisitId"></param>
         public abstract void SetProperty(string key, string value);
+        public abstract void SetProperty(string key, int value);
+        public abstract void SetProperty(string key, double value);
+        public abstract void SetProperty(string key, DateTime value);
+        public abstract void SetProperty(string key, bool value);
         //
         //====================================================================================================
         /// <summary>
@@ -158,16 +162,16 @@ namespace Contensive.BaseClasses {
         [Obsolete("Deprecated. Set and get only the current visit", true)]
         public abstract void SetProperty(string key, string value, int targetVisitId);
         //
-        [Obsolete("Deprecated. Use the get with the correct defaulot argumnet type", true)]
+        [Obsolete("Deprecated. Use the get with the correct default argumnet type", true)]
         public abstract bool GetBoolean(string key, string defaultValue);
         //
-        [Obsolete("Deprecated. Use the get with the correct defaulot argumnet type", true)]
+        [Obsolete("Deprecated. Use the get with the correct default argumnet type", true)]
         public abstract DateTime GetDate(string key, string defaultValue);
         //
-        [Obsolete("Deprecated. Use the get with the correct defaulot argumnet type", true)]
+        [Obsolete("Deprecated. Use the get with the correct default argumnet type", true)]
         public abstract int GetInteger(string key, string defaultValue);
         //
-        [Obsolete("Deprecated. Use the get with the correct defaulot argumnet type", true)]
+        [Obsolete("Deprecated. Use the get with the correct default argumnet type", true)]
         public abstract double GetNumber(string key, string defaultValue);
     }
 }

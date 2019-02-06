@@ -28,7 +28,7 @@ namespace Contensive.Processor {
         //
         //==========================================================================================
         //
-        public override string FromAddressDefault {
+        public override string fromAddressDefault {
             get {
                 return cp.core.siteProperties.getText("EMAILFROMADDRESS");
             }
@@ -44,7 +44,7 @@ namespace Contensive.Processor {
         /// <param name="body"></param>
         /// <param name="sendImmediately"></param>
         /// <param name="bodyIsHTML"></param>
-        public override bool Send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage) {
+        public override bool send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage) {
             try {
                 return EmailController.queueAdHocEmail(cp.core, toAddress, fromAddress, subject, body, fromAddress, fromAddress, "", sendImmediately, bodyIsHTML,0 , ref userErrorMessage);
             } catch (Exception ex) {
@@ -53,19 +53,19 @@ namespace Contensive.Processor {
             }
         }
         //
-        public override bool Send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml ) {
+        public override bool send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml ) {
             string userErrorMessage = "";
-            return Send(toAddress, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+            return send(toAddress, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
         }
         //
-        public override bool Send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately) {
+        public override bool send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately) {
             string userErrorMessage = "";
-            return Send(toAddress, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
+            return send(toAddress, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
         }
         //
-        public override bool Send(string toAddress, string fromAddress, string subject, string body) {
+        public override bool send(string toAddress, string fromAddress, string subject, string body) {
             string userErrorMessage = "";
-            return Send(toAddress, fromAddress, subject, body, true, true, ref userErrorMessage);
+            return send(toAddress, fromAddress, subject, body, true, true, ref userErrorMessage);
         }
         //
         //====================================================================================================
@@ -75,7 +75,7 @@ namespace Contensive.Processor {
         /// <param name="toAddress"></param>
         /// <param name="fromAddress"></param>
         /// <param name="subject"></param>
-        public override bool SendForm(string toAddress, string fromAddress, string subject, ref string userErrorMessage) {
+        public override bool sendForm(string toAddress, string fromAddress, string subject, ref string userErrorMessage) {
             try {
                 return EmailController.queueFormEmail(cp.core, toAddress, fromAddress, subject, ref userErrorMessage);
             } catch (Exception ex) {
@@ -84,20 +84,20 @@ namespace Contensive.Processor {
             }
         }
         //
-        public override bool SendForm(string toAddress, string fromAddress, string subject) {
+        public override bool sendForm(string toAddress, string fromAddress, string subject) {
             string userErrorMessage = "";
-            return SendForm(toAddress, fromAddress, subject, ref userErrorMessage);
+            return sendForm(toAddress, fromAddress, subject, ref userErrorMessage);
         }
         //
         //====================================================================================================
         //
-        public override bool SendPassword(string UserEmailAddress, ref string userErrorMessage) {
+        public override bool sendPassword(string UserEmailAddress, ref string userErrorMessage) {
             return LoginController.sendPassword(cp.core, UserEmailAddress, ref userErrorMessage);
         }
         //
-        public override bool SendPassword(string UserEmailAddress) {
+        public override bool sendPassword(string UserEmailAddress) {
             string userErrorMessage = "";
-            return SendPassword(UserEmailAddress, ref userErrorMessage);
+            return sendPassword(UserEmailAddress, ref userErrorMessage);
         }
         //
         //====================================================================================================
@@ -220,7 +220,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override bool SendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
+        public override bool sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
             PersonModel person = PersonModel.create(cp.core, toUserId);
             if ( person == null ) {
                 userErrorMessage = "An email could not be sent because the user could not be located.";
@@ -229,26 +229,26 @@ namespace Contensive.Processor {
             return EmailController.queuePersonEmail(cp.core, person, fromAddress, subject, body, "", "", sendImmediately, bodyIsHtml, 0,"",false, ref userErrorMessage);
         }
         //
-        public override bool SendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
+        public override bool sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
             string userErrorMessage = "";
-            return SendUser(toUserId, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+            return sendUser(toUserId, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
 
         }
         //
-        public override bool SendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately) {
+        public override bool sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately) {
             string userErrorMessage = "";
-            return SendUser(toUserId, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
+            return sendUser(toUserId, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
         }
         //
-        public override bool SendUser(int toUserId, string fromAddress, string subject, string body) {
+        public override bool sendUser(int toUserId, string fromAddress, string subject, string body) {
             string userErrorMessage = "";
-            return SendUser(toUserId, fromAddress, subject, body, true, true, ref userErrorMessage);
+            return sendUser(toUserId, fromAddress, subject, body, true, true, ref userErrorMessage);
         }
         //
         //====================================================================================================
         //
-        [Obsolete("Use uppercase method", true)]
-        public override string fromAddressDefault => FromAddressDefault;
+        //[Obsolete("Use uppercase method", true)]
+        //public override string fromAddressDefault => fromAddressDefault;
         //
         [Obsolete("Use SendToGroup", true)]
         public override void sendGroup(string GroupCommaList, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML) {
@@ -264,42 +264,42 @@ namespace Contensive.Processor {
         public override void sendGroup(string GroupCommaList, string FromAddress, string Subject, string Body) {
             EmailController.queueGroupEmail(cp.core, GroupCommaList, FromAddress, Subject, Body, true, true);
         }
-        //
-        [Obsolete("Use uppercase method", true)]
-        public override void sendPassword(string userEmailAddress) 
-            => SendPassword(userEmailAddress);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public override void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML)
-            => Send(toAddress, fromAddress, subject, body, sendImmediately, bodyIsHTML);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public override void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately)
-            => Send(toAddress, fromAddress, subject, body, sendImmediately, true);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public override void send(string toAddress, string fromAddress, string subject, string body)
-            => Send(toAddress, fromAddress, subject, body, true, true);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public override void sendForm(string toAddress, string fromAddress, string subject)
-            => SendForm(toAddress, fromAddress, subject);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public override void sendSystem(string emailIdOrName, string additionalCopy = "", int additionalUserID = 0)
-            => SendSystem(emailIdOrName, additionalCopy, additionalUserID);
-        //
-        [Obsolete("Use uppercase method, SendUser(int,string,string,string,bool,bool)", true)]
-        public override void sendUser(string toUserID, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML)
-            => SendUser(GenericController.encodeInteger(toUserID), fromAddress, subject, body, sendImmediately, bodyIsHTML);
-        //
-        [Obsolete("Use uppercase method, SendUser(int,string,string,string,bool)", true)]
-        public override void sendUser(string toUserID, string fromAddress, string subject, string body, bool sendImmediately)
-            => SendUser(GenericController.encodeInteger(toUserID), fromAddress, subject, body, sendImmediately, true);
-        //
-        [Obsolete("Use uppercase method, SendUser(int,string,string,string,bool,bool)", true)]
-        public override void sendUser(string toUserID, string fromAddress, string subject, string body)
-            => SendUser(GenericController.encodeInteger(toUserID), fromAddress, subject, body, true, true);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public override void sendPassword(string userEmailAddress) 
+        //    => sendPassword(userEmailAddress);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public override void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML)
+        //    => send(toAddress, fromAddress, subject, body, sendImmediately, bodyIsHTML);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public override void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately)
+        //    => send(toAddress, fromAddress, subject, body, sendImmediately, true);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public override void send(string toAddress, string fromAddress, string subject, string body)
+        //    => send(toAddress, fromAddress, subject, body, true, true);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public override void sendForm(string toAddress, string fromAddress, string subject)
+        //    => sendForm(toAddress, fromAddress, subject);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public override void sendSystem(string emailIdOrName, string additionalCopy = "", int additionalUserID = 0)
+        //    => SendSystem(emailIdOrName, additionalCopy, additionalUserID);
+        ////
+        //[Obsolete("Use uppercase method, SendUser(int,string,string,string,bool,bool)", true)]
+        //public override void sendUser(string toUserID, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML)
+        //    => sendUser(GenericController.encodeInteger(toUserID), fromAddress, subject, body, sendImmediately, bodyIsHTML);
+        ////
+        //[Obsolete("Use uppercase method, SendUser(int,string,string,string,bool)", true)]
+        //public override void sendUser(string toUserID, string fromAddress, string subject, string body, bool sendImmediately)
+        //    => sendUser(GenericController.encodeInteger(toUserID), fromAddress, subject, body, sendImmediately, true);
+        ////
+        //[Obsolete("Use uppercase method, SendUser(int,string,string,string,bool,bool)", true)]
+        //public override void sendUser(string toUserID, string fromAddress, string subject, string body)
+        //    => sendUser(GenericController.encodeInteger(toUserID), fromAddress, subject, body, true, true);
         //
         //====================================================================================================
         //
