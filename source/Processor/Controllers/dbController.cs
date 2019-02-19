@@ -192,7 +192,20 @@ namespace Contensive.Processor.Controllers {
                 //
                 Stopwatch sw = Stopwatch.StartNew();
                 using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET(core.appConfig.name))) {
-                    connSQL.Open();
+                    int retryCnt = 1;
+                    bool success = false;
+                    do {
+                        try {
+                            connSQL.Open();
+                            success = true;
+                        } catch (System.Data.SqlClient.SqlException) {
+                            // network related error, retry once
+                            if (retryCnt <= 0) { throw; }
+                            retryCnt--;
+                        } catch (Exception) {
+                            throw;
+                        }
+                    } while (!success && (retryCnt > 0));
                     using (SqlCommand cmdSQL = new SqlCommand()) {
                         cmdSQL.CommandType = CommandType.Text;
                         cmdSQL.CommandText = sql;

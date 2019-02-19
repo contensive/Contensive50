@@ -244,7 +244,8 @@ namespace Contensive.Processor {
         public override bool Login(string usernameOrEmail, string password, bool setAutoLogin) {
             return cp.core.session.authenticate(cp.core, usernameOrEmail, password, setAutoLogin);
         }
-        public override bool Login(string usernameOrEmail, string password) => Login(usernameOrEmail, password);
+        public override bool Login(string usernameOrEmail, string password) 
+            => Login(usernameOrEmail, password, false);
         //
         //====================================================================================================
         //

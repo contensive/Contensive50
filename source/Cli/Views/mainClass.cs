@@ -178,7 +178,7 @@ namespace Contensive.CLI {
                                 case "-n":
                                     //
                                     // set application name
-                                    if (argPtr < (args.Length + 1)) {
+                                    if (argPtr < (args.Length - 1)) {
                                         argPtr++;
                                         appName = args[argPtr];
                                     }

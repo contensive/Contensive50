@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Contensive.CPBaseClass</id>
-    <version>5.1.8</version>
+    <version>5.1.9</version>
     <title>Contensive Addon API Base Classes</title>
     <authors>Contensive</authors>
     <owners>Contensive</owners>

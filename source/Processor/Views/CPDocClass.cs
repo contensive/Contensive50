@@ -210,7 +210,7 @@ namespace Contensive.Processor {
             if (cp.core.docProperties.containsKey(key)) { return cp.core.docProperties.getText(key); }
             return defaultValue;
         }
-        public override string GetProperty(string key) => GetProperty(key, "");
+        public override string GetProperty(string key) => GetProperty(key, string.Empty);
         //
         //=======================================================================================================
         //
@@ -224,7 +224,7 @@ namespace Contensive.Processor {
         public override DateTime GetDate(string key, DateTime defaultValue) {
             return GenericController.encodeDate(GetProperty(key, GenericController.encodeText( defaultValue)));
         }
-        public override DateTime GetDate(string key) => GetDate(key, default(DateTime));
+        public override DateTime GetDate(string key) => GetDate(key, DateTime.MinValue);
         //
         //=======================================================================================================
         //
@@ -247,7 +247,7 @@ namespace Contensive.Processor {
         }
         //
         public override string GetText(string key) {
-            return GetProperty(key, default(string));
+            return GetProperty(key, string.Empty);
         }
         //
         //=======================================================================================================

@@ -48,7 +48,6 @@ namespace Contensive.CLI {
                     appConfig.allowSiteMonitor = false;
                     //
                     // -- create app
-                    appConfig.name = appName;
                     if (promptForArguments) {
                         //
                         // -- app name
@@ -59,11 +58,12 @@ namespace Contensive.CLI {
                             AssemblyName myAssemblyname = myAssembly.GetName();
                             Version myVersion = myAssemblyname.Version;
                             string appNameDefault = "app" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0') + "v" + myVersion.Major.ToString("0") + myVersion.Minor.ToString("0");
-                            appConfig.name = cliController.promptForReply("Application Name", appNameDefault).ToLowerInvariant();
-                            appNameOk = !cp.core.serverConfig.apps.ContainsKey(appConfig.name.ToLowerInvariant());
+                            appName = cliController.promptForReply("Application Name", appNameDefault).ToLowerInvariant();
+                            appNameOk = !cp.core.serverConfig.apps.ContainsKey(appName.ToLowerInvariant());
                             if (!appNameOk) { Console.Write("\n\nThere is already an application with this name. To get the current server configuration, use cc -s"); }
                         } while (!appNameOk);
                     }
+                    appConfig.name = appName;
                     //
                     // -- admin route
                     appConfig.adminRoute = "admin";

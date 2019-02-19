@@ -1137,7 +1137,7 @@ namespace Contensive.Processor.Models.Domain {
                     ContentModel.invalidateRecordCache(core, contentMetadata.id);
                     //
                     // -- reload metadata
-                    contentMetadata = ContentMetadataModel.create(core, contentMetadata.id);
+                    contentMetadata = ContentMetadataModel.create(core, contentMetadata.id,false,true);
                     //
                     // Verify Core Content Definition Fields
                     if (parentId < 1) {
