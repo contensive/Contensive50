@@ -129,7 +129,7 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
-        public int saveObject(CoreController core) {
+        public int save(CoreController core) {
             try {
                 string jsonTemp = core.json.Serialize(this);
                 core.programDataFiles.saveFile("config.json", jsonTemp);

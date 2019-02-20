@@ -225,7 +225,7 @@ namespace Contensive.CLI {
                     Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Save app configuration.");
                     appConfig.appStatus = AppConfigModel.AppStatusEnum.maintenance;
                     cp.core.serverConfig.apps.Add(appConfig.name, appConfig);
-                    cp.core.serverConfig.saveObject(cp.core);
+                    cp.core.serverConfig.save(cp.core);
                     cp.core.serverConfig = ServerConfigModel.getObject(cp.core);
                     cp.core.appConfig = AppConfigModel.getObject(cp.core, cp.core.serverConfig, appConfig.name);
                     // 
@@ -271,7 +271,7 @@ namespace Contensive.CLI {
                     Processor.Controllers.AppBuilderController.upgrade(cp.core, true, true);
                     //
                     // -- set the application back to normal mode
-                    cp.core.serverConfig.saveObject(cp.core);
+                    cp.core.serverConfig.save(cp.core);
                     cp.core.siteProperties.setProperty(Constants.siteproperty_serverPageDefault_name, iisDefaultDoc);
                     //
                     Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Upgrade complete.");

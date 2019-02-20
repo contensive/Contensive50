@@ -147,7 +147,7 @@ namespace Contensive.CLI {
                     }
                     //
                     // -- save the configuration
-                    cp.core.serverConfig.saveObject(cp.core);
+                    cp.core.serverConfig.save(cp.core);
                 }
             } catch (Exception ex) {
                 Console.WriteLine("Error: [" + ex.ToString() + "]");

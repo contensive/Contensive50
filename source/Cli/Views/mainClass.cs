@@ -49,7 +49,7 @@ namespace Contensive.CLI {
                                 //  -- developer, fake a path
                                 cpServer.core.serverConfig.programFilesPath = "c:\\Program Files (x86)\\kma\\Contensive5\\";
                             }
-                            cpServer.core.serverConfig.saveObject(cpServer.core);
+                            cpServer.core.serverConfig.save(cpServer.core);
                         }
                         //
                         // -- loop through arguments and execute each command
@@ -58,6 +58,18 @@ namespace Contensive.CLI {
                             bool exitArgumentProcessing = false;
                             bool repair = false;
                             switch (argument.ToLowerInvariant()) {
+                                case "-a":
+                                    //
+                                    // set application name
+                                    if (argPtr < (args.Length + 1)) {
+                                        argPtr++;
+                                        appName = args[argPtr];
+                                        if (!cpServer.core.serverConfig.apps.ContainsKey(appName)) {
+                                            Console.WriteLine("The appName [" + appName + "] was not found.");
+                                            return;
+                                        }
+                                    }
+                                    break;
                                 case "--flushcache":
                                     if (!string.IsNullOrEmpty(appName)) {
                                         //
@@ -76,14 +88,6 @@ namespace Contensive.CLI {
                                         }
                                     }
                                     exitArgumentProcessing = true;
-                                    break;
-                                case "-a":
-                                    //
-                                    // set application name
-                                    if (argPtr < (args.Length + 1)) {
-                                        argPtr++;
-                                        appName = args[argPtr];
-                                    }
                                     break;
                                 case "-i":
                                 case "--install":
@@ -232,6 +236,7 @@ namespace Contensive.CLI {
                                             AppConfigModel app = kvp.Value;
                                             Console.WriteLine("    name: " + app.name);
                                             Console.WriteLine("        enabled: " + app.enabled);
+                                            Console.WriteLine("        delete protection: " + app.deleteProtection);
                                             Console.WriteLine("        admin route: " + app.adminRoute);
                                             Console.WriteLine("        local file storage");
                                             Console.WriteLine("            app path: " + app.localWwwPath);
@@ -280,7 +285,7 @@ namespace Contensive.CLI {
                                             //
                                             // turn the windows service scheduler on/off
                                             cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
-                                            cpServer.core.serverConfig.saveObject(cpServer.core);
+                                            cpServer.core.serverConfig.save(cpServer.core);
                                             Console.WriteLine("allowtaskscheduler set " + cpServer.core.serverConfig.allowTaskSchedulerService.ToString());
                                         }
                                     }
@@ -304,7 +309,7 @@ namespace Contensive.CLI {
                                             //
                                             // -- turn the windows service scheduler on/off
                                             cpServer.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
-                                            cpServer.core.serverConfig.saveObject(cpServer.core);
+                                            cpServer.core.serverConfig.save(cpServer.core);
                                             Console.WriteLine("allowtaskrunner set " + cpServer.core.serverConfig.allowTaskRunnerService.ToString());
                                         }
                                     }
@@ -335,7 +340,7 @@ namespace Contensive.CLI {
                                             //
                                             cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
                                             cpServer.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
-                                            cpServer.core.serverConfig.saveObject(cpServer.core);
+                                            cpServer.core.serverConfig.save(cpServer.core);
                                             Console.WriteLine("allowTaskScheduler set " + cpServer.core.serverConfig.allowTaskSchedulerService.ToString());
                                             Console.WriteLine("allowTaskRunner set " + cpServer.core.serverConfig.allowTaskRunnerService.ToString());
                                         }
@@ -347,7 +352,7 @@ namespace Contensive.CLI {
                                     if (argPtr != (args.Length + 1)) {
                                         argPtr++;
                                         cpServer.core.serverConfig.enableLogging = GenericController.encodeBoolean(args[argPtr].ToLowerInvariant());
-                                        cpServer.core.serverConfig.saveObject(cpServer.core);
+                                        cpServer.core.serverConfig.save(cpServer.core);
                                         Console.WriteLine("enableLogging set " + cpServer.core.serverConfig.enableLogging.ToString());
                                     }
                                     break;
@@ -398,6 +403,62 @@ namespace Contensive.CLI {
                                                 }
                                             }
                                         }
+                                    }
+                                    break;
+                                case "--deleteprotection":
+                                    // turn off delete protection
+                                    if (string.IsNullOrWhiteSpace(appName)) {
+                                        Console.WriteLine("ERROR, you must first specify the application with -a appName");
+                                    } else {
+                                        if (argPtr > (args.Length + 1)) {
+                                            Console.WriteLine("ERROR, deleteprotection requires on|off");
+                                        } else {
+                                            argPtr++;
+                                            string onOff = args[argPtr];
+                                            if (onOff.ToLower().Equals("on")) {
+                                                try {
+                                                    using (var cp = new CPClass(appName)) {
+                                                        cp.core.appConfig.deleteProtection = true;
+                                                        cp.core.appConfig.save(cp.core);
+                                                    }
+                                                } catch (Exception) {
+                                                    Console.WriteLine("ERROR, the application would not startup correctly. You may need to work with it manually.");
+                                                    return;
+                                                }
+                                            } else if (onOff.ToLower().Equals("off")) {
+                                                try {
+                                                    using (var cp = new CPClass(appName)) {
+                                                        cp.core.appConfig.deleteProtection = false;
+                                                        cp.core.appConfig.save(cp.core);
+                                                    }
+                                                } catch (Exception) {
+                                                    Console.WriteLine("ERROR, the application would not startup correctly. You may need to work with it manually.");
+                                                    return;
+                                                }
+                                            } else {
+                                                Console.WriteLine("ERROR, deleteprotection requires on|off");
+                                                return;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                case "--delete":
+                                    // delete 
+                                    if (string.IsNullOrWhiteSpace(appName)) {
+                                        Console.WriteLine("ERROR, you must first specify the application with -a appName");
+                                    } else {
+                                        try {
+                                            using (var cp = new CPClass(appName)) {
+                                                if (cp.core.appConfig.deleteProtection) {
+                                                    Console.WriteLine("Cannot delete app [" + appName + "] because delete protection is on. Use --deleteprotection off to disable it.");
+                                                    return;
+                                                }
+                                            }
+                                        } catch (Exception) {
+                                            Console.WriteLine("ERROR, the application would not startup correctly. You may need to work with it manually.");
+                                            return;
+                                        }
+                                        DeleteAppClass.deleteApp(cpServer, appName);
                                     }
                                     break;
                                 //
@@ -475,6 +536,12 @@ namespace Contensive.CLI {
             + "\r\n"
             + "\r\n--uninstallservice"
             + "\r\n    Uninstalls the TaskService.exe from Windows Services"
+            + "\r\n"
+            + "\r\n--deleteprotection on|off"
+            + "\r\n    Enables or Disables delete protection for an application. You must specify the application first with -a appName."
+            + "\r\n"
+            + "\r\n--delete"
+            + "\r\n    Deletes an application. You must first specify the application first with -a appName. The application must have delete protection off."
             + "";
         //
         // ====================================================================================================

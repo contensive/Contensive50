@@ -1408,7 +1408,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- Do Plain Text Conversion
                     if (convertHtmlToText) {
-                        result = NUglify.Uglify.HtmlToText(result).Code; // htmlToTextControllers.convert(core, result);
+                        NUglify.Html.HtmlToTextOptions options = NUglify.Html.HtmlToTextOptions.KeepFormatting;
+                        result = NUglify.Uglify.HtmlToText(result,options).Code; // htmlToTextControllers.convert(core, result);
                     }
                     //
                     // -- Process Active Content that must be run here to access webclass objects parse as {{functionname?querystring}}

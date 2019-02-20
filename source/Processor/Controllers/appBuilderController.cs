@@ -53,7 +53,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, logPrefix + ", update configuration file");
                     if (!core.appConfig.appStatus.Equals(AppConfigModel.AppStatusEnum.ok)) {
                         core.appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
-                        core.serverConfig.saveObject(core);
+                        core.serverConfig.save(core);
                     }
                     //
                     // verify current database meets minimum field requirements (before installing base collection)

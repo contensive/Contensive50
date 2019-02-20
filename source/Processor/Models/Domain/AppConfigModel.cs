@@ -96,6 +96,10 @@ namespace Contensive.Processor.Models.Domain {
         /// when exeecuting iis, this is the default page.
         /// </summary>
         public string defaultPage = "default.aspx";
+        /// <summary>
+        /// if true, the command line delete cannot delete this app
+        /// </summary>
+        public bool deleteProtection = true;
         //
         //====================================================================================================
         /// <summary>
@@ -154,7 +158,7 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
-        public void saveObject(CoreController core) {
+        public void save(CoreController core) {
             try {
                 if (!string.IsNullOrEmpty(name)) {
                     if (!core.serverConfig.apps.ContainsKey(name.ToLowerInvariant())) {
@@ -162,7 +166,7 @@ namespace Contensive.Processor.Models.Domain {
                         // -- application not configured yet
                         core.serverConfig.apps.Add(name.ToLowerInvariant(), this);
                     }
-                    core.serverConfig.saveObject(core);
+                    core.serverConfig.save(core);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

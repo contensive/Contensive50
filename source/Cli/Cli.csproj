@@ -189,6 +189,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Views\configureClass.cs" />
+    <Compile Include="Views\deleteAppClass.cs" />
     <Compile Include="Views\genericController.cs" />
     <Compile Include="Views\installClass.cs" />
     <Compile Include="Views\createAppClass.cs" />
