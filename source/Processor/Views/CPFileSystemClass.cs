@@ -68,6 +68,16 @@ namespace Contensive.Processor {
         }
         //
         //==========================================================================================
+        public override void CopyLocalToRemote(string pathFilename) {
+            fileSystemController.copyLocalToRemote(pathFilename);
+        }
+        //
+        //==========================================================================================
+        public override void CopyRemoteToLocal(string pathFilename) {
+            fileSystemController.copyRemoteToLocal(pathFilename);
+        }
+        //
+        //==========================================================================================
         /// <summary>
         /// Create a folder in a path. Path arguments should have no leading slash.
         /// </summary>
@@ -174,6 +184,7 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         ~CPFileSystemClass() {
             Dispose(false);
         }

@@ -124,7 +124,7 @@ namespace Contensive.CLI {
                                                         string logPrefix = "CLI";
                                                         var installedCollections = new List<string>();
                                                         var nonCritialErrorList = new List<string>();
-                                                        CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair,ref nonCritialErrorList ,logPrefix, ref installedCollections);
+                                                        CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair, ref nonCritialErrorList, logPrefix, ref installedCollections);
                                                         if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                                             Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                                         }
@@ -383,22 +383,22 @@ namespace Contensive.CLI {
                                     //
                                     // -- execute an addon
                                     cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
-                                    if (cpServer.core.serverConfig.apps.Count==1) {
+                                    if (cpServer.core.serverConfig.apps.Count == 1) {
                                         appName = cpServer.core.serverConfig.apps.First().Value.name;
                                     }
-                                    if ( string.IsNullOrWhiteSpace( appName )) {
+                                    if (string.IsNullOrWhiteSpace(appName)) {
                                         Console.WriteLine("ERROR, execute requires an application name (-a appName --execute addonNameOrGuid) because this server has 2+ apps");
                                     } else {
                                         if (argPtr > (args.Length + 1)) {
                                             Console.WriteLine("ERROR, execute requires a parameter for the addon you want to run");
-                                        } else { 
+                                        } else {
                                             argPtr++;
                                             string addonNameOrGuid = args[argPtr];
                                             if (string.IsNullOrWhiteSpace(addonNameOrGuid)) {
                                                 Console.WriteLine("ERROR, execute requires a parameter for the addon you want to run");
                                             } else {
                                                 Console.WriteLine("executing addon [" + addonNameOrGuid + "], app  [" + appName + "]");
-                                                using ( var cp = new CPClass( appName )) {
+                                                using (var cp = new CPClass(appName)) {
                                                     cp.executeAddon(addonNameOrGuid);
                                                 }
                                             }
@@ -460,6 +460,9 @@ namespace Contensive.CLI {
                                         }
                                         DeleteAppClass.deleteApp(cpServer, appName);
                                     }
+                                    break;
+                                case "--uploadfiles":
+                                    UploadFilesClass.uploadFiles(cpServer, appName);
                                     break;
                                 //
                                 // -- run task in ccTasks table in application appName 
@@ -550,7 +553,7 @@ namespace Contensive.CLI {
         /// </summary>
         /// <param name="appName"></param>
         /// <param name="repair"></param>
-        private static void upgrade( Contensive.Processor.CPClass cp, string appName, bool repair) {
+        private static void upgrade(Contensive.Processor.CPClass cp, string appName, bool repair) {
             if (!string.IsNullOrEmpty(appName)) {
                 //
                 // -- upgrade app

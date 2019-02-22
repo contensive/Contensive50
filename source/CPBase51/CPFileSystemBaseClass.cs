@@ -102,6 +102,20 @@ namespace Contensive.BaseClasses {
         //
         //==========================================================================================
         /// <summary>
+        /// Copy a file from the local storage to its remote store
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        public abstract void CopyLocalToRemote(string pathFilename);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Copy a file from the remote storate to its local store
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        public abstract void CopyRemoteToLocal(string pathFilename);
+        //
+        //==========================================================================================
+        /// <summary>
         /// Create a folder in a path. Path arguments should have no leading slash. (ex ParentFolder/NewFolder )
         /// </summary>
         /// <param name="pathFolder"></param>
