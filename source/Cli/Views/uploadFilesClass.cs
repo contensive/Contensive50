@@ -12,6 +12,7 @@ using System.Security.Principal;
 using Contensive.Processor.Models.Domain;
 using System.Reflection;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
+using Contensive.BaseClasses;
 
 namespace Contensive.CLI {
     class UploadFilesClass {
@@ -34,11 +35,21 @@ namespace Contensive.CLI {
                 using (var cp = new CPClass(appName)) {
                     Console.Write("\n\rUploading files from local file store to remove file store.");
                     // verify the server has a remote file path configured
-                    // create a local filesystem to the cdn's local path
-                    var cdnRootLocalPath = cp.CdnFiles.PhysicalFilePath;
-                    var cdnLocalFileController = new Processor.Controllers.FileController(cp.core, true, cdnRootLocalPath, "");
-                    CPFileSystemClass cdnLocalFiles = new CPFileSystemClass(cp, cdnLocalFileController);
-                    uploadPath(cp, cdnLocalFiles, "\\");
+                    //
+                    // create a local cdn file system
+                    var cdnLocalFileController = new Processor.Controllers.FileController(cp.core, true, cp.CdnFiles.PhysicalFilePath, "");
+                    CPFileSystemBaseClass cdnLocalFiles = new CPFileSystemClass(cp, cdnLocalFileController);
+                    uploadPath(cp, cp.CdnFiles, cdnLocalFiles, "\\");
+                    //
+                    // create a local private file system
+                    var privateLocalFileController = new Processor.Controllers.FileController(cp.core, true, cp.PrivateFiles.PhysicalFilePath, "");
+                    CPFileSystemBaseClass privateLocalFiles = new CPFileSystemClass(cp, privateLocalFileController);
+                    uploadPath(cp, cp.PrivateFiles, privateLocalFiles, "\\");
+                    //
+                    // create a local www file system
+                    var wwwLocalFileController = new Processor.Controllers.FileController(cp.core, true, cp.WwwFiles.PhysicalFilePath, "");
+                    CPFileSystemBaseClass wwwLocalFiles = new CPFileSystemClass(cp, wwwLocalFileController);
+                    uploadPath(cp, cp.WwwFiles, wwwLocalFiles, "\\");
 
                 }
                 //
@@ -49,12 +60,13 @@ namespace Contensive.CLI {
             }
         }
         //
-        private static void  uploadPath( CPClass cp, CPFileSystemClass cdnLocalFiles, string sourcePath ) {
-            foreach (var folder in cdnLocalFiles.FolderList(sourcePath)) {
-                uploadPath(cp, cdnLocalFiles, sourcePath  + folder.Name + "\\");                 
+        private static void  uploadPath( CPClass cp, CPFileSystemBaseClass remoteFileSystem, CPFileSystemBaseClass localFileSystem, string sourcePath ) {
+            foreach (var folder in localFileSystem.FolderList(sourcePath)) {
+                uploadPath(cp, remoteFileSystem, localFileSystem, sourcePath  + folder.Name + "\\");                 
             }
-            foreach ( var file in cdnLocalFiles.FileList( sourcePath)) {
-                cp.CdnFiles.CopyLocalToRemote(sourcePath + file.Name );
+            foreach ( var file in localFileSystem.FileList( sourcePath)) {
+                Console.WriteLine("Copying local file [" + sourcePath + file.Name + "] to remote public files.");
+                remoteFileSystem.CopyLocalToRemote(sourcePath + file.Name );
             }
         }
     }
