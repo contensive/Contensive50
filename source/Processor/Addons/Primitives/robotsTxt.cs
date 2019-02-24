@@ -39,7 +39,7 @@ namespace Contensive.Addons.Primitives {
                     // save default robots.txt
                     //
                     result = "User-agent: *\r\nDisallow: /admin/\r\nDisallow: /images/";
-                    core.wwwfiles.saveFile(Filename, result);
+                    core.wwwFiles.saveFile(Filename, result);
                 }
                 result += core.addonCache.robotsTxt;
                 core.webServer.setResponseContentType("text/plain");

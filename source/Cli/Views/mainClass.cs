@@ -545,6 +545,9 @@ namespace Contensive.CLI {
             + "\r\n"
             + "\r\n--delete"
             + "\r\n    Deletes an application. You must first specify the application first with -a appName. The application must have delete protection off."
+            + "\r\n"
+            + "\r\n--uploadfiles"
+            + "\r\n    Copies all local files to remote files. Use for migration to a remote file system."
             + "";
         //
         // ====================================================================================================

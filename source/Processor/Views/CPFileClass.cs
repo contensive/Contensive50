@@ -37,7 +37,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="virtualFilename"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override string getVirtualFileLink(string virtualFilename) {
             return GenericController.getCdnFileLink(core, virtualFilename);
         }
@@ -48,7 +48,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="fileContent"></param>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override void AppendVirtual(string filename, string fileContent) {
             core.cdnFiles.appendFile(filename, fileContent);
         }
@@ -59,7 +59,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="sourceFilename"></param>
         /// <param name="destinationFilename"></param>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override void CopyVirtual(string sourceFilename, string destinationFilename) {
             core.cdnFiles.copyFile(sourceFilename, destinationFilename);
         }
@@ -69,14 +69,14 @@ namespace Contensive.Processor {
         /// Create a folder anywhere on the physical file space of the hosting server. Deprecated, use with cp.file.cdnFiles, cp.file.appRootFiles, or cp.file.privateFiles
         /// </summary>
         /// <param name="folderPath"></param>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override void CreateFolder(string folderPath) {
-            if (core.wwwfiles.isinLocalAbsDosPath(folderPath)) {
-                core.wwwfiles.createPath(folderPath);
+            if (core.wwwFiles.isinLocalAbsDosPath(folderPath)) {
+                core.wwwFiles.createPath(core.wwwFiles.convertLocalAbsToRelativePath(folderPath));
             } else if (core.privateFiles.isinLocalAbsDosPath(folderPath)) {
-                core.privateFiles.createPath(folderPath);
+                core.privateFiles.createPath(core.privateFiles.convertLocalAbsToRelativePath(folderPath));
             } else if (core.cdnFiles.isinLocalAbsDosPath(folderPath)) {
-                core.cdnFiles.createPath(folderPath);
+                core.cdnFiles.createPath(core.cdnFiles.convertLocalAbsToRelativePath(folderPath));
             } else {
                 throw (new GenericException("Application cannot access this path [" + folderPath + "]"));
             }
@@ -87,14 +87,14 @@ namespace Contensive.Processor {
         /// Delete a file anywhere on the physical file space of the hosting server.
         /// </summary>
         /// <param name="pathFilename"></param>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override void Delete(string pathFilename) {
-            if (core.wwwfiles.isinLocalAbsDosPath(pathFilename)) {
-                core.wwwfiles.deleteFile(pathFilename);
+            if (core.wwwFiles.isinLocalAbsDosPath(pathFilename)) {
+                core.wwwFiles.deleteFile(core.wwwFiles.convertLocalAbsToRelativePath(pathFilename));
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFilename)) {
-                core.privateFiles.deleteFile(pathFilename);
+                core.privateFiles.deleteFile(core.privateFiles.convertLocalAbsToRelativePath(pathFilename));
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFilename)) {
-                core.cdnFiles.deleteFile(pathFilename);
+                core.cdnFiles.deleteFile(core.cdnFiles.convertLocalAbsToRelativePath(pathFilename));
             } else {
                 throw (new GenericException("Application cannot access this path [" + pathFilename + "]"));
             }
@@ -105,7 +105,7 @@ namespace Contensive.Processor {
         /// Delete a file in the cdnFiles store.
         /// </summary>
         /// <param name="pathFilename"></param>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override void DeleteVirtual(string pathFilename) {
             core.cdnFiles.deleteFile(pathFilename);
         }
@@ -116,14 +116,14 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="pathFilename"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override string Read(string pathFilename) {
-            if (core.wwwfiles.isinLocalAbsDosPath(pathFilename)) {
-                return core.wwwfiles.readFileText(pathFilename);
+            if (core.wwwFiles.isinLocalAbsDosPath(pathFilename)) {
+                return core.wwwFiles.readFileText(core.wwwFiles.convertLocalAbsToRelativePath(pathFilename));
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFilename)) {
-                return core.privateFiles.readFileText(pathFilename);
+                return core.privateFiles.readFileText(core.privateFiles.convertLocalAbsToRelativePath(pathFilename));
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFilename)) {
-                return core.cdnFiles.readFileText(pathFilename);
+                return core.cdnFiles.readFileText(core.cdnFiles.convertLocalAbsToRelativePath(pathFilename));
             } else {
                 throw (new GenericException("Application cannot access this path [" + pathFilename + "]"));
             }
@@ -135,7 +135,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="pathFilename"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override string ReadVirtual(string pathFilename) {
             return core.cdnFiles.readFileText(pathFilename);
         }
@@ -146,14 +146,14 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="pathFilename"></param>
         /// <param name="fileContent"></param>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override void Save(string pathFilename, string fileContent) {
-            if (core.wwwfiles.isinLocalAbsDosPath(pathFilename)) {
-                core.wwwfiles.saveFile(pathFilename, fileContent);
+            if (core.wwwFiles.isinLocalAbsDosPath(pathFilename)) {
+                core.wwwFiles.saveFile(core.wwwFiles.convertLocalAbsToRelativePath(pathFilename), fileContent);
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFilename)) {
-                core.privateFiles.saveFile(pathFilename, fileContent);
+                core.privateFiles.saveFile(core.privateFiles.convertLocalAbsToRelativePath(pathFilename), fileContent);
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFilename)) {
-                core.cdnFiles.saveFile(pathFilename, fileContent);
+                core.cdnFiles.saveFile(core.cdnFiles.convertLocalAbsToRelativePath(pathFilename), fileContent);
             } else {
                 throw (new GenericException("Application cannot access this path [" + pathFilename + "]"));
             }
@@ -165,7 +165,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="fileContent"></param>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override void SaveVirtual(string filename, string fileContent) {
             core.cdnFiles.saveFile(filename, fileContent);
         }
@@ -176,15 +176,15 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="pathFileName"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override bool fileExists(string pathFileName) {
             bool result = false;
-            if (core.wwwfiles.isinLocalAbsDosPath(pathFileName)) {
-                result = core.wwwfiles.fileExists(pathFileName);
+            if (core.wwwFiles.isinLocalAbsDosPath(pathFileName)) {
+                result = core.wwwFiles.fileExists(core.wwwFiles.convertLocalAbsToRelativePath(pathFileName));
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFileName)) {
-                result = core.privateFiles.fileExists(pathFileName);
+                result = core.privateFiles.fileExists(core.privateFiles.convertLocalAbsToRelativePath(pathFileName));
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFileName)) {
-                result = core.cdnFiles.fileExists(pathFileName);
+                result = core.cdnFiles.fileExists(core.cdnFiles.convertLocalAbsToRelativePath(pathFileName));
             } else {
                 throw (new GenericException("Application cannot access this path [" + pathFileName + "]"));
             }
@@ -197,15 +197,15 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="pathFolderName"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override bool folderExists(string pathFolderName) {
             bool result = false;
-            if (core.wwwfiles.isinLocalAbsDosPath(pathFolderName)) {
-                result = core.wwwfiles.pathExists(pathFolderName);
+            if (core.wwwFiles.isinLocalAbsDosPath(pathFolderName)) {
+                result = core.wwwFiles.pathExists(core.wwwFiles.convertLocalAbsToRelativePath(pathFolderName));
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
-                result = core.privateFiles.pathExists(pathFolderName);
+                result = core.privateFiles.pathExists(core.privateFiles.convertLocalAbsToRelativePath(pathFolderName));
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
-                result = core.cdnFiles.pathExists(pathFolderName);
+                result = core.cdnFiles.pathExists(core.cdnFiles.convertLocalAbsToRelativePath(pathFolderName));
             } else {
                 throw (new GenericException("Application cannot access this path [" + pathFolderName + "]"));
             }
@@ -220,17 +220,17 @@ namespace Contensive.Processor {
         /// <param name="pageSize"></param>
         /// <param name="pageNumber"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override string fileList(string pathFolderName, int pageSize, int pageNumber) {
             string result = "";
-            if (core.wwwfiles.isinLocalAbsDosPath(pathFolderName)) {
-                List<FileDetail> fi = core.wwwfiles.getFileList(pathFolderName);
+            if (core.wwwFiles.isinLocalAbsDosPath(pathFolderName)) {
+                List<FileDetail> fi = core.wwwFiles.getFileList(core.wwwFiles.convertLocalAbsToRelativePath(pathFolderName));
                 result = UpgradeController.Upgrade51ConvertFileInfoArrayToParseString(fi);
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
-                List<FileDetail> fi = core.privateFiles.getFileList(pathFolderName);
+                List<FileDetail> fi = core.privateFiles.getFileList(core.privateFiles.convertLocalAbsToRelativePath(pathFolderName));
                 result = UpgradeController.Upgrade51ConvertFileInfoArrayToParseString(fi);
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
-                List<FileDetail> fi = core.cdnFiles.getFileList(pathFolderName);
+                List<FileDetail> fi = core.cdnFiles.getFileList(core.cdnFiles.convertLocalAbsToRelativePath(pathFolderName));
                 result = UpgradeController.Upgrade51ConvertFileInfoArrayToParseString(fi);
             } else {
                 throw (new GenericException("Application cannot access this path [" + pathFolderName + "]"));
@@ -238,12 +238,12 @@ namespace Contensive.Processor {
             return result;
         }
         //
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override string fileList(string pathFolderName, int pageSize) {
             return fileList(pathFolderName, pageSize, 1);
         }
         //
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override string fileList(string pathFolderName) {
             return fileList(pathFolderName, 9999, 1);
         }
@@ -254,17 +254,17 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="pathFolderName"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override string folderList(string pathFolderName) {
             string result = "";
-            if (core.wwwfiles.isinLocalAbsDosPath(pathFolderName)) {
-                List<FolderDetail> fi = core.wwwfiles.getFolderList(pathFolderName);
+            if (core.wwwFiles.isinLocalAbsDosPath(pathFolderName)) {
+                List<FolderDetail> fi = core.wwwFiles.getFolderList(core.wwwFiles.convertLocalAbsToRelativePath(pathFolderName));
                 result = UpgradeController.Upgrade51ConvertDirectoryInfoArrayToParseString(fi);
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
-                List<FolderDetail> fi = core.privateFiles.getFolderList(pathFolderName);
+                List<FolderDetail> fi = core.privateFiles.getFolderList(core.privateFiles.convertLocalAbsToRelativePath(pathFolderName));
                 result = UpgradeController.Upgrade51ConvertDirectoryInfoArrayToParseString(fi);
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
-                List<FolderDetail> fi = core.cdnFiles.getFolderList(pathFolderName);
+                List<FolderDetail> fi = core.cdnFiles.getFolderList(core.cdnFiles.convertLocalAbsToRelativePath(pathFolderName));
                 result = UpgradeController.Upgrade51ConvertDirectoryInfoArrayToParseString(fi);
             } else {
                 throw (new GenericException("Application cannot access this path [" + pathFolderName + "]"));
@@ -277,14 +277,14 @@ namespace Contensive.Processor {
         /// Delete a folder anywhere on the physical file space of the hosting server.
         /// </summary>
         /// <param name="pathFolderName"></param>
-        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.FileTemp instead.", true)]
         public override void DeleteFolder(string pathFolderName) {
-            if (core.wwwfiles.isinLocalAbsDosPath(pathFolderName)) {
-                core.wwwfiles.deleteFolder(pathFolderName);
+            if (core.wwwFiles.isinLocalAbsDosPath(pathFolderName)) {
+                core.wwwFiles.deleteFolder(core.wwwFiles.convertLocalAbsToRelativePath((pathFolderName)));
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
-                core.wwwfiles.deleteFolder(pathFolderName);
+                core.privateFiles.deleteFolder( core.privateFiles.convertLocalAbsToRelativePath( pathFolderName));
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
-                core.wwwfiles.deleteFolder(pathFolderName);
+                core.cdnFiles.deleteFolder( core.cdnFiles.convertLocalAbsToRelativePath( pathFolderName));
             } else {
                 throw (new GenericException("Application cannot access this path [" + pathFolderName + "]"));
             }

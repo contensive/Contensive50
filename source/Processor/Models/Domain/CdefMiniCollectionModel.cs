@@ -937,7 +937,7 @@ namespace Contensive.Processor.Models.Domain {
                             + "\r\nStyles added " + DateTime.Now + "\r\n*/"
                             + "\r\n" + StyleSheetAdd;
                     }
-                    core.wwwfiles.saveFile("templates/styles.css", SiteStyles);
+                    core.wwwFiles.saveFile("templates/styles.css", SiteStyles);
                     //
                     // -- Update stylesheet cache
                     core.siteProperties.setProperty("StylesheetSerialNumber", "-1");

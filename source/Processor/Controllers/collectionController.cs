@@ -1002,10 +1002,10 @@ namespace Contensive.Processor.Controllers {
                                                                     case "www":
                                                                         wwwFileList += "\r\n" + dstDosPath + filename;
                                                                         LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.localWwwPath + dstDosPath + "].");
-                                                                        core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.wwwfiles);
+                                                                        core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.wwwFiles);
                                                                         if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
                                                                             LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping www file [" + core.appConfig.localWwwPath + dstDosPath + filename + "].");
-                                                                            core.wwwfiles.UnzipFile(dstDosPath + filename);
+                                                                            core.wwwFiles.UnzipFile(dstDosPath + filename);
                                                                         }
                                                                         break;
                                                                     case "file":
@@ -2014,7 +2014,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // copy this file to destination
                             //
-                            core.privateFiles.copyFile(SrcPath + file.Name, DstPath + file.Name, core.wwwfiles);
+                            core.privateFiles.copyFile(SrcPath + file.Name, DstPath + file.Name, core.wwwFiles);
                         }
                     }
                     //

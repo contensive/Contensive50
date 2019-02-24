@@ -108,14 +108,14 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
                 try {
                     CPBlockBaseClass block = cp.BlockNew();
                     // act
-                    cp.core.wwwfiles.saveFile(filename, templateA);
+                    cp.core.wwwFiles.saveFile(filename, templateA);
                     block.ImportFile(filename);
                     // assert
                     Assert.AreEqual(layoutC, block.GetHtml());
                 } catch (Exception) {
                     //
                 } finally {
-                    cp.core.wwwfiles.deleteFile(filename);
+                    cp.core.wwwFiles.deleteFile(filename);
                 }
             }
         }
@@ -159,12 +159,12 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 string filename = "cpBlockTest" + GetRandomInteger(cp.core).ToString() + ".html";
                 // act
-                cp.core.wwwfiles.saveFile(filename, layoutA);
+                cp.core.wwwFiles.saveFile(filename, layoutA);
                 CPBlockBaseClass block = cp.BlockNew();
                 block.OpenFile(filename);
                 // assert
                 Assert.AreEqual(layoutA, block.GetHtml());
-                cp.core.wwwfiles.deleteFile(filename);
+                cp.core.wwwFiles.deleteFile(filename);
             }
         }
         //

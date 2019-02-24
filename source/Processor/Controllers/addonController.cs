@@ -802,7 +802,7 @@ namespace Contensive.Processor.Controllers {
                                                                     Filename = DefaultFilename;
                                                                     core.siteProperties.setProperty(FieldName, DefaultFilename);
                                                                 }
-                                                                core.wwwfiles.saveFile(Filename, FieldValue);
+                                                                core.wwwFiles.saveFile(Filename, FieldValue);
                                                                 break;
                                                             case "cssfile":
                                                                 //
@@ -812,7 +812,7 @@ namespace Contensive.Processor.Controllers {
                                                                     Filename = DefaultFilename;
                                                                     core.siteProperties.setProperty(FieldName, DefaultFilename);
                                                                 }
-                                                                core.wwwfiles.saveFile(Filename, FieldValue);
+                                                                core.wwwFiles.saveFile(Filename, FieldValue);
                                                                 break;
                                                             case "xmlfile":
                                                                 //
@@ -822,7 +822,7 @@ namespace Contensive.Processor.Controllers {
                                                                     Filename = DefaultFilename;
                                                                     core.siteProperties.setProperty(FieldName, DefaultFilename);
                                                                 }
-                                                                core.wwwfiles.saveFile(Filename, FieldValue);
+                                                                core.wwwFiles.saveFile(Filename, FieldValue);
                                                                 break;
                                                             case "currency":
                                                                 //
@@ -889,7 +889,7 @@ namespace Contensive.Processor.Controllers {
                                                             FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                             fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
                                                             FieldValue = core.docProperties.getText(FieldName);
-                                                            core.wwwfiles.saveFile(fieldfilename, FieldValue);
+                                                            core.wwwFiles.saveFile(fieldfilename, FieldValue);
                                                         }
                                                         break;
                                                     case "dbquery":
@@ -1113,7 +1113,7 @@ namespace Contensive.Processor.Controllers {
                                                         FieldValue = TabNode.InnerText;
                                                         FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                         if (!string.IsNullOrEmpty(fieldfilename)) {
-                                                            if (core.wwwfiles.fileExists(fieldfilename)) {
+                                                            if (core.wwwFiles.fileExists(fieldfilename)) {
                                                                 FieldValue = core.cdnFiles.readFileText(fieldfilename);
                                                             }
                                                         }
@@ -1471,7 +1471,7 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // -- foreground - appRootPath
-                        appPath = core.privateFiles.joinPath(core.wwwfiles.localAbsRootPath, "bin\\");
+                        appPath = core.privateFiles.joinPath(core.wwwFiles.localAbsRootPath, "bin\\");
                     }
 
 

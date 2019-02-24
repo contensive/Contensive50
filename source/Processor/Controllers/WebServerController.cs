@@ -942,8 +942,8 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- create temp cclib virtual folder pointed to contensiveBase.
-                    core.wwwfiles.deleteFolder("cclib");
-                    core.wwwfiles.createPath("ContensiveBase");
+                    core.wwwFiles.deleteFolder("cclib");
+                    core.wwwFiles.createPath("ContensiveBase");
                     verifyWebsite_VirtualDirectory(core, site, appName, "cclib", phyPath + @"ContensiveBase");
                     //
                     // -- commit any changes

@@ -230,7 +230,7 @@ namespace Contensive.Processor {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
         public override string PhysicalWWWPath {
             get {
-                return cp.core.wwwfiles.localAbsRootPath;
+                return cp.core.wwwFiles.localAbsRootPath;
             }
         }
         //

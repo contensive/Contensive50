@@ -163,7 +163,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     if (fileExists_local(pathFilename)) {
-                        using (StreamReader sr = File.OpenText(convertToLocalAbsPath(pathFilename))) {
+                        using (StreamReader sr = File.OpenText(convertRelativeToLocalAbsPath(pathFilename))) {
                             returnContent = sr.ReadToEnd();
                         }
                     }
@@ -197,7 +197,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     if (fileExists(pathFilename)) {
-                        using (FileStream sr = File.OpenRead(convertToLocalAbsPath(pathFilename))) {
+                        using (FileStream sr = File.OpenRead(convertRelativeToLocalAbsPath(pathFilename))) {
                             bytesRead = sr.Read(returnContent, 0, 1000000000);
                         }
                     }
@@ -251,9 +251,9 @@ namespace Contensive.Processor.Controllers {
                 //}
                 try {
                     if (isBinary) {
-                        File.WriteAllBytes(convertToLocalAbsPath(pathFilename), binaryContent);
+                        File.WriteAllBytes(convertRelativeToLocalAbsPath(pathFilename), binaryContent);
                     } else {
-                        File.WriteAllText(convertToLocalAbsPath(pathFilename), textContent);
+                        File.WriteAllText(convertRelativeToLocalAbsPath(pathFilename), textContent);
                     }
                 } catch (Exception ex) {
                     LogController.handleError( core,ex);
@@ -282,7 +282,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (!string.IsNullOrEmpty(fileContent)) {
                     //
                     // -- verify local path
-                    string absFilename = convertToLocalAbsPath(pathFilename);
+                    string absFilename = convertRelativeToLocalAbsPath(pathFilename);
                     string path = "";
                     string filename = "";
                     splitDosPathFilename(pathFilename, ref path, ref filename);
@@ -323,7 +323,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="path"></param>
         private void createPath_local(string path) {
-            createPathAbs_local(convertToLocalAbsPath(path));
+            createPathAbs_local(convertRelativeToLocalAbsPath(path));
         }
         //
         //==============================================================================================================
@@ -433,7 +433,7 @@ namespace Contensive.Processor.Controllers {
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 if (!string.IsNullOrEmpty(pathFilename)) {
                     if (fileExists_local(pathFilename)) {
-                        File.Delete(convertToLocalAbsPath(pathFilename));
+                        File.Delete(convertRelativeToLocalAbsPath(pathFilename));
                     }
                 }
             } catch (Exception ex) {
@@ -618,7 +618,7 @@ namespace Contensive.Processor.Controllers {
 
                 } else {
                     if (pathExists_local(path)) {
-                        string localPath = convertToLocalAbsPath(path);
+                        string localPath = convertRelativeToLocalAbsPath(path);
                         DirectoryInfo di = new DirectoryInfo(localPath);
                         foreach(var file in di.GetFiles()) {
                             //
@@ -698,7 +698,7 @@ namespace Contensive.Processor.Controllers {
                     };
                 } else {
                     if (pathExists_local(path)) {
-                        string localPath = convertToLocalAbsPath(path);
+                        string localPath = convertRelativeToLocalAbsPath(path);
                         DirectoryInfo di = new DirectoryInfo(localPath);
                         foreach( var folder in di.GetDirectories()) {
                             returnFolders.Add(new FolderDetail() {
@@ -748,7 +748,7 @@ namespace Contensive.Processor.Controllers {
         private bool fileExists_local(string dosPathFilename) {
             bool returnOK = false;
             try {
-                string absDosPathFilename = convertToLocalAbsPath(dosPathFilename);
+                string absDosPathFilename = convertRelativeToLocalAbsPath(dosPathFilename);
                 returnOK = File.Exists(absDosPathFilename);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -818,7 +818,7 @@ namespace Contensive.Processor.Controllers {
         private bool pathExists_local(string path) {
             bool returnOk = false; 
             try {
-                string absPath = convertToLocalAbsPath(path);
+                string absPath = convertRelativeToLocalAbsPath(path);
                 returnOk = Directory.Exists(absPath);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1058,7 +1058,7 @@ namespace Contensive.Processor.Controllers {
                     string URLLink = GenericController.vbReplace(Link, " ", "%20");
                     HttpRequestController HTTP = new HttpRequestController();
                     HTTP.timeout = 600;
-                    HTTP.getUrlToFile(encodeText(URLLink), convertToLocalAbsPath(pathFilename));
+                    HTTP.getUrlToFile(encodeText(URLLink), convertRelativeToLocalAbsPath(pathFilename));
                     //
                     if (!isLocal) {
                         copyLocalToRemote(pathFilename);
@@ -1089,7 +1089,7 @@ namespace Contensive.Processor.Controllers {
                     string path = "";
                     string filename = "";
                     splitDosPathFilename(pathFilename, ref path, ref filename);
-                    string absPathFilename = convertToLocalAbsPath(pathFilename);
+                    string absPathFilename = convertRelativeToLocalAbsPath(pathFilename);
                     string absPath = "";
                     splitDosPathFilename(absPathFilename, ref absPath, ref filename);
                     string fileFilter = null;
@@ -1131,7 +1131,7 @@ namespace Contensive.Processor.Controllers {
                 FastZip fastZip = new FastZip();
                 string fileFilter = null;
                 bool recurse = true;
-                fastZip.CreateZip(convertToLocalAbsPath(archivePathFilename), convertToLocalAbsPath(addPathFilename), recurse, fileFilter);
+                fastZip.CreateZip(convertRelativeToLocalAbsPath(archivePathFilename), convertRelativeToLocalAbsPath(addPathFilename), recurse, fileFilter);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -1144,7 +1144,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="pathFilename"></param>
         /// <returns></returns>
-        private string convertToLocalAbsPath(string pathFilename) {
+        public string convertRelativeToLocalAbsPath(string pathFilename) {
             string result = pathFilename;
             try {
                 string normalizedPathFilename = normalizeDosPathFilename(pathFilename);
@@ -1163,6 +1163,18 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Convert an absolute pathFilename to a relative pathFilename
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <returns></returns>
+        public string convertLocalAbsToRelativePath(string pathFilename) {
+            if (pathFilename.ToLower().IndexOf(localAbsRootPath.ToLower()).Equals(0)) { return pathFilename.Substring(localAbsRootPath.Length); }
+            return pathFilename;
+        }
+
         //
         //====================================================================================================
         /// <summary>
@@ -1394,10 +1406,10 @@ namespace Contensive.Processor.Controllers {
         public bool copyRemoteToLocal(string pathFilename) {
             bool result = false;
             try {
-                pathFilename = normalizeDosPathFilename(pathFilename);
                 if (!isLocal) {
                     //
                     // note: local call is not exception, can be used regardless of isLocal
+                    pathFilename = normalizeDosPathFilename(pathFilename);
                     verifyPath_remote(getPath(pathFilename));
                     string remoteUnixAbsPathFilename = GenericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
                     string localDosPathFilename = GenericController.convertToDosSlash(pathFilename);
@@ -1406,7 +1418,10 @@ namespace Contensive.Processor.Controllers {
                     deleteFile_local(localDosPathFilename);
                     if (fileExists_remote(pathFilename)) {
                         //
-                        // -- remote file exists, delete local version and copy remote to local
+                        // -- remote file exists, verify local folder (or AWS returns error
+                        verifyPath_local(getPath(pathFilename));
+                        //
+                        // -- remote file exists, copy remote to local
                         GetObjectRequest request = new GetObjectRequest {
                             BucketName = core.serverConfig.awsBucketName,
                             Key = remoteUnixAbsPathFilename

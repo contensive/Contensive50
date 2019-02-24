@@ -559,7 +559,7 @@ namespace Contensive.Processor {
         public override CPFileSystemBaseClass WwwFiles {
             get {
                 if (_FileAppRoot == null) {
-                    _FileAppRoot = new CPFileSystemClass(this, core.wwwfiles);
+                    _FileAppRoot = new CPFileSystemClass(this, core.wwwFiles);
                 }
                 return _FileAppRoot;
             }

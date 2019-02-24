@@ -116,11 +116,11 @@ namespace Contensive.Processor.Controllers {
                                     Delimiter = "";
                                     FieldNameVariant = csData.getFirstFieldName();
                                     while (!string.IsNullOrEmpty(FieldNameVariant)) {
-                                        core.wwwfiles.appendFile(TestFilename, Delimiter + "\"" + FieldNameVariant + "\"");
+                                        core.wwwFiles.appendFile(TestFilename, Delimiter + "\"" + FieldNameVariant + "\"");
                                         Delimiter = ",";
                                         FieldNameVariant = csData.getNextFieldName();
                                     }
-                                    core.wwwfiles.appendFile(TestFilename, "\r\n");
+                                    core.wwwFiles.appendFile(TestFilename, "\r\n");
                                 }
                                 //
                                 // ----- print out the values
@@ -152,20 +152,20 @@ namespace Contensive.Processor.Controllers {
                                             Copy = GenericController.vbReplace(Copy, "\r", " ");
                                             Copy = GenericController.vbReplace(Copy, "\n", " ");
                                         }
-                                        core.wwwfiles.appendFile(TestFilename, Delimiter + "\"" + Copy + "\"");
+                                        core.wwwFiles.appendFile(TestFilename, Delimiter + "\"" + Copy + "\"");
                                         Delimiter = ",";
                                         FieldNameVariant = csData.getNextFieldName();
                                         ///DoEvents
                                     }
-                                    core.wwwfiles.appendFile(TestFilename, "\r\n");
+                                    core.wwwFiles.appendFile(TestFilename, "\r\n");
                                     csData.goNext();
                                 }
                             }
                         }
                         break;
                 }
-                result = core.wwwfiles.readFileText(TestFilename);
-                core.wwwfiles.deleteFile(TestFilename);
+                result = core.wwwFiles.readFileText(TestFilename);
+                core.wwwFiles.deleteFile(TestFilename);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
             }

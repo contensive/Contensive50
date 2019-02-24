@@ -237,7 +237,7 @@ namespace Contensive.Processor.Controllers {
         private WebServerController _webServer;
         //
         //===================================================================================================
-        public FileController wwwfiles {
+        public FileController wwwFiles {
             get {
                 if (_appRootFiles == null) {
                     if (appConfig != null) {
@@ -1321,14 +1321,14 @@ namespace Contensive.Processor.Controllers {
                                         FilePath = Filename.Left(Pos);
                                         Filename = Filename.Substring(Pos);
                                     }
-                                    csData.set("filesize", wwwfiles.getFileSize(FilePath + Filename));
+                                    csData.set("filesize", wwwFiles.getFileSize(FilePath + Filename));
                                     Pos = Filename.LastIndexOf(".") + 1;
                                     if (Pos > 0) {
                                         string FilenameExt = Filename.Substring(Pos);
                                         string FilenameNoExt = Filename.Left(Pos - 1);
                                         if (GenericController.vbInstr(1, "jpg,gif,png", FilenameExt, 1) != 0) {
                                             ImageEditController sf = new ImageEditController();
-                                            if (sf.load(FilePath + Filename, wwwfiles)) {
+                                            if (sf.load(FilePath + Filename, wwwFiles)) {
                                                 //
                                                 //
                                                 //
@@ -1344,7 +1344,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (sf.width >= 640) {
                                                         sf.height = encodeInteger(sf.height * (640 / sf.width));
                                                         sf.width = 640;
-                                                        sf.save(FilePath + FilenameNoExt + "-640x" + sf.height + "." + FilenameExt, wwwfiles);
+                                                        sf.save(FilePath + FilenameNoExt + "-640x" + sf.height + "." + FilenameExt, wwwFiles);
                                                         AltSizeList = AltSizeList + "\r\n640x" + sf.height;
                                                     }
                                                     //
@@ -1353,7 +1353,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (sf.width >= 320) {
                                                         sf.height = encodeInteger(sf.height * (320 / sf.width));
                                                         sf.width = 320;
-                                                        sf.save(FilePath + FilenameNoExt + "-320x" + sf.height + "." + FilenameExt, wwwfiles);
+                                                        sf.save(FilePath + FilenameNoExt + "-320x" + sf.height + "." + FilenameExt, wwwFiles);
 
                                                         AltSizeList = AltSizeList + "\r\n320x" + sf.height;
                                                     }
@@ -1363,7 +1363,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (sf.width >= 160) {
                                                         sf.height = encodeInteger(sf.height * (160 / sf.width));
                                                         sf.width = 160;
-                                                        sf.save(FilePath + FilenameNoExt + "-160x" + sf.height + "." + FilenameExt, wwwfiles);
+                                                        sf.save(FilePath + FilenameNoExt + "-160x" + sf.height + "." + FilenameExt, wwwFiles);
                                                         AltSizeList = AltSizeList + "\r\n160x" + sf.height;
                                                     }
                                                     //
@@ -1372,7 +1372,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (sf.width >= 80) {
                                                         sf.height = encodeInteger(sf.height * (80 / sf.width));
                                                         sf.width = 80;
-                                                        sf.save(FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt, wwwfiles);
+                                                        sf.save(FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt, wwwFiles);
                                                         AltSizeList = AltSizeList + "\r\n80x" + sf.height;
                                                     }
                                                     csData.set("AltSizeList", AltSizeList);

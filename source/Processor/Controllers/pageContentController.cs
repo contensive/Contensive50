@@ -403,7 +403,7 @@ namespace Contensive.Processor.Controllers {
                                 // -- ceate new template named Default
                                 core.doc.pageController.template = PageTemplateModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, PageTemplateModel.contentName));
                                 core.doc.pageController.template.name = defaultTemplateName;
-                                core.doc.pageController.template.bodyHTML = core.wwwfiles.readFileText(defaultTemplateHomeFilename);
+                                core.doc.pageController.template.bodyHTML = core.wwwFiles.readFileText(defaultTemplateHomeFilename);
                                 core.doc.pageController.template.save(core);
                             }
                             //
