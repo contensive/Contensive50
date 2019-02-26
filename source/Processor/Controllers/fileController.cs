@@ -486,19 +486,23 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dstPathFilename"></param>
         /// <param name="dstFileSystem"></param>
         public void copyFile(string srcPathFilename, string dstPathFilename, FileController dstFileSystem) {
+            string hint = "src [" + srcPathFilename + "], dst [" + dstPathFilename + "]";
             try {
                 if (string.IsNullOrEmpty(srcPathFilename)) {
                     throw new ArgumentException("Invalid source file.");
                 } else if (string.IsNullOrEmpty(dstPathFilename)) {
                     throw new ArgumentException("Invalid destination file.");
                 } else {
+                    hint += ",normalize";
                     srcPathFilename = normalizeDosPathFilename(srcPathFilename);
                     dstPathFilename = normalizeDosPathFilename(dstPathFilename);
                     if (!isLocal) {
                         //
                         // src is remote file - copy file to local mirror
+                        hint += ",!isLocal";
                         if (fileExists_remote(srcPathFilename)) {
                             verifyPath_remote(getPath(srcPathFilename));
+                            hint += ",copyRemoteToLocal";
                             copyRemoteToLocal(srcPathFilename);
                             //
                             // -- copy src to dst on local mirror
@@ -509,31 +513,25 @@ namespace Contensive.Processor.Controllers {
                                 dstFileSystem.createPath_local(dstPath);
                             }
                             string srcFullPathFilename = joinPath(localAbsRootPath, srcPathFilename);
-                            string DstFullPathFilename = joinPath(dstFileSystem.localAbsRootPath, dstPathFilename);
-                            if (dstFileSystem.fileExists(dstPathFilename)) {
-                                dstFileSystem.deleteFile(dstPathFilename);
+                            string dstFullPathFilename = joinPath(dstFileSystem.localAbsRootPath, dstPathFilename);
+                            if (!dstFileSystem.fileExists_local(dstPathFilename)) {
+                                hint += ",does not exist on local dst [" + dstPathFilename + "]";
+                            } else { 
+                                hint += ",delete local dst [" + dstPathFilename + "]";
+                                dstFileSystem.deleteFile_local(dstPathFilename);
                             }
-                            File.Copy(srcFullPathFilename, DstFullPathFilename);
+                            hint += ",File.copy";
+                            File.Copy(srcFullPathFilename, dstFullPathFilename);
                             if (!dstFileSystem.isLocal) {
                                 //
                                 // -- dst is remote, copy file to remote source
                                 dstFileSystem.copyLocalToRemote(dstPathFilename);
                             }
                         }
-                        //string srcRemoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, srcPathFilename));
-                        //var s3FileInfo = new Amazon.S3.IO.S3FileInfo(s3Client, core.serverConfig.awsBucketName, convertToDosSlash(srcRemoteUnixPathFilename.Substring(1)));
-                        //if ( s3FileInfo.Exists ) {
-                        //    string dstRemoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, dstPathFilename));
-                        //    string dstRemoteUnixPath = "";
-                        //    string dstRemoteUnixFilename = "";
-                        //    splitUnixPathFilename(dstPathFilename, ref dstRemoteUnixPath, ref dstRemoteUnixFilename);
-                        //    verifyPath_remote(dstRemoteUnixPath);
-                        //    Amazon.S3.IO.S3DirectoryInfo remoteDirectoryInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, dstRemoteUnixPathFilename);
-                        //    s3FileInfo.CopyTo(remoteDirectoryInfo);
-                        //}
                     } else {
                         //
                         // -- src is local file, copy to dst local
+                        hint += "isLocal";
                         if (fileExists_local(srcPathFilename)) {
                             string dstPath = "";
                             string dstFilename = "";
@@ -556,7 +554,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError( core,ex, hint);
                 throw;
             }
         }

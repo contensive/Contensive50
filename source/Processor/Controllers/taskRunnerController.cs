@@ -237,20 +237,24 @@ namespace Contensive.Processor.Controllers {
                                     errorContextMessage = "running task, addon [" + cmdDetail.addonId + "]"
                                 };
                                 string result = cp.core.addon.execute(addon, context);
-                                if ( task.resultDownloadId>0) {
-                                    var download = DbModel.create<DownloadModel>(cp.core, task.resultDownloadId);
-                                    if ( download != null ) {
-                                        if ( string.IsNullOrEmpty( download.name )) {
-                                            download.name = "Download";
+                                if(!string.IsNullOrEmpty(result)) {
+                                    //
+                                    // -- save output
+                                    if (task.resultDownloadId > 0) {
+                                        var download = DbModel.create<DownloadModel>(cp.core, task.resultDownloadId);
+                                        if (download != null) {
+                                            if (string.IsNullOrEmpty(download.name)) {
+                                                download.name = "Download";
+                                            }
+                                            download.resultMessage = "Completed";
+                                            download.filename.content = result;
+                                            download.dateRequested = dateStarted;
+                                            download.dateCompleted = DateTime.Now;
+                                            download.save(cp.core);
                                         }
-                                        download.resultMessage = "Completed";
-                                        download.filename.content = result;
-                                        download.dateRequested = dateStarted;
-                                        download.dateCompleted = DateTime.Now;
-                                        download.save(cp.core);
                                     }
+                                    task.filename.content = result;
                                 }
-                                task.filename.content = result;
                             }
                         }
                         task.dateCompleted = DateTime.Now;
