@@ -69,12 +69,12 @@ namespace Contensive.Processor {
         //
         //==========================================================================================
         public override void CopyLocalToRemote(string pathFilename) {
-            fileSystemController.copyLocalToRemote(pathFilename);
+            fileSystemController.copyFileLocalToRemote(pathFilename);
         }
         //
         //==========================================================================================
         public override void CopyRemoteToLocal(string pathFilename) {
-            fileSystemController.copyRemoteToLocal(pathFilename);
+            fileSystemController.copyFileRemoteToLocal(pathFilename);
         }
         //
         //==========================================================================================

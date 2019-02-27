@@ -702,9 +702,9 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     break;
                                 }
-                            case "import": {
-                                    throw new NotImplementedException("import contentCmd");
-                                }
+                            //case "import": {
+                            //        throw new NotImplementedException("import contentCmd");
+                            //    }
                             case "userproperty":
                             case "user": {
                                     CmdAccumulator = "";
@@ -747,125 +747,125 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     break;
                                 }
-                            case "set": {
-                                    throw new NotImplementedException("set contentCmd");
-                                    //
-                                    // does a find and replace
-                                    //
-                                    // arguments
-                                    //   find: what to search for in teh accumulator
-                                    //   replace: what to replace it with
-                                    // default argument
-                                    //   find
-                                    //
-                                    //CmdAccumulator = ""
-                                    //ArgName = ""
-                                    //For Ptr = 0 To cmdArgDef.Count - 1
-                                    //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
-                                    //        Case "find"
-                                    //            argFind = cmdArgDef.Item[Ptr]
-                                    //        Case "replace"
-                                    //            argReplace = cmdArgDef.Item[Ptr]
-                                    //    End Select
-                                    //Next
-                                    //If argFind <> "" Then
-                                    //    CmdAccumulator = genericController.vbReplace(CmdAccumulator, argFind, argReplace, vbTextCompare)
-                                    //End If
-                                }
-                            case "setinner": {
-                                    throw new NotImplementedException("setInner contentCmd");
-                                    //
-                                    // does a find and replace on the inner HTML of an element identified by its class selector
-                                    //
-                                    // arguments
-                                    //   find: what to search for in teh accumulator
-                                    //   replace: what to replace it with
-                                    // default argument
-                                    //   find
-                                    //
-                                    //ArgName = ""
-                                    //For Ptr = 0 To cmdArgDef.Count - 1
-                                    //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
-                                    //        Case "find"
-                                    //            argFind = cmdArgDef.Item[Ptr]
-                                    //        Case "replace"
-                                    //            argReplace = cmdArgDef.Item[Ptr]
-                                    //    End Select
-                                    //Next
-                                    //If argFind <> "" Then
-                                    //    CmdAccumulator = htmlTools.insertInnerHTML(Nothing, CmdAccumulator, argFind, argReplace)
-                                    //End If
-                                }
-                            case "getinner": {
-                                    throw new NotImplementedException("getInner contentCmd");
-                                    //
-                                    // returns the inner HTML of an element identified by its class selector
-                                    //
-                                    // arguments
-                                    //   find: what to search for in teh accumulator
-                                    // default argument
-                                    //   find
-                                    //
-                                    //ArgName = ""
-                                    //For Ptr = 0 To cmdArgDef.Count - 1
-                                    //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
-                                    //        Case "find"
-                                    //            argFind = cmdArgDef.Item[Ptr]
-                                    //        Case "replace"
-                                    //            argReplace = cmdArgDef.Item[Ptr]
-                                    //    End Select
-                                    //Next
-                                    //If argFind <> "" Then
-                                    //    CmdAccumulator = htmlTools.getInnerHTML(Nothing, CmdAccumulator, argFind)
-                                    //End If
-                                }
-                            case "setouter": {
-                                    throw new NotImplementedException("setOuter contentCmd");
-                                    //
-                                    // does a find and replace on the outer HTML of an element identified by its class selector
-                                    //
-                                    // arguments
-                                    //   find: what to search for in teh accumulator
-                                    //   replace: what to replace it with
-                                    // default argument
-                                    //   find
-                                    //
-                                    //ArgName = ""
-                                    //For Ptr = 0 To cmdArgDef.Count - 1
-                                    //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
-                                    //        Case "find"
-                                    //            argFind = cmdArgDef.Item[Ptr]
-                                    //        Case "replace"
-                                    //            argReplace = cmdArgDef.Item[Ptr]
-                                    //    End Select
-                                    //Next
-                                    //If argFind <> "" Then
-                                    //    CmdAccumulator = htmlTools.insertOuterHTML(Nothing, CmdAccumulator, argFind, argReplace)
-                                    //End If
-                                }
-                            case "getouter": {
-                                    throw new NotImplementedException("getouter contentCmd");
-                                    //
-                                    // returns the outer HTML of an element identified by its class selector
-                                    //
-                                    // arguments
-                                    //   find: what to search for in teh accumulator
-                                    // default argument
-                                    //   find
-                                    //
-                                    //ArgName = ""
-                                    //For Ptr = 0 To cmdArgDef.Count - 1
-                                    //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
-                                    //        Case "find"
-                                    //            argFind = cmdArgDef.Item[Ptr]
-                                    //        Case "replace"
-                                    //            argReplace = cmdArgDef.Item[Ptr]
-                                    //    End Select
-                                    //Next
-                                    //If argFind <> "" Then
-                                    //    CmdAccumulator = htmlTools.getOuterHTML(Nothing, CmdAccumulator, argFind)
-                                    //End If
-                                }
+                            //case "set": {
+                            //        throw new NotImplementedException("set contentCmd");
+                            //        //
+                            //        // does a find and replace
+                            //        //
+                            //        // arguments
+                            //        //   find: what to search for in teh accumulator
+                            //        //   replace: what to replace it with
+                            //        // default argument
+                            //        //   find
+                            //        //
+                            //        //CmdAccumulator = ""
+                            //        //ArgName = ""
+                            //        //For Ptr = 0 To cmdArgDef.Count - 1
+                            //        //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
+                            //        //        Case "find"
+                            //        //            argFind = cmdArgDef.Item[Ptr]
+                            //        //        Case "replace"
+                            //        //            argReplace = cmdArgDef.Item[Ptr]
+                            //        //    End Select
+                            //        //Next
+                            //        //If argFind <> "" Then
+                            //        //    CmdAccumulator = genericController.vbReplace(CmdAccumulator, argFind, argReplace, vbTextCompare)
+                            //        //End If
+                            //    }
+                            //case "setinner": {
+                            //        throw new NotImplementedException("setInner contentCmd");
+                            //        //
+                            //        // does a find and replace on the inner HTML of an element identified by its class selector
+                            //        //
+                            //        // arguments
+                            //        //   find: what to search for in teh accumulator
+                            //        //   replace: what to replace it with
+                            //        // default argument
+                            //        //   find
+                            //        //
+                            //        //ArgName = ""
+                            //        //For Ptr = 0 To cmdArgDef.Count - 1
+                            //        //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
+                            //        //        Case "find"
+                            //        //            argFind = cmdArgDef.Item[Ptr]
+                            //        //        Case "replace"
+                            //        //            argReplace = cmdArgDef.Item[Ptr]
+                            //        //    End Select
+                            //        //Next
+                            //        //If argFind <> "" Then
+                            //        //    CmdAccumulator = htmlTools.insertInnerHTML(Nothing, CmdAccumulator, argFind, argReplace)
+                            //        //End If
+                            //    }
+                            //case "getinner": {
+                            //        throw new NotImplementedException("getInner contentCmd");
+                            //        //
+                            //        // returns the inner HTML of an element identified by its class selector
+                            //        //
+                            //        // arguments
+                            //        //   find: what to search for in teh accumulator
+                            //        // default argument
+                            //        //   find
+                            //        //
+                            //        //ArgName = ""
+                            //        //For Ptr = 0 To cmdArgDef.Count - 1
+                            //        //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
+                            //        //        Case "find"
+                            //        //            argFind = cmdArgDef.Item[Ptr]
+                            //        //        Case "replace"
+                            //        //            argReplace = cmdArgDef.Item[Ptr]
+                            //        //    End Select
+                            //        //Next
+                            //        //If argFind <> "" Then
+                            //        //    CmdAccumulator = htmlTools.getInnerHTML(Nothing, CmdAccumulator, argFind)
+                            //        //End If
+                            //    }
+                            //case "setouter": {
+                            //        throw new NotImplementedException("setOuter contentCmd");
+                            //        //
+                            //        // does a find and replace on the outer HTML of an element identified by its class selector
+                            //        //
+                            //        // arguments
+                            //        //   find: what to search for in teh accumulator
+                            //        //   replace: what to replace it with
+                            //        // default argument
+                            //        //   find
+                            //        //
+                            //        //ArgName = ""
+                            //        //For Ptr = 0 To cmdArgDef.Count - 1
+                            //        //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
+                            //        //        Case "find"
+                            //        //            argFind = cmdArgDef.Item[Ptr]
+                            //        //        Case "replace"
+                            //        //            argReplace = cmdArgDef.Item[Ptr]
+                            //        //    End Select
+                            //        //Next
+                            //        //If argFind <> "" Then
+                            //        //    CmdAccumulator = htmlTools.insertOuterHTML(Nothing, CmdAccumulator, argFind, argReplace)
+                            //        //End If
+                            //    }
+                            //case "getouter": {
+                            //        throw new NotImplementedException("getouter contentCmd");
+                            //        //
+                            //        // returns the outer HTML of an element identified by its class selector
+                            //        //
+                            //        // arguments
+                            //        //   find: what to search for in teh accumulator
+                            //        // default argument
+                            //        //   find
+                            //        //
+                            //        //ArgName = ""
+                            //        //For Ptr = 0 To cmdArgDef.Count - 1
+                            //        //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
+                            //        //        Case "find"
+                            //        //            argFind = cmdArgDef.Item[Ptr]
+                            //        //        Case "replace"
+                            //        //            argReplace = cmdArgDef.Item[Ptr]
+                            //        //    End Select
+                            //        //Next
+                            //        //If argFind <> "" Then
+                            //        //    CmdAccumulator = htmlTools.getOuterHTML(Nothing, CmdAccumulator, argFind)
+                            //        //End If
+                            //    }
                             case "runaddon":
                             case "executeaddon":
                             case "addon": {

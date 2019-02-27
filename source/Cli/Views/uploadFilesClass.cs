@@ -31,26 +31,31 @@ namespace Contensive.CLI {
                     Console.WriteLine("The application [" + appName + "] was not found in this server group.");
                     return;
                 }
-
+                if (cpServer.core.serverConfig.isLocalFileSystem) {
+                    Console.WriteLine("This server is in localmode. Uploading is only valid if NOT in localmode.");
+                    return;
+                }
                 using (var cp = new CPClass(appName)) {
                     Console.Write("\n\rUploading files from local file store to remove file store.");
                     // verify the server has a remote file path configured
                     //
                     // create a local cdn file system
-                    var cdnLocalFileController = new Processor.Controllers.FileController(cp.core, true, cp.CdnFiles.PhysicalFilePath, "");
-                    CPFileSystemBaseClass cdnLocalFiles = new CPFileSystemClass(cp, cdnLocalFileController);
-                    uploadPath(cp, cp.CdnFiles, cdnLocalFiles, "\\");
+                    cp.core.cdnFiles.copyPathLocalToRemote("");
+                    //var cdnLocalFileController = new Processor.Controllers.FileController(cp.core, true, cp.CdnFiles.PhysicalFilePath, "");
+                    //CPFileSystemBaseClass cdnLocalFiles = new CPFileSystemClass(cp, cdnLocalFileController);
+                    //uploadPath(cp, cp.CdnFiles, cdnLocalFiles, "\\");
                     //
                     // create a local private file system
-                    var privateLocalFileController = new Processor.Controllers.FileController(cp.core, true, cp.PrivateFiles.PhysicalFilePath, "");
-                    CPFileSystemBaseClass privateLocalFiles = new CPFileSystemClass(cp, privateLocalFileController);
-                    uploadPath(cp, cp.PrivateFiles, privateLocalFiles, "\\");
+                    cp.core.privateFiles.copyPathLocalToRemote("");
+                    //var privateLocalFileController = new Processor.Controllers.FileController(cp.core, true, cp.PrivateFiles.PhysicalFilePath, "");
+                    //CPFileSystemBaseClass privateLocalFiles = new CPFileSystemClass(cp, privateLocalFileController);
+                    //uploadPath(cp, cp.PrivateFiles, privateLocalFiles, "\\");
                     //
                     // create a local www file system
-                    var wwwLocalFileController = new Processor.Controllers.FileController(cp.core, true, cp.WwwFiles.PhysicalFilePath, "");
-                    CPFileSystemBaseClass wwwLocalFiles = new CPFileSystemClass(cp, wwwLocalFileController);
-                    uploadPath(cp, cp.WwwFiles, wwwLocalFiles, "\\");
-
+                    cp.core.wwwFiles.copyPathLocalToRemote("");
+                    //var wwwLocalFileController = new Processor.Controllers.FileController(cp.core, true, cp.WwwFiles.PhysicalFilePath, "");
+                    //CPFileSystemBaseClass wwwLocalFiles = new CPFileSystemClass(cp, wwwLocalFileController);
+                    //uploadPath(cp, cp.WwwFiles, wwwLocalFiles, "\\");
                 }
                 //
                 //

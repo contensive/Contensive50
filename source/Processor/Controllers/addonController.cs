@@ -1473,14 +1473,10 @@ namespace Contensive.Processor.Controllers {
                         // -- foreground - appRootPath
                         appPath = core.privateFiles.joinPath(core.wwwFiles.localAbsRootPath, "bin\\");
                     }
-
-
                     string codeBase = Assembly.GetExecutingAssembly().CodeBase;
                     UriBuilder uri = new UriBuilder(codeBase);
                     string path = Uri.UnescapeDataString(uri.Path);
                     appPath = Path.GetDirectoryName(path);
-
-
                     result = execute_assembly_byFilePath(addon, appPath, true, ref AddonFound);
                     if (!AddonFound) {
                         //
@@ -1499,6 +1495,9 @@ namespace Contensive.Processor.Controllers {
                                 throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection");
                             } else {
                                 string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
+                                if (!core.privateFiles.pathExists_local(AddonPath)) {
+                                    core.privateFiles.copyPathRemoteToLocal(AddonPath);
+                                }
                                 string appAddonPath = core.privateFiles.joinPath(core.privateFiles.localAbsRootPath, AddonPath);
                                 result = execute_assembly_byFilePath(addon, appAddonPath, false, ref AddonFound);
                                 if (!AddonFound) {

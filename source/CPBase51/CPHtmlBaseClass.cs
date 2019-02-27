@@ -173,5 +173,57 @@ namespace Contensive.BaseClasses {
         public abstract string Button(string htmlName);
         //
         public abstract string AdminHint(string innerHtml);
+        //
+        //====================================================================================================
+        //
+        // -- deprecated
+        //
+        [Obsolete("Use InputText(string, string, integer, string, string ) instead", true)]
+        public abstract string InputText(string HtmlName, string HtmlValue, string Height, string Width, bool IsPassword, string HtmlClass, string HtmlId);
+        //
+        [Obsolete("Use InputText(string, string, integer, string, string ) instead", true)]
+        public abstract string InputText(string HtmlName, string HtmlValue, string Height, string Width, bool IsPassword, string HtmlClass);
+        //
+        [Obsolete("Use InputText(string, string, integer, string, string ) instead", true)]
+        public abstract string InputText(string HtmlName, string HtmlValue, string Height, string Width, bool IsPassword);
+        //
+        [Obsolete("Use InputText(string, string, integer, string, string ) instead", true)]
+        public abstract string InputText(string HtmlName, string HtmlValue, string Height, string Width);
+        //
+        [Obsolete("Use InputText(string, string, integer, string, string ) instead", true)]
+        public abstract string InputText(string HtmlName, string HtmlValue, string Height);
+        //
+        [Obsolete("Use html5 methods instead", true)]
+        public abstract string RadioBox(string HtmlName, int HtmlValue, int CurrentValue, string HtmlClass = "", string HtmlId = "");
+        //
+        [Obsolete("Use html5 methods instead", true)]
+        public abstract string InputDate(string HtmlName, string HtmlValue = "", string Width = "", string HtmlClass = "", string HtmlId = "");
+        //
+        [Obsolete("Use html5 methods instead", true)]
+        public abstract string Hidden(string HtmlName, int HtmlValue);
+        //
+        [Obsolete("Use html5 methods instead", true)]
+        public abstract string Hidden(string HtmlName, int HtmlValue, string HtmlClass);
+        //
+        [Obsolete("Use html5 methods instead", true)]
+        public abstract string Hidden(string HtmlName, int HtmlValue, string HtmlClass, string HtmlId = "");
+        //
+        [Obsolete("Use html5 methods instead", true)]
+        public abstract string Hidden(string HtmlName, bool HtmlValue);
+        //
+        [Obsolete("Use html5 methods instead", true)]
+        public abstract string Hidden(string HtmlName, bool HtmlValue, string HtmlClass);
+        //
+        [Obsolete("Use html5 methods instead", true)]
+        public abstract string Hidden(string HtmlName, bool HtmlValue, string HtmlClass, string HtmlId = "");
+        //
+        [Obsolete("Use html5 methods instead", true)]
+        public abstract string Hidden(string HtmlName, DateTime HtmlValue);
+        //
+        [Obsolete("Use html5 methods instead", true)]
+        public abstract string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass);
+        //
+        [Obsolete("Use html5 methods instead", true)]
+        public abstract string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass, string HtmlId = "");
     }
 }

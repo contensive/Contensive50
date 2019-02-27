@@ -762,8 +762,8 @@ namespace Contensive.Processor.Controllers {
                             case Constants.DataSourceTypeODBCAccess:
                                 sql = "DROP INDEX " + IndexName + " On " + TableName + ";";
                                 break;
-                            case Constants.DataSourceTypeODBCMySQL:
-                                throw new NotImplementedException("MySql not implemented");
+                            //case Constants.DataSourceTypeODBCMySQL:
+                            //    throw new NotImplementedException("MySql not implemented");
                             default:
                                 sql = "DROP INDEX [" + TableName + "].[" + IndexName + "];";
                                 break;

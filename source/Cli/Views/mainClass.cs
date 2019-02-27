@@ -13,7 +13,6 @@ namespace Contensive.CLI {
         static void Main(string[] args) {
             try {
                 string appName = "";
-                string collectionName = "";
                 //
                 // create cp for cluster work, with no application
                 //
@@ -56,7 +55,6 @@ namespace Contensive.CLI {
                         for (int argPtr = 0; argPtr < args.Length; argPtr++) {
                             string argument = args[argPtr];
                             bool exitArgumentProcessing = false;
-                            bool repair = false;
                             switch (argument.ToLowerInvariant()) {
                                 case "-a":
                                     //
@@ -93,58 +91,15 @@ namespace Contensive.CLI {
                                 case "--install":
                                     //
                                     // -- install collection to one or all applications
-                                    if (argPtr < (args.Length + 1)) {
+                                    if (argPtr >= (args.Length + 1)) {
+                                        Console.WriteLine("Collection name is required after the --install command");
+                                    } else { 
                                         argPtr++;
-                                        collectionName = args[argPtr];
+                                        string collectionName = args[argPtr];
                                         if (collectionName.Left(1).Equals("\"") && collectionName.Right(1).Equals("\"")) {
                                             collectionName = collectionName.Substring(1, collectionName.Length - 2);
                                         }
-                                    }
-                                    if (string.IsNullOrEmpty(collectionName)) {
-                                        Console.WriteLine("Collection name is required after the --install command");
-                                    } else {
-                                        //
-                                        // -- determine guid of collection
-                                        var collectionList = new List<CollectionController.CollectionStoreClass>();
-                                        CollectionController.getRemoteCollectionStoreList(cpServer.core, ref collectionList);
-                                        string collectionGuid = "";
-                                        foreach (var collection in collectionList) {
-                                            if (collection.name.ToLowerInvariant() == collectionName.ToLowerInvariant()) {
-                                                collectionGuid = collection.guid;
-                                                break;
-                                            }
-                                        }
-                                        if (string.IsNullOrEmpty(collectionGuid)) {
-                                            Console.WriteLine("Collection was not found on the distribution server");
-                                        } else {
-                                            if (string.IsNullOrEmpty(appName)) {
-                                                foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
-                                                    using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(kvp.Key)) {
-                                                        string returnErrorMessage = "";
-                                                        string logPrefix = "CLI";
-                                                        var installedCollections = new List<string>();
-                                                        var nonCritialErrorList = new List<string>();
-                                                        CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair, ref nonCritialErrorList, logPrefix, ref installedCollections);
-                                                        if (!string.IsNullOrEmpty(returnErrorMessage)) {
-                                                            Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
-                                                        }
-                                                        cpApp.Cache.InvalidateAll();
-                                                    }
-                                                }
-                                            } else {
-                                                using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(appName)) {
-                                                    string returnErrorMessage = "";
-                                                    string logPrefix = "CLI";
-                                                    var installedCollections = new List<string>();
-                                                    var nonCritialErrorList = new List<string>();
-                                                    CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair, ref nonCritialErrorList, logPrefix, ref installedCollections);
-                                                    if (!string.IsNullOrEmpty(returnErrorMessage)) {
-                                                        Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
-                                                    }
-                                                    cpApp.Cache.InvalidateAll();
-                                                }
-                                            }
-                                        }
+                                        installAddonClass.execute(cpServer, appName, collectionName);
                                     }
                                     break;
                                 case "-h":
@@ -239,15 +194,15 @@ namespace Contensive.CLI {
                                             Console.WriteLine("        delete protection: " + app.deleteProtection);
                                             Console.WriteLine("        admin route: " + app.adminRoute);
                                             Console.WriteLine("        local file storage");
-                                            Console.WriteLine("            app path: " + app.localWwwPath);
+                                            Console.WriteLine("            www (app) path: " + app.localWwwPath);
                                             Console.WriteLine("            private path: " + app.localPrivatePath);
-                                            Console.WriteLine("            cdn path: " + app.localFilesPath);
+                                            Console.WriteLine("            files (cdn) path: " + app.localFilesPath);
                                             Console.WriteLine("            temp path: " + app.localTempPath);
                                             if (!cpServer.core.serverConfig.isLocalFileSystem) {
                                                 Console.WriteLine("        remote file storage");
-                                                Console.WriteLine("            app path: " + app.remoteWwwPath);
+                                                Console.WriteLine("            www (app) path: " + app.remoteWwwPath);
                                                 Console.WriteLine("            private path: " + app.remotePrivatePath);
-                                                Console.WriteLine("            cdn path: " + app.remoteFilePath);
+                                                Console.WriteLine("            files (cdn) path: " + app.remoteFilePath);
                                             }
                                             Console.WriteLine("        cdnFilesNetprefix: " + app.cdnFileUrl);
                                             foreach (string domain in app.domainList) {
@@ -284,7 +239,7 @@ namespace Contensive.CLI {
                                         } else {
                                             //
                                             // turn the windows service scheduler on/off
-                                            cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
+                                            cpServer.core.serverConfig.allowTaskSchedulerService = GenericController.encodeBoolean(args[argPtr]);
                                             cpServer.core.serverConfig.save(cpServer.core);
                                             Console.WriteLine("allowtaskscheduler set " + cpServer.core.serverConfig.allowTaskSchedulerService.ToString());
                                         }
@@ -373,11 +328,11 @@ namespace Contensive.CLI {
                                     break;
                                 case "--installservice":
                                     string installService = "/C C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\installutil TaskService.exe";
-                                    System.Diagnostics.Process.Start("cmd.exe", installService);
+                                    Process.Start("cmd.exe", installService);
                                     break;
                                 case "--uninstallservice":
                                     string unInstallService = "/C C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\installutil /u TaskService.exe";
-                                    System.Diagnostics.Process.Start("cmd.exe", unInstallService);
+                                    Process.Start("cmd.exe", unInstallService);
                                     break;
                                 case "--execute":
                                     //
@@ -406,6 +361,7 @@ namespace Contensive.CLI {
                                     }
                                     break;
                                 case "--deleteprotection":
+                                    //
                                     // turn off delete protection
                                     if (string.IsNullOrWhiteSpace(appName)) {
                                         Console.WriteLine("ERROR, you must first specify the application with -a appName");
@@ -443,6 +399,7 @@ namespace Contensive.CLI {
                                     }
                                     break;
                                 case "--delete":
+                                    //
                                     // delete 
                                     if (string.IsNullOrWhiteSpace(appName)) {
                                         Console.WriteLine("ERROR, you must first specify the application with -a appName");
@@ -463,6 +420,9 @@ namespace Contensive.CLI {
                                     break;
                                 case "--uploadfiles":
                                     UploadFilesClass.uploadFiles(cpServer, appName);
+                                    break;
+                                case "--fixtablefoldercase":
+                                    FixTableFolderCaseClass.fixTableFolderCase(cpServer, appName);
                                     break;
                                 //
                                 // -- run task in ccTasks table in application appName 
@@ -548,6 +508,9 @@ namespace Contensive.CLI {
             + "\r\n"
             + "\r\n--uploadfiles"
             + "\r\n    Copies all local files to remote files. Use for migration to a remote file system."
+            + "\r\n"
+            + "\r\n--fixtablefoldercase"
+            + "\r\n    For local file sites only. Rename all table folders (ccTablename/fieldName) and the filenames saved in the table fields to reflect lowecase table and fields names."
             + "";
         //
         // ====================================================================================================

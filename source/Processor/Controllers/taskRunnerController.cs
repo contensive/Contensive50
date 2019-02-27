@@ -224,8 +224,8 @@ namespace Contensive.Processor.Controllers {
                         Console.WriteLine("runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]");
                         //
                         DateTime dateStarted = DateTime.Now;
-                        task.dateStarted = dateStarted;
-                        task.save(cp.core);
+                        //task.dateStarted = dateStarted;
+                        //task.save(cp.core);
                         var cmdDetail = cp.core.json.Deserialize<TaskModel.CmdDetailClass>(task.cmdDetail);
                         if (cmdDetail != null) {
                             var addon = AddonModel.create(cp.core, cmdDetail.addonId);
@@ -253,12 +253,13 @@ namespace Contensive.Processor.Controllers {
                                             download.save(cp.core);
                                         }
                                     }
-                                    task.filename.content = result;
+                                    //task.filename.content = result;
                                 }
                             }
                         }
                         task.dateCompleted = DateTime.Now;
-                        task.save(cp.core);
+                        //task.save(cp.core);
+                        TaskModel.delete(cp.core, task.id);
                         //
                         // -- info log the task running - so info state will log for memory leaks
                         LogController.forceNLog("TaskRunner exit, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", LogController.LogLevel.Info);

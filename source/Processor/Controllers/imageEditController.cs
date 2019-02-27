@@ -35,7 +35,7 @@ namespace Contensive.Processor.Controllers {
         public bool load(string pathFilename, FileController fileSystem) {
             bool returnOk = false;
             try {
-                fileSystem.copyRemoteToLocal(pathFilename);
+                fileSystem.copyFileRemoteToLocal(pathFilename);
                 src = fileSystem.localAbsRootPath + pathFilename;
                 if (System.IO.File.Exists(src)) {
                     srcImage = System.Drawing.Image.FromFile(src);
@@ -63,7 +63,7 @@ namespace Contensive.Processor.Controllers {
                     Bitmap imgOutput = new Bitmap(srcImage, setWidth, setHeight);
                     System.Drawing.Imaging.ImageFormat imgFormat = srcImage.RawFormat;
                     imgOutput.Save(fileSystem.localAbsRootPath + pathFilename, imgFormat);
-                    fileSystem.copyLocalToRemote(pathFilename);
+                    fileSystem.copyFileLocalToRemote(pathFilename);
                     imgOutput.Dispose();
                     returnOk = true;
                 }

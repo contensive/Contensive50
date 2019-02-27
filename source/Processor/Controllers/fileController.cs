@@ -156,7 +156,7 @@ namespace Contensive.Processor.Controllers {
                     if (!isLocal) {
                         //
                         // -- copy remote file to local
-                        if (!copyRemoteToLocal(pathFilename)) {
+                        if (!copyFileRemoteToLocal(pathFilename)) {
                             //
                             // -- if remote file does not exist, delete local mirror
                             deleteFile_local(pathFilename);
@@ -190,7 +190,7 @@ namespace Contensive.Processor.Controllers {
                     if (!isLocal) {
                         //
                         // -- copy remote file to local
-                        if (!copyRemoteToLocal(pathFilename)) {
+                        if (!copyFileRemoteToLocal(pathFilename)) {
                             //
                             // -- if remote file does not exist, delete local mirror
                             deleteFile_local(pathFilename);
@@ -261,7 +261,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (!isLocal) {
                     // copy to remote
-                    copyLocalToRemote(pathFilename);
+                    copyFileLocalToRemote(pathFilename);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -293,7 +293,7 @@ namespace Contensive.Processor.Controllers {
                     if (!isLocal) {
                         //
                         // -- non-local, copy remote file to local
-                        if (!copyRemoteToLocal(pathFilename)) {
+                        if (!copyFileRemoteToLocal(pathFilename)) {
                             deleteFile_local(pathFilename);
                         }
                     }
@@ -309,7 +309,7 @@ namespace Contensive.Processor.Controllers {
                     if (!isLocal) {
                         //
                         // -- non-local, copy local file to remote
-                        copyLocalToRemote(pathFilename);
+                        copyFileLocalToRemote(pathFilename);
                     }
                 }
             } catch (Exception ex) {
@@ -503,7 +503,7 @@ namespace Contensive.Processor.Controllers {
                         if (fileExists_remote(srcPathFilename)) {
                             verifyPath_remote(getPath(srcPathFilename));
                             hint += ",copyRemoteToLocal";
-                            copyRemoteToLocal(srcPathFilename);
+                            copyFileRemoteToLocal(srcPathFilename);
                             //
                             // -- copy src to dst on local mirror
                             string dstPath = "";
@@ -525,7 +525,7 @@ namespace Contensive.Processor.Controllers {
                             if (!dstFileSystem.isLocal) {
                                 //
                                 // -- dst is remote, copy file to remote source
-                                dstFileSystem.copyLocalToRemote(dstPathFilename);
+                                dstFileSystem.copyFileLocalToRemote(dstPathFilename);
                             }
                         }
                     } else {
@@ -548,7 +548,7 @@ namespace Contensive.Processor.Controllers {
                             if (!dstFileSystem.isLocal) {
                                 //
                                 // -- dst is remote, copy file to remote source
-                                dstFileSystem.copyLocalToRemote(dstPathFilename);
+                                dstFileSystem.copyFileLocalToRemote(dstPathFilename);
                             }
                         }
                     }
@@ -571,35 +571,53 @@ namespace Contensive.Processor.Controllers {
         //
         //==============================================================================================================
         /// <summary>
-        /// list of files, each row is delimited by a comma
+        /// list of files from the appropriate local/remote filesystem
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         public List<BaseClasses.CPFileSystemBaseClass.FileDetail> getFileList(string path) {
             var returnFileList = new List<FileDetail>();
             try {
+                if (!isLocal) {
+                    return getFileList_remote(path);
+                } else {
+                    return getFileList_local(path);
+                }
+            } catch (Exception ex) {
+                LogController.handleError( core,ex);
+                throw;
+            }
+        }
+        //
+        //==============================================================================================================
+        /// <summary>
+        /// list of files from the remote server
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public List<BaseClasses.CPFileSystemBaseClass.FileDetail> getFileList_remote(string path) {
+            try {
                 path = normalizeDosPath(path);
                 string unixPath = convertToUnixSlash(joinPath(remotePathPrefix, path));
-                if (!isLocal) {
-                    ListObjectsRequest request = new ListObjectsRequest {
-                        BucketName = core.serverConfig.awsBucketName,
-                        Prefix = unixPath
-                    };
-                    // Build your call out to S3 and store the response
-                    ListObjectsResponse response = s3Client.ListObjects(request);
-
-                    IEnumerable<S3Object> fileList = response.S3Objects.Where(x => !x.Key.EndsWith(@"/") );
-                    foreach (var file in fileList) {
-                        //
-                        // -- create a fileDetail for each file found
-                        string fileName = file.Key;
-                        string keyPath = "";
-                        int pos = fileName.LastIndexOf("/");
-                        if (pos > -1) {
-                            keyPath = fileName.Substring(0, pos+1);
-                            fileName = fileName.Substring(pos + 1);
-                        }
-                        if ( unixPath.Equals(keyPath)) {
+                ListObjectsRequest request = new ListObjectsRequest {
+                    BucketName = core.serverConfig.awsBucketName,
+                    Prefix = unixPath
+                };
+                // Build your call out to S3 and store the response
+                ListObjectsResponse response = s3Client.ListObjects(request);
+                IEnumerable<S3Object> fileList = response.S3Objects.Where(x => !x.Key.EndsWith(@"/"));
+                var returnFileList = new List<FileDetail>();
+                foreach (var file in fileList) {
+                    //
+                    // -- create a fileDetail for each file found
+                    string fileName = file.Key;
+                    string keyPath = "";
+                    int pos = fileName.LastIndexOf("/");
+                    if (pos > -1) {
+                        keyPath = fileName.Substring(0, pos + 1);
+                        fileName = fileName.Substring(pos + 1);
+                    }
+                    if (unixPath.Equals(keyPath)) {
                         returnFileList.Add(new FileDetail() {
                             Attributes = 0,
                             Type = "",
@@ -610,31 +628,44 @@ namespace Contensive.Processor.Controllers {
                             Size = file.Size
                         });
 
-                        }
-                    };
-
-
-                } else {
-                    if (pathExists_local(path)) {
-                        string localPath = convertRelativeToLocalAbsPath(path);
-                        DirectoryInfo di = new DirectoryInfo(localPath);
-                        foreach(var file in di.GetFiles()) {
-                            //
-                            // -- create a fileDetail for each file found
-                            returnFileList.Add(new FileDetail() {
-                                Attributes = (int)file.Attributes,
-                                DateCreated = file.CreationTime,
-                                DateLastAccessed = file.LastAccessTime,
-                                DateLastModified = file.LastWriteTime,
-                                Name = file.Name,
-                                Size = file.Length,
-                                Type = ""
-                            });
-                        }
+                    }
+                };
+                return returnFileList;
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
+        //==============================================================================================================
+        /// <summary>
+        /// list of files from the local server
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public List<BaseClasses.CPFileSystemBaseClass.FileDetail> getFileList_local(string path) {
+            var returnFileList = new List<FileDetail>();
+            try {
+                path = normalizeDosPath(path);
+                if (pathExists_local(path)) {
+                    string localPath = convertRelativeToLocalAbsPath(path);
+                    DirectoryInfo di = new DirectoryInfo(localPath);
+                    foreach (var file in di.GetFiles()) {
+                        //
+                        // -- create a fileDetail for each file found
+                        returnFileList.Add(new FileDetail() {
+                            Attributes = (int)file.Attributes,
+                            DateCreated = file.CreationTime,
+                            DateLastAccessed = file.LastAccessTime,
+                            DateLastModified = file.LastWriteTime,
+                            Name = file.Name,
+                            Size = file.Length,
+                            Type = ""
+                        });
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnFileList;
@@ -651,12 +682,15 @@ namespace Contensive.Processor.Controllers {
             try {
                 path = normalizeDosPath(path);
                 if (!isLocal) {
-                    // todo implement remote
-                    throw new NotImplementedException("getFolderNameList, remote mode not implemented");
+                    foreach (var folder in getFolderList_remote(path)) {
+                        returnList += "," + folder.Name;
+                    }
+                    if (!string.IsNullOrEmpty(returnList)) {
+                        returnList = returnList.Substring(1);
+                    }
                 } else {
-                    List<FolderDetail> di = getFolderList(path);
-                    foreach (FolderDetail d in di) {
-                        returnList += "," + d.Name;
+                    foreach (FolderDetail folder in getFolderList_local(path)) {
+                        returnList += "," + folder.Name;
                     }
                     if (!string.IsNullOrEmpty(returnList)) {
                         returnList = returnList.Substring(1);
@@ -674,47 +708,72 @@ namespace Contensive.Processor.Controllers {
         public List<BaseClasses.CPFileSystemBaseClass.FolderDetail> getFolderList(string path) {
             var returnFolders = new List<FolderDetail>();
             try {
-                path = normalizeDosPath(path);
                 if (!isLocal) {
-                    //var DirectoryList = new List<DirectoryInfo>();
-                    ListObjectsRequest request = new ListObjectsRequest {
-                        BucketName = core.serverConfig.awsBucketName,
-                        Prefix = convertToUnixSlash(path)
-                    };
-                    // Build your call out to S3 and store the response
-                    ListObjectsResponse response = s3Client.ListObjects(request);
-                    IEnumerable<S3Object> folderList = response.S3Objects.Where(x =>x.Key.EndsWith(@"/") && x.Size == 0);
-                    foreach (var folder in folderList) {
-                        returnFolders.Add(new FolderDetail() {
-                            Attributes = 0,
-                            Type = "",
-                            DateCreated = folder.LastModified,
-                            DateLastAccessed = folder.LastModified,
-                            DateLastModified = folder.LastModified,
-                            Name = folder.Key
-                        });
-                    };
+                    return getFolderList_remote(path);
                 } else {
-                    if (pathExists_local(path)) {
-                        string localPath = convertRelativeToLocalAbsPath(path);
-                        DirectoryInfo di = new DirectoryInfo(localPath);
-                        foreach( var folder in di.GetDirectories()) {
-                            returnFolders.Add(new FolderDetail() {
-                                Attributes = (int)folder.Attributes,
-                                Type = "",
-                                DateCreated = folder.CreationTime,
-                                DateLastAccessed = folder.LastWriteTime,
-                                DateLastModified = folder.LastWriteTime,
-                                Name = folder.Name
-                            });
-                        }
-                    }
+                    return getFolderList_local(path);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
             }
-            return returnFolders;
+        }
+        //
+        //==============================================================================================================
+        //
+        public List<BaseClasses.CPFileSystemBaseClass.FolderDetail> getFolderList_remote(string path) {
+            try {
+                path = normalizeDosPath(path);
+                ListObjectsRequest request = new ListObjectsRequest {
+                    BucketName = core.serverConfig.awsBucketName,
+                    Prefix = convertToUnixSlash(path)
+                };
+                // Build your call out to S3 and store the response
+                ListObjectsResponse response = s3Client.ListObjects(request);
+                IEnumerable<S3Object> folderList = response.S3Objects.Where(x => x.Key.EndsWith(@"/") && x.Size == 0);
+                var returnFolders = new List<FolderDetail>();
+                foreach (var folder in folderList) {
+                    returnFolders.Add(new FolderDetail() {
+                        Attributes = 0,
+                        Type = "",
+                        DateCreated = folder.LastModified,
+                        DateLastAccessed = folder.LastModified,
+                        DateLastModified = folder.LastModified,
+                        Name = folder.Key
+                    });
+                };
+                return returnFolders;
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
+        //==============================================================================================================
+        //
+        public List<BaseClasses.CPFileSystemBaseClass.FolderDetail> getFolderList_local(string path) {
+            try {
+                path = normalizeDosPath(path);
+                var returnFolders = new List<FolderDetail>();
+                if (pathExists_local(path)) {
+                    string localPath = convertRelativeToLocalAbsPath(path);
+                    DirectoryInfo di = new DirectoryInfo(localPath);
+                    foreach (var folder in di.GetDirectories()) {
+                        returnFolders.Add(new FolderDetail() {
+                            Attributes = (int)folder.Attributes,
+                            Type = "",
+                            DateCreated = folder.CreationTime,
+                            DateLastAccessed = folder.LastWriteTime,
+                            DateLastModified = folder.LastWriteTime,
+                            Name = folder.Name
+                        });
+                    }
+                }
+                return returnFolders;
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
         }
         //
         //==============================================================================================================
@@ -813,7 +872,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private bool pathExists_local(string path) {
+        public bool pathExists_local(string path) {
             bool returnOk = false; 
             try {
                 string absPath = convertRelativeToLocalAbsPath(path);
@@ -831,7 +890,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private bool pathExists_remote(string path) {
+        public bool pathExists_remote(string path) {
             try {
                 //
                 // -- remote
@@ -868,8 +927,9 @@ namespace Contensive.Processor.Controllers {
                     throw new GenericException("Invalid source file");
                 } else {
                     if (!isLocal) {
-                        // todo remote file case
-                        throw new NotImplementedException("renameFile, remote not implemented yet");
+                        string dstPath = getPath(srcPathFilename);
+                        copyFile(srcPathFilename, dstPath + dstFilename);
+                        deleteFile(srcPathFilename);
                     } else {
                         string srcFullPathFilename = joinPath(localAbsRootPath, srcPathFilename);
                         int Pos = srcPathFilename.LastIndexOf("\\") + 1;
@@ -907,7 +967,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 if (!isLocal) {
                     // todo remote file case
-                    throw new NotImplementedException("getDriveFreeSpace, remotePathPrefix mode not implemented");
+                    returnSize = 1000000000;
                 } else {
                     DriveInfo scriptingDrive = null;
                     string driveLetter;
@@ -954,7 +1014,7 @@ namespace Contensive.Processor.Controllers {
                         if (!dstFileSystem.isLocal) {
                             //
                             // -- now copy the dst file to the remote
-                            dstFileSystem.copyLocalToRemote(joinPath(dstDosPath, srcFile.Name));
+                            dstFileSystem.copyFileLocalToRemote(joinPath(dstDosPath, srcFile.Name));
                         }
                     }
                     //
@@ -999,7 +1059,7 @@ namespace Contensive.Processor.Controllers {
                         if (!dstFileSystem.isLocal) {
                             //
                             // -- now copy the dst file to the remote
-                            dstFileSystem.copyLocalToRemote(joinPath(dstDosPath, srcFile.Name));
+                            dstFileSystem.copyFileLocalToRemote(joinPath(dstDosPath, srcFile.Name));
                         }
                     }
                     //
@@ -1059,7 +1119,7 @@ namespace Contensive.Processor.Controllers {
                     HTTP.getUrlToFile(encodeText(URLLink), convertRelativeToLocalAbsPath(pathFilename));
                     //
                     if (!isLocal) {
-                        copyLocalToRemote(pathFilename);
+                        copyFileLocalToRemote(pathFilename);
                     }
                 }
             } catch (Exception ex) {
@@ -1078,7 +1138,7 @@ namespace Contensive.Processor.Controllers {
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 bool processLocalFile = true;
                 if ( !isLocal ) {
-                    if (!copyRemoteToLocal(pathFilename)) {
+                    if (!copyFileRemoteToLocal(pathFilename)) {
                         processLocalFile = false;
                         deleteFile_local(pathFilename);
                     }
@@ -1103,7 +1163,7 @@ namespace Contensive.Processor.Controllers {
                                     if (ze.IsDirectory) {
                                         verifyPath_remote(getPath( joinPath(path, ze.Name)));
                                     } else {
-                                        copyLocalToRemote(joinPath(path, ze.Name));
+                                        copyFileLocalToRemote(joinPath(path, ze.Name));
                                     }
                                 }
                             }
@@ -1265,7 +1325,7 @@ namespace Contensive.Processor.Controllers {
                             core.tempFiles.copyFile(docProperty.tempfilename, dosPathFilename, this);
                             //
                             if (!isLocal) {
-                                copyLocalToRemote(dosPathFilename);
+                                copyFileLocalToRemote(dosPathFilename);
                             }
                             success = true;
                         }
@@ -1365,7 +1425,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="pathFilename"></param>
         /// <param name="dstS3UnixPathFilename"></param>
         /// <returns></returns>
-        public bool copyLocalToRemote(string pathFilename) {
+        public bool copyFileLocalToRemote(string pathFilename) {
             bool result = false;
             try {
                 pathFilename = normalizeDosPathFilename(pathFilename);
@@ -1401,7 +1461,7 @@ namespace Contensive.Processor.Controllers {
         /// copy a file (object) from remote to local. Returns false if the remote file does not exist. The localDosPath must exist.
         /// not exist
         /// </summary>
-        public bool copyRemoteToLocal(string pathFilename) {
+        public bool copyFileRemoteToLocal(string pathFilename) {
             bool result = false;
             try {
                 if (!isLocal) {
@@ -1434,6 +1494,34 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
             }
             return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Copy a remote path to the local file system
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="remoteFileSystem"></param>
+        /// <param name="localFileSystem"></param>
+        /// <param name="path"></param>
+        public void copyPathLocalToRemote(string path) {
+            path = normalizeDosPath(path);
+            foreach (var folder in getFolderList_local(path)) {
+                copyPathLocalToRemote(path + folder.Name + "\\");
+            }
+            foreach (var file in getFileList_local(path)) {
+                copyFileLocalToRemote(path + file.Name);
+            }
+        }
+        //
+        public void copyPathRemoteToLocal(string path) {
+            path = normalizeDosPath(path);
+            foreach (var folder in getFolderList_remote(path)) {
+                copyPathRemoteToLocal(path + folder.Name + "\\");
+            }
+            foreach (var file in getFileList_remote(path)) {
+                copyFileRemoteToLocal(path + file.Name);
+            }
         }
         //
         //====================================================================================================
@@ -1575,6 +1663,23 @@ namespace Contensive.Processor.Controllers {
                 }
             }
             return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// sample, use to get space available
+        /// </summary>
+        /// <param name="bucketName"></param>
+        /// <returns></returns>
+        double getSpaceUsedMB(string bucketName) {
+            ListObjectsRequest request = new ListObjectsRequest();
+            request.BucketName = bucketName;
+            ListObjectsResponse response = s3Client.ListObjects(request);
+            long totalSize = 0;
+            foreach (S3Object o in response.S3Objects) {
+                totalSize += o.Size;
+            }
+            return Math.Round(totalSize / 1024.0 / 1024.0, 2);
         }
         //
         //====================================================================================================

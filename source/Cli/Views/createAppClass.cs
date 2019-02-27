@@ -103,13 +103,15 @@ namespace Contensive.CLI {
                         appConfig.cdnFileUrl = "/" + appConfig.name + "/files/";
                         //
                     } else {
+                        Console.Write("\nSelect application architecture.");
+                        Console.Write("\n1 = Local Mode, scale-up architecture. Files are stored and accessed on the local server.");
+                        Console.Write("\n2 = Remote Mode, scale-out architecture. wwwRoot, public files and private files are stored in subfolders of an S3 Bucket. A local mirror is used to file transfer.");
                         appArchitecture = cliController.promptForReply("Enter 1 or 2", "1");
                         switch (appArchitecture) {
                             case "1":
                                 //
                                 // Local Mode, compatible with v4.1, cdn in appRoot folder as /" + appConfig.name + "/files/
                                 //
-                                Console.Write("Local Mode, scale-up architecture. Files are stored and accessed on the local server.");
                                 appConfig.localWwwPath = cliController.promptForReply("\napp files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\www\\");
                                 appConfig.localFilesPath = cliController.promptForReply("cdn files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files\\");
                                 appConfig.localPrivatePath = cliController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private\\");
@@ -123,7 +125,6 @@ namespace Contensive.CLI {
                                 //
                                 // 2 Scale Mode, cdn as AWS S3 bucket, FilePrivate as AWS S3 bucket"
                                 //
-                                Console.Write("\n\nRemote Files, scale-out architecture. Files are stored and accessed on a remote server. A local mirror is used to file transfer.");
                                 appConfig.localWwwPath = cliController.promptForReply("\napp files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\www\\");
                                 appConfig.localFilesPath = cliController.promptForReply("cdn files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files\\");
                                 appConfig.localPrivatePath = cliController.promptForReply("private files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private\\");

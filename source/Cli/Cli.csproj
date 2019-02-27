@@ -189,10 +189,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Views\configureClass.cs" />
+    <Compile Include="Views\FixTableFolderCaseClass.cs" />
+    <Compile Include="Views\_blankClass.cs" />
+    <Compile Include="Views\installAddonClass.cs" />
     <Compile Include="Views\uploadFilesClass.cs" />
     <Compile Include="Views\deleteAppClass.cs" />
     <Compile Include="Views\genericController.cs" />
-    <Compile Include="Views\installClass.cs" />
     <Compile Include="Views\createAppClass.cs" />
     <Compile Include="Views\mainClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
