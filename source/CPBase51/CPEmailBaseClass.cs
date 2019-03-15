@@ -25,10 +25,10 @@ namespace Contensive.BaseClasses {
         /// <param name="sendImmediately"></param>
         /// <param name="bodyIsHTML"></param>
         /// <remarks></remarks>
-        public abstract bool send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
-        public abstract bool send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
-        public abstract bool send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately);
-        public abstract bool send(string toAddress, string fromAddress, string subject, string body);
+        public abstract void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        public abstract void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        public abstract void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately);
+        public abstract void send(string toAddress, string fromAddress, string subject, string body);
         //
         //====================================================================================================
         /// <summary>
@@ -38,8 +38,8 @@ namespace Contensive.BaseClasses {
         /// <param name="FromAddress"></param>
         /// <param name="Subject"></param>
         /// <remarks></remarks>
-        public abstract bool sendForm(string toAddress, string fromAddress, string subject, ref string userErrorMessage);
-        public abstract bool sendForm(string toAddress, string fromAddress, string subject);
+        public abstract void sendForm(string toAddress, string fromAddress, string subject, ref string userErrorMessage);
+        public abstract void sendForm(string toAddress, string fromAddress, string subject);
         //
         //====================================================================================================
         /// <summary>
@@ -47,8 +47,8 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="userEmailAddress"></param>
         /// <remarks></remarks>
-        public abstract bool sendPassword(string userEmailAddress, ref string userErrorMessage);
-        public abstract bool sendPassword(string userEmailAddress);
+        public abstract void sendPassword(string userEmailAddress, ref string userErrorMessage);
+        public abstract void sendPassword(string userEmailAddress);
         //
         //====================================================================================================
         /// <summary>
@@ -58,15 +58,15 @@ namespace Contensive.BaseClasses {
         /// <param name="additionalCopy"></param>
         /// <param name="additionalUserID"></param>
         /// <remarks></remarks>
-        public abstract bool SendSystem(string emailName, string additionalCopy, int additionalUserID, ref string userErrorMessage);
-        public abstract bool SendSystem(string emailName, string additionalCopy, int additionalUserID);
-        public abstract bool SendSystem(string emailName, string additionalCopy);
-        public abstract bool SendSystem(string emailName);
+        public abstract void sendSystem(string emailName, string additionalCopy, int additionalUserID, ref string userErrorMessage);
+        public abstract void sendSystem(string emailName, string additionalCopy, int additionalUserID);
+        public abstract void sendSystem(string emailName, string additionalCopy);
+        public abstract void sendSystem(string emailName);
         //
-        public abstract bool SendSystem(int emailId, string additionalCopy, int additionalUserID, ref string userErrorMessage);
-        public abstract bool SendSystem(int emailId, string additionalCopy, int additionalUserID);
-        public abstract bool SendSystem(int emailId, string additionalCopy);
-        public abstract bool SendSystem(int emailId);
+        public abstract void sendSystem(int emailId, string additionalCopy, int additionalUserID, ref string userErrorMessage);
+        public abstract void sendSystem(int emailId, string additionalCopy, int additionalUserID);
+        public abstract void sendSystem(int emailId, string additionalCopy);
+        public abstract void sendSystem(int emailId);
         //
         //====================================================================================================
         /// <summary>
@@ -80,25 +80,25 @@ namespace Contensive.BaseClasses {
         /// <param name="bodyIsHTML"></param>
         /// <remarks></remarks>
         //
-        public abstract bool SendToGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
-        public abstract bool SendToGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
-        public abstract bool SendToGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately);
-        public abstract bool SendToGroup(string groupName, string fromAddress, string subject, string body);
+        public abstract void sendGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        public abstract void sendGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        public abstract void sendGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately);
+        public abstract void sendGroup(string groupName, string fromAddress, string subject, string body);
         //
-        public abstract bool SendToGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
-        public abstract bool SendToGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
-        public abstract bool SendToGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately);
-        public abstract bool SendToGroup(int groupId, string fromAddress, string subject, string body);
+        public abstract void sendGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        public abstract void sendGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        public abstract void sendGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately);
+        public abstract void sendGroup(int groupId, string fromAddress, string subject, string body);
         //
-        public abstract bool SendToGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
-        public abstract bool SendToGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
-        public abstract bool SendToGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately);
-        public abstract bool SendToGroup(List<string> groupNameList, string fromAddress, string subject, string body);
+        public abstract void sendGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        public abstract void sendGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        public abstract void sendGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately);
+        public abstract void sendGroup(List<string> groupNameList, string fromAddress, string subject, string body);
         //
-        public abstract bool SendToGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
-        public abstract bool SendToGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
-        public abstract bool SendToGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately);
-        public abstract bool SendToGroup(List<int> groupIdList, string fromAddress, string subject, string body);
+        public abstract void sendGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        public abstract void sendGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        public abstract void sendGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately);
+        public abstract void sendGroup(List<int> groupIdList, string fromAddress, string subject, string body);
         //
         //====================================================================================================
         /// <summary>
@@ -111,10 +111,10 @@ namespace Contensive.BaseClasses {
         /// <param name="sendImmediately"></param>
         /// <param name="bodyIsHTML"></param>
         /// <remarks></remarks>
-        public abstract bool sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
-        public abstract bool sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
-        public abstract bool sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately);
-        public abstract bool sendUser(int toUserId, string fromAddress, string subject, string body);
+        public abstract void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        public abstract void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        public abstract void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately);
+        public abstract void sendUser(int toUserId, string fromAddress, string subject, string body);
         //
         //====================================================================================================
         // deprecated
@@ -134,14 +134,14 @@ namespace Contensive.BaseClasses {
         //[Obsolete("Use uppercase version", true)]
         //public abstract void sendForm(string ToAddress, string FromAddress, string Subject);
         //
-        [Obsolete("Use SendToGroup()", true)]
-        public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
-        //
-        [Obsolete("Use SendToGroup()", true)]
-        public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body, bool SendImmediately);
-        //
-        [Obsolete("Use SendToGroup()", true)]
-        public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body);
+        //[Obsolete("Use SendToGroup()", true)]
+        //public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
+        ////
+        //[Obsolete("Use SendToGroup()", true)]
+        //public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body, bool SendImmediately);
+        ////
+        //[Obsolete("Use SendToGroup()", true)]
+        //public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body);
 
         ////
         //[Obsolete("Use uppercase version", true)]

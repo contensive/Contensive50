@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Contensive.Processor</id>
-        <version>5.1.1</version>
+        <version>5.1.2</version>
         <title>Contensive Processor</title>
         <authors>Contensive</authors>
         <owners>Contensive</owners>
@@ -11,7 +11,7 @@
         <iconUrl>http://contensive.io/img/ContensiveLogo2-385x60.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>This package installs the library files required to manage an application.</description>
-        <releaseNotes>not release</releaseNotes>
+        <releaseNotes>20190315 - update to cpbaseclass</releaseNotes>
         <copyright>Copyright 2019</copyright>
         <tags>Contensive</tags>
         <dependencies>

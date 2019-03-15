@@ -166,66 +166,14 @@ namespace Contensive.Addons.AdminSite {
                                     }
                                 }
                             }
-                            //
-                            int LimitContentSelectToThisID = 0;
-                            if (ContentSupportsParentID) {
-                                //
-                                // Parentid - restrict CDefs to those compatible with the parentid
-                                if (ParentID != 0) {
-                                    //
-                                    // This record has a parent, set LimitContentSelectToThisID to the parent's CID
-                                    using (var csData = new CsModel(core)) {
-                                        csData.openRecord(RecordContentName, ParentID, "contentControlId");
-                                        if (csData.ok()) {
-                                            LimitContentSelectToThisID = csData.getInteger("contentControlId");
-                                        }
-                                        csData.close();
-                                    }
-                                }
-
-                            }
                             bool IsEmptyList = false;
-                            if (core.session.isAuthenticatedAdmin(core) && (LimitContentSelectToThisID == 0)) {
+                            if (core.session.isAuthenticatedAdmin(core)) {
                                 //
                                 // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                                 string sqlFilter = "(ContentTableID=" + TableID + ")";
                                 int contentCID = MetadataController.getRecordIdByUniqueName(core, Processor.Models.Db.ContentModel.contentName, Processor.Models.Db.ContentModel.contentName);
                                 HTMLFieldString += AdminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, false, "", "", true, sqlFilter);
                                 FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)";
-                                //
-                                // remove this - you can select any content in the table if you are an admin, else you cannot
-                                //} else {
-                                //    //
-                                //    // Limit the list to only those cdefs that are within the record's parent contentid
-                                //    foreach ( var childContentId in adminData.adminContent.childIdList(core) ) {
-
-                                //    }
-
-                                //    RecordContentName = editRecord.contentControlId_Name;
-                                //    TableName2 = MetadataController.getContentTablename(core, RecordContentName);
-                                //    TableID = MetadataController.getRecordIdByUniqueName(core, "Tables", TableName2);
-                                //    string CIDList = "";
-                                //    using (var csData = new CsModel(core)) {
-                                //        csData.open("Content", "ContentTableID=" + TableID, "", true, 0, "contentControlId");
-                                //        while (csData.ok()) {
-                                //            int ChildCID = csData.getInteger("ID");
-                                //            if (MetadataController.isParentOf(core, ChildCID, LimitContentSelectToThisID)) {
-                                //                if ((core.session.isAuthenticatedAdmin(core)) || (core.session.isAuthenticatedContentManager(core, MetadataController.getContentNameByID(core, ChildCID)))) {
-                                //                    CIDList = CIDList + "," + ChildCID;
-                                //                }
-                                //            }
-                                //            csData.goNext();
-                                //        }
-                                //        csData.close();
-                                //    }
-
-                                //    if (!string.IsNullOrEmpty(CIDList)) {
-                                //        CIDList = CIDList.Substring(1);
-                                //        string sqlFilter = "(id in (" + CIDList + "))";
-                                //        int contentCID = MetadataController.getRecordIdByUniqueName(core, Processor.Models.Db.ContentModel.contentName, Processor.Models.Db.ContentModel.contentName);
-                                //        HTMLFieldString += AdminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, false, "", "", true, sqlFilter);
-                                //        FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited. This record includes a Parent field, so your choices for controlling content are limited to those compatible with the parent of this record.)";
-                                //    }
                             }
                         }
                     }

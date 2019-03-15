@@ -44,28 +44,28 @@ namespace Contensive.Processor {
         /// <param name="body"></param>
         /// <param name="sendImmediately"></param>
         /// <param name="bodyIsHTML"></param>
-        public override bool send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage) {
+        public override void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage) {
             try {
-                return EmailController.queueAdHocEmail(cp.core, toAddress, fromAddress, subject, body, fromAddress, fromAddress, "", sendImmediately, bodyIsHTML,0 , ref userErrorMessage);
+                EmailController.queueAdHocEmail(cp.core, toAddress, fromAddress, subject, body, fromAddress, fromAddress, "", sendImmediately, bodyIsHTML,0 , ref userErrorMessage);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
             }
         }
         //
-        public override bool send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml ) {
+        public override void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml ) {
             string userErrorMessage = "";
-            return send(toAddress, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+            send(toAddress, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
         }
         //
-        public override bool send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately) {
+        public override void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately) {
             string userErrorMessage = "";
-            return send(toAddress, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
+            send(toAddress, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
         }
         //
-        public override bool send(string toAddress, string fromAddress, string subject, string body) {
+        public override void send(string toAddress, string fromAddress, string subject, string body) {
             string userErrorMessage = "";
-            return send(toAddress, fromAddress, subject, body, true, true, ref userErrorMessage);
+            send(toAddress, fromAddress, subject, body, true, true, ref userErrorMessage);
         }
         //
         //====================================================================================================
@@ -75,231 +75,177 @@ namespace Contensive.Processor {
         /// <param name="toAddress"></param>
         /// <param name="fromAddress"></param>
         /// <param name="subject"></param>
-        public override bool sendForm(string toAddress, string fromAddress, string subject, ref string userErrorMessage) {
+        public override void sendForm(string toAddress, string fromAddress, string subject, ref string userErrorMessage) {
             try {
-                return EmailController.queueFormEmail(cp.core, toAddress, fromAddress, subject, ref userErrorMessage);
+                EmailController.queueFormEmail(cp.core, toAddress, fromAddress, subject, ref userErrorMessage);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
             }
         }
         //
-        public override bool sendForm(string toAddress, string fromAddress, string subject) {
+        public override void sendForm(string toAddress, string fromAddress, string subject) {
             string userErrorMessage = "";
-            return sendForm(toAddress, fromAddress, subject, ref userErrorMessage);
+            sendForm(toAddress, fromAddress, subject, ref userErrorMessage);
         }
         //
         //====================================================================================================
         //
-        public override bool sendPassword(string UserEmailAddress, ref string userErrorMessage) {
-            return LoginController.sendPassword(cp.core, UserEmailAddress, ref userErrorMessage);
+        public override void sendPassword(string UserEmailAddress, ref string userErrorMessage) {
+            LoginController.sendPassword(cp.core, UserEmailAddress, ref userErrorMessage);
         }
         //
-        public override bool sendPassword(string UserEmailAddress) {
+        public override void sendPassword(string UserEmailAddress) {
             string userErrorMessage = "";
-            return sendPassword(UserEmailAddress, ref userErrorMessage);
+            sendPassword(UserEmailAddress, ref userErrorMessage);
         }
         //
         //====================================================================================================
         //
-        public override bool SendSystem(string EmailName, string AdditionalCopy, int AdditionalUserID, ref string userErrorMessage) {
-            return EmailController.queueSystemEmail(cp.core, EmailName, AdditionalCopy, AdditionalUserID, ref userErrorMessage);
+        public override void sendSystem(string EmailName, string AdditionalCopy, int AdditionalUserID, ref string userErrorMessage) {
+            EmailController.queueSystemEmail(cp.core, EmailName, AdditionalCopy, AdditionalUserID, ref userErrorMessage);
         }
         //
-        public override bool SendSystem(string EmailName, string AdditionalCopy, int AdditionalUserID) {
-            return EmailController.queueSystemEmail(cp.core, EmailName, AdditionalCopy, AdditionalUserID);
+        public override void sendSystem(string EmailName, string AdditionalCopy, int AdditionalUserID) {
+            EmailController.queueSystemEmail(cp.core, EmailName, AdditionalCopy, AdditionalUserID);
         }
         //
-        public override bool SendSystem(string EmailName, string AdditionalCopy) {
-            return EmailController.queueSystemEmail(cp.core, EmailName, AdditionalCopy);
+        public override void sendSystem(string EmailName, string AdditionalCopy) {
+            EmailController.queueSystemEmail(cp.core, EmailName, AdditionalCopy);
         }
         //
-        public override bool SendSystem(string EmailName) {
-            return EmailController.queueSystemEmail(cp.core, EmailName);
-        }
-        //
-        public override bool SendSystem(int emailId, string additionalCopy, int additionalUserID, ref string userErrorMessage) {
-            return EmailController.queueSystemEmail(cp.core, emailId, additionalCopy, additionalUserID);
-        }
-        //
-        public override bool SendSystem(int emailId, string additionalCopy, int additionalUserID) {
-            return EmailController.queueSystemEmail(cp.core, emailId, additionalCopy, additionalUserID);
-        }
-        //
-        public override bool SendSystem(int emailId, string additionalCopy) {
-            return EmailController.queueSystemEmail(cp.core, emailId, additionalCopy);
-        }
-        //
-        public override bool SendSystem(int emailId) {
-            return EmailController.queueSystemEmail(cp.core, emailId);
+        public override void sendSystem(string EmailName) {
+            EmailController.queueSystemEmail(cp.core, EmailName);
         }
         //
         //====================================================================================================
         //
-        public override bool SendToGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
-            return EmailController.queueGroupEmail(cp.core, new List<string>() { groupName }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+        public override void sendSystem(int emailId, string additionalCopy, int additionalUserID, ref string userErrorMessage) {
+            EmailController.queueSystemEmail(cp.core, emailId, additionalCopy, additionalUserID);
         }
         //
-        public override bool SendToGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
-            string userErrorMessage = "";
-            return EmailController.queueGroupEmail(cp.core, new List<string>() { groupName }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+        public override void sendSystem(int emailId, string additionalCopy, int additionalUserID) {
+            EmailController.queueSystemEmail(cp.core, emailId, additionalCopy, additionalUserID);
         }
         //
-        public override bool SendToGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately) {
-            string userErrorMessage = "";
-            return EmailController.queueGroupEmail(cp.core, new List<string>() { groupName }, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
+        public override void sendSystem(int emailId, string additionalCopy) {
+            EmailController.queueSystemEmail(cp.core, emailId, additionalCopy);
         }
         //
-        public override bool SendToGroup(string groupName, string fromAddress, string subject, string body) {
-            string userErrorMessage = "";
-            return EmailController.queueGroupEmail(cp.core, new List<string>() { groupName }, fromAddress, subject, body, true, true, ref userErrorMessage);
+        public override void sendSystem(int emailId) {
+            EmailController.queueSystemEmail(cp.core, emailId);
         }
         //
         //====================================================================================================
         //
-        public override bool SendToGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
-            return EmailController.queueGroupEmail(cp.core, new List<int>() { groupId }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+        public override void sendGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
+            EmailController.queueGroupEmail(cp.core, new List<string>() { groupName }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
         }
         //
-        public override bool SendToGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
+        public override void sendGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
             string userErrorMessage = "";
-            return EmailController.queueGroupEmail(cp.core, new List<int>() { groupId }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<string>() { groupName }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
         }
         //
-        public override bool SendToGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately) {
+        public override void sendGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately) {
             string userErrorMessage = "";
-            return EmailController.queueGroupEmail(cp.core, new List<int>() { groupId }, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<string>() { groupName }, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
         }
         //
-        public override bool SendToGroup(int groupId, string fromAddress, string subject, string body) {
+        public override void sendGroup(string groupName, string fromAddress, string subject, string body) {
             string userErrorMessage = "";
-            return EmailController.queueGroupEmail(cp.core, new List<int>() { groupId }, fromAddress, subject, body, true, true, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<string>() { groupName }, fromAddress, subject, body, true, true, ref userErrorMessage);
         }
         //
         //====================================================================================================
         //
-        public override bool SendToGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
-            return EmailController.queueGroupEmail(cp.core, groupNameList, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+        public override void sendGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
+            EmailController.queueGroupEmail(cp.core, new List<int>() { groupId }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
         }
         //
-        public override bool SendToGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
+        public override void sendGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
             string userErrorMessage = "";
-            return EmailController.queueGroupEmail(cp.core, groupNameList, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<int>() { groupId }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
         }
         //
-        public override bool SendToGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately) {
+        public override void sendGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately) {
             string userErrorMessage = "";
-            return EmailController.queueGroupEmail(cp.core, groupNameList, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<int>() { groupId }, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
         }
         //
-        public override bool SendToGroup(List<string> groupNameList, string fromAddress, string subject, string body) {
+        public override void sendGroup(int groupId, string fromAddress, string subject, string body) {
             string userErrorMessage = "";
-            return EmailController.queueGroupEmail(cp.core, groupNameList, fromAddress, subject, body, true, true, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<int>() { groupId }, fromAddress, subject, body, true, true, ref userErrorMessage);
         }
         //
         //====================================================================================================
         //
-        public override bool SendToGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
-            return EmailController.queueGroupEmail(cp.core, groupIdList, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+        public override void sendGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
+            EmailController.queueGroupEmail(cp.core, groupNameList, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
         }
         //
-        public override bool SendToGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
+        public override void sendGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
             string userErrorMessage = "";
-            return EmailController.queueGroupEmail(cp.core, groupIdList, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, groupNameList, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
         }
         //
-        public override bool SendToGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately) {
+        public override void sendGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately) {
             string userErrorMessage = "";
-            return EmailController.queueGroupEmail(cp.core, groupIdList, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, groupNameList, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
         }
         //
-        public override bool SendToGroup(List<int> groupIdList, string fromAddress, string subject, string body) {
+        public override void sendGroup(List<string> groupNameList, string fromAddress, string subject, string body) {
             string userErrorMessage = "";
-            return EmailController.queueGroupEmail(cp.core, groupIdList, fromAddress, subject, body, true, true, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, groupNameList, fromAddress, subject, body, true, true, ref userErrorMessage);
         }
         //
         //====================================================================================================
         //
-        public override bool sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
+        public override void sendGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
+            EmailController.queueGroupEmail(cp.core, groupIdList, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+        }
+        //
+        public override void sendGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
+            string userErrorMessage = "";
+            EmailController.queueGroupEmail(cp.core, groupIdList, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+        }
+        //
+        public override void sendGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately) {
+            string userErrorMessage = "";
+            EmailController.queueGroupEmail(cp.core, groupIdList, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
+        }
+        //
+        public override void sendGroup(List<int> groupIdList, string fromAddress, string subject, string body) {
+            string userErrorMessage = "";
+            EmailController.queueGroupEmail(cp.core, groupIdList, fromAddress, subject, body, true, true, ref userErrorMessage);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
             PersonModel person = PersonModel.create(cp.core, toUserId);
             if ( person == null ) {
                 userErrorMessage = "An email could not be sent because the user could not be located.";
-                return false;
+                return;
             }
-            return EmailController.queuePersonEmail(cp.core, person, fromAddress, subject, body, "", "", sendImmediately, bodyIsHtml, 0,"",false, ref userErrorMessage);
+            EmailController.queuePersonEmail(cp.core, person, fromAddress, subject, body, "", "", sendImmediately, bodyIsHtml, 0,"",false, ref userErrorMessage);
         }
         //
-        public override bool sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
+        public override void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
             string userErrorMessage = "";
-            return sendUser(toUserId, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+            sendUser(toUserId, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
 
         }
         //
-        public override bool sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately) {
+        public override void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately) {
             string userErrorMessage = "";
-            return sendUser(toUserId, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
+            sendUser(toUserId, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
         }
         //
-        public override bool sendUser(int toUserId, string fromAddress, string subject, string body) {
+        public override void sendUser(int toUserId, string fromAddress, string subject, string body) {
             string userErrorMessage = "";
-            return sendUser(toUserId, fromAddress, subject, body, true, true, ref userErrorMessage);
+            sendUser(toUserId, fromAddress, subject, body, true, true, ref userErrorMessage);
         }
-        //
-        //====================================================================================================
-        //
-        //[Obsolete("Use uppercase method", true)]
-        //public override string fromAddressDefault => fromAddressDefault;
-        //
-        [Obsolete("Use SendToGroup", true)]
-        public override void sendGroup(string GroupCommaList, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML) {
-            EmailController.queueGroupEmail(cp.core, GroupCommaList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML);
-        }
-        //
-        [Obsolete("Use SendToGroup", true)]
-        public override void sendGroup(string GroupCommaList, string FromAddress, string Subject, string Body, bool SendImmediately) {
-            EmailController.queueGroupEmail(cp.core, GroupCommaList, FromAddress, Subject, Body, SendImmediately, true);
-        }
-        //
-        [Obsolete("Use SendToGroup", true)]
-        public override void sendGroup(string GroupCommaList, string FromAddress, string Subject, string Body) {
-            EmailController.queueGroupEmail(cp.core, GroupCommaList, FromAddress, Subject, Body, true, true);
-        }
-        ////
-        //[Obsolete("Use uppercase method", true)]
-        //public override void sendPassword(string userEmailAddress) 
-        //    => sendPassword(userEmailAddress);
-        ////
-        //[Obsolete("Use uppercase method", true)]
-        //public override void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML)
-        //    => send(toAddress, fromAddress, subject, body, sendImmediately, bodyIsHTML);
-        ////
-        //[Obsolete("Use uppercase method", true)]
-        //public override void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately)
-        //    => send(toAddress, fromAddress, subject, body, sendImmediately, true);
-        ////
-        //[Obsolete("Use uppercase method", true)]
-        //public override void send(string toAddress, string fromAddress, string subject, string body)
-        //    => send(toAddress, fromAddress, subject, body, true, true);
-        ////
-        //[Obsolete("Use uppercase method", true)]
-        //public override void sendForm(string toAddress, string fromAddress, string subject)
-        //    => sendForm(toAddress, fromAddress, subject);
-        ////
-        //[Obsolete("Use uppercase method", true)]
-        //public override void sendSystem(string emailIdOrName, string additionalCopy = "", int additionalUserID = 0)
-        //    => SendSystem(emailIdOrName, additionalCopy, additionalUserID);
-        ////
-        //[Obsolete("Use uppercase method, SendUser(int,string,string,string,bool,bool)", true)]
-        //public override void sendUser(string toUserID, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML)
-        //    => sendUser(GenericController.encodeInteger(toUserID), fromAddress, subject, body, sendImmediately, bodyIsHTML);
-        ////
-        //[Obsolete("Use uppercase method, SendUser(int,string,string,string,bool)", true)]
-        //public override void sendUser(string toUserID, string fromAddress, string subject, string body, bool sendImmediately)
-        //    => sendUser(GenericController.encodeInteger(toUserID), fromAddress, subject, body, sendImmediately, true);
-        ////
-        //[Obsolete("Use uppercase method, SendUser(int,string,string,string,bool,bool)", true)]
-        //public override void sendUser(string toUserID, string fromAddress, string subject, string body)
-        //    => sendUser(GenericController.encodeInteger(toUserID), fromAddress, subject, body, true, true);
         //
         //====================================================================================================
         //
