@@ -672,6 +672,10 @@ namespace Contensive.Processor.Models.Db {
                                         double valueDbl = (double)instanceProperty.GetValue(this);
                                         sqlPairs.add(instanceProperty.Name, DbController.encodeSQLNumber(valueDbl));
                                         break;
+                                    case "String":
+                                        string valueString = (string)instanceProperty.GetValue(this, null);
+                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(valueString));
+                                        break;
                                     case "FieldTypeTextFile": {
                                             fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileText;
                                             fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
@@ -693,8 +697,11 @@ namespace Contensive.Processor.Models.Db {
                                         }
                                         break;
                                     default:
-                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
-                                        break;
+                                        //
+                                        // -- invalid field type
+                                        throw new GenericException("Unsupported type [" + instanceProperty.PropertyType.Name + "] in Model [" + instanceType.Name + "] Property [" + instanceProperty.Name + "]");
+                                        //sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(instanceProperty.GetValue(this, null)?.ToString()));
+                                        //break;
                                 }
                                 if (!((int)fieldTypeId).Equals(0)) {
                                     fileProperty.internalcore = core;

@@ -196,7 +196,7 @@ namespace Contensive.Processor {
             var installedCollections = new List<string>();
             string logPrefix = "installCollectionFromLibrary";
             var nonCriticalErrorList = new List<string>();
-            return CollectionController.installCollectionFromRemoteRepo(cp.core, collectionGuid, ref ignoreUserMessage, "", false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+            return CollectionController.installCollectionFromRegistry(cp.core, collectionGuid, ref ignoreUserMessage, "", false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
         }
         //
         public override int InstallCollectionFromLibraryAsync(string collectionGuid) { throw new NotImplementedException(); }

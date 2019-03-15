@@ -47,7 +47,7 @@ namespace Contensive.CLI {
                                 string logPrefix = "CLI";
                                 var installedCollections = new List<string>();
                                 var nonCritialErrorList = new List<string>();
-                                CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, false, ref nonCritialErrorList, logPrefix, ref installedCollections);
+                                CollectionController.installCollectionFromRegistry(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, false, ref nonCritialErrorList, logPrefix, ref installedCollections);
                                 if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                     Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                 }
@@ -60,7 +60,7 @@ namespace Contensive.CLI {
                             string logPrefix = "CLI";
                             var installedCollections = new List<string>();
                             var nonCritialErrorList = new List<string>();
-                            CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, false, ref nonCritialErrorList, logPrefix, ref installedCollections);
+                            CollectionController.installCollectionFromRegistry(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, false, ref nonCritialErrorList, logPrefix, ref installedCollections);
                             if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                 Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                             }

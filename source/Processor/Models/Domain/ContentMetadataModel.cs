@@ -806,14 +806,13 @@ namespace Contensive.Processor.Models.Domain {
         /// <returns></returns>
         public static int getContentId(CoreController core, string contentName) {
             try {
+                if (string.IsNullOrWhiteSpace(contentName)) return 0;
                 var nameLower = contentName.Trim().ToLowerInvariant();
                 if (core.contentNameIdDictionary.ContainsKey(nameLower)) { return core.contentNameIdDictionary[nameLower]; }
                 ContentModel content = ContentModel.createByUniqueName(core, contentName);
-                if (content != null) {
-                    core.contentNameIdDictionary.Add(nameLower, content.id);
-                    return content.id;
-                }
-                return 0;
+                if (content == null) { return 0; }
+                core.contentNameIdDictionary.Add(nameLower, content.id);
+                return content.id;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -1137,14 +1136,14 @@ namespace Contensive.Processor.Models.Domain {
                     ContentModel.invalidateRecordCache(core, contentMetadata.id);
                     //
                     // -- reload metadata
-                    contentMetadata = ContentMetadataModel.create(core, contentMetadata.id,false,true);
+                    contentMetadata = ContentMetadataModel.create(core, contentMetadata.id, false, true);
                     //
                     // Verify Core Content Definition Fields
                     if (parentId < 1) {
                         //
                         // metadata does not inherit its fields, create what is needed for a non-inherited metadata
                         //
-                        if(!contentMetadata.fields.ContainsKey( "id" )) {
+                        if (!contentMetadata.fields.ContainsKey("id")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "id",
                                 active = true,
@@ -1172,7 +1171,7 @@ namespace Contensive.Processor.Models.Domain {
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
                         //
-                        if(!contentMetadata.fields.ContainsKey( "active")) {
+                        if (!contentMetadata.fields.ContainsKey("active")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "active",
                                 active = true,
@@ -1186,7 +1185,7 @@ namespace Contensive.Processor.Models.Domain {
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
                         //
-                        if(!contentMetadata.fields.ContainsKey( "sortorder")) {
+                        if (!contentMetadata.fields.ContainsKey("sortorder")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "sortorder",
                                 active = true,
@@ -1200,7 +1199,7 @@ namespace Contensive.Processor.Models.Domain {
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
                         //
-                        if(!contentMetadata.fields.ContainsKey( "dateadded")) {
+                        if (!contentMetadata.fields.ContainsKey("dateadded")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "dateadded",
                                 active = true,
@@ -1213,7 +1212,7 @@ namespace Contensive.Processor.Models.Domain {
                             };
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        if(!contentMetadata.fields.ContainsKey( "createdby")) {
+                        if (!contentMetadata.fields.ContainsKey("createdby")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "createdby",
                                 active = true,
@@ -1227,7 +1226,7 @@ namespace Contensive.Processor.Models.Domain {
                             fieldMetadata.isBaseField = contentMetadata.isBaseContent;
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        if(!contentMetadata.fields.ContainsKey( "modifieddate")) {
+                        if (!contentMetadata.fields.ContainsKey("modifieddate")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "modifieddate",
                                 active = true,
@@ -1240,7 +1239,7 @@ namespace Contensive.Processor.Models.Domain {
                             };
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        if(!contentMetadata.fields.ContainsKey( "modifiedby")) {
+                        if (!contentMetadata.fields.ContainsKey("modifiedby")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "modifiedby",
                                 active = true,
@@ -1254,7 +1253,7 @@ namespace Contensive.Processor.Models.Domain {
                             fieldMetadata.isBaseField = contentMetadata.isBaseContent;
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        if(!contentMetadata.fields.ContainsKey( "ContentControlId")) {
+                        if (!contentMetadata.fields.ContainsKey("ContentControlId")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "contentcontrolid",
                                 active = true,
@@ -1268,7 +1267,7 @@ namespace Contensive.Processor.Models.Domain {
                             fieldMetadata.isBaseField = contentMetadata.isBaseContent;
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        if(!contentMetadata.fields.ContainsKey( "CreateKey")) {
+                        if (!contentMetadata.fields.ContainsKey("CreateKey")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "createkey",
                                 active = true,
@@ -1281,7 +1280,7 @@ namespace Contensive.Processor.Models.Domain {
                             };
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        if(!contentMetadata.fields.ContainsKey( "ccGuid")) {
+                        if (!contentMetadata.fields.ContainsKey("ccGuid")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "ccguid",
                                 active = true,
@@ -1295,7 +1294,7 @@ namespace Contensive.Processor.Models.Domain {
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
                         // -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
-                        if(!contentMetadata.fields.ContainsKey( "ContentCategoryId")) {
+                        if (!contentMetadata.fields.ContainsKey("ContentCategoryId")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
                                 nameLc = "contentcategoryid",
                                 active = true,
@@ -1619,7 +1618,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         public int getRecordId(CoreController core, string recordGuid) {
             try {
-                if(string.IsNullOrWhiteSpace(recordGuid)) { return 0; }
+                if (string.IsNullOrWhiteSpace(recordGuid)) { return 0; }
                 using (DataTable dt = core.db.executeQuery("select id from " + tableName + " where ccguid=" + DbController.encodeSQLText(recordGuid))) {
 
                     foreach (DataRow dr in dt.Rows) {

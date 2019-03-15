@@ -742,11 +742,11 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 if ((Button == ButtonSave) || (Button == ButtonOK)) {
                                     foreach (XmlNode SettingNode in Doc.DocumentElement.ChildNodes) {
-                                        if (SettingNode.Name=="tab") {
+                                        if (SettingNode.Name.ToLower() =="tab") {
                                             foreach (XmlNode TabNode in SettingNode.ChildNodes) {
                                                 string Filename = null;
                                                 string DefaultFilename = null;
-                                                switch (GenericController.vbLCase(TabNode.Name)) {
+                                                switch (TabNode.Name.ToLower()) {
                                                     case "siteproperty":
                                                         //
                                                         FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
@@ -889,7 +889,7 @@ namespace Contensive.Processor.Controllers {
                                                             FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                             fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
                                                             FieldValue = core.docProperties.getText(FieldName);
-                                                            core.wwwFiles.saveFile(fieldfilename, FieldValue);
+                                                            core.cdnFiles.saveFile(fieldfilename, FieldValue);
                                                         }
                                                         break;
                                                     case "dbquery":
@@ -1110,10 +1110,10 @@ namespace Contensive.Processor.Controllers {
                                                         FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                         FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                         FieldDefaultValue = TabNode.InnerText;
-                                                        FieldValue = TabNode.InnerText;
+                                                        FieldValue = FieldDefaultValue;
                                                         FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                         if (!string.IsNullOrEmpty(fieldfilename)) {
-                                                            if (core.wwwFiles.fileExists(fieldfilename)) {
+                                                            if (core.cdnFiles.fileExists(fieldfilename)) {
                                                                 FieldValue = core.cdnFiles.readFileText(fieldfilename);
                                                             }
                                                         }
@@ -1121,7 +1121,7 @@ namespace Contensive.Processor.Controllers {
                                                             Copy = AdminUIController.getDefaultEditor_Html(core, FieldName, FieldValue, "", "", "", FieldReadOnly);
                                                             //Copy = core.html.getFormInputHTML(FieldName, FieldValue);
                                                         } else {
-                                                            Copy = AdminUIController.getDefaultEditor_Text(core, FieldName, FieldValue, FieldReadOnly);
+                                                            Copy = AdminUIController.getDefaultEditor_TextArea(core, FieldName, FieldValue, FieldReadOnly);
                                                             //Copy = htmlController.inputText(core, FieldName, FieldValue);
                                                         }
                                                         TabCell.Add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
@@ -1490,7 +1490,7 @@ namespace Contensive.Processor.Controllers {
                             string AddonVersionPath = "";
                             var tmpDate = new DateTime();
                             string tmpName = "";
-                            CollectionController.getCollectionConfig(core, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
+                            CollectionController.getAddonCollectionFolderConfig(core, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
                             if (string.IsNullOrEmpty(AddonVersionPath)) {
                                 throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection");
                             } else {
@@ -1534,6 +1534,12 @@ namespace Contensive.Processor.Controllers {
                         if (!core.assemblySkipList.Contains(TestFilePathname)) {
                             bool testFileIsValidAddonAssembly = true;
                             Assembly testAssembly = null;
+                            if (TestFilePathname.ToLower().Right(11)=="\\cpbase.dll") {
+                                //
+                                // -- always block cpbase.dll from addon folders
+                                core.assemblySkipList.Add(TestFilePathname);
+                                testFileIsValidAddonAssembly = false;
+                            }
                             try {
                                 //
                                 // ##### consider using refectiononlyload first, then if it is right, do the loadfrom - so Dependencies are not loaded.

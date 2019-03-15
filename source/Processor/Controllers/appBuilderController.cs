@@ -58,11 +58,11 @@ namespace Contensive.Processor.Controllers {
                     //
                     // verify current database meets minimum field requirements (before installing base collection)
                     LogController.logInfo(core, logPrefix + ", verify existing database fields meet requirements");
-                    verifySqlfieldCompatibility(core,  logPrefix);
+                    verifySqlfieldCompatibility(core, logPrefix);
                     //
                     // -- verify base collection
                     LogController.logInfo(core, logPrefix + ", install base collection");
-                    CollectionController.installBaseCollection(core, isNewBuild, repair, ref  nonCriticalErrorList, logPrefix, ref installedCollections);
+                    CollectionController.installBaseCollection(core, isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                     //
                     // -- verify iis configuration
                     LogController.logInfo(core, logPrefix + ", verify iis configuration");
@@ -74,12 +74,12 @@ namespace Contensive.Processor.Controllers {
                     if (root == null) {
                         LogController.logInfo(core, logPrefix + ", root user guid not found, test for root username");
                         var rootList = PersonModel.createList(core, "(username='root')");
-                        if ( rootList.Count > 0 ) {
+                        if (rootList.Count > 0) {
                             LogController.logInfo(core, logPrefix + ", root username found");
                             root = rootList.First();
                         }
                     }
-                    if ( root == null ) {
+                    if (root == null) {
                         LogController.logInfo(core, logPrefix + ", root user not found, adding root/contensive");
                         root = PersonModel.addEmpty(core);
                         root.name = defaultRootUserName;
@@ -88,8 +88,7 @@ namespace Contensive.Processor.Controllers {
                         root.password = defaultRootUserPassword;
                         root.developer = true;
                         root.contentControlID = ContentMetadataModel.getContentId(core, "people");
-                        try 
-                            {
+                        try {
                             root.save(core);
                         } catch (Exception) {
                             LogController.logInfo(core, logPrefix + ", error prevented root user update");
@@ -122,7 +121,7 @@ namespace Contensive.Processor.Controllers {
                             memberRule.MemberID = root.id;
                             memberRule.save(core);
                         }
-                    }           
+                    }
                     if (isNewBuild) {
                         //
                         // -- set build version so a scratch build will not go through data conversion
@@ -237,7 +236,7 @@ namespace Contensive.Processor.Controllers {
                         domain.name = primaryDomain;
                         domain.pageNotFoundPageId = landingPage.id;
                         domain.rootPageId = landingPage.id;
-                        domain.typeId = (int) DomainModel.DomainTypeEnum.Normal;
+                        domain.typeId = (int)DomainModel.DomainTypeEnum.Normal;
                         domain.visited = false;
                         domain.save(core);
                         //
@@ -254,121 +253,122 @@ namespace Contensive.Processor.Controllers {
                     {
                         LogController.logInfo(core, logPrefix + ", internal upgrade complete, set Buildversion to " + core.codeVersion());
                         core.siteProperties.setProperty("BuildVersion", core.codeVersion());
-                        //
-                        // ----- Upgrade local collections
-                        {
-                            string ErrorMessage = "";
-                            LogController.logInfo(core, logPrefix + ", upgrading All Local Collections to new server build.");
-                            bool UpgradeOK = CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, isNewBuild, repair, ref  nonCriticalErrorList, logPrefix, ref installedCollections);
-                            if (!string.IsNullOrEmpty(ErrorMessage)) {
-                                throw (new GenericException("Unexpected exception"));
-                            } else if (!UpgradeOK) {
-                                throw (new GenericException("Unexpected exception")); 
-                            }
-                            //
-                            // ----- Upgrade all collection for this app (in case collections were installed before the upgrade
-                            string Collectionname = null;
-                            string CollectionGuid = null;
-                            bool localCollectionFound = false;
-                            LogController.logInfo(core, logPrefix + ", Checking all installed collections for upgrades from Collection Library...Open collectons.xml");
-                            try {
-                                XmlDocument Doc = new XmlDocument();
-                                Doc.LoadXml(CollectionController.getLocalCollectionStoreListXml(core));
-                                if (true) {
-                                    if (GenericController.vbLCase(Doc.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
-                                        throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
-                                    } else {
-                                        if (GenericController.vbLCase(Doc.DocumentElement.Name) == "collectionlist") {
-                                            //
-                                            // now go through each collection in this app and check the last updated agains the one here
-                                            //
-                                            LogController.logInfo(core, logPrefix + ", Open site collectons, iterate through all collections");
-                                            //Dim dt As DataTable
-                                            DataTable dt = core.db.executeQuery("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)");
-                                            if (dt.Rows.Count > 0) {
-                                                int rowptr = 0;
-                                                for (rowptr = 0; rowptr < dt.Rows.Count; rowptr++) {
+                            // deprecated, we no longer upgrade all collections
+                        ////
+                        //// ----- Upgrade local collections
+                        //{
+                        //    string ErrorMessage = "";
+                        //    LogController.logInfo(core, logPrefix + ", upgrading All Local Collections to new server build.");
+                        //    bool UpgradeOK = CollectionController.upgradeInstalledCollectionsFromRegistry(core, ref ErrorMessage, isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                        //    if (!string.IsNullOrEmpty(ErrorMessage)) {
+                        //        throw (new GenericException("Unexpected exception"));
+                        //    } else if (!UpgradeOK) {
+                        //        throw (new GenericException("Unexpected exception"));
+                        //    }
+                        //    //
+                        //    // ----- Upgrade all collection for this app (in case collections were installed before the upgrade
+                        //    string Collectionname = null;
+                        //    string CollectionGuid = null;
+                        //    bool localCollectionFound = false;
+                        //    LogController.logInfo(core, logPrefix + ", Checking all installed collections for upgrades from Collection Library...Open collectons.xml");
+                        //    try {
+                        //        XmlDocument Doc = new XmlDocument();
+                        //        Doc.LoadXml(CollectionController.getLocalCollectionStoreListXml(core));
+                        //        if (true) {
+                        //            if (GenericController.vbLCase(Doc.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
+                        //                throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
+                        //            } else {
+                        //                if (GenericController.vbLCase(Doc.DocumentElement.Name) == "collectionlist") {
+                        //                    //
+                        //                    // now go through each collection in this app and check the last updated agains the one here
+                        //                    //
+                        //                    LogController.logInfo(core, logPrefix + ", Open site collectons, iterate through all collections");
+                        //                    //Dim dt As DataTable
+                        //                    DataTable dt = core.db.executeQuery("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)");
+                        //                    if (dt.Rows.Count > 0) {
+                        //                        int rowptr = 0;
+                        //                        for (rowptr = 0; rowptr < dt.Rows.Count; rowptr++) {
 
-                                                    ErrorMessage = "";
-                                                    CollectionGuid = GenericController.vbLCase(dt.Rows[rowptr]["ccguid"].ToString());
-                                                    Collectionname = dt.Rows[rowptr]["name"].ToString();
-                                                    LogController.logInfo(core, logPrefix + ", checking collection [" + Collectionname + "], guid [" + CollectionGuid + "]");
-                                                    if (CollectionGuid != "{7c6601a7-9d52-40a3-9570-774d0d43d758}") {
-                                                        //
-                                                        // upgrade all except base collection from the local collections
-                                                        //
-                                                        localCollectionFound = false;
-                                                        bool upgradeCollection = false;
-                                                        DateTime LastChangeDate = GenericController.encodeDate(dt.Rows[rowptr]["LastChangeDate"]);
-                                                        if (LastChangeDate == DateTime.MinValue) {
-                                                            //
-                                                            // app version has no lastchangedate
-                                                            //
-                                                            upgradeCollection = true;
-                                                            appendUpgradeLog(core, core.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection installed in the application has no LastChangeDate. It may have been installed manually.");
-                                                        } else {
-                                                            //
-                                                            // compare to last change date in collection config file
-                                                            //
-                                                            string LocalGuid = "";
-                                                            DateTime LocalLastChangeDate = DateTime.MinValue;
-                                                            foreach (XmlNode LocalListNode in Doc.DocumentElement.ChildNodes) {
-                                                                switch (GenericController.vbLCase(LocalListNode.Name)) {
-                                                                    case "collection":
-                                                                        foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
-                                                                            switch (GenericController.vbLCase(CollectionNode.Name)) {
-                                                                                case "guid":
-                                                                                    //
-                                                                                    LocalGuid = GenericController.vbLCase(CollectionNode.InnerText);
-                                                                                    break;
-                                                                                case "lastchangedate":
-                                                                                    //
-                                                                                    LocalLastChangeDate = GenericController.encodeDate(CollectionNode.InnerText);
-                                                                                    break;
-                                                                            }
-                                                                        }
-                                                                        break;
-                                                                }
-                                                                if (CollectionGuid == GenericController.vbLCase(LocalGuid)) {
-                                                                    localCollectionFound = true;
-                                                                    LogController.logInfo(core, logPrefix + ", local collection found");
-                                                                    if (LocalLastChangeDate != DateTime.MinValue) {
-                                                                        if (LocalLastChangeDate > LastChangeDate) {
-                                                                            appendUpgradeLog(core, core.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.");
-                                                                            upgradeCollection = true;
-                                                                        }
-                                                                    }
-                                                                    break;
-                                                                }
-                                                            }
-                                                        }
-                                                        ErrorMessage = "";
-                                                        if (!localCollectionFound) {
-                                                            LogController.logInfo(core, logPrefix + ", site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
-                                                            bool addonInstallOk = CollectionController.installCollectionFromRemoteRepo(core, CollectionGuid, ref  ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
-                                                            if (!addonInstallOk) {
-                                                                //
-                                                                // this may be OK so log, but do not call it an error
-                                                                //
-                                                                LogController.logInfo(core, logPrefix + ", site collection [" + Collectionname + "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" + CollectionGuid + "]");
-                                                            }
-                                                        } else {
-                                                            if (upgradeCollection) {
-                                                                LogController.logInfo(core, logPrefix + ", upgrading collection");
-                                                                CollectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections, true);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                        //                            ErrorMessage = "";
+                        //                            CollectionGuid = GenericController.vbLCase(dt.Rows[rowptr]["ccguid"].ToString());
+                        //                            Collectionname = dt.Rows[rowptr]["name"].ToString();
+                        //                            LogController.logInfo(core, logPrefix + ", checking collection [" + Collectionname + "], guid [" + CollectionGuid + "]");
+                        //                            if (CollectionGuid != "{7c6601a7-9d52-40a3-9570-774d0d43d758}") {
+                        //                                //
+                        //                                // upgrade all except base collection from the local collections
+                        //                                //
+                        //                                localCollectionFound = false;
+                        //                                bool upgradeCollection = false;
+                        //                                DateTime LastChangeDate = GenericController.encodeDate(dt.Rows[rowptr]["LastChangeDate"]);
+                        //                                if (LastChangeDate == DateTime.MinValue) {
+                        //                                    //
+                        //                                    // app version has no lastchangedate
+                        //                                    //
+                        //                                    upgradeCollection = true;
+                        //                                    appendUpgradeLog(core, core.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection installed in the application has no LastChangeDate. It may have been installed manually.");
+                        //                                } else {
+                        //                                    //
+                        //                                    // compare to last change date in collection config file
+                        //                                    //
+                        //                                    string LocalGuid = "";
+                        //                                    DateTime LocalLastChangeDate = DateTime.MinValue;
+                        //                                    foreach (XmlNode LocalListNode in Doc.DocumentElement.ChildNodes) {
+                        //                                        switch (GenericController.vbLCase(LocalListNode.Name)) {
+                        //                                            case "collection":
+                        //                                                foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
+                        //                                                    switch (GenericController.vbLCase(CollectionNode.Name)) {
+                        //                                                        case "guid":
+                        //                                                            //
+                        //                                                            LocalGuid = GenericController.vbLCase(CollectionNode.InnerText);
+                        //                                                            break;
+                        //                                                        case "lastchangedate":
+                        //                                                            //
+                        //                                                            LocalLastChangeDate = GenericController.encodeDate(CollectionNode.InnerText);
+                        //                                                            break;
+                        //                                                    }
+                        //                                                }
+                        //                                                break;
+                        //                                        }
+                        //                                        if (CollectionGuid == GenericController.vbLCase(LocalGuid)) {
+                        //                                            localCollectionFound = true;
+                        //                                            LogController.logInfo(core, logPrefix + ", local collection found");
+                        //                                            if (LocalLastChangeDate != DateTime.MinValue) {
+                        //                                                if (LocalLastChangeDate > LastChangeDate) {
+                        //                                                    appendUpgradeLog(core, core.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.");
+                        //                                                    upgradeCollection = true;
+                        //                                                }
+                        //                                            }
+                        //                                            break;
+                        //                                        }
+                        //                                    }
+                        //                                }
+                        //                                ErrorMessage = "";
+                        //                                if (!localCollectionFound) {
+                        //                                    LogController.logInfo(core, logPrefix + ", site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
+                        //                                    bool addonInstallOk = CollectionController.installCollectionFromRegistry(core, CollectionGuid, ref ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                        //                                    if (!addonInstallOk) {
+                        //                                        //
+                        //                                        // this may be OK so log, but do not call it an error
+                        //                                        //
+                        //                                        LogController.logInfo(core, logPrefix + ", site collection [" + Collectionname + "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" + CollectionGuid + "]");
+                        //                                    }
+                        //                                } else {
+                        //                                    if (upgradeCollection) {
+                        //                                        LogController.logInfo(core, logPrefix + ", upgrading collection");
+                        //                                        CollectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections, true);
+                        //                                    }
+                        //                                }
+                        //                            }
+                        //                        }
+                        //                    }
+                        //                }
+                        //            }
+                        //        }
 
-                            } catch (Exception ex9) {
-                                LogController.handleError( core,ex9);
-                            }
-                        }
+                        //    } catch (Exception ex9) {
+                        //        LogController.handleError(core, ex9);
+                        //    }
+                        //}
                     }
                     //
                     // ----- Explain, put up a link and exit without continuing
@@ -376,7 +376,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, logPrefix + ", Upgrade Complete");
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -419,7 +419,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -449,7 +449,7 @@ namespace Contensive.Processor.Controllers {
                     core.db.executeQuery(sql1 + sql2 + sql3);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -464,10 +464,10 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // verify Db field schema for fields handled internally (fix datatime2(0) problem -- need at least 3 digits for precision)
-                var tableList = Models.Db.TableModel.createList(core, "","dataSourceId");
+                var tableList = Models.Db.TableModel.createList(core, "", "dataSourceId");
                 var dataSource = DataSourceModel.addEmpty(core);
                 foreach (TableModel table in tableList) {
-                    if ( table.dataSourceID != dataSource.id ) { dataSource = DataSourceModel.create(core, table.dataSourceID); }
+                    if (table.dataSourceID != dataSource.id) { dataSource = DataSourceModel.create(core, table.dataSourceID); }
                     if ((dataSource == null)) { dataSource = DataSourceModel.addEmpty(core); }
                     var tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, table.name, "default");
 
@@ -479,8 +479,8 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // drop any indexes that use this field
                                 bool indexDropped = false;
-                                foreach( Models.Domain.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
-                                    if ( index.indexKeyList.Contains(column.COLUMN_NAME) ) {
+                                foreach (Models.Domain.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
+                                    if (index.indexKeyList.Contains(column.COLUMN_NAME)) {
                                         //
                                         LogController.logInfo(core, logPrefix + ", verifySqlFieldCompatibility, index [" + index.index_name + "] must be dropped");
                                         core.db.deleteSqlIndex(table.name, index.index_name);
@@ -533,7 +533,7 @@ namespace Contensive.Processor.Controllers {
                 verifyRecord(core, "Languages", "French", "HTTP_Accept_Language", "'fr'");
                 verifyRecord(core, "Languages", "Any", "HTTP_Accept_Language", "'any'");
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -553,7 +553,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library Folders", "Downloads");
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -567,14 +567,14 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // Load basic records -- default images are handled in the REsource Library through the /ContensiveBase/config/DefaultValues.txt GetDefaultValue(key) mechanism
-                if (MetadataController.getRecordIdByUniqueName( core,"Library File Types", "Image") == 0) {
+                if (MetadataController.getRecordIdByUniqueName(core, "Library File Types", "Image") == 0) {
                     verifyRecord(core, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'");
                     verifyRecord(core, "Library File Types", "Image", "IsImage", "1");
                     verifyRecord(core, "Library File Types", "Image", "IsVideo", "0");
                     verifyRecord(core, "Library File Types", "Image", "IsDownload", "1");
                     verifyRecord(core, "Library File Types", "Image", "IsFlash", "0");
                 }
-                if (MetadataController.getRecordIdByUniqueName( core,"Library File Types", "Video") == 0) {
+                if (MetadataController.getRecordIdByUniqueName(core, "Library File Types", "Video") == 0) {
                     verifyRecord(core, "Library File Types", "Video", "ExtensionList", "'ASX,AVI,WMV,MOV,MPG,MPEG,MP4,QT,RM'");
                     verifyRecord(core, "Library File Types", "Video", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Video", "IsVideo", "1");
@@ -582,7 +582,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Video", "IsFlash", "0");
                 }
                 //
-                if (MetadataController.getRecordIdByUniqueName( core,"Library File Types", "Audio") == 0) {
+                if (MetadataController.getRecordIdByUniqueName(core, "Library File Types", "Audio") == 0) {
                     verifyRecord(core, "Library File Types", "Audio", "ExtensionList", "'AIF,AIFF,ASF,CDA,M4A,M4P,MP2,MP3,MPA,WAV,WMA'");
                     verifyRecord(core, "Library File Types", "Audio", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Audio", "IsVideo", "0");
@@ -590,7 +590,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Audio", "IsFlash", "0");
                 }
                 //
-                if (MetadataController.getRecordIdByUniqueName( core,"Library File Types", "Word") == 0) {
+                if (MetadataController.getRecordIdByUniqueName(core, "Library File Types", "Word") == 0) {
                     verifyRecord(core, "Library File Types", "Word", "ExtensionList", "'DOC'");
                     verifyRecord(core, "Library File Types", "Word", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Word", "IsVideo", "0");
@@ -598,7 +598,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Word", "IsFlash", "0");
                 }
                 //
-                if (MetadataController.getRecordIdByUniqueName( core,"Library File Types", "Flash") == 0) {
+                if (MetadataController.getRecordIdByUniqueName(core, "Library File Types", "Flash") == 0) {
                     verifyRecord(core, "Library File Types", "Flash", "ExtensionList", "'SWF'");
                     verifyRecord(core, "Library File Types", "Flash", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Flash", "IsVideo", "0");
@@ -606,7 +606,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Flash", "IsFlash", "1");
                 }
                 //
-                if (MetadataController.getRecordIdByUniqueName( core,"Library File Types", "PDF") == 0) {
+                if (MetadataController.getRecordIdByUniqueName(core, "Library File Types", "PDF") == 0) {
                     verifyRecord(core, "Library File Types", "PDF", "ExtensionList", "'PDF'");
                     verifyRecord(core, "Library File Types", "PDF", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "PDF", "IsVideo", "0");
@@ -614,7 +614,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "PDF", "IsFlash", "0");
                 }
                 //
-                if (MetadataController.getRecordIdByUniqueName( core,"Library File Types", "XLS") == 0) {
+                if (MetadataController.getRecordIdByUniqueName(core, "Library File Types", "XLS") == 0) {
                     verifyRecord(core, "Library File Types", "Excel", "ExtensionList", "'XLS'");
                     verifyRecord(core, "Library File Types", "Excel", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Excel", "IsVideo", "0");
@@ -622,7 +622,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Excel", "IsFlash", "0");
                 }
                 //
-                if (MetadataController.getRecordIdByUniqueName( core,"Library File Types", "PPT") == 0) {
+                if (MetadataController.getRecordIdByUniqueName(core, "Library File Types", "PPT") == 0) {
                     verifyRecord(core, "Library File Types", "Power Point", "ExtensionList", "'PPT,PPS'");
                     verifyRecord(core, "Library File Types", "Power Point", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Power Point", "IsVideo", "0");
@@ -630,7 +630,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Power Point", "IsFlash", "0");
                 }
                 //
-                if (MetadataController.getRecordIdByUniqueName( core,"Library File Types", "Default") == 0) {
+                if (MetadataController.getRecordIdByUniqueName(core, "Library File Types", "Default") == 0) {
                     verifyRecord(core, "Library File Types", "Default", "ExtensionList", "''");
                     verifyRecord(core, "Library File Types", "Default", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Default", "IsVideo", "0");
@@ -638,7 +638,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Default", "IsFlash", "0");
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -655,13 +655,13 @@ namespace Contensive.Processor.Controllers {
         private static void verifyState(CoreController core, string Name, string Abbreviation, double SaleTax, int CountryID) {
             try {
                 var state = Models.Db.StateModel.createByUniqueName(core, Name);
-                if ( state == null ) state = StateModel.addEmpty(core);
+                if (state == null) state = StateModel.addEmpty(core);
                 state.abbreviation = Abbreviation;
                 state.salesTax = SaleTax;
                 state.countryID = CountryID;
-                state.save(core,true);
+                state.save(core, true);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -677,7 +677,7 @@ namespace Contensive.Processor.Controllers {
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyStates", "Verify States");
                 //
                 verifyCountry(core, "United States", "US");
-                int CountryID = MetadataController.getRecordIdByUniqueName( core,"Countries", "United States");
+                int CountryID = MetadataController.getRecordIdByUniqueName(core, "Countries", "United States");
                 //
                 verifyState(core, "Alaska", "AK", 0.0D, CountryID);
                 verifyState(core, "Alabama", "AL", 0.0D, CountryID);
@@ -735,7 +735,7 @@ namespace Contensive.Processor.Controllers {
                 verifyState(core, "West Virginia", "WV", 0.0D, CountryID);
                 verifyState(core, "Wyoming", "WY", 0.0D, CountryID);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -768,7 +768,7 @@ namespace Contensive.Processor.Controllers {
                     csData.close();
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -784,8 +784,8 @@ namespace Contensive.Processor.Controllers {
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCountries", "Verify Countries");
                 //
                 string list = core.wwwFiles.readFileText("cclib\\config\\DefaultCountryList.txt");
-                string[] rows  = GenericController.stringSplit(list, "\r\n");
-                foreach( var row in rows) {
+                string[] rows = GenericController.stringSplit(list, "\r\n");
+                foreach (var row in rows) {
                     if (!string.IsNullOrEmpty(row)) {
                         string[] attrs = row.Split(';');
                         foreach (var attr in attrs) {
@@ -794,7 +794,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -812,7 +812,7 @@ namespace Contensive.Processor.Controllers {
                 string SQL = "Update ccContent Set EditorGroupID=" + DbController.encodeSQLNumber(GroupID) + " where EditorGroupID is null;";
                 core.db.executeQuery(SQL);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -829,93 +829,93 @@ namespace Contensive.Processor.Controllers {
                     logPrefix += "-verifyBasicTables";
                     LogController.logInfo(core, logPrefix + ", enter");
                     //
-                    core.db.createSQLTable( "ccDataSources");
-                    core.db.createSQLTableField( "ccDataSources", "username", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccDataSources", "password", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccDataSources", "connString", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccDataSources", "endpoint", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccDataSources", "dbTypeId", CPContentBaseClass.fileTypeIdEnum.Lookup);
+                    core.db.createSQLTable("ccDataSources");
+                    core.db.createSQLTableField("ccDataSources", "username", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccDataSources", "password", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccDataSources", "connString", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccDataSources", "endpoint", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccDataSources", "dbTypeId", CPContentBaseClass.fileTypeIdEnum.Lookup);
                     //
-                    core.db.createSQLTable( "ccTables");
-                    core.db.createSQLTableField( "ccTables", "DataSourceID", CPContentBaseClass.fileTypeIdEnum.Lookup);
+                    core.db.createSQLTable("ccTables");
+                    core.db.createSQLTableField("ccTables", "DataSourceID", CPContentBaseClass.fileTypeIdEnum.Lookup);
                     //
-                    core.db.createSQLTable( "ccContent");
-                    core.db.createSQLTableField( "ccContent", "ContentTableID", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccContent", "AuthoringTableID", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccContent", "AllowAdd", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccContent", "AllowDelete", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccContent", "AllowWorkflowAuthoring", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccContent", "DeveloperOnly", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccContent", "AdminOnly", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccContent", "ParentID", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccContent", "DefaultSortMethodID", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccContent", "DropDownFieldList", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccContent", "EditorGroupID", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccContent", "AllowCalendarEvents", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccContent", "AllowContentTracking", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccContent", "AllowTopicRules", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccContent", "AllowContentChildTool", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccContent", "IconLink", CPContentBaseClass.fileTypeIdEnum.Link);
-                    core.db.createSQLTableField( "ccContent", "IconHeight", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccContent", "IconWidth", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccContent", "IconSprites", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccContent", "installedByCollectionId", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccContent", "IsBaseContent", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTable("ccContent");
+                    core.db.createSQLTableField("ccContent", "ContentTableID", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccContent", "AuthoringTableID", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccContent", "AllowAdd", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccContent", "AllowDelete", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccContent", "AllowWorkflowAuthoring", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccContent", "DeveloperOnly", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccContent", "AdminOnly", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccContent", "ParentID", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccContent", "DefaultSortMethodID", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccContent", "DropDownFieldList", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccContent", "EditorGroupID", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccContent", "AllowCalendarEvents", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccContent", "AllowContentTracking", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccContent", "AllowTopicRules", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccContent", "AllowContentChildTool", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccContent", "IconLink", CPContentBaseClass.fileTypeIdEnum.Link);
+                    core.db.createSQLTableField("ccContent", "IconHeight", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccContent", "IconWidth", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccContent", "IconSprites", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccContent", "installedByCollectionId", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccContent", "IsBaseContent", CPContentBaseClass.fileTypeIdEnum.Boolean);
                     //
-                    core.db.createSQLTable( "ccFields");
-                    core.db.createSQLTableField( "ccFields", "ContentID", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccFields", "Type", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccFields", "Caption", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccFields", "ReadOnly", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "NotEditable", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "LookupContentID", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccFields", "RedirectContentID", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccFields", "RedirectPath", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccFields", "RedirectID", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccFields", "HelpMessage", CPContentBaseClass.fileTypeIdEnum.LongText); // deprecated but Im chicken to remove this
-                    core.db.createSQLTableField( "ccFields", "UniqueName", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "TextBuffered", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "Password", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "IndexColumn", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccFields", "IndexWidth", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccFields", "IndexSortPriority", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccFields", "IndexSortDirection", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccFields", "EditSortPriority", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccFields", "AdminOnly", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "DeveloperOnly", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "DefaultValue", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccFields", "Required", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "HTMLContent", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "Authorable", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "ManyToManyContentID", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccFields", "ManyToManyRuleContentID", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccFields", "ManyToManyRulePrimaryField", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccFields", "ManyToManyRuleSecondaryField", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccFields", "RSSTitleField", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "RSSDescriptionField", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "MemberSelectGroupID", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    core.db.createSQLTableField( "ccFields", "EditTab", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccFields", "Scramble", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "LookupList", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccFields", "IsBaseField", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    core.db.createSQLTableField( "ccFields", "installedByCollectionId", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTable("ccFields");
+                    core.db.createSQLTableField("ccFields", "ContentID", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccFields", "Type", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccFields", "Caption", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccFields", "ReadOnly", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "NotEditable", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "LookupContentID", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccFields", "RedirectContentID", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccFields", "RedirectPath", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccFields", "RedirectID", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccFields", "HelpMessage", CPContentBaseClass.fileTypeIdEnum.LongText); // deprecated but Im chicken to remove this
+                    core.db.createSQLTableField("ccFields", "UniqueName", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "TextBuffered", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "Password", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "IndexColumn", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccFields", "IndexWidth", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccFields", "IndexSortPriority", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccFields", "IndexSortDirection", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccFields", "EditSortPriority", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccFields", "AdminOnly", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "DeveloperOnly", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "DefaultValue", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccFields", "Required", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "HTMLContent", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "Authorable", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "ManyToManyContentID", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccFields", "ManyToManyRuleContentID", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccFields", "ManyToManyRulePrimaryField", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccFields", "ManyToManyRuleSecondaryField", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccFields", "RSSTitleField", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "RSSDescriptionField", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "MemberSelectGroupID", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    core.db.createSQLTableField("ccFields", "EditTab", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccFields", "Scramble", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "LookupList", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccFields", "IsBaseField", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTableField("ccFields", "installedByCollectionId", CPContentBaseClass.fileTypeIdEnum.Integer);
                     //
-                    core.db.createSQLTable( "ccFieldHelp");
-                    core.db.createSQLTableField( "ccFieldHelp", "FieldID", CPContentBaseClass.fileTypeIdEnum.Lookup);
-                    core.db.createSQLTableField( "ccFieldHelp", "HelpDefault", CPContentBaseClass.fileTypeIdEnum.LongText);
-                    core.db.createSQLTableField( "ccFieldHelp", "HelpCustom", CPContentBaseClass.fileTypeIdEnum.LongText);
+                    core.db.createSQLTable("ccFieldHelp");
+                    core.db.createSQLTableField("ccFieldHelp", "FieldID", CPContentBaseClass.fileTypeIdEnum.Lookup);
+                    core.db.createSQLTableField("ccFieldHelp", "HelpDefault", CPContentBaseClass.fileTypeIdEnum.LongText);
+                    core.db.createSQLTableField("ccFieldHelp", "HelpCustom", CPContentBaseClass.fileTypeIdEnum.LongText);
                     //
-                    core.db.createSQLTable( "ccSetup");
-                    core.db.createSQLTableField( "ccSetup", "FieldValue", CPContentBaseClass.fileTypeIdEnum.Text);
-                    core.db.createSQLTableField( "ccSetup", "DeveloperOnly", CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    core.db.createSQLTable("ccSetup");
+                    core.db.createSQLTableField("ccSetup", "FieldValue", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTableField("ccSetup", "DeveloperOnly", CPContentBaseClass.fileTypeIdEnum.Boolean);
                     //
-                    core.db.createSQLTable( "ccSortMethods");
-                    core.db.createSQLTableField( "ccSortMethods", "OrderByClause", CPContentBaseClass.fileTypeIdEnum.Text);
+                    core.db.createSQLTable("ccSortMethods");
+                    core.db.createSQLTableField("ccSortMethods", "OrderByClause", CPContentBaseClass.fileTypeIdEnum.Text);
                     //
-                    core.db.createSQLTable( "ccFieldTypes");
+                    core.db.createSQLTable("ccFieldTypes");
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -937,34 +937,26 @@ namespace Contensive.Processor.Controllers {
         /// verify a nanigator entry
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="ccGuid"></param>
-        /// <param name="menuNameSpace"></param>
-        /// <param name="EntryName"></param>
-        /// <param name="ContentName"></param>
-        /// <param name="LinkPage"></param>
-        /// <param name="SortOrder"></param>
-        /// <param name="AdminOnly"></param>
-        /// <param name="DeveloperOnly"></param>
-        /// <param name="NewWindow"></param>
-        /// <param name="Active"></param>
-        /// <param name="AddonName"></param>
-        /// <param name="NavIconType"></param>
-        /// <param name="NavIconTitle"></param>
+        /// <param name="menu"></param>
         /// <param name="InstalledByCollectionID"></param>
         /// <returns></returns>
-        public static int verifyNavigatorEntry(CoreController core, string ccGuid, string menuNameSpace, string EntryName, string ContentName, string LinkPage, string SortOrder, bool AdminOnly, bool DeveloperOnly, bool NewWindow, bool Active, string AddonName, string NavIconType, string NavIconTitle, int InstalledByCollectionID) {
+        public static int verifyNavigatorEntry(CoreController core, MetadataMiniCollectionModel.MiniCollectionMenuModel menu, int InstalledByCollectionID) {
             int returnEntry = 0;
             try {
-                if (!string.IsNullOrEmpty(EntryName.Trim())) {
-                    int addonId = MetadataController.getRecordIdByUniqueName( core,Models.Db.AddonModel.contentName, AddonName);
-                    int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menuNameSpace);
-                    int contentId = ContentMetadataModel.getContentId(core, ContentName);
-                    string listCriteria = "(name=" + DbController.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
+                if (!string.IsNullOrEmpty(menu.name.Trim())) {
+                    if(!string.IsNullOrWhiteSpace(menu.AddonGuid)) {
+                        returnEntry = 0;
+                    }
+                    AddonModel addon = ((!string.IsNullOrWhiteSpace(menu.AddonGuid)) ? AddonModel.create(core, menu.AddonGuid) : null);
+                    addon = addon ?? ((!string.IsNullOrWhiteSpace(menu.AddonName)) ? AddonModel.createByUniqueName(core, menu.AddonName) : null);
+                    int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menu.menuNameSpace);
+                    int contentId = ContentMetadataModel.getContentId(core, menu.ContentName);
+                    string listCriteria = "(name=" + DbController.encodeSQLText(menu.name) + ")and(Parentid=" + parentId + ")";
                     List<Models.Db.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(core, listCriteria, "id");
                     NavigatorEntryModel entry = null;
                     if (entryList.Count == 0) {
                         entry = NavigatorEntryModel.addEmpty(core);
-                        entry.name = EntryName.Trim();
+                        entry.name = menu.name.Trim();
                         entry.ParentID = parentId;
                     } else {
                         entry = entryList.First();
@@ -974,27 +966,26 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         entry.ContentID = contentId;
                     }
-                    entry.LinkPage = LinkPage;
-                    entry.sortOrder = SortOrder;
-                    entry.AdminOnly = AdminOnly;
-                    entry.DeveloperOnly = DeveloperOnly;
-                    entry.NewWindow = NewWindow;
-                    entry.active = Active;
-                    entry.AddonID = addonId;
-                    entry.ccguid = ccGuid;
-                    entry.NavIconTitle = NavIconTitle;
-                    entry.NavIconType = GetListIndex(NavIconType, NavIconTypeList);
+                    entry.LinkPage = menu.LinkPage;
+                    entry.sortOrder = menu.SortOrder;
+                    entry.AdminOnly = menu.AdminOnly;
+                    entry.DeveloperOnly = menu.DeveloperOnly;
+                    entry.NewWindow = menu.NewWindow;
+                    entry.active = menu.Active;
+                    entry.AddonID = (addon == null) ? 0 : addon.id;
+                    entry.ccguid = menu.Guid;
+                    entry.NavIconTitle = menu.NavIconTitle;
+                    entry.NavIconType = GetListIndex(menu.NavIconType, NavIconTypeList);
                     entry.InstalledByCollectionID = InstalledByCollectionID;
                     entry.save(core);
                     returnEntry = entry.id;
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnEntry;
         }
-        //
         //====================================================================================================
         /// <summary>
         /// get navigator id from namespace
@@ -1005,9 +996,9 @@ namespace Contensive.Processor.Controllers {
         public static int verifyNavigatorEntry_getParentIdFromNameSpace(CoreController core, string menuNameSpace) {
             int parentRecordId = 0;
             try {
-                if (!string.IsNullOrEmpty(menuNameSpace.Trim())) {
+                if (!string.IsNullOrEmpty(menuNameSpace)) {
                     string[] parents = menuNameSpace.Trim().Split('.');
-                    foreach( var parent in parents ) {
+                    foreach (var parent in parents) {
                         string recordName = parent.Trim();
                         if (!string.IsNullOrEmpty(recordName)) {
                             string Criteria = "(name=" + DbController.encodeSQLText(recordName) + ")";
@@ -1018,7 +1009,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             int RecordID = 0;
                             using (var csData = new CsModel(core)) {
-                                csData.open(NavigatorEntryModel.contentName, Criteria, "ID", true, 0,  "ID", 1);
+                                csData.open(NavigatorEntryModel.contentName, Criteria, "ID", true, 0, "ID", 1);
                                 if (csData.ok()) {
                                     RecordID = (csData.getInteger("ID"));
                                 }
@@ -1037,7 +1028,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return parentRecordId;
@@ -1057,17 +1048,17 @@ namespace Contensive.Processor.Controllers {
                 sqlList.add("active", SQLTrue);
                 sqlList.add("contentControlId", ContentMetadataModel.getContentId(core, "Sort Methods").ToString());
                 //
-                DataTable dt = core.db.openTable( "ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1, 1);
+                DataTable dt = core.db.openTable("ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1, 1);
                 if (dt.Rows.Count > 0) {
                     //
                     // update sort method
                     int recordId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
-                    core.db.updateTableRecord( "ccSortMethods", "ID=" + recordId.ToString(), sqlList, true);
+                    core.db.updateTableRecord("ccSortMethods", "ID=" + recordId.ToString(), sqlList, true);
                     SortMethodModel.invalidateRecordCache(core, recordId);
                 } else {
                     //
                     // Create the new sort method
-                    core.db.insertTableRecord( "ccSortMethods", sqlList);
+                    core.db.insertTableRecord("ccSortMethods", sqlList);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -1130,8 +1121,8 @@ namespace Contensive.Processor.Controllers {
                 // ----- Replace table if needed
                 //
                 if (TableBad) {
-                    core.db.deleteTable( "ccFieldTypes");
-                    core.db.createSQLTable( "ccFieldTypes");
+                    core.db.deleteTable("ccFieldTypes");
+                    core.db.createSQLTable("ccFieldTypes");
                     RowsFound = 0;
                 }
                 //

@@ -292,7 +292,7 @@
     <Compile Include="Models\Domain\RouteMapModel.cs" />
     <Compile Include="Models\Domain\TableSchemeModel.cs" />
     <Compile Include="Controllers\SessionController.cs" />
-    <Compile Include="Models\Domain\CDefMiniCollectionModel.cs" />
+    <Compile Include="Models\Domain\MetadataMiniCollectionModel.cs" />
     <Compile Include="Models\Domain\PropertyModel.cs" />
     <Compile Include="Models\Domain\StylesheetContextModel.cs" />
     <Compile Include="Models\Domain\UploadFileModel.cs" />

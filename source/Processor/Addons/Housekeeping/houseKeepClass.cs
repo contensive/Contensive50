@@ -75,17 +75,19 @@ namespace Contensive.Addons.Housekeeping {
                     // Register and unregister files in the Addon folder
                     housekeepAddonFolder(core);
                     //
-                    // Upgrade Local Collections, and all applications that use them
-                    string ErrorMessage = "";
-                    logHousekeeping(core, "Updating local collections from library, see Upgrade log for details during this period.");
-                    List<string> nonCriticalErrorList = new List<string>();
-                    string logPrefix = "Housekeep";
-                    if (!CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections)) {
-                        if (string.IsNullOrEmpty(ErrorMessage)) {
-                            ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status.";
-                        }
-                        logHousekeeping(core, "Updating local collections from Library returned an error, " + ErrorMessage);
-                    }
+                    // deprecated - we no longer automatically upgrade all collections during housekeeping
+                    ////
+                    //// Upgrade Local Collections, and all applications that use them
+                    //string ErrorMessage = "";
+                    //logHousekeeping(core, "Updating local collections from library, see Upgrade log for details during this period.");
+                    //List<string> nonCriticalErrorList = new List<string>();
+                    //string logPrefix = "Housekeep";
+                    //if (!CollectionController.upgradeInstalledCollectionsFromRegistry(core, ref ErrorMessage, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections)) {
+                    //    if (string.IsNullOrEmpty(ErrorMessage)) {
+                    //        ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status.";
+                    //    }
+                    //    logHousekeeping(core, "Updating local collections from Library returned an error, " + ErrorMessage);
+                    //}
                     //
                     // 20180816, no, core is v.41
                     // Verify core installation

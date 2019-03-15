@@ -198,14 +198,15 @@ namespace Contensive.Processor.Controllers {
                         try {
                             connSQL.Open();
                             success = true;
-                        } catch (System.Data.SqlClient.SqlException) {
+                        } catch (System.Data.SqlClient.SqlException exSql) {
                             // network related error, retry once
+                            LogController.logError(core, "executeQuery SqlException, retries left [" + retryCnt.ToString() + "], ex [" + exSql.ToString() + "]");
                             if (retryCnt <= 0) { throw; }
                             retryCnt--;
                         } catch (Exception) {
                             throw;
                         }
-                    } while (!success && (retryCnt > 0));
+                    } while (!success && (retryCnt >= 0));
                     using (SqlCommand cmdSQL = new SqlCommand()) {
                         cmdSQL.CommandType = CommandType.Text;
                         cmdSQL.CommandText = sql;

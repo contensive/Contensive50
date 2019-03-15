@@ -496,7 +496,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             Cnt = LibGuids.GetUpperBound(0) + 1;
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                 RegisterList = "";
-                                UpgradeOK = CollectionController.installCollectionFromRemoteRepo(core, LibGuids[Ptr], ref ErrorMessage, "", false, true, ref nonCriticalErrorList, "AddonManagerClass.GetForm_SaveModeAddonManager", ref installedCollections);
+                                UpgradeOK = CollectionController.installCollectionFromRegistry(core, LibGuids[Ptr], ref ErrorMessage, "", false, true, ref nonCriticalErrorList, "AddonManagerClass.GetForm_SaveModeAddonManager", ref installedCollections);
                                 if (!UpgradeOK) {
                                     //
                                     // block the reset because we will loose the error message

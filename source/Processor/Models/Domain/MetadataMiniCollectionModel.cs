@@ -21,7 +21,7 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// miniCollection - This is an old collection object used in part to load the metadata part xml files. REFACTOR this into CollectionWantList and werialization into jscon
     /// </summary>
-    public class MetaDataMiniCollectionModel : ICloneable {
+    public class MetadataMiniCollectionModel : ICloneable {
         //
         //====================================================================================================
         /// <summary>
@@ -71,7 +71,7 @@ namespace Contensive.Processor.Models.Domain {
         /// Model for menu dictionary
         /// </summary>
         public class MiniCollectionMenuModel {
-            public string Name;
+            public string name;
             public bool IsNavigator;
             public string menuNameSpace;
             public string ParentName;
@@ -83,6 +83,7 @@ namespace Contensive.Processor.Models.Domain {
             public bool NewWindow;
             public bool Active;
             public string AddonName;
+            public string AddonGuid;
             public bool dataChanged;
             public string Guid;
             public string NavIconType;
@@ -162,14 +163,14 @@ namespace Contensive.Processor.Models.Domain {
                     LogController.logInfo(core, "installmetadataMiniCollectionFromXML");
                     // 
                     // -- method 1, just install
-                    MetaDataMiniCollectionModel baseCollection = installMetaDataMiniCollection_LoadXml(core, srcXml, true, true, isNewBuild, new MetaDataMiniCollectionModel(), logPrefix, ref installedCollections);
+                    MetadataMiniCollectionModel baseCollection = loadXML(core, srcXml, true, true, isNewBuild, new MetadataMiniCollectionModel(), logPrefix, ref installedCollections);
                     installMetaDataMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                 } else {
                     //
                     // -- method 2, merge with application collection and install
                     //
-                    MetaDataMiniCollectionModel miniCollectionWorking = getApplicationMetaDataMiniCollection(core, isNewBuild, logPrefix, ref installedCollections);
-                    MetaDataMiniCollectionModel miniCollectionToAdd = installMetaDataMiniCollection_LoadXml(core, srcXml, isBaseCollection, false, isNewBuild, miniCollectionWorking, logPrefix, ref installedCollections);
+                    MetadataMiniCollectionModel miniCollectionWorking = getApplicationMetaDataMiniCollection(core, isNewBuild, logPrefix, ref installedCollections);
+                    MetadataMiniCollectionModel miniCollectionToAdd = loadXML(core, srcXml, isBaseCollection, false, isNewBuild, miniCollectionWorking, logPrefix, ref installedCollections);
                     addMiniCollectionSrcToDst(core, ref miniCollectionWorking, miniCollectionToAdd);
                     installMetaDataMiniCollection_BuildDb(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                 }
@@ -183,8 +184,8 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// create a collection class from a collection xml file, metadata are added to the metadatas in the application collection
         /// </summary>
-        private static MetaDataMiniCollectionModel installMetaDataMiniCollection_LoadXml(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, MetaDataMiniCollectionModel defaultCollection, string logPrefix, ref List<string> installedCollections) {
-            MetaDataMiniCollectionModel result = null;
+        public static MetadataMiniCollectionModel loadXML(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, MetadataMiniCollectionModel defaultCollection, string logPrefix, ref List<string> installedCollections) {
+            MetadataMiniCollectionModel result = null;
             try {
                 ContentMetadataModel DefaultMetaData = null;
                 ContentFieldMetadataModel DefaultMetaDataField = null;
@@ -211,7 +212,7 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 LogController.logInfo(core, "Application: " + core.appConfig.name + ", Upgrademetadata_LoadDataToCollection");
                 //
-                result = new MetaDataMiniCollectionModel();
+                result = new MetadataMiniCollectionModel();
                 //
                 if (string.IsNullOrEmpty(srcCollecionXml)) {
                     //
@@ -471,8 +472,8 @@ namespace Contensive.Processor.Models.Domain {
                                         DataSourceName = "default";
                                     }
                                     bool removeDup = false;
-                                    MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel dupToRemove = new MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel();
-                                    foreach (MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel index in result.sqlIndexes) {
+                                    MetadataMiniCollectionModel.MiniCollectionSQLIndexModel dupToRemove = new MetadataMiniCollectionModel.MiniCollectionSQLIndexModel();
+                                    foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel index in result.sqlIndexes) {
                                         if (textMatch(index.IndexName, IndexName) & textMatch(index.TableName, TableName) & textMatch(index.DataSourceName, DataSourceName)) {
                                             dupToRemove = index;
                                             removeDup = true;
@@ -482,7 +483,7 @@ namespace Contensive.Processor.Models.Domain {
                                     if (removeDup) {
                                         result.sqlIndexes.Remove(dupToRemove);
                                     }
-                                    MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel newIndex = new MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel {
+                                    MetadataMiniCollectionModel.MiniCollectionSQLIndexModel newIndex = new MetadataMiniCollectionModel.MiniCollectionSQLIndexModel {
                                         IndexName = IndexName,
                                         TableName = TableName,
                                         DataSourceName = DataSourceName,
@@ -510,9 +511,9 @@ namespace Contensive.Processor.Models.Domain {
                                         if (string.IsNullOrEmpty(ActiveText)) {
                                             ActiveText = "1";
                                         }
-                                        result.menus.Add(MenuKey, new MetaDataMiniCollectionModel.MiniCollectionMenuModel() {
+                                        result.menus.Add(MenuKey, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
                                             dataChanged = setAllDataChanged,
-                                            Name = MenuName,
+                                            name = MenuName,
                                             Guid = MenuGuid,
                                             Key = MenuKey,
                                             Active = GenericController.encodeBoolean(ActiveText),
@@ -525,6 +526,7 @@ namespace Contensive.Processor.Models.Domain {
                                             DeveloperOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "DeveloperOnly", false),
                                             NewWindow = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "NewWindow", false),
                                             AddonName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "AddonName", ""),
+                                            AddonGuid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "AddonGuid", ""),
                                             NavIconType = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NavIconType", ""),
                                             NavIconTitle = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NavIconTitle", ""),
                                             IsNavigator = IsNavigator
@@ -650,7 +652,7 @@ namespace Contensive.Processor.Models.Domain {
                         // Convert Menus.ParentName to Menu.menuNameSpace
                         //
                         foreach (var kvp in result.menus) {
-                            MetaDataMiniCollectionModel.MiniCollectionMenuModel menu = kvp.Value;
+                            MetadataMiniCollectionModel.MiniCollectionMenuModel menu = kvp.Value;
                             if (!string.IsNullOrEmpty(menu.ParentName)) {
                                 menu.menuNameSpace = GetMenuNameSpace(core, result.menus, menu, "");
                             }
@@ -668,7 +670,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Verify ccContent and ccFields records from the metadata nodes of a a collection file. This is the last step of loading teh metadata nodes of a collection file. ParentId field is set based on ParentName node.
         /// </summary>
-        private static void installMetaDataMiniCollection_BuildDb(CoreController core, MetaDataMiniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
+        private static void installMetaDataMiniCollection_BuildDb(CoreController core, MetadataMiniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
             try {
                 //
                 logPrefix += ", installCollection_BuildDbFromMiniCollection";
@@ -818,7 +820,7 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.logInfo(core, "metadata Load, stage 8: create SQL indexes");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                foreach (MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel index in Collection.sqlIndexes) {
+                foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel index in Collection.sqlIndexes) {
                     if (index.dataChanged) {
                         using (var db = new DbController(core, index.DataSourceName)) {
                             LogController.logInfo(core, "creating index [" + index.IndexName + "], fields [" + index.FieldNameList + "], on table [" + index.TableName + "]");
@@ -836,8 +838,8 @@ namespace Contensive.Processor.Models.Domain {
                 foreach (var kvp in Collection.menus) {
                     var menu = kvp.Value;
                     if (menu.dataChanged) {
-                        LogController.logInfo(core, "creating navigator entry [" + menu.Name + "], namespace [" + menu.menuNameSpace + "], guid [" + menu.Guid + "]");
-                        AppBuilderController.verifyNavigatorEntry(core, menu.Guid, menu.menuNameSpace, menu.Name, menu.ContentName, menu.LinkPage, menu.SortOrder, menu.AdminOnly, menu.DeveloperOnly, menu.NewWindow, menu.Active, menu.AddonName, menu.NavIconType, menu.NavIconTitle, 0);
+                        LogController.logInfo(core, "creating navigator entry [" + menu.name + "], namespace [" + menu.menuNameSpace + "], guid [" + menu.Guid + "]");
+                        AppBuilderController.verifyNavigatorEntry(core, menu, 0);
                     }
                 }
                 //
@@ -953,7 +955,7 @@ namespace Contensive.Processor.Models.Domain {
         /// Overlay a Src metadata on to the current one (Dst). Any Src metadata entries found in Src are added to Dst.
         /// if SrcIsUsermetadata is true, then the Src is overlayed on the Dst if there are any changes -- and .metadataChanged flag set
         /// </summary>
-        private static bool addMiniCollectionSrcToDst(CoreController core, ref MetaDataMiniCollectionModel dstCollection, MetaDataMiniCollectionModel srcCollection) {
+        private static bool addMiniCollectionSrcToDst(CoreController core, ref MetadataMiniCollectionModel dstCollection, MetadataMiniCollectionModel srcCollection) {
             bool returnOk = true;
             try {
                 string SrcFieldName = null;
@@ -1235,15 +1237,15 @@ namespace Contensive.Processor.Models.Domain {
                 // Check SQL Indexes
                 // -------------------------------------------------------------------------------------------------
                 //
-                foreach (MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel srcSqlIndex in srcCollection.sqlIndexes) {
+                foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel srcSqlIndex in srcCollection.sqlIndexes) {
                     string srcName = (srcSqlIndex.DataSourceName + "-" + srcSqlIndex.TableName + "-" + srcSqlIndex.IndexName).ToLowerInvariant();
                     updateDst = false;
                     //
                     // Search for this name in the Dst
                     bool indexFound = false;
                     bool indexChanged = false;
-                    MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel indexToUpdate = new MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel();
-                    foreach (MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
+                    MetadataMiniCollectionModel.MiniCollectionSQLIndexModel indexToUpdate = new MetadataMiniCollectionModel.MiniCollectionSQLIndexModel();
+                    foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
                         dstName = (dstSqlIndex.DataSourceName + "-" + dstSqlIndex.TableName + "-" + dstSqlIndex.IndexName).ToLowerInvariant();
                         if (textMatch(dstName, srcName)) {
                             //
@@ -1277,8 +1279,8 @@ namespace Contensive.Processor.Models.Domain {
                 string DataBuildVersion = core.siteProperties.dataBuildVersion;
                 foreach (var srcKvp in srcCollection.menus) {
                     string srcKey = srcKvp.Key.ToLowerInvariant();
-                    MetaDataMiniCollectionModel.MiniCollectionMenuModel srcMenu = srcKvp.Value;
-                    string srcName = srcMenu.Name.ToLowerInvariant();
+                    MetadataMiniCollectionModel.MiniCollectionMenuModel srcMenu = srcKvp.Value;
+                    string srcName = srcMenu.name.ToLowerInvariant();
                     string srcGuid = srcMenu.Guid;
                     string SrcParentName = GenericController.vbLCase(srcMenu.ParentName);
                     string SrcNameSpace = GenericController.vbLCase(srcMenu.menuNameSpace);
@@ -1286,13 +1288,13 @@ namespace Contensive.Processor.Models.Domain {
                     updateDst = false;
                     //
                     // Search for match using guid
-                    MetaDataMiniCollectionModel.MiniCollectionMenuModel dstMenuMatch = new MetaDataMiniCollectionModel.MiniCollectionMenuModel();
+                    MetadataMiniCollectionModel.MiniCollectionMenuModel dstMenuMatch = new MetadataMiniCollectionModel.MiniCollectionMenuModel();
                     bool IsMatch = false;
                     string DstKey = null;
                     bool DstIsNavigator = false;
                     foreach (var dstKvp in dstCollection.menus) {
                         string dstKey = dstKvp.Key.ToLowerInvariant();
-                        MetaDataMiniCollectionModel.MiniCollectionMenuModel dstMenu = dstKvp.Value;
+                        MetadataMiniCollectionModel.MiniCollectionMenuModel dstMenu = dstKvp.Value;
                         string dstGuid = dstMenu.Guid;
                         if (dstGuid == srcGuid) {
                             DstIsNavigator = dstMenu.IsNavigator;
@@ -1311,8 +1313,8 @@ namespace Contensive.Processor.Models.Domain {
                         // no match found on guid, try name and ( either namespace or parentname )
                         foreach (var dstKvp in dstCollection.menus) {
                             string dstKey = dstKvp.Key.ToLowerInvariant();
-                            MetaDataMiniCollectionModel.MiniCollectionMenuModel dstMenu = dstKvp.Value;
-                            dstName = GenericController.vbLCase(dstMenu.Name);
+                            MetadataMiniCollectionModel.MiniCollectionMenuModel dstMenu = dstKvp.Value;
+                            dstName = GenericController.vbLCase(dstMenu.name);
                             if ((srcName == dstName) && (SrcIsNavigator == DstIsNavigator)) {
                                 if (SrcIsNavigator) {
                                     //
@@ -1336,10 +1338,11 @@ namespace Contensive.Processor.Models.Domain {
                         updateDst |= !textMatch(dstMenuMatch.ContentName, srcMenu.ContentName);
                         updateDst |= (dstMenuMatch.DeveloperOnly != srcMenu.DeveloperOnly);
                         updateDst |= !textMatch(dstMenuMatch.LinkPage, srcMenu.LinkPage);
-                        updateDst |= !textMatch(dstMenuMatch.Name, srcMenu.Name);
+                        updateDst |= !textMatch(dstMenuMatch.name, srcMenu.name);
                         updateDst |= (dstMenuMatch.NewWindow != srcMenu.NewWindow);
                         updateDst |= !textMatch(dstMenuMatch.SortOrder, srcMenu.SortOrder);
                         updateDst |= !textMatch(dstMenuMatch.AddonName, srcMenu.AddonName);
+                        updateDst |= !textMatch(dstMenuMatch.AddonGuid, srcMenu.AddonGuid);
                         updateDst |= !textMatch(dstMenuMatch.NavIconType, srcMenu.NavIconType);
                         updateDst |= !textMatch(dstMenuMatch.NavIconTitle, srcMenu.NavIconTitle);
                         updateDst |= !textMatch(dstMenuMatch.menuNameSpace, srcMenu.menuNameSpace);
@@ -1484,14 +1487,14 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         //
-        private static MetaDataMiniCollectionModel getApplicationMetaDataMiniCollection(CoreController core, bool isNewBuild, string logPrefix, ref List<string> installedCollections) {
-            var result = new MetaDataMiniCollectionModel();
+        private static MetadataMiniCollectionModel getApplicationMetaDataMiniCollection(CoreController core, bool isNewBuild, string logPrefix, ref List<string> installedCollections) {
+            var result = new MetadataMiniCollectionModel();
             try {
                 if (!isNewBuild) {
                     //
                     // if this is not an empty database, get the application collection, else return empty
                     string applicationMetaDataMiniCollectionXml = ApplicationMetaDataMiniCollection.get(core, true);
-                    result = MetaDataMiniCollectionModel.installMetaDataMiniCollection_LoadXml(core, applicationMetaDataMiniCollectionXml, false, false, isNewBuild, new MetaDataMiniCollectionModel(), logPrefix, ref installedCollections);
+                    result = MetadataMiniCollectionModel.loadXML(core, applicationMetaDataMiniCollectionXml, false, false, isNewBuild, new MetadataMiniCollectionModel(), logPrefix, ref installedCollections);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -1565,7 +1568,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         //
-        private static string GetMenuNameSpace(CoreController core, Dictionary<string, MetaDataMiniCollectionModel.MiniCollectionMenuModel> menus, MetaDataMiniCollectionModel.MiniCollectionMenuModel menu, string UsedIDList) {
+        private static string GetMenuNameSpace(CoreController core, Dictionary<string, MetadataMiniCollectionModel.MiniCollectionMenuModel> menus, MetadataMiniCollectionModel.MiniCollectionMenuModel menu, string UsedIDList) {
             string returnAttr = "";
             try {
                 string ParentName = null;
@@ -1578,9 +1581,9 @@ namespace Contensive.Processor.Models.Domain {
                 if (!string.IsNullOrEmpty(ParentName)) {
                     LCaseParentName = GenericController.vbLCase(ParentName);
                     foreach (var kvp in menus) {
-                        MetaDataMiniCollectionModel.MiniCollectionMenuModel testMenu = kvp.Value;
+                        MetadataMiniCollectionModel.MiniCollectionMenuModel testMenu = kvp.Value;
                         if (GenericController.vbInstr(1, "," + UsedIDList + ",", "," + Ptr.ToString() + ",") == 0) {
-                            if (LCaseParentName == GenericController.vbLCase(testMenu.Name) && (menu.IsNavigator == testMenu.IsNavigator)) {
+                            if (LCaseParentName == GenericController.vbLCase(testMenu.name) && (menu.IsNavigator == testMenu.IsNavigator)) {
                                 Prefix = GetMenuNameSpace(core, menus, testMenu, UsedIDList + "," + menu.Guid);
                                 if (string.IsNullOrEmpty(Prefix)) {
                                     returnAttr = ParentName;
