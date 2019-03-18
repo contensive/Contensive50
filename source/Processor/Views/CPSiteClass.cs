@@ -190,7 +190,7 @@ namespace Contensive.Processor {
         //
         [Obsolete("Use GetText()", true)]
         public override string GetProperty(string propertyName) {
-            throw new NotImplementedException();
+            return cp.core.siteProperties.getText(propertyName, "");
         }
         //
         [Obsolete("Use methods with matching types", true)]
@@ -292,9 +292,8 @@ namespace Contensive.Processor {
             => cp.Addon.InstallCollectionFromLibrary(collectionGuid, ref returnUserError);
         //
         [Obsolete("Use CP.Utils.EncodeAppRootPath()", true)]
-        public override string EncodeAppRootPath(string link) {
-            throw new NotImplementedException();
-        }
+        public override string EncodeAppRootPath(string link) 
+            => cp.Utils.EncodeAppRootPath(link);
         //
         //
         #region  IDisposable Support 

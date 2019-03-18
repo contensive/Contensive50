@@ -3029,8 +3029,6 @@ namespace Contensive.Processor.Controllers {
         public string getHtmlDoc(string htmlBody, string htmlBodyTag, bool allowLogin = true, bool allowTools = true) {
             string result = "";
             try {
-                string encoding = HtmlController.encodeHtml(core.siteProperties.getText("Site Character Encoding", "utf-8"));
-                addHeadTag("<meta http-equiv=\"content-type\" content=\"text/html; charset=" + encoding + "\">");
                 string htmlHead = getHtmlHead();
                 string htmlBeforeEndOfBody = getHtmlBodyEnd(allowLogin, allowTools);
                 result = ""
@@ -3104,14 +3102,6 @@ namespace Contensive.Processor.Controllers {
                         headList.Add("\r\n<link rel=\"icon\" type=\"image/jpg\" href=\"" + GenericController.getCdnFileLink(core, VirtualFilename) + "\" >");
                         break;
                 }
-                //
-                // -- misc caching, etc
-                //string encoding = htmlController.encodeHTML(core.siteProperties.getText("Site Character Encoding", "utf-8"));
-                //headList.Add("<meta http-equiv=\"content-type\" content=\"text/html; charset=" + encoding + "\">");
-                //headList.Add("<meta http-equiv=\"content-language\" content=\"en-us\">");
-                //headList.Add("<meta http-equiv=\"cache-control\" content=\"no-cache\">");
-                //headList.Add("<meta http-equiv=\"expires\" content=\"-1\">");
-                //headList.Add("<meta http-equiv=\"pragma\" content=\"no-cache\">");
                 headList.Add("\r\n<meta name=\"generator\" content=\"Contensive\">");
                 //
                 // -- no-follow

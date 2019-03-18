@@ -163,22 +163,15 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="Title"></param>
         /// <param name="Description"></param>
         /// <returns></returns>
-        public static string getTitleBar(CoreController core, string Title, string Description) {
-            string result = "";
+        public static string getTitleBar(CoreController core, string Description) {
+            string result = string.Empty;
             try {
-                result = Title;
-                if (core.doc.debug_iUserError != "") {
-                    Description += HtmlController.div( ErrorController.getUserError(core));
-                }
-                if (!string.IsNullOrEmpty(Description)) {
-                    result += HtmlController.div(Description);
-                    //result += htmlController.div(Description, "ccAdminInfoBar ccPanel3DReverse");
-                }
+                if (core.doc.debug_iUserError != "") { Description += HtmlController.div( ErrorController.getUserError(core)); }
+                if (!string.IsNullOrEmpty(Description)) { result += HtmlController.div(Description); }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }
-            result = HtmlController.div(result, "ccAdminTitleBar");
-            return result;
+            return HtmlController.div(result, "ccAdminTitleBar");
         }
         //
         //====================================================================================================
@@ -434,7 +427,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 }
                 result += ""
                     + ButtonBar 
-                    + getTitleBar(core, Caption, Description)
+                    + getTitleBar(core, Description)
                     + CellContentSummary 
                     + "<div style=\"padding:" + ContentPadding + "px;\">" + Content + "\r</div>"
                     + ButtonBar;
@@ -1080,7 +1073,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         if (csData.getText("Name") == "") {
                             result += ("No Name");
                         } else {
-                            result += (HtmlController.encodeHtml(csData.getText("Name")));
+                            result += getDefaultEditor_Text(core, fieldName, csData.getText("Name"), readOnly, htmlId);
                         }
                         result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentId + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                     } else {
@@ -1132,7 +1125,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 } else if (defaultLookupIndexBaseOne > (lookupArray.GetUpperBound(0) + 1)) {
                     result += "None";
                 } else {
-                    result += lookupArray[defaultLookupIndexBaseOne - 1];
+                    result += getDefaultEditor_Text(core, htmlName, lookupArray[defaultLookupIndexBaseOne - 1], readOnly, htmlId);
                 }
                 result += WhyReadOnlyMsg;
             } else {

@@ -247,7 +247,7 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, getTitle(core,adminData), titleBarDetails));
+                        Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Groups", GroupRuleEditor.get(core, adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
@@ -296,7 +296,7 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, getTitle(core,adminData), titleBarDetails));
+                        Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
                         Stream.Add(getTabs(core,adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Groups", EmailRuleEditor.get(core, adminData, adminData.editRecord.userReadOnly & (!core.session.isAuthenticatedDeveloper(core))), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Topics", EmailTopicEditor.get(core, adminData, adminData.editRecord.userReadOnly & (!core.session.isAuthenticatedDeveloper(core))), adminData.allowAdminTabs));
@@ -328,7 +328,7 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, getTitle(core,adminData), titleBarDetails));
+                        Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly || EmailSubmitted, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Condition&nbsp;Groups", EmailRuleEditor.get(core, adminData, adminData.editRecord.userReadOnly || EmailSubmitted), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Bounce&nbsp;Control", EmailBounceEditor.get(core, adminData), adminData.allowAdminTabs));
@@ -358,7 +358,7 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, getTitle(core,adminData), titleBarDetails));
+                        Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly || EmailSubmitted || EmailSent, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Groups", EmailRuleEditor.get(core, adminData, adminData.editRecord.userReadOnly || EmailSubmitted || EmailSent), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Topics", EmailTopicEditor.get(core, adminData, adminData.editRecord.userReadOnly || EmailSubmitted || EmailSent), adminData.allowAdminTabs));
@@ -389,7 +389,7 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, getTitle(core,adminData), titleBarDetails));
+                        Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Authoring Permissions", getForm_Edit_GroupRules(core,adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
@@ -420,7 +420,7 @@ namespace Contensive.Addons.AdminSite {
                         isPageContent = false
                     });
                     Stream.Add(EditSectionButtonBar);
-                    Stream.Add(AdminUIController.getTitleBar(core, getTitle(core,adminData), titleBarDetails));
+                    Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
                     Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, IsLandingPage || IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                     Stream.Add(addTab(core, adminMenu, "Link Aliases", LinkAliasEditor.GetForm_Edit_LinkAliases(core, adminData, adminData.editRecord.userReadOnly), adminData.allowAdminTabs));
                     Stream.Add(addTab(core, adminMenu, "Content Watch", ContentTrackingEditor.get(core, adminData), adminData.allowAdminTabs));
@@ -555,7 +555,7 @@ namespace Contensive.Addons.AdminSite {
                         isPageContent = pageContentMetadata.isParentOf( core, adminData.adminContent.id)
                     });
                     Stream.Add(EditSectionButtonBar);
-                    Stream.Add(AdminUIController.getTitleBar(core, getTitle(core,adminData), titleBarDetails));
+                    Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
                     Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                     Stream.Add(addTab(core, adminMenu, "Content Watch", ContentTrackingEditor.get(core, adminData), adminData.allowAdminTabs));
                     Stream.Add(addTab(core, adminMenu, "Control Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
@@ -610,64 +610,6 @@ namespace Contensive.Addons.AdminSite {
         public static string getTab(CoreController core, AdminDataModel adminData, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, CPHtml5BaseClass.EditorContentType EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, Dictionary<int, int > fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
-                // todo
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
-
-                //
-                //
-                string AjaxQS = null;
-                string fancyBoxLinkId = null;
-                string fancyBoxContentId = null;
-                int fieldTypeDefaultEditorAddonId = 0;
-                int fieldIdPos = 0;
-                int Pos = 0;
-                int editorAddonID = 0;
-                bool editorReadOnly = false;
-                bool AllowHelpIcon = false;
-                int fieldId = 0;
-                string LcaseName = null;
-                bool IsEmptyList = false;
-                string HelpMsgCustom = null;
-                string HelpMsgDefault = null;
-                //
-                string WhyReadOnlyMsg = null;
-                bool IsLongHelp = false;
-                bool IsEmptyHelp = false;
-                string HelpMsg = null;
-                string HelpClosedContentID = null;
-                string EditorHelp = null;
-                string HelpEditorID = null;
-                string HelpOpenedReadID = null;
-                string HelpOpenedEditID = null;
-                string HelpClosedID = null;
-                string HelpID = null;
-                string HelpMsgClosed = null;
-                string HelpMsgOpenedRead = null;
-                string HelpMsgOpenedEdit = null;
-                //string RecordName = null;
-                //string GroupName = null;
-                bool IsBaseField = false;
-                bool field_readOnly = false;
-                string NonEncodedLink = null;
-                string EncodedLink = null;
-                string fieldCaption = null;
-                //string[] lookups = null;
-                string fieldValue_text = null;
-                //int FieldValueInteger = 0;
-                double FieldValueNumber = 0;
-                CPContentBaseClass.fileTypeIdEnum fieldTypeId = 0;
-                object fieldValue_object = null;
-                string RedirectPath = null;
-                StringBuilderLegacyController resultBody = new StringBuilderLegacyController();
-                int FieldRows = 0;
-                string EditorString = null;
-                //string MTMContent0 = null;
-                //string MTMContent1 = null;
-                //string MTMRuleContent = null;
-                //string MTMRuleField0 = null;
-                //string MTMRuleField1 = null;
-                string AlphaSort = null;
-                bool needUniqueEmailMessage = false;
                 //
                 // ----- Open the panel
                 if (adminData.adminContent.fields.Count <= 0) {
@@ -682,23 +624,29 @@ namespace Contensive.Addons.AdminSite {
                         ContentFieldMetadataModel field = keyValuePair.Value;
                         if (field.editTabName.ToLowerInvariant() == EditTab.ToLowerInvariant()) {
                             if (AdminDataModel.IsVisibleUserField(core, field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminData.adminContent.tableName)) {
-                                AlphaSort = GenericController.getIntegerString(field.editSortPriority, 10) + "-" + GenericController.getIntegerString(field.id, 10);
+                                string AlphaSort = GenericController.getIntegerString(field.editSortPriority, 10) + "-" + GenericController.getIntegerString(field.id, 10);
                                 sortingFields.Add(AlphaSort, field);
                             }
                         }
                     }
                     //
                     // ----- display the record fields
-                    //
-                    AllowHelpIcon = core.visitProperty.getBoolean("AllowHelpIcon");
+                    bool AllowHelpIcon = core.visitProperty.getBoolean("AllowHelpIcon");
+                    string fieldCaption = "";
+                    StringBuilderLegacyController resultBody = new StringBuilderLegacyController();
+                    bool needUniqueEmailMessage = false;
                     foreach (var kvp in sortingFields) {
                         ContentFieldMetadataModel field = kvp.Value;
-                        fieldId = field.id;
-                        WhyReadOnlyMsg = "";
-                        fieldTypeId = field.fieldTypeId;
-                        fieldValue_object = editRecord.fieldsLc[field.nameLc].value;
-                        fieldValue_text = GenericController.encodeText(fieldValue_object);
-                        FieldRows = 1;
+                        int fieldId = field.id;
+                        //
+                        string WhyReadOnlyMsg = "";
+                        CPContentBaseClass.fileTypeIdEnum fieldTypeId = field.fieldTypeId;
+                        // todo
+                        EditRecordClass editRecord = adminData.editRecord;
+                        object fieldValue_object = editRecord.fieldsLc[field.nameLc].value;
+                        //string[] lookups = null;
+                        string fieldValue_text = GenericController.encodeText(fieldValue_object);
+                        int FieldRows = 1;
                         string fieldHtmlId = field.nameLc + field.id.ToString();
                         //
                         fieldCaption = field.caption;
@@ -715,9 +663,11 @@ namespace Contensive.Addons.AdminSite {
                         if (field.required) {
                             fieldCaption = "&nbsp;*" + fieldCaption;
                         }
-                        IsBaseField = field.blockAccess; // field renamed
+                        //string RecordName = null;
+                        //string GroupName = null;
+                        bool IsBaseField = field.blockAccess;
                         adminData.FormInputCount = adminData.FormInputCount + 1;
-                        field_readOnly = false;
+                        bool field_readOnly = false;
                         //
                         // Read only Special Cases
                         //
@@ -777,17 +727,17 @@ namespace Contensive.Addons.AdminSite {
                             }
                         }
                         //EditorStyleModifier = genericController.vbLCase(core.db.getFieldTypeNameFromFieldTypeId(fieldTypeId));
-                        EditorString = "";
-                        editorReadOnly = (record_readOnly || field.readOnly || (editRecord.id != 0 & field.notEditable) || (field_readOnly));
+                        string EditorString = "";
+                        bool editorReadOnly = (record_readOnly || field.readOnly || (editRecord.id != 0 & field.notEditable) || (field_readOnly));
                         //
                         // Determine the editor: Contensive editor, field type default, or add-on preference
                         //
-                        editorAddonID = 0;
+                        int editorAddonID = 0;
                         //editorPreferenceAddonId = 0
-                        fieldIdPos = GenericController.vbInstr(1, "," + fieldEditorPreferenceList, "," + fieldId.ToString() + ":");
+                        int fieldIdPos = GenericController.vbInstr(1, "," + fieldEditorPreferenceList, "," + fieldId.ToString() + ":");
                         while ((editorAddonID == 0) && (fieldIdPos > 0)) {
                             fieldIdPos = fieldIdPos + 1 + fieldId.ToString().Length;
-                            Pos = GenericController.vbInstr(fieldIdPos, fieldEditorPreferenceList + ",", ",");
+                            int Pos = GenericController.vbInstr(fieldIdPos, fieldEditorPreferenceList + ",", ",");
                             if (Pos > 0) {
                                 editorAddonID = GenericController.encodeInteger(fieldEditorPreferenceList.Substring(fieldIdPos - 1, Pos - fieldIdPos));
                                 //editorPreferenceAddonId = genericController.EncodeInteger(Mid(fieldEditorPreferenceList, fieldIdPos, Pos - fieldIdPos))
@@ -795,7 +745,8 @@ namespace Contensive.Addons.AdminSite {
                             }
                             fieldIdPos = GenericController.vbInstr(fieldIdPos + 1, "," + fieldEditorPreferenceList, "," + fieldId.ToString() + ":");
                         }
-                        if ((editorAddonID == 0) &&(fieldTypeDefaultEditors.ContainsKey((int)fieldTypeId))) {
+                        int fieldTypeDefaultEditorAddonId = 0;
+                        if ((editorAddonID == 0) && (fieldTypeDefaultEditors.ContainsKey((int)fieldTypeId))) {
                             fieldTypeDefaultEditorAddonId = fieldTypeDefaultEditors[(int)fieldTypeId];
                             editorAddonID = fieldTypeDefaultEditorAddonId;
                         }
@@ -863,13 +814,16 @@ namespace Contensive.Addons.AdminSite {
                             }
                         }
                         if (!useEditorAddon) {
+                            bool IsEmptyList = false;
+                            string NonEncodedLink = null;
+                            string EncodedLink = null;
                             //
                             // if custom editor not used or if it failed
                             //
                             if (fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Redirect) {
                                 //
                                 // ----- Default Editor, Redirect fields (the same for normal/readonly/spelling)
-                                RedirectPath = core.appConfig.adminRoute;
+                                string RedirectPath = core.appConfig.adminRoute;
                                 if (field.redirectPath != "") {
                                     RedirectPath = field.redirectPath;
                                 }
@@ -897,6 +851,8 @@ namespace Contensive.Addons.AdminSite {
                                 if (!string.IsNullOrEmpty(WhyReadOnlyMsg)) {
                                     WhyReadOnlyMsg = "<span class=\"ccDisabledReason\">" + WhyReadOnlyMsg + "</span>";
                                 }
+                                //int FieldValueInteger = 0;
+                                double FieldValueNumber = 0;
                                 //EditorStyleModifier = "";
                                 switch (fieldTypeId) {
                                     case CPContentBaseClass.fileTypeIdEnum.Text:
@@ -904,23 +860,23 @@ namespace Contensive.Addons.AdminSite {
                                     case CPContentBaseClass.fileTypeIdEnum.ResourceLink:
                                         //
                                         // ----- Text Type
-                                        EditorString += AdminUIController.getDefaultEditor_Text(core, field.nameLc, fieldValue_text, true, fieldHtmlId);
+                                        EditorString += AdminUIController.getDefaultEditor_Text(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId);
                                         return_NewFieldList += "," + field.nameLc;
                                         break;
                                     case CPContentBaseClass.fileTypeIdEnum.Boolean:
                                         //
                                         // ----- Boolean ReadOnly
-                                        EditorString += AdminUIController.getDefaultEditor_Bool(core, field.nameLc, GenericController.encodeBoolean(fieldValue_object), true, fieldHtmlId);
+                                        EditorString += AdminUIController.getDefaultEditor_Bool(core, field.nameLc, GenericController.encodeBoolean(fieldValue_object), editorReadOnly, fieldHtmlId);
                                         return_NewFieldList += "," + field.nameLc;
                                         break;
                                     case CPContentBaseClass.fileTypeIdEnum.Lookup:
                                         //
                                         // ----- Lookup, readonly
                                         if (field.lookupContentID != 0) {
-                                            EditorString = AdminUIController.getDefaultEditor_LookupContent(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupContentID, ref IsEmptyList, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                            EditorString = AdminUIController.getDefaultEditor_LookupContent(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupContentID, ref IsEmptyList, editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
                                             return_NewFieldList += "," + field.nameLc;
                                         } else if (field.lookupList != "") {
-                                            EditorString = AdminUIController.getDefaultEditor_LookupList(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupList.Split(','), field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                            EditorString = AdminUIController.getDefaultEditor_LookupList(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupList.Split(','), editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
                                             return_NewFieldList += "," + field.nameLc;
                                         } else {
                                             //
@@ -938,33 +894,22 @@ namespace Contensive.Addons.AdminSite {
                                     case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
                                         //
                                         // ----- Member Select ReadOnly
-                                        //
                                         return_NewFieldList += "," + field.nameLc;
-                                        EditorString = AdminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValue_object), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                        EditorString = AdminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValue_object), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), editorReadOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
                                         //
                                         break;
                                     case CPContentBaseClass.fileTypeIdEnum.ManyToMany:
                                         //
                                         //   Placeholder
-                                        //
                                         EditorString = AdminUIController.getDefaultEditor_manyToMany(core, field, "field" + field.id, fieldValue_text, editRecord.id, editorReadOnly, WhyReadOnlyMsg);
-                                        //MTMContent0 = CdefController.getContentNameByID(core, field.contentId);
-                                        //MTMContent1 = CdefController.getContentNameByID(core, field.manyToManyContentID);
-                                        //MTMRuleContent = CdefController.getContentNameByID(core, field.manyToManyRuleContentID);
-                                        //MTMRuleField0 = field.ManyToManyRulePrimaryField;
-                                        //MTMRuleField1 = field.ManyToManyRuleSecondaryField;
-                                        //EditorString += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1);
-                                        //EditorString += WhyReadOnlyMsg;
-                                        ////
                                         break;
                                     case CPContentBaseClass.fileTypeIdEnum.Currency:
                                         //
                                         // ----- Currency ReadOnly
-                                        //
                                         return_NewFieldList += "," + field.nameLc;
                                         FieldValueNumber = GenericController.encodeNumber(fieldValue_object);
                                         EditorString += (HtmlController.inputHidden(field.nameLc, GenericController.encodeText(FieldValueNumber)));
-                                        EditorString += (HtmlController.inputText(core, field.nameLc, FieldValueNumber.ToString(), -1, -1, fieldHtmlId, false, true, "text form-control"));
+                                        EditorString += (HtmlController.inputText(core, field.nameLc, FieldValueNumber.ToString(), -1, -1, fieldHtmlId, false, editorReadOnly, "text form-control"));
                                         EditorString += (string.Format("{0:C}", FieldValueNumber));
                                         EditorString += WhyReadOnlyMsg;
                                         //
@@ -977,7 +922,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         return_NewFieldList += "," + field.nameLc;
                                         EditorString += (HtmlController.inputHidden(field.nameLc, fieldValue_text));
-                                        EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, false, true, "number form-control"));
+                                        EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, false, editorReadOnly, "number form-control"));
                                         EditorString += WhyReadOnlyMsg;
                                         //
                                         break;
@@ -994,13 +939,13 @@ namespace Contensive.Addons.AdminSite {
                                             EditorString += HtmlController.inputHidden(field.nameLc, fieldValue_text);
                                             //EditorStyleModifier = "textexpandable";
                                             FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                                            EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, true, "form-control");
+                                            EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, editorReadOnly, "form-control");
                                         } else {
                                             //
                                             // edit html as wysiwyg readonly
                                             //
                                             return_NewFieldList += "," + field.nameLc;
-                                            EditorString += AdminUIController.getDefaultEditor_Html(core, field.nameLc, fieldValue_text, editorAddonListJSON, styleList, styleOptionList, true, fieldHtmlId);
+                                            EditorString += AdminUIController.getDefaultEditor_Html(core, field.nameLc, fieldValue_text, editorAddonListJSON, styleList, styleOptionList, editorReadOnly, fieldHtmlId);
                                         }
                                         break;
                                     case CPContentBaseClass.fileTypeIdEnum.LongText:
@@ -1012,7 +957,7 @@ namespace Contensive.Addons.AdminSite {
                                         EditorString += HtmlController.inputHidden(field.nameLc, fieldValue_text);
                                         //EditorStyleModifier = "textexpandable";
                                         FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                                        EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, true, " form-control");
+                                        EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, editorReadOnly, " form-control");
                                         break;
                                     case CPContentBaseClass.fileTypeIdEnum.File:
                                     case CPContentBaseClass.fileTypeIdEnum.FileImage:
@@ -1078,7 +1023,7 @@ namespace Contensive.Addons.AdminSite {
                                             //
                                             //EditorStyleModifier = "textexpandable";
                                             FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                                            EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, true);
+                                            EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, editorReadOnly);
                                             //EditorString = core.main_GetFormInputTextExpandable(FormFieldLCaseName, encodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False)
                                         }
                                         break;
@@ -1318,42 +1263,45 @@ namespace Contensive.Addons.AdminSite {
                         // Build Help Line Below editor
                         //
                         adminData.includeFancyBox = true;
-                        HelpMsgDefault = "";
-                        HelpMsgCustom = "";
-                        EditorHelp = "";
-                        LcaseName = GenericController.vbLCase(field.nameLc);
+                        string HelpMsgDefault = "";
+                        string HelpMsgCustom = "";
+                        string EditorHelp = "";
+                        string LcaseName = GenericController.vbLCase(field.nameLc);
                         if (AllowHelpMsgCustom) {
                             HelpMsgDefault = field.helpDefault;
                             HelpMsgCustom = field.helpCustom;
                         }
+                        string HelpMsg = null;
                         if (!string.IsNullOrEmpty(HelpMsgCustom)) {
                             HelpMsg = HelpMsgCustom;
                         } else {
                             HelpMsg = HelpMsgDefault;
                         }
-                        HelpMsgOpenedRead = HelpMsg;
-                        HelpMsgClosed = HelpMsg;
-                        IsEmptyHelp = HelpMsgClosed.Length == 0;
-                        IsLongHelp = (HelpMsgClosed.Length > 100);
+                        string HelpMsgOpenedRead = HelpMsg;
+                        string HelpMsgClosed = HelpMsg;
+                        bool IsEmptyHelp = HelpMsgClosed.Length == 0;
+                        bool IsLongHelp = (HelpMsgClosed.Length > 100);
                         if (IsLongHelp) {
                             HelpMsgClosed = HelpMsgClosed.Left(100) + "...";
                         }
                         //
-                        HelpID = "helpId" + fieldId;
-                        HelpEditorID = "helpEditorId" + fieldId;
-                        HelpOpenedReadID = "HelpOpenedReadID" + fieldId;
-                        HelpOpenedEditID = "HelpOpenedEditID" + fieldId;
-                        HelpClosedID = "helpClosedId" + fieldId;
-                        HelpClosedContentID = "helpClosedContentId" + fieldId;
+                        string HelpID = "helpId" + fieldId;
+                        string HelpEditorID = "helpEditorId" + fieldId;
+                        string HelpOpenedReadID = "HelpOpenedReadID" + fieldId;
+                        string HelpOpenedEditID = "HelpOpenedEditID" + fieldId;
+                        string HelpClosedID = "helpClosedId" + fieldId;
+                        string HelpClosedContentID = "helpClosedContentId" + fieldId;
+                        //
+                        //
                         //AllowHelpRow = true;
                         //
                         //------------------------------------------------------------------------------------------------------------
                         // editor preferences form - a fancybox popup that interfaces with a hardcoded ajax function in init() to set a member property
                         //------------------------------------------------------------------------------------------------------------
                         //
-                        AjaxQS = RequestNameAjaxFunction + "=" + ajaxGetFieldEditorPreferenceForm + "&fieldid=" + fieldId + "&currentEditorAddonId=" + editorAddonID + "&fieldTypeDefaultEditorAddonId=" + fieldTypeDefaultEditorAddonId;
-                        fancyBoxLinkId = "fbl" + adminData.fancyBoxPtr;
-                        fancyBoxContentId = "fbc" + adminData.fancyBoxPtr;
+                        string AjaxQS = RequestNameAjaxFunction + "=" + ajaxGetFieldEditorPreferenceForm + "&fieldid=" + fieldId + "&currentEditorAddonId=" + editorAddonID + "&fieldTypeDefaultEditorAddonId=" + fieldTypeDefaultEditorAddonId;
+                        string fancyBoxLinkId = "fbl" + adminData.fancyBoxPtr;
+                        string fancyBoxContentId = "fbc" + adminData.fancyBoxPtr;
                         adminData.fancyBoxHeadJS = adminData.fancyBoxHeadJS + "\r\njQuery('#" + fancyBoxLinkId + "').fancybox({"
                             + "'titleShow':false,"
                             + "'transitionIn':'elastic',"
@@ -1370,6 +1318,7 @@ namespace Contensive.Addons.AdminSite {
                             + "\r</div>"
                             + "";
                         adminData.fancyBoxPtr = adminData.fancyBoxPtr + 1;
+                        string HelpMsgOpenedEdit = null;
                         //
                         //------------------------------------------------------------------------------------------------------------
                         // field help
@@ -1509,7 +1458,7 @@ namespace Contensive.Addons.AdminSite {
                         fieldCaption = "Content Fields - " + EditTab;
                     }
                     adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
-                    returnHtml = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), fieldCaption, "", AdminUIController.editTable( resultBody.Text ));
+                    returnHtml = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), fieldCaption, "", AdminUIController.editTable(resultBody.Text));
                     adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
                     resultBody = null;
                 }
@@ -1544,32 +1493,7 @@ namespace Contensive.Addons.AdminSite {
             string returnHtml = "";
             try {
                 // todo
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
-                //
-                //
-                string tabContent = null;
-                string AjaxLink = null;
-                List<string> TabsFound = new List<string>();
-                string editTabCaption = null;
-                string NewFormFieldList = null;
-                string FormFieldList = null;
-                bool AllowHelpMsgCustom = false;
-                string IDList = null;
-                DataTable dt = null;
-                string[,] TempVar = null;
-                int HelpCnt = 0;
-                int fieldId = 0;
-                int LastFieldID = 0;
-                int HelpPtr = 0;
-                int[] HelpIDCache = { };
-                string[] helpDefaultCache = { };
-                string[] HelpCustomCache = { };
-                KeyPtrController helpIdIndex = new KeyPtrController();
-                string fieldNameLc = null;
-                //
-                // ----- read in help
-                //
-                IDList = "";
+                string IDList = "";
                 foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
                     ContentFieldMetadataModel field = keyValuePair.Value;
                     IDList = IDList + "," + field.id;
@@ -1578,16 +1502,24 @@ namespace Contensive.Addons.AdminSite {
                     IDList = IDList.Substring(1);
                 }
                 //
-                dt = core.db.executeQuery("select fieldid,helpdefault,helpcustom from ccfieldhelp where fieldid in (" + IDList + ") order by fieldid,id");
-                TempVar = core.db.convertDataTabletoArray(dt);
+                DataTable dt = core.db.executeQuery("select fieldid,helpdefault,helpcustom from ccfieldhelp where fieldid in (" + IDList + ") order by fieldid,id");
+                string[,] TempVar = core.db.convertDataTabletoArray(dt);
+                bool AllowHelpMsgCustom = false;
+                int HelpCnt = 0;
+                int[] HelpIDCache = { };
+                string[] helpDefaultCache = { };
+                string[] HelpCustomCache = { };
+                KeyPtrController helpIdIndex = new KeyPtrController();
                 if (TempVar.GetLength(0) > 0) {
                     HelpCnt = TempVar.GetUpperBound(1) + 1;
                     HelpIDCache = new int[HelpCnt + 1];
                     helpDefaultCache = new string[HelpCnt + 1];
                     HelpCustomCache = new string[HelpCnt + 1];
-                    fieldId = -1;
+                    int fieldId = -1;
+                    int HelpPtr = 0;
                     for (HelpPtr = 0; HelpPtr < HelpCnt; HelpPtr++) {
                         fieldId = GenericController.encodeInteger(TempVar[0, HelpPtr]);
+                        int LastFieldID = 0;
                         if (fieldId != LastFieldID) {
                             LastFieldID = fieldId;
                             HelpIDCache[HelpPtr] = fieldId;
@@ -1599,37 +1531,40 @@ namespace Contensive.Addons.AdminSite {
                     AllowHelpMsgCustom = true;
                 }
                 //
-                FormFieldList = ",";
+                string FormFieldList = ",";
+                List<string> TabsFound = new List<string>();
                 foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
                     ContentFieldMetadataModel field = keyValuePair.Value;
                     if ((field.authorable) && (field.active) && (!TabsFound.Contains(field.editTabName.ToLowerInvariant()))) {
                         TabsFound.Add(field.editTabName.ToLowerInvariant());
-                        fieldNameLc = field.nameLc;
-                        editTabCaption = field.editTabName;
-                        if (string.IsNullOrEmpty(editTabCaption)) {
-                            editTabCaption = "Details";
+                        //string fieldNameLc = field.nameLc;
+                        string editTabCaption = field.editTabName;
+                        if (string.IsNullOrEmpty(editTabCaption)) { editTabCaption = "Details"; }
+                        string NewFormFieldList = "";
+                        string tabContent = getTab(core, adminData, adminData.editRecord.id, adminData.adminContent.id, readOnlyField, IsLandingPage, IsRootPage, field.editTabName, EditorContext, ref NewFormFieldList, TemplateIDForStyles, HelpCnt, HelpIDCache, helpDefaultCache, HelpCustomCache, AllowHelpMsgCustom, helpIdIndex, fieldTypeDefaultEditors, fieldEditorPreferenceList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON);
+                        if (!string.IsNullOrEmpty(tabContent)) {
+                            returnHtml += addTab(core, adminMenu, editTabCaption, tabContent, adminData.allowAdminTabs);
                         }
-                        NewFormFieldList = "";
-                        if ((!adminData.allowAdminTabs) || (!allowAjaxTabs) || (editTabCaption.ToLowerInvariant() == "details")) {
-                            //
-                            // Live Tab (non-tab mode, non-ajax mode, or details tab
-                            //
-                            tabContent = getTab(core,adminData, editRecord.id, adminData.adminContent.id, readOnlyField, IsLandingPage, IsRootPage, field.editTabName, EditorContext, ref NewFormFieldList, TemplateIDForStyles, HelpCnt, HelpIDCache, helpDefaultCache, HelpCustomCache, AllowHelpMsgCustom, helpIdIndex, fieldTypeDefaultEditors, fieldEditorPreferenceList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON);
-                            if (!string.IsNullOrEmpty(tabContent)) {
-                                returnHtml += addTab2(core, adminMenu, editTabCaption, tabContent, adminData.allowAdminTabs, "");
-                            }
-                        } else {
-                            //
-                            // Ajax Tab
-                            //
-                            //AjaxLink = "/admin/index.asp?"
-                            AjaxLink = "/" + core.appConfig.adminRoute + "?"
-                            + RequestNameAjaxFunction + "=" + AjaxGetFormEditTabContent + "&ID=" + editRecord.id + "&CID=" + adminData.adminContent.id + "&ReadOnly=" + readOnlyField + "&IsLandingPage=" + IsLandingPage + "&IsRootPage=" + IsRootPage + "&EditTab=" + GenericController.encodeRequestVariable(field.editTabName) + "&EditorContext=" + EditorContext + "&NewFormFieldList=" + GenericController.encodeRequestVariable(NewFormFieldList);
-                            returnHtml += addTab2(core, adminMenu, editTabCaption, "", true, AjaxLink);
-                        }
-                        if (!string.IsNullOrEmpty(NewFormFieldList)) {
-                            FormFieldList = NewFormFieldList + FormFieldList;
-                        }
+                        //if ((!adminData.allowAdminTabs) || (!allowAjaxTabs) || (editTabCaption.ToLowerInvariant() == "details")) {
+                        //    //
+                        //    //
+                        //    //
+                        //    // Live Tab (non-tab mode, non-ajax mode, or details tab
+                        //    //
+                        //    string tabContent = getTab(core, adminData, adminData.editRecord.id, adminData.adminContent.id, readOnlyField, IsLandingPage, IsRootPage, field.editTabName, EditorContext, ref NewFormFieldList, TemplateIDForStyles, HelpCnt, HelpIDCache, helpDefaultCache, HelpCustomCache, AllowHelpMsgCustom, helpIdIndex, fieldTypeDefaultEditors, fieldEditorPreferenceList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON);
+                        //    if (!string.IsNullOrEmpty(tabContent)) {
+                        //        returnHtml += addTab2(core, adminMenu, editTabCaption, tabContent, adminData.allowAdminTabs, "");
+                        //    }
+                        //} else {
+                        //    //
+                        //    // Ajax Tab
+                        //    //
+                        //    //AjaxLink = "/admin/index.asp?"
+                        //    string AjaxLink = "/" + core.appConfig.adminRoute + "?"
+                        //    + RequestNameAjaxFunction + "=" + AjaxGetFormEditTabContent + "&ID=" + adminData.editRecord.id + "&CID=" + adminData.adminContent.id + "&ReadOnly=" + readOnlyField + "&IsLandingPage=" + IsLandingPage + "&IsRootPage=" + IsRootPage + "&EditTab=" + GenericController.encodeRequestVariable(field.editTabName) + "&EditorContext=" + EditorContext + "&NewFormFieldList=" + GenericController.encodeRequestVariable(NewFormFieldList);
+                        //    returnHtml += addTab2(core, adminMenu, editTabCaption, "", true, AjaxLink);
+                        //}
+                        if (!string.IsNullOrEmpty(NewFormFieldList)) { FormFieldList = NewFormFieldList + FormFieldList; }
                     }
                 }
                 //
@@ -1657,79 +1592,14 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="AllowAdminTabs"></param>
         /// <returns></returns>
         public static string addTab(CoreController core, TabController adminMenu, string Caption, string Content, bool AllowAdminTabs) {
-            string tempGetForm_Edit_AddTab = null;
             try {
-                //
-                if (!string.IsNullOrEmpty(Content)) {
-                    if (!AllowAdminTabs) {
-                        tempGetForm_Edit_AddTab = Content;
-                    } else {
-                        adminMenu.addEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
-                        //Call core.htmldoc.main_AddLiveTabEntry(Replace(Caption, " ", "&nbsp;"), Content, "ccAdminTab")
-                    }
-                }
+                if (string.IsNullOrEmpty(Content)) { return string.Empty; }
+                if (!AllowAdminTabs) { return Content; }
+                adminMenu.addEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }
-            return tempGetForm_Edit_AddTab;
-        }
-        //
-        // ====================================================================================================
-        //   Creates Tabbed content that is either Live (all content on page) or Ajax (click and ajax in the content)
-        //
-        public static string addTab2(CoreController core, TabController adminMenu, string Caption, string Content, bool AllowAdminTabs, string AjaxLink) {
-            string tempGetForm_Edit_AddTab2 = null;
-            try {
-                //
-                if (!AllowAdminTabs) {
-                    //
-                    // non-tab mode
-                    //
-                    tempGetForm_Edit_AddTab2 = Content;
-                } else if (!string.IsNullOrEmpty(AjaxLink)) {
-                    //
-                    // Ajax Tab
-                    //
-                    adminMenu.addEntry(Caption.Replace(" ", "&nbsp;"), "", AjaxLink, "", false, "ccAdminTab");
-                } else {
-                    //
-                    // Live Tab
-                    //
-                    adminMenu.addEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
-                }
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-            }
-            return tempGetForm_Edit_AddTab2;
-        }
-        //
-        // ====================================================================================================
-        //
-        public static string getTitle(CoreController core, AdminDataModel adminData) {
-            return "";
-            // this info moved to description block
-            //string tempGetForm_EditTitle = "";
-            //try {
-            //    //
-            //    if (editRecord.id == 0) {
-            //        tempGetForm_EditTitle = "Add an entry to " + editRecord.contentControlId_Name + TitleExtension;
-            //    } else {
-            //        tempGetForm_EditTitle = "Editing Record " + editRecord.id + " in " + editRecord.contentControlId_Name + " " + TitleExtension;
-            //    }
-            //} catch (Exception ex) {
-            //    logController.handleError(core, ex);
-            //}
-            //return tempGetForm_EditTitle;
-        }
-        //
-        // ====================================================================================================
-        //
-        public static string getTitleBar(CoreController core, AdminDataModel adminData) {
-            // todo
-            AdminUIController.EditRecordClass editRecord = adminData.editRecord;
-            //
-            //adminUIController Adminui = new adminUIController(core);
-            return AdminUIController.getTitleBar(core, getTitle(core,adminData), "");
+            return string.Empty;
         }
         //
         //========================================================================
