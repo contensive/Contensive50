@@ -146,6 +146,11 @@ namespace Contensive.CLI {
                         } while (string.IsNullOrEmpty(reply));
                     }
                     //
+                    // -- tasks and logging
+                    cp.core.serverConfig.allowTaskRunnerService = true;
+                    cp.core.serverConfig.allowTaskSchedulerService = true;
+                    cp.core.serverConfig.enableLogging = true;
+                    //
                     // -- save the configuration
                     cp.core.serverConfig.save(cp.core);
                 }
