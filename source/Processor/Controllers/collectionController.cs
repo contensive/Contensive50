@@ -992,32 +992,6 @@ namespace Contensive.Processor.Controllers {
                                                                     LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1. The collection to be imported is [" + ChildCollectionName + "], GUID [" + ChildCollectionGUID + "]");
                                                                 } else {
                                                                     installCollectionFromRegistry(core, ChildCollectionGUID, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref blockCollectionList);
-                                                                    //if (true) {
-                                                                    //    installCollectionFromRemoteRepo(core, ChildCollectionGUID, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, ref nonCriticalErrorList);
-                                                                    //} else {
-                                                                    //    if (string.IsNullOrEmpty(ChildCollectionGUID)) {
-                                                                    //        logController.appendInstallLog(core, "The importcollection node [" + ChildCollectionName + "] can not be upgraded because it does not include a valid guid.");
-                                                                    //    } else {
-                                                                    //        //
-                                                                    //        // This import occurred while upgrading an application from the local collections (Db upgrade or AddonManager)
-                                                                    //        // Its OK to install it if it is missing, but you do not need to upgrade the local collections from the Library
-                                                                    //        //
-                                                                    //        // 5/18/2008 -----------------------------------
-                                                                    //        // See if it is in the local collections storage. If yes, just upgrade this app with it. If not,
-                                                                    //        // it must be downloaded and the entire server must be upgraded
-                                                                    //        //
-                                                                    //        string ChildCollectionVersionFolderName = "";
-                                                                    //        DateTime ChildCollectionLastChangeDate = default(DateTime);
-                                                                    //        string tempVar2 = "";
-                                                                    //        GetCollectionConfig(core, ChildCollectionGUID, ref ChildCollectionVersionFolderName, ref ChildCollectionLastChangeDate, ref tempVar2);
-                                                                    //        if (!string.IsNullOrEmpty(ChildCollectionVersionFolderName)) {
-                                                                    //            //
-                                                                    //            // It is installed in the local collections, update just this site
-                                                                    //            //
-                                                                    //            result &= installCollectionFromLocalRepo(core, ChildCollectionGUID, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, ImportFromCollectionsGuidList + "," + CollectionGuid, IsNewBuild, ref nonCriticalErrorList);
-                                                                    //        }
-                                                                    //    }
-                                                                    //}
                                                                 }
                                                                 break;
                                                             }
