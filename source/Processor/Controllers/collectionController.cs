@@ -236,39 +236,21 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     //
-                    // Install it if it is not already here
+                    // Download all files for this collection and build the collection folder(s)
+                    string privateFilesDownloadPath = core.addon.getPrivateFilesAddonPath() + "temp_" + GenericController.GetRandomInteger(core) + "\\";
+                    core.privateFiles.createPath(privateFilesDownloadPath);
                     //
-                    string CollectionVersionFolderName = GetAddonCollectionFolderPath(core, collectionGuid);
-                    if (string.IsNullOrEmpty(CollectionVersionFolderName)) {
-                        //
-                        // Download all files for this collection and build the collection folder(s)
-                        //
-                        string privateFilesDownloadPath = core.addon.getPrivateFilesAddonPath() + "temp_" + GenericController.GetRandomInteger(core) + "\\";
-                        core.privateFiles.createPath(privateFilesDownloadPath);
-                        //
-                        DateTime CollectionLastChangeDate = default(DateTime);
-                        UpgradeOK = downloadCollectionFromRegistry(core, privateFilesDownloadPath, collectionGuid, ref CollectionLastChangeDate, ref return_ErrorMessage);
-                        if (!UpgradeOK) {
-                            //UpgradeOK = UpgradeOK;
-                        } else {
-                            List<string> collectionGuidList = new List<string>();
-                            UpgradeOK = buildAddonCollectionFoldersFromAddonCollectionZipFiles(core, privateFilesDownloadPath, CollectionLastChangeDate, ref collectionGuidList, ref return_ErrorMessage);
-                            if (!UpgradeOK) {
-                                //UpgradeOK = UpgradeOK;
-                            }
-                        }
-                        //
-                        core.privateFiles.deleteFolder(privateFilesDownloadPath);
-                    }
-                    //
-                    // Upgrade the server from the collection files
-                    //
-                    if (UpgradeOK) {
-                        UpgradeOK = installCollectionFromAddonCollectionFolder(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref blockCollectionList,true);
-                        if (!UpgradeOK) {
-                            //UpgradeOK = UpgradeOK;
+                    DateTime CollectionLastChangeDate = default(DateTime);
+                    if (downloadCollectionFromRegistry(core, privateFilesDownloadPath, collectionGuid, ref CollectionLastChangeDate, ref return_ErrorMessage)) {
+                        List<string> collectionGuidList = new List<string>();
+                        if (buildAddonCollectionFoldersFromAddonCollectionZipFiles(core, privateFilesDownloadPath, CollectionLastChangeDate, ref collectionGuidList, ref return_ErrorMessage)) {
+                            //
+                            // Upgrade the server from the collection files
+                            installCollectionFromAddonCollectionFolder(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref blockCollectionList, true);
                         }
                     }
+                    //
+                    core.privateFiles.deleteFolder(privateFilesDownloadPath);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -669,48 +651,6 @@ namespace Contensive.Processor.Controllers {
                                                 bool Found = false;
                                                 switch (GenericController.vbLCase(metaDataSection.Name)) {
                                                     case "resource":
-                                                        //
-                                                        // resource node, if executable node, save to RegisterList
-                                                        //
-                                                        //hint = hint & ",510"
-                                                        //ResourceType = genericController.vbLCase(xmlController.GetXMLAttribute(core, IsFound, metadataSection, "type", ""))
-                                                        //Dim resourceFilename As String = Trim(xmlController.GetXMLAttribute(core, IsFound, metadataSection, "name", ""))
-                                                        //Dim resourcePathFilename As String = CollectionVersionPath & resourceFilename
-                                                        //If resourceFilename = "" Then
-                                                        //    '
-                                                        //    ' filename is blank
-                                                        //    '
-                                                        //    'hint = hint & ",511"
-                                                        //ElseIf Not core.privateFiles.fileExists(resourcePathFilename) Then
-                                                        //    '
-                                                        //    ' resource is not here
-                                                        //    '
-                                                        //    'hint = hint & ",513"
-                                                        //    result = False
-                                                        //    return_ErrorMessage = "<p>There was a problem with the Collection File. The resource referenced in the collection file [" & resourceFilename & "] was not included in the resource files.</p>"
-                                                        //    Call logController.appendInstallLog(core, "BuildLocalCollectionFolder, The resource referenced in the collection file [" & resourceFilename & "] was not included in the resource files.")
-                                                        //    'StatusOK = False
-                                                        //Else
-                                                        //    Select Case ResourceType
-                                                        //        Case "executable"
-                                                        //            '
-                                                        //            ' Executable resources - add to register list
-                                                        //            '
-                                                        //            'hint = hint & ",520"
-                                                        //            If False Then
-                                                        //                '
-                                                        //                ' file is already installed
-                                                        //                '
-                                                        //                'hint = hint & ",521"
-                                                        //            Else
-                                                        //                '
-                                                        //                ' Add the file to be registered
-                                                        //                '
-                                                        //            End If
-                                                        //        Case "www"
-                                                        //        Case "file"
-                                                        //    End Select
-                                                        //End If
                                                         break;
                                                     case "getcollection":
                                                     case "importcollection":
