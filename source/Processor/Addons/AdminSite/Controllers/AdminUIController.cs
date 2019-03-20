@@ -1018,7 +1018,10 @@ namespace Contensive.Addons.AdminSite.Controllers {
             string result = "";
             if (readONly) {
                 result += HtmlController.inputHidden(fieldName, fieldValue);
-            } else if (string.IsNullOrEmpty(fieldValue)) {
+                result += getDefaultEditor_TextArea(core, fieldName, fieldValue, readONly, htmlId);
+                return result;
+            }
+            if (string.IsNullOrEmpty(fieldValue)) {
                 //
                 // editor needs a starting p tag to setup correctly
                 fieldValue = HTMLEditorDefaultCopyNoCr;
@@ -1071,9 +1074,9 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     csData.openRecord(lookupContentMetacontent.name, fieldValue, "Name,ContentControlID");
                     if (csData.ok()) {
                         if (csData.getText("Name") == "") {
-                            result += ("No Name");
+                            result += getDefaultEditor_Text(core, fieldName + "-readonly-fpo", "No Name", readOnly, htmlId);
                         } else {
-                            result += getDefaultEditor_Text(core, fieldName, csData.getText("Name"), readOnly, htmlId);
+                            result += getDefaultEditor_Text(core, fieldName + "-readonly-fpo", csData.getText("Name"), readOnly, htmlId);
                         }
                         result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentId + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                     } else {
@@ -1121,11 +1124,11 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 // ----- Lookup ReadOnly
                 result += (HtmlController.inputHidden(htmlName, defaultLookupIndexBaseOne.ToString()));
                 if (defaultLookupIndexBaseOne < 1) {
-                    result += "None";
+                    result += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
                 } else if (defaultLookupIndexBaseOne > (lookupArray.GetUpperBound(0) + 1)) {
-                    result += "None";
+                    result += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
                 } else {
-                    result += getDefaultEditor_Text(core, htmlName, lookupArray[defaultLookupIndexBaseOne - 1], readOnly, htmlId);
+                    result += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", lookupArray[defaultLookupIndexBaseOne - 1], readOnly, htmlId);
                 }
                 result += WhyReadOnlyMsg;
             } else {
@@ -1146,9 +1149,9 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 result += (HtmlController.inputHidden(htmlName, GenericController.encodeText(defaultValue)));
                 NameValueClass nameValue = lookupList.Find(x => x.name.ToLowerInvariant() == htmlName.ToLowerInvariant());
                 if (nameValue == null) {
-                    result += "none";
+                    result += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
                 } else {
-                    result += nameValue.value;
+                    result += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", nameValue.value, readOnly, htmlId);
                 }
                 result += WhyReadOnlyMsg;
             } else {
@@ -1216,9 +1219,9 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 } else {
                     var selectedUser = PersonModel.create(core, selectedRecordId);
                     if ( selectedUser==null) {
-                        EditorString += "Deleted";
+                        EditorString += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", "(deleted)", readOnly, htmlId);
                     } else {
-                        EditorString += (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : HtmlController.encodeHtml(selectedUser.name);
+                        EditorString += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : HtmlController.encodeHtml(selectedUser.name), readOnly, htmlId);
                         EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                     }
                 }

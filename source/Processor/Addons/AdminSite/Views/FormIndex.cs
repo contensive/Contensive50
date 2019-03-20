@@ -490,13 +490,9 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="ContentAccessLimitMessage"></param>
         /// <returns></returns>
         public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, ContentMetadataModel content, int recordCnt, string ContentAccessLimitMessage) {
-            //
-            // ----- TitleBar
-            //
-            string Title = "";
             string filterLine = "";
             if (IndexConfig.activeOnly) {
-                filterLine = filterLine + ", active records";
+                filterLine += ", active records";
             }
             string filterLastEdited = "";
             if (IndexConfig.lastEditedByMe) {
@@ -512,7 +508,7 @@ namespace Contensive.Addons.AdminSite {
                 filterLastEdited = filterLastEdited + " today";
             }
             if (!string.IsNullOrEmpty(filterLastEdited)) {
-                filterLine = filterLine + ", last edited" + filterLastEdited;
+                filterLine += ", last edited" + filterLastEdited;
             }
             foreach (var kvp in IndexConfig.findWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
@@ -521,28 +517,28 @@ namespace Contensive.Addons.AdminSite {
                     string FieldCaption = fieldMeta.caption;
                     switch (findWord.MatchOption) {
                         case FindWordMatchEnum.MatchEmpty:
-                            filterLine = filterLine + ", " + FieldCaption + " is empty";
+                            filterLine += ", " + FieldCaption + " is empty";
                             break;
                         case FindWordMatchEnum.MatchEquals:
-                            filterLine = filterLine + ", " + FieldCaption + " = '" + findWord.Value + "'";
+                            filterLine += ", " + FieldCaption + " = '" + findWord.Value + "'";
                             break;
                         case FindWordMatchEnum.MatchFalse:
-                            filterLine = filterLine + ", " + FieldCaption + " is false";
+                            filterLine += ", " + FieldCaption + " is false";
                             break;
                         case FindWordMatchEnum.MatchGreaterThan:
-                            filterLine = filterLine + ", " + FieldCaption + " &gt; '" + findWord.Value + "'";
+                            filterLine += ", " + FieldCaption + " &gt; '" + findWord.Value + "'";
                             break;
                         case FindWordMatchEnum.matchincludes:
-                            filterLine = filterLine + ", " + FieldCaption + " includes '" + findWord.Value + "'";
+                            filterLine += ", " + FieldCaption + " includes '" + findWord.Value + "'";
                             break;
                         case FindWordMatchEnum.MatchLessThan:
-                            filterLine = filterLine + ", " + FieldCaption + " &lt; '" + findWord.Value + "'";
+                            filterLine += ", " + FieldCaption + " &lt; '" + findWord.Value + "'";
                             break;
                         case FindWordMatchEnum.MatchNotEmpty:
-                            filterLine = filterLine + ", " + FieldCaption + " is not empty";
+                            filterLine += ", " + FieldCaption + " is not empty";
                             break;
                         case FindWordMatchEnum.MatchTrue:
-                            filterLine = filterLine + ", " + FieldCaption + " is true";
+                            filterLine += ", " + FieldCaption + " is true";
                             break;
                     }
 
@@ -551,7 +547,7 @@ namespace Contensive.Addons.AdminSite {
             if (IndexConfig.subCDefID > 0) {
                 string ContentName = MetadataController.getContentNameByID(core, IndexConfig.subCDefID);
                 if (!string.IsNullOrEmpty(ContentName)) {
-                    filterLine = filterLine + ", in Sub-content '" + ContentName + "'";
+                    filterLine += ", in Sub-content '" + ContentName + "'";
                 }
             }
             //
@@ -567,16 +563,16 @@ namespace Contensive.Addons.AdminSite {
                 if (!string.IsNullOrEmpty(GroupList)) {
                     string[] Groups = GroupList.Split('\t');
                     if (Groups.GetUpperBound(0) == 0) {
-                        filterLine = filterLine + ", in group '" + Groups[0] + "'";
+                        filterLine += ", in group '" + Groups[0] + "'";
                     } else if (Groups.GetUpperBound(0) == 1) {
-                        filterLine = filterLine + ", in groups '" + Groups[0] + "' and '" + Groups[1] + "'";
+                        filterLine += ", in groups '" + Groups[0] + "' and '" + Groups[1] + "'";
                     } else {
                         int Ptr;
                         string filterGroups = "";
                         for (Ptr = 0; Ptr < Groups.GetUpperBound(0); Ptr++) {
                             filterGroups += ", '" + Groups[Ptr] + "'";
                         }
-                        filterLine = filterLine + ", in groups" + filterGroups.Substring(1) + " and '" + Groups[Ptr] + "'";
+                        filterLine += ", in groups" + filterGroups.Substring(1) + " and '" + Groups[Ptr] + "'";
                     }
 
                 }
@@ -595,7 +591,10 @@ namespace Contensive.Addons.AdminSite {
                 }
             }
             string pageNavigation = getForm_index_pageNavigation(core, IndexConfig.pageNumber, IndexConfig.recordsPerPage, recordCnt, content.name);
-            Title = HtmlController.div("<strong>" + content.name + "</strong><div style=\"float:right;\">" + pageNavigation + "</div>");
+            //
+            // ----- TitleBar
+            //
+            string Title = HtmlController.div("<strong>" + content.name + "</strong><div style=\"float:right;\">" + pageNavigation + "</div>");
             int TitleRows = 0;
             if (!string.IsNullOrEmpty(filterLine)) {
                 string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexFilterRemoveAll=1";
