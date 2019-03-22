@@ -1243,21 +1243,21 @@
   <Addon name="Child Page List" guid="{D291F133-AB50-4640-9A9A-18DB68FF363B}" type="Add-on">
     <DotNetClass><![CDATA[Contensive.Addons.PageManager.getChildPageList]]></DotNetClass>    
     <ArgumentList><![CDATA[List Name]]></ArgumentList>
-		<IncludeAddon name="JQuery UI" guid="{840B9AEF-9470-4599-BD47-7EC0C9298614}"/>
-		<Content>Yes</Content>
+	<IncludeAddon name="JQuery UI" guid="{840B9AEF-9470-4599-BD47-7EC0C9298614}"/>
+	<Content>Yes</Content>
 	</Addon>
 	<Addon name="Login Page" guid="{288a7ee1-9d93-4058-bcd9-c9cd29d25ec8}" type="Add-on">
 		<DotNetClass><![CDATA[Contensive.Addons.Login.getLoginPageClass]]></DotNetClass>
-    <BlockEditTools>Yes</BlockEditTools>
-    <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
+		<BlockEditTools>Yes</BlockEditTools>
+		<IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
 	</Addon>
 	<Addon name="Page Manager" guid="{3a01572e-0f08-4feb-b189-18371752a3c3}" type="Add-on">
 		<DotNetClass><![CDATA[Contensive.Addons.PageManager.getHtmlBodyClass]]></DotNetClass>
-    <styleslinkhref>/contensiveBase/pageManager.css</styleslinkhref>
-    <BlockEditTools>Yes</BlockEditTools>
-    <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
-    <htmlDocument>Yes</htmlDocument>
-  </Addon>
+		<styleslinkhref>/contensiveBase/pageManager.css</styleslinkhref>
+		<BlockEditTools>Yes</BlockEditTools>
+		<IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
+		<htmlDocument>Yes</htmlDocument>
+	</Addon>
 	<Addon name="savePageManagerChildListSort" guid="{8429641A-03C9-4CD1-9369-5B9F2FA509E9}" type="Add-on">
 		<DotNetClass><![CDATA[Contensive.Addons.PageManager.saveChildPageListDraggableClass]]></DotNetClass>
 		<BlockEditTools>Yes</BlockEditTools>
@@ -1618,8 +1618,6 @@
 	<ImportCollection name="File Manager">{0A080FBC-2814-407F-8F8C-CD06F422789D}</ImportCollection>
 	<ImportCollection name="Admin Navigator">{0AB76B52-2C9E-4339-B4DB-902AF42B57EB}</ImportCollection>
 	<ImportCollection name="Import Wizard">{339B9171-5B57-4F42-914C-DCEF4F52F388}</ImportCollection>
-	<ImportCollection name="Logout Link">{1D8AC775-0C19-4310-B375-A2561B7BED12}</ImportCollection>
-	<ImportCollection name="Login">{030DBBCD-8817-4889-8F50-E5DAE4CA7DD1}</ImportCollection>
 	<ImportCollection name="Whats Related">{9E0D6124-0C6B-45A9-A310-2D434A4AA7D6}</ImportCollection>
 	<ImportCollection name="Content Box">{6A681E1F-ABCC-4E28-AAB4-79264DA18B91}</ImportCollection>
   <ImportCollection name="Redactor Html Editor">{E87AFAFF-2503-44DE-A343-EFF8C64B652D}</ImportCollection>
