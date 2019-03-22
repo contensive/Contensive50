@@ -133,11 +133,16 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static List<LinkAliasModel> createList(CoreController core, int pageId, string queryStringSuffix) {
-            if (string.IsNullOrEmpty(queryStringSuffix)) {
-                return createList<LinkAliasModel>(core, "(pageId=" + pageId + ")", "id desc");
+            if ( string.IsNullOrEmpty(queryStringSuffix)) {
+                return createList<LinkAliasModel>(core, "(pageId=" + pageId + ")and((QueryStringSuffix='')or(QueryStringSuffix is null))", "id desc");
             } else {
                 return createList<LinkAliasModel>(core, "(pageId=" + pageId + ")and(QueryStringSuffix=" + DbController.encodeSQLText(queryStringSuffix) + ")", "id desc");
             }
+        }
+        //
+        //====================================================================================================
+        public static List<LinkAliasModel> createList(CoreController core, int pageId) {
+            return createList<LinkAliasModel>(core, "(pageId=" + pageId + ")and((QueryStringSuffix='')or(QueryStringSuffix is null)", "id desc");
         }
         //
         //====================================================================================================

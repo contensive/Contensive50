@@ -22,10 +22,6 @@ namespace Contensive.CLI {
                     Console.WriteLine("The application [" + appName + "] was not found in this server group.");
                     return;
                 }
-                if (cpServer.core.serverConfig.isLocalFileSystem) {
-                    Console.WriteLine("This server is in localmode. Uploading is only valid if NOT in localmode.");
-                    return;
-                }
                 //
                 // -- determine guid of collection
                 var collectionList = new List<CollectionController.CollectionStoreClass>();

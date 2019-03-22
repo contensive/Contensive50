@@ -214,12 +214,12 @@ namespace Contensive.CLI {
                                     break;
                                 case "--repair":
                                 case "-r":
-                                    upgrade(cpServer, appName, true);
+                                    upgradeClass.upgrade(cpServer, appName, true);
                                     exitArgumentProcessing = true;
                                     break;
                                 case "--upgrade":
                                 case "-u":
-                                    upgrade(cpServer, appName, false);
+                                    upgradeClass.upgrade(cpServer, appName, false);
                                     exitArgumentProcessing = true;
                                     break;
                                 case "--taskscheduler":
@@ -512,32 +512,6 @@ namespace Contensive.CLI {
             + "\r\n--fixtablefoldercase"
             + "\r\n    For local file sites only. Rename all table folders (ccTablename/fieldName) and the filenames saved in the table fields to reflect lowecase table and fields names."
             + "";
-        //
-        // ====================================================================================================
-        /// <summary>
-        /// Upgrade a single or all apps, optionally forcing full install to include up-to-date collections (to fix broken collection addons)
-        /// </summary>
-        /// <param name="appName"></param>
-        /// <param name="repair"></param>
-        private static void upgrade(Contensive.Processor.CPClass cp, string appName, bool repair) {
-            if (!string.IsNullOrEmpty(appName)) {
-                //
-                // -- upgrade app
-                using (CPClass upgradeApp = new Contensive.Processor.CPClass(appName)) {
-                    AppBuilderController.upgrade(upgradeApp.core, false, repair);
-                    upgradeApp.Cache.InvalidateAll();
-                }
-            } else {
-                //
-                // -- upgrade all apps
-                foreach (KeyValuePair<String, AppConfigModel> kvp in cp.core.serverConfig.apps) {
-                    using (CPClass upgradeApp = new Contensive.Processor.CPClass(kvp.Key)) {
-                        AppBuilderController.upgrade(upgradeApp.core, false, repair);
-                        upgradeApp.Cache.InvalidateAll();
-                    }
-                }
-            }
-        }
     }
 
 }

@@ -190,6 +190,7 @@
     </Compile>
     <Compile Include="Views\configureClass.cs" />
     <Compile Include="Views\FixTableFolderCaseClass.cs" />
+    <Compile Include="Views\upgradeClass.cs" />
     <Compile Include="Views\_blankClass.cs" />
     <Compile Include="Views\installAddonClass.cs" />
     <Compile Include="Views\uploadFilesClass.cs" />

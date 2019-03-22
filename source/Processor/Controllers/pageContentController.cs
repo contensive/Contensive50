@@ -1974,12 +1974,24 @@ namespace Contensive.Processor.Controllers {
                     core.html.addHeadTag(core.doc.pageController.page.otherHeadTags, "page content");
                     core.html.addMetaKeywordList(core.doc.pageController.page.metaKeywordList, "page content");
                     //
-                    Dictionary<string, string> instanceArguments = new Dictionary<string, string> {
-                        { "CSPage", "-1" }
-                    };
+                    //---------------------------------------------------------------------------------
+                    // add open graph properties
+                    //---------------------------------------------------------------------------------
                     //
-                    // -- OnPageStartEvent
+                    string siteName = core.siteProperties.getText("facebook site_name");
+                    if ( string.IsNullOrEmpty( siteName )) { siteName = core.appConfig.name; }
+                    core.docProperties.setProperty("Open Graph Content Type", "website");
+                    core.docProperties.setProperty("Open Graph URL", getPageLink(core, core.doc.pageController.page.id,""));
+                    core.docProperties.setProperty("Open Graph Title", HtmlController.encodeHtml(core.doc.pageController.page.pageTitle));
+                    core.docProperties.setProperty("Open Graph Description", HtmlController.encodeHtml(core.doc.pageController.page.metaDescription));
+                    core.docProperties.setProperty("Open Graph Site Name", core.appConfig.name);
+                    //
+                    //---------------------------------------------------------------------------------
+                    // OnPageStartEvent
+                    //---------------------------------------------------------------------------------
+                    //
                     core.doc.bodyContent = returnHtml;
+                    Dictionary<string, string> instanceArguments = new Dictionary<string, string> { { "CSPage", "-1" } };
                     foreach (var addon in core.addonCache.getOnPageStartAddonList()) {
                         CPUtilsBaseClass.addonExecuteContext pageStartContext = new CPUtilsBaseClass.addonExecuteContext() {
                             instanceGuid = "-1",
@@ -1991,7 +2003,10 @@ namespace Contensive.Processor.Controllers {
                     }
                     returnHtml = core.doc.bodyContent;
                     //
-                    // -- OnPageEndEvent / filter
+                    //---------------------------------------------------------------------------------
+                    // OnPageEndEvent / filter
+                    //---------------------------------------------------------------------------------
+                    //
                     core.doc.bodyContent = returnHtml;
                     foreach (AddonModel addon in core.addonCache.getOnPageEndAddonList()) {
                         CPUtilsBaseClass.addonExecuteContext pageEndContext = new CPUtilsBaseClass.addonExecuteContext() {

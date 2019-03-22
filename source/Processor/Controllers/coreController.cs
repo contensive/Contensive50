@@ -857,9 +857,9 @@ namespace Contensive.Processor.Controllers {
                                             string[] keyValue = nv.Split('=');
                                             if (!string.IsNullOrEmpty(keyValue[0])) {
                                                 if (keyValue.Length > 1) {
-                                                    siteProperties.setProperty(keyValue[0], keyValue[1]);
+                                                    docProperties.setProperty(keyValue[0], keyValue[1]);
                                                 } else {
-                                                    siteProperties.setProperty(keyValue[0], string.Empty);
+                                                    docProperties.setProperty(keyValue[0], string.Empty);
                                                 }
                                             }
                                         }
