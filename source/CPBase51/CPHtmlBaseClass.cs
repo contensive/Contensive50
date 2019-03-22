@@ -9,18 +9,18 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// The type of content being edited with the html editor. Used to determine types of addons that can be included
         /// </summary>
-        public enum EditorContentType {
-            contentTypeWeb = 1,
-            contentTypeEmail = 2,
-            contentTypeWebTemplate = 3,
-            contentTypeEmailTemplate = 4
+        public enum EditorContentScope {
+            Page = 1,
+            Email = 2,
+            PageTemplate = 3,
+            EmailTemplate = 4
         }
         //
         // ====================================================================================================
         /// <summary>
         /// The role of the user
         /// </summary>
-        public enum EditorUserRole {
+        public enum EditorUserScope {
             Developer = 1,
             Administrator = 2,
             ContentManager = 3,
@@ -158,12 +158,12 @@ namespace Contensive.BaseClasses {
         public abstract string Indent(string sourceHtml, int tabCnt);
         public abstract string Indent(string sourceHtml);
         //
-        public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope, string height, string width, string htmlClass, string htmlId);
-        public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope, string height, string width, string htmlClass);
-        public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope, string height, string width);
-        public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope, string height);
-        public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope);
-        public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope);
+        public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserScope userScope, EditorContentScope contentScope, string height, string width, string htmlClass, string htmlId);
+        public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserScope userScope, EditorContentScope contentScope, string height, string width, string htmlClass);
+        public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserScope userScope, EditorContentScope contentScope, string height, string width);
+        public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserScope userScope, EditorContentScope contentScope, string height);
+        public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserScope userScope, EditorContentScope contentScope);
+        public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserScope userScope);
         //
         public abstract void AddEvent(string htmlId, string domEvent, string javaScript);
         //

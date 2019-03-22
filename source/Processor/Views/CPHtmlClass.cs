@@ -311,22 +311,22 @@ namespace Contensive.Processor {
             return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId);
         }
         //
-        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope, string height, string width, string htmlClass, string htmlId)
+        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserScope userScope, EditorContentScope contentScope, string height, string width, string htmlClass, string htmlId)
             => cp.core.html.getFormInputHTML(htmlName, htmlValue, height, width);
         //
-        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope, string height, string width, string htmlClass)
+        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserScope userScope, EditorContentScope contentScope, string height, string width, string htmlClass)
             => cp.core.html.getFormInputHTML(htmlName, htmlValue, height, width);
         //
-        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope, string height, string width)
+        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserScope userScope, EditorContentScope contentScope, string height, string width)
             => cp.core.html.getFormInputHTML(htmlName, htmlValue, height, width);
         //
-        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope, string height)
+        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserScope userScope, EditorContentScope contentScope, string height)
             => cp.core.html.getFormInputHTML(htmlName, htmlValue, height);
         //
-        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope)
+        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserScope userScope, EditorContentScope contentScope)
             => cp.core.html.getFormInputHTML(htmlName, htmlValue);
         //
-        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope)
+        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserScope userScope)
             => cp.core.html.getFormInputHTML(htmlName, htmlValue);
         //
         public override string InputTextExpandable(string htmlName, string htmlValue, int rows, string styleWidth, bool isPassword, string htmlClass, string htmlId) => HtmlController.inputTextarea(cp.core, htmlName, htmlValue, rows, -1, htmlId, false, false, htmlClass, false, -1);
