@@ -669,9 +669,9 @@ namespace Contensive.Addons.AdminSite {
                     // Can not load edit record because bad content definition
                     //
                     if (adminContent.id == 0) {
-                        throw (new Exception("The record can Not be edited because no content definition was specified."));
+                        throw (new Exception("The record can not be edited because no content definition was specified."));
                     } else {
-                        throw (new Exception("The record can Not be edited because a content definition For ID [" + adminContent.id + "] was not found."));
+                        throw (new Exception("The record can not be edited because a content definition For ID [" + adminContent.id + "] was not found."));
                     }
                 } else {
                     //
@@ -751,7 +751,7 @@ namespace Contensive.Addons.AdminSite {
                             if (editRecord.fieldsLc.ContainsKey("developer")) {
                                 if (GenericController.encodeBoolean(editRecord.fieldsLc["developer"].value)) {
                                     editRecord.userReadOnly = true;
-                                    Processor.Controllers.ErrorController.addUserError(core, "You Do Not have access rights To edit this record.");
+                                    Processor.Controllers.ErrorController.addUserError(core, "You do not have access rights To edit this record.");
                                     BlockEditForm = true;
                                 }
                             }
@@ -970,7 +970,7 @@ namespace Contensive.Addons.AdminSite {
                     // ----- Error: no content table
                     //
                     BlockEditForm = true;
-                    Processor.Controllers.ErrorController.addUserError(core, "The content definition [" + adminContent.name + "] Is Not associated With a valid database table. Please contact your application developer For more assistance.");
+                    Processor.Controllers.ErrorController.addUserError(core, "The content definition [" + adminContent.name + "] is not associated With a valid database table. Please contact your application developer For more assistance.");
                     LogController.handleError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, No content definition For ContentID [" + adminContent.id + "] could be found."));
                     //
                     // move block to the edit and listing pages - to handle content editor cases - so they can edit 'pages', and just get the records they are allowed
@@ -1204,8 +1204,8 @@ namespace Contensive.Addons.AdminSite {
                     // If there are any form fields that were no loaded, flag the error now
                     //
                     if (AllowAdminFieldCheck(core) && (FormFieldLcListToBeLoaded.Count > 0)) {
-                        Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where Not found [" + string.Join(",", FormFieldLcListToBeLoaded) + "].");
-                        throw (new GenericException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
+                        Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where not found [" + string.Join(",", FormFieldLcListToBeLoaded) + "].");
+                        throw (new GenericException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
                     } else {
                         //
                         // if page content, check for the 'pagenotfound','landingpageid' checkboxes in control tab
@@ -1230,7 +1230,7 @@ namespace Contensive.Addons.AdminSite {
                         //    //    //
                         //    //    // Do not reset the LandingPageID from here -- set another instead
                         //    //    //
-                        //    //    errorController.addUserError(core, "This page was marked As the Landing Page For the website, And the checkbox has been cleared. This Is Not allowed. To remove this page As the Landing Page, locate a New landing page And Select it, Or go To Settings &gt; Page Settings And Select a New Landing Page.");
+                        //    //    errorController.addUserError(core, "This page was marked As the Landing Page For the website, And the checkbox has been cleared. This Is not allowed. To remove this page As the Landing Page, locate a New landing page And Select it, Or go To Settings &gt; Page Settings And Select a New Landing Page.");
                         //    //}
                         //}
                     }
@@ -1283,9 +1283,9 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // Add user error only for the first missing field
                                         //
-                                        Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try again, taking care Not To submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" + field.nameLc + " Not found]. There may have been others.");
+                                        Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try again, taking care not to submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" + field.nameLc + " not found]. There may have been others.");
                                     }
-                                    throw (new GenericException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    throw (new GenericException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but not found In the response stream.")
                                 }
                             }
                             if (GenericController.encodeInteger(ResponseFieldValueText) != GenericController.encodeInteger(editRecord.fieldsLc[field.nameLc].value)) {
@@ -1299,7 +1299,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             //
                             if (AllowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
-                                Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" + field.nameLc + " Not found].");
+                                Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The rrror is [" + field.nameLc + " not found].");
                                 return;
                             }
                             //
@@ -1321,7 +1321,7 @@ namespace Contensive.Addons.AdminSite {
                             InResponse = core.docProperties.containsKey(field.nameLc);
                             if (AllowAdminFieldCheck(core)) {
                                 if ((!InResponse) && (!InEmptyFieldList)) {
-                                    Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" + field.nameLc + " Not found].");
+                                    Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" + field.nameLc + " not found].");
                                     return;
                                 }
                             }
@@ -1548,13 +1548,13 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // Reference to iteslf
                                         //
-                                        Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This record points back to itself. This Is Not allowed.");
+                                        Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This record points back to itself. This is not allowed.");
                                         ResponseFieldValueIsOKToSave = false;
                                     } else if (ParentID != 0) {
                                         //
                                         // Circular reference
                                         //
-                                        Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This field either points to other records which then point back to this record. This Is Not allowed.");
+                                        Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This field either points to other records which then point back to this record. This is not allowed.");
                                         ResponseFieldValueIsOKToSave = false;
                                     }
                                 }

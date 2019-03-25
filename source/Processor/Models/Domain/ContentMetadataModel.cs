@@ -857,7 +857,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (fieldMetadata.fieldTypeId <= 0) {
                     //
                     // invalid field type
-                    throw (new GenericException("Could Not create Field [" + fieldMetadata.nameLc + "] because the field type [" + fieldMetadata.fieldTypeId + "] Is Not valid."));
+                    throw (new GenericException("Could not create Field [" + fieldMetadata.nameLc + "] because the field type [" + fieldMetadata.fieldTypeId + "] is not valid."));
                 } else {
                     bool RecordIsBaseField = false;
                     var contentFieldList = ContentFieldModel.createList(core, "(ContentID=" + DbController.encodeSQLNumber(id) + ")and(name=" + DbController.encodeSQLText(fieldMetadata.nameLc) + ")");
@@ -999,7 +999,7 @@ namespace Contensive.Processor.Models.Domain {
                             }
                         }
                         if (fieldMetadata.id == 0) {
-                            throw (new GenericException("Could Not create Field [" + fieldMetadata.nameLc + "] because insert into ccfields failed."));
+                            throw (new GenericException("Could not create Field [" + fieldMetadata.nameLc + "] because insert into ccfields failed."));
                         } else {
                             db.updateTableRecord("ccFields", "ID=" + fieldMetadata.id, sqlList);
                             ContentFieldModel.invalidateRecordCache(core, fieldMetadata.id);
@@ -1342,7 +1342,7 @@ namespace Contensive.Processor.Models.Domain {
                         if (dt.Rows.Count == 0) { core.db.executeNonQuery("insert into cccontent default values"); }
                     }
                     using (DataTable dt = targetDb.executeQuery("select top 1 * from " + TableName)) {
-                        if (dt.Rows.Count == 0) { throw new GenericException("Could Not add a record To table [" + TableName + "]."); }
+                        if (dt.Rows.Count == 0) { throw new GenericException("Could not add a record To table [" + TableName + "]."); }
                         //
                         // -- Find/Create the Content Definition
                         contentMetadata.id = DbController.getContentId(core, ContentName);

@@ -1010,7 +1010,7 @@ namespace Contensive.Processor.Controllers {
                                 IsInLinkForwardTable = true;
                                 int Viewings = csData.getInteger("Viewings") + 1;
                                 Sql = "update ccLinkForwards set Viewings=" + Viewings + " where ID=" + csData.getInteger("ID");
-                                core.db.executeQuery(Sql);
+                                core.db.executeNonQueryAsync(Sql);
                                 tmpLink = csData.getText("DestinationLink");
                                 if (!string.IsNullOrEmpty(tmpLink)) {
                                     //

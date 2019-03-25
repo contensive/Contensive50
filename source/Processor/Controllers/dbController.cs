@@ -737,7 +737,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Invalid field type
                         //
-                        throw new GenericException("Can Not proceed because the field being created has an invalid FieldType [" + fieldType + "]");
+                        throw new GenericException("Can not proceed because the field being created has an invalid FieldType [" + fieldType + "]");
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

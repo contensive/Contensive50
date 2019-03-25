@@ -481,10 +481,10 @@ namespace Contensive.Processor.Controllers {
                     confirmationMessage += BR + "Primary Recipient:" + BR;
                     PersonModel person = PersonModel.create(core, additionalMemberID);
                     if (person == null) {
-                        confirmationMessage += "&nbsp;&nbsp;Error: Not sent additional user [#" + additionalMemberID + "] because the user record could not be found." + BR;
+                        confirmationMessage += "&nbsp;&nbsp;Error: Not sent to additional user [#" + additionalMemberID + "] because the user record could not be found." + BR;
                     } else {
                         if (string.IsNullOrWhiteSpace(person.email)) {
-                            confirmationMessage += "&nbsp;&nbsp;Error: Not sent additional user [#" + additionalMemberID + "] because their email address was blank." + BR;
+                            confirmationMessage += "&nbsp;&nbsp;Error: Not sent to additional user [#" + additionalMemberID + "] because their email address was blank." + BR;
                         } else {
                             string EmailStatus = "";
                             string queryStringForLinkAppend = "";
@@ -501,10 +501,10 @@ namespace Contensive.Processor.Controllers {
                 foreach (var personId in peopleIdList) {
                     var person = PersonModel.create(core, personId);
                     if (person == null) {
-                        confirmationMessage += "&nbsp;&nbsp;Error: Not sent user [#" + additionalMemberID + "] because the user record could not be found." + BR;
+                        confirmationMessage += "&nbsp;&nbsp;Error: Not sent to user [#" + additionalMemberID + "] because the user record could not be found." + BR;
                     } else {
                         if (string.IsNullOrWhiteSpace(person.email)) {
-                            confirmationMessage += "&nbsp;&nbsp;Error: Not sent user [#" + additionalMemberID + "] because their email address was blank." + BR;
+                            confirmationMessage += "&nbsp;&nbsp;Error: Not sent to user [#" + additionalMemberID + "] because their email address was blank." + BR;
                         } else {
                             string EmailStatus = "";
                             string queryStringForLinkAppend = "";
