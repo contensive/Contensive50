@@ -1339,7 +1339,11 @@ namespace Contensive.Processor.Models.Domain {
                 var contentMetadata = new ContentMetadataModel();
                 using (var targetDb = new DbController(core, DataSource.name)) {
                     using (DataTable dt = targetDb.executeQuery("select top 1 * from " + TableName)) {
-                        if (dt.Rows.Count == 0) { core.db.executeNonQuery("insert into cccontent default values"); }
+                        if (dt.Rows.Count == 0) {
+                            var fieldList = new SqlFieldListClass();
+                            fieldList.add("name", DbController.encodeSQLText("test-record"));
+                            core.db.insertTableRecord(TableName, fieldList);
+                        }
                     }
                     using (DataTable dt = targetDb.executeQuery("select top 1 * from " + TableName)) {
                         if (dt.Rows.Count == 0) { throw new GenericException("Could not add a record To table [" + TableName + "]."); }
