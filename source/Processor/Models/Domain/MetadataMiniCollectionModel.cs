@@ -1161,8 +1161,8 @@ namespace Contensive.Processor.Models.Domain {
                                 //
                                 // Check Help fields, track changed independantly so frequent help changes will not force timely metadata loads
                                 //
-                                bool HelpCustomChanged = !textMatch(srcMetaDataField.helpCustom, srcMetaDataField.helpCustom);
-                                bool HelpDefaultChanged = !textMatch(srcMetaDataField.helpDefault, srcMetaDataField.helpDefault);
+                                bool HelpCustomChanged = !textMatch(srcMetaDataField.helpCustom, dstMetaDataField.helpCustom);
+                                bool HelpDefaultChanged = !textMatch(srcMetaDataField.helpDefault, dstMetaDataField.helpDefault);
                                 HelpChanged = HelpDefaultChanged || HelpCustomChanged;
                             } else {
                                 //

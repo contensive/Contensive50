@@ -31,7 +31,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 LogController.logInfo(core, "AppBuilderController.upgrade, app [" + core.appConfig.name + "], repair [" + repair.ToString() + "]");
-                string logPrefix = "***** upgrade[" + core.appConfig.name + "]";
+                string logPrefix = "upgrade[" + core.appConfig.name + "]";
                 var installedCollections = new List<string>();
                 //
                 {

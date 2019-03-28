@@ -417,10 +417,12 @@ namespace Contensive.Processor.Models.Domain {
         /// For memberSelect type content. memberSelectGroup, name set by xml file load, name get for xml file save, id and name get and set in code
         /// </summary>
         public string memberSelectGroupName_get(CoreController core) {
-            if (_memberSelectGroupName == null) {
-                if (_memberSelectGroupId != null) {
-                    _memberSelectGroupName = MetadataController.getRecordName( core,"groups", GenericController.encodeInteger(_memberSelectGroupId));
-                };
+            if ((_memberSelectGroupName == null) && (_memberSelectGroupId != null)) {
+                if (_memberSelectGroupId == 0) {
+                    _memberSelectGroupName = "";
+                } else {
+                    _memberSelectGroupName = MetadataController.getRecordName(core, "groups", GenericController.encodeInteger(_memberSelectGroupId));
+                }
             }
             return (_memberSelectGroupName as string);
         }
@@ -437,8 +439,10 @@ namespace Contensive.Processor.Models.Domain {
         /// For memberSelect type content. memberSelectGroup, name set by xml file load, name get for xml file save, id and name get and set in code
         /// </summary>
         public int memberSelectGroupId_get(CoreController core) {
-            if (_memberSelectGroupId == null) {
-                if (_memberSelectGroupName != null) {
+            if ((_memberSelectGroupId == null) && (_memberSelectGroupName != null)) {
+                if (string.IsNullOrEmpty(_memberSelectGroupName)) {
+                    _memberSelectGroupId = 0;
+                } else {
                     var group = GroupModel.createByUniqueName(core, _memberSelectGroupName);
                     _memberSelectGroupId = (group == null) ? 0 : group.id;
                 };
