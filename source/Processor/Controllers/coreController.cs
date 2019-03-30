@@ -848,18 +848,25 @@ namespace Contensive.Processor.Controllers {
                             case RouteMapModel.routeTypeEnum.linkAlias:
                                 //
                                 // - link alias
+                                // -- all the query string values have already been added to doc properties, so do not over write them.
+                                // -- consensus is that since the link alias (permalink, long-tail url, etc) comes first on the left, that the querystring should override
+                                // -- so http://www.mySite.com/My-Blog-Post?bid=9 means use the bid not the bid from the link-alias
                                 LinkAliasModel linkAlias = LinkAliasModel.create(this, route.linkAliasId);
                                 if (linkAlias != null) {
-                                    docProperties.setProperty("bid", linkAlias.pageID);
-                                    if (!string.IsNullOrEmpty(linkAlias.queryStringSuffix)) {
-                                        string[] nvp = linkAlias.queryStringSuffix.Split('&');
-                                        foreach (var nv in nvp) {
-                                            string[] keyValue = nv.Split('=');
+                                    // -- set the link alias page number, unless it has been overridden
+                                    if (!docProperties.containsKey("bid")) { docProperties.setProperty("bid", linkAlias.pageID); }
+                                    if (!string.IsNullOrWhiteSpace(linkAlias.queryStringSuffix)) {
+                                        string[] keyValuePairs = linkAlias.queryStringSuffix.Split('&');
+                                        // -- iterate through all the key=value pairs
+                                        foreach (var keyEqualsValue in keyValuePairs) {
+                                            string[] keyValue = keyEqualsValue.Split('=');
                                             if (!string.IsNullOrEmpty(keyValue[0])) {
-                                                if (keyValue.Length > 1) {
-                                                    docProperties.setProperty(keyValue[0], keyValue[1]);
-                                                } else {
-                                                    docProperties.setProperty(keyValue[0], string.Empty);
+                                                if (!docProperties.containsKey(keyValue[0])) {
+                                                    if (keyValue.Length > 1) {
+                                                        docProperties.setProperty(keyValue[0], keyValue[1]);
+                                                    } else {
+                                                        docProperties.setProperty(keyValue[0], string.Empty);
+                                                    }
                                                 }
                                             }
                                         }
