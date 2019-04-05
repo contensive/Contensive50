@@ -453,7 +453,9 @@ namespace Contensive.Processor.Controllers {
                                 // -- OnNewVisit Add-on call
                                 AllowOnNewVisitEvent = true;
                             }
+                            // -- update the last visit time - this seems to force the visit to always save - to be revisited. Impact is low because visit save is async
                             resultSessionContext.visit.lastVisitTime = core.doc.profileStartTime;
+                            visit_changes = true;
                             //
                             // -- verify visitor
                             if (resultSessionContext.visitor.id == 0) {
