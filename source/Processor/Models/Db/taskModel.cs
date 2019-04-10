@@ -35,22 +35,23 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         public string cmdDetail { get; set; }
         /// <summary>
-        /// The file where the output of the command is stored. 
+        /// if non-0, the addon's result over-writes the content of the file referenced by the the download file-field. If this field is 0 the addon result goes to the filename field.
+        /// These files are not deleted by housekeeping
+        /// </summary>
+        public int resultDownloadId { get; set; }
+        /// <summary>
+        /// if resultDownloadId is null or 0, and the addon return is not empty, the return is saved in a file referenced here.
+        /// These files should be deleted in housekeep as the tasks are deleted.
         /// </summary>
         public DbModel.FieldTypeTextFile filename { get; set; }
-        /// <summary>
-        /// datetime when the task completes
-        /// </summary>
-        public DateTime dateCompleted { get; set; }
         /// <summary>
         /// datetime when the task is started
         /// </summary>
         public DateTime dateStarted { get; set; }
         /// <summary>
-        /// if 0, this field is ignore. if non-zero, the output from the task is saved to the download record with this id.
-        /// To save a tasks output, create a download record and set this field with its id.
+        /// datetime when the task completes
         /// </summary>
-        public int resultDownloadId { get; set; }
+        public DateTime dateCompleted { get; set; }
         //
         //====================================================================================================
         public static TaskModel addDefault(CoreController core, Domain.ContentMetadataModel metaData) {

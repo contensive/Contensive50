@@ -35,11 +35,53 @@ namespace Contensive.Addons.Housekeeping {
         public override object Execute(CPBaseClass cp) {
             string result = "";
             try {
-                //
-                // -- ok to cast cpbase to cp because they build from the same solution
-                //this.cp = (CPClass)cp;
                 CoreController core = ((CPClass)cp).core;
-                houseKeep(core, core.docProperties.getBoolean("force"));
+                DateTime rightNow = DateTime.Now;
+                DateTime LastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default(DateTime));
+                int ServerHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2);
+                var env = new HousekeepEnvironment {
+                    rightNow = rightNow,
+                    LastCheckDateTime = LastCheckDateTime,
+                    force = core.docProperties.getBoolean("force"),
+                    ServerHousekeepHour = ServerHousekeepHour,
+                    RunServerHousekeep = ((rightNow.Date > LastCheckDateTime.Date) && (ServerHousekeepHour < rightNow.Hour)),
+                    Yesterday = rightNow.AddDays(-1).Date,
+                    ALittleWhileAgo = rightNow.AddDays(-90).Date,
+                    SQLNow = DbController.encodeSQLDate(rightNow)
+                };
+                if (env.force || env.RunServerHousekeep) {
+                    //
+                    // Get ArchiveAgeDays - use this as the oldest data they care about
+                    //
+                    env.VisitArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveRecordAgeDays", "365"));
+                    if (env.VisitArchiveAgeDays < 2) {
+                        env.VisitArchiveAgeDays = 2;
+                        core.siteProperties.setProperty("ArchiveRecordAgeDays", "2");
+                    }
+                    env.VisitArchiveDate = env.rightNow.AddDays(-env.VisitArchiveAgeDays).Date;
+                    env.OldestVisitSummaryWeCareAbout = DateTime.Now.Date.AddDays(-120);
+                    if (env.OldestVisitSummaryWeCareAbout < env.VisitArchiveDate) {
+                        env.OldestVisitSummaryWeCareAbout = env.VisitArchiveDate;
+                    }
+                    //
+                    // Get GuestArchiveAgeDays
+                    //
+                    env.GuestArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchivePeopleAgeDays", "2"));
+                    if (env.GuestArchiveAgeDays < 2) {
+                        env.GuestArchiveAgeDays = 2;
+                        core.siteProperties.setProperty("ArchivePeopleAgeDays", env.GuestArchiveAgeDays.ToString());
+                    }
+                    //
+                    // Get EmailDropArchiveAgeDays
+                    //
+                    env.EmailDropArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveEmailDropAgeDays", "90"));
+                    if (env.EmailDropArchiveAgeDays < 2) {
+                        env.EmailDropArchiveAgeDays = 2;
+                        core.siteProperties.setProperty("ArchiveEmailDropAgeDays", env.EmailDropArchiveAgeDays.ToString());
+                    }
+                    env.defaultMemberName = ContentFieldMetadataModel.getDefaultValue(core, "people", "name");
+                    houseKeep(core, env);
+                }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }
@@ -48,332 +90,127 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        public void houseKeep(CoreController core, bool force) {
+        public void houseKeep(CoreController core, HousekeepEnvironment env) {
             try {
-                DateTime LastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default(DateTime));
-                int ServerHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2);
-                var installedCollections = new List<string>();
+                core.siteProperties.setProperty("housekeep, last check", env.rightNow);
                 //
-                // ----- Run Server Housekeep
+                // -- remove old log files
+                LogController.housekeepLogs(core);
                 //
-                DateTime rightNow = DateTime.Now;
-                bool RunServerHousekeep = ((rightNow.Date > LastCheckDateTime.Date) && (ServerHousekeepHour < rightNow.Hour));
-                if (force || RunServerHousekeep) {
-                    core.siteProperties.setProperty("housekeep, last check", rightNow);
-                    //CPClass cp = new CPClass();
-                    DateTime Yesterday = rightNow.AddDays(-1).Date;
-                    DateTime ALittleWhileAgo = rightNow.AddDays(-90).Date;
-                    string SQLNow = DbController.encodeSQLDate(rightNow);
+                // -- Download Updates
+                DownloadUpdates(core);
+                //
+                // -- Register and unregister files in the Addon folder
+                housekeepAddonFolder(core);
+                //
+                string DefaultMemberName = ContentFieldMetadataModel.getDefaultValue( core, "people", "name");
+                //
+                // Do non-optional housekeeping
+                //
+                doNonOptionalHousekeeping(core, env);
+                //
+                // Each hour, summarize the visits and viewings into the Visit Summary table
+                //
+                bool NewHour = (env.rightNow.Hour != env.LastCheckDateTime.Hour);
+                if (env.force || NewHour) {
                     //
-                    // it is the next day, remove old log files
+                    // Set NextSummaryStartDate based on the last time we ran hourly summarization
                     //
-                    LogController.housekeepLogs(core);
-                    //
-                    // Download Updates
-                    DownloadUpdates(core);
-                    //
-                    // Register and unregister files in the Addon folder
-                    housekeepAddonFolder(core);
-                    //
-                    // deprecated - we no longer automatically upgrade all collections during housekeeping
-                    ////
-                    //// Upgrade Local Collections, and all applications that use them
-                    //string ErrorMessage = "";
-                    //logHousekeeping(core, "Updating local collections from library, see Upgrade log for details during this period.");
-                    //List<string> nonCriticalErrorList = new List<string>();
-                    //string logPrefix = "Housekeep";
-                    //if (!CollectionController.upgradeInstalledCollectionsFromRegistry(core, ref ErrorMessage, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections)) {
-                    //    if (string.IsNullOrEmpty(ErrorMessage)) {
-                    //        ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status.";
-                    //    }
-                    //    logHousekeeping(core, "Updating local collections from Library returned an error, " + ErrorMessage);
-                    //}
-                    //
-                    // 20180816, no, core is v.41
-                    // Verify core installation
-                    //CollectionController.installCollectionFromRemoteRepo(core, CoreCollectionGuid, ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
-                    //
-                    string DomainNamePrimary = core.appConfig.domainList[0];
-                    int Pos = GenericController.vbInstr(1, DomainNamePrimary, ",");
-                    if (Pos > 1) {
-                        DomainNamePrimary = DomainNamePrimary.Left(Pos - 1);
-                    }
-                    int DataSourceType = core.db.getDataSourceType();
-                    //
-                    string DefaultMemberName = "";
-                    int PeopleCID = ContentMetadataModel.getContentId(core, "people");
-                    string SQL = "select defaultvalue from ccfields where name='name' and contentid=(" + PeopleCID + ")";
+                    DateTime LastTimeSummaryWasRun = env.VisitArchiveDate;
                     using (var csData = new CsModel(core)) {
-                        csData.openSql(SQL, "Default");
-                        if (csData.ok()) {
-                            DefaultMemberName = csData.getText("defaultvalue");
-                        }
-                        csData.close();
-                    }
-                    //
-                    // Get ArchiveAgeDays - use this as the oldest data they care about
-                    //
-                    int VisitArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveRecordAgeDays", "365"));
-                    if (VisitArchiveAgeDays < 2) {
-                        VisitArchiveAgeDays = 2;
-                        core.siteProperties.setProperty("ArchiveRecordAgeDays", "2");
-                    }
-                    DateTime VisitArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date;
-                    DateTime OldestVisitSummaryWeCareAbout = DateTime.Now.Date.AddDays(-120);
-                    if (OldestVisitSummaryWeCareAbout < VisitArchiveDate) {
-                        OldestVisitSummaryWeCareAbout = VisitArchiveDate;
-                    }
-                    //OldestVisitSummaryWeCareAbout = now.date - VisitArchiveAgeDays
-                    //
-                    // Get GuestArchiveAgeDays
-                    //
-                    int GuestArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchivePeopleAgeDays", "2"));
-                    if (GuestArchiveAgeDays < 2) {
-                        GuestArchiveAgeDays = 2;
-                        core.siteProperties.setProperty("ArchivePeopleAgeDays", GuestArchiveAgeDays.ToString());
-                    }
-                    //
-                    // Get EmailDropArchiveAgeDays
-                    //
-                    int EmailDropArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveEmailDropAgeDays", "90"));
-                    if (EmailDropArchiveAgeDays < 2) {
-                        EmailDropArchiveAgeDays = 2;
-                        core.siteProperties.setProperty("ArchiveEmailDropAgeDays", EmailDropArchiveAgeDays.ToString());
-                    }
-                    //
-                    // Do non-optional housekeeping
-                    //
-                    if (RunServerHousekeep || force) {
-                        {
-                            //
-                            // Move Archived pages from their current parent to their archive parent
-                            //
-                            bool NeedToClearCache = false;
-                            logHousekeeping(core, "Archive update for pages on [" + core.appConfig.name + "]");
-                            SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + SQLNow + "))and(active<>0)";
-                            using (var csData = new CsModel(core)) {
-                                csData.openSql(SQL, "Default");
-                                while (csData.ok()) {
-                                    int RecordID = csData.getInteger("ID");
-                                    int ArchiveParentID = csData.getInteger("ArchiveParentID");
-                                    if (ArchiveParentID == 0) {
-                                        SQL = "update ccpagecontent set DateArchive=null where (id=" + RecordID + ")";
-                                        core.db.executeQuery(SQL);
-                                    } else {
-                                        SQL = "update ccpagecontent set ArchiveParentID=null,DateArchive=null,parentid=" + ArchiveParentID + " where (id=" + RecordID + ")";
-                                        core.db.executeQuery(SQL);
-                                        NeedToClearCache = true;
-                                    }
-                                    csData.goNext();
-                                }
-                                csData.close();
-                            }
-                            //
-                            // Clear caches
-                            //
-                            if (NeedToClearCache) {
-                                object emptyData = null;
-                                core.cache.invalidate("Page Content");
-                                core.cache.storeObject("PCC", emptyData);
-                            }
-                        }
-                        {
-                            //
-                            // Delete any daily visit summary duplicates during this period(keep the first)
-                            //
-                            SQL = "delete from ccvisitsummary"
-                                + " where id in ("
-                                + " select d.id from ccvisitsummary d,ccvisitsummary f"
-                                + " where f.datenumber=d.datenumber"
-                                + " and f.datenumber>" + OldestVisitSummaryWeCareAbout.ToOADate() + " and f.datenumber<" + Yesterday.ToOADate() + " and f.TimeDuration=24"
-                                + " and d.TimeDuration=24"
-                                + " and f.id<d.id"
-                                + ")";
-                            core.db.executeQuery(SQL);
-                            //
-                            // Find missing daily summaries, summarize that date
-                            //
-                            SQL = core.db.getSQLSelect( "ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
-                            using (var csData = new CsModel(core)) {
-                                csData.openSql(SQL, "Default");
-                                DateTime datePtr = OldestVisitSummaryWeCareAbout;
-                                while (datePtr <= Yesterday) {
-                                    if (!csData.ok()) {
-                                        //
-                                        // Out of data, start with this DatePtr
-                                        //
-                                        houseKeep_VisitSummary(core, datePtr, datePtr, 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
-                                        //Exit For
-                                    } else {
-                                        DateTime workingDate = DateTime.MinValue.AddDays(csData.getInteger("DateNumber"));
-                                        if (datePtr < workingDate) {
-                                            //
-                                            // There are missing dates, update them
-                                            //
-                                            houseKeep_VisitSummary(core, datePtr, workingDate.AddDays(-1), 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
-                                        }
-                                    }
-                                    if (csData.ok()) {
-                                        //
-                                        // if there is more data, go to the next record
-                                        //
-                                        csData.goNext();
-                                    }
-                                    datePtr = datePtr.AddDays(1).Date;
-                                }
-                                csData.close();
-                            }
-                        }
-                        //
-                        // Remote Query Expiration
-                        //
-                        SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" + DbController.encodeSQLDate(DateTime.Now) + ")";
-                        core.db.executeQuery(SQL);
-                        if (DataSourceType == DataSourceTypeODBCMySQL) {
-                            SQL = "delete m from ccmenuEntries m left join ccAggregateFunctions a on a.id=m.AddonID where m.addonid<>0 and a.id is null";
+                        if (csData.openSql(core.db.getSQLSelect("ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + DbController.encodeSQLDate(env.VisitArchiveDate) + ")", "id Desc", "", 1))) {
+                            LastTimeSummaryWasRun = csData.getDate("DateAdded");
+                            logHousekeeping(core, "Update hourly visit summary, last time summary was run was [" + LastTimeSummaryWasRun + "]");
                         } else {
-                            SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.AddonID where m.addonid<>0 and a.id is null)";
+                            logHousekeeping(core, "Update hourly visit summary, no hourly summaries were found, set start to [" + LastTimeSummaryWasRun + "]");
                         }
-                        core.db.executeQuery(SQL);
-                        //
-                        if (DataSourceType == DataSourceTypeODBCMySQL) {
-                            SQL = "delete m from ccmenuEntries m left join ccAggregateFunctions a on a.id=m.helpaddonid where m.helpaddonid<>0 and a.id is null";
-                        } else {
-                            SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.helpaddonid where m.helpaddonid<>0 and a.id is null)";
-                        }
-                        core.db.executeQuery(SQL);
-                        //
-                        if (DataSourceType == DataSourceTypeODBCMySQL) {
-                            SQL = "delete m from ccmenuEntries m left join ccAggregateFunctions a on a.id=m.helpcollectionid where m.helpcollectionid<>0 and a.id is null";
-                        } else {
-                            SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAddonCollections c on c.id=m.helpcollectionid Where m.helpcollectionid <> 0 And c.Id Is Null)";
-                        }
-                        core.db.executeQuery(SQL);
-                        //
-                        // Page View Summary
-                        //
-                        {
-                            DateTime datePtr = default(DateTime);
-                            using (var csData = new CsModel(core)) {
-                                if (!csData.openSql(core.db.getSQLSelect("ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
-                                    datePtr = OldestVisitSummaryWeCareAbout;
-                                } else {
-                                    datePtr = DateTime.MinValue.AddDays(csData.getInteger("DateNumber"));
-                                }
+                    }
+                    DateTime NextSummaryStartDate = LastTimeSummaryWasRun;
+                    //
+                    // Each hourly entry includes visits that started during that hour, but we do not know when they finished (maybe during last hour)
+                    //   Find the oldest starttime of all the visits with endtimes after the LastTimeSummaryWasRun. Resummarize all periods
+                    //   from then to now
+                    //
+                    //   For the past 24 hours, find the oldest visit with the last viewing during the last hour
+                    //
+                    DateTime StartOfHour = (new DateTime(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1)).AddHours(-1); // (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
+                    DateTime OldestDateAdded = StartOfHour;
+                    using (var csData = new CsModel(core)) {
+                        if (csData.openSql(core.db.getSQLSelect("ccVisits", "DateAdded", "LastVisitTime>" + DbController.encodeSQLDate(StartOfHour), "dateadded", "", 1))) {
+                            OldestDateAdded = csData.getDate("DateAdded");
+                            if (OldestDateAdded < NextSummaryStartDate) {
+                                NextSummaryStartDate = OldestDateAdded;
+                                logHousekeeping(core, "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" + OldestDateAdded + "], before the last summary was run.");
                             }
-                            if (datePtr < OldestVisitSummaryWeCareAbout) { datePtr = OldestVisitSummaryWeCareAbout; }
-                            houseKeep_PageViewSummary(core, datePtr, Yesterday, 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
                         }
-                        //
-                        // -- Properties
-                        housekeep_userProperties(core);
-                        housekeep_visitProperties(core);
-                        housekeep_visitorProperties(core);
                     }
                     //
-                    // Each hour, summarize the visits and viewings into the Visit Summary table
+                    // Verify there are 24 hour records for every day back the past 90 days
                     //
-                    bool NewHour = (rightNow.Hour != LastCheckDateTime.Hour);
-                    if (force || NewHour) {
-                        //
-                        // Set NextSummaryStartDate based on the last time we ran hourly summarization
-                        //
-                        DateTime LastTimeSummaryWasRun = VisitArchiveDate;
+                    DateTime DateofMissingSummary = DateTime.MinValue;
+                    //Call AppendClassLog(core, core.appEnvironment.name, "HouseKeep", "Verify there are 24 hour records for the past 90 days")
+                    DateTime PeriodStartDate = env.rightNow.Date.AddDays(-90);
+                    double PeriodStep = 1;
+                    int HoursPerDay = 0;
+                    for (double PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
                         using (var csData = new CsModel(core)) {
-                            if (csData.openSql(core.db.getSQLSelect("ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + DbController.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1))) {
-                                LastTimeSummaryWasRun = csData.getDate("DateAdded");
-                                logHousekeeping(core, "Update hourly visit summary, last time summary was run was [" + LastTimeSummaryWasRun + "]");
-                            } else {
-                                logHousekeeping(core, "Update hourly visit summary, no hourly summaries were found, set start to [" + LastTimeSummaryWasRun + "]");
+                            if (csData.openSql("select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber")) {
+                                HoursPerDay = csData.getInteger("HoursPerDay");
+                            }
+                            csData.close();
+                            if (HoursPerDay < 24) {
+                                DateofMissingSummary = DateTime.FromOADate(PeriodDatePtr);
+                                break;
                             }
                         }
-                        DateTime NextSummaryStartDate = LastTimeSummaryWasRun;
-                        //
-                        // Each hourly entry includes visits that started during that hour, but we do not know when they finished (maybe during last hour)
-                        //   Find the oldest starttime of all the visits with endtimes after the LastTimeSummaryWasRun. Resummarize all periods
-                        //   from then to now
-                        //
-                        //   For the past 24 hours, find the oldest visit with the last viewing during the last hour
-                        //
-                        DateTime StartOfHour = (new DateTime(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1)).AddHours(-1); // (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
-                        DateTime OldestDateAdded = StartOfHour;
-                        using (var csData = new CsModel(core)) {
-                            if (csData.openSql(core.db.getSQLSelect("ccVisits", "DateAdded", "LastVisitTime>" + DbController.encodeSQLDate(StartOfHour), "dateadded", "", 1))) {
-                                OldestDateAdded = csData.getDate("DateAdded");
-                                if (OldestDateAdded < NextSummaryStartDate) {
-                                    NextSummaryStartDate = OldestDateAdded;
-                                    logHousekeeping(core, "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" + OldestDateAdded + "], before the last summary was run.");
-                                }
-                            }
+                        if ((DateofMissingSummary != DateTime.MinValue) && (DateofMissingSummary < NextSummaryStartDate)) {
+                            logHousekeeping(core, "Found a missing hourly period in the visit summary table [" + DateofMissingSummary + "], it only has [" + HoursPerDay + "] hourly summaries.");
+                            NextSummaryStartDate = DateofMissingSummary;
                         }
                         //
-                        // Verify there are 24 hour records for every day back the past 90 days
+                        // Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
                         //
-                        DateTime DateofMissingSummary = DateTime.MinValue;
-                        //Call AppendClassLog(core, core.appEnvironment.name, "HouseKeep", "Verify there are 24 hour records for the past 90 days")
-                        DateTime PeriodStartDate = rightNow.Date.AddDays(-90);
-                        double PeriodStep = 1;
-                        int HoursPerDay = 0;
-                        for (double PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
-                            using (var csData = new CsModel(core)) {
-                                if (csData.openSql("select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber")) {
-                                    HoursPerDay = csData.getInteger("HoursPerDay");
-                                }
-                                csData.close();
-                                if (HoursPerDay < 24) {
-                                    DateofMissingSummary = DateTime.FromOADate(PeriodDatePtr);
-                                    break;
-                                }
-                            }
-                            if ((DateofMissingSummary != DateTime.MinValue) && (DateofMissingSummary < NextSummaryStartDate)) {
-                                logHousekeeping(core, "Found a missing hourly period in the visit summary table [" + DateofMissingSummary + "], it only has [" + HoursPerDay + "] hourly summaries.");
-                                NextSummaryStartDate = DateofMissingSummary;
-                            }
-                            //
-                            // Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
-                            //
-                            logHousekeeping(core, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
-                            PeriodStep = (double)1 / (double)24;
-                            //PeriodStart = (Int(OldestDateAdded * 24) / 24)
-                            houseKeep_VisitSummary(core, NextSummaryStartDate, rightNow, 1, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                        logHousekeeping(core, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
+                        PeriodStep = (double)1 / (double)24;
+                        //PeriodStart = (Int(OldestDateAdded * 24) / 24)
+                        houseKeep_VisitSummary(core, NextSummaryStartDate, env.rightNow, 1, core.siteProperties.dataBuildVersion, env.OldestVisitSummaryWeCareAbout);
+                    }
+                    //
+                    // OK to run archive
+                    // During archive, non-cookie records are removed, so this has to run after summarizing
+                    // and we can only delete non-cookie records older than 2 days (so we can be sure they have been summarized)
+                    //
+                    if (env.force) {
+                        //
+                        // debug mode - run achive if no times are given
+                        //
+                        HouseKeep_App_Daily(core, env.VisitArchiveAgeDays, env.GuestArchiveAgeDays, env.EmailDropArchiveAgeDays, DefaultMemberName, core.siteProperties.dataBuildVersion);
+                    } else {
+                        //
+                        // Check for site's archive time of day
+                        //
+                        string AlarmTimeString = core.siteProperties.getText("ArchiveTimeOfDay", "12:00:00 AM");
+                        if (string.IsNullOrEmpty(AlarmTimeString)) {
+                            AlarmTimeString = "12:00:00 AM";
+                            core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
                         }
-                        //
-                        // OK to run archive
-                        // During archive, non-cookie records are removed, so this has to run after summarizing
-                        // and we can only delete non-cookie records older than 2 days (so we can be sure they have been summarized)
-                        //
-                        if (force) {
+                        if (!GenericController.IsDate(AlarmTimeString)) {
+                            AlarmTimeString = "12:00:00 AM";
+                            core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
+                        }
+                        //AlarmTimeMinutesSinceMidnight = genericController.encodeDate(AlarmTimeString).TimeOfDay.TotalMinutes;
+                        double minutesSinceMidnight = env.rightNow.TimeOfDay.TotalMinutes;
+                        double LastCheckMinutesFromMidnight = env.LastCheckDateTime.TimeOfDay.TotalMinutes;
+                        if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
                             //
-                            // debug mode - run achive if no times are given
+                            // Same Day - Midnight is before last and after current
                             //
-                            HouseKeep_App_Daily(core, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, core.siteProperties.dataBuildVersion);
-                        } else {
+                            HouseKeep_App_Daily(core, env.VisitArchiveAgeDays, env.GuestArchiveAgeDays, env.EmailDropArchiveAgeDays, DefaultMemberName, core.siteProperties.dataBuildVersion);
+                        } else if ((LastCheckMinutesFromMidnight > minutesSinceMidnight) && ((LastCheckMinutesFromMidnight < minutesSinceMidnight))) {
                             //
-                            // Check for site's archive time of day
+                            // New Day - Midnight is between Last and Set
                             //
-                            string AlarmTimeString = core.siteProperties.getText("ArchiveTimeOfDay", "12:00:00 AM");
-                            if (string.IsNullOrEmpty(AlarmTimeString)) {
-                                AlarmTimeString = "12:00:00 AM";
-                                core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
-                            }
-                            if (!GenericController.IsDate(AlarmTimeString)) {
-                                AlarmTimeString = "12:00:00 AM";
-                                core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
-                            }
-                            //AlarmTimeMinutesSinceMidnight = genericController.encodeDate(AlarmTimeString).TimeOfDay.TotalMinutes;
-                            double minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes;
-                            double LastCheckMinutesFromMidnight = LastCheckDateTime.TimeOfDay.TotalMinutes;
-                            if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
-                                //
-                                // Same Day - Midnight is before last and after current
-                                //
-                                HouseKeep_App_Daily(core, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, core.siteProperties.dataBuildVersion);
-                            } else if ((LastCheckMinutesFromMidnight > minutesSinceMidnight) && ((LastCheckMinutesFromMidnight < minutesSinceMidnight))) {
-                                //
-                                // New Day - Midnight is between Last and Set
-                                //
-                                HouseKeep_App_Daily(core, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, core.siteProperties.dataBuildVersion);
-                            }
+                            HouseKeep_App_Daily(core, env.VisitArchiveAgeDays, env.GuestArchiveAgeDays, env.EmailDropArchiveAgeDays, DefaultMemberName, core.siteProperties.dataBuildVersion);
                         }
                     }
                 }
@@ -393,7 +230,6 @@ namespace Contensive.Addons.Housekeeping {
                 DateTime thirtyDaysAgo = rightNow.AddDays(-30).Date;
                 string appName = core.appConfig.name;
                 bool ArchiveDeleteNoCookie = GenericController.encodeBoolean(core.siteProperties.getText("ArchiveDeleteNoCookie", "1"));
-                int DataSourceType = core.db.getDataSourceType();
                 int TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
                 string SQLDateMidnightTwoDaysAgo = DbController.encodeSQLDate(MidnightTwoDaysAgo);
@@ -411,67 +247,13 @@ namespace Contensive.Addons.Housekeeping {
                     // legacy records without createdbyvisit will have to be corrected by hand (or upgrade)
                     //
                     logHousekeeping(core, "Deleting members from visits with no cookie support older than Midnight, Two Days Ago");
-                    switch (DataSourceType) {
-                        case DataSourceTypeODBCAccess:
-                            sql = "delete m.*"
-                                + " from ccmembers m,ccvisits v"
-                                + " where v.memberid=m.id"
-                                + " and(m.Visits=1)"
-                                + " and(m.createdbyvisit=1)"
-                                + " and(m.Username is null)"
-                                + " and(m.email is null)"
-                                + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
-                            break;
-                        case DataSourceTypeODBCMySQL:
-                            sql = "delete m"
-                                + " from ccmembers m,ccvisits v"
-                                + " where v.memberid=m.id"
-                                + " and(m.Visits=1)"
-                                + " and(m.createdbyvisit=1)"
-                                + " and(m.Username is null)"
-                                + " and(m.email is null)"
-                                + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
-                            break;
-                        default:
-                            sql = "delete from ccmembers from ccmembers m,ccvisits v"
-                                + " where v.memberid=m.id"
-                                + " and(m.Visits=1)"
-                                + " and(m.createdbyvisit=1)"
-                                + " and(m.Username is null)"
-                                + " and(m.email is null)"
-                                + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
-                            break;
-                    }
-                    // removed name requirement bc spiders not have bot names
-                    //        Select Case DataSourceType
-                    //            Case DataSourceTypeODBCAccess
-                    //                SQL = "delete m.*" _
-                    //                    & " from " & SQLTablePeople & " m,ccvisits v" _
-                    //                    & " where v.memberid=m.id" _
-                    //                    & " and(m.Name=" & encodeSQLText(DefaultMemberName) & ")" _
-                    //                    & " and(m.Visits=1)" _
-                    //                    & " and(m.Username is null)" _
-                    //                    & " and(m.email is null)" _
-                    //                    & " and(v.CookieSupport=0)and(v.LastVisitTime<" & SQLDateMidnightTwoDaysAgo & ")"
-                    //            Case DataSourceTypeODBCMySQL
-                    //                SQL = "delete m" _
-                    //                    & " from " & SQLTablePeople & " m,ccvisits v" _
-                    //                    & " where v.memberid=m.id" _
-                    //                    & " and(m.Name=" & encodeSQLText(DefaultMemberName) & ")" _
-                    //                    & " and(m.Visits=1)" _
-                    //                    & " and(m.Username is null)" _
-                    //                    & " and(m.email is null)" _
-                    //                    & " and(v.CookieSupport=0)and(v.LastVisitTime<" & SQLDateMidnightTwoDaysAgo & ")"
-                    //            Case Else
-                    //                SQL = "delete from " & SQLTablePeople _
-                    //                    & " from " & SQLTablePeople & " m,ccvisits v" _
-                    //                    & " where v.memberid=m.id" _
-                    //                    & " and(m.Name=" & encodeSQLText(DefaultMemberName) & ")" _
-                    //                    & " and(m.Visits=1)" _
-                    //                    & " and(m.Username is null)" _
-                    //                    & " and(m.email is null)" _
-                    //                    & " and(v.CookieSupport=0)and(v.LastVisitTime<" & SQLDateMidnightTwoDaysAgo & ")"
-                    //        End Select
+                    sql = "delete from ccmembers from ccmembers m,ccvisits v"
+                        + " where v.memberid=m.id"
+                        + " and(m.Visits=1)"
+                        + " and(m.createdbyvisit=1)"
+                        + " and(m.Username is null)"
+                        + " and(m.email is null)"
+                        + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
                     try {
                         core.db.executeQuery(sql);
                     } catch (Exception) {
@@ -481,26 +263,10 @@ namespace Contensive.Addons.Housekeeping {
                     // delete viewings from the non-cookie visits
                     //
                     logHousekeeping(core, "Deleting viewings from visits with no cookie support older than Midnight, Two Days Ago");
-                    switch (DataSourceType) {
-                        case DataSourceTypeODBCAccess:
-                            sql = "delete h.*"
-                                + " from ccviewings h,ccvisits v"
-                                + " where h.visitid=v.id"
-                                + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
-                            break;
-                        case DataSourceTypeODBCMySQL:
-                            sql = "delete h"
-                                + " from ccviewings h,ccvisits v"
-                                + " where h.visitid=v.id"
-                                + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
-                            break;
-                        default:
-                            sql = "delete from ccviewings"
-                                + " from ccviewings h,ccvisits v"
-                                + " where h.visitid=v.id"
-                                + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
-                            break;
-                    }
+                    sql = "delete from ccviewings"
+                        + " from ccviewings h,ccvisits v"
+                        + " where h.visitid=v.id"
+                        + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
                     // if this fails, continue with the rest of the work
                     try {
                         core.db.executeQuery(sql);
@@ -510,26 +276,10 @@ namespace Contensive.Addons.Housekeeping {
                     // delete visitors from the non-cookie visits
                     //
                     logHousekeeping(core, "Deleting visitors from visits with no cookie support older than Midnight, Two Days Ago");
-                    switch (DataSourceType) {
-                        case DataSourceTypeODBCAccess:
-                            sql = "delete r.*"
-                                + " from ccvisitors r,ccvisits v"
-                                + " where r.id=v.visitorid"
-                                + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
-                            break;
-                        case DataSourceTypeODBCMySQL:
-                            sql = "delete r"
-                                + " from ccvisitors r,ccvisits v"
-                                + " where r.id=v.visitorid"
-                                + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
-                            break;
-                        default:
-                            sql = "delete from ccvisitors"
-                                + " from ccvisitors r,ccvisits v"
-                                + " where r.id=v.visitorid"
-                                + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
-                            break;
-                    }
+                    sql = "delete from ccvisitors"
+                        + " from ccvisitors r,ccvisits v"
+                        + " where r.id=v.visitorid"
+                        + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
                     try {
                         core.db.executeQuery(sql);
                     } catch (Exception) {
@@ -586,7 +336,7 @@ namespace Contensive.Addons.Housekeeping {
                         DateTime SingleDate = default(DateTime);
                         SingleDate = OldestVisitDate;
                         do {
-                            HouseKeep_App_Daily_RemoveVisitRecords(core, SingleDate, DataSourceType);
+                            HouseKeep_App_Daily_RemoveVisitRecords(core, SingleDate);
                             SingleDate = SingleDate.AddDays(1);
                         } while (SingleDate < ArchiveDate);
                     }
@@ -595,81 +345,31 @@ namespace Contensive.Addons.Housekeeping {
                 // Remove old guest records
                 //
                 ArchiveDate = rightNow.AddDays(-GuestArchiveAgeDays).Date;
-                HouseKeep_App_Daily_RemoveGuestRecords(core, ArchiveDate, DataSourceType);
+                HouseKeep_App_Daily_RemoveGuestRecords(core, ArchiveDate);
                 //
                 // delete 'guests' Members with one visits but no valid visit record
                 //
                 logHousekeeping(core, "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        sql = "delete m.*"
-                            + " from ccmembers m,ccvisits v"
-                            + " where v.memberid=m.id"
-                            + " and(m.createdbyvisit=1)"
-                            + " and(m.Visits=1)"
-                            + " and(m.Username is null)"
-                            + " and(m.email is null)"
-                            + " and(m.dateadded=m.lastvisit)"
-                            + " and(v.id is null)";
-                        break;
-                    case DataSourceTypeODBCMySQL:
-                        sql = "delete m"
-                            + " from ccmembers m,ccvisits v"
-                            + " where v.memberid=m.id"
-                            + " and(m.createdbyvisit=1)"
-                            + " and(m.Visits=1)"
-                            + " and(m.Username is null)"
-                            + " and(m.email is null)"
-                            + " and(m.dateadded=m.lastvisit)"
-                            + " and(v.id is null)";
-                        break;
-                    default:
-                        sql = "delete from ccmembers from ccmembers m,ccvisits v"
-                            + " where v.memberid=m.id"
-                            + " and(m.createdbyvisit=1)"
-                            + " and(m.Visits=1)"
-                            + " and(m.Username is null)"
-                            + " and(m.email is null)"
-                            + " and(m.dateadded=m.lastvisit)"
-                            + " and(v.id is null)";
-                        break;
-                }
+                sql = "delete from ccmembers from ccmembers m,ccvisits v"
+                    + " where v.memberid=m.id"
+                    + " and(m.createdbyvisit=1)"
+                    + " and(m.Visits=1)"
+                    + " and(m.Username is null)"
+                    + " and(m.email is null)"
+                    + " and(m.dateadded=m.lastvisit)"
+                    + " and(v.id is null)";
                 core.db.executeNonQuery(sql);
                 //
                 // delete 'guests' Members created before ArchivePeopleAgeDays
                 //
                 logHousekeeping(core, "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        sql = "delete m.*"
-                            + " from ccmembers m left join ccvisits v on v.memberid=m.id"
-                            + " where(m.createdbyvisit=1)"
-                            + " and(m.Visits=1)"
-                            + " and(m.Username is null)"
-                            + " and(m.email is null)"
-                            + " and(m.dateadded=m.lastvisit)"
-                            + " and(v.id is null)";
-                        break;
-                    case DataSourceTypeODBCMySQL:
-                        sql = "delete m"
-                            + " from ccmembers m left join ccvisits v on v.memberid=m.id"
-                            + " where(m.createdbyvisit=1)"
-                            + " and(m.Visits=1)"
-                            + " and(m.Username is null)"
-                            + " and(m.email is null)"
-                            + " and(m.dateadded=m.lastvisit)"
-                            + " and(v.id is null)";
-                        break;
-                    default:
-                        sql = "delete from ccmembers from ccmembers m left join ccvisits v on v.memberid=m.id"
-                            + " where(m.createdbyvisit=1)"
-                            + " and(m.Visits=1)"
-                            + " and(m.Username is null)"
-                            + " and(m.email is null)"
-                            + " and(m.dateadded=m.lastvisit)"
-                            + " and(v.id is null)";
-                        break;
-                }
+                sql = "delete from ccmembers from ccmembers m left join ccvisits v on v.memberid=m.id"
+                    + " where(m.createdbyvisit=1)"
+                    + " and(m.Visits=1)"
+                    + " and(m.Username is null)"
+                    + " and(m.email is null)"
+                    + " and(m.dateadded=m.lastvisit)"
+                    + " and(v.id is null)";
                 core.db.executeNonQuery(sql);
                 //
                 // delete email drops older than archive.
@@ -732,161 +432,55 @@ namespace Contensive.Addons.Housekeeping {
                 // Activities with no Member
                 //
                 logHousekeeping(core, "Deleting activities with no member record.");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        sql = "delete ccactivitylog.*"
-                            + " From ccactivitylog LEFT JOIN ccmembers on ccmembers.ID=ccactivitylog.memberid"
-                            + " WHERE (ccmembers.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    case DataSourceTypeODBCSQLServer:
-                        sql = "delete from ccactivitylog"
-                            + " From ccactivitylog LEFT JOIN ccmembers on ccmembers.ID=ccactivitylog.memberid"
-                            + " WHERE (ccmembers.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    default:
-                        sql = "delete ccactivitylog"
-                            + " From ccactivitylog LEFT JOIN ccmembers on ccmembers.ID=ccactivitylog.memberid"
-                            + " WHERE (ccmembers.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                }
+                sql = "delete ccactivitylog"
+                    + " From ccactivitylog LEFT JOIN ccmembers on ccmembers.ID=ccactivitylog.memberid"
+                    + " WHERE (ccmembers.ID is null)";
+                core.db.executeQuery(sql);
                 //
                 // Member Properties with no member
                 //
                 logHousekeeping(core, "Deleting member properties with no member record.");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        sql = "delete ccProperties.*"
-                            + " From ccProperties LEFT JOIN ccmembers on ccmembers.ID=ccProperties.KeyID"
-                            + " WHERE (ccProperties.TypeID=0)"
-                            + " AND (ccmembers.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    case DataSourceTypeODBCSQLServer:
-                        sql = "delete From ccProperties"
-                            + " From ccProperties LEFT JOIN ccmembers on ccmembers.ID=ccProperties.KeyID"
-                            + " WHERE (ccProperties.TypeID=0)"
-                            + " AND (ccmembers.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    default:
-                        sql = "delete ccProperties"
-                            + " From ccProperties LEFT JOIN ccmembers on ccmembers.ID=ccProperties.KeyID"
-                            + " WHERE (ccProperties.TypeID=0)"
-                            + " AND (ccmembers.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                }
+                sql = "delete ccProperties"
+                    + " From ccProperties LEFT JOIN ccmembers on ccmembers.ID=ccProperties.KeyID"
+                    + " WHERE (ccProperties.TypeID=0)"
+                    + " AND (ccmembers.ID is null)";
+                core.db.executeQuery(sql);
                 //
                 // Visit Properties with no visits
                 //
                 logHousekeeping(core, "Deleting visit properties with no visit record.");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        sql = "delete ccProperties.*"
-                            + " from ccProperties LEFT JOIN ccVisits on ccVisits.ID=ccProperties.KeyID"
-                            + " WHERE (ccProperties.TypeID=1)"
-                            + " AND (ccVisits.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    case DataSourceTypeODBCSQLServer:
-                        sql = "delete From ccProperties"
-                            + " from ccProperties LEFT JOIN ccVisits on ccVisits.ID=ccProperties.KeyID"
-                            + " WHERE (ccProperties.TypeID=1)"
-                            + " AND (ccVisits.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    default:
-                        sql = "delete ccProperties"
-                            + " from ccProperties LEFT JOIN ccVisits on ccVisits.ID=ccProperties.KeyID"
-                            + " WHERE (ccProperties.TypeID=1)"
-                            + " AND (ccVisits.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                }
+                sql = "delete ccProperties"
+                    + " from ccProperties LEFT JOIN ccVisits on ccVisits.ID=ccProperties.KeyID"
+                    + " WHERE (ccProperties.TypeID=1)"
+                    + " AND (ccVisits.ID is null)";
+                core.db.executeQuery(sql);
                 //
                 // Visitor Properties with no visitor
                 //
                 logHousekeeping(core, "Deleting visitor properties with no visitor record.");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        sql = "delete ccProperties.*"
-                            + " from ccProperties LEFT JOIN ccvisitors on ccvisitors.ID=ccProperties.KeyID"
-                            + " where ccproperties.typeid=2"
-                            + " and ccvisitors.id is null";
-                        core.db.executeQuery(sql);
-                        break;
-                    case DataSourceTypeODBCSQLServer:
-                        sql = "delete From ccProperties"
-                            + " from ccProperties LEFT JOIN ccvisitors on ccvisitors.ID=ccProperties.KeyID"
-                            + " where ccproperties.typeid=2"
-                            + " and ccvisitors.id is null";
-                        core.db.executeQuery(sql);
-                        break;
-                    default:
-                        sql = "delete ccProperties"
-                            + " from ccProperties LEFT JOIN ccvisitors on ccvisitors.ID=ccProperties.KeyID"
-                            + " where ccproperties.typeid=2"
-                            + " and ccvisitors.id is null";
-                        core.db.executeQuery(sql);
-                        break;
-                }
+                sql = "delete ccProperties"
+                    + " from ccProperties LEFT JOIN ccvisitors on ccvisitors.ID=ccProperties.KeyID"
+                    + " where ccproperties.typeid=2"
+                    + " and ccvisitors.id is null";
+                core.db.executeQuery(sql);
                 //
                 // MemberRules with bad MemberID
                 //
                 logHousekeeping(core, "Deleting Member Rules with bad MemberID.");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        sql = "delete ccmemberrules.*"
-                            + " From ccmemberrules"
-                            + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.MemberID"
-                            + " WHERE (ccmembers.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    case DataSourceTypeODBCSQLServer:
-                        sql = "delete From ccmemberrules"
-                            + " From ccmemberrules"
-                            + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.MemberID"
-                            + " WHERE (ccmembers.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    default:
-                        sql = "delete ccmemberrules"
-                            + " From ccmemberrules"
-                            + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.MemberID"
-                            + " WHERE (ccmembers.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                }
+                sql = "delete ccmemberrules"
+                    + " From ccmemberrules"
+                    + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.MemberID"
+                    + " WHERE (ccmembers.ID is null)";
+                core.db.executeQuery(sql);
                 //
                 // MemberRules with bad GroupID
                 //
                 logHousekeeping(core, "Deleting Member Rules with bad GroupID.");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        sql = "delete ccmemberrules.*"
-                            + " From ccmemberrules"
-                            + " LEFT JOIN ccgroups on ccgroups.ID=ccmemberrules.GroupID"
-                            + " WHERE (ccgroups.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    case DataSourceTypeODBCSQLServer:
-                        sql = "delete From ccmemberrules"
-                            + " From ccmemberrules"
-                            + " LEFT JOIN ccgroups on ccgroups.ID=ccmemberrules.GroupID"
-                            + " WHERE (ccgroups.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    default:
-                        sql = "delete ccmemberrules"
-                            + " From ccmemberrules"
-                            + " LEFT JOIN ccgroups on ccgroups.ID=ccmemberrules.GroupID"
-                            + " WHERE (ccgroups.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                }
+                sql = "delete ccmemberrules"
+                    + " From ccmemberrules"
+                    + " LEFT JOIN ccgroups on ccgroups.ID=ccmemberrules.GroupID"
+                    + " WHERE (ccgroups.ID is null)";
+                core.db.executeQuery(sql);
                 //
                 // GroupRules with bad ContentID
                 //   Handled record by record removed to prevent CDEF reload
@@ -906,29 +500,11 @@ namespace Contensive.Addons.Housekeeping {
                 // GroupRules with bad GroupID
                 //
                 logHousekeeping(core, "Deleting Group Rules with bad GroupID.");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        sql = "delete ccGroupRules.*"
-                            + " From ccGroupRules"
-                            + " LEFT JOIN ccgroups on ccgroups.ID=ccGroupRules.GroupID"
-                            + " WHERE (ccgroups.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    case DataSourceTypeODBCSQLServer:
-                        sql = "delete from ccGroupRules"
-                            + " From ccGroupRules"
-                            + " LEFT JOIN ccgroups on ccgroups.ID=ccGroupRules.GroupID"
-                            + " WHERE (ccgroups.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    default:
-                        sql = "delete ccGroupRules"
-                            + " From ccGroupRules"
-                            + " LEFT JOIN ccgroups on ccgroups.ID=ccGroupRules.GroupID"
-                            + " WHERE (ccgroups.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                }
+                sql = "delete ccGroupRules"
+                    + " From ccGroupRules"
+                    + " LEFT JOIN ccgroups on ccgroups.ID=ccGroupRules.GroupID"
+                    + " WHERE (ccgroups.ID is null)";
+                core.db.executeQuery(sql);
                 //
                 // ContentWatch with bad CContentID
                 //     must be deleted manually
@@ -948,56 +524,20 @@ namespace Contensive.Addons.Housekeeping {
                 // ContentWatchListRules with bad ContentWatchID
                 //
                 logHousekeeping(core, "Deleting ContentWatchList Rules with bad ContentWatchID.");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        sql = "delete ccContentWatchListRules.*"
-                            + " From ccContentWatchListRules"
-                            + " LEFT JOIN ccContentWatch on ccContentWatch.ID=ccContentWatchListRules.ContentWatchID"
-                            + " WHERE (ccContentWatch.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    case DataSourceTypeODBCSQLServer:
-                        sql = "delete from ccContentWatchListRules"
-                            + " From ccContentWatchListRules"
-                            + " LEFT JOIN ccContentWatch on ccContentWatch.ID=ccContentWatchListRules.ContentWatchID"
-                            + " WHERE (ccContentWatch.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    default:
-                        sql = "delete ccContentWatchListRules"
-                            + " From ccContentWatchListRules"
-                            + " LEFT JOIN ccContentWatch on ccContentWatch.ID=ccContentWatchListRules.ContentWatchID"
-                            + " WHERE (ccContentWatch.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                }
+                sql = "delete ccContentWatchListRules"
+                    + " From ccContentWatchListRules"
+                    + " LEFT JOIN ccContentWatch on ccContentWatch.ID=ccContentWatchListRules.ContentWatchID"
+                    + " WHERE (ccContentWatch.ID is null)";
+                core.db.executeQuery(sql);
                 //
                 // ContentWatchListRules with bad ContentWatchListID
                 //
                 logHousekeeping(core, "Deleting ContentWatchList Rules with bad ContentWatchListID.");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        sql = "delete ccContentWatchListRules.*"
-                            + " From ccContentWatchListRules"
-                            + " LEFT JOIN ccContentWatchLists on ccContentWatchLists.ID=ccContentWatchListRules.ContentWatchListID"
-                            + " WHERE (ccContentWatchLists.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    case DataSourceTypeODBCSQLServer:
-                        sql = "delete from ccContentWatchListRules"
-                            + " From ccContentWatchListRules"
-                            + " LEFT JOIN ccContentWatchLists on ccContentWatchLists.ID=ccContentWatchListRules.ContentWatchListID"
-                            + " WHERE (ccContentWatchLists.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                    default:
-                        sql = "delete ccContentWatchListRules"
-                            + " From ccContentWatchListRules"
-                            + " LEFT JOIN ccContentWatchLists on ccContentWatchLists.ID=ccContentWatchListRules.ContentWatchListID"
-                            + " WHERE (ccContentWatchLists.ID is null)";
-                        core.db.executeQuery(sql);
-                        break;
-                }
+                sql = "delete ccContentWatchListRules"
+                    + " From ccContentWatchListRules"
+                    + " LEFT JOIN ccContentWatchLists on ccContentWatchLists.ID=ccContentWatchListRules.ContentWatchListID"
+                    + " WHERE (ccContentWatchLists.ID is null)";
+                core.db.executeQuery(sql);
                 //
                 // Field help with no field
                 //
@@ -1115,7 +655,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        private void HouseKeep_App_Daily_RemoveVisitRecords(CoreController core, DateTime DeleteBeforeDate, int DataSourceType) {
+        private void HouseKeep_App_Daily_RemoveVisitRecords(CoreController core, DateTime DeleteBeforeDate) {
             try {
                 //
                 int TimeoutSave = 0;
@@ -1146,27 +686,10 @@ namespace Contensive.Addons.Housekeeping {
                 // Visitors with no visits
                 //
                 logHousekeeping(core, "Deleting visitors with no visits");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        SQL = "delete ccVisitors.*"
-                            + " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID"
-                            + " where ccVisits.ID is null";
-                        core.db.executeQuery(SQL);
-
-                        break;
-                    case DataSourceTypeODBCSQLServer:
-                        SQL = "delete From ccVisitors"
-                            + " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID"
-                            + " where ccVisits.ID is null";
-                        core.db.executeQuery(SQL);
-                        break;
-                    default:
-                        SQL = "delete ccVisitors"
-                            + " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID"
-                            + " where ccVisits.ID is null";
-                        core.db.executeQuery(SQL);
-                        break;
-                }
+                SQL = "delete ccVisitors"
+                    + " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID"
+                    + " where ccVisits.ID is null";
+                core.db.executeQuery(SQL);
                 //
                 // restore sved timeout
                 //
@@ -1180,7 +703,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        private void HouseKeep_App_Daily_RemoveGuestRecords(CoreController core, DateTime DeleteBeforeDate, int DataSourceType) {
+        private void HouseKeep_App_Daily_RemoveGuestRecords(CoreController core, DateTime DeleteBeforeDate) {
             int TimeoutSave = core.db.sqlCommandTimeout;
             try {
                 //
@@ -2006,5 +1529,146 @@ namespace Contensive.Addons.Housekeeping {
             string sql = "delete from ccProperties where id in (" + sqlInner + ")";
             core.db.executeNonQueryAsync(sql);
         }
+        //
+        //====================================================================================================
+        //
+        public void doNonOptionalHousekeeping( CoreController core, HousekeepEnvironment env ) {
+            string SQL = "";
+            {
+                //
+                // Move Archived pages from their current parent to their archive parent
+                //
+                bool NeedToClearCache = false;
+                logHousekeeping(core, "Archive update for pages on [" + core.appConfig.name + "]");
+                SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + env.SQLNow + "))and(active<>0)";
+                using (var csData = new CsModel(core)) {
+                    csData.openSql(SQL, "Default");
+                    while (csData.ok()) {
+                        int RecordID = csData.getInteger("ID");
+                        int ArchiveParentID = csData.getInteger("ArchiveParentID");
+                        if (ArchiveParentID == 0) {
+                            SQL = "update ccpagecontent set DateArchive=null where (id=" + RecordID + ")";
+                            core.db.executeQuery(SQL);
+                        } else {
+                            SQL = "update ccpagecontent set ArchiveParentID=null,DateArchive=null,parentid=" + ArchiveParentID + " where (id=" + RecordID + ")";
+                            core.db.executeQuery(SQL);
+                            NeedToClearCache = true;
+                        }
+                        csData.goNext();
+                    }
+                    csData.close();
+                }
+                //
+                // Clear caches
+                //
+                if (NeedToClearCache) {
+                    object emptyData = null;
+                    core.cache.invalidate("Page Content");
+                    core.cache.storeObject("PCC", emptyData);
+                }
+            }
+            {
+                //
+                // Delete any daily visit summary duplicates during this period(keep the first)
+                //
+                SQL = "delete from ccvisitsummary"
+                    + " where id in ("
+                    + " select d.id from ccvisitsummary d,ccvisitsummary f"
+                    + " where f.datenumber=d.datenumber"
+                    + " and f.datenumber>" + env.OldestVisitSummaryWeCareAbout.ToOADate() + " and f.datenumber<" + env.Yesterday.ToOADate() + " and f.TimeDuration=24"
+                    + " and d.TimeDuration=24"
+                    + " and f.id<d.id"
+                    + ")";
+                core.db.executeQuery(SQL);
+                //
+                // Find missing daily summaries, summarize that date
+                //
+                SQL = core.db.getSQLSelect("ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + env.OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
+                using (var csData = new CsModel(core)) {
+                    csData.openSql(SQL, "Default");
+                    DateTime datePtr = env.OldestVisitSummaryWeCareAbout;
+                    while (datePtr <= env.Yesterday) {
+                        if (!csData.ok()) {
+                            //
+                            // Out of data, start with this DatePtr
+                            //
+                            houseKeep_VisitSummary(core, datePtr, datePtr, 24, core.siteProperties.dataBuildVersion, env.OldestVisitSummaryWeCareAbout);
+                            //Exit For
+                        } else {
+                            DateTime workingDate = DateTime.MinValue.AddDays(csData.getInteger("DateNumber"));
+                            if (datePtr < workingDate) {
+                                //
+                                // There are missing dates, update them
+                                //
+                                houseKeep_VisitSummary(core, datePtr, workingDate.AddDays(-1), 24, core.siteProperties.dataBuildVersion, env.OldestVisitSummaryWeCareAbout);
+                            }
+                        }
+                        if (csData.ok()) {
+                            //
+                            // if there is more data, go to the next record
+                            //
+                            csData.goNext();
+                        }
+                        datePtr = datePtr.AddDays(1).Date;
+                    }
+                    csData.close();
+                }
+            }
+            //
+            // Remote Query Expiration
+            //
+            SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" + DbController.encodeSQLDate(DateTime.Now) + ")";
+            core.db.executeQuery(SQL);
+            SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.AddonID where m.addonid<>0 and a.id is null)";
+            core.db.executeQuery(SQL);
+            //
+            SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.helpaddonid where m.helpaddonid<>0 and a.id is null)";
+            core.db.executeQuery(SQL);
+            //
+            SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAddonCollections c on c.id=m.helpcollectionid Where m.helpcollectionid <> 0 And c.Id Is Null)";
+            core.db.executeQuery(SQL);
+            //
+            // Page View Summary
+            //
+            {
+                DateTime datePtr = default(DateTime);
+                using (var csData = new CsModel(core)) {
+                    if (!csData.openSql(core.db.getSQLSelect("ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + env.OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
+                        datePtr = env.OldestVisitSummaryWeCareAbout;
+                    } else {
+                        datePtr = DateTime.MinValue.AddDays(csData.getInteger("DateNumber"));
+                    }
+                }
+                if (datePtr < env.OldestVisitSummaryWeCareAbout) { datePtr = env.OldestVisitSummaryWeCareAbout; }
+                houseKeep_PageViewSummary(core, datePtr, env.Yesterday, 24, core.siteProperties.dataBuildVersion, env.OldestVisitSummaryWeCareAbout);
+            }
+            //
+            // -- Properties
+            housekeep_userProperties(core);
+            housekeep_visitProperties(core);
+            housekeep_visitorProperties(core);
+
+        }
+    }
+    //
+    //====================================================================================================
+    /// <summary>
+    /// housekeep environment, to facilitate argument passing
+    /// </summary>
+    public class HousekeepEnvironment {
+        public bool force;
+        public bool RunServerHousekeep;
+        public DateTime rightNow;
+        public DateTime LastCheckDateTime;
+        public int ServerHousekeepHour;
+        public DateTime Yesterday;
+        public DateTime ALittleWhileAgo;
+        public string SQLNow;
+        public DateTime OldestVisitSummaryWeCareAbout;
+        public int VisitArchiveAgeDays;
+        public DateTime VisitArchiveDate;
+        public string defaultMemberName;
+        public int GuestArchiveAgeDays;
+        public int EmailDropArchiveAgeDays;
     }
 }
