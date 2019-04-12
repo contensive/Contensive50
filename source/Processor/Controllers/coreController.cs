@@ -922,6 +922,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- no route
+                    LogController.logWarn(core, "executeRoute called with an unknown route [], and no default route is set to handle it. Go to the admin site, open preferences and set a detault route. Typically this is Page Manager for websites or an authorization error for remote applications.");
                     result = "<p>This site is not configured for website traffic. Please set the default route.</p>";
                 }
             } catch (Exception ex) {
