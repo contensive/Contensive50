@@ -156,7 +156,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     if ((addon.processNextRun < RightNow) || (addon.processRunOnce)) {
                                         //
-                                        LogController.logTrace(cpApp.core, "scheduleTasks, addon [" + addon.name + "], add task, addonProcessRunOnce [" + addon.processRunOnce + "], addonProcessNextRun [" + addon.processNextRun + "]");
+                                        LogController.logInfo(cpApp.core, "scheduleTasks, addon [" + addon.name + "], add task, addonProcessRunOnce [" + addon.processRunOnce + "], addonProcessNextRun [" + addon.processNextRun + "]");
                                         //
                                         // -- resolve triggering state
                                         addon.processRunOnce = false;
@@ -170,7 +170,7 @@ namespace Contensive.Processor.Controllers {
                                         }, false);
                                     } else if (addon.processNextRun == DateTime.MinValue) {
                                         //
-                                        LogController.logTrace(cpApp.core, "scheduleTasks, addon [" + addon.name + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
+                                        LogController.logInfo(cpApp.core, "scheduleTasks, addon [" + addon.name + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
                                         //
                                         // -- Interval is OK but NextRun is 0, just set next run
                                         addon.processNextRun = nextRun;

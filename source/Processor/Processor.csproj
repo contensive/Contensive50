@@ -107,6 +107,7 @@
     <Compile Include="Addons\Monitor\GetStatus.cs" />
     <Compile Include="Controllers\PermissionController.cs" />
     <Compile Include="Controllers\UpgradeController.cs" />
+    <Compile Include="Controllers\RouteController.cs" />
     <Compile Include="Exceptions\Exceptions.cs" />
     <Compile Include="Addons\AdminSite\Views\ControlEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\EmailBounceEditor.cs" />
@@ -188,7 +189,7 @@
     <Compile Include="Controllers\AddonController.cs" />
     <Compile Include="Controllers\CollectionController.cs" />
     <Compile Include="Addons\AdminSite\Controllers\AdminUIController.cs" />
-    <Compile Include="Controllers\AppBuilderController.cs" />
+    <Compile Include="Controllers\NewAppController.cs" />
     <Compile Include="Controllers\CacheController.cs" />
     <Compile Include="Controllers\KeyPtrIndexController.cs" />
     <Compile Include="Controllers\ContentCmdController.cs" />

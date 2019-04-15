@@ -796,25 +796,25 @@ namespace Contensive.Addons.AdminSite.Controllers {
         //
         // ====================================================================================================
         //
-        public static string getButtonPrimary(string buttonValue, string onclick, bool disabled, string htmlId, string htmlName) => HtmlController.getHtmlInputSubmit(buttonValue, htmlName, htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
+        public static string getButtonPrimary(string buttonValue, string onclick, bool disabled, string htmlId, string htmlName) => HtmlController.inputSubmit(buttonValue, htmlName, htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
         //
-        public static string getButtonPrimary(string buttonValue, string onclick, bool disabled, string htmlId) => HtmlController.getHtmlInputSubmit(buttonValue, "button", htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
+        public static string getButtonPrimary(string buttonValue, string onclick, bool disabled, string htmlId) => HtmlController.inputSubmit(buttonValue, "button", htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
         //
-        public static string getButtonPrimary(string buttonValue, string onclick, bool disabled) => HtmlController.getHtmlInputSubmit(buttonValue, "button", "", onclick, disabled, "btn btn-primary mr-1 btn-sm");
+        public static string getButtonPrimary(string buttonValue, string onclick, bool disabled) => HtmlController.inputSubmit(buttonValue, "button", "", onclick, disabled, "btn btn-primary mr-1 btn-sm");
         //
-        public static string getButtonPrimary(string buttonValue, string onclick) => HtmlController.getHtmlInputSubmit(buttonValue, "button", "", onclick, false, "btn btn-primary mr-1 btn-sm");
+        public static string getButtonPrimary(string buttonValue, string onclick) => HtmlController.inputSubmit(buttonValue, "button", "", onclick, false, "btn btn-primary mr-1 btn-sm");
         //
-        public static string getButtonPrimary(string buttonValue) => HtmlController.getHtmlInputSubmit(buttonValue, "button", "", "", false, "btn btn-primary mr-1 btn-sm");
+        public static string getButtonPrimary(string buttonValue) => HtmlController.inputSubmit(buttonValue, "button", "", "", false, "btn btn-primary mr-1 btn-sm");
         //
         // ====================================================================================================
         //
-        public static string getButtonDanger(string buttonValue, string onclick, bool disabled, string htmlId) => HtmlController.getHtmlInputSubmit(buttonValue, "button", htmlId, onclick, disabled, "btn btn-danger mr-1 btn-sm");
+        public static string getButtonDanger(string buttonValue, string onclick, bool disabled, string htmlId) => HtmlController.inputSubmit(buttonValue, "button", htmlId, onclick, disabled, "btn btn-danger mr-1 btn-sm");
         //
-        public static string getButtonDanger(string buttonValue, string onclick, bool disabled) => HtmlController.getHtmlInputSubmit(buttonValue, "button", "", onclick, disabled, "btn btn-danger mr-1 btn-sm");
+        public static string getButtonDanger(string buttonValue, string onclick, bool disabled) => HtmlController.inputSubmit(buttonValue, "button", "", onclick, disabled, "btn btn-danger mr-1 btn-sm");
         //
-        public static string getButtonDanger(string buttonValue, string onclick) => HtmlController.getHtmlInputSubmit(buttonValue, "button", "", onclick, false, "btn btn-danger mr-1 btn-sm");
+        public static string getButtonDanger(string buttonValue, string onclick) => HtmlController.inputSubmit(buttonValue, "button", "", onclick, false, "btn btn-danger mr-1 btn-sm");
         //
-        public static string getButtonDanger(string buttonValue) => HtmlController.getHtmlInputSubmit(buttonValue, "button", "", "", false, "btn btn-danger mr-1 btn-sm");
+        public static string getButtonDanger(string buttonValue) => HtmlController.inputSubmit(buttonValue, "button", "", "", false, "btn btn-danger mr-1 btn-sm");
         //
         // ====================================================================================================
         //

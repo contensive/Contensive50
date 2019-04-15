@@ -118,7 +118,7 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Contensive.CLI.mainClass</StartupObject>
+    <StartupObject>Contensive.CLI.MainClass</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <TargetZone>LocalIntranet</TargetZone>
@@ -188,16 +188,29 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Views\configureClass.cs" />
-    <Compile Include="Views\FixTableFolderCaseClass.cs" />
-    <Compile Include="Views\upgradeClass.cs" />
-    <Compile Include="Views\_blankClass.cs" />
-    <Compile Include="Views\installAddonClass.cs" />
-    <Compile Include="Views\uploadFilesClass.cs" />
-    <Compile Include="Views\deleteAppClass.cs" />
-    <Compile Include="Views\genericController.cs" />
-    <Compile Include="Views\createAppClass.cs" />
-    <Compile Include="Views\mainClass.cs" />
+    <Compile Include="Views\ConfigureCmd.cs" />
+    <Compile Include="Views\FixTableFolderCaseCmd.cs" />
+    <Compile Include="Views\ExecuteAddonCmd.cs" />
+    <Compile Include="Views\DeleteProtectionCmd.cs" />
+    <Compile Include="Views\StatusCmd.cs" />
+    <Compile Include="Views\HousekeepCmd.cs" />
+    <Compile Include="Views\FlushCacheCmd.cs" />
+    <Compile Include="Views\RepairCmd.cs" />
+    <Compile Include="Views\LoggingCmd.cs" />
+    <Compile Include="Views\TasksCmd.cs" />
+    <Compile Include="Views\TaskRunnerCmd.cs" />
+    <Compile Include="Views\UpgradeCmd.cs" />
+    <Compile Include="Views\TaskSchedulerCmd.cs" />
+    <Compile Include="Views\HelpCmd.cs" />
+    <Compile Include="Views\VersionCmd.cs" />
+    <Compile Include="Views\RunTaskCmd.cs" />
+    <Compile Include="Views\_BlankCmd.cs" />
+    <Compile Include="Views\InstallCollectionCmd.cs" />
+    <Compile Include="Views\UploadFilesCmd.cs" />
+    <Compile Include="Views\DeleteAppCmd.cs" />
+    <Compile Include="Views\GenericController.cs" />
+    <Compile Include="Views\NewAppCmd.cs" />
+    <Compile Include="Views\MainClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>

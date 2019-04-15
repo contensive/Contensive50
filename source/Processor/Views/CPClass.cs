@@ -127,7 +127,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public string executeRoute(string route) {
             try {
-                return core.executeRoute(route);
+                return RouteController.executeRoute(core, route);
             } catch (Exception ex) {
                 Site.ErrorReport(ex);
             }
@@ -142,7 +142,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public string executeRoute() {
             try {
-                return core.executeRoute();
+                return RouteController.executeRoute(core);
             } catch (Exception ex) {
                 Site.ErrorReport(ex);
             }

@@ -121,6 +121,7 @@ namespace Contensive.Processor.Controllers {
         private int _assemblySkipList_CountWhenLoaded;
         //
         //===================================================================================================
+        //
         public Dictionary<string, DataSourceModel> dataSourceDictionary {
             get {
                 if (_dataSources == null) {
@@ -132,6 +133,7 @@ namespace Contensive.Processor.Controllers {
         private Dictionary<string, DataSourceModel> _dataSources = null;
         //
         //===================================================================================================
+        //
         public DocController doc {
             get {
                 if (_doc == null) {
@@ -143,6 +145,7 @@ namespace Contensive.Processor.Controllers {
         private DocController _doc;
         //
         //===================================================================================================
+        //
         public Controllers.HtmlController html {
             get {
                 if (_html == null) {
@@ -154,6 +157,7 @@ namespace Contensive.Processor.Controllers {
         private Controllers.HtmlController _html;
         //
         //===================================================================================================
+        //
         public Controllers.AddonController addon {
             get {
                 if (_addon == null) {
@@ -165,6 +169,7 @@ namespace Contensive.Processor.Controllers {
         private Controllers.AddonController _addon;
         //
         //===================================================================================================
+        //
         public PropertyModelClass userProperty {
             get {
                 if (_userProperty == null) {
@@ -176,6 +181,7 @@ namespace Contensive.Processor.Controllers {
         private PropertyModelClass _userProperty;
         //
         //===================================================================================================
+        //
         public PropertyModelClass visitorProperty {
             get {
                 if (_visitorProperty == null) {
@@ -187,6 +193,7 @@ namespace Contensive.Processor.Controllers {
         private PropertyModelClass _visitorProperty;
         //
         //===================================================================================================
+        //
         public PropertyModelClass visitProperty {
             get {
                 if (_visitProperty == null) {
@@ -198,6 +205,7 @@ namespace Contensive.Processor.Controllers {
         private PropertyModelClass _visitProperty;
         //
         //===================================================================================================
+        //
         public DocPropertyController docProperties {
             get {
                 if (_docProperties == null) {
@@ -226,6 +234,7 @@ namespace Contensive.Processor.Controllers {
         private SitePropertiesController _siteProperties = null;
         //
         //===================================================================================================
+        //
         public WebServerController webServer {
             get {
                 if (_webServer == null) {
@@ -237,6 +246,7 @@ namespace Contensive.Processor.Controllers {
         private WebServerController _webServer;
         //
         //===================================================================================================
+        //
         public FileController wwwFiles {
             get {
                 if (_appRootFiles == null) {
@@ -252,6 +262,7 @@ namespace Contensive.Processor.Controllers {
         private FileController _appRootFiles = null;
         //
         //===================================================================================================
+        //
         public FileController tempFiles {
             get {
                 if (_tmpFiles == null) {
@@ -265,6 +276,7 @@ namespace Contensive.Processor.Controllers {
         private FileController _tmpFiles = null;
         //
         //===================================================================================================
+        //
         public FileController privateFiles {
             get {
                 if (_privateFiles == null) {
@@ -280,6 +292,7 @@ namespace Contensive.Processor.Controllers {
         private FileController _privateFiles = null;
         //
         //===================================================================================================
+        //
         public FileController programDataFiles {
             get {
                 if (_programDataFiles == null) {
@@ -294,9 +307,27 @@ namespace Contensive.Processor.Controllers {
         private FileController _programDataFiles = null;
         //
         //===================================================================================================
+        //
         public FileController programFiles {
             get {
                 if (_programFiles == null) {
+                    if (String.IsNullOrEmpty(serverConfig.programFilesPath)) {
+                        //
+                        // -- dev environment, setup programfiles path 
+                        string executePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+                        if (!executePath.ToLowerInvariant().IndexOf("\\git\\").Equals(-1)) {
+                            //
+                            //  -- save if not in developer execution path
+                            serverConfig.programFilesPath = executePath;
+                            LogController.logWarn(this, "serverConfig.ProgramFilesPath is blank. Current executable path includes \\git\\ so development environment set.");
+                        } else {
+                            //
+                            //  -- developer, fake a path
+                            serverConfig.programFilesPath = "c:\\Program Files (x86)\\kma\\Contensive5\\";
+                            LogController.logWarn(this, "serverConfig.ProgramFilesPath is blank. Current executable path does NOT includes \\git\\ so assumed program files path environment set.");
+                        }
+                        serverConfig.save(this);
+                    }
                     //
                     // -- always local
                     _programFiles = new FileController(this, true, serverConfig.programFilesPath,"");
@@ -307,6 +338,7 @@ namespace Contensive.Processor.Controllers {
         private FileController _programFiles = null;
         //
         //===================================================================================================
+        //
         public FileController cdnFiles {
             get {
                 if (_cdnFiles == null) {
@@ -549,6 +581,7 @@ namespace Contensive.Processor.Controllers {
             constructorInitialize(true);
             LogController.forceNLog( "CoreController constructor-3, exit", LogController.LogLevel.Trace);
         }
+        //
         //====================================================================================================
         /// <summary>
         /// coreClass constructor for a web request/response environment. coreClass is the primary object internally, created by cp.
@@ -572,571 +605,7 @@ namespace Contensive.Processor.Controllers {
             }
             LogController.forceNLog( "CoreController constructor-4, exit", LogController.LogLevel.Trace);
         }
-        //=============================================================================
-        /// <summary>
-        /// Executes the current route. To determine the route:
-        /// route can be from URL, or from routeOverride
-        /// how to process route
-        /// -- urlParameters - /urlParameter(0)/urlParameter(1)/etc.
-        /// -- first try full url, then remove them from the left and test until last, try just urlParameter(0)
-        /// ---- so url /a/b/c, with addon /a and addon /a/b -> would run addon /a/b
-        /// 
-        /// </summary>
-        /// <returns>The doc created by the default addon. (html, json, etc)</returns>
-        public string executeRoute(string routeOverride = "") {
-            string result = "";
-            var sw = new Stopwatch();
-            sw.Start();
-            LogController.forceNLog("CoreController executeRoute, enter", LogController.LogLevel.Trace);
-            try {
-                if (appConfig != null) {
-                    //
-                    // -- test fix for 404 response during routing - could it be a response left over from processing before we are called
-                    webServer.setResponseStatus(WebServerController.httpResponseStatus200);
-                    //
-                    // -- execute intercept methods first, like login, that run before the route that returns the page
-                    // -- intercept routes should be addons alos
-                    //
-                    // -- determine the route: try routeOverride
-                    string normalizedRoute = GenericController.normalizeRoute(routeOverride);
-                    if (string.IsNullOrEmpty(normalizedRoute)) {
-                        //
-                        // -- no override, try argument route (remoteMethodAddon=)
-                        normalizedRoute = GenericController.normalizeRoute(docProperties.getText(RequestNameRemoteMethodAddon));
-                        if (string.IsNullOrEmpty(normalizedRoute)) {
-                            //
-                            // -- no override or argument, use the url as the route
-                            normalizedRoute = GenericController.normalizeRoute(webServer.requestPathPage.ToLowerInvariant());
-                        }
-                    }
-                    //
-                    // -- legacy ajaxfn methods
-                    string AjaxFunction = docProperties.getText(RequestNameAjaxFunction);
-                    if (!string.IsNullOrEmpty(AjaxFunction)) {
-                        //
-                        // -- Need to be converted to Url parameter addons
-                        switch ((AjaxFunction)) {
-                            case ajaxGetFieldEditorPreferenceForm:
-                                //
-                                // moved to Addons.AdminSite
-                                doc.continueProcessing = false;
-                                return (new Addons.AdminSite.GetFieldEditorPreference()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case AjaxGetDefaultAddonOptionString:
-                                //
-                                // moved to Addons.AdminSite
-                                doc.continueProcessing = false;
-                                return (new Addons.AdminSite.GetAjaxDefaultAddonOptionStringClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case AjaxSetVisitProperty:
-                                //
-                                // moved to Addons.AdminSite
-                                doc.continueProcessing = false;
-                                return (new Addons.AdminSite.SetAjaxVisitPropertyClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case AjaxGetVisitProperty:
-                                //
-                                // moved to Addons.AdminSite
-                                doc.continueProcessing = false;
-                                return (new Addons.AdminSite.GetAjaxVisitPropertyClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case AjaxData:
-                                //
-                                // moved to Addons.AdminSite
-                                doc.continueProcessing = false;
-                                return (new Addons.AdminSite.ProcessAjaxDataClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case AjaxPing:
-                                //
-                                // moved to Addons.AdminSite
-                                doc.continueProcessing = false;
-                                return (new Addons.AdminSite.GetOKClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case AjaxOpenIndexFilter:
-                                //
-                                // moved to Addons.AdminSite
-                                doc.continueProcessing = false;
-                                return (new Addons.AdminSite.OpenAjaxIndexFilterClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case AjaxOpenIndexFilterGetContent:
-                                //
-                                // moved to Addons.AdminSite
-                                doc.continueProcessing = false;
-                                return (new Addons.AdminSite.OpenAjaxIndexFilterGetContentClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case AjaxCloseIndexFilter:
-                                //
-                                // moved to Addons.AdminSite
-                                doc.continueProcessing = false;
-                                return (new Addons.AdminSite.CloseAjaxIndexFilterClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case AjaxOpenAdminNav:
-                                //
-                                // moved to Addons.AdminSite
-                                doc.continueProcessing = false;
-                                return (new Addons.AdminSite.OpenAjaxAdminNavClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            default:
-                                //
-                                // -- unknown method, log warning
-                                doc.continueProcessing = false;
-                                return string.Empty;
-                        }
-                    }
-                    //
-                    // -- legacy email intercept methods
-                    if (docProperties.getInteger(rnEmailOpenFlag) > 0) {
-                        //
-                        // -- Process Email Open
-                        doc.continueProcessing = false;
-                        return (new Addons.Primitives.openEmailClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                    }
-                    if (docProperties.getInteger(rnEmailClickFlag) > 0) {
-                        //
-                        // -- Process Email click
-                        doc.continueProcessing = false;
-                        return (new Addons.Primitives.clickEmailClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                    }
-                    if (docProperties.getInteger(rnEmailBlockRecipientEmail) > 0) {
-                        //
-                        // -- Process Email block
-                        doc.continueProcessing = false;
-                        return (new Addons.Primitives.blockEmailClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                    }
-                    //
-                    // -- legacy form process methods 
-                    string formType = docProperties.getText(docProperties.getText("ccformsn") + "type");
-                    if (!string.IsNullOrEmpty(formType)) {
-                        //
-                        // set the meta content flag to show it is not needed for the head tag
-                        switch (formType) {
-                            case FormTypeAddonStyleEditor:
-                                //
-                                result = (new Addons.Primitives.processAddonStyleEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                                break;
-                            case FormTypeAddonSettingsEditor:
-                                //
-                                result = (new Addons.Primitives.processAddonSettingsEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                                break;
-                            case FormTypeSendPassword:
-                                //
-                                result = (new Addons.Primitives.processSendPasswordFormClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                                break;
-                            case FormTypeLogin:
-                            case "l09H58a195":
-                                //
-                                result = (new Addons.Primitives.processFormLoginDefaultClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                                break;
-                            case FormTypeToolsPanel:
-                                //
-                                result = (new Addons.Primitives.processFormToolsPanelClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                                break;
-                            case FormTypePageAuthoring:
-                                //
-                                result = (new Addons.Primitives.processFormQuickEditingClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                                break;
-                            case FormTypeActiveEditor:
-                                //
-                                result = (new Addons.Primitives.processActiveEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                                break;
-                            case FormTypeSiteStyleEditor:
-                                //
-                                result = (new Addons.Primitives.processSiteStyleEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                                break;
-                            case FormTypeHelpBubbleEditor:
-                                //
-                                result = (new Addons.Primitives.processHelpBubbleEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                                break;
-                            case FormTypeJoin:
-                                //
-                                result = (new Addons.Primitives.processJoinFormClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                                break;
-                        }
-                    }
-                    //
-                    // -- legacy methods=
-                    string HardCodedPage = docProperties.getText(RequestNameHardCodedPage);
-                    if (!string.IsNullOrEmpty(HardCodedPage)) {
-                        switch (GenericController.vbLCase(HardCodedPage)) {
-                            case HardCodedPageLogout:
-                                //
-                                // -- logout intercept -- after logout continue
-                                (new Addons.Primitives.processLogoutMethodClass()).Execute(cp_forAddonExecutionOnly);
-                                break;
-                            case HardCodedPageSendPassword:
-                                //
-                                return (new Addons.Primitives.processSendPasswordMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case HardCodedPageResourceLibrary:
-                                //
-                                return (new Addons.Primitives.processResourceLibraryMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case HardCodedPageLoginDefault:
-                                //
-                                return (new Addons.Primitives.processLoginDefaultMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case HardCodedPageLogin:
-                                //
-                                return (new Addons.Primitives.processLoginMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case HardCodedPageLogoutLogin:
-                                //
-                                return (new Addons.Primitives.processLogoutLoginMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case HardCodedPageSiteExplorer:
-                                //
-                                return (new Addons.Primitives.processSiteExplorerMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case HardCodedPageStatus:
-                                //
-                                return (new Addons.Primitives.processStatusMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case HardCodedPageRedirect:
-                                //
-                                return (new Addons.Primitives.processRedirectMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case HardCodedPageExportAscii:
-                                //
-                                return (new Addons.Primitives.processExportAsciiMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                                //case HardCodedPagePayPalConfirm:
-                                //    //
-                                //    return (new Addons.Primitives.processPayPalConformMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                        }
-                    }
-                    //
-                    // -- try route Dictionary (addons, admin, link forwards, link alias), from full route to first segment one at a time
-                    // -- so route /this/and/that would first test /this/and/that, then test /this/and, then test /this
-                    string routeTest = normalizedRoute;
-                    bool routeFound = false;
-                    int routeCnt = 100;
-                    do {
-                        routeFound = routeMap.routeDictionary.ContainsKey(routeTest);
-                        if (routeFound) {
-                            break;
-                        }
-                        if (routeTest.IndexOf("/") < 0) {
-                            break;
-                        }
-                        routeTest = routeTest.Left(routeTest.LastIndexOf("/"));
-                        routeCnt -= 1;
-                    } while ((routeCnt > 0) && (!routeFound));
-                    //
-                    // -- execute route
-                    if (routeFound) {
-                         RouteMapModel.routeClass route = routeMap.routeDictionary[routeTest];
-                        switch (route.routeType) {
-                            case RouteMapModel.routeTypeEnum.admin: {
-                                    //
-                                    // -- admin site
-                                    AddonModel addon = AddonModel.create(this, addonGuidAdminSite);
-                                    if (addon == null) {
-                                        LogController.handleError( this,new GenericException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
-                                        return "The default admin site addon could not be found. Please run an upgrade on this application to restore default services (command line> cc -a appName -r )";
-                                    } else {
-                                        return this.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
-                                            addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
-                                            errorContextMessage = "calling admin route [" + addonGuidAdminSite + "] during execute route method"
-                                        });
-                                    }
-                                }
-                            case RouteMapModel.routeTypeEnum.remoteMethod: {
-                                    //
-                                    // -- remote method
-                                    AddonModel addon = addonCache.getAddonById(route.remoteMethodAddonId);
-                                    if (addon == null) {
-                                        LogController.handleError( this,new GenericException("The addon for remoteMethodAddonId [" + route.remoteMethodAddonId + "] could not be opened."));
-                                        return "";
-                                    } else { 
-                                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                                            addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson,
-                                            cssContainerClass = "",
-                                            cssContainerId = "",
-                                            hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                                contentName = docProperties.getText("hostcontentname"),
-                                                fieldName = "",
-                                                recordId = docProperties.getInteger("HostRecordID")
-                                            },
-                                            personalizationAuthenticated = session.isAuthenticated,
-                                            personalizationPeopleId = session.user.id,
-                                            errorContextMessage = "calling remote method addon [" + route.remoteMethodAddonId + "] during execute route method"
-                                        };
-                                        return this.addon.execute(addon, executeContext);
-                                    }
-                                }
-                            case RouteMapModel.routeTypeEnum.linkAlias:
-                                //
-                                // - link alias
-                                // -- all the query string values have already been added to doc properties, so do not over write them.
-                                // -- consensus is that since the link alias (permalink, long-tail url, etc) comes first on the left, that the querystring should override
-                                // -- so http://www.mySite.com/My-Blog-Post?bid=9 means use the bid not the bid from the link-alias
-                                LinkAliasModel linkAlias = LinkAliasModel.create(this, route.linkAliasId);
-                                if (linkAlias != null) {
-                                    // -- set the link alias page number, unless it has been overridden
-                                    if (!docProperties.containsKey("bid")) { docProperties.setProperty("bid", linkAlias.pageID); }
-                                    if (!string.IsNullOrWhiteSpace(linkAlias.queryStringSuffix)) {
-                                        string[] keyValuePairs = linkAlias.queryStringSuffix.Split('&');
-                                        // -- iterate through all the key=value pairs
-                                        foreach (var keyEqualsValue in keyValuePairs) {
-                                            string[] keyValue = keyEqualsValue.Split('=');
-                                            if (!string.IsNullOrEmpty(keyValue[0])) {
-                                                if (!docProperties.containsKey(keyValue[0])) {
-                                                    if (keyValue.Length > 1) {
-                                                        docProperties.setProperty(keyValue[0], keyValue[1]);
-                                                    } else {
-                                                        docProperties.setProperty(keyValue[0], string.Empty);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                }
-                                break;
-                            case RouteMapModel.routeTypeEnum.linkForward:
-                                //
-                                // -- link forward
-                                LinkForwardModel linkForward = LinkForwardModel.create(this, route.linkForwardId);
-                                return webServer.redirect(linkForward.DestinationLink, "Link Forward #" + linkForward.id + ", " + linkForward.name);
-                        }
-                    }
-                    if (normalizedRoute.Equals("favicon.ico")) {
-                        //
-                        // -- Favicon.ico
-                        doc.continueProcessing = false;
-                        return (new Addons.Primitives.faviconIcoClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                    }
-                    if (normalizedRoute.Equals("robots.txt")) {
-                        //
-                        // -- Favicon.ico
-                        doc.continueProcessing = false;
-                        return (new Addons.Primitives.robotsTxtClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                    }
-                    //
-                    // -- default route 
-                    int defaultAddonId = 0;
-                    if (doc.domain != null) {
-                        defaultAddonId = doc.domain.defaultRouteId;
-                    }
-                    if (defaultAddonId == 0) {
-                        defaultAddonId = siteProperties.defaultRouteId;
-                    }
-                    if (defaultAddonId > 0) {
-                        //
-                        // -- default route is run if no other route is found, which includes the route=defaultPage (default.aspx)
-                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                            addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                            cssContainerClass = "",
-                            cssContainerId = "",
-                            hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                contentName = "",
-                                fieldName = "",
-                                recordId = 0
-                            },
-                            personalizationAuthenticated = session.visit.visitAuthenticated,
-                            personalizationPeopleId = session.user.id,
-                            errorContextMessage = "calling default route addon [" + defaultAddonId + "] during execute route method"
-                        };
-                        return this.addon.execute(Models.Db.AddonModel.create(this, defaultAddonId), executeContext);
-                    }
-                    //
-                    // -- no route
-                    LogController.logWarn(core, "executeRoute called with an unknown route [], and no default route is set to handle it. Go to the admin site, open preferences and set a detault route. Typically this is Page Manager for websites or an authorization error for remote applications.");
-                    result = "<p>This site is not configured for website traffic. Please set the default route.</p>";
-                }
-            } catch (Exception ex) {
-                LogController.handleError( this,ex);
-            } finally {
-                // if (doc.routeDictionaryChanges) { DefaultSite.configurationClass.loadRouteMap(cp))}
-                LogController.forceNLog("CoreController executeRoute, exit", LogController.LogLevel.Trace);
-            }
-            return result;
-        }
         //
-        //=================================================================================================
-        /// <summary>
-        /// Run and return results from a remotequery call from cj.ajax.data(handler,key,args,pagesize,pagenumber)
-        /// This routine builds an xml object inside a <result></result> node. 
-        /// Right now, the response is in JSON format, and conforms to the google data visualization spec 0.5
-        /// </summary>
-        /// <returns></returns>
-        public string executeRoute_ProcessAjaxData() {
-            string result = "";
-            try {
-                LogController.handleError( this,new GenericException("executeRoute_ProcessAjaxData deprecated"));
-                //string RemoteKey = docProperties.getText("key");
-                //string EncodedArgs = docProperties.getText("args");
-                //int PageSize = docProperties.getInteger("pagesize");
-                //int PageNumber = docProperties.getInteger("pagenumber");
-                //RemoteFormatEnum RemoteFormat = null;
-                //switch (genericController.vbLCase(docProperties.getText("responseformat"))) {
-                //    case "jsonnamevalue":
-                //        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameValue;
-                //        break;
-                //    case "jsonnamearray":
-                //        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameArray;
-                //        break;
-                //    default: //jsontable
-                //        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonTable;
-                //        break;
-                //}
-                ////
-                //return "";
-                ////
-                ////
-                //// Handle common work
-                ////
-                //if (PageNumber == 0) {
-                //    PageNumber = 1;
-                //}
-                //if (PageSize == 0) {
-                //    PageSize = 100;
-                //}
-                //int maxRows = 0;
-                //if (maxRows != 0 && PageSize > maxRows) {
-                //    PageSize = maxRows;
-                //}
-                ////
-                //string[] ArgName = { };
-                //string[] ArgValue = { };
-                //if (!string.IsNullOrEmpty(EncodedArgs)) {
-                //    string Args = EncodedArgs;
-                //    string[] ArgArray = Args.Split('&');
-                //    int ArgCnt = ArgArray.GetUpperBound(0) + 1;
-                //    ArgName = new string[ArgCnt + 1];
-                //    ArgValue = new string[ArgCnt + 1];
-                //    for (var Ptr = 0; Ptr < ArgCnt; Ptr++) {
-                //        int Pos = genericController.vbInstr(1, ArgArray[Ptr], "=");
-                //        if (Pos > 0) {
-                //            ArgName[Ptr] = genericController.DecodeResponseVariable(ArgArray[Ptr].Left( Pos - 1));
-                //            ArgValue[Ptr] = genericController.DecodeResponseVariable(ArgArray[Ptr].Substring(Pos));
-                //        }
-                //    }
-                //}
-                ////
-                //// main_Get values out of the remote query record
-                ////
-                //GoogleVisualizationType gv = new GoogleVisualizationType();
-                //gv.status = GoogleVisualizationStatusEnum.OK;
-                ////
-                //if (gv.status == GoogleVisualizationStatusEnum.OK) {
-                //    string SetPairString = "";
-                //    int QueryType = 0;
-                //    string ContentName = "";
-                //    string Criteria = "";
-                //    string SortFieldList = "";
-                //    bool AllowInactiveRecords2 = false;
-                //    string SelectFieldList = "";
-                //    int CS = db.csOpen("Remote Queries", "((VisitId=" + doc.authContext.visit.id + ")and(remotekey=" + DbController.encodeSQLText(RemoteKey) + "))");
-                //    if (db.csOk()) {
-                //        //
-                //        // Use user definied query
-                //        //
-                //        string SQLQuery = db.csGetText("sqlquery");
-                //        //DataSource = dataSourceModel.create(Me, db.cs_getInteger(CS, "datasourceid"), New List(Of String))
-                //        maxRows = db.csGetInteger("maxrows");
-                //        QueryType = db.csGetInteger("QueryTypeID");
-                //        ContentName = db.csGet("ContentID");
-                //        Criteria = db.csGetText("Criteria");
-                //        SortFieldList = db.csGetText("SortFieldList");
-                //        AllowInactiveRecords2 = db.csGetBoolean("AllowInactiveRecords");
-                //        SelectFieldList = db.csGetText("SelectFieldList");
-                //    } else {
-                //        //
-                //        // Try Hardcoded queries
-                //        //
-                //        switch (genericController.vbLCase(RemoteKey)) {
-                //            case "ccfieldhelpupdate":
-                //                //
-                //                // developers editing field help
-                //                //
-                //                if (!doc.authContext.user.Developer) {
-                //                    gv.status = GoogleVisualizationStatusEnum.ErrorStatus;
-                //                    int Ptr = 0;
-                //                    if (gv.errors.GetType().IsArray) {
-                //                        Ptr = gv.errors.GetUpperBound(0) + 1;
-                //                    }
-                //                    Array.Resize(ref gv.errors, Ptr);
-                //                    gv.errors[Ptr] = "permission error";
-                //                } else {
-                //                    QueryType = QueryTypeUpdateContent;
-                //                    ContentName = "Content Field Help";
-                //                    Criteria = "";
-                //                    AllowInactiveRecords2 = false;
-                //                }
-                //                //Case Else
-                //                //    '
-                //                //    ' query not found
-                //                //    '
-                //                //    gv.status = GoogleVisualizationStatusEnum.ErrorStatus
-                //                //    If IsArray(gv.errors) Then
-                //                //        Ptr = 0
-                //                //    Else
-                //                //        Ptr = UBound(gv.errors) + 1
-                //                //    End If
-                //                //    ReDim gv.errors[Ptr]
-                //                //    gv.errors[Ptr] = "query not found"
-                //                break;
-                //        }
-                //    }
-                //    db.csClose();
-                //    //
-                //    if (gv.status == GoogleVisualizationStatusEnum.OK) {
-                //        switch (QueryType) {
-                //            case QueryTypeUpdateContent:
-                //                //
-                //                // Contensive Content Update, args are field=value updates
-                //                // !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
-                //                //
-                //                //
-                //                // Go though args and main_Get Set and Criteria
-                //                //
-                //                SetPairString = "";
-                //                Criteria = "";
-                //                for (var Ptr = 0; Ptr < ArgName.Length; Ptr++) {
-                //                    if (genericController.vbLCase(ArgName[Ptr]) == "setpairs") {
-                //                        SetPairString = ArgValue[Ptr];
-                //                    } else if (genericController.vbLCase(ArgName[Ptr]) == "criteria") {
-                //                        Criteria = ArgValue[Ptr];
-                //                    }
-                //                }
-                //                //
-                //                // Open the content and cycle through each setPair
-                //                //
-                //                CS = db.csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, 0, false, false, SelectFieldList);
-                //                if (db.csOk()) {
-                //                    //
-                //                    // update by looping through the args and setting name=values
-                //                    //
-                //                    string[] SetPairs = SetPairString.Split('&');
-                //                    for (var Ptr = 0; Ptr <= SetPairs.GetUpperBound(0); Ptr++) {
-                //                        if (!string.IsNullOrEmpty(SetPairs[Ptr])) {
-                //                            int Pos = genericController.vbInstr(1, SetPairs[Ptr], "=");
-                //                            if (Pos > 0) {
-                //                                string FieldValue = genericController.DecodeResponseVariable(SetPairs[Ptr].Substring(Pos));
-                //                                string FieldName = genericController.DecodeResponseVariable(SetPairs[Ptr].Left( Pos - 1));
-                //                                if (!Models.Complex.cdefModel.isContentFieldSupported(this, ContentName, FieldName)) {
-                //                                    string errorMessage = "result, QueryTypeUpdateContent, key [" + RemoteKey + "], bad field [" + FieldName + "] skipped";
-                //                                    throw (new GenericException(errorMessage));
-                //                                } else {
-                //                                    db.csSet(FieldName, FieldValue);
-                //                                }
-                //                            }
-                //                        }
-                //                    }
-                //                }
-                //                db.csClose();
-                //                //Case QueryTypeInsertContent
-                //                //    '
-                //                //    ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
-                //                //    '
-                //                //    '
-                //                //    ' Contensive Content Insert, args are field=value
-                //                //    '
-                //                //    'CS = main_InsertCSContent(ContentName)
-                //                break;
-                //            default:
-                //                break;
-                //        }
-                //        //
-                //        // output
-                //        //
-                //        GoogleDataType gd = new GoogleDataType();
-                //        gd.IsEmpty = true;
-                //        //
-                //        string Copy = remoteQueryController.main_FormatRemoteQueryOutput(this, gd, RemoteFormat);
-                //        Copy = htmlController.encodeHTML(Copy);
-                //        result = "<data>" + Copy + "</data>";
-                //    }
-                //}
-            } catch (Exception ex) {
-                throw (ex);
-            }
-            return result;
-        }
-        //
-        //====================================================================================================
         /// <summary>
         /// coreClass constructor common tasks.
         /// </summary>

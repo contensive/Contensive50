@@ -680,7 +680,7 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.logInfo(core, "metadata Load, stage 1: verify core sql tables");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                AppBuilderController.verifyBasicTables(core, logPrefix);
+                NewAppController.verifyBasicTables(core, logPrefix);
                 //
                 //----------------------------------------------------------------------------------------------------------------------
                 LogController.logInfo(core, "metadata Load, stage 2: create SQL tables in default datasource");
@@ -739,8 +739,8 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.logInfo(core, "metadata Load, stage 4: Verify content records required for Content Server");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                AppBuilderController.verifySortMethods(core);
-                AppBuilderController.verifyContentFieldTypes(core);
+                NewAppController.verifySortMethods(core);
+                NewAppController.verifyContentFieldTypes(core);
                 core.clearMetaData();
                 core.cache.invalidateAll();
                 //
@@ -839,7 +839,7 @@ namespace Contensive.Processor.Models.Domain {
                     var menu = kvp.Value;
                     if (menu.dataChanged) {
                         LogController.logInfo(core, "creating navigator entry [" + menu.name + "], namespace [" + menu.menuNameSpace + "], guid [" + menu.Guid + "]");
-                        AppBuilderController.verifyNavigatorEntry(core, menu, 0);
+                        NewAppController.verifyNavigatorEntry(core, menu, 0);
                     }
                 }
                 //

@@ -67,7 +67,7 @@ namespace Contensive.Addons.Tools {
                 //
                 Stream.Add("<tr>");
                 Stream.Add("<TD>&nbsp;</td>");
-                Stream.Add("<TD>" + HtmlController.getHtmlInputSubmit(ButtonCreateFields) + "</td>");
+                Stream.Add("<TD>" + HtmlController.inputSubmit(ButtonCreateFields) + "</td>");
                 //Stream.Add("<TD><INPUT type=\"submit\" value=\"" + ButtonCreateFields + "\" name=\"Button\"></td>");
                 Stream.Add("</tr>");
                 //

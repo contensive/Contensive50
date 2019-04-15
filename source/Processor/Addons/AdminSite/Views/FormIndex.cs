@@ -1125,8 +1125,6 @@ namespace Contensive.Addons.AdminSite {
                     adminData.adminContent.id = adminData.adminContent.id;
                     SubContentCnt = 0;
                     if (!string.IsNullOrEmpty(list)) {
-                        Console.WriteLine("console - adminContext.adminContext.content.contentControlCriteria=" + list);
-                        ////Debug.WriteLine("debug - adminContext.adminContext.content.contentControlCriteria=" + list);
                         LogController.logInfo(core, "appendlog - adminContext.adminContext.content.contentControlCriteria=" + list);
                         ListSplit = list.Split('=');
                         Cnt = ListSplit.GetUpperBound(0) + 1;

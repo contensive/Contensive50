@@ -46,7 +46,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string Button(string htmlName, string htmlValue, string htmlClass, string htmlId) {
-            return HtmlController.getHtmlInputSubmit(htmlValue, htmlName, htmlId, "", false, htmlClass);
+            return HtmlController.inputSubmit(htmlValue, htmlName, htmlId, "", false, htmlClass);
         }
         //
         public override string Button(string htmlName, string htmlValue, string htmlClass) => Button(htmlName, htmlValue, htmlClass, "");

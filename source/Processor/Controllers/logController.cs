@@ -174,92 +174,15 @@ namespace Contensive.Processor.Controllers {
         /// <param name="level"></param>
         public static void log(CoreController core, string message, LogLevel level) {
             try {
+                //
+                // -- use enableLogging to block application logging
                 if ((level >= LogLevel.Error) || core.serverConfig.enableLogging) {
                     //
-                    // -- logging enabled or trace log, append log
-                    if (core.useNlog) {
-                        //
-                        // -- log to Nlog
-                        if (core.appConfig != null) {
-                            forceNLog("app [" + core.appConfig.name + "], " + message, level);
-                        } else {
-                            forceNLog("non-app instance, " + message, level);
-                        }
+                    // -- log to Nlog
+                    if (core.appConfig != null) {
+                        forceNLog("app [" + core.appConfig.name + "], " + message, level);
                     } else {
-                        //
-                        // -- legacy logging
-                        string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
-                        string logContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\t" + level.ToString() + "\tthread:" + threadName + "\t" + message;
-                        //
-                        Console.WriteLine(message);
-                        //
-                        FileController fileSystem = null;
-                        if (core.serverConfig != null) {
-                            if (core.appConfig != null) {
-                                //
-                                // -- use app log space
-                                fileSystem = core.privateFiles;
-                            }
-                        }
-                        //
-                        // -- fall-back to simple appending
-                        //
-                        if (fileSystem == null) {
-                            //
-                            // -- no app or no server, use program data files
-                            fileSystem = core.programDataFiles;
-                        }
-                        //
-                        try {
-                            DateTime rightNow = DateTime.Now;
-                            string FilenameNoExt = rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0');
-                            string logPath = "logs\\";
-                            //
-                            // check for serverconfig, then for appConfig, else use programdata folder
-                            //
-                            int FileSize = 0;
-                            if (!fileSystem.pathExists(logPath)) {
-                                fileSystem.createPath(logPath);
-                            } else {
-                                //FileInfo[] logFiles = fileSystem.getFileList(logPath);
-                                //foreach (FileInfo fileInfo in logFiles) {
-                                //    if (fileInfo.Name.ToLowerInvariant() == FilenameNoExt.ToLowerInvariant() + ".log") {
-                                //        FileSize = (int)fileInfo.Length;
-                                //        break;
-                                //    }
-                                //}
-                            }
-                            string PathFilenameNoExt = logPath + FilenameNoExt;
-                            //
-                            // -- add to log file
-                            if (FileSize < 10000000) {
-                                int RetryCnt = 0;
-                                bool SaveOK = false;
-                                string FileSuffix = "";
-                                while ((!SaveOK) && (RetryCnt < 10)) {
-                                    SaveOK = true;
-                                    try {
-                                        fileSystem.appendFile(PathFilenameNoExt + FileSuffix + ".log", logContent + "\r\n");
-                                    } catch (IOException) {
-                                        //
-                                        // permission denied - happens when more then one process are writing at once, go to the next suffix
-                                        //
-                                        FileSuffix = "-" + (RetryCnt + 1).ToString();
-                                        RetryCnt = RetryCnt + 1;
-                                        SaveOK = false;
-                                    } catch (Exception) {
-                                        //
-                                        // unknown error
-                                        //
-                                        FileSuffix = "-" + (RetryCnt + 1).ToString();
-                                        RetryCnt = RetryCnt + 1;
-                                        SaveOK = false;
-                                    }
-                                }
-                            }
-                        } catch (Exception) {
-                            // -- ignore errors in error handling
-                        }
+                        forceNLog("non-app instance, " + message, level);
                     }
                 }
             } catch (Exception) {

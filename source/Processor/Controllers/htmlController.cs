@@ -1,23 +1,15 @@
 ﻿
 using System;
 using System.IO;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-
-using Contensive.BaseClasses;
-using Contensive.Processor;
-using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
 using System.Net;
 using System.Text;
+using System.Data;
+using System.Collections.Generic;
+using Contensive.BaseClasses;
+using Contensive.Processor.Models.Db;
+using Contensive.Processor.Models.Domain;
+using static Contensive.Processor.Controllers.GenericController;
+using static Contensive.Processor.Constants;
 using Contensive.Addons.AdminSite.Controllers;
 
 namespace Contensive.Processor.Controllers {
@@ -54,12 +46,6 @@ namespace Contensive.Processor.Controllers {
                         result.Add(getLoginLink());
                     }
                 }
-                //
-                // TODO -- closing the menu attaches the flyout panels -- should be done when the menu is returned, not at page end
-                // -- output the menu system
-                //if (core.menuFlyout != null) {
-                //    result.Add(core.menuFlyout.menu_GetClose());
-                //}
                 //
                 // -- body Javascript
                 bool allowDebugging = core.visitProperty.getBoolean("AllowDebugging");
@@ -119,83 +105,34 @@ namespace Contensive.Processor.Controllers {
             try {
                 const string MenuNameFPO = "<MenuName>";
                 const string NoneCaptionFPO = "<NoneCaption>";
-                Models.Domain.ContentMetadataModel metaData = null;
-                string ContentControlCriteria = null;
-                string LcaseCriteria = null;
-                bool SelectedFound = false;
-                int RecordID = 0;
-                string Copy = null;
-                string DropDownFieldList = null;
-                string[] DropDownFieldName = { };
-                string[] DropDownDelimiter = { };
-                int DropDownFieldCount = 0;
-                string DropDownPreField = "";
-                int DropDownFieldListLength = 0;
-                string FieldName = "";
-                string CharAllowed = null;
-                string CharTest = null;
-                int CharPointer = 0;
-                int IDFieldPointer = 0;
-                StringBuilderLegacyController FastString = new StringBuilderLegacyController();
-                string[,] RowsArray = null;
-                string[] RowFieldArray = null;
-                int RowCnt = 0;
-                int RowMax = 0;
-                int ColumnMax = 0;
-                int RowPointer = 0;
-                int ColumnPointer = 0;
-                int[] DropDownFieldPointer = null;
-                string UcaseFieldName = null;
-                string SortFieldList = "";
-                string SQL = null;
-                string TableName = null;
-                string DataSource = null;
-                string SelectFields = null;
-                int Ptr = 0;
-                string SelectRaw = "";
-                string TagID = null;
-                string CurrentValueText = null;
-                //
-                LcaseCriteria = GenericController.vbLCase(Criteria);
+                string LcaseCriteria = vbLCase(Criteria);
                 return_IsEmptyList = true;
                 //
-                CurrentValueText = CurrentValue.ToString();
+                string CurrentValueText = CurrentValue.ToString();
+                string SelectRaw = "";
                 foreach (Constants.CacheInputSelectClass inputSelect in core.doc.inputSelectCache) {
-                    if ((inputSelect.ContentName == ContentName) && (inputSelect.Criteria == LcaseCriteria) && (inputSelect.CurrentValue == CurrentValueText)) {
+                    if ((inputSelect.ContentName == ContentName) && (inputSelect.Criteria == null) && (inputSelect.CurrentValue == CurrentValueText)) {
                         SelectRaw = inputSelect.SelectRaw;
                         return_IsEmptyList = false;
                         break;
                     }
                 }
                 //
-                //
-                //
                 if (string.IsNullOrEmpty(SelectRaw)) {
                     //
-                    // Build the SelectRaw
-                    // Test selection size
-                    //
-                    // This was commented out -- I really do not know why -- seems like the best way
-                    //
-                    metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
-                    TableName = metaData.tableName;
-                    DataSource = metaData.dataSourceName;
-                    ContentControlCriteria = metaData.legacyContentControlCriteria;
-                    //
-                    // This is what was there
-                    //
-                    //        TableName = main_GetContentProperty(ContentName, "ContentTableName")
-                    //        DataSource = main_GetContentProperty(ContentName, "ContentDataSourceName")
-                    //        ContentControlCriteria = main_GetContentProperty(ContentName, "ContentControlCriteria")
-                    //
-                    SQL = "select count(*) as cnt from " + TableName + " where " + ContentControlCriteria;
-                    if (!string.IsNullOrEmpty(LcaseCriteria)) {
-                        SQL += " and " + LcaseCriteria;
+                    // Build the SelectRaw, Test selection size
+                    ContentMetadataModel metaData = ContentMetadataModel.createByUniqueName(core, ContentName);
+                    string ContentControlCriteria = metaData.legacyContentControlCriteria;
+                    string SQL = "select count(*) as cnt from " + metaData.tableName + " where " + ContentControlCriteria;
+                    if (!string.IsNullOrEmpty(null)) {
+                        SQL += " and " + null;
                     }
                     DataTable dt = core.db.executeQuery(SQL);
+                    int RowCnt = 0;
                     if (dt.Rows.Count > 0) {
                         RowCnt = GenericController.encodeInteger(dt.Rows[0]["cnt"]);
                     }
+                    int RowMax = 0;
                     if (RowCnt == 0) {
                         RowMax = -1;
                     } else {
@@ -205,11 +142,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     if (RowCnt > core.siteProperties.selectFieldLimit) {
                         //
-                        // Selection is too big
-                        //
+                        // -- Selection is too big
                         ErrorController.addUserError(core, "The drop down list for " + ContentName + " called " + MenuName + " is too long to display. The site administrator has been notified and the problem will be resolved shortly. To fix this issue temporarily, go to the admin tab of the Preferences page and set the Select Field Limit larger than " + RowCnt + ".");
-                        //                    logController.handleException( core,New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-
                         LogController.handleError( core,new Exception("Error creating select list from content [" + ContentName + "] called [" + MenuName + "]. Selection of [" + RowCnt + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property SelectFieldLimit."));
                         result += inputHidden(MenuNameFPO, CurrentValue);
                         if (CurrentValue == 0) {
@@ -224,17 +158,20 @@ namespace Contensive.Processor.Controllers {
                         result += "(Selection is too large to display option list)";
                     } else {
                         //
-                        // ----- Generate Drop Down Field Names
-                        //
-                        DropDownFieldList = metaData.dropDownFieldList;
-                        if (string.IsNullOrEmpty(DropDownFieldList)) {
-                            DropDownFieldList = "NAME";
-                        }
-                        DropDownFieldCount = 0;
-                        CharAllowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                        DropDownFieldListLength = DropDownFieldList.Length;
+                        // -- Generate Drop Down Field Names
+                        string DropDownFieldList = metaData.dropDownFieldList;
+                        if (string.IsNullOrEmpty(DropDownFieldList)) { DropDownFieldList = "NAME"; }
+                        int DropDownFieldCount = 0;
+                        string CharAllowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        int DropDownFieldListLength = DropDownFieldList.Length;
+                        string[] DropDownDelimiter = { };
+                        string[] DropDownFieldName = { };
+                        string DropDownPreField = "";
+                        string FieldName = "";
+                        int CharPointer = 0;
+                        string SortFieldList = "";
                         for (CharPointer = 1; CharPointer <= DropDownFieldListLength; CharPointer++) {
-                            CharTest = DropDownFieldList.Substring(CharPointer - 1, 1);
+                            string CharTest = DropDownFieldList.Substring(CharPointer - 1, 1);
                             if (GenericController.vbInstr(1, CharAllowed, CharTest) == 0) {
                                 //
                                 // Character not allowed, delimit Field name here
@@ -288,31 +225,35 @@ namespace Contensive.Processor.Controllers {
                         if (DropDownFieldCount == 0) {
                             LogController.handleError( core,new Exception("No drop down field names found for content [" + ContentName + "]."));
                         } else {
-                            DropDownFieldPointer = new int[DropDownFieldCount];
-                            SelectFields = "ID";
+                            int[] DropDownFieldPointer = new int[DropDownFieldCount];
+                            string SelectFields = "ID";
+                            int Ptr = 0;
                             for (Ptr = 0; Ptr < DropDownFieldCount; Ptr++) {
                                 SelectFields = SelectFields + "," + DropDownFieldName[Ptr];
                             }
                             //
                             // ----- Start select box
                             //
-                            TagID = "";
+                            string TagID = "";
                             if (!string.IsNullOrEmpty(htmlId)) {
                                 TagID = " ID=\"" + htmlId + "\"";
                             }
+                            StringBuilderLegacyController FastString = new StringBuilderLegacyController();
                             FastString.Add("<select size=\"1\" name=\"" + MenuNameFPO + "\"" + TagID + ">");
                             FastString.Add("<option value=\"\">" + NoneCaptionFPO + "</option>");
                             //
                             // ----- select values
                             using (var csData = new CsModel(core)) {
                                 if (csData.open(ContentName, Criteria, SortFieldList, false, 0, SelectFields)) {
-                                    RowsArray = csData.getRows();
-                                    RowFieldArray = csData.getSelectFieldList().Split(',');
-                                    ColumnMax = RowsArray.GetUpperBound(0);
+                                    string[,] RowsArray = csData.getRows();
+                                    string[] RowFieldArray = csData.getSelectFieldList().Split(',');
+                                    int ColumnMax = RowsArray.GetUpperBound(0);
                                     RowMax = RowsArray.GetUpperBound(1);
                                     //
                                     // -- setup IDFieldPointer
-                                    UcaseFieldName = "ID";
+                                    string UcaseFieldName = "ID";
+                                    int IDFieldPointer = 0;
+                                    int ColumnPointer = 0;
                                     for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                         if (UcaseFieldName == GenericController.vbUCase(RowFieldArray[ColumnPointer])) {
                                             IDFieldPointer = ColumnPointer;
@@ -334,7 +275,10 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // output select
                                     //
-                                    SelectedFound = false;
+                                    bool SelectedFound = false;
+                                    string Copy = null;
+                                    int RowPointer = 0;
+                                    int RecordID = 0;
                                     for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                                         RecordID = GenericController.encodeInteger(RowsArray[IDFieldPointer, RowPointer]);
                                         Copy = DropDownPreField;
@@ -477,7 +421,7 @@ namespace Contensive.Processor.Controllers {
                         // ----- Generate Drop Down Field Names
                         //
                         string DropDownFieldList = "name";
-                        var peopleMetaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, "people");
+                        var peopleMetaData = ContentMetadataModel.createByUniqueName(core, "people");
                         if ( peopleMetaData != null ) DropDownFieldList = peopleMetaData.dropDownFieldList;
                         int DropDownFieldCount = 0;
                         string CharAllowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -693,6 +637,8 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
+        //
+        //====================================================================================================
         /// <summary>
         /// Select from a list where the list is a comma delimited list
         /// </summary>
@@ -967,6 +913,8 @@ namespace Contensive.Processor.Controllers {
             return result;
         }
         //
+        //====================================================================================================
+        //
         public static string inputDateTime(CoreController core, string htmlName, DateTime? htmlValue, string Width = "", string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
             string result = "";
             try {
@@ -1104,228 +1052,202 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Return an html input element for the field in the current dataset
+        /// </summary>
+        /// <param name="cs"></param>
+        /// <param name="ContentName"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="Height"></param>
+        /// <param name="Width"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public string inputCs(CsModel cs, string ContentName, string fieldName, int Height = 1, int Width = 40, string htmlId = "") {
             string returnResult = "";
             try {
-                bool IsEmptyList = false;
-                string FieldCaption = null;
+                bool fieldFound = false;
+                var contentMetadata = ContentMetadataModel.createByUniqueName(core, ContentName);
                 string FieldValueVariant = "";
-                string FieldValueText = null;
-                int FieldValueInteger = 0;
                 CPContentBaseClass.fileTypeIdEnum fieldTypeId = 0;
                 bool FieldReadOnly = false;
                 bool FieldPassword = false;
-                bool fieldFound = false;
                 int FieldLookupContentID = 0;
                 int FieldMemberSelectGroupID = 0;
-                string FieldLookupContentName = null;
-                Models.Domain.ContentMetadataModel Contentdefinition = null;
                 bool FieldHTMLContent = false;
                 string FieldLookupList = "";
-                //
-                if (true) {
-                    fieldFound = false;
-                    Contentdefinition = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
-                    foreach (KeyValuePair<string, Models.Domain.ContentFieldMetadataModel> keyValuePair in Contentdefinition.fields) {
-                        Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
-                        if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(fieldName)) {
-                            FieldValueVariant = field.defaultValue;
-                            fieldTypeId = field.fieldTypeId;
-                            FieldReadOnly = field.readOnly;
-                            FieldCaption = field.caption;
-                            FieldPassword = field.password;
-                            FieldHTMLContent = field.htmlContent;
-                            FieldLookupContentID = field.lookupContentID;
-                            FieldLookupList = field.lookupList;
-                            FieldMemberSelectGroupID = field.memberSelectGroupId_get(core);
-                            fieldFound = true;
-                        }
+                foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in contentMetadata.fields) {
+                    ContentFieldMetadataModel field = keyValuePair.Value;
+                    if (field.nameLc == fieldName.ToLower()) {
+                        FieldValueVariant = field.defaultValue;
+                        fieldTypeId = field.fieldTypeId;
+                        FieldReadOnly = field.readOnly;
+                        string FieldCaption = field.caption;
+                        FieldPassword = field.password;
+                        FieldHTMLContent = field.htmlContent;
+                        FieldLookupContentID = field.lookupContentID;
+                        FieldLookupList = field.lookupList;
+                        FieldMemberSelectGroupID = field.memberSelectGroupId_get(core);
+                        fieldFound = true;
+                        break;
                     }
-                    if (!fieldFound) {
-                        LogController.handleError( core,new Exception("Field [" + fieldName + "] was not found in Content Definition [" + ContentName + "]"));
+                }
+                if (!fieldFound) {
+                    LogController.handleError(core, new Exception("Field [" + fieldName + "] was not found in Content Definition [" + ContentName + "]"));
+                } else {
+                    //
+                    // main_Get the current value if the record was found
+                    //
+                    if (cs.ok()) { FieldValueVariant = cs.getRawData(fieldName); }
+                    string FieldValueText = null;
+                    //
+                    if (FieldPassword) {
+                        //
+                        // Handle Password Fields
+                        //
+                        FieldValueText = GenericController.encodeText(FieldValueVariant);
+                        returnResult = inputText(core, fieldName, FieldValueText, Height, Width, "", true);
                     } else {
+                        string FieldLookupContentName = null;
+                        int FieldValueInteger = 0;
                         //
-                        // main_Get the current value if the record was found
+                        // Non Password field by fieldtype
                         //
-                        if (cs.ok()) {
-                            FieldValueVariant = cs.getRawData(fieldName);
-                        }
-                        //
-                        if (FieldPassword) {
-                            //
-                            // Handle Password Fields
-                            //
-                            FieldValueText = GenericController.encodeText(FieldValueVariant);
-                            returnResult = inputText(core, fieldName, FieldValueText, Height, Width, "", true);
-                        } else {
-                            //
-                            // Non Password field by fieldtype
-                            //
-                            switch (fieldTypeId) {
+                        switch (fieldTypeId) {
+                            case CPContentBaseClass.fileTypeIdEnum.HTML:
+                                FieldValueText = GenericController.encodeText(FieldValueVariant);
+                                if (FieldReadOnly) {
+                                    returnResult = FieldValueText;
+                                } else {
+                                    returnResult = getFormInputHTML(fieldName, FieldValueText, "", Width.ToString());
+                                }
+                                break;
+                            case CPContentBaseClass.fileTypeIdEnum.FileHTML:
                                 //
+                                // html files, read from cdnFiles and use html editor
                                 //
+                                FieldValueText = GenericController.encodeText(FieldValueVariant);
+                                if (!string.IsNullOrEmpty(FieldValueText)) {
+                                    FieldValueText = core.cdnFiles.readFileText(FieldValueText);
+                                }
+                                if (FieldReadOnly) {
+                                    returnResult = FieldValueText;
+                                } else {
+                                    //Height = encodeEmptyInteger(Height, 4)
+                                    returnResult = getFormInputHTML(fieldName, FieldValueText, "", Width.ToString());
+                                }
+                                break;
+                            case CPContentBaseClass.fileTypeIdEnum.FileText:
                                 //
-                                case CPContentBaseClass.fileTypeIdEnum.HTML:
-                                    FieldValueText = GenericController.encodeText(FieldValueVariant);
+                                // text cdnFiles files, read from cdnFiles and use text editor
+                                //
+                                FieldValueText = GenericController.encodeText(FieldValueVariant);
+                                if (!string.IsNullOrEmpty(FieldValueText)) {
+                                    FieldValueText = core.cdnFiles.readFileText(FieldValueText);
+                                }
+                                if (FieldReadOnly) {
+                                    returnResult = FieldValueText;
+                                } else {
+                                    //Height = encodeEmptyInteger(Height, 4)
+                                    returnResult = inputText(core, fieldName, FieldValueText, Height, Width);
+                                }
+                                //
+                                // text public files, read from core.cdnFiles and use text editor
+                                //
+                                break;
+                            case CPContentBaseClass.fileTypeIdEnum.FileCSS:
+                            case CPContentBaseClass.fileTypeIdEnum.FileXML:
+                            case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
+                                FieldValueText = GenericController.encodeText(FieldValueVariant);
+                                if (!string.IsNullOrEmpty(FieldValueText)) {
+                                    FieldValueText = core.cdnFiles.readFileText(FieldValueText);
+                                }
+                                if (FieldReadOnly) {
+                                    returnResult = FieldValueText;
+                                } else {
+                                    returnResult = inputText(core, fieldName, FieldValueText, Height, Width);
+                                }
+                                break;
+                            case CPContentBaseClass.fileTypeIdEnum.Boolean:
+                                if (FieldReadOnly) {
+                                    returnResult = GenericController.encodeText(GenericController.encodeBoolean(FieldValueVariant));
+                                } else {
+                                    returnResult = checkbox(fieldName, GenericController.encodeBoolean(FieldValueVariant));
+                                }
+                                break;
+                            case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
+                                returnResult = GenericController.encodeText(GenericController.encodeNumber(FieldValueVariant));
+                                break;
+                            case CPContentBaseClass.fileTypeIdEnum.Float:
+                            case CPContentBaseClass.fileTypeIdEnum.Currency:
+                            case CPContentBaseClass.fileTypeIdEnum.Integer:
+                                FieldValueVariant = GenericController.encodeNumber(FieldValueVariant).ToString();
+                                if (FieldReadOnly) {
+                                    returnResult = GenericController.encodeText(FieldValueVariant);
+                                } else {
+                                    returnResult = inputText(core, fieldName, GenericController.encodeText(FieldValueVariant), Height, Width);
+                                }
+                                break;
+                            case CPContentBaseClass.fileTypeIdEnum.File:
+                                FieldValueText = GenericController.encodeText(FieldValueVariant);
+                                if (FieldReadOnly) {
+                                    returnResult = FieldValueText;
+                                } else {
+                                    returnResult = FieldValueText + "<br>change: " + inputFile(fieldName, GenericController.encodeText(FieldValueVariant));
+                                }
+                                break;
+                            case CPContentBaseClass.fileTypeIdEnum.FileImage:
+                                FieldValueText = GenericController.encodeText(FieldValueVariant);
+                                if (FieldReadOnly) {
+                                    returnResult = FieldValueText;
+                                } else {
+                                    returnResult = "<img src=\"" + GenericController.getCdnFileLink(core, FieldValueText) + "\"><br>change: " + inputFile(fieldName, GenericController.encodeText(FieldValueVariant));
+                                }
+                                break;
+                            case CPContentBaseClass.fileTypeIdEnum.Lookup:
+                                FieldValueInteger = GenericController.encodeInteger(FieldValueVariant);
+                                FieldLookupContentName = MetadataController.getContentNameByID(core, FieldLookupContentID);
+                                if (!string.IsNullOrEmpty(FieldLookupContentName)) {
+                                    //
+                                    // Lookup into Content
+                                    //
                                     if (FieldReadOnly) {
-                                        returnResult = FieldValueText;
+                                        using (CsModel csLookup = new CsModel(core)) {
+                                            if (cs.openRecord(FieldLookupContentName, FieldValueInteger)) {
+                                                returnResult = csLookup.getTextEncoded("name");
+                                            }
+                                        }
                                     } else {
-                                        returnResult = getFormInputHTML(fieldName, FieldValueText, "", Width.ToString());
+                                        bool IsEmptyList = false;
+                                        returnResult = selectFromContent(fieldName, FieldValueInteger, FieldLookupContentName, "", "", "", ref IsEmptyList);
                                     }
+                                } else if (!string.IsNullOrEmpty(FieldLookupList)) {
                                     //
-                                    // html files, read from cdnFiles and use html editor
+                                    // Lookup into LookupList
                                     //
-                                    break;
-                                case CPContentBaseClass.fileTypeIdEnum.FileHTML:
-                                    FieldValueText = GenericController.encodeText(FieldValueVariant);
-                                    if (!string.IsNullOrEmpty(FieldValueText)) {
-                                        FieldValueText = core.cdnFiles.readFileText(FieldValueText);
-                                    }
-                                    if (FieldReadOnly) {
-                                        returnResult = FieldValueText;
+                                    returnResult = selectFromList(core, fieldName, FieldValueInteger, FieldLookupList.Split(','), "", "");
+                                } else {
+                                    //
+                                    // Just call it text
+                                    //
+                                    returnResult = inputText(core, fieldName, FieldValueInteger.ToString(), Height, Width);
+                                }
+                                break;
+                            case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
+                                FieldValueInteger = GenericController.encodeInteger(FieldValueVariant);
+                                returnResult = selectUserFromGroup(fieldName, FieldValueInteger, FieldMemberSelectGroupID);
+                                break;
+                            default:
+                                FieldValueText = GenericController.encodeText(FieldValueVariant);
+                                if (FieldReadOnly) {
+                                    returnResult = FieldValueText;
+                                } else {
+                                    if (FieldHTMLContent) {
+                                        returnResult = getFormInputHTML(fieldName, FieldValueText, Height.ToString(), Width.ToString(), FieldReadOnly, false);
                                     } else {
-                                        //Height = encodeEmptyInteger(Height, 4)
-                                        returnResult = getFormInputHTML(fieldName, FieldValueText, "", Width.ToString());
-                                    }
-                                    //
-                                    // text cdnFiles files, read from cdnFiles and use text editor
-                                    //
-                                    break;
-                                case CPContentBaseClass.fileTypeIdEnum.FileText:
-                                    FieldValueText = GenericController.encodeText(FieldValueVariant);
-                                    if (!string.IsNullOrEmpty(FieldValueText)) {
-                                        FieldValueText = core.cdnFiles.readFileText(FieldValueText);
-                                    }
-                                    if (FieldReadOnly) {
-                                        returnResult = FieldValueText;
-                                    } else {
-                                        //Height = encodeEmptyInteger(Height, 4)
-                                        returnResult = inputText(core,fieldName, FieldValueText, Height, Width);
-                                    }
-                                    //
-                                    // text public files, read from core.cdnFiles and use text editor
-                                    //
-                                    break;
-                                case CPContentBaseClass.fileTypeIdEnum.FileCSS:
-                                case CPContentBaseClass.fileTypeIdEnum.FileXML:
-                                case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
-                                    FieldValueText = GenericController.encodeText(FieldValueVariant);
-                                    if (!string.IsNullOrEmpty(FieldValueText)) {
-                                        FieldValueText = core.cdnFiles.readFileText(FieldValueText);
-                                    }
-                                    if (FieldReadOnly) {
-                                        returnResult = FieldValueText;
-                                    } else {
-                                        //Height = encodeEmptyInteger(Height, 4)
                                         returnResult = inputText(core, fieldName, FieldValueText, Height, Width);
                                     }
-                                    //
-                                    //
-                                    //
-                                    break;
-                                case CPContentBaseClass.fileTypeIdEnum.Boolean:
-                                    if (FieldReadOnly) {
-                                        returnResult = GenericController.encodeText(GenericController.encodeBoolean(FieldValueVariant));
-                                    } else {
-                                        returnResult = checkbox(fieldName, GenericController.encodeBoolean(FieldValueVariant));
-                                    }
-                                    //
-                                    //
-                                    //
-                                    break;
-                                case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
-                                    returnResult = GenericController.encodeText(GenericController.encodeNumber(FieldValueVariant));
-                                    //
-                                    //
-                                    //
-                                    break;
-                                case CPContentBaseClass.fileTypeIdEnum.Float:
-                                case CPContentBaseClass.fileTypeIdEnum.Currency:
-                                case CPContentBaseClass.fileTypeIdEnum.Integer:
-                                    FieldValueVariant = GenericController.encodeNumber(FieldValueVariant).ToString();
-                                    if (FieldReadOnly) {
-                                        returnResult = GenericController.encodeText(FieldValueVariant);
-                                    } else {
-                                        returnResult = inputText(core, fieldName, GenericController.encodeText(FieldValueVariant), Height, Width);
-                                    }
-                                    //
-                                    //
-                                    //
-                                    break;
-                                case CPContentBaseClass.fileTypeIdEnum.File:
-                                    FieldValueText = GenericController.encodeText(FieldValueVariant);
-                                    if (FieldReadOnly) {
-                                        returnResult = FieldValueText;
-                                    } else {
-                                        returnResult = FieldValueText + "<br>change: " + inputFile(fieldName, GenericController.encodeText(FieldValueVariant));
-                                    }
-                                    //
-                                    //
-                                    //
-                                    break;
-                                case CPContentBaseClass.fileTypeIdEnum.FileImage:
-                                    FieldValueText = GenericController.encodeText(FieldValueVariant);
-                                    if (FieldReadOnly) {
-                                        returnResult = FieldValueText;
-                                    } else {
-                                        returnResult = "<img src=\"" + GenericController.getCdnFileLink(core, FieldValueText) + "\"><br>change: " + inputFile(fieldName, GenericController.encodeText(FieldValueVariant));
-                                    }
-                                    //
-                                    //
-                                    //
-                                    break;
-                                case CPContentBaseClass.fileTypeIdEnum.Lookup:
-                                    FieldValueInteger = GenericController.encodeInteger(FieldValueVariant);
-                                    FieldLookupContentName = MetadataController.getContentNameByID(core, FieldLookupContentID);
-                                    if (!string.IsNullOrEmpty(FieldLookupContentName)) {
-                                        //
-                                        // Lookup into Content
-                                        //
-                                        if (FieldReadOnly) {
-                                            using (CsModel csLookup = new CsModel(core)) {
-                                                if (cs.openRecord(FieldLookupContentName, FieldValueInteger)) {
-                                                    returnResult = csLookup.getTextEncoded("name");
-                                                }
-                                            }
-                                        } else {
-                                            returnResult = selectFromContent(fieldName, FieldValueInteger, FieldLookupContentName, "", "", "", ref IsEmptyList);
-                                        }
-                                    } else if (!string.IsNullOrEmpty(FieldLookupList)) {
-                                        //
-                                        // Lookup into LookupList
-                                        //
-                                        returnResult = selectFromList(core, fieldName, FieldValueInteger, FieldLookupList.Split(','), "", "");
-                                    } else {
-                                        //
-                                        // Just call it text
-                                        //
-                                        returnResult = inputText(core, fieldName, FieldValueInteger.ToString(), Height, Width);
-                                    }
-                                    //
-                                    //
-                                    //
-                                    break;
-                                case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
-                                    FieldValueInteger = GenericController.encodeInteger(FieldValueVariant);
-                                    returnResult = selectUserFromGroup(fieldName, FieldValueInteger, FieldMemberSelectGroupID);
-                                    //
-                                    //
-                                    //
-                                    break;
-                                default:
-                                    FieldValueText = GenericController.encodeText(FieldValueVariant);
-                                    if (FieldReadOnly) {
-                                        returnResult = FieldValueText;
-                                    } else {
-                                        if (FieldHTMLContent) {
-                                            returnResult = getFormInputHTML(fieldName, FieldValueText, Height.ToString(), Width.ToString(), FieldReadOnly, false);
-                                        } else {
-                                            returnResult = inputText(core, fieldName, FieldValueText, Height, Width);
-                                        }
-                                    }
-                                    break;
-                            }
+                                }
+                                break;
                         }
                     }
                 }
@@ -1338,7 +1260,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string getHtmlInputSubmit(string htmlValue, string htmlName = "button", string htmlId = "", string onClick = "", bool disabled = false, string htmlClass = "") {
+        public static string inputSubmit(string htmlValue, string htmlName = "button", string htmlId = "", string onClick = "", bool disabled = false, string htmlClass = "") {
             string attrList = "<input type=submit name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
             attrList += (string.IsNullOrEmpty(htmlName)) ? "" : " name=\"" + htmlName + "\"";
             attrList += (string.IsNullOrEmpty(htmlValue)) ? "" : " value=\"" + htmlValue + "\"";
@@ -1435,7 +1357,7 @@ namespace Contensive.Processor.Controllers {
                         // Personalization Tag
                         //
                         string selectOptions = "";
-                        var peopleMetaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, "people");
+                        var peopleMetaData = ContentMetadataModel.createByUniqueName(core, "people");
                         if (peopleMetaData != null) selectOptions = string.Join("|", peopleMetaData.selectList);
                         IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" + selectOptions + "]";
                         IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
@@ -1761,7 +1683,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     //
                                     // ListField
-                                    int CID = Models.Domain.ContentMetadataModel.getContentId(core, ContentName);
+                                    int CID = ContentMetadataModel.getContentId(core, ContentName);
                                     csData.open("Content Fields", "Contentid=" + CID, "name", true, 0, "ID,Name");
                                 }
 
@@ -2342,7 +2264,7 @@ namespace Contensive.Processor.Controllers {
             string returnHtml = "";
             try {
                 bool CanSeeHiddenFields = false;
-                Models.Domain.ContentMetadataModel SecondaryMetaData = null;
+                ContentMetadataModel SecondaryMetaData = null;
                 List<int> ContentIDList = new List<int>();
                 bool Found = false;
                 int RecordID = 0;
@@ -2371,8 +2293,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     //
-                    int PrimaryContentID = Models.Domain.ContentMetadataModel.getContentId(core, PrimaryContentName);
-                    SecondaryMetaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, SecondaryContentName);
+                    int PrimaryContentID = ContentMetadataModel.getContentId(core, PrimaryContentName);
+                    SecondaryMetaData = ContentMetadataModel.createByUniqueName(core, SecondaryContentName);
                     string SecondaryTablename = SecondaryMetaData.tableName;
                     int SecondaryContentID = SecondaryMetaData.id;
                     ContentIDList.Add(SecondaryContentID);
@@ -2614,80 +2536,40 @@ namespace Contensive.Processor.Controllers {
         //
         public string getPanel(string content) => getPanel(content, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5, 1);
         //
-        public string getPanel(string content, string stylePanel) => getPanel(content, stylePanel, "ccPanelHilite", "ccPanelShadow", "100%", 5, 1);
-        //
-        public string getPanel(string content, string stylePanel, string styleHilite) => getPanel(content, stylePanel, styleHilite, "ccPanelShadow", "100%", 5, 1);
-        //
-        public string getPanel(string content, string stylePanel, string styleHilite, string styleShadow) => getPanel(content, stylePanel, styleHilite, styleShadow, "100%", 5, 1);
-        //
-        public string getPanel(string content, string stylePanel, string styleHilite, string styleShadow, string width) => getPanel(content, stylePanel, styleHilite, styleShadow, width, 5, 1);
-        //
         public string getPanel(string content, string stylePanel, string styleHilite, string styleShadow, string width, int padding) => getPanel(content, stylePanel, styleHilite, styleShadow, width, padding, 1);
         //
         //====================================================================================================
+        //
         public string getPanelHeader(string HeaderMessage, string RightSideMessage = "") {
-            string iHeaderMessage = null;
-            string iRightSideMessage = null;
-            //
-            //If Not (true) Then Exit Function
-            //
-            iHeaderMessage = GenericController.encodeText(HeaderMessage);
-            iRightSideMessage = GenericController.encodeEmpty(RightSideMessage, core.doc.profileStartTime.ToString("G"));
-            return AdminUIController.getHeader(core, iHeaderMessage, iRightSideMessage);
+            string iRightSideMessage = GenericController.encodeEmpty(RightSideMessage, core.doc.profileStartTime.ToString("G"));
+            return AdminUIController.getHeader(core, HeaderMessage, iRightSideMessage);
         }
         //
         //====================================================================================================
         //
         public string getPanelTop(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "", string HeightMin = "") {
-            string tempmain_GetPanelTop = null;
-            string ContentPanelWidth = null;
-            string MyStylePanel = null;
-            string MyStyleHilite = null;
-            string MyStyleShadow = null;
-            string MyWidth = null;
-            string MyPadding = null;
-            string MyHeightMin = null;
-            //
-            tempmain_GetPanelTop = "";
-            MyStylePanel = GenericController.encodeEmpty(StylePanel, "ccPanel");
-            MyStyleHilite = GenericController.encodeEmpty(StyleHilite, "ccPanelHilite");
-            MyStyleShadow = GenericController.encodeEmpty(StyleShadow, "ccPanelShadow");
-            MyWidth = GenericController.encodeEmpty(Width, "100%");
-            MyPadding = GenericController.encodeEmpty(Padding, "5");
-            MyHeightMin = GenericController.encodeEmpty(HeightMin, "1");
-            if (MyWidth.IsNumeric()) {
-                ContentPanelWidth = (int.Parse(MyWidth) - 2).ToString();
-            } else {
-                ContentPanelWidth = "100%";
-            }
-            tempmain_GetPanelTop = tempmain_GetPanelTop + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + MyWidth + "\" class=\"" + MyStylePanel + "\">";
-            //
-            // --- center row with Panel
-            //
-            tempmain_GetPanelTop = tempmain_GetPanelTop
+            string MyWidth = encodeEmpty(Width, "100%");
+            string MyPadding = encodeEmpty(Padding, "5");
+            string ContentPanelWidth = (MyWidth.IsNumeric()) ? (int.Parse(MyWidth) - 2).ToString() :  "100%";
+            return ""
+                + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + MyWidth + "\">"
                 + cr2 + "<tr>"
-                + cr3 + "<td colspan=\"3\" width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\" class=\"" + MyStylePanel + "\">"
-                + cr4 + "<table border=\"0\" cellpadding=\"" + MyPadding + "\" cellspacing=\"0\" width=\"" + ContentPanelWidth + "\" class=\"" + MyStylePanel + "\">"
+                + cr3 + "<td colspan=\"3\" width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\">"
+                + cr4 + "<table border=\"0\" cellpadding=\"" + MyPadding + "\" cellspacing=\"0\" width=\"" + ContentPanelWidth + "\">"
                 + cr5 + "<tr>"
-                + cr6 + "<td valign=\"top\" class=\"" + MyStylePanel + "\"><Span class=\"" + MyStylePanel + "\">";
-            return tempmain_GetPanelTop;
+                + cr6 + "<td valign=\"top\">";
         }
         //
         //====================================================================================================
         //
-        public string getPanelBottom(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "") {
-            string result = "";
-            try {
-                result += cr6 + "</span></td>"
-                    + cr5 + "</tr>"
-                    + cr4 + "</table>"
-                    + cr3 + "</td>"
-                    + cr2 + "</tr>"
-                    + "\r</table>";
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-            }
-            return result;
+        public string getPanelBottom() {
+            return ""
+                + cr6 + "</td>"
+                + cr5 + "</tr>"
+                + cr4 + "</table>"
+                + cr3 + "</td>"
+                + cr2 + "</tr>"
+                + "\r</table>";
         }
         //
         //====================================================================================================
@@ -2710,28 +2592,11 @@ namespace Contensive.Processor.Controllers {
         public string getToolsPanel() {
             string result = "";
             try {
-                string DebugPanel = "";
-                string Copy = null;
-                string EditTagID = null;
-                string QuickEditTagID = null;
-                string AdvancedEditTagID = null;
-                string Tag = null;
-                string TagID = null;
-                StringBuilderLegacyController ToolsPanel = null;
-                string OptionsPanel = "";
-                StringBuilderLegacyController LinkPanel = null;
-                string LoginPanel = "";
-                bool iValueBoolean = false;
-                string WorkingQueryString = null;
-                bool ShowLegacyToolsPanel = false;
-                string QS = null;
-                //
                 if (core.session.user.allowToolsPanel) {
-                    ShowLegacyToolsPanel = core.siteProperties.getBoolean("AllowLegacyToolsPanel", true);
+                    bool ShowLegacyToolsPanel = core.siteProperties.getBoolean("AllowLegacyToolsPanel", true);
                     //
                     // --- Link Panel - used for both Legacy Tools Panel, and without it
-                    //
-                    LinkPanel = new StringBuilderLegacyController();
+                    StringBuilderLegacyController LinkPanel = new StringBuilderLegacyController();
                     LinkPanel.Add(SpanClassAdminSmall);
                     LinkPanel.Add("Contensive " + core.codeVersion() + " | ");
                     LinkPanel.Add(core.doc.profileStartTime.ToString("G") + " | ");
@@ -2740,6 +2605,7 @@ namespace Contensive.Processor.Controllers {
                     LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + HtmlController.encodeHtml("http://" + core.webServer.requestDomain) + "\">Public Home</A> | ");
                     LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"" + HtmlController.encodeHtml("/" + core.appConfig.adminRoute + "?" + RequestNameHardCodedPage + "=" + HardCodedPageMyProfile) + "\">My Profile</A> | ");
                     if (core.siteProperties.getBoolean("AllowMobileTemplates", false)) {
+                        string QS;
                         if (core.session.visit.mobile) {
                             QS = core.doc.refreshQueryString;
                             QS = GenericController.modifyQueryString(QS, "method", "forcenonmobile");
@@ -2753,140 +2619,72 @@ namespace Contensive.Processor.Controllers {
                     LinkPanel.Add("</span>");
                     //
                     if (ShowLegacyToolsPanel) {
-                        ToolsPanel = new StringBuilderLegacyController();
-                        WorkingQueryString = GenericController.modifyQueryString(core.doc.refreshQueryString, "ma", "", false);
+                        StringBuilderLegacyController ToolsPanel = new StringBuilderLegacyController();
+                        string WorkingQueryString = GenericController.modifyQueryString(core.doc.refreshQueryString, "ma", "", false);
                         //
                         // ----- Tools Panel Caption
-                        //
                         string helpLink = "";
-                        //helpLink = main_GetHelpLink("2", "Contensive Tools Panel", BubbleCopy)
                         result += getPanelHeader("Contensive Tools Panel" + helpLink);
-                        //
-                        //ToolsPanel.Add(htmlController.form_start( core,WorkingQueryString));
                         ToolsPanel.Add(HtmlController.inputHidden("Type", FormTypeToolsPanel));
+                        string TagID = null;
+                        string OptionsPanel = "";
                         //
                         if (true) {
-                            //
-                            // ----- Create the Options Panel
-                            //
-                            //PathsContentID = main_GetContentID("Paths")
-                            //                '
-                            //                ' Allow Help Links
-                            //                '
-                            //                iValueBoolean = visitProperty.getboolean("AllowHelpIcon")
-                            //                TagID =  "AllowHelpIcon"
-                            //                OptionsPanel = OptionsPanel & "" _
-                            //                    & CR & "<div class=""ccAdminSmall"">" _
-                            //                    & cr2 & "<LABEL for=""" & TagID & """>" & main_GetFormInputCheckBox2(TagID, iValueBoolean, TagID) & "&nbsp;Help</LABEL>" _
-                            //                    & CR & "</div>"
-                            //
-                            EditTagID = "AllowEditing";
-                            QuickEditTagID = "AllowQuickEditor";
-                            AdvancedEditTagID = "AllowAdvancedEditor";
+                            string EditTagID = "AllowEditing";
+                            string QuickEditTagID = "AllowQuickEditor";
+                            string AdvancedEditTagID = "AllowAdvancedEditor";
                             //
                             // Edit
-                            //
                             helpLink = "";
-                            //helpLink = main_GetHelpLink(7, "Enable Editing", "Display the edit tools for basic content, such as pages, copy and sections. ")
-                            iValueBoolean = core.visitProperty.getBoolean("AllowEditing");
-                            Tag = HtmlController.checkbox(EditTagID, iValueBoolean, EditTagID);
+                            bool iValueBoolean = core.visitProperty.getBoolean("AllowEditing");
+                            string Tag = HtmlController.checkbox(EditTagID, iValueBoolean, EditTagID);
                             Tag = GenericController.vbReplace(Tag, ">", " onClick=\"document.getElementById('" + QuickEditTagID + "').checked=false;document.getElementById('" + AdvancedEditTagID + "').checked=false;\">");
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
                             + cr2 + "<LABEL for=\"" + EditTagID + "\">" + Tag + "&nbsp;Edit</LABEL>" + helpLink + "\r</div>";
                             //
                             // Quick Edit
-                            //
                             helpLink = "";
-                            //helpLink = main_GetHelpLink(8, "Enable Quick Edit", "Display the quick editor to edit the main page content.")
                             iValueBoolean = core.visitProperty.getBoolean("AllowQuickEditor");
                             Tag = HtmlController.checkbox(QuickEditTagID, iValueBoolean, QuickEditTagID);
                             Tag = GenericController.vbReplace(Tag, ">", " onClick=\"document.getElementById('" + EditTagID + "').checked=false;document.getElementById('" + AdvancedEditTagID + "').checked=false;\">");
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
-                            + cr2 + "<LABEL for=\"" + QuickEditTagID + "\">" + Tag + "&nbsp;Quick Edit</LABEL>" + helpLink + "\r</div>";
+                                + cr2 + "<LABEL for=\"" + QuickEditTagID + "\">" + Tag + "&nbsp;Quick Edit</LABEL>" + helpLink + "\r</div>";
                             //
                             // Advanced Edit
-                            //
                             helpLink = "";
-                            //helpLink = main_GetHelpLink(0, "Enable Advanced Edit", "Display the edit tools for advanced content, such as templates and add-ons. Basic content edit tools are also displayed.")
                             iValueBoolean = core.visitProperty.getBoolean("AllowAdvancedEditor");
                             Tag = HtmlController.checkbox(AdvancedEditTagID, iValueBoolean, AdvancedEditTagID);
                             Tag = GenericController.vbReplace(Tag, ">", " onClick=\"document.getElementById('" + QuickEditTagID + "').checked=false;document.getElementById('" + EditTagID + "').checked=false;\">");
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
-                            + cr2 + "<LABEL for=\"" + AdvancedEditTagID + "\">" + Tag + "&nbsp;Advanced Edit</LABEL>" + helpLink + "\r</div>";
+                                + cr2 + "<LABEL for=\"" + AdvancedEditTagID + "\">" + Tag + "&nbsp;Advanced Edit</LABEL>" + helpLink + "\r</div>";
                             //
                             // Workflow Authoring Render Mode
                             //
                             helpLink = "";
-                            //helpLink = main_GetHelpLink(9, "Enable Workflow Rendering", "Control the display of workflow rendering. With workflow rendering enabled, any changes saved to content records that have not been published will be visible for your review.")
-                            //If core.siteProperties.allowWorkflowAuthoring Then
-                            //    iValueBoolean = core.visitProperty.getBoolean("AllowWorkflowRendering")
-                            //    Tag = core.html.html_GetFormInputCheckBox2(WorkflowTagID, iValueBoolean, WorkflowTagID)
-                            //    OptionsPanel = OptionsPanel _
-                            //    & cr & "<div class=""ccAdminSmall"">" _
-                            //    & cr2 & "<LABEL for=""" & WorkflowTagID & """>" & Tag & "&nbsp;Render Workflow Authoring Changes</LABEL>" & helpLink _
-                            //    & cr & "</div>"
-                            //End If
                             helpLink = "";
                             iValueBoolean = core.visitProperty.getBoolean("AllowDebugging");
                             TagID = "AllowDebugging";
                             Tag = HtmlController.checkbox(TagID, iValueBoolean, TagID);
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
-                            + cr2 + "<LABEL for=\"" + TagID + "\">" + Tag + "&nbsp;Debug</LABEL>" + helpLink + "\r</div>";
-                            //
-                            // Create Path Block Row
-                            //
-                            //If core.doc.authContext.isAuthenticatedDeveloper(core) Then
-                            //    TagID = "CreatePathBlock"
-                            //    If core.siteProperties.allowPathBlocking Then
-                            //        '
-                            //        ' Path blocking allowed
-                            //        '
-                            //        'OptionsPanel = OptionsPanel & SpanClassAdminSmall & "<LABEL for=""" & TagID & """>"
-                            //        csData.cs_open("Paths", "name=" & DbController.encodeSQLText(core.webServer.requestPath), , , , , , "ID")
-                            //        If csData.cs_ok(CS) Then
-                            //            PathID = (csData.cs_getInteger(CS, "ID"))
-                            //        End If
-                            //        Call csData.cs_Close(CS)
-                            //        If PathID <> 0 Then
-                            //            '
-                            //            ' Path is blocked
-                            //            '
-                            //            Tag = core.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & core.webServer.requestPath & "] [<a href=""" & htmlController.encodeHTML("/" & core.appConfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & Models.Complex.Models.Domain.MetaModel.getContentId(core,"paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
-                            //        Else
-                            //            '
-                            //            ' Path is not blocked
-                            //            '
-                            //            Tag = core.html.html_GetFormInputCheckBox2(TagID, False, TagID) & "&nbsp;Block this path [" & core.webServer.requestPath & "]</LABEL>"
-                            //        End If
-                            //        helpLink = ""
-                            //        'helpLink = main_GetHelpLink(10, "Enable Debugging", "Debugging is a developer only debugging tool. With Debugging enabled, ccLib.TestPoints(...) will print, ErrorTrapping will be displayed, redirections are blocked, and more.")
-                            //        OptionsPanel = OptionsPanel _
-                            //        & cr & "<div class=""ccAdminSmall"">" _
-                            //        & cr2 & "<LABEL for=""" & TagID & """>" & Tag & "</LABEL>" & helpLink _
-                            //        & cr & "</div>"
-                            //    End If
-                            //End If
-                            //
-                            // Buttons
-                            //
+                                + cr2 + "<LABEL for=\"" + TagID + "\">" + Tag + "&nbsp;Debug</LABEL>" + helpLink + "\r</div>";
                             OptionsPanel = OptionsPanel + ""
-                            + "\r<div class=\"border bg-white p-2\">"
-                            + cr2 + getHtmlInputSubmit(ButtonApply, "mb","","",false, "btn btn-primary mr-1 btn-sm")
-                            + "\r</div>"
-                            + "";
+                                + "\r<div class=\"border bg-white p-2\">"
+                                + cr2 + inputSubmit(ButtonApply, "mb", "", "", false, "btn btn-primary mr-1 btn-sm")
+                                + "\r</div>"
+                                + "";
                         }
                         //
                         // ----- Create the Login Panel
-                        //
+                        string Copy;
                         if (string.IsNullOrEmpty(core.session.user.name.Trim(' '))) {
                             Copy = "You are logged in as member #" + core.session.user.id + ".";
                         } else {
                             Copy = "You are logged in as " + core.session.user.name + ".";
                         }
-                        LoginPanel = LoginPanel + ""
-                        + "\r<div class=\"ccAdminSmall\">"
-                        + cr2 + Copy + ""
-                        + "\r</div>";
+                        string LoginPanel = ""
+                            + "\r<div class=\"ccAdminSmall\">"
+                            + cr2 + Copy + ""
+                            + "\r</div>";
                         //
                         // Username
                         //
@@ -2898,9 +2696,9 @@ namespace Contensive.Processor.Controllers {
                         }
                         TagID = "Username";
                         LoginPanel = LoginPanel + ""
-                        + "\r<div class=\"ccAdminSmall\">"
-                        + cr2 + "<LABEL for=\"" + TagID + "\">" + HtmlController.inputText( core,TagID, "", 1, 30, TagID, false) + "&nbsp;" + Caption + "</LABEL>"
-                        + "\r</div>";
+                            + "\r<div class=\"ccAdminSmall\">"
+                            + cr2 + "<LABEL for=\"" + TagID + "\">" + HtmlController.inputText(core, TagID, "", 1, 30, TagID, false) + "&nbsp;" + Caption + "</LABEL>"
+                            + "\r</div>";
                         //
                         // Username
                         //
@@ -2911,9 +2709,9 @@ namespace Contensive.Processor.Controllers {
                         }
                         TagID = "Password";
                         LoginPanel = LoginPanel + ""
-                        + "\r<div class=\"ccAdminSmall\">"
-                        + cr2 + "<LABEL for=\"" + TagID + "\">" + HtmlController.inputText( core,TagID, "", 1, 30, TagID, true) + "&nbsp;" + Caption + "</LABEL>"
-                        + "\r</div>";
+                            + "\r<div class=\"ccAdminSmall\">"
+                            + cr2 + "<LABEL for=\"" + TagID + "\">" + HtmlController.inputText(core, TagID, "", 1, 30, TagID, true) + "&nbsp;" + Caption + "</LABEL>"
+                            + "\r</div>";
                         //
                         // Autologin checkbox
                         //
@@ -2921,9 +2719,9 @@ namespace Contensive.Processor.Controllers {
                             if (core.session.visit.cookieSupport) {
                                 TagID = "autologin";
                                 LoginPanel = LoginPanel + ""
-                                + "\r<div class=\"ccAdminSmall\">"
-                                + cr2 + "<LABEL for=\"" + TagID + "\">" + HtmlController.checkbox(TagID, true, TagID) + "&nbsp;Login automatically from this computer</LABEL>"
-                                + "\r</div>";
+                                    + "\r<div class=\"ccAdminSmall\">"
+                                    + cr2 + "<LABEL for=\"" + TagID + "\">" + HtmlController.checkbox(TagID, true, TagID) + "&nbsp;Login automatically from this computer</LABEL>"
+                                    + "\r</div>";
                             }
                         }
                         //
@@ -2934,36 +2732,30 @@ namespace Contensive.Processor.Controllers {
                         // ----- assemble tools panel
                         //
                         Copy = ""
-                        + "\r<td width=\"50%\" class=\"ccPanelInput\" style=\"vertical-align:bottom;\">"
-                        + GenericController.nop(LoginPanel) + "\r</td>"
-                        + "\r<td width=\"50%\" class=\"ccPanelInput\" style=\"vertical-align:bottom;\">"
-                        + GenericController.nop(OptionsPanel) + "\r</td>";
+                            + "\r<td width=\"50%\" class=\"ccPanelInput\" style=\"vertical-align:bottom;\">"
+                            + GenericController.nop(LoginPanel) + "\r</td>"
+                            + "\r<td width=\"50%\" class=\"ccPanelInput\" style=\"vertical-align:bottom;\">"
+                            + GenericController.nop(OptionsPanel) + "\r</td>";
                         Copy = ""
-                        + "\r<tr>"
-                        + GenericController.nop(Copy) + "\r</tr>"
-                        + "";
+                            + "\r<tr>"
+                            + GenericController.nop(Copy) + "\r</tr>"
+                            + "";
                         Copy = ""
-                        + "\r<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
-                        + GenericController.nop(Copy) + "\r</table>";
+                            + "\r<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
+                            + GenericController.nop(Copy) + "\r</table>";
                         ToolsPanel.Add(getPanelInput(Copy));
-                        //ToolsPanel.Add(htmlController.form_end());
-                        result += getPanel(HtmlController.form( core,  ToolsPanel.Text ), "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
-                        //
+                        result += getPanel(HtmlController.form(core, ToolsPanel.Text), "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         result += getPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
-                        //
                         LinkPanel = null;
                         ToolsPanel = null;
                     }
                     //
                     // --- Developer Debug Panel
-                    //
                     if (core.visitProperty.getBoolean("AllowDebugging")) {
                         //
                         // --- Debug Panel Header
-                        //
                         LinkPanel = new StringBuilderLegacyController();
                         LinkPanel.Add(SpanClassAdminSmall);
-                        //LinkPanel.Add( "WebClient " & main_WebClientVersion & " | "
                         LinkPanel.Add("Contensive " + core.codeVersion() + " | ");
                         LinkPanel.Add(core.doc.profileStartTime.ToString("G") + " | ");
                         LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"http://support.Contensive.com/\">Support</A> | ");
@@ -2971,6 +2763,7 @@ namespace Contensive.Processor.Controllers {
                         LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + HtmlController.encodeHtml("http://" + core.webServer.requestDomain) + "\">Public Home</A> | ");
                         LinkPanel.Add("Render " + (Convert.ToSingle(core.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec | ");
                         LinkPanel.Add("</span>");
+                        string DebugPanel = "";
                         //
                         DebugPanel += "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                             + cr2 + "<tr>"
@@ -2982,12 +2775,10 @@ namespace Contensive.Processor.Controllers {
                         if (ShowLegacyToolsPanel) {
                             //
                             // Debug Panel as part of legacy tools panel
-                            //
                             result += getPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         } else {
                             //
                             // Debug Panel without Legacy Tools panel
-                            //
                             result += getPanelHeader("Debug Panel") + getPanel(LinkPanel.Text) + getPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         }
                     }
@@ -3125,23 +2916,23 @@ namespace Contensive.Processor.Controllers {
                     List<string> headScriptList = new List<string>();
                     List<string> styleList = new List<string>();
                     foreach (var asset in core.doc.htmlAssetList.FindAll((HtmlAssetClass item) => (item.inHead))) {
-                        string debugComment = "\r\n";
+                        string debugComment = "";
                         if ((core.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
                             debugComment = "\r\n<!-- added by " + HtmlController.encodeHtml(asset.addedByMessage) + " -->";
                         }
                         if (asset.assetType.Equals(HtmlAssetTypeEnum.style)) {
                             styleList.Add(debugComment);
                             if (asset.isLink) {
-                                styleList.Add("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + asset.content + "\" >");
+                                styleList.Add("\r\n<link rel=\"stylesheet\" type=\"text/css\" href=\"" + asset.content + "\" >");
                             } else {
-                                styleList.Add("<style>" + asset.content + "</style>");
+                                styleList.Add("\r\n<style>" + asset.content + "</style>");
                             }
                         } else if (asset.assetType.Equals(HtmlAssetTypeEnum.script)) {
                             headScriptList.Add(debugComment);
                             if (asset.isLink) {
-                                headScriptList.Add("<script type=\"text/javascript\" src=\"" + asset.content + "\"></script>");
+                                headScriptList.Add("\r\n<script type=\"text/javascript\" src=\"" + asset.content + "\"></script>");
                             } else {
-                                headScriptList.Add("<script type=\"text/javascript\">" + asset.content + "</script>");
+                                headScriptList.Add("\r\n<script type=\"text/javascript\">" + asset.content + "</script>");
                             }
                         }
                     }
@@ -3154,7 +2945,7 @@ namespace Contensive.Processor.Controllers {
                     if ((core.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
                         headList.Add("\r\n<!-- added by " + HtmlController.encodeHtml(asset.addedByMessage) + " -->");
                     }
-                    headList.Add(asset.content);
+                    headList.Add("\r\n" + asset.content);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -3178,7 +2969,6 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
             }
         }
-
         //
         //====================================================================================================
         //
@@ -3427,12 +3217,12 @@ namespace Contensive.Processor.Controllers {
             if (GroupCnt > 0) {
                 //
                 // Test if RuleCopy is supported
-                var ruleContentMetadata = Models.Domain.ContentMetadataModel.createByUniqueName(core, rulesContentName);
+                var ruleContentMetadata = ContentMetadataModel.createByUniqueName(core, rulesContentName);
                 if ( ruleContentMetadata==null) {
                     LogController.logWarn(core, "processCheckList called and ruleContentName not found [" + rulesContentName + "]");
                     return;
                 }
-                var secondaryContentMetadata = Models.Domain.ContentMetadataModel.createByUniqueName(core, secondaryContentName);
+                var secondaryContentMetadata = ContentMetadataModel.createByUniqueName(core, secondaryContentName);
                 if (secondaryContentMetadata == null) {
                     LogController.logWarn(core, "processCheckList called and secondaryContentName not found [" + secondaryContentName + "]");
                     return;
@@ -3522,6 +3312,8 @@ namespace Contensive.Processor.Controllers {
                 core.cache.invalidateAllKeysInTable(tablename);
             }
         }
+        //
+        //====================================================================================================
         //
         public static string genericBlockTag(string TagName, string InnerHtml) => genericBlockTag(TagName, InnerHtml, "", "", "");
         //
@@ -3656,6 +3448,9 @@ namespace Contensive.Processor.Controllers {
             }
             return "<label " + s + ">" + innerHtml + "</label>";
         }
+        //
+        //====================================================================================================
+        //
         public static string strong(string innerHtml, string htmlClass = "", string htmlId = "") {
             string s = "";
             if (!string.IsNullOrEmpty(htmlClass)) {

@@ -2449,7 +2449,7 @@ namespace Contensive.Processor.Controllers {
                         // ----- submit button
                         //
                         Panel = Panel + "<td>&nbsp;</td>";
-                        Panel = Panel + "<td>" + HtmlController.getHtmlInputSubmit(FeedbackButtonSubmit, "fbb") + "</td>";
+                        Panel = Panel + "<td>" + HtmlController.inputSubmit(FeedbackButtonSubmit, "fbb") + "</td>";
                         //Panel = Panel + "<td><input type=\"submit\" name=\"fbb\" value=\"" + FeedbackButtonSubmit + "\"></td>";
                         Panel = Panel + "</tr></table>";
                         Panel = Panel + "</form>";

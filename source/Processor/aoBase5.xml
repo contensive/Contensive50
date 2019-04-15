@@ -1440,7 +1440,8 @@
 	<SQLIndex IndexName="ccEmailScheduleDate" DataSourceName="Default" TableName="ccEmail" FieldNameList="ScheduleDate"  />
 	<SQLIndex IndexName="ccEmailSubmitted" DataSourceName="Default" TableName="ccEmail" FieldNameList="Submitted"  />
 	<SQLIndex IndexName="ccVisitsRemoteNameLookup" DataSourceName="Default" TableName="ccVisits" FieldNameList="RemoteName,ID,Remote_Addr"  />
-	<SQLIndex IndexName="ccVisitSummaryDateTimeDuration" DataSourceName="Default" TableName="ccVisitSummary" FieldNameList="DateNumber,TimeNumber,TimeDuration"  />
+  <SQLIndex IndexName="ccVisitSummaryDateTimeDuration" DataSourceName="Default" TableName="ccVisitSummary" FieldNameList="DateNumber,TimeNumber,TimeDuration"  />
+  <SQLIndex IndexName="ccPropertiesTypeidKeyIdActive" DataSourceName="Default" TableName="ccProperties" FieldNameList="typeid,keyid,active"  />
   <!-- Manage Users -->
   <NavigatorEntry Name="Manage Users" NameSpace="" NavIconTitle="" NavIconType="User" LinkPage="" ContentName="" AdminOnly="1" DeveloperOnly="0" NewWindow="0" Active="1" AddonGuid="" guid="{4B5CFF55-67B0-41D1-AEA8-339FBEB37540}" />
   <!-- Reports -->

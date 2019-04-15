@@ -9,509 +9,208 @@ using Contensive.Processor;
 using System.Linq;
 
 namespace Contensive.CLI {
-    class mainClass {
+    //
+    class MainClass {
+        //
         static void Main(string[] args) {
             try {
-                string appName = "";
                 //
-                // create cp for cluster work, with no application
+                // -- configure command executes without processor instance
+                int argPtr = 0;
+                if (getNextCmd(args, ref argPtr).ToLowerInvariant().Equals("--configure")) {
+                    ConfigureCmd.execute();
+
+                }
                 //
-                if (args.Length == 0) {
-                    Console.WriteLine(helpText); // Check for null array
-                } else {
+                // -- create an instance of cp to execute commands
+                using (Processor.CPClass cpServer = new Processor.CPClass()) {
+                    ////
+                    //// -- for dev environment, fix programfiles path 
+                    //if (String.IsNullOrEmpty(cpServer.core.serverConfig.programFilesPath)) {
+                    //    string executePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+                    //    if (executePath.ToLowerInvariant().IndexOf("\\git\\") == 0) {
+                    //        //  -- save if not in developer execution path
+                    //        cpServer.core.serverConfig.programFilesPath = executePath;
+                    //    } else {
+                    //        //  -- developer, fake a path
+                    //        cpServer.core.serverConfig.programFilesPath = "c:\\Program Files (x86)\\kma\\Contensive5\\";
+                    //    }
+                    //    cpServer.core.serverConfig.save(cpServer.core);
+                    //}
                     //
-                    // -- create an instance of cp to execute commands
-                    using (Processor.CPClass cpServer = new Processor.CPClass()) {
-                        //
-                        // -- if logging enabled, tell user the output includes log append
-                        if (cpServer.core.serverConfig.enableLogging) {
-                            Console.WriteLine("Logging enabled, all internal logging will be included.");
-                        }
-                        //
-                        // start by creating an application event log entry - because you must be admin to make this entry so making it here will create the "source"
-                        string eventLogSource = "Contensive";
-                        string eventLogLog = "Application";
-                        string eventLogEvent = "command line:";
-                        for (int argPtr = 0; argPtr < args.Length; argPtr++) {
-                            eventLogEvent += " " + args[argPtr];
-                        }
-                        if (!EventLog.SourceExists(eventLogSource)) EventLog.CreateEventSource(eventLogSource, eventLogLog);
-                        EventLog.WriteEntry(eventLogSource, eventLogEvent, EventLogEntryType.Information);
-                        //
-                        // -- set programfiles path if empty
-                        if (String.IsNullOrEmpty(cpServer.core.serverConfig.programFilesPath)) {
-                            string executePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
-                            if (executePath.ToLowerInvariant().IndexOf("\\git\\") == 0) {
-                                //  -- save if not in developer execution path
-                                cpServer.core.serverConfig.programFilesPath = executePath;
-                            } else {
-                                //  -- developer, fake a path
-                                cpServer.core.serverConfig.programFilesPath = "c:\\Program Files (x86)\\kma\\Contensive5\\";
-                            }
-                            cpServer.core.serverConfig.save(cpServer.core);
-                        }
-                        //
-                        // -- loop through arguments and execute each command
-                        for (int argPtr = 0; argPtr < args.Length; argPtr++) {
-                            string argument = args[argPtr];
-                            bool exitArgumentProcessing = false;
-                            switch (argument.ToLowerInvariant()) {
-                                case "-a":
-                                    //
-                                    // set application name
-                                    if (argPtr < (args.Length + 1)) {
-                                        argPtr++;
-                                        appName = args[argPtr];
-                                        if (!cpServer.core.serverConfig.apps.ContainsKey(appName)) {
-                                            Console.WriteLine("The appName [" + appName + "] was not found.");
-                                            return;
-                                        }
-                                    }
-                                    break;
-                                case "--flushcache":
-                                    if (!string.IsNullOrEmpty(appName)) {
-                                        //
-                                        // -- flush this app
-                                        using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(appName)) {
-                                            cpApp.Cache.InvalidateAll();
-                                        }
-                                    } else {
-                                        //
-                                        // -- flush all apps
-                                        foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
-                                            String housekeepAppName = kvp.Key;
-                                            using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
-                                                cpApp.Cache.InvalidateAll();
-                                            }
-                                        }
-                                    }
-                                    exitArgumentProcessing = true;
-                                    break;
-                                case "-i":
-                                case "--install":
-                                    //
-                                    // -- install collection to one or all applications
-                                    if (argPtr >= (args.Length + 1)) {
-                                        Console.WriteLine("Collection name is required after the --install command");
-                                    } else { 
-                                        argPtr++;
-                                        string collectionName = args[argPtr];
-                                        if (collectionName.Left(1).Equals("\"") && collectionName.Right(1).Equals("\"")) {
-                                            collectionName = collectionName.Substring(1, collectionName.Length - 2);
-                                        }
-                                        installAddonClass.execute(cpServer, appName, collectionName);
-                                    }
-                                    break;
-                                case "-h":
-                                case "--housekeep":
-                                    if (!string.IsNullOrEmpty(appName)) {
-                                        //
-                                        // -- housekeep app
-                                        using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(appName)) {
-                                            cpApp.Doc.SetProperty("force", "1");
-                                            cpApp.executeAddon(Contensive.Processor.Constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
-                                            cpApp.Cache.InvalidateAll();
-                                        }
-                                    } else {
-                                        //
-                                        // -- housekeep all apps
-                                        foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
-                                            String housekeepAppName = kvp.Key;
-                                            using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
-                                                cpApp.Doc.SetProperty("force", "1");
-                                                cpApp.executeAddon(Contensive.Processor.Constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
-                                                cpApp.Cache.InvalidateAll();
-                                            }
-                                        }
-                                    }
-                                    exitArgumentProcessing = true;
-                                    break;
-                                case "--version":
-                                case "-v":
-                                    //
-                                    // display core version
-                                    Console.WriteLine("version " + cpServer.core.codeVersion());
-                                    exitArgumentProcessing = true;
-                                    break;
-                                case "--newapp":
-                                case "-n":
-                                    //
-                                    // set application name
-                                    if (argPtr < (args.Length - 1)) {
-                                        argPtr++;
-                                        appName = args[argPtr];
-                                    }
-                                    //
-                                    // -- start the new app wizard
-                                    CreateAppClass createApp = new CreateAppClass();
-                                    createApp.createApp(appName);
-                                    exitArgumentProcessing = true;
-                                    break;
-                                case "--configure":
-                                    //
-                                    // -- eventually write a configure. For now, just use the new app
-                                    configureClass.configure();
-                                    exitArgumentProcessing = true;
-                                    break;
-                                case "--status":
-                                case "-s":
-                                    //
-                                    // -- display ServerGroup and application status
-                                    if (!cpServer.serverOk) {
-                                        //
-                                        // -- something went wrong with server initialization
-                                        Console.WriteLine("configuration file [c:\\ProgramData\\Contensive\\config.json] not found or not valid. Run cc --configure");
-                                    } else {
-                                        Console.WriteLine("Configuration File [c:\\ProgramData\\Contensive\\config.json] found.");
-                                        Console.WriteLine("ServerGroup name: " + cpServer.core.serverConfig.name);
-                                        Console.WriteLine("Cache: ");
-                                        Console.WriteLine("    enableLocalMemoryCache: " + cpServer.core.serverConfig.enableLocalMemoryCache);
-                                        Console.WriteLine("    enableLocalFileCache: " + cpServer.core.serverConfig.enableLocalFileCache);
-                                        Console.WriteLine("    enableRemoteCache: " + cpServer.core.serverConfig.enableRemoteCache);
-                                        Console.WriteLine("    ElastiCacheConfigurationEndpoint: " + cpServer.core.serverConfig.awsElastiCacheConfigurationEndpoint);
-                                        Console.WriteLine("File System:");
-                                        Console.WriteLine("    isLocal: " + cpServer.core.serverConfig.isLocalFileSystem.ToString());
-                                        //Console.WriteLine("    cdnFilesRemoteEndpoint: " + cp.core.serverConfig.cdnFilesRemoteEndpoint);
-                                        Console.WriteLine("    awsBucketRegionName: " + cpServer.core.serverConfig.awsBucketRegionName);
-                                        Console.WriteLine("    awsBucketName: " + cpServer.core.serverConfig.awsBucketName);
-                                        Console.WriteLine("    awsAccessKey: " + cpServer.core.serverConfig.awsAccessKey);
-                                        Console.WriteLine("    awsSecretAccessKey: " + cpServer.core.serverConfig.awsSecretAccessKey);
-                                        Console.WriteLine("Database:");
-                                        Console.WriteLine("    defaultDataSourceAddress: " + cpServer.core.serverConfig.defaultDataSourceAddress.ToString());
-                                        Console.WriteLine("    defaultDataSourceType: " + cpServer.core.serverConfig.defaultDataSourceType.ToString());
-                                        Console.WriteLine("    defaultDataSourceUsername: " + cpServer.core.serverConfig.defaultDataSourceUsername.ToString());
-                                        Console.WriteLine("Services:");
-                                        Console.WriteLine("    TaskScheduler: " + cpServer.core.serverConfig.allowTaskSchedulerService.ToString());
-                                        Console.WriteLine("    TaskRunner: " + cpServer.core.serverConfig.allowTaskRunnerService.ToString());
-                                        Console.WriteLine("    TaskRunner-MaxConcurrentTasksPerServer: " + cpServer.core.serverConfig.maxConcurrentTasksPerServer.ToString());
-                                        Console.WriteLine("Logging:");
-                                        Console.WriteLine("    enableLogging: " + cpServer.core.serverConfig.enableLogging.ToString());
-                                        Console.WriteLine("Applications: " + cpServer.core.serverConfig.apps.Count);
-                                        foreach (KeyValuePair<string, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
-                                            AppConfigModel app = kvp.Value;
-                                            Console.WriteLine("    name: " + app.name);
-                                            Console.WriteLine("        enabled: " + app.enabled);
-                                            Console.WriteLine("        delete protection: " + app.deleteProtection);
-                                            Console.WriteLine("        admin route: " + app.adminRoute);
-                                            Console.WriteLine("        local file storage");
-                                            Console.WriteLine("            www (app) path: " + app.localWwwPath);
-                                            Console.WriteLine("            private path: " + app.localPrivatePath);
-                                            Console.WriteLine("            files (cdn) path: " + app.localFilesPath);
-                                            Console.WriteLine("            temp path: " + app.localTempPath);
-                                            if (!cpServer.core.serverConfig.isLocalFileSystem) {
-                                                Console.WriteLine("        remote file storage");
-                                                Console.WriteLine("            www (app) path: " + app.remoteWwwPath);
-                                                Console.WriteLine("            private path: " + app.remotePrivatePath);
-                                                Console.WriteLine("            files (cdn) path: " + app.remoteFilePath);
-                                            }
-                                            Console.WriteLine("        cdnFilesNetprefix: " + app.cdnFileUrl);
-                                            foreach (string domain in app.domainList) {
-                                                Console.WriteLine("        domain: " + domain);
-                                            }
-                                        }
-                                    }
-                                    exitArgumentProcessing = true;
-                                    break;
-                                case "--repair":
-                                case "-r":
-                                    upgradeClass.upgrade(cpServer, appName, true);
-                                    exitArgumentProcessing = true;
-                                    break;
-                                case "--upgrade":
-                                case "-u":
-                                    upgradeClass.upgrade(cpServer, appName, false);
-                                    exitArgumentProcessing = true;
-                                    break;
-                                case "--taskscheduler":
-                                    //
-                                    // -- manage the task scheduler
-                                    if (argPtr != (args.Length + 1)) {
-                                        argPtr++;
-                                        if (args[argPtr].ToLowerInvariant() == "run") {
-                                            //
-                                            // run the taskscheduler in the console
-                                            Console.WriteLine("Beginning command line taskScheduler. Hit any key to exit");
-                                            TaskSchedulerController taskScheduler = new TaskSchedulerController();
-                                            taskScheduler.startTimerEvents();
-                                            object keyStroke = Console.ReadKey();
-                                            taskScheduler.stopTimerEvents();
-                                            exitArgumentProcessing = true;
-                                        } else {
-                                            //
-                                            // turn the windows service scheduler on/off
-                                            cpServer.core.serverConfig.allowTaskSchedulerService = GenericController.encodeBoolean(args[argPtr]);
-                                            cpServer.core.serverConfig.save(cpServer.core);
-                                            Console.WriteLine("allowtaskscheduler set " + cpServer.core.serverConfig.allowTaskSchedulerService.ToString());
-                                        }
-                                    }
-                                    break;
-                                case "--taskrunner":
-                                    //
-                                    // -- manager the task runner
-                                    if (argPtr != (args.Length + 1)) {
-                                        argPtr++;
-                                        if (args[argPtr].ToLowerInvariant() == "run") {
-                                            //
-                                            // -- run the taskrunner in the console
-                                            Console.WriteLine("Beginning command line taskRunner. Hit any key to exit");
-                                            using (TaskRunnerController taskRunner = new TaskRunnerController()) {
-                                                taskRunner.startTimerEvents();
-                                                object keyStroke = Console.ReadKey();
-                                                taskRunner.stopTimerEvents();
-                                                exitArgumentProcessing = true;
-                                            }
-                                        } else {
-                                            //
-                                            // -- turn the windows service scheduler on/off
-                                            cpServer.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
-                                            cpServer.core.serverConfig.save(cpServer.core);
-                                            Console.WriteLine("allowtaskrunner set " + cpServer.core.serverConfig.allowTaskRunnerService.ToString());
-                                        }
-                                    }
-                                    break;
-                                case "--tasks":
-                                    //
-                                    // -- turn on, off or run both services together
-                                    if (argPtr != (args.Length + 1)) {
-                                        argPtr++;
-                                        if (args[argPtr].ToLowerInvariant() == "run") {
-                                            //
-                                            // run the tasks in the console
-                                            //
-                                            Console.WriteLine("Beginning command line taskScheduler and taskRunner. Hit any key to exit");
-                                            //
-                                            TaskSchedulerController taskScheduler = new TaskSchedulerController();
-                                            taskScheduler.startTimerEvents();
-                                            //
-                                            using (TaskRunnerController taskRunner = new TaskRunnerController()) {
-                                                taskRunner.startTimerEvents();
-                                                object keyStroke = Console.ReadKey();
-                                                taskRunner.stopTimerEvents();
-                                            }
-                                            exitArgumentProcessing = true;
-                                        } else {
-                                            //
-                                            // turn the windows service scheduler on/off
-                                            //
-                                            cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
-                                            cpServer.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
-                                            cpServer.core.serverConfig.save(cpServer.core);
-                                            Console.WriteLine("allowTaskScheduler set " + cpServer.core.serverConfig.allowTaskSchedulerService.ToString());
-                                            Console.WriteLine("allowTaskRunner set " + cpServer.core.serverConfig.allowTaskRunnerService.ToString());
-                                        }
-                                    }
-                                    break;
-                                case "--logging":
-                                    //
-                                    // -- logging
-                                    if (argPtr != (args.Length + 1)) {
-                                        argPtr++;
-                                        cpServer.core.serverConfig.enableLogging = GenericController.encodeBoolean(args[argPtr].ToLowerInvariant());
-                                        cpServer.core.serverConfig.save(cpServer.core);
-                                        Console.WriteLine("enableLogging set " + cpServer.core.serverConfig.enableLogging.ToString());
-                                    }
-                                    break;
-                                case "--runtask":
-                                    //
-                                    // -- run task in ccTasks table in application appName 
-                                    if (argPtr != (args.Length + 1)) {
-                                        argPtr++;
-                                        appName = args[argPtr];
-                                        string runnerGuid = "";
-                                        if (argPtr < (args.Length + 1)) {
-                                            argPtr++;
-                                            runnerGuid = args[argPtr];
-                                        }
-                                        Console.WriteLine("runTask, appName [" + appName + "], runnerGuid [" + runnerGuid + "]");
-                                        TaskRunnerController.executeRunnerTasks(appName, runnerGuid);
-                                    }
-                                    break;
-                                case "--installservice":
-                                    string installService = "/C C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\installutil TaskService.exe";
-                                    Process.Start("cmd.exe", installService);
-                                    break;
-                                case "--uninstallservice":
-                                    string unInstallService = "/C C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\installutil /u TaskService.exe";
-                                    Process.Start("cmd.exe", unInstallService);
-                                    break;
-                                case "--execute":
-                                    //
-                                    // -- execute an addon
-                                    cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
-                                    if (cpServer.core.serverConfig.apps.Count == 1) {
-                                        appName = cpServer.core.serverConfig.apps.First().Value.name;
-                                    }
-                                    if (string.IsNullOrWhiteSpace(appName)) {
-                                        Console.WriteLine("ERROR, execute requires an application name (-a appName --execute addonNameOrGuid) because this server has 2+ apps");
-                                    } else {
-                                        if (argPtr > (args.Length + 1)) {
-                                            Console.WriteLine("ERROR, execute requires a parameter for the addon you want to run");
-                                        } else {
-                                            argPtr++;
-                                            string addonNameOrGuid = args[argPtr];
-                                            if (string.IsNullOrWhiteSpace(addonNameOrGuid)) {
-                                                Console.WriteLine("ERROR, execute requires a parameter for the addon you want to run");
-                                            } else {
-                                                Console.WriteLine("executing addon [" + addonNameOrGuid + "], app  [" + appName + "]");
-                                                using (var cp = new CPClass(appName)) {
-                                                    cp.executeAddon(addonNameOrGuid);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    break;
-                                case "--deleteprotection":
-                                    //
-                                    // turn off delete protection
-                                    if (string.IsNullOrWhiteSpace(appName)) {
-                                        Console.WriteLine("ERROR, you must first specify the application with -a appName");
-                                    } else {
-                                        if (argPtr > (args.Length + 1)) {
-                                            Console.WriteLine("ERROR, deleteprotection requires on|off");
-                                        } else {
-                                            argPtr++;
-                                            string onOff = args[argPtr];
-                                            if (onOff.ToLower().Equals("on")) {
-                                                try {
-                                                    using (var cp = new CPClass(appName)) {
-                                                        cp.core.appConfig.deleteProtection = true;
-                                                        cp.core.appConfig.save(cp.core);
-                                                    }
-                                                } catch (Exception) {
-                                                    Console.WriteLine("ERROR, the application would not startup correctly. You may need to work with it manually.");
-                                                    return;
-                                                }
-                                            } else if (onOff.ToLower().Equals("off")) {
-                                                try {
-                                                    using (var cp = new CPClass(appName)) {
-                                                        cp.core.appConfig.deleteProtection = false;
-                                                        cp.core.appConfig.save(cp.core);
-                                                    }
-                                                } catch (Exception) {
-                                                    Console.WriteLine("ERROR, the application would not startup correctly. You may need to work with it manually.");
-                                                    return;
-                                                }
-                                            } else {
-                                                Console.WriteLine("ERROR, deleteprotection requires on|off");
-                                                return;
-                                            }
-                                        }
-                                    }
-                                    break;
-                                case "--delete":
-                                    //
-                                    // delete 
-                                    if (string.IsNullOrWhiteSpace(appName)) {
-                                        Console.WriteLine("ERROR, you must first specify the application with -a appName");
-                                    } else {
-                                        try {
-                                            using (var cp = new CPClass(appName)) {
-                                                if (cp.core.appConfig.deleteProtection) {
-                                                    Console.WriteLine("Cannot delete app [" + appName + "] because delete protection is on. Use --deleteprotection off to disable it.");
-                                                    return;
-                                                }
-                                            }
-                                        } catch (Exception) {
-                                            Console.WriteLine("ERROR, the application would not startup correctly. You may need to work with it manually.");
-                                            return;
-                                        }
-                                        DeleteAppClass.deleteApp(cpServer, appName);
-                                    }
-                                    break;
-                                case "--uploadfiles":
-                                    UploadFilesClass.uploadFiles(cpServer, appName);
-                                    break;
-                                case "--fixtablefoldercase":
-                                    FixTableFolderCaseClass.fixTableFolderCase(cpServer, appName);
-                                    break;
+                    if (!cpServer.serverOk) {
+                        Console.WriteLine("Server Configuration not loaded correctly. Please run --configure");
+                        return;
+                    }
+                    //
+                    // -- loop through arguments and execute each command
+                    string appName = "";
+                    argPtr = 0;
+                    while (true) {
+                        string cmd = getNextCmd(args, ref argPtr);
+                        switch (cmd.ToLowerInvariant()) {
+                            case "-a":
                                 //
-                                // -- run task in ccTasks table in application appName 
-                                default:
-                                    Console.Write(helpText);
-                                    exitArgumentProcessing = true;
-                                    break;
-                            }
-                            if (exitArgumentProcessing) break;
+                                // set application name
+                                appName = getNextCmdArg(args, ref argPtr);
+                                if ((String.IsNullOrEmpty(appName)) || (!cpServer.core.serverConfig.apps.ContainsKey(appName))) {
+                                    Console.WriteLine("The appName [" + appName + "] was not found.");
+                                    return;
+                                }
+                                Console.WriteLine("Set application to [" + appName + "].");
+                                break;
+                            case "--flushcache":
+                                FlushCacheCmd.execute(cpServer, appName);
+                                break;
+                            case "-i":
+                            case "--install":
+                                //
+                                // -- install collection to one or all applications
+                                InstallCollectionCmd.execute(cpServer, appName, getNextCmdArg(args, ref argPtr));
+                                break;
+                            case "-h":
+                            case "--housekeep":
+                                HousekeepCmd.execute(cpServer, appName);
+                                break;
+                            case "--version":
+                            case "-v":
+                                //
+                                // display core version
+                                VersionCmd.execute(cpServer);
+                                break;
+                            case "--newapp":
+                            case "-n":
+                                //
+                                // -- start the new app wizard
+                                appName = getNextCmdArg(args, ref argPtr);
+                                NewAppCmd.execute(appName);
+                                break;
+                            case "--status":
+                            case "-s":
+                                //
+
+                                StatusCmd.execute(cpServer);
+                                break;
+                            case "--repair":
+                            case "-r":
+                                //
+                                // -- repair one or more apps
+                                RepairCmd.execute(cpServer, appName);
+                                break;
+                            case "--upgrade":
+                            case "-u":
+                                //
+                                // -- upgrade one or more apps
+                                UpgradeCmd.execute(cpServer, appName, false);
+                                break;
+                            case "--taskscheduler":
+                                //
+                                // -- manage the task scheduler
+                                TaskSchedulerCmd.execute(cpServer, appName, getNextCmdArg(args, ref argPtr));
+                                break;
+                            case "--taskrunner":
+                                //
+                                // -- manager the task runner
+                                TaskRunnerCmd.execute(cpServer, appName, getNextCmdArg(args, ref argPtr));
+                                break;
+                            case "--tasks":
+                                //
+                                // -- turn on, off or run both services together
+                                TasksCmd.execute(cpServer, appName, getNextCmdArg(args, ref argPtr));
+                                break;
+                            case "--logging":
+                                //
+                                // -- logging on|off
+                                LoggingCmd.execute(cpServer, appName, getNextCmdArg(args, ref argPtr));
+                                break;
+                            case "--execute":
+                                //
+                                // -- execute an addon
+                                ExecuteAddonCmd.execute(cpServer, appName, getNextCmdArg(args, ref argPtr));
+                                break;
+                            case "--deleteprotection":
+                                //
+                                // turn off delete protection
+                                DeleteProtectionCmd.execute(cpServer, appName, getNextCmdArg( args, ref argPtr));
+                                break;
+                            case "--delete":
+                                //
+                                // delete 
+                                DeleteAppCmd.deleteApp(cpServer, appName);
+                                break;
+                            case "--uploadfiles":
+                                //
+                                // -- upload files
+                                UploadFilesCmd.execute(cpServer, appName);
+                                break;
+                            case "--fixtablefoldercase":
+                                //
+                                // -- fix folder case from older version
+                                FixTableFolderCaseCmd.execute(cpServer, appName);
+                                break;
+                            case "--help":
+                                //
+                                // -- help
+                                HelpCmd.consoleWriteAll(cpServer);
+                                return;
+                            case "--runtask":
+                                //
+                                // -- help
+                                RunTaskCmd.execute(cpServer, appName, getNextCmdArg(args, ref argPtr));
+                                return;
+                            case "--verifybasicwebsite":
+                                using (var cp = new CPClass(appName)) {
+                                    NewAppController.verifyBasicWebSiteData(cp.core);
+                                    Console.WriteLine("verified basic website data.");
+                                }
+                                return;
+                            case "":
+                                //
+                                // -- empty command, done
+                                if (args.Length.Equals(0)) {
+                                    //
+                                    // -- no args, do help
+                                    HelpCmd.consoleWriteAll(cpServer);
+                                }
+                                return;
+                            //
+                            // -- run task in ccTasks table in application appName 
+                            default:
+                                Console.WriteLine("Command not recognized [" + cmd + "]. Run cc.exe with no arguments for help.");
+                                break;
                         }
                     }
-                }
+                };
             } catch (Exception ex) {
                 Console.WriteLine("There was an error that forced the program to close. Details follow.\n\n" + ex.ToString());
             }
         }
-        //
-        const string helpText = ""
-            + "\r\ncc command line"
-            + "\r\n"
-            + "\r\n-a appName"
-            + "\r\n    apply the current command to just one application"
-            + "\r\n"
-            + "\r\n--configure"
-            + "\r\n    setup or review server configuration (Sql, cache, filesystem, etc)"
-            + "\r\n"
-            + "\r\n--flushcache"
-            + "\r\n    invalidate cache. Use with -a"
-            + "\r\n"
-            + "\r\n--housekeep (-h)"
-            + "\r\n    housekeep all appications, or just one if specifid with -a"
-            + "\r\n"
-            + "\r\n--logging true|false"
-            + "\r\n    Enable or disable logging at the server level"
-            + "\r\n"
-            + "\r\n--newapp (-n)"
-            + "\r\n    new application wizard"
-            + "\r\n"
-            + "\r\n--repair (-r)"
-            + "\r\n    reinstall the base collection and all it's dependancies. For all applications, or just one if specified with -a"
-            + "\r\n"
-            + "\r\n--status (-s)"
-            + "\r\n    display configuration status"
-            + "\r\n"
-            + "\r\n--taskrunner run"
-            + "\r\n    Run the taskrunner in the console (temporary)"
-            + "\r\n"
-            + "\r\n--taskrunner on|off"
-            + "\r\n    Start or stop the taskrunner service"
-            + "\r\n"
-            + "\r\n--tasks run"
-            + "\r\n    Run the taskscheduler and the taskrunner in the console (temporary)"
-            + "\r\n"
-            + "\r\n--taskscheduler run"
-            + "\r\n    Run the taskscheduler in the console (temporary)"
-            + "\r\n"
-            + "\r\n--taskscheduler on|off"
-            + "\r\n    Start or stop the taskscheduler service"
-            + "\r\n"
-            + "\r\n--upgrade (-u)"
-            + "\r\n    upgrade all applications, or just one if specified with -a"
-            + "\r\n"
-            + "\r\n--version (-v)"
-            + "\r\n    display code version"
-            + "\r\n"
-            + "\r\n--runtask appName {taskGuid}"
-            + "\r\n    executes the ccTask table record with cmdRunner=(taskGuid)"
-            + "\r\n"
-            + "\r\n--install CollectionName"
-            + "\r\n    downloads and installed the addon collection named from the Contensive Support Library"
-            + "\r\n"
-            + "\r\n--installservice"
-            + "\r\n    Installs the TaskService.exe to Windows Services"
-            + "\r\n"
-            + "\r\n--uninstallservice"
-            + "\r\n    Uninstalls the TaskService.exe from Windows Services"
-            + "\r\n"
-            + "\r\n--deleteprotection on|off"
-            + "\r\n    Enables or Disables delete protection for an application. You must specify the application first with -a appName."
-            + "\r\n"
-            + "\r\n--delete"
-            + "\r\n    Deletes an application. You must first specify the application first with -a appName. The application must have delete protection off."
-            + "\r\n"
-            + "\r\n--uploadfiles"
-            + "\r\n    Copies all local files to remote files. Use for migration to a remote file system."
-            + "\r\n"
-            + "\r\n--fixtablefoldercase"
-            + "\r\n    For local file sites only. Rename all table folders (ccTablename/fieldName) and the filenames saved in the table fields to reflect lowecase table and fields names."
-            + "";
+        /// <summary>
+        /// Return the next argument attribute (non command). 
+        /// If no more args or next argument is a command (starts with -), return blank
+        /// </summary>
+        /// <param name="args"></param>
+        /// <param name="argPtr"></param>
+        /// <returns></returns>
+        private static string getNextCmdArg(string[] args, ref int argPtr) {
+            if (argPtr >= args.Length) { return string.Empty; }
+            if (args[argPtr].IndexOf('-').Equals(0)) { return string.Empty; }
+            string arg = args[argPtr++];
+            arg = (arg.Left(1).Equals("\"") && arg.Right(1).Equals("\"")) ? arg.Substring(1, arg.Length - 2) : arg;
+            return arg;
+        }
+        /// <summary>
+        /// Return the next command (starting with -). Skips anythng not a command. Returns blank if no more commands
+        /// </summary>
+        /// <param name="args"></param>
+        /// <param name="argPtr"></param>
+        /// <returns></returns>
+        private static string getNextCmd(string[] args, ref int argPtr) {
+            --argPtr;
+            do {
+                if (++argPtr >= args.Length) { return string.Empty; }
+            } while (!args[argPtr].IndexOf('-').Equals(0));
+            return args[argPtr++];
+        }
     }
-
 }

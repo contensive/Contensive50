@@ -217,7 +217,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 dbVerified = true;
-                saveTransactionLog(sql, sw.ElapsedMilliseconds, "query");
+                saveTransactionLog(sql, sw.ElapsedMilliseconds, "query", recordsReturned);
             } catch (Exception ex) {
                 LogController.handleError( core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "], recordsReturned [" + recordsReturned + "]", ex));
                 throw;
@@ -256,7 +256,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 dbVerified = true;
-                saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query");
+                saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query", recordsAffected);
             } catch (Exception ex) {
                 LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], recordsAffected [" + recordsAffected + "]", ex));
                 throw;
@@ -283,7 +283,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 dbVerified = true;
-                saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query-async");
+                saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query-async", -1);
             } catch (Exception ex) {
                 LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "]", ex));
                 throw;
@@ -438,8 +438,8 @@ namespace Contensive.Processor.Controllers {
         /// update the transaction log
         /// </summary>
         /// <param name="LogEntry"></param>
-        private void saveTransactionLog(string sql, long elapsedMilliseconds, string sqlMethodType) {
-            string logMsg = "type [" + sqlMethodType + "], duration [" + elapsedMilliseconds + "ms], sql [" + sql.Replace("\r", "").Replace("\n", "") + "]";
+        private void saveTransactionLog(string sql, long elapsedMilliseconds, string sqlMethodType, int recordsAffected) {
+            string logMsg = "type [" + sqlMethodType + "], duration [" + elapsedMilliseconds + "ms], recordsAffected [" + recordsAffected + "], sql [" + sql.Replace("\r", "").Replace("\n", "") + "]";
             if (elapsedMilliseconds > sqlSlowThreshholdMsec) {
                 LogController.logWarn(core, "Slow Query " + logMsg);
             } else {

@@ -104,7 +104,8 @@ namespace Contensive.Processor.Controllers {
                 // non-thread safe. Use lock to prevent re-entry?
                 if (processTimerInProcess) {
                     //
-                    Console.WriteLine("taskRunner.processTimerTick, skip -- processTimerInProcess true");
+                    // -- trace log without core
+                    LogController.forceNLog("taskRunner.processTimerTick, skip -- processTimerInProcess true",LogController.LogLevel.Trace);
                 } else {
                     processTimerInProcess = true;
                     //
@@ -175,25 +176,36 @@ namespace Contensive.Processor.Controllers {
                                         }
                                         //
                                         // -- two execution methods, 1) run task here, 2) start process and wait (so bad addon code does not memory link)
-                                        if (cpApp.Site.GetBoolean("Run tasks in service process")) {
+                                        bool runInServiceProcess = cpApp.Site.GetBoolean("Run tasks in service process");
+                                        string cliPathFilename = cpApp.core.programFiles.localAbsRootPath + "cc.exe";
+                                        if(!runInServiceProcess && !System.IO.File.Exists(cliPathFilename)) {
+                                            runInServiceProcess = true;
+                                            LogController.logError(cpApp.core, "TaskRunner cannot run out of process because command line program cc.exe not found in program files folder [" + cpApp.core.programFiles.localAbsRootPath + "]");
+                                        }
+                                        if (runInServiceProcess) {
                                             //
                                             // -- execute here
                                             executeRunnerTasks(cpApp.Site.Name, runnerGuid);
                                         } else {
                                             //
                                             // -- execute in new  process
+                                            string filename = "cc.exe";
+                                            string workingDirectory = cpApp.core.programFiles.localAbsRootPath;
+                                            string arguments = "-a \"" + appKVP.Value.name + "\" --runTask \"" + runnerGuid + "\"";
+                                            LogController.logInfo(cpApp.core, "TaskRunner starting process to execute task for filename [" + filename + "], workingDirectory [" + workingDirectory + "], arguments [" + arguments + "]");
+                                            //
                                             Process process = new Process();
                                             process.StartInfo.CreateNoWindow = true;
-                                            process.StartInfo.FileName = "cc.exe";
-                                            process.StartInfo.WorkingDirectory = cpApp.core.programFiles.localAbsRootPath;
-                                            process.StartInfo.Arguments = " --runTask " + appKVP.Value.name + " " + runnerGuid;
+                                            process.StartInfo.FileName = filename;
+                                            process.StartInfo.WorkingDirectory = workingDirectory;
+                                            process.StartInfo.Arguments = arguments;
                                             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                                             process.Start();
                                             //
                                             // todo manage multiple executing processes
                                             process.WaitForExit();
                                         }
-                                        Console.WriteLine("runTasks, app [" + appKVP.Value.name + "], task complete (" + swTask.ElapsedMilliseconds + "ms)");
+                                        LogController.logTrace(cpApp.core, "runTasks, app [" + appKVP.Value.name + "], task complete (" + swTask.ElapsedMilliseconds + "ms)");
                                     }
                                     sequentialTaskCount++;
                                 } while (recordsAffected > 0);
@@ -203,7 +215,9 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                Console.WriteLine("runTasks, exit (" + swProcess.ElapsedMilliseconds + "ms)");
+                //
+                // -- trace log without core
+                LogController.forceNLog("taskRunner.runTasks, exit (" + swProcess.ElapsedMilliseconds + "ms)", LogController.LogLevel.Trace);
             } catch (Exception ex) {
                 LogController.handleError(serverCore, ex);
             }
@@ -221,11 +235,10 @@ namespace Contensive.Processor.Controllers {
                 using (var cp = new Contensive.Processor.CPClass(appName)) {
                     foreach (var task in TaskModel.createList(cp.core, "(cmdRunner=" + DbController.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
                         //
-                        Console.WriteLine("runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]");
+                        // -- trace log without core
+                        LogController.forceNLog("taskRunner.runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", LogController.LogLevel.Info);
                         //
                         DateTime dateStarted = DateTime.Now;
-                        //task.dateStarted = dateStarted;
-                        //task.save(cp.core);
                         var cmdDetail = cp.core.json.Deserialize<TaskModel.CmdDetailClass>(task.cmdDetail);
                         if (cmdDetail != null) {
                             var addon = AddonModel.create(cp.core, cmdDetail.addonId);

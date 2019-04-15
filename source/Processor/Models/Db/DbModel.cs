@@ -713,7 +713,7 @@ namespace Contensive.Processor.Models.Db {
                                         if ((String.IsNullOrEmpty(fileFieldFilename)) && (id != 0)) {
                                             // 
                                             // -- if record exists and file property's filename is not set, get the filename from the Db
-                                            using (System.Data.DataTable dt = db.executeQuery("select " + instanceProperty.Name + " from " + tableName + " where (id=" + id + ")")) {
+                                            using (DataTable dt = db.executeQuery("select " + instanceProperty.Name + " from " + tableName + " where (id=" + id + ")")) {
                                                 if (dt.Rows.Count > 0) {
                                                     fileFieldFilename = GenericController.encodeText(dt.Rows[0][instanceProperty.Name]);
                                                 }
@@ -724,7 +724,7 @@ namespace Contensive.Processor.Models.Db {
                                         if ((string.IsNullOrEmpty(fileFieldContent)) && (!string.IsNullOrEmpty(fileFieldFilename))) {
                                             //
                                             // -- empty content and valid filename, delete the file and clear the filename
-                                            sqlPairs.add(instanceProperty.Name, "");
+                                            sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(string.Empty));
                                             core.cdnFiles.deleteFile(fileFieldFilename);
                                             fileFieldFilenameProperty.SetValue(fileProperty, string.Empty);
                                         } else {
