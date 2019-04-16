@@ -324,34 +324,6 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         // Replace with main_GetPageArgs()
         //
-        // Used Interally by main_GetPageLink to main_Get the SectionID of the parents
-        // Dim siteSectionRootPageIndex As Dictionary(Of Integer, Integer) = siteSectionModel.getRootPageIdIndex(Me)
-        //====================================================================================================
-        //
-        internal int getPageSectionId(int PageID, ref List<int> UsedIDList, Dictionary<int, int> siteSectionRootPageIndex) {
-            int sectionId = 0;
-            try {
-                PageContentModel page = PageContentModel.create(core, PageID);
-                if (page != null) {
-                    if ((page.parentID == 0) && (!UsedIDList.Contains(page.parentID))) {
-                        UsedIDList.Add(page.parentID);
-                        if (siteSectionRootPageIndex.ContainsKey(page.parentID)) {
-                            sectionId = siteSectionRootPageIndex[page.parentID];
-                        }
-                    } else {
-                        sectionId = getPageSectionId(page.parentID, ref UsedIDList, siteSectionRootPageIndex);
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
-            }
-            return sectionId;
-        }
-        //
-        //====================================================================================================
-        // Replace with main_GetPageArgs()
-        //
         // Used Interally by main_GetPageLink to main_Get the TemplateID of the parents
         //====================================================================================================
         //

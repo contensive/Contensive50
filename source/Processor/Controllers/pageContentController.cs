@@ -1978,13 +1978,12 @@ namespace Contensive.Processor.Controllers {
                     // add open graph properties
                     //---------------------------------------------------------------------------------
                     //
-                    string siteName = core.siteProperties.getText("facebook site_name");
-                    if ( string.IsNullOrEmpty( siteName )) { siteName = core.appConfig.name; }
+                    core.docProperties.setProperty("Open Graph Site Name", core.siteProperties.getText("Open Graph Site Name", core.appConfig.name));
                     core.docProperties.setProperty("Open Graph Content Type", "website");
                     core.docProperties.setProperty("Open Graph URL", getPageLink(core, core.doc.pageController.page.id,""));
                     core.docProperties.setProperty("Open Graph Title", HtmlController.encodeHtml(core.doc.pageController.page.pageTitle));
                     core.docProperties.setProperty("Open Graph Description", HtmlController.encodeHtml(core.doc.pageController.page.metaDescription));
-                    core.docProperties.setProperty("Open Graph Site Name", core.appConfig.name);
+                    core.docProperties.setProperty("Open Graph Image", (string.IsNullOrEmpty(core.doc.pageController.page.imageFilename)) ? string.Empty : core.appConfig.cdnFileUrl + core.doc.pageController.page.imageFilename);
                     //
                     //---------------------------------------------------------------------------------
                     // OnPageStartEvent
