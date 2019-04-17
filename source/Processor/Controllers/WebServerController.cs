@@ -299,6 +299,7 @@ namespace Contensive.Processor.Controllers {
                                 IsForm = true,
                                 tempfilename = instanceId + "-" + filePtr.ToString() + ".bin"
                         };
+                            core.tempFiles.verifyPath(core.tempFiles.localAbsRootPath);
                             file.SaveAs(core.tempFiles.joinPath(core.tempFiles.localAbsRootPath, prop.tempfilename));
                             core.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename);
                             prop.FileSize = encodeInteger(file.ContentLength);

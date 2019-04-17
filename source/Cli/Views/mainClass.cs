@@ -19,7 +19,7 @@ namespace Contensive.CLI {
                 int argPtr = 0;
                 if (getNextCmd(args, ref argPtr).ToLowerInvariant().Equals("--configure")) {
                     ConfigureCmd.execute();
-
+                    return;
                 }
                 //
                 // -- create an instance of cp to execute commands

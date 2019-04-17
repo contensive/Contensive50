@@ -93,7 +93,8 @@ namespace Contensive.Processor.Controllers {
                 }
                 return _contentNameIdDictionary;
             }
-        } internal Dictionary<string, int> _contentNameIdDictionary = null;
+        }
+        internal Dictionary<string, int> _contentNameIdDictionary = null;
         //
         //===================================================================================================
         /// <summary>
@@ -101,24 +102,69 @@ namespace Contensive.Processor.Controllers {
         /// and not loaded in the future. The me.dispose compares the list count to the loaded count and caches if different.
         /// </summary>
         /// <returns></returns>
-        public List<string> assemblySkipList {
+        public List<string> assemblyList_NonAddonsFound {
             get {
-                if (_assemblySkipList == null) {
-                    _assemblySkipList = cache.getObject<List<string>>(cacheNameAssemblySkipList);
-                    if (_assemblySkipList == null) {
-                        _assemblySkipList = new List<string> {
-                            programFiles.localAbsRootPath + "v8-base-ia32.dll",
-                            programFiles.localAbsRootPath + "v8-ia32.dll",
-                            programFiles.localAbsRootPath + "ClearScriptV8-32.dll"
-                        };
+                if (_assemblyList_NonAddonsFound == null) {
+                    _assemblyList_NonAddonsFound = cache.getObject<List<string>>(cacheName_AssemblyList_NonAddonsFound);
+                    if (_assemblyList_NonAddonsFound == null) {
+                        _assemblyList_NonAddonsFound = new List<string>();
                     }
-                    _assemblySkipList_CountWhenLoaded = _assemblySkipList.Count;
+                    _assemblyList_NonAddonsFound_CountWhenLoaded = _assemblyList_NonAddonsFound.Count;
                 }
-                return _assemblySkipList;
+                return _assemblyList_NonAddonsFound;
             }
         }
-        private List<string> _assemblySkipList;
-        private int _assemblySkipList_CountWhenLoaded;
+        private List<string> _assemblyList_NonAddonsFound;
+        private int _assemblyList_NonAddonsFound_CountWhenLoaded;
+        //
+        // -- assembly files to skip
+        public List<string> assemblyList_NonAddonsInstalled = new List<string>() {
+            "\\cpbase.dll",
+            "\\awssdk.core.dll",
+            "\\awssdk.s3.dll",
+            "\\clearscript.dll",
+            "\\clearscriptv8-32.dll",
+            "\\clearscriptv8-64.dll",
+            "\\amazon.elasticachecluster.dll",
+            "\\defaultsite.dll",
+            "\\enyim.caching.dll",
+            "\\icsharpcode.sharpziplib.dll",
+            "\\microsoft.web.administration.dll",
+            "\\newtonsoft.json.dll",
+            "\\nlog.dll",
+            "\\nuglify.dll",
+            "\\nustache.core.dll",
+            "\\v8-base-ia32.dll",
+            "\\v8-ia32.dll",
+            "\\v8-x64.dll",
+            "\\v8-ia32.dll",
+            "\\v8-x64.dll"
+        };
+        //
+        //===================================================================================================
+        // todo move to class
+        /// <summary>
+        /// A dictionary of addon collection.namespace.class and the file assembly where it was found. Built during execution, stored in cache
+        /// </summary>
+        public Dictionary<string, AssemblyFileDetails> assemblyList_AddonsFound {
+            get {
+                if (_assemblyFileDict != null) { return _assemblyFileDict; }
+                _assemblyFileDict = cache.getObject<Dictionary<string, AssemblyFileDetails>>(AssemblyFileDictCacheName);
+                if (_assemblyFileDict == null) {
+                    _assemblyFileDict = new Dictionary<string, AssemblyFileDetails>();
+                }
+                return _assemblyFileDict;
+            }
+        }
+        public void assemblyList_AddonsFound_save() {
+            cache.storeObject(AssemblyFileDictCacheName, _assemblyFileDict);
+        }
+        private Dictionary<string, AssemblyFileDetails> _assemblyFileDict;
+        public const string AssemblyFileDictCacheName = "assemblyFileDict";
+        public class AssemblyFileDetails {
+            public string path;
+            public string pathFilename;
+        }
         //
         //===================================================================================================
         //
@@ -268,7 +314,7 @@ namespace Contensive.Processor.Controllers {
                 if (_tmpFiles == null) {
                     //
                     // local server -- everything is ephemeral
-                    _tmpFiles = new FileController(this, true, appConfig.localTempPath,"");
+                    _tmpFiles = new FileController(this, true, appConfig.localTempPath, "");
                 }
                 return _tmpFiles;
             }
@@ -330,7 +376,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- always local
-                    _programFiles = new FileController(this, true, serverConfig.programFilesPath,"");
+                    _programFiles = new FileController(this, true, serverConfig.programFilesPath, "");
                 }
                 return _programFiles;
             }
@@ -344,7 +390,7 @@ namespace Contensive.Processor.Controllers {
                 if (_cdnFiles == null) {
                     if (appConfig != null) {
                         if (appConfig.enabled) {
-                            _cdnFiles = new FileController(this, serverConfig.isLocalFileSystem, appConfig.localFilesPath,appConfig.remoteFilePath);
+                            _cdnFiles = new FileController(this, serverConfig.isLocalFileSystem, appConfig.localFilesPath, appConfig.remoteFilePath);
                         }
                     }
                 }
@@ -467,7 +513,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp) {
             cp_forAddonExecutionOnly = cp;
-            LogController.forceNLog( "CoreController constructor-0, enter", LogController.LogLevel.Trace);
+            LogController.forceNLog("CoreController constructor-0, enter", LogController.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
             tableSchemaDictionary = null;
@@ -479,7 +525,7 @@ namespace Contensive.Processor.Controllers {
             this.serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
             webServer.iisContext = null;
             constructorInitialize(false);
-            LogController.forceNLog( "CoreController constructor-0, exit", LogController.LogLevel.Trace);
+            LogController.forceNLog("CoreController constructor-0, exit", LogController.LogLevel.Trace);
         }
         //
         //====================================================================================================
@@ -490,7 +536,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName) : base() {
             this.cp_forAddonExecutionOnly = cp;
-            LogController.forceNLog( "CoreController constructor-1, enter", LogController.LogLevel.Trace);
+            LogController.forceNLog("CoreController constructor-1, enter", LogController.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
             tableSchemaDictionary = null;
@@ -505,7 +551,7 @@ namespace Contensive.Processor.Controllers {
                 webServer.iisContext = null;
                 constructorInitialize(false);
             }
-            LogController.forceNLog( "CoreController constructor-1, exit", LogController.LogLevel.Trace);
+            LogController.forceNLog("CoreController constructor-1, exit", LogController.LogLevel.Trace);
         }
         //
         //====================================================================================================
@@ -543,7 +589,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig) : base() {
             cp_forAddonExecutionOnly = cp;
-            LogController.forceNLog( "CoreController constructor-2, enter", LogController.LogLevel.Trace);
+            LogController.forceNLog("CoreController constructor-2, enter", LogController.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
             tableSchemaDictionary = null;
@@ -557,7 +603,7 @@ namespace Contensive.Processor.Controllers {
             appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
             webServer.iisContext = null;
             constructorInitialize(false);
-            LogController.forceNLog( "CoreController constructor-2, exit", LogController.LogLevel.Trace);
+            LogController.forceNLog("CoreController constructor-2, exit", LogController.LogLevel.Trace);
         }
         //
         //====================================================================================================
@@ -568,7 +614,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
-            LogController.forceNLog( "CoreController constructor-3, enter", LogController.LogLevel.Trace);
+            LogController.forceNLog("CoreController constructor-3, enter", LogController.LogLevel.Trace);
             //
             // -- create default auth objects for non-user methods, or until auth is available
             session = new SessionController(this);
@@ -579,7 +625,7 @@ namespace Contensive.Processor.Controllers {
             this.appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
             webServer.initWebContext(httpContext);
             constructorInitialize(true);
-            LogController.forceNLog( "CoreController constructor-3, exit", LogController.LogLevel.Trace);
+            LogController.forceNLog("CoreController constructor-3, exit", LogController.LogLevel.Trace);
         }
         //
         //====================================================================================================
@@ -588,7 +634,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public CoreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
-            LogController.forceNLog( "CoreController constructor-4, enter", LogController.LogLevel.Trace);
+            LogController.forceNLog("CoreController constructor-4, enter", LogController.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
             tableSchemaDictionary = null;
@@ -603,7 +649,7 @@ namespace Contensive.Processor.Controllers {
                 webServer.initWebContext(httpContext);
                 constructorInitialize(true);
             }
-            LogController.forceNLog( "CoreController constructor-4, exit", LogController.LogLevel.Trace);
+            LogController.forceNLog("CoreController constructor-4, exit", LogController.LogLevel.Trace);
         }
         //
         /// <summary>
@@ -942,10 +988,10 @@ namespace Contensive.Processor.Controllers {
                     doc.continueProcessing = false;
                     //
                     // -- save assemblySkipList
-                    if (_assemblySkipList != null) {
-                        if (_assemblySkipList.Count > _assemblySkipList_CountWhenLoaded) {
-                            LogController.forceNLog("CoreController dispose, save assemblySkipList to cache, _assemblySkipList.Count [" + _assemblySkipList.Count + "], _assemblySkipList_CountWhenLoaded [" + _assemblySkipList_CountWhenLoaded + "]", LogController.LogLevel.Trace);
-                            cache.storeObject(cacheNameAssemblySkipList, _assemblySkipList);
+                    if (_assemblyList_NonAddonsFound != null) {
+                        if (_assemblyList_NonAddonsFound.Count > _assemblyList_NonAddonsFound_CountWhenLoaded) {
+                            LogController.forceNLog("CoreController dispose, save assemblySkipList to cache, _assemblySkipList.Count [" + _assemblyList_NonAddonsFound.Count + "], _assemblySkipList_CountWhenLoaded [" + _assemblyList_NonAddonsFound_CountWhenLoaded + "]", LogController.LogLevel.Trace);
+                            cache.storeObject(cacheName_AssemblyList_NonAddonsFound, _assemblyList_NonAddonsFound);
                         }
                     }
                     //

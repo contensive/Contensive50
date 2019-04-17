@@ -470,7 +470,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- DotNet
                                 if (addon.dotNetClass != "") {
-                                    result += execute_assembly(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core, addon.collectionID));
+                                    result += execute_dotNetClass(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core, addon.collectionID));
                                 }
                                 //
                                 // -- RemoteAssetLink
@@ -742,7 +742,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 if ((Button == ButtonSave) || (Button == ButtonOK)) {
                                     foreach (XmlNode SettingNode in Doc.DocumentElement.ChildNodes) {
-                                        if (SettingNode.Name.ToLower() =="tab") {
+                                        if (SettingNode.Name.ToLower() == "tab") {
                                             foreach (XmlNode TabNode in SettingNode.ChildNodes) {
                                                 string Filename = null;
                                                 string DefaultFilename = null;
@@ -1443,69 +1443,53 @@ namespace Contensive.Processor.Controllers {
         /// <param name="addon"></param>
         /// <param name="addonCollection"></param>
         /// <returns></returns>
-        private string execute_assembly(CPUtilsBaseClass.addonExecuteContext executeContext, Models.Db.AddonModel addon, AddonCollectionModel addonCollection) {
+        private string execute_dotNetClass(CPUtilsBaseClass.addonExecuteContext executeContext, Models.Db.AddonModel addon, AddonCollectionModel addonCollection) {
             string result = "";
             try {
                 LogController.logTrace(core, "execute_assembly dotNetClass [" + addon.dotNetClass + "], enter");
-                // todo - move locals
-                bool AddonFound = false;
+                //
                 string warningMessage = "The addon [" + addon.name + "] dotnet code could not be executed because no assembly was found with namespace [" + addon.dotNetClass + "].";
+                // -- purpose is to have a repository where addons can be stored for now web and non-web apps, and allow permissions to be installed with online upload
+                if ((addonCollection == null) || (string.IsNullOrEmpty(addonCollection.ccguid))) { throw new GenericException(warningMessage + " The addon dotnet assembly could not be run because no collection is set, or the collection guid is empty."); }
+                //
+                // -- has addon been found before
+                string assemblyFileDictKey = (addonCollection.ccguid + addon.dotNetClass).ToLower();
+                if (core.assemblyList_AddonsFound.ContainsKey(assemblyFileDictKey)) {
+                    return execute_dotNetClass_assembly(addon, core.assemblyList_AddonsFound[assemblyFileDictKey].pathFilename);
+                }
                 //
                 // -- development bypass folder (addonAssemblyBypass)
                 // -- purpose is to provide a path that can be hardcoded in visual studio after-build event to make development easier
+                bool AddonFound = false;
                 string commonAssemblyPath = core.programDataFiles.localAbsRootPath + "AddonAssemblyBypass\\";
-                if (!Directory.Exists(commonAssemblyPath)) {
-                    Directory.CreateDirectory(commonAssemblyPath);
-                } else {
-                    result = execute_assembly_byFilePath(addon, commonAssemblyPath, true, ref AddonFound);
-                }
+                if (!Directory.Exists(commonAssemblyPath)) { Directory.CreateDirectory(commonAssemblyPath); }
+                result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, commonAssemblyPath, true, ref AddonFound);
+                if (AddonFound) { return result; }
+                //
+                // -- application path (background from program files, forground from appRoot)
+                // -- purpose is to allow add-ons to be included in the website's (wwwRoot) assembly. So a website's custom addons are within the wwwRoot build, not separate
+                // -- background - program files installation folder, foreground - appRootPath
+                //string appPath = (executeContext.backgroundProcess) ? core.programFiles.localAbsRootPath : core.privateFiles.joinPath(core.wwwFiles.localAbsRootPath, "bin\\");
+                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                UriBuilder uri = new UriBuilder(codeBase);
+                string path = Uri.UnescapeDataString(uri.Path);
+                string appPath = Path.GetDirectoryName(path);
+                result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appPath, true, ref AddonFound);
+                if (AddonFound) { return result; }
+                //
+                //
+                // -- try addon folder
+                string AddonVersionPath = "";
+                var tmpDate = new DateTime();
+                string tmpName = "";
+                CollectionController.getAddonCollectionFolderConfig(core, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
+                if (string.IsNullOrEmpty(AddonVersionPath)) { throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection"); };
+                string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
+                if (!core.privateFiles.pathExists_local(AddonPath)) { core.privateFiles.copyPathRemoteToLocal(AddonPath); }
+                string appAddonPath = core.privateFiles.joinPath(core.privateFiles.localAbsRootPath, AddonPath);
+                result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appAddonPath, false, ref AddonFound);
                 if (!AddonFound) {
-                    //
-                    // -- application path (background from program files, forground from appRoot)
-                    // -- purpose is to allow add-ons to be included in the website's (wwwRoot) assembly. So a website's custom addons are within the wwwRoot build, not separate
-                    string appPath = "";
-                    if (executeContext.backgroundProcess) {
-                        //
-                        // -- background - program files installation folder
-                        appPath = core.programFiles.localAbsRootPath;
-                    } else {
-                        //
-                        // -- foreground - appRootPath
-                        appPath = core.privateFiles.joinPath(core.wwwFiles.localAbsRootPath, "bin\\");
-                    }
-                    string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                    UriBuilder uri = new UriBuilder(codeBase);
-                    string path = Uri.UnescapeDataString(uri.Path);
-                    appPath = Path.GetDirectoryName(path);
-                    result = execute_assembly_byFilePath(addon, appPath, true, ref AddonFound);
-                    if (!AddonFound) {
-                        //
-                        // -- try addon folder
-                        // -- purpose is to have a repository where addons can be stored for now web and non-web apps, and allow permissions to be installed with online upload
-                        if (addonCollection == null) {
-                            throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the addon has no collection set.");
-                        } else if (string.IsNullOrEmpty(addonCollection.ccguid)) {
-                            throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the addon collection [" + addonCollection.name + "] has no guid.");
-                        } else {
-                            string AddonVersionPath = "";
-                            var tmpDate = new DateTime();
-                            string tmpName = "";
-                            CollectionController.getAddonCollectionFolderConfig(core, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
-                            if (string.IsNullOrEmpty(AddonVersionPath)) {
-                                throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection");
-                            } else {
-                                string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
-                                if (!core.privateFiles.pathExists_local(AddonPath)) {
-                                    core.privateFiles.copyPathRemoteToLocal(AddonPath);
-                                }
-                                string appAddonPath = core.privateFiles.joinPath(core.privateFiles.localAbsRootPath, AddonPath);
-                                result = execute_assembly_byFilePath(addon, appAddonPath, false, ref AddonFound);
-                                if (!AddonFound) {
-                                    throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "] or collection path [" + appAddonPath + "].");
-                                }
-                            }
-                        }
-                    }
+                    throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "] or collection path [" + appAddonPath + "].");
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -1525,145 +1509,153 @@ namespace Contensive.Processor.Controllers {
         /// <param name="IsDevAssembliesFolder"></param>
         /// <param name="AddonFound"></param>
         /// <returns></returns>
-        private string execute_assembly_byFilePath(Models.Db.AddonModel addon, string fullPath, bool IsDevAssembliesFolder, ref bool AddonFound) {
-            string returnValue = "";
+        private string execute_dotNetClass_byPath(AddonModel addon, string assemblyFileDictKey, string fullPath, bool IsDevAssembliesFolder, ref bool AddonFound) {
             try {
-                AddonFound = false;
-                if (Directory.Exists(fullPath)) {
-                    foreach (var TestFilePathname in Directory.GetFileSystemEntries(fullPath, "*.dll")) {
-                        if (!core.assemblySkipList.Contains(TestFilePathname)) {
-                            bool testFileIsValidAddonAssembly = true;
-                            Assembly testAssembly = null;
-                            if (TestFilePathname.ToLower().Right(11)=="\\cpbase.dll") {
-                                //
-                                // -- always block cpbase.dll from addon folders
-                                core.assemblySkipList.Add(TestFilePathname);
-                                testFileIsValidAddonAssembly = false;
-                            }
-                            try {
-                                //
-                                // ##### consider using refectiononlyload first, then if it is right, do the loadfrom - so Dependencies are not loaded.
-                                //
-                                testAssembly = System.Reflection.Assembly.LoadFrom(TestFilePathname);
-                                //testAssemblyName = testAssembly.FullName
-                            } catch (Exception ex) {
-                                LogController.logInfo(core, "Assembly.LoadFrom failure, adding DLL [" + TestFilePathname + "] to assemblySkipList, ex [" + ex.Message + "]");
-                                core.assemblySkipList.Add(TestFilePathname);
-                                testFileIsValidAddonAssembly = false;
-                            }
-                            try {
-                                if (testFileIsValidAddonAssembly) {
-                                    //
-                                    // problem loading types, use try to debug
-                                    //
-                                    try {
-                                        bool isAddonAssembly = false;
-                                        var typeMap = testAssembly.GetTypes().ToDictionary(t => t.FullName, t => t, StringComparer.OrdinalIgnoreCase);
-                                        if (typeMap.TryGetValue(addon.dotNetClass, out Type addonType)) {
-                                            if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
-                                                //
-                                                // -- assembly is public, not abstract, based on a base type
-                                                if (addonType.BaseType.FullName != null) {
-                                                    //
-                                                    // -- assembly has a baseType fullname
-                                                    if ((addonType.BaseType.FullName.ToLowerInvariant() == "addonbaseclass") || (addonType.BaseType.FullName.ToLowerInvariant() == "contensive.baseclasses.addonbaseclass")) {
-                                                        //
-                                                        // -- valid addon assembly
-                                                        isAddonAssembly = true;
-                                                        AddonFound = true;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        if (AddonFound) {
-                                            try {
-                                                //
-                                                // -- Create the object from the Assembly
-                                                AddonBaseClass AddonObj = (AddonBaseClass)testAssembly.CreateInstance(addonType.FullName);
-                                                try {
-                                                    //
-                                                    // -- Call Execute
-                                                    object AddonReturnObj = AddonObj.Execute(core.cp_forAddonExecutionOnly);
-                                                    if (AddonReturnObj != null) {
-                                                        switch (AddonReturnObj.GetType().ToString()) {
-                                                            case "System.Object[,]":
-                                                                //
-                                                                //   a 2-D Array of objects
-                                                                //   each cell can contain 
-                                                                //   return array for internal use constructing data/layout merge
-                                                                //   return xml as dataset to another computer
-                                                                //   return json as dataset for browser
-                                                                //
-                                                                break;
-                                                            case "System.String[,]":
-                                                                //
-                                                                //   return array for internal use constructing data/layout merge
-                                                                //   return xml as dataset to another computer
-                                                                //   return json as dataset for browser
-                                                                //
-                                                                break;
-                                                            default:
-                                                                returnValue = AddonReturnObj.ToString();
-                                                                break;
-                                                        }
-                                                    }
-                                                } catch (Exception Ex) {
-                                                    //
-                                                    // Error in the addon
-                                                    //
-                                                    string detailedErrorMessage = "There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + TestFilePathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + Ex.ToString() + "]";
-                                                    LogController.handleError(core, Ex, detailedErrorMessage);
-                                                    //Throw new GenericException(detailedErrorMessage)
-                                                }
-                                            } catch (Exception Ex) {
-                                                string detailedErrorMessage = addon.name + " could not be executed because there was an error creating an object from the assembly, DLL [" + addonType.FullName + "]. The error was [" + Ex.ToString() + "]";
-                                                LogController.handleError(core, Ex, detailedErrorMessage);
-                                                throw new GenericException(detailedErrorMessage);
-                                            }
-                                            //
-                                            // -- addon was found, no need to look for more
-                                            break;
-                                        }
-                                        if (!isAddonAssembly) {
-                                            //
-                                            // -- not an addon assembly
-                                            //core.assemblySkipList.Add(TestFilePathname);
-                                        }
-                                    } catch (ReflectionTypeLoadException ex) {
-                                        //
-                                        // exceptin thrown out of application bin folder when xunit library included -- ignore
-                                        //
-                                        LogController.logDebug(core, "Assembly ReflectionTypeLoadException, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
-                                        core.assemblySkipList.Add(TestFilePathname);
-                                    } catch (Exception ex) {
-                                        //
-                                        // problem loading types
-                                        //
-                                        LogController.logDebug(core, "Assembly exception, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
-                                        core.assemblySkipList.Add(TestFilePathname);
-                                        string detailedErrorMessage = "While locating assembly for addon [" + addon.name + "], there was an error loading types for assembly [" + TestFilePathname + "]. This assembly was skipped and should be removed from the folder [" + fullPath + "]";
-                                        throw new GenericException(detailedErrorMessage);
-                                    }
-                                }
-                            } catch (System.Reflection.ReflectionTypeLoadException ex) {
-                                LogController.logDebug(core, "Assembly ReflectionTypeLoadException-2, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
-                                core.assemblySkipList.Add(TestFilePathname);
-                                string detailedErrorMessage = "A load exception occured for addon [" + addon.name + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "] Any internal exception follow:";
-                                foreach (Exception exLoader in ex.LoaderExceptions) {
-                                    detailedErrorMessage += "\r\n--LoaderExceptions: " + exLoader.Message;
-                                }
-                                throw new GenericException(detailedErrorMessage);
-                            } catch (Exception ex) {
-                                //
-                                // ignore these errors
-                                //
-                                LogController.logDebug(core, "Assembly Exception-2, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
-                                core.assemblySkipList.Add(TestFilePathname);
-                                string detailedErrorMessage = "A non-load exception occured while loading the addon [" + addon.name + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "].";
-                                LogController.handleError(core, new GenericException(detailedErrorMessage));
-                            }
+                if (!Directory.Exists(fullPath)) { return string.Empty; }
+                foreach (var testPathFilename in Directory.GetFileSystemEntries(fullPath, "*.dll")) {
+                    if (!core.assemblyList_NonAddonsFound.Contains(testPathFilename)) {
+                        bool testFileIsValidAddonAssembly = true;
+                        if (!string.IsNullOrEmpty(core.assemblyList_NonAddonsInstalled.Find(x => testPathFilename.ToLower().Right(x.Length) == x))) {
+                            //
+                            // -- this assembly is a non-addon installed file, block full path
+                            core.assemblyList_NonAddonsFound.Add(testPathFilename);
+                            continue;
+                        };
+                        string returnValue = execute_dotNetClass_assembly(addon, testPathFilename, ref testFileIsValidAddonAssembly, ref AddonFound);
+                        //
+                        // -- if found, add this assembly to the found-dictionary
+                        if (AddonFound) {
+                            core.assemblyList_AddonsFound.Add(assemblyFileDictKey, new CoreController.AssemblyFileDetails() {
+                                pathFilename = testPathFilename,
+                                path = ""
+                            });
+                            core.assemblyList_AddonsFound_save();
+                            return returnValue;
                         }
                     }
+                }
+                return string.Empty;
+            } catch (Exception ex) {
+                //
+                // -- this exception should interrupt the caller
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Execute an addon assembly
+        /// </summary>
+        /// <param name="addon"></param>
+        /// <param name="assemblyPathname"></param>
+        /// <param name="fileIsValidAddonAssembly">The file was a valid assembly, just not the right onw</param>
+        /// <param name="addonFound">If found, the search for the assembly can be abandoned</param>
+        /// <returns></returns>
+        private string execute_dotNetClass_assembly(AddonModel addon, string assemblyPathname, ref bool fileIsValidAddonAssembly, ref bool addonFound) {
+            string result = "";
+            try {
+                Assembly testAssembly = null;
+                fileIsValidAddonAssembly = true;
+                try {
+                    //
+                    // todo consider using refectiononlyload first, then if it is right, do the loadfrom - so Dependencies are not loaded.
+                    testAssembly = System.Reflection.Assembly.LoadFrom(assemblyPathname);
+                } catch (Exception ex) {
+                    LogController.logInfo(core, "Assembly.LoadFrom failure, adding DLL [" + assemblyPathname + "] to assemblySkipList, ex [" + ex.Message + "]");
+                    core.assemblyList_NonAddonsFound.Add(assemblyPathname);
+                    fileIsValidAddonAssembly = false;
+                    return string.Empty;
+                }
+                try {
+                    if (fileIsValidAddonAssembly) {
+                        //
+                        // problem loading types, use try to debug
+                        //
+                        try {
+                            var typeMap = testAssembly.GetTypes().ToDictionary(t => t.FullName, t => t, StringComparer.OrdinalIgnoreCase);
+                            if (typeMap.TryGetValue(addon.dotNetClass, out Type addonType)) {
+                                if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
+                                    //
+                                    // -- assembly is public, not abstract, based on a base type
+                                    if (addonType.BaseType.FullName != null) {
+                                        //
+                                        // -- assembly has a baseType fullname
+                                        addonFound = ((addonType.BaseType.FullName.ToLowerInvariant() == "addonbaseclass") || (addonType.BaseType.FullName.ToLowerInvariant() == "contensive.baseclasses.addonbaseclass"));
+                                    }
+                                }
+                            }
+                            if (!addonFound) { return string.Empty; }
+                            //
+                            // -- Create the object from the Assembly
+                            AddonBaseClass AddonObj = (AddonBaseClass)testAssembly.CreateInstance(addonType.FullName);
+                            try {
+                                //
+                                // -- Call Execute
+                                object AddonReturnObj = AddonObj.Execute(core.cp_forAddonExecutionOnly);
+                                if (AddonReturnObj != null) {
+                                    switch (AddonReturnObj.GetType().ToString()) {
+                                        case "System.Object[,]":
+                                            //
+                                            //   a 2-D Array of objects
+                                            //   each cell can contain 
+                                            //   return array for internal use constructing data/layout merge
+                                            //   return xml as dataset to another computer
+                                            //   return json as dataset for browser
+                                            //
+                                            break;
+                                        case "System.String[,]":
+                                            //
+                                            //   return array for internal use constructing data/layout merge
+                                            //   return xml as dataset to another computer
+                                            //   return json as dataset for browser
+                                            //
+                                            break;
+                                        default:
+                                            result = AddonReturnObj.ToString();
+                                            break;
+                                    }
+                                }
+                            } catch (Exception Ex) {
+                                //
+                                // Error in the addon
+                                //
+                                string detailedErrorMessage = "There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + assemblyPathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + Ex.ToString() + "]";
+                                LogController.handleError(core, Ex, detailedErrorMessage);
+                                //Throw new GenericException(detailedErrorMessage)
+                            }
+                        } catch (ReflectionTypeLoadException ex) {
+                            //
+                            // exceptin thrown out of application bin folder when xunit library included -- ignore
+                            //
+                            LogController.logDebug(core, "Assembly ReflectionTypeLoadException, [" + assemblyPathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
+                            core.assemblyList_NonAddonsFound.Add(assemblyPathname);
+                        } catch (Exception ex) {
+                            //
+                            // problem loading types
+                            //
+                            LogController.logDebug(core, "Assembly exception, [" + assemblyPathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
+                            core.assemblyList_NonAddonsFound.Add(assemblyPathname);
+                            string detailedErrorMessage = "While locating assembly for addon [" + addon.name + "], there was an error loading types for assembly [" + assemblyPathname + "]. This assembly was skipped and should be removed from the folder.";
+                            throw new GenericException(detailedErrorMessage);
+                        }
+                    }
+                } catch (System.Reflection.ReflectionTypeLoadException ex) {
+                    LogController.logDebug(core, "Assembly ReflectionTypeLoadException-2, [" + assemblyPathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
+                    core.assemblyList_NonAddonsFound.Add(assemblyPathname);
+                    string detailedErrorMessage = "A load exception occured for addon [" + addon.name + "], DLL [" + assemblyPathname + "]. The error was [" + ex.ToString() + "] Any internal exception follow:";
+                    foreach (Exception exLoader in ex.LoaderExceptions) {
+                        detailedErrorMessage += "\r\n--LoaderExceptions: " + exLoader.Message;
+                    }
+                    throw new GenericException(detailedErrorMessage);
+                } catch (Exception ex) {
+                    //
+                    // ignore these errors
+                    //
+                    LogController.logDebug(core, "Assembly Exception-2, [" + assemblyPathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
+                    core.assemblyList_NonAddonsFound.Add(assemblyPathname);
+                    string detailedErrorMessage = "A non-load exception occured while loading the addon [" + addon.name + "], DLL [" + assemblyPathname + "]. The error was [" + ex.ToString() + "].";
+                    LogController.handleError(core, new GenericException(detailedErrorMessage));
                 }
             } catch (Exception ex) {
                 //
@@ -1671,7 +1663,18 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return returnValue;
+            return result;
+        }
+        /// <summary>
+        /// Execute an addon assembly
+        /// </summary>
+        /// <param name="addon"></param>
+        /// <param name="assemblyPathname"></param>
+        /// <returns></returns>
+        private string execute_dotNetClass_assembly(AddonModel addon, string assemblyPathname) {
+            bool mock1 = false;
+            bool mock2 = false;
+            return execute_dotNetClass_assembly(addon, assemblyPathname, ref mock1, ref mock2);
         }
         //
         //====================================================================================================================
@@ -2073,7 +2076,7 @@ namespace Contensive.Processor.Controllers {
                         CollectionCopy = "This add-on is not a member of any collection.";
                     }
                     string CopyHeader = "";
-                    CopyHeader = CopyHeader 
+                    CopyHeader = CopyHeader
                         + "<div class=\"ccHeaderCon\">"
                         + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                         + "<tr>"
@@ -2426,14 +2429,14 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Add in default constructors, like wrapper
                 if (!string.IsNullOrEmpty(ArgumentList)) {
-                    ArgumentList +=  "\r\n";
+                    ArgumentList += "\r\n";
                 }
                 if (GenericController.vbLCase(AddonGuid) == GenericController.vbLCase(addonGuidContentBox)) {
-                    ArgumentList +=  AddonOptionConstructor_BlockNoAjax;
+                    ArgumentList += AddonOptionConstructor_BlockNoAjax;
                 } else if (IsInline) {
-                    ArgumentList +=  AddonOptionConstructor_Inline;
+                    ArgumentList += AddonOptionConstructor_Inline;
                 } else {
-                    ArgumentList +=  AddonOptionConstructor_Block;
+                    ArgumentList += AddonOptionConstructor_Block;
                 }
             }
             string result = "";
@@ -2648,7 +2651,7 @@ namespace Contensive.Processor.Controllers {
             string tempGetAddonIconImg = "";
             try {
                 if (string.IsNullOrEmpty(IconAlt)) { IconAlt = "Add-on"; }
-                if (string.IsNullOrEmpty(IconTitle)) { IconTitle = "Rendered as Add-on";}
+                if (string.IsNullOrEmpty(IconTitle)) { IconTitle = "Rendered as Add-on"; }
                 if (string.IsNullOrEmpty(IconFilename)) {
                     //
                     // No icon given, use the default
@@ -2677,7 +2680,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     IconFilename = serverFilePath + IconFilename;
                 }
-                if ((IconWidth == 0) || (IconHeight == 0)) {  IconSprites = 0; }
+                if ((IconWidth == 0) || (IconHeight == 0)) { IconSprites = 0; }
                 if (IconSprites == 0) {
                     //
                     // just the icon
