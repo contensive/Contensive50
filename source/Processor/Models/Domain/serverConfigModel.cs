@@ -25,15 +25,18 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         public string programFilesPath { get; set; }
         //
-        // -- old serverConfig
+        // -- control the task runner and task scheduler for the server group
         public bool allowTaskRunnerService { get; set; }
         public bool allowTaskSchedulerService { get; set; }
+        public int maxConcurrentTasksPerServer { get; set; }
         //
-        // -- old clusterConfig
+        // -- name for this server group
         public string name { get; set; }
         //
         // -- If true, use local dotnet memory cache backed by filesystem
         public bool enableLocalMemoryCache { get; set; }
+        //
+        // -- if true, used local files to cache, backing up local cache, then remote cache
         public bool enableLocalFileCache { get; set; }
         //
         // -- AWS dotnet elaticcache client wraps enyim, and provides node autodiscovery through the configuration object. this is the srver:port to the config file it uses.
@@ -55,16 +58,17 @@ namespace Contensive.Processor.Models.Domain {
         public string awsBucketName { get; set; }
         //
         // -- configuration of async command listener on render machines (not sure if used still)
-        public int serverListenerPort { get; set; }
-        public int maxConcurrentTasksPerServer { get; set; }
-        public string username { get; set; }
-        public string password { get; set; }
+        //public int serverListenerPort { get; set; }
+        //public string username { get; set; }
+        //public string password { get; set; }
         //
         // -- used by applications to enable/disable features, like 
         //      - ecommerce batch should only run in production
         // todo figure out how to expose this, add it to configuration setup
         public bool productionEnvironment { get; set; }
-        public bool enableLogging { get; set; }
+        //
+        // -- Allow logging. NLog config should be used primarily. This is needed for file logging
+        //public bool enableLogging { get; set; }
         //
         // -- List of all apps on this server
         public CaseInsensitiveDictionary<string,AppConfigModel> apps { get; set; }
@@ -84,12 +88,12 @@ namespace Contensive.Processor.Models.Domain {
             defaultDataSourcePassword = "";
             isLocalFileSystem = true;
             localDataDriveLetter = "D";
-            serverListenerPort = Port_ContentServerControlDefault;
+            //serverListenerPort = Port_ContentServerControlDefault;
             maxConcurrentTasksPerServer = 5;
-            username = "";
-            password = "";
+            //username = "";
+            //password = "";
             productionEnvironment = true;
-            enableLogging = false;
+            //enableLogging = false;
             apps = new CaseInsensitiveDictionary<string, AppConfigModel>();
         }
         //

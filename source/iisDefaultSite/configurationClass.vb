@@ -48,9 +48,9 @@ Public Class ConfigurationClass
             serverConfig.isLocalFileSystem = GenericController.encodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalFileSystem"))
             serverConfig.localDataDriveLetter = ConfigurationManager.AppSettings("ContensiveLocalDataDriveLetter")
             serverConfig.name = ConfigurationManager.AppSettings("ContensiveServerGroupName")
-            serverConfig.password = ConfigurationManager.AppSettings("ContensiveServerGroupPassword")
+            'serverConfig.password = ConfigurationManager.AppSettings("ContensiveServerGroupPassword")
             serverConfig.programFilesPath = ""
-            serverConfig.username = ConfigurationManager.AppSettings("ContensiveServerGroupUsername")
+            'serverConfig.username = ConfigurationManager.AppSettings("ContensiveServerGroupUsername")
             Dim appConfig As New AppConfigModel
             appConfig.name = getAppName()
             appConfig.adminRoute = ConfigurationManager.AppSettings("ContensiveAdminRoute")

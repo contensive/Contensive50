@@ -2977,7 +2977,7 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrWhiteSpace(code)) {
                     HtmlAssetClass asset = null;
                     if (sourceAddonId != 0) {
-                        asset = core.doc.htmlAssetList.Find(t => t.sourceAddonId == sourceAddonId);
+                        asset = core.doc.htmlAssetList.Find(t => ((t.sourceAddonId == sourceAddonId) && (!t.isLink)));
                     }
                     if (asset != null) {
                         //
@@ -3008,7 +3008,7 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrWhiteSpace(scriptLinkSrc)) {
                     HtmlAssetClass asset = null;
                     if (sourceAddonId != 0) {
-                        asset = core.doc.htmlAssetList.Find(t => t.sourceAddonId == sourceAddonId);
+                        asset = core.doc.htmlAssetList.Find(t => ((t.content == scriptLinkSrc) && (t.isLink)));
                     }
                     if (asset != null) {
                         //

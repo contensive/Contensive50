@@ -48,13 +48,13 @@ namespace Contensive.CLI {
                 if (string.IsNullOrEmpty(collectionGuid)) {
                     Console.WriteLine("Collection was not found on the distribution server");
                 } else {
+                    string returnErrorMessage = "";
+                    string logPrefix = "CLI";
+                    var installedCollections = new List<string>();
+                    var nonCritialErrorList = new List<string>();
                     if (string.IsNullOrEmpty(appName)) {
                         foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
-                            using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(kvp.Key)) {
-                                string returnErrorMessage = "";
-                                string logPrefix = "CLI";
-                                var installedCollections = new List<string>();
-                                var nonCritialErrorList = new List<string>();
+                            using (CPClass cpApp = new CPClass(kvp.Key)) {
                                 CollectionController.installCollectionFromRegistry(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, false, ref nonCritialErrorList, logPrefix, ref installedCollections);
                                 if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                     Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
@@ -63,11 +63,7 @@ namespace Contensive.CLI {
                             }
                         }
                     } else {
-                        using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(appName)) {
-                            string returnErrorMessage = "";
-                            string logPrefix = "CLI";
-                            var installedCollections = new List<string>();
-                            var nonCritialErrorList = new List<string>();
+                        using (CPClass cpApp = new CPClass(appName)) {
                             CollectionController.installCollectionFromRegistry(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, false, ref nonCritialErrorList, logPrefix, ref installedCollections);
                             if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                 Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);

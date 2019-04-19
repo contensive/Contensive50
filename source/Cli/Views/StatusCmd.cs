@@ -54,8 +54,8 @@ namespace Contensive.CLI {
                 Console.WriteLine("    TaskScheduler: " + cpServer.core.serverConfig.allowTaskSchedulerService.ToString());
                 Console.WriteLine("    TaskRunner: " + cpServer.core.serverConfig.allowTaskRunnerService.ToString());
                 Console.WriteLine("    TaskRunner-MaxConcurrentTasksPerServer: " + cpServer.core.serverConfig.maxConcurrentTasksPerServer.ToString());
-                Console.WriteLine("Logging:");
-                Console.WriteLine("    enableLogging: " + cpServer.core.serverConfig.enableLogging.ToString());
+                //Console.WriteLine("Logging:");
+                //Console.WriteLine("    enableLogging: " + cpServer.core.serverConfig.enableLogging.ToString());
                 Console.WriteLine("Applications: " + cpServer.core.serverConfig.apps.Count);
                 foreach (KeyValuePair<string, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
                     AppConfigModel app = kvp.Value;

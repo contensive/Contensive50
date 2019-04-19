@@ -43,14 +43,14 @@ namespace Contensive.CLI {
                         String defaultValue = (cp.core.serverConfig.productionEnvironment) ? "y" : "n";
                         cp.core.serverConfig.productionEnvironment = Equals(GenericController.promptForReply(prompt, defaultValue).ToLowerInvariant(), "y");
                     }
-                    //
-                    // -- enable logging
-                    {
-                        Console.WriteLine("\n\nWith logging disabled, the server log at c:\\ProgramData\\Contensive\\Logs only includes Error and Fatal level entries. With logging enabled, these logs are verbose and can be large.");
-                        string prompt = "Enable Logging (y/n)?";
-                        String defaultValue = (cp.core.serverConfig.enableLogging) ? "y" : "n";
-                        cp.core.serverConfig.enableLogging = Equals(GenericController.promptForReply(prompt, defaultValue).ToLowerInvariant(), "y");
-                    }
+                    ////
+                    //// -- enable logging
+                    //{
+                    //    Console.WriteLine("\n\nWith logging disabled, the server log at c:\\ProgramData\\Contensive\\Logs only includes Error and Fatal level entries. With logging enabled, these logs are verbose and can be large.");
+                    //    string prompt = "Enable Logging (y/n)?";
+                    //    String defaultValue = (cp.core.serverConfig.enableLogging) ? "y" : "n";
+                    //    cp.core.serverConfig.enableLogging = Equals(GenericController.promptForReply(prompt, defaultValue).ToLowerInvariant(), "y");
+                    //}
                     //
                     // -- local or multiserver mode
                     {
@@ -172,7 +172,7 @@ namespace Contensive.CLI {
                     // -- tasks and logging
                     cp.core.serverConfig.allowTaskRunnerService = true;
                     cp.core.serverConfig.allowTaskSchedulerService = true;
-                    cp.core.serverConfig.enableLogging = true;
+                    //cp.core.serverConfig.enableLogging = true;
                     //
                     // -- save the configuration
                     cp.core.serverConfig.save(cp.core);

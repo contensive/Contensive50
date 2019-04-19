@@ -104,6 +104,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="executeContext"></param>
         /// <returns></returns>
         public string execute(Models.Db.AddonModel addon, CPUtilsBaseClass.addonExecuteContext executeContext) {
+            //
+            LogController.logInfo(core, "execute addon [" + addon.id + ", " + addon.name + "], context [" + executeContext.addonType + "], context [" + executeContext.errorContextMessage + "]");
+            //
             string result = "";
             //
             // -- setup values that have to be in finalize

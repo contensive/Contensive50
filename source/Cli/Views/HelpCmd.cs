@@ -24,7 +24,7 @@ namespace Contensive.CLI {
             Console.Write(FlushCacheCmd.helpText);
             Console.Write(HousekeepCmd.helpText);
             Console.Write(InstallCollectionCmd.helpText);
-            Console.Write(LoggingCmd.helpText);
+            //Console.Write(LoggingCmd.helpText);
             Console.Write(RepairCmd.helpText);
             Console.Write(RunTaskCmd.helpText);
             Console.Write(StatusCmd.helpText);

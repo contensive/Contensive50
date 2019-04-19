@@ -63,17 +63,32 @@ namespace Contensive.CLI {
                     if (promptForArguments) {
                         //
                         // -- app name
-                        bool appNameOk = false;
-                        do {
+                        while (true) {
                             Type myType = typeof(Processor.Controllers.CoreController);
                             Assembly myAssembly = Assembly.GetAssembly(myType);
                             AssemblyName myAssemblyname = myAssembly.GetName();
                             Version myVersion = myAssemblyname.Version;
                             string appNameDefault = "app" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0') + "v" + myVersion.Major.ToString("0") + myVersion.Minor.ToString("0");
-                            appName = GenericController.promptForReply("Application Name", appNameDefault).ToLowerInvariant();
-                            appNameOk = !cp.core.serverConfig.apps.ContainsKey(appName.ToLowerInvariant());
-                            if (!appNameOk) { Console.Write("\n\nThere is already an application with this name. To get the current server configuration, use cc -s"); continue; }
-                        } while (!appNameOk);
+                            Console.Write("\n\nEnter your application name. It must start with a letter and contain only letters and numbers.");
+                            appName = GenericController.promptForReply("\nApplication Name:", appNameDefault).ToLowerInvariant();
+                            if ( string.IsNullOrWhiteSpace( appName )) {
+                                Console.Write("\nThis application name is not valid because it cannot be blank.");
+                                continue;
+                            }
+                            if (!char.IsLetter(appName,0)) {
+                                Console.Write("\nThis application name is not valid because it must start with a letter.");
+                                continue;
+                            }
+                            if (!appName.All(x => char.IsLetterOrDigit(x))) {
+                                Console.Write("\nThis application name is not valid because it must contain only letters and numbers.");
+                                continue;
+                            }
+                            if (cp.core.serverConfig.apps.ContainsKey(appName.ToLowerInvariant())) {
+                                Console.Write("\nThere is already an application with this name. To get the current server configuration, use cc -s");
+                                continue;
+                            }
+                            break;
+                        }
                     }
                     appConfig.name = appName;
                     //

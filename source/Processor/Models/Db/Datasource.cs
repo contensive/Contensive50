@@ -147,9 +147,9 @@ namespace Contensive.Processor.Models.Db {
                     dateAdded = DateTime.MinValue,
                     dbTypeId = (int)DataSourceTypeEnum.sqlServerNative,
                     endpoint = core.serverConfig.defaultDataSourceAddress,
-                    name = "default",
-                    password = core.serverConfig.password,
-                    username = core.serverConfig.username
+                    name = "default"
+                    //password = core.serverConfig.password,
+                    //username = core.serverConfig.username
                 };
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

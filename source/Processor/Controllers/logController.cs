@@ -176,7 +176,8 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // -- use enableLogging to block application logging
-                if ((level >= LogLevel.Error) || core.serverConfig.enableLogging) {
+                //if ((level >= LogLevel.Error) || core.serverConfig.enableLogging) 
+                {
                     //
                     // -- log to Nlog
                     if (core.appConfig != null) {
