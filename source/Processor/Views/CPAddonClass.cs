@@ -157,7 +157,7 @@ namespace Contensive.Processor {
                 var tmpList = new List<string> { };
                 string logPrefix = "CPSiteClass.installCollectionFile";
                 var installedCollections = new List<string>();
-                returnOk = Controllers.CollectionController.installCollectionsFromPrivateFile(cp.core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
+                returnOk = Controllers.CollectionController.installCollectionFromPrivateFile(cp.core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
             } catch (Exception ex) {
                 Controllers.LogController.handleError(cp.core, ex);
                 if (!cp.core.siteProperties.trapErrors) {
@@ -181,8 +181,8 @@ namespace Contensive.Processor {
             List<string> ignoreList1 = new List<string>();
             List<string> ignoreList2 = new List<string>();
             string logPrefix = "CPUtilsClass.installCollectionsFromFolder";
-            var installedCollections = new List<string>();
-            return CollectionController.installCollectionsFromPrivateFolder(cp.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, false, ref ignoreList2, logPrefix, ref installedCollections, true);
+            var collectionsInstalledList = new List<string>();
+            return CollectionController.installCollectionsFromPrivateFolder(cp.core, privateFolder, ref ignoreUserMessage, ref collectionsInstalledList, false, false, ref ignoreList2, logPrefix, true);
         }
         //
         public override int InstallCollectionsFromFolderAsync(string privateFolder, bool deleteFolderWhenDone) { throw new NotImplementedException(); }
@@ -196,7 +196,7 @@ namespace Contensive.Processor {
             var installedCollections = new List<string>();
             string logPrefix = "installCollectionFromLibrary";
             var nonCriticalErrorList = new List<string>();
-            return CollectionController.installCollectionFromRegistry(cp.core, collectionGuid, ref ignoreUserMessage, "", false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+            return CollectionController.installCollectionFromRegistry(cp.core, collectionGuid, ref ignoreUserMessage, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
         }
         //
         public override int InstallCollectionFromLibraryAsync(string collectionGuid) { throw new NotImplementedException(); }

@@ -32,27 +32,73 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class CollectionController {
         //
+        //======================================================================================================
+        /// <summary>
+        /// Install the base collection to this applicaiton
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="isNewBuild"></param>
+        /// <param name="isRepairMode"></param>
+        /// <param name="nonCriticalErrorList"></param>
+        /// <param name="logPrefix"></param>
+        /// <param name="collectionsInstalledList">A list of collection guids that are already installed this pass. All collections that install will be added to it. </param>
+        public static void installBaseCollection(CoreController core, bool isNewBuild, bool isRepairMode, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList) {
+            try {
+                //
+                // -- new build
+                // 20171029 -- upgrading should restore base collection fields as a fix to deleted required fields
+                const string baseCollectionFilename = "aoBase5.xml";
+                string baseCollectionXml = core.programFiles.readFileText(baseCollectionFilename);
+                if (string.IsNullOrEmpty(baseCollectionXml)) {
+                    //
+                    // -- base collection notfound
+                    throw new GenericException("Cannot load [" + core.programFiles.localAbsRootPath + "aoBase5.xml]");
+                }
+                {
+                    //
+                    // -- Special Case - must install base collection metadata first because it builds the system that the system needs to do everything else
+                    LogController.logInfo(core, "installBaseCollection, install metadata first to verify system requirements");
+                    MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, true, isRepairMode, ref nonCriticalErrorList, logPrefix);
+                }
+                {
+                    //
+                    // now treat as a regular collection and install - to pickup everything else 
+                    string installPrivatePath = "installBaseCollection" + GenericController.GetRandomInteger(core).ToString() + "\\";
+                    core.privateFiles.createPath(installPrivatePath);
+                    core.programFiles.copyFile(baseCollectionFilename, installPrivatePath + baseCollectionFilename, core.privateFiles);
+                    string installErrorMessage = "";
+                    if (!installCollectionsFromPrivateFolder(core, installPrivatePath, ref installErrorMessage, ref collectionsInstalledList, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, false)) {
+                        throw new GenericException(installErrorMessage);
+                    }
+                    core.privateFiles.deleteFolder(installPrivatePath);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
         //====================================================================================================
         /// <summary>
         /// Primary collection installation method. 
         /// If collection not already installed during this install, mark it installed and install
         /// </summary>
-        public static bool installCollectionFromAddonCollectionFolder(CoreController core, string collectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollectionList, bool includeBaseMetaDataInstall) {
+        public static bool installCollectionFromAddonCollectionFolder(CoreController core, string collectionGuid, ref string return_ErrorMessage, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList, bool includeBaseMetaDataInstall) {
             bool result = false;
             try {
                 //
                 LogController.logInfo(core, "installCollectionFromAddonCollectionFolder [" + collectionGuid + "]");
                 //
-                if (installedCollectionList.Contains(collectionGuid.ToLower())) {
+                if (collectionsInstalledList.Contains(collectionGuid.ToLower())) {
                     LogController.logInfo(core, "installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder not found.");
                     return_ErrorMessage +=  "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>";
                     return false;
                 }
-                installedCollectionList.Add(collectionGuid.ToLower());
+                collectionsInstalledList.Add(collectionGuid.ToLower());
                 string collectionVersionFolderName = "";
                 DateTime collectionLastChangeDate = default(DateTime);
                 string collectionName = "";
-                getAddonCollectionFolderConfig(core, collectionGuid, ref collectionVersionFolderName, ref collectionLastChangeDate, ref collectionName);
+                getCollectionFolderConfig(core, collectionGuid, ref collectionVersionFolderName, ref collectionLastChangeDate, ref collectionName);
                 if (string.IsNullOrEmpty(collectionVersionFolderName)) {
                     LogController.logInfo(core, "installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder not found.");
                     return_ErrorMessage +=  "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>";
@@ -239,13 +285,13 @@ namespace Contensive.Processor.Controllers {
                                                                 if (string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                     ChildCollectionGUID = MetaDataSection.InnerText;
                                                                 }
-                                                                if ((ImportFromCollectionsGuidList + "," + collectionGuid).IndexOf(ChildCollectionGUID, System.StringComparison.OrdinalIgnoreCase) != -1) {
+                                                                if (collectionsInstalledList.Contains(ChildCollectionGUID.ToLower())) {
                                                                     //
                                                                     // circular import detected, this collection is already imported
                                                                     //
                                                                     LogController.logInfo(core, "installCollectionFromAddonCollectionFolder [" + Collectionname + "], Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" + Collectionname + "], GUID [" + collectionGuid + "], pass 1. The collection to be imported is [" + ChildCollectionName + "], GUID [" + ChildCollectionGUID + "]");
                                                                 } else {
-                                                                    installCollectionFromRegistry(core, ChildCollectionGUID, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollectionList);
+                                                                    installCollectionFromRegistry(core, ChildCollectionGUID, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList);
                                                                 }
                                                                 break;
                                                             }
@@ -380,7 +426,7 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             // -- Use the upgrade code to import this part
                                                             metaDataMiniCollection = "<" + CollectionFileRootNode + ">" + metaDataMiniCollection + "</" + CollectionFileRootNode + ">";
-                                                            MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(false, core, metaDataMiniCollection, IsNewBuild, repair, isBaseCollection, ref nonCriticalErrorList, logPrefix, ref installedCollectionList);
+                                                            MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(false, core, metaDataMiniCollection, IsNewBuild, repair, isBaseCollection, ref nonCriticalErrorList, logPrefix);
                                                             //
                                                             // -- Process nodes to save Collection data
                                                             XmlDocument NavDoc = new XmlDocument();
@@ -687,7 +733,7 @@ namespace Contensive.Processor.Controllers {
                                                                 // Add-on Node, do part 1 of 2
                                                                 //   (include add-on node must be done after all add-ons are installed)
                                                                 //
-                                                                InstallCollectionFromAddonCollectionFolder_addonNode_installAddon(core, metaDataSection, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                                InstallAddonNode(core, metaDataSection, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                 if (!result) {
                                                                     //result = result;
                                                                 }
@@ -697,7 +743,7 @@ namespace Contensive.Processor.Controllers {
                                                                 // Legacy Interface Node
                                                                 //
                                                                 foreach (XmlNode metaDataInterfaces in metaDataSection.ChildNodes) {
-                                                                    InstallCollectionFromAddonCollectionFolder_addonNode_installAddon(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                                    InstallAddonNode(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                     if (!result) {
                                                                         //result = result;
                                                                     }
@@ -733,14 +779,14 @@ namespace Contensive.Processor.Controllers {
                                                                 if (addonName.ToLowerInvariant() == "_oninstall") {
                                                                     onInstallAddonGuid = XmlController.GetXMLAttribute(core, IsFound, collectionNode, "guid", collectionNode.Name);
                                                                 }
-                                                                InstallCollectionFromAddonCollectionFolder_addonNode_setAddonDependencies(core, collectionNode, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                                setAddonDependencies(core, collectionNode, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                 break;
                                                             case "interfaces":
                                                                 //
                                                                 // Legacy Interface Node
                                                                 //
                                                                 foreach (XmlNode metaDataInterfaces in collectionNode.ChildNodes) {
-                                                                    InstallCollectionFromAddonCollectionFolder_addonNode_setAddonDependencies(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                                    setAddonDependencies(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                     if (!result) {
                                                                         //result = result;
                                                                     }
@@ -844,9 +890,9 @@ namespace Contensive.Processor.Controllers {
                                                     LogController.logInfo(core, "verify all navigator menu entries for updated addons");
                                                     //----------------------------------------------------------------------------------------------------------------------
                                                     //
-                                                    var emptyList = new List<string>();
+                                                    //var emptyList = new List<string>();
                                                     var defaultMiniCollection = new MetadataMiniCollectionModel();
-                                                    MetadataMiniCollectionModel Collection = MetadataMiniCollectionModel.loadXML(core, collectionFileContent, isBaseCollection, false, IsNewBuild, defaultMiniCollection, "", ref emptyList);
+                                                    MetadataMiniCollectionModel Collection = MetadataMiniCollectionModel.loadXML(core, collectionFileContent, isBaseCollection, false, IsNewBuild, defaultMiniCollection, "");
                                                     foreach (var kvp in Collection.menus) {
                                                         NewAppController.verifyNavigatorEntry(core, kvp.Value, 0);
                                                     }
@@ -895,19 +941,32 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Installs Addons in a source folder
         /// </summary>
-        public static bool installCollectionsFromPrivateFolder(CoreController core, string installPrivatePath, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollectionList, bool includeBaseMetaDataInstall) {
+        /// <param name="core"></param>
+        /// <param name="installPrivatePath"></param>
+        /// <param name="return_ErrorMessage"></param>
+        /// <param name="collectionsInstalledList">a list of the collections installed to the database during this installation (dependencies etc.). The collections installed are added to this list</param>
+        /// <param name="IsNewBuild"></param>
+        /// <param name="repair"></param>
+        /// <param name="nonCriticalErrorList"></param>
+        /// <param name="logPrefix"></param>
+        /// <param name="includeBaseMetaDataInstall"></param>
+        /// <returns></returns>
+        public static bool installCollectionsFromPrivateFolder(CoreController core, string installPrivatePath, ref string return_ErrorMessage, ref List<string> collectionsInstalledList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, bool includeBaseMetaDataInstall) {
             bool returnSuccess = false;
             try {
                 DateTime CollectionLastChangeDate = DateTime.Now;
-                returnSuccess = buildAddonCollectionFoldersFromAddonCollectionZipFiles(core, installPrivatePath, CollectionLastChangeDate, ref return_CollectionGUIDList, ref return_ErrorMessage);
+                //
+                // -- collectionsToInstall = collections stored in the collection folder that need to be stored in the Db
+                var collectionsToInstall = new List<string>();
+                returnSuccess = buildCollectionFoldersFromCollectionZips(core, installPrivatePath, CollectionLastChangeDate, ref collectionsToInstall, ref return_ErrorMessage, ref collectionsInstalledList);
                 if (!returnSuccess) {
                     //
                     // BuildLocal failed, log it and do not upgrade
                     //
                     LogController.logInfo(core, "BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
                 } else {
-                    foreach (string collectionGuid in return_CollectionGUIDList) {
-                        if (!installCollectionFromAddonCollectionFolder(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollectionList, includeBaseMetaDataInstall)) {
+                    foreach (string collectionGuid in collectionsToInstall) {
+                        if (!installCollectionFromAddonCollectionFolder(core, collectionGuid,  ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, includeBaseMetaDataInstall)) {
                             LogController.logInfo(core, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
                             break;
                         }
@@ -927,27 +986,27 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Installs Addons in a source file
         /// </summary>
-        public static bool installCollectionsFromPrivateFile(CoreController core, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollectionList) {
+        public static bool installCollectionFromPrivateFile(CoreController core, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList) {
             bool returnSuccess = false;
             try {
                 DateTime CollectionLastChangeDate;
                 //
                 CollectionLastChangeDate = DateTime.Now;
-                returnSuccess = buildAddonCollectionFolderFromAddonCollectionZipFile(core, pathFilename, CollectionLastChangeDate, ref return_CollectionGUID, ref return_ErrorMessage, ref installedCollectionList);
-                if (!returnSuccess) {
+                var collectionsToInstallList = new List<string>();
+                if (!buildCollectionFolderFromCollectionZip(core, pathFilename, CollectionLastChangeDate, ref return_ErrorMessage, ref collectionsToInstallList, ref collectionsInstalledList)) {
                     //
                     // BuildLocal failed, log it and do not upgrade
                     //
                     LogController.logInfo(core, "BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
-                } else {
-                    returnSuccess = installCollectionFromAddonCollectionFolder(core, return_CollectionGUID, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollectionList, true);
-                    if (!returnSuccess) {
-                        //
-                        // Upgrade all apps failed
-                        //
-                        LogController.logInfo(core, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
-                    } else {
-                        returnSuccess = true;
+                } else if(collectionsToInstallList.Count>0) {
+                    return_CollectionGUID = collectionsToInstallList.First();
+                    foreach( var collection in collectionsToInstallList ) {
+                        if (!installCollectionFromAddonCollectionFolder(core, collection, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, true)) {
+                            //
+                            // Upgrade all apps failed
+                            //
+                            LogController.logInfo(core, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -972,35 +1031,35 @@ namespace Contensive.Processor.Controllers {
         /// <param name="repair"></param>
         /// <param name="nonCriticalErrorList"></param>
         /// <param name="logPrefix"></param>
-        /// <param name="installedCollectionList"></param>
+        /// <param name="collectionsInstalledList"></param>
         /// <returns></returns>
-        public static bool installCollectionFromRegistry(CoreController core, string collectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollectionList) {
+        public static bool installCollectionFromRegistry(CoreController core, string collectionGuid, ref string return_ErrorMessage,  bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList) {
             bool UpgradeOK = true;
             try {
                 if (string.IsNullOrWhiteSpace(collectionGuid)) {
                     LogController.logWarn(core, "installCollectionFromRemoteRepo, collectionGuid is null");
-                } else {
+                } else if (!collectionsInstalledList.Contains(collectionGuid.ToLower())) {
                     //
-                    // normalize guid
-                    if (collectionGuid.Length < 38) {
-                        if (collectionGuid.Length == 32) {
-                            collectionGuid = collectionGuid.Left(8) + "-" + collectionGuid.Substring(8, 4) + "-" + collectionGuid.Substring(12, 4) + "-" + collectionGuid.Substring(16, 4) + "-" + collectionGuid.Substring(20);
-                        }
-                        if (collectionGuid.Length == 36) {
-                            collectionGuid = "{" + collectionGuid + "}";
-                        }
-                    }
+                    // -- collection has not been installed this installation
+                    // -- normalize guid
+                    collectionGuid = GenericController.normalizeGuid(collectionGuid);
                     //
                     // Download all files for this collection and build the collection folder(s)
                     string privateFilesDownloadPath = core.addon.getPrivateFilesAddonPath() + "temp_" + GenericController.GetRandomInteger(core) + "\\";
                     core.privateFiles.createPath(privateFilesDownloadPath);
                     //
+                    // -- download the collection file into the download path from the collectionGuid provided
                     DateTime CollectionLastChangeDate = default(DateTime);
                     if (downloadCollectionFromRegistry(core, privateFilesDownloadPath, collectionGuid, ref CollectionLastChangeDate, ref return_ErrorMessage)) {
-                        if (buildAddonCollectionFoldersFromAddonCollectionZipFiles(core, privateFilesDownloadPath, CollectionLastChangeDate, ref installedCollectionList, ref return_ErrorMessage)) {
+                        //
+                        // -- build the collection folders for all collection files in the download path and created a list of collection Guids that need to be installed
+                        var collectionsToInstallList = new List<string>();
+                        if (buildCollectionFoldersFromCollectionZips(core, privateFilesDownloadPath, CollectionLastChangeDate, ref collectionsToInstallList, ref return_ErrorMessage, ref collectionsInstalledList)) {
                             //
-                            // Upgrade the server from the collection files
-                            installCollectionFromAddonCollectionFolder(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollectionList, true);
+                            // go through the collection list built and install them
+                            foreach( var collection in collectionsToInstallList) {
+                                installCollectionFromAddonCollectionFolder(core, collection, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, true);
+                            }
                         }
                     }
                     //
@@ -1024,8 +1083,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="return_ErrorMessage"></param>
         /// <returns></returns>
         private static bool downloadCollectionFromRegistry(CoreController core, string privateFilesDownloadPath, string collectionGuid, ref DateTime return_CollectionLastChangeDate, ref string return_ErrorMessage) {
-            bool tempDownloadCollectionFiles = false;
-            tempDownloadCollectionFiles = false;
+            bool result = false;
             try {
                 LogController.logInfo(core, "downloading collection [" + collectionGuid + "]");
                 //
@@ -1038,7 +1096,7 @@ namespace Contensive.Processor.Controllers {
                 const int downloadRetryMax = 3;
                 do {
                     try {
-                        tempDownloadCollectionFiles = true;
+                        result = true;
                         return_ErrorMessage = "";
                         //
                         // -- pause for a second between fetches to pace the server (<10 hits in 10 seconds)
@@ -1057,7 +1115,7 @@ namespace Contensive.Processor.Controllers {
                         // this error could be data related, and may not be critical. log issue and continue
                         downloadDelay += 2000;
                         return_ErrorMessage = "There was an error while requesting the download details for collection [" + collectionGuid + "]";
-                        tempDownloadCollectionFiles = false;
+                        result = false;
                         LogController.logInfo(core, errorPrefix + "There was a parse error reading the response [" + ex.ToString() + "]");
                     }
                     downloadRetry += 1;
@@ -1067,7 +1125,7 @@ namespace Contensive.Processor.Controllers {
                     // continue if no errors
                     if (Doc.DocumentElement.Name.ToLowerInvariant() != GenericController.vbLCase(DownloadFileRootNode)) {
                         return_ErrorMessage = "The collection file from the server was not valid for collection [" + collectionGuid + "]";
-                        tempDownloadCollectionFiles = false;
+                        result = false;
                         LogController.logInfo(core, errorPrefix + "The response has a basename [" + Doc.DocumentElement.Name + "] but [" + DownloadFileRootNode + "] was expected.");
                     } else {
                         //
@@ -1075,7 +1133,7 @@ namespace Contensive.Processor.Controllers {
                         if (Doc.DocumentElement.ChildNodes.Count == 0) {
                             return_ErrorMessage = "The collection library status file from the server has a valid basename, but no childnodes.";
                             LogController.logInfo(core, errorPrefix + "The collection library status file from the server has a valid basename, but no childnodes. The collection was probably Not found");
-                            tempDownloadCollectionFiles = false;
+                            result = false;
                         } else {
                             //
                             int CollectionFileCnt = 0;
@@ -1182,14 +1240,21 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return tempDownloadCollectionFiles;
+            return result;
         }
         //
         //====================================================================================================
         /// <summary>
-        /// Upgrade a collection from the files in a working folder
+        /// Save a collection to the collection folder if it is not in the collectionsInstalled list. If it is saved, add it to the collectionsToInstall list and return
         /// </summary>
-        public static bool buildAddonCollectionFoldersFromAddonCollectionZipFiles(CoreController core, string sourcePrivateFolderPath, DateTime CollectionLastChangeDate, ref List<string> installedCollectionGUIDList, ref string return_ErrorMessage) {
+        /// <param name="core"></param>
+        /// <param name="sourcePrivateFolderPath"></param>
+        /// <param name="CollectionLastChangeDate"></param>
+        /// <param name="collectionsToInstall">A list of collection guids that need to be installed in the database. Any collection folders built are added to he collectionsToInstall list.</param>
+        /// <param name="return_ErrorMessage"></param>
+        /// <param name="collectionsInstalledList"></param>
+        /// <returns></returns>
+        public static bool buildCollectionFoldersFromCollectionZips(CoreController core, string sourcePrivateFolderPath, DateTime CollectionLastChangeDate, ref List<string> collectionsToInstall, ref string return_ErrorMessage, ref List<string> collectionsInstalledList) {
             bool success = false;
             try {
                 if (core.privateFiles.pathExists(sourcePrivateFolderPath)) {
@@ -1197,9 +1262,7 @@ namespace Contensive.Processor.Controllers {
                     List<CPFileSystemClass.FileDetail> SrcFileNamelist = core.privateFiles.getFileList(sourcePrivateFolderPath);
                     foreach (CPFileSystemClass.FileDetail file in SrcFileNamelist) {
                         if ((file.Extension == ".zip") || (file.Extension == ".xml")) {
-                            string collectionGuid = "";
-                            success = buildAddonCollectionFolderFromAddonCollectionZipFile(core, sourcePrivateFolderPath + file.Name, CollectionLastChangeDate, ref collectionGuid, ref return_ErrorMessage, ref installedCollectionGUIDList);
-                            //installedCollectionGUIDList.Add(collectionGuid);
+                            success = buildCollectionFolderFromCollectionZip(core, sourcePrivateFolderPath + file.Name, CollectionLastChangeDate, ref return_ErrorMessage, ref collectionsToInstall, ref collectionsInstalledList);
                         }
                     }
                 }
@@ -1211,8 +1274,18 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
-        public static bool buildAddonCollectionFolderFromAddonCollectionZipFile(CoreController core, string sourcePrivateFolderPathFilename, DateTime CollectionLastChangeDate, ref string return_CollectionGUID, ref string return_ErrorMessage, ref List<string> installedCollectionGUIDList) {
+        /// <summary>
+        /// unzip a folder and if the collection is not in the collections installed or the collectionsToInstall, save the collection to the appropriate collection folder and add it to the collectionsToInstall
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="sourcePrivateFolderPathFilename"></param>
+        /// <param name="CollectionLastChangeDate"></param>
+        /// <param name="collectionGuid"></param>
+        /// <param name="return_ErrorMessage"></param>
+        /// <param name="collectionsToInstallList">collection guids that have been saved to the collection folder and need to be saved to the database druing this install.</param>
+        /// <param name="collectionsInstalledList">collection guids that have been saved to the database during this install.</param>
+        /// <returns></returns>
+        public static bool buildCollectionFolderFromCollectionZip(CoreController core, string sourcePrivateFolderPathFilename, DateTime CollectionLastChangeDate, ref string return_ErrorMessage, ref List<string> collectionsToInstallList, ref List<string> collectionsInstalledList) {
             bool tempBuildLocalCollectionRepoFromFile = false;
             bool result = true;
             try {
@@ -1220,8 +1293,6 @@ namespace Contensive.Processor.Controllers {
                 string collectionFilename = "";
                 core.privateFiles.splitDosPathFilename(sourcePrivateFolderPathFilename, ref collectionPath, ref collectionFilename);
                 string CollectionVersionFolderName = "";
-                string Collectionname = "";
-                string collectionGuid = "";
                 if (!core.privateFiles.pathExists(collectionPath)) {
                     //
                     // The working folder is not there
@@ -1284,9 +1355,9 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // Collection File
                                         //
-                                        collectionGuid = XmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "guid", Collectionname);
-                                        {
-                                            Collectionname = XmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "name", "");
+                                        string Collectionname = XmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "name", "");
+                                        string collectionGuid = XmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "guid", Collectionname);
+                                        if ((!collectionsInstalledList.Contains( collectionGuid.ToLower())) && (!collectionsToInstallList.Contains(collectionGuid.ToLower()))) {
                                             if (string.IsNullOrEmpty(Collectionname)) {
                                                 //
                                                 // ----- Error condition -- it must have a collection name
@@ -1300,7 +1371,7 @@ namespace Contensive.Processor.Controllers {
                                                 // Build Collection folder structure in /Add-ons folder
                                                 //------------------------------------------------------------------
                                                 //
-                                                //hint = hint & ",440"
+                                                collectionsToInstallList.Add(collectionGuid.ToLower());
                                                 CollectionFileFound = true;
                                                 if (string.IsNullOrEmpty(collectionGuid)) {
                                                     //
@@ -1308,8 +1379,8 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     collectionGuid = Collectionname;
                                                 }
-                                                collectionGuid = collectionGuid.ToLowerInvariant();
-                                                CollectionVersionFolderName = GetAddonCollectionFolderPath(core, collectionGuid);
+                                                collectionGuid = GenericController.normalizeGuid( collectionGuid );
+                                                CollectionVersionFolderName = GetCollectionFolderPath(core, collectionGuid);
                                                 string CollectionFolderName = "";
                                                 if (!string.IsNullOrEmpty(CollectionVersionFolderName)) {
                                                     //
@@ -1393,6 +1464,7 @@ namespace Contensive.Processor.Controllers {
                                                             if (string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                 ChildCollectionGUID = metaDataSection.InnerText;
                                                             }
+                                                            ChildCollectionGUID = GenericController.normalizeGuid(ChildCollectionGUID);
                                                             string statusMsg = "Installing collection [" + ChildCollectionName + ", " + ChildCollectionGUID + "] referenced from collection [" + Collectionname + "]";
                                                             LogController.logInfo(core, "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" + ChildCollectionName + "], childCollectionGuid [" + ChildCollectionGUID + "]");
                                                             if (GenericController.vbInstr(1, CollectionVersionPath, ChildCollectionGUID, 1) == 0) {
@@ -1402,48 +1474,45 @@ namespace Contensive.Processor.Controllers {
                                                                     result = false;
                                                                     return_ErrorMessage = statusMsg + ". The installation can not continue because an imported collection could not be downloaded because it does not include a valid GUID.";
                                                                     LogController.logInfo(core, "BuildLocalCollectionFolder, return message [" + return_ErrorMessage + "]");
-                                                                } else if (GetAddonCollectionFolderPath(core, ChildCollectionGUID) == "") {
-                                                                    LogController.logInfo(core, "BuildLocalCollectionFolder, [" + ChildCollectionGUID + "], not found so needs to be installed");
-                                                                    //
-                                                                    // If it is not already installed, download and install it also
-                                                                    //
-                                                                    string ChildWorkingPath = CollectionVersionPath + "\\" + ChildCollectionGUID + "\\";
-                                                                    DateTime ChildCollectionLastChangeDate = default(DateTime);
-                                                                    //
-                                                                    // down an imported collection file
-                                                                    //
-                                                                    bool StatusOK = downloadCollectionFromRegistry(core, ChildWorkingPath, ChildCollectionGUID, ref ChildCollectionLastChangeDate, ref return_ErrorMessage);
-                                                                    if (!StatusOK) {
-
-                                                                        LogController.logInfo(core, "BuildLocalCollectionFolder, [" + statusMsg + "], downloadCollectionFiles returned error state, message [" + return_ErrorMessage + "]");
-                                                                        if (string.IsNullOrEmpty(return_ErrorMessage)) {
-                                                                            return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error while downloading the necessary collection file, [" + ChildCollectionGUID + "].";
-                                                                        } else {
-                                                                            return_ErrorMessage = statusMsg + ". The installation can not continue because there was an error while downloading the necessary collection file, guid [" + ChildCollectionGUID + "]. The error was [" + return_ErrorMessage + "]";
-                                                                        }
-                                                                    } else {
-                                                                        LogController.logInfo(core, "BuildLocalCollectionFolder, [" + ChildCollectionGUID + "], downloadCollectionFiles returned OK");
+                                                                } else {
+                                                                    if ((!collectionsToInstallList.Contains(ChildCollectionGUID)) && (!collectionsInstalledList.Contains(ChildCollectionGUID))) {
+                                                                        LogController.logInfo(core, "BuildLocalCollectionFolder, [" + ChildCollectionGUID + "], not found so needs to be installed");
                                                                         //
-                                                                        // install the downloaded file
+                                                                        // If it is not already installed, download and install it also
                                                                         //
-                                                                        StatusOK = buildAddonCollectionFoldersFromAddonCollectionZipFiles(core, ChildWorkingPath, ChildCollectionLastChangeDate, ref installedCollectionGUIDList, ref return_ErrorMessage);
+                                                                        string ChildWorkingPath = CollectionVersionPath + "\\" + ChildCollectionGUID + "\\";
+                                                                        DateTime ChildCollectionLastChangeDate = default(DateTime);
+                                                                        //
+                                                                        // down an imported collection file
+                                                                        //
+                                                                        bool StatusOK = downloadCollectionFromRegistry(core, ChildWorkingPath, ChildCollectionGUID, ref ChildCollectionLastChangeDate, ref return_ErrorMessage);
                                                                         if (!StatusOK) {
-                                                                            LogController.logInfo(core, "BuildLocalCollectionFolder, [" + statusMsg + "], BuildLocalCollectionFolder returned error state, message [" + return_ErrorMessage + "]");
+
+                                                                            LogController.logInfo(core, "BuildLocalCollectionFolder, [" + statusMsg + "], downloadCollectionFiles returned error state, message [" + return_ErrorMessage + "]");
                                                                             if (string.IsNullOrEmpty(return_ErrorMessage)) {
-                                                                                return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error installing the included collection file, guid [" + ChildCollectionGUID + "].";
+                                                                                return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error while downloading the necessary collection file, [" + ChildCollectionGUID + "].";
                                                                             } else {
-                                                                                return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error installing the included collection file, guid [" + ChildCollectionGUID + "]. The error was [" + return_ErrorMessage + "]";
+                                                                                return_ErrorMessage = statusMsg + ". The installation can not continue because there was an error while downloading the necessary collection file, guid [" + ChildCollectionGUID + "]. The error was [" + return_ErrorMessage + "]";
+                                                                            }
+                                                                        } else {
+                                                                            LogController.logInfo(core, "BuildLocalCollectionFolder, [" + ChildCollectionGUID + "], downloadCollectionFiles returned OK");
+                                                                            //
+                                                                            // install the downloaded file
+                                                                            //
+                                                                            StatusOK = buildCollectionFoldersFromCollectionZips(core, ChildWorkingPath, ChildCollectionLastChangeDate, ref collectionsToInstallList, ref return_ErrorMessage, ref collectionsInstalledList);
+                                                                            if (!StatusOK) {
+                                                                                LogController.logInfo(core, "BuildLocalCollectionFolder, [" + statusMsg + "], BuildLocalCollectionFolder returned error state, message [" + return_ErrorMessage + "]");
+                                                                                if (string.IsNullOrEmpty(return_ErrorMessage)) {
+                                                                                    return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error installing the included collection file, guid [" + ChildCollectionGUID + "].";
+                                                                                } else {
+                                                                                    return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error installing the included collection file, guid [" + ChildCollectionGUID + "]. The error was [" + return_ErrorMessage + "]";
+                                                                                }
                                                                             }
                                                                         }
+                                                                        //
+                                                                        // -- remove child installation working folder
+                                                                        core.privateFiles.deleteFolder(ChildWorkingPath);
                                                                     }
-                                                                    //
-                                                                    // -- remove child installation working folder
-                                                                    core.privateFiles.deleteFolder(ChildWorkingPath);
-                                                                } else {
-                                                                    //
-                                                                    //
-                                                                    //
-                                                                    LogController.logInfo(core, "BuildLocalCollectionFolder, [" + ChildCollectionGUID + "], already installed");
                                                                 }
                                                             }
                                                             break;
@@ -1458,6 +1527,19 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                             }
                                         }
+                                        //
+                                        // If the collection parsed correctly, update the Collections.xml file
+                                        //
+                                        if (string.IsNullOrEmpty(return_ErrorMessage)) {
+                                            updateCollectionFolderConfig(core, Collectionname, collectionGuid, CollectionLastChangeDate, CollectionVersionFolderName);
+                                        } else {
+                                            //
+                                            // there was an error processing the collection, be sure to save description in the log
+                                            //
+                                            result = false;
+                                            LogController.logInfo(core, "BuildLocalCollectionFolder, ERROR Exiting, ErrorMessage [" + return_ErrorMessage + "]");
+                                        }
+
                                     }
                                 }
                             }
@@ -1494,22 +1576,9 @@ namespace Contensive.Processor.Controllers {
                     core.privateFiles.deleteFolder(tmpInstallPath);
                 }
                 //
-                // If the collection parsed correctly, update the Collections.xml file
-                //
-                if (string.IsNullOrEmpty(return_ErrorMessage)) {
-                    updateAddonCollectionFolderConfig(core, Collectionname, collectionGuid, CollectionLastChangeDate, CollectionVersionFolderName);
-                } else {
-                    //
-                    // there was an error processing the collection, be sure to save description in the log
-                    //
-                    result = false;
-                    LogController.logInfo(core, "BuildLocalCollectionFolder, ERROR Exiting, ErrorMessage [" + return_ErrorMessage + "]");
-                }
-                //
                 LogController.logInfo(core, "BuildLocalCollectionFolder, Exiting with ErrorMessage [" + return_ErrorMessage + "]");
                 //
                 tempBuildLocalCollectionRepoFromFile = (string.IsNullOrEmpty(return_ErrorMessage));
-                return_CollectionGUID = collectionGuid;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -1519,7 +1588,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private static void updateAddonCollectionFolderConfig(CoreController core, string Collectionname, string CollectionGuid, DateTime CollectionUpdatedDate, string CollectionVersionFolderName) {
+        private static void updateCollectionFolderConfig(CoreController core, string Collectionname, string CollectionGuid, DateTime CollectionUpdatedDate, string CollectionVersionFolderName) {
             try {
                 //
                 bool loadOK = true;
@@ -1532,7 +1601,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 loadOK = true;
                 try {
-                    Doc.LoadXml(getLocalCollectionStoreListXml(core));
+                    Doc.LoadXml(getCollectionFolderConfigXml(core));
                 } catch (Exception) {
                     LogController.logInfo(core, "UpdateConfig, Error loading Collections.xml file.");
                 }
@@ -1615,12 +1684,12 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private static string GetAddonCollectionFolderPath(CoreController core, string CollectionGuid) {
+        private static string GetCollectionFolderPath(CoreController core, string CollectionGuid) {
             string result = "";
             try {
                 DateTime LastChangeDate = default(DateTime);
                 string Collectionname = "";
-                getAddonCollectionFolderConfig(core, CollectionGuid, ref result, ref LastChangeDate, ref Collectionname);
+                getCollectionFolderConfig(core, CollectionGuid, ref result, ref LastChangeDate, ref Collectionname);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -1632,7 +1701,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Return the collection path, lastChangeDate, and collectionName given the guid
         /// </summary>
-        public static void getAddonCollectionFolderConfig(CoreController core, string CollectionGuid, ref string return_CollectionPath, ref DateTime return_LastChagnedate, ref string return_CollectionName) {
+        public static void getCollectionFolderConfig(CoreController core, string CollectionGuid, ref string return_CollectionPath, ref DateTime return_LastChagnedate, ref string return_CollectionName) {
             try {
                 string LocalGuid = "";
                 XmlDocument Doc = new XmlDocument();
@@ -1646,7 +1715,7 @@ namespace Contensive.Processor.Controllers {
                 return_LastChagnedate = DateTime.MinValue;
                 loadOK = true;
                 try {
-                    Doc.LoadXml(getLocalCollectionStoreListXml(core));
+                    Doc.LoadXml(getCollectionFolderConfigXml(core));
                 } catch (Exception) {
                     LogController.logInfo(core, "GetCollectionConfig, Hint=[" + hint + "], Error loading Collections.xml file.");
                     loadOK = false;
@@ -1813,7 +1882,7 @@ namespace Contensive.Processor.Controllers {
         //
         //======================================================================================================
         //
-        private static void InstallCollectionFromAddonCollectionFolder_addonNode_installAddon(CoreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool return_UpgradeOK, ref string return_ErrorMessage) {
+        private static void InstallAddonNode(CoreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool return_UpgradeOK, ref string return_ErrorMessage) {
             try {
                 string Basename = GenericController.vbLCase(AddonNode.Name);
                 if ((Basename == "page") || (Basename == "process") || (Basename == "addon") || (Basename == "add-on")) {
@@ -2315,7 +2384,7 @@ namespace Contensive.Processor.Controllers {
         /// this is the second pass, so all add-ons should be added
         /// no errors for missing addones, except the include add-on case
         /// </summary>
-        private static string InstallCollectionFromAddonCollectionFolder_addonNode_setAddonDependencies(CoreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool ReturnUpgradeOK, ref string ReturnErrorMessage) {
+        private static string setAddonDependencies(CoreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool ReturnUpgradeOK, ref string ReturnErrorMessage) {
             string result = "";
             try {
                 string Basename = GenericController.vbLCase(AddonNode.Name);
@@ -2411,51 +2480,12 @@ namespace Contensive.Processor.Controllers {
             //
         }
         //
-        //======================================================================================================
-        /// <summary>
-        /// Import metadata on top of current configuration and the base configuration
-        /// </summary>
-        public static void installBaseCollection(CoreController core, bool isNewBuild, bool isRepairMode, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollectionList) {
-            try {
-                //
-                // -- new build
-                // 20171029 -- upgrading should restore base collection fields as a fix to deleted required fields
-                const string baseCollectionFilename = "aoBase5.xml";
-                string baseCollectionXml = core.programFiles.readFileText(baseCollectionFilename);
-                if (string.IsNullOrEmpty(baseCollectionXml)) {
-                    //
-                    // -- base collection notfound
-                    throw new GenericException("Cannot load [" + core.programFiles.localAbsRootPath + "aoBase5.xml]");
-                }
-                {
-                    //
-                    // -- Special Case - must install base collection metadata first because it builds the system that the system needs to do everything else
-                    LogController.logInfo(core, "installBaseCollection, install metadata first to verify system requirements");
-                    MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, true, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollectionList);
-                }
-                //
-                // now treat as a regular collection and install - to pickup everything else 
-                string installPrivatePath = "installBaseCollection" + GenericController.GetRandomInteger(core).ToString() + "\\";
-                core.privateFiles.createPath(installPrivatePath);
-                core.programFiles.copyFile(baseCollectionFilename, installPrivatePath + baseCollectionFilename, core.privateFiles);
-                List<string> installedCollectionGuidList = new List<string>();
-                string installErrorMessage = "";
-                if (!installCollectionsFromPrivateFolder(core, installPrivatePath, ref installErrorMessage, ref installedCollectionGuidList, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollectionList, false)) {
-                    throw new GenericException(installErrorMessage);
-                }
-                core.privateFiles.deleteFolder(installPrivatePath);
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
-            }
-        }
-        //
         //====================================================================================================
         /// <summary>
         /// Return the collectionList file stored in the root of the addon folder.
         /// </summary>
         /// <returns></returns>
-        public static string getLocalCollectionStoreListXml(CoreController core) {
+        public static string getCollectionFolderConfigXml(CoreController core) {
             string returnXml = "";
             try {
                 string LastChangeDate = "";
@@ -2510,7 +2540,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// get a list of collections available on the server
         /// </summary>
-        public static bool getLocalCollectionStoreList(CoreController core, ref List<CollectionStoreClass> localCollectionStoreList, ref string return_ErrorMessage) {
+        public static bool getCollectionFolderConfigCollectionList(CoreController core, ref List<CollectionStoreClass> localCollectionStoreList, ref string return_ErrorMessage) {
             bool returnOk = true;
             try {
                 //
@@ -2518,7 +2548,7 @@ namespace Contensive.Processor.Controllers {
                 //   Load LocalCollections from the Collections.xml file
                 //-----------------------------------------------------------------------------------------------
                 //
-                string localCollectionStoreListXml = getLocalCollectionStoreListXml(core);
+                string localCollectionStoreListXml = getCollectionFolderConfigXml(core);
                 if (!string.IsNullOrEmpty(localCollectionStoreListXml)) {
                     XmlDocument LocalCollections = new XmlDocument();
                     try {
@@ -2574,7 +2604,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// return a list of collections on the 
         /// </summary>
-        public static bool getRemoteCollectionStoreList(CoreController core, ref List<CollectionStoreClass> remoteCollectionStoreList) {
+        public static bool getRegistryCollectionList(CoreController core, ref List<CollectionStoreClass> remoteCollectionStoreList) {
             bool result = false;
             try {
                 var LibCollections = new XmlDocument();

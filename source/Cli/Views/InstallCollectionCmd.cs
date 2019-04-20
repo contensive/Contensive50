@@ -37,7 +37,7 @@ namespace Contensive.CLI {
                 //
                 // -- determine guid of collection
                 var collectionList = new List<CollectionController.CollectionStoreClass>();
-                CollectionController.getRemoteCollectionStoreList(cpServer.core, ref collectionList);
+                CollectionController.getRegistryCollectionList(cpServer.core, ref collectionList);
                 string collectionGuid = "";
                 foreach (var collection in collectionList) {
                     if (collection.name.ToLowerInvariant() == collectionName.ToLowerInvariant()) {
@@ -50,12 +50,12 @@ namespace Contensive.CLI {
                 } else {
                     string returnErrorMessage = "";
                     string logPrefix = "CLI";
-                    var installedCollections = new List<string>();
+                    var collectionsInstalledList = new List<string>();
                     var nonCritialErrorList = new List<string>();
                     if (string.IsNullOrEmpty(appName)) {
                         foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
                             using (CPClass cpApp = new CPClass(kvp.Key)) {
-                                CollectionController.installCollectionFromRegistry(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, false, ref nonCritialErrorList, logPrefix, ref installedCollections);
+                                CollectionController.installCollectionFromRegistry(cpApp.core, collectionGuid, ref returnErrorMessage, false, false, ref nonCritialErrorList, logPrefix, ref collectionsInstalledList);
                                 if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                     Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                 }
@@ -64,7 +64,7 @@ namespace Contensive.CLI {
                         }
                     } else {
                         using (CPClass cpApp = new CPClass(appName)) {
-                            CollectionController.installCollectionFromRegistry(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, false, ref nonCritialErrorList, logPrefix, ref installedCollections);
+                            CollectionController.installCollectionFromRegistry(cpApp.core, collectionGuid, ref returnErrorMessage, false, false, ref nonCritialErrorList, logPrefix, ref collectionsInstalledList);
                             if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                 Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                             }

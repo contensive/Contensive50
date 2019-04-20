@@ -64,14 +64,13 @@ namespace Contensive.Addons.SafeAddonManager {
         public string getForm_SafeModeAddonManager() {
             string addonManager = "";
             try {
-                var installedCollections = new List<string>();
+                var collectionsInstalledList = new List<string>();
                 string LocalCollectionXML = null;
                 bool DisplaySystem = false;
                 bool DbUpToDate = false;
                 //CollectionXmlController XMLTools = new CollectionXmlController(core);
                 string GuidFieldName = null;
-                List<int> InstalledCollectionIDList = new List<int>();
-                List<string> InstalledCollectionGuidList = new List<string>();
+                List<int> collectionsInstalledIDList = new List<int>();
                 DateTime DateValue = default(DateTime);
                 string ErrorMessage = "";
                 string OnServerGuidList = "";
@@ -496,7 +495,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             Cnt = LibGuids.GetUpperBound(0) + 1;
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                 RegisterList = "";
-                                UpgradeOK = CollectionController.installCollectionFromRegistry(core, LibGuids[Ptr], ref ErrorMessage, "", false, true, ref nonCriticalErrorList, "AddonManagerClass.GetForm_SaveModeAddonManager", ref installedCollections);
+                                UpgradeOK = CollectionController.installCollectionFromRegistry(core, LibGuids[Ptr], ref ErrorMessage, false, true, ref nonCriticalErrorList, "AddonManagerClass.GetForm_SaveModeAddonManager", ref collectionsInstalledList);
                                 if (!UpgradeOK) {
                                     //
                                     // block the reset because we will loose the error message
@@ -522,7 +521,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             //InstallFolder = core.asv.config.physicalFilePath & InstallFolderName & "\"
                             if (core.privateFiles.pathExists(privateFilesInstallPath)) {
                                 string logPrefix = "SafeModeAddonManager";
-                                UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, true, ref nonCriticalErrorList, logPrefix, ref installedCollections, true);
+                                UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref collectionsInstalledList, false, true, ref nonCriticalErrorList, logPrefix, true);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
                                         ErrorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");
@@ -530,11 +529,11 @@ namespace Contensive.Addons.SafeAddonManager {
                                         ErrorController.addUserError(core, "The Add-on Collection did not install correctly, " + ErrorMessage);
                                     }
                                 } else {
-                                    foreach (string installedCollectionGuid in InstalledCollectionGuidList) {
+                                    foreach (string installedCollectionGuid in collectionsInstalledList) {
                                         using (var csData = new CsModel(core)) {
                                             csData.open("Add-on Collections", GuidFieldName + "=" + DbController.encodeSQLText(installedCollectionGuid));
                                             if (csData.ok()) {
-                                                InstalledCollectionIDList.Add(csData.getInteger("ID"));
+                                                collectionsInstalledIDList.Add(csData.getInteger("ID"));
                                             }
                                         }
                                     }
@@ -556,8 +555,8 @@ namespace Contensive.Addons.SafeAddonManager {
                         //   Forward to help page
                         // --------------------------------------------------------------------------------
                         //
-                        if ((InstalledCollectionIDList.Count > 0) && (!(core.doc.debug_iUserError != ""))) {
-                            return core.webServer.redirect("/" + core.appConfig.adminRoute + "?helpcollectionid=" + InstalledCollectionIDList[0].ToString(), "Redirecting to help page after collection installation");
+                        if ((collectionsInstalledIDList.Count > 0) && (!(core.doc.debug_iUserError != ""))) {
+                            return core.webServer.redirect("/" + core.appConfig.adminRoute + "?helpcollectionid=" + collectionsInstalledIDList[0].ToString(), "Redirecting to help page after collection installation");
                         }
                         //
                         // --------------------------------------------------------------------------------
@@ -599,7 +598,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                 ColSortable[3] = false;
                                 //
                                 LocalCollections = new XmlDocument();
-                                LocalCollectionXML = CollectionController.getLocalCollectionStoreListXml(core);
+                                LocalCollectionXML = CollectionController.getCollectionFolderConfigXml(core);
                                 LocalCollections.LoadXml(LocalCollectionXML);
                                 foreach (XmlNode CDef_Node in LocalCollections.DocumentElement.ChildNodes) {
                                     if (GenericController.vbLCase(CDef_Node.Name) == "collection") {

@@ -58,6 +58,22 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
+        /// convert a guid in any guid format to the registery format used here
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <returns></returns>
+        public static string normalizeGuid(string guid) {
+            if (guid.Length == 38) { return guid.ToLowerInvariant(); }
+            if (guid.Length == 36) { return "{" + guid.ToLowerInvariant() + "}"; }
+            if (guid.Length == 32) {
+                guid = guid.ToLowerInvariant();
+                return guid.Left(8) + "-" + guid.Substring(8, 4) + "-" + guid.Substring(12, 4) + "-" + guid.Substring(16, 4) + "-" + guid.Substring(20);
+            }
+            return string.Empty;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
         /// If string is empty, return default value
         /// </summary>
         /// <param name="sourceText"></param>
@@ -2331,7 +2347,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnList;
@@ -2408,7 +2424,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     } catch (Exception ex) {
-                        LogController.handleError( core,ex);
+                        LogController.handleError(core, ex);
                         throw;
                     }
                 }

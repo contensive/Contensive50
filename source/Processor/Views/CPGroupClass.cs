@@ -56,7 +56,7 @@ namespace Contensive.Processor {
         /// Add current user to a group
         /// </summary>
         /// <param name="groupId"></param>
-        public override void AddUser(int groupId) => GroupController.addUser(core, groupId.ToString(), 0, DateTime.MinValue);
+        public override void AddUser(int groupId) => GroupController.addUser(core, groupId.ToString(), core.session.user.id, DateTime.MinValue);
         //
         //====================================================================================================
         //

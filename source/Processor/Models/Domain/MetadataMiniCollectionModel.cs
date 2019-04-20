@@ -156,23 +156,23 @@ namespace Contensive.Processor.Models.Domain {
         //
         //======================================================================================================
         //
-        internal static void installMetaDataMiniCollectionFromXml(bool quick, CoreController core, string srcXml, bool isNewBuild, bool isRepairMode, bool isBaseCollection, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
+        internal static void installMetaDataMiniCollectionFromXml(bool quick, CoreController core, string srcXml, bool isNewBuild, bool isRepairMode, bool isBaseCollection, ref List<string> nonCriticalErrorList, string logPrefix) {
             try {
                 if (quick) {
                     //
                     LogController.logInfo(core, "installmetadataMiniCollectionFromXML");
                     // 
                     // -- method 1, just install
-                    MetadataMiniCollectionModel baseCollection = loadXML(core, srcXml, true, true, isNewBuild, new MetadataMiniCollectionModel(), logPrefix, ref installedCollections);
-                    installMetaDataMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                    MetadataMiniCollectionModel baseCollection = loadXML(core, srcXml, true, true, isNewBuild, new MetadataMiniCollectionModel(), logPrefix);
+                    installMetaDataMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix);
                 } else {
                     //
                     // -- method 2, merge with application collection and install
                     //
-                    MetadataMiniCollectionModel miniCollectionWorking = getApplicationMetaDataMiniCollection(core, isNewBuild, logPrefix, ref installedCollections);
-                    MetadataMiniCollectionModel miniCollectionToAdd = loadXML(core, srcXml, isBaseCollection, false, isNewBuild, miniCollectionWorking, logPrefix, ref installedCollections);
+                    MetadataMiniCollectionModel miniCollectionWorking = getApplicationMetaDataMiniCollection(core, isNewBuild, logPrefix);
+                    MetadataMiniCollectionModel miniCollectionToAdd = loadXML(core, srcXml, isBaseCollection, false, isNewBuild, miniCollectionWorking, logPrefix);
                     addMiniCollectionSrcToDst(core, ref miniCollectionWorking, miniCollectionToAdd);
-                    installMetaDataMiniCollection_BuildDb(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                    installMetaDataMiniCollection_BuildDb(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -184,7 +184,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// create a collection class from a collection xml file, metadata are added to the metadatas in the application collection
         /// </summary>
-        public static MetadataMiniCollectionModel loadXML(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, MetadataMiniCollectionModel defaultCollection, string logPrefix, ref List<string> installedCollections) {
+        public static MetadataMiniCollectionModel loadXML(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, MetadataMiniCollectionModel defaultCollection, string logPrefix) {
             MetadataMiniCollectionModel result = null;
             try {
                 ContentMetadataModel DefaultMetaData = null;
@@ -670,7 +670,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Verify ccContent and ccFields records from the metadata nodes of a a collection file. This is the last step of loading teh metadata nodes of a collection file. ParentId field is set based on ParentName node.
         /// </summary>
-        private static void installMetaDataMiniCollection_BuildDb(CoreController core, MetadataMiniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
+        private static void installMetaDataMiniCollection_BuildDb(CoreController core, MetadataMiniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix) {
             try {
                 //
                 logPrefix += ", installCollection_BuildDbFromMiniCollection";
@@ -1487,14 +1487,14 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         //
-        private static MetadataMiniCollectionModel getApplicationMetaDataMiniCollection(CoreController core, bool isNewBuild, string logPrefix, ref List<string> installedCollections) {
+        private static MetadataMiniCollectionModel getApplicationMetaDataMiniCollection(CoreController core, bool isNewBuild, string logPrefix) {
             var result = new MetadataMiniCollectionModel();
             try {
                 if (!isNewBuild) {
                     //
                     // if this is not an empty database, get the application collection, else return empty
                     string applicationMetaDataMiniCollectionXml = ApplicationMetaDataMiniCollection.get(core, true);
-                    result = MetadataMiniCollectionModel.loadXML(core, applicationMetaDataMiniCollectionXml, false, false, isNewBuild, new MetadataMiniCollectionModel(), logPrefix, ref installedCollections);
+                    result = MetadataMiniCollectionModel.loadXML(core, applicationMetaDataMiniCollectionXml, false, false, isNewBuild, new MetadataMiniCollectionModel(), logPrefix);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

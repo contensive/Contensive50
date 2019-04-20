@@ -1485,7 +1485,7 @@ namespace Contensive.Processor.Controllers {
                 string AddonVersionPath = "";
                 var tmpDate = new DateTime();
                 string tmpName = "";
-                CollectionController.getAddonCollectionFolderConfig(core, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
+                CollectionController.getCollectionFolderConfig(core, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
                 if (string.IsNullOrEmpty(AddonVersionPath)) { throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection"); };
                 string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
                 if (!core.privateFiles.pathExists_local(AddonPath)) { core.privateFiles.copyPathRemoteToLocal(AddonPath); }
