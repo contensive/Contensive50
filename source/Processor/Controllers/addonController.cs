@@ -2690,7 +2690,6 @@ namespace Contensive.Processor.Controllers {
                     tempGetAddonIconImg = "<img"
                         + " border=0"
                         + " id=\"" + IconImgID + "\""
-                        + " onDblClick=\"window.parent.OpenAddonPropertyWindow(this,'" + AdminURL + "');\""
                         + " alt=\"" + IconAlt + "\""
                         + " title=\"" + IconTitle + "\""
                         + " src=\"" + IconFilename + "\"";
@@ -2706,7 +2705,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     //
                     // Sprite Icon
-                    tempGetAddonIconImg = getIconSprite(IconImgID, IconSpriteColumn, IconFilename, IconWidth, IconHeight, IconAlt, IconTitle, "window.parent.OpenAddonPropertyWindow(this,'" + AdminURL + "');", IconIsInline, ACInstanceID);
+                    tempGetAddonIconImg = getIconSprite(IconImgID, IconSpriteColumn, IconFilename, IconWidth, IconHeight, IconAlt, IconTitle, "", IconIsInline, ACInstanceID);
                 }
             } catch (Exception) {
                 throw;

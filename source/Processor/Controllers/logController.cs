@@ -45,13 +45,25 @@ namespace Contensive.Processor.Controllers {
             Fatal = 5
         }
         //
-        private static string LogFileCopyPrep(string Source) {
-            string Copy = Source;
-            Copy = GenericController.vbReplace(Copy, "\r\n", " ");
-            Copy = GenericController.vbReplace(Copy, "\n", " ");
-            Copy = GenericController.vbReplace(Copy, "\r", " ");
-            return Copy;
+        //=============================================================================
+        /// <summary>
+        /// v51 logging - each class has its own NLog logger and calls these methods for uniform output
+        /// use:
+        /// logger.Log(LogLevel.Info, LogController.getLogMsg( core, "Sample informational message"));
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static string getLogMsg(CoreController core, string message) {
+            string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
+            return "app [" + ((core.appConfig != null) ? core.appConfig.name : "no-app") + ", thread [" + threadName + "], " + message.Replace("\r\n", " ").Replace("\n", " ").Replace("\r", " ");
         }
+        //
+        //=============================================================================
+        public static string getLogMsg(CoreController core, Exception ex) => getLogMsg(core, ex.ToString());
+        //
+        // v5 logging
+        //
         //
         //=============================================================================
         /// <summary>
@@ -126,7 +138,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <param name="level"></param>
-        public static void forceNLog(string message, LogLevel level ) {
+        public static void forceNLog(string message, LogLevel level) {
             try {
                 string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
                 string logContent = level.ToString() + "\tthread:" + threadName + "\t" + message;
@@ -224,7 +236,7 @@ namespace Contensive.Processor.Controllers {
                 return;
                 //
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
             }
             //ErrorTrap:
             throw (new Exception("Unexpected exception"));
@@ -314,18 +326,6 @@ namespace Contensive.Processor.Controllers {
                 }
             }
             //
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// not implemented, as current logging system does not need to be housekeeped. Keep the hood here for the future
-        /// </summary>
-        /// <param name="core"></param>
-        public static void housekeepLogs(CoreController core) {
-            try {
-                // -- deprecated, NLog handles housekeeping
-                return;
-            } catch (Exception) { }
         }
         //
         //==========================================================================================

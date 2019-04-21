@@ -495,7 +495,8 @@ namespace Contensive.Addons.SafeAddonManager {
                             Cnt = LibGuids.GetUpperBound(0) + 1;
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                 RegisterList = "";
-                                UpgradeOK = CollectionController.installCollectionFromRegistry(core, LibGuids[Ptr], ref ErrorMessage, false, true, ref nonCriticalErrorList, "AddonManagerClass.GetForm_SaveModeAddonManager", ref collectionsInstalledList);
+                                var context = new Stack<string>(new string[] { "AddonManager Install Library Collection [" + LibGuids[Ptr] + "]" });
+                                UpgradeOK = CollectionController.installCollectionFromLibrary(core, context, LibGuids[Ptr], ref ErrorMessage, false, true, ref nonCriticalErrorList, "AddonManagerClass.GetForm_SaveModeAddonManager", ref collectionsInstalledList);
                                 if (!UpgradeOK) {
                                     //
                                     // block the reset because we will loose the error message
@@ -521,7 +522,8 @@ namespace Contensive.Addons.SafeAddonManager {
                             //InstallFolder = core.asv.config.physicalFilePath & InstallFolderName & "\"
                             if (core.privateFiles.pathExists(privateFilesInstallPath)) {
                                 string logPrefix = "SafeModeAddonManager";
-                                UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref collectionsInstalledList, false, true, ref nonCriticalErrorList, logPrefix, true);
+                                var context = new Stack<string>(new string[] { "AddonManager install from path [" + privateFilesInstallPath + "]" });
+                                UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core,context, privateFilesInstallPath, ref ErrorMessage, ref collectionsInstalledList, false, true, ref nonCriticalErrorList, logPrefix, true);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
                                         ErrorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");
@@ -555,325 +557,319 @@ namespace Contensive.Addons.SafeAddonManager {
                         //   Forward to help page
                         // --------------------------------------------------------------------------------
                         //
-                        if ((collectionsInstalledIDList.Count > 0) && (!(core.doc.debug_iUserError != ""))) {
+                        if ((collectionsInstalledIDList.Count > 0) && ( string.IsNullOrEmpty( core.doc.debug_iUserError ))) {
                             return core.webServer.redirect("/" + core.appConfig.adminRoute + "?helpcollectionid=" + collectionsInstalledIDList[0].ToString(), "Redirecting to help page after collection installation");
                         }
                         //
                         // --------------------------------------------------------------------------------
                         // Get Form
+                        //
+                        // --------------------------------------------------------------------------------
+                        // Get the Collection Library tab
                         // --------------------------------------------------------------------------------
                         //
-                        if (true) {
-                            if (true) {
-                                //
-                                // --------------------------------------------------------------------------------
-                                // Get the Collection Library tab
-                                // --------------------------------------------------------------------------------
-                                //
-                                ColumnCnt = 4;
-                                ColCaption = new string[4];
-                                ColAlign = new string[4];
-                                ColWidth = new string[4];
-                                ColSortable = new bool[4];
-                                Cells3 = new string[1001, 5];
-                                //
-                                ColCaption[0] = "Install";
-                                ColAlign[0] = "center";
-                                ColWidth[0] = "50";
-                                ColSortable[0] = false;
-                                //
-                                ColCaption[1] = "Name";
-                                ColAlign[1] = "left";
-                                ColWidth[1] = "200";
-                                ColSortable[1] = false;
-                                //
-                                ColCaption[2] = "Last&nbsp;Updated";
-                                ColAlign[2] = "right";
-                                ColWidth[2] = "200";
-                                ColSortable[2] = false;
-                                //
-                                ColCaption[3] = "Description";
-                                ColAlign[3] = "left";
-                                ColWidth[3] = "99%";
-                                ColSortable[3] = false;
-                                //
-                                LocalCollections = new XmlDocument();
-                                LocalCollectionXML = CollectionController.getCollectionFolderConfigXml(core);
-                                LocalCollections.LoadXml(LocalCollectionXML);
-                                foreach (XmlNode CDef_Node in LocalCollections.DocumentElement.ChildNodes) {
-                                    if (GenericController.vbLCase(CDef_Node.Name) == "collection") {
-                                        foreach (XmlNode CollectionNode in CDef_Node.ChildNodes) {
-                                            if (GenericController.vbLCase(CollectionNode.Name) == "guid") {
-                                                OnServerGuidList += "," + CollectionNode.InnerText;
-                                                break;
-                                            }
-                                        }
+                        ColumnCnt = 4;
+                        ColCaption = new string[4];
+                        ColAlign = new string[4];
+                        ColWidth = new string[4];
+                        ColSortable = new bool[4];
+                        Cells3 = new string[1001, 5];
+                        //
+                        ColCaption[0] = "Install";
+                        ColAlign[0] = "center";
+                        ColWidth[0] = "50";
+                        ColSortable[0] = false;
+                        //
+                        ColCaption[1] = "Name";
+                        ColAlign[1] = "left";
+                        ColWidth[1] = "200";
+                        ColSortable[1] = false;
+                        //
+                        ColCaption[2] = "Last&nbsp;Updated";
+                        ColAlign[2] = "right";
+                        ColWidth[2] = "200";
+                        ColSortable[2] = false;
+                        //
+                        ColCaption[3] = "Description";
+                        ColAlign[3] = "left";
+                        ColWidth[3] = "99%";
+                        ColSortable[3] = false;
+                        //
+                        LocalCollections = new XmlDocument();
+                        LocalCollectionXML = CollectionController.getCollectionFolderConfigXml(core);
+                        LocalCollections.LoadXml(LocalCollectionXML);
+                        foreach (XmlNode CDef_Node in LocalCollections.DocumentElement.ChildNodes) {
+                            if (GenericController.vbLCase(CDef_Node.Name) == "collection") {
+                                foreach (XmlNode CollectionNode in CDef_Node.ChildNodes) {
+                                    if (GenericController.vbLCase(CollectionNode.Name) == "guid") {
+                                        OnServerGuidList += "," + CollectionNode.InnerText;
+                                        break;
                                     }
                                 }
+                            }
+                        }
+                        //
+                        LibCollections = new XmlDocument();
+                        bool parseError = false;
+                        try {
+                            LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&includeSystem=1&includeNonPublic=1");
+                        } catch (Exception) {
+                            UserError = "There was an error reading the Collection Library. The site may be unavailable.";
+                            HandleClassAppendLog("AddonManager", UserError);
+                            status += "<br>" + UserError;
+                            ErrorController.addUserError(core, UserError);
+                            parseError = true;
+                        }
+                        Ptr = 0;
+                        if (!parseError) {
+                            if (GenericController.vbLCase(LibCollections.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
+                                UserError = "There was an error reading the Collection Library file. The '" + CollectionListRootNode + "' element was not found.";
+                                HandleClassAppendLog("AddonManager", UserError);
+                                status += "<br>" + UserError;
+                                ErrorController.addUserError(core, UserError);
+                            } else {
                                 //
-                                LibCollections = new XmlDocument();
-                                bool parseError = false;
-                                try {
-                                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&includeSystem=1&includeNonPublic=1");
-                                } catch (Exception) {
-                                    UserError = "There was an error reading the Collection Library. The site may be unavailable.";
-                                    HandleClassAppendLog("AddonManager", UserError);
-                                    status += "<br>" + UserError;
-                                    ErrorController.addUserError(core, UserError);
-                                    parseError = true;
-                                }
-                                Ptr = 0;
-                                if (!parseError) {
-                                    if (GenericController.vbLCase(LibCollections.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
-                                        UserError = "There was an error reading the Collection Library file. The '" + CollectionListRootNode + "' element was not found.";
-                                        HandleClassAppendLog("AddonManager", UserError);
-                                        status += "<br>" + UserError;
-                                        ErrorController.addUserError(core, UserError);
-                                    } else {
-                                        //
-                                        // Go through file to validate the XML, and build status message -- since service process can not communicate to user
-                                        //
-                                        RowPtr = 0;
-                                        foreach (XmlNode CDef_Node in LibCollections.DocumentElement.ChildNodes) {
-                                            switch (GenericController.vbLCase(CDef_Node.Name)) {
-                                                case "collection":
-                                                    //
-                                                    // Read the collection
-                                                    //
-                                                    foreach (XmlNode CollectionNode in CDef_Node.ChildNodes) {
-                                                        switch (GenericController.vbLCase(CollectionNode.Name)) {
-                                                            case "name":
-                                                                //
-                                                                // Name
-                                                                //
-                                                                Collectionname = CollectionNode.InnerText;
-                                                                break;
-                                                            case "guid":
-                                                                //
-                                                                // Guid
-                                                                //
-                                                                CollectionGuid = CollectionNode.InnerText;
-                                                                break;
-                                                            case "version":
-                                                                //
-                                                                // Version
-                                                                //
-                                                                CollectionVersion = CollectionNode.InnerText;
-                                                                break;
-                                                            case "description":
-                                                                //
-                                                                // Version
-                                                                //
-                                                                CollectionDescription = CollectionNode.InnerText;
-                                                                break;
-                                                            case "contensiveversion":
-                                                                //
-                                                                // Version
-                                                                //
-                                                                CollectionContensiveVersion = CollectionNode.InnerText;
-                                                                break;
-                                                            case "lastchangedate":
-                                                                //
-                                                                // Version
-                                                                //
-                                                                CollectionLastChangeDate = CollectionNode.InnerText;
-                                                                if (GenericController.IsDate(CollectionLastChangeDate)) {
-                                                                    DateValue = DateTime.Parse(CollectionLastChangeDate);
-                                                                    CollectionLastChangeDate = DateValue.ToShortDateString();
-                                                                }
-                                                                if (string.IsNullOrEmpty(CollectionLastChangeDate)) {
-                                                                    CollectionLastChangeDate = "unknown";
-                                                                }
-                                                                break;
+                                // Go through file to validate the XML, and build status message -- since service process can not communicate to user
+                                //
+                                RowPtr = 0;
+                                foreach (XmlNode CDef_Node in LibCollections.DocumentElement.ChildNodes) {
+                                    switch (GenericController.vbLCase(CDef_Node.Name)) {
+                                        case "collection":
+                                            //
+                                            // Read the collection
+                                            //
+                                            foreach (XmlNode CollectionNode in CDef_Node.ChildNodes) {
+                                                switch (GenericController.vbLCase(CollectionNode.Name)) {
+                                                    case "name":
+                                                        //
+                                                        // Name
+                                                        //
+                                                        Collectionname = CollectionNode.InnerText;
+                                                        break;
+                                                    case "guid":
+                                                        //
+                                                        // Guid
+                                                        //
+                                                        CollectionGuid = CollectionNode.InnerText;
+                                                        break;
+                                                    case "version":
+                                                        //
+                                                        // Version
+                                                        //
+                                                        CollectionVersion = CollectionNode.InnerText;
+                                                        break;
+                                                    case "description":
+                                                        //
+                                                        // Version
+                                                        //
+                                                        CollectionDescription = CollectionNode.InnerText;
+                                                        break;
+                                                    case "contensiveversion":
+                                                        //
+                                                        // Version
+                                                        //
+                                                        CollectionContensiveVersion = CollectionNode.InnerText;
+                                                        break;
+                                                    case "lastchangedate":
+                                                        //
+                                                        // Version
+                                                        //
+                                                        CollectionLastChangeDate = CollectionNode.InnerText;
+                                                        if (GenericController.IsDate(CollectionLastChangeDate)) {
+                                                            DateValue = DateTime.Parse(CollectionLastChangeDate);
+                                                            CollectionLastChangeDate = DateValue.ToShortDateString();
+                                                        }
+                                                        if (string.IsNullOrEmpty(CollectionLastChangeDate)) {
+                                                            CollectionLastChangeDate = "unknown";
+                                                        }
+                                                        break;
+                                                }
+                                            }
+                                            bool IsOnServer = false;
+                                            bool IsOnSite = false;
+                                            if (RowPtr >= Cells3.GetUpperBound(0)) {
+                                                //todo  NOTE: The following block reproduces what 'ReDim Preserve' does behind the scenes in VB:
+                                                //ORIGINAL LINE: ReDim Preserve Cells3(RowPtr + 100, ColumnCnt)
+                                                string[,] tempVar2 = new string[RowPtr + 101, ColumnCnt + 1];
+                                                if (Cells3 != null) {
+                                                    for (int Dimension0 = 0; Dimension0 < Cells3.GetLength(0); Dimension0++) {
+                                                        int CopyLength = Math.Min(Cells3.GetLength(1), tempVar2.GetLength(1));
+                                                        for (int Dimension1 = 0; Dimension1 < CopyLength; Dimension1++) {
+                                                            tempVar2[Dimension0, Dimension1] = Cells3[Dimension0, Dimension1];
                                                         }
                                                     }
-                                                    bool IsOnServer = false;
-                                                    bool IsOnSite = false;
-                                                    if (RowPtr >= Cells3.GetUpperBound(0)) {
-                                                        //todo  NOTE: The following block reproduces what 'ReDim Preserve' does behind the scenes in VB:
-                                                        //ORIGINAL LINE: ReDim Preserve Cells3(RowPtr + 100, ColumnCnt)
-                                                        string[,] tempVar2 = new string[RowPtr + 101, ColumnCnt + 1];
-                                                        if (Cells3 != null) {
-                                                            for (int Dimension0 = 0; Dimension0 < Cells3.GetLength(0); Dimension0++) {
-                                                                int CopyLength = Math.Min(Cells3.GetLength(1), tempVar2.GetLength(1));
-                                                                for (int Dimension1 = 0; Dimension1 < CopyLength; Dimension1++) {
-                                                                    tempVar2[Dimension0, Dimension1] = Cells3[Dimension0, Dimension1];
-                                                                }
-                                                            }
-                                                        }
-                                                        Cells3 = tempVar2;
+                                                }
+                                                Cells3 = tempVar2;
+                                            }
+                                            if (string.IsNullOrEmpty(Collectionname)) {
+                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
+                                                Cells3[RowPtr, 1] = "no name";
+                                                Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
+                                                Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
+                                            } else {
+                                                if (string.IsNullOrEmpty(CollectionGuid)) {
+                                                    Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
+                                                    Cells3[RowPtr, 1] = Collectionname + " (no guid)";
+                                                    Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
+                                                    Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
+                                                } else {
+                                                    IsOnServer = GenericController.encodeBoolean(OnServerGuidList.IndexOf(CollectionGuid, System.StringComparison.OrdinalIgnoreCase) + 1);
+                                                    using (var csData = new CsModel(core)) {
+                                                        IsOnSite = csData.open("Add-on Collections", GuidFieldName + "=" + DbController.encodeSQLText(CollectionGuid));
                                                     }
-                                                    if (string.IsNullOrEmpty(Collectionname)) {
+                                                    if (IsOnSite) {
+                                                        //
+                                                        // Already installed
+                                                        //
+                                                        Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow" + RowPtr + "\" VALUE=\"1\" disabled>";
+                                                        Cells3[RowPtr, 1] = Collectionname + "&nbsp;(installed already)";
+                                                        Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
+                                                        Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
+                                                    } else if ((!string.IsNullOrEmpty(CollectionContensiveVersion)) && (string.CompareOrdinal(CollectionContensiveVersion, core.codeVersion()) > 0)) {
+                                                        //
+                                                        // wrong version
+                                                        //
                                                         Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
-                                                        Cells3[RowPtr, 1] = "no name";
+                                                        Cells3[RowPtr, 1] = Collectionname + "&nbsp;(Contensive v" + CollectionContensiveVersion + " needed)";
+                                                        Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
+                                                        Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
+                                                    } else if (!DbUpToDate) {
+                                                        //
+                                                        // Site needs to by upgraded
+                                                        //
+                                                        Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
+                                                        Cells3[RowPtr, 1] = Collectionname + "&nbsp;(install disabled)";
                                                         Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
                                                         Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
                                                     } else {
-                                                        if (string.IsNullOrEmpty(CollectionGuid)) {
-                                                            Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
-                                                            Cells3[RowPtr, 1] = Collectionname + " (no guid)";
-                                                            Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
-                                                            Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
-                                                        } else {
-                                                            IsOnServer = GenericController.encodeBoolean(OnServerGuidList.IndexOf(CollectionGuid, System.StringComparison.OrdinalIgnoreCase) + 1);
-                                                            using (var csData = new CsModel(core)) {
-                                                                IsOnSite = csData.open("Add-on Collections", GuidFieldName + "=" + DbController.encodeSQLText(CollectionGuid));
-                                                            }
-                                                            if (IsOnSite) {
-                                                                //
-                                                                // Already installed
-                                                                //
-                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow" + RowPtr + "\" VALUE=\"1\" disabled>";
-                                                                Cells3[RowPtr, 1] = Collectionname + "&nbsp;(installed already)";
-                                                                Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
-                                                                Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
-                                                            } else if ((!string.IsNullOrEmpty(CollectionContensiveVersion)) && (string.CompareOrdinal(CollectionContensiveVersion, core.codeVersion()) > 0)) {
-                                                                //
-                                                                // wrong version
-                                                                //
-                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
-                                                                Cells3[RowPtr, 1] = Collectionname + "&nbsp;(Contensive v" + CollectionContensiveVersion + " needed)";
-                                                                Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
-                                                                Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
-                                                            } else if (!DbUpToDate) {
-                                                                //
-                                                                // Site needs to by upgraded
-                                                                //
-                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
-                                                                Cells3[RowPtr, 1] = Collectionname + "&nbsp;(install disabled)";
-                                                                Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
-                                                                Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
-                                                            } else {
-                                                                //
-                                                                // Not installed yet
-                                                                //
-                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + HtmlController.inputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + HtmlController.inputHidden("LibraryRowName" + RowPtr, Collectionname);
-                                                                //Cells3(RowPtr, 0) = core.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & core.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & core.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
-                                                                Cells3[RowPtr, 1] = Collectionname + "&nbsp;";
-                                                                Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
-                                                                Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
-                                                            }
-                                                        }
+                                                        //
+                                                        // Not installed yet
+                                                        //
+                                                        Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + HtmlController.inputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + HtmlController.inputHidden("LibraryRowName" + RowPtr, Collectionname);
+                                                        //Cells3(RowPtr, 0) = core.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & core.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & core.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
+                                                        Cells3[RowPtr, 1] = Collectionname + "&nbsp;";
+                                                        Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
+                                                        Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
                                                     }
-                                                    RowPtr = RowPtr + 1;
-                                                    break;
+                                                }
                                             }
-                                        }
+                                            RowPtr = RowPtr + 1;
+                                            break;
                                     }
-                                    BodyHTML = ""
-                                    + "<input type=hidden name=LibraryCnt value=\"" + RowPtr + "\">"
-                                    + "<script language=\"JavaScript\">"
-                                    + "function clearLibraryRows(r) {"
-                                    + "var c,p;"
-                                    + "c=document.getElementsByName('LibraryRow');"
-                                        + "for (p=0;p<c.length;p++){"
-                                            + "if(c[p].value!=r)c[p].checked=false;"
-                                        + "}"
-                                    + ""
-                                    + "}"
-                                    + "</script>"
-                                    + "<div style=\"width:100%\">" + AdminUIController.getReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells3, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>"
-                                    + "";
-                                    BodyHTML = AdminUIController.getEditPanel(core,true, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML);
-                                    BodyHTML = BodyHTML + HtmlController.inputHidden("AOCnt", RowPtr);
-                                    adminMenu.addEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
                                 }
-                                //
-                                // --------------------------------------------------------------------------------
-                                // Current Collections Tab
-                                // --------------------------------------------------------------------------------
-                                //
-                                ColumnCnt = 2;
-                                ColCaption = new string[3];
-                                ColAlign = new string[3];
-                                ColWidth = new string[3];
-                                ColSortable = new bool[3];
-                                //
-                                ColCaption[0] = "Del";
-                                ColAlign[0] = "center";
-                                ColWidth[0] = "50";
-                                ColSortable[0] = false;
-                                //
-                                ColCaption[1] = "Name";
-                                ColAlign[1] = "left";
-                                ColWidth[1] = "";
-                                ColSortable[1] = false;
-                                //
-                                DisplaySystem = false;
-                                using (var csData = new CsModel(core)) {
-                                    if (!core.session.isAuthenticatedDeveloper(core)) {
-                                        //
-                                        // non-developers
-                                        //
-                                        csData.open("Add-on Collections", "((system is null)or(system=0))", "Name");
-                                    } else {
-                                        //
-                                        // developers
-                                        //
-                                        DisplaySystem = true;
-                                        csData.open("Add-on Collections", "", "Name");
-                                    }
-                                    string[,] tempVar3 = new string[csData.getRowCount() + 1, ColumnCnt + 1];
-                                    if (Cells != null) {
-                                        for (int Dimension0 = 0; Dimension0 < Cells.GetLength(0); Dimension0++) {
-                                            int CopyLength = Math.Min(Cells.GetLength(1), tempVar3.GetLength(1));
-                                            for (int Dimension1 = 0; Dimension1 < CopyLength; Dimension1++) {
-                                                tempVar3[Dimension0, Dimension1] = Cells[Dimension0, Dimension1];
-                                            }
-                                        }
-                                    }
-                                    Cells = tempVar3;
-                                    RowPtr = 0;
-                                    while (csData.ok()) {
-                                        Cells[RowPtr, 0] = HtmlController.checkbox("AC" + RowPtr) + HtmlController.inputHidden("ACID" + RowPtr, csData.getInteger("ID"));
-                                        Cells[RowPtr, 1] = csData.getText("name");
-                                        if (DisplaySystem) {
-                                            if (csData.getBoolean("system")) {
-                                                Cells[RowPtr, 1] = Cells[RowPtr, 1] + " (system)";
-                                            }
-                                        }
-                                        csData.goNext();
-                                        RowPtr = RowPtr + 1;
-                                    }
-                                    csData.close();
-                                }
-                                BodyHTML = "<div style=\"width:100%\">" + AdminUIController.getReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
-                                BodyHTML = AdminUIController.getEditPanel(core,true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
-                                BodyHTML = BodyHTML + HtmlController.inputHidden("accnt", RowPtr);
-                                adminMenu.addEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
-                                //
-                                // --------------------------------------------------------------------------------
-                                // Get the Upload Add-ons tab
-                                // --------------------------------------------------------------------------------
-                                //
-                                Body = new StringBuilderLegacyController();
-                                if (!DbUpToDate) {
-                                    Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>");
-                                } else {
-                                    FormInput = ""
-                                        + "<table id=\"UploadInsert\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
-                                        + "</table>"
-                                        + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
-                                        + "<tr><td align=\"left\"><a href=\"#\" onClick=\"InsertUpload(); return false;\">+ Add more files</a></td></tr>"
-                                        + "</table>"
-                                        + HtmlController.inputHidden("UploadCount", 1, "", "UploadCount") + "";
-                                    Body.Add(AdminUIController.editTable( ""
-                                        + AdminUIController.getEditRowLegacy(core, core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, "")
-                                        + AdminUIController.getEditRowLegacy(core, FormInput, "&nbsp;", "", true, false, "")
-                                        ));
-                                }
-                                adminMenu.addEntry("Add&nbsp;Manually", AdminUIController.getEditPanel(core,true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
-                                //
-                                // --------------------------------------------------------------------------------
-                                // Build Page from tabs
-                                // --------------------------------------------------------------------------------
-                                //
-                                Content.Add(adminMenu.getTabs(core));
-                                //
-                                ButtonList = ButtonCancel + "," + ButtonOK;
-                                Content.Add(HtmlController.inputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));
                             }
+                            BodyHTML = ""
+                            + "<input type=hidden name=LibraryCnt value=\"" + RowPtr + "\">"
+                            + "<script language=\"JavaScript\">"
+                            + "function clearLibraryRows(r) {"
+                            + "var c,p;"
+                            + "c=document.getElementsByName('LibraryRow');"
+                                + "for (p=0;p<c.length;p++){"
+                                    + "if(c[p].value!=r)c[p].checked=false;"
+                                + "}"
+                            + ""
+                            + "}"
+                            + "</script>"
+                            + "<div style=\"width:100%\">" + AdminUIController.getReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells3, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>"
+                            + "";
+                            BodyHTML = AdminUIController.getEditPanel(core, true, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML);
+                            BodyHTML = BodyHTML + HtmlController.inputHidden("AOCnt", RowPtr);
+                            adminMenu.addEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
                         }
+                        //
+                        // --------------------------------------------------------------------------------
+                        // Current Collections Tab
+                        // --------------------------------------------------------------------------------
+                        //
+                        ColumnCnt = 2;
+                        ColCaption = new string[3];
+                        ColAlign = new string[3];
+                        ColWidth = new string[3];
+                        ColSortable = new bool[3];
+                        //
+                        ColCaption[0] = "Del";
+                        ColAlign[0] = "center";
+                        ColWidth[0] = "50";
+                        ColSortable[0] = false;
+                        //
+                        ColCaption[1] = "Name";
+                        ColAlign[1] = "left";
+                        ColWidth[1] = "";
+                        ColSortable[1] = false;
+                        //
+                        DisplaySystem = false;
+                        using (var csData = new CsModel(core)) {
+                            if (!core.session.isAuthenticatedDeveloper(core)) {
+                                //
+                                // non-developers
+                                //
+                                csData.open("Add-on Collections", "((system is null)or(system=0))", "Name");
+                            } else {
+                                //
+                                // developers
+                                //
+                                DisplaySystem = true;
+                                csData.open("Add-on Collections", "", "Name");
+                            }
+                            string[,] tempVar3 = new string[csData.getRowCount() + 1, ColumnCnt + 1];
+                            if (Cells != null) {
+                                for (int Dimension0 = 0; Dimension0 < Cells.GetLength(0); Dimension0++) {
+                                    int CopyLength = Math.Min(Cells.GetLength(1), tempVar3.GetLength(1));
+                                    for (int Dimension1 = 0; Dimension1 < CopyLength; Dimension1++) {
+                                        tempVar3[Dimension0, Dimension1] = Cells[Dimension0, Dimension1];
+                                    }
+                                }
+                            }
+                            Cells = tempVar3;
+                            RowPtr = 0;
+                            while (csData.ok()) {
+                                Cells[RowPtr, 0] = HtmlController.checkbox("AC" + RowPtr) + HtmlController.inputHidden("ACID" + RowPtr, csData.getInteger("ID"));
+                                Cells[RowPtr, 1] = csData.getText("name");
+                                if (DisplaySystem) {
+                                    if (csData.getBoolean("system")) {
+                                        Cells[RowPtr, 1] = Cells[RowPtr, 1] + " (system)";
+                                    }
+                                }
+                                csData.goNext();
+                                RowPtr = RowPtr + 1;
+                            }
+                            csData.close();
+                        }
+                        BodyHTML = "<div style=\"width:100%\">" + AdminUIController.getReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
+                        BodyHTML = AdminUIController.getEditPanel(core, true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
+                        BodyHTML = BodyHTML + HtmlController.inputHidden("accnt", RowPtr);
+                        adminMenu.addEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
+                        //
+                        // --------------------------------------------------------------------------------
+                        // Get the Upload Add-ons tab
+                        // --------------------------------------------------------------------------------
+                        //
+                        Body = new StringBuilderLegacyController();
+                        if (!DbUpToDate) {
+                            Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>");
+                        } else {
+                            FormInput = ""
+                                + "<table id=\"UploadInsert\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
+                                + "</table>"
+                                + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
+                                + "<tr><td align=\"left\"><a href=\"#\" onClick=\"InsertUpload(); return false;\">+ Add more files</a></td></tr>"
+                                + "</table>"
+                                + HtmlController.inputHidden("UploadCount", 1, "", "UploadCount") + "";
+                            Body.Add(AdminUIController.editTable(""
+                                + AdminUIController.getEditRowLegacy(core, core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, "")
+                                + AdminUIController.getEditRowLegacy(core, FormInput, "&nbsp;", "", true, false, "")
+                                ));
+                        }
+                        adminMenu.addEntry("Add&nbsp;Manually", AdminUIController.getEditPanel(core, true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
+                        //
+                        // --------------------------------------------------------------------------------
+                        // Build Page from tabs
+                        // --------------------------------------------------------------------------------
+                        //
+                        Content.Add(adminMenu.getTabs(core));
+                        //
+                        ButtonList = ButtonCancel + "," + ButtonOK;
+                        Content.Add(HtmlController.inputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));
                     }
                     //
                     // Output the Add-on

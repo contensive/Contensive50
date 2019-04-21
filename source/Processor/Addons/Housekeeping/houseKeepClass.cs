@@ -94,9 +94,6 @@ namespace Contensive.Addons.Housekeeping {
             try {
                 core.siteProperties.setProperty("housekeep, last check", env.rightNow);
                 //
-                // -- remove old log files
-                LogController.housekeepLogs(core);
-                //
                 // -- Download Updates
                 DownloadUpdates(core);
                 //

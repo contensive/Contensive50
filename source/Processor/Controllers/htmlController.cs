@@ -1378,7 +1378,6 @@ namespace Contensive.Processor.Controllers {
                             IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 64, 0, false, IconIDControlString, "/ContensiveBase/images/ACTemplateContentIcon.gif", core.appConfig.cdnFileUrl, "Content Box", "Renders as the content for a template", "", 0);
                             IconImg = GenericController.EncodeJavascriptStringSingleQuote(IconImg);
                             Items[ItemsCnt] = "['Content Box','" + IconImg + "']";
-                            //Items(ItemsCnt) = "['Template Content','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Content"" id=""AC," & ACTypeTemplateContent & ",0,Template Content,"" src=""/ContensiveBase/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>']"
                             Index.setPtr("Content Box", ItemsCnt);
                             ItemsCnt += 1;
                             //
@@ -1386,7 +1385,6 @@ namespace Contensive.Processor.Controllers {
                             IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 52, 0, false, IconIDControlString, "/ContensiveBase/images/ACTemplateTextIcon.gif", core.appConfig.cdnFileUrl, "Template Text", "Renders as a template text block", "", 0);
                             IconImg = GenericController.EncodeJavascriptStringSingleQuote(IconImg);
                             Items[ItemsCnt] = "['Template Text','" + IconImg + "']";
-                            //Items(ItemsCnt) = "['Template Text','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Text"" id=""AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"" src=""/ContensiveBase/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>']"
                             Index.setPtr("Template Text", ItemsCnt);
                             ItemsCnt += 1;
                         }

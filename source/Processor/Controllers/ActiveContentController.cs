@@ -668,48 +668,6 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                     break;
                                                 }
-                                                // 20180914 - deprecate, template text should be an addon, this was an old special case
-                                                //case ACTypeTemplateText: {
-                                                //        //
-                                                //        // ----- Create Template Content
-                                                //        AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                //        addonOptionString = HtmlController.decodeHtml(AddonOptionStringHTMLEncoded);
-                                                //        NotUsedID = 0;
-                                                //        if (encodeForWysiwygEditor) {
-                                                //            //
-                                                //            string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                //            Copy = AddonController.getAddonIconImg(AdminURL, 52, 52, 0, false, IconIDControlString, "/ContensiveBase/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0);
-                                                //            //Copy = IconImg;
-                                                //            //
-                                                //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as Template Text"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ContensiveBase/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>"
-                                                //        } else if (EncodeNonCachableTags) {
-                                                //            //
-                                                //            // Add in the Content Page
-                                                //            string NewName = HtmlController.getAddonOptionStringValue("new", addonOptionString);
-                                                //            string TextName = HtmlController.getAddonOptionStringValue("name", addonOptionString);
-                                                //            if (string.IsNullOrEmpty(TextName)) {
-                                                //                TextName = "Default";
-                                                //            }
-                                                //            Copy = "{{" + ACTypeTemplateText + "?name=" + genericController.encodeNvaArgument(TextName) + "&new=" + genericController.encodeNvaArgument(NewName) + "}}";
-                                                //        }
-                                                //        break;
-                                                //    }
-                                                // 20180914 - deprecate, watch list should be an addon
-                                                //case ACTypeWatchList: {
-                                                //        //
-                                                //        // ----- Formatting Tag
-                                                //        AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                //        addonOptionString = HtmlController.decodeHtml(AddonOptionStringHTMLEncoded);
-                                                //        if (encodeForWysiwygEditor) {
-                                                //            //
-                                                //            string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                //            Copy = AddonController.getAddonIconImg(AdminURL, 109, 10, 0, true, IconIDControlString, "/ContensiveBase/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" + ACName + "]", ACInstanceID, 0);
-                                                //            //Copy = IconImg;
-                                                //        } else if (EncodeNonCachableTags) {
-                                                //            Copy = "{{" + ACTypeWatchList + "?" + addonOptionString + "}}";
-                                                //        }
-                                                //        break;
-                                                //    }
                                         }
                                         break;
                                 }

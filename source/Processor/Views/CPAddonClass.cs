@@ -157,7 +157,8 @@ namespace Contensive.Processor {
                 var tmpList = new List<string> { };
                 string logPrefix = "CPSiteClass.installCollectionFile";
                 var installedCollections = new List<string>();
-                returnOk = Controllers.CollectionController.installCollectionFromPrivateFile(cp.core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
+                var context = new Stack<string>(new string[] { "Api call cp.addon.InstallCollectionFile [" + privatePathFilename + "]" });
+                returnOk = Controllers.CollectionController.installCollectionFromPrivateFile(cp.core, context, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
             } catch (Exception ex) {
                 Controllers.LogController.handleError(cp.core, ex);
                 if (!cp.core.siteProperties.trapErrors) {
@@ -182,7 +183,8 @@ namespace Contensive.Processor {
             List<string> ignoreList2 = new List<string>();
             string logPrefix = "CPUtilsClass.installCollectionsFromFolder";
             var collectionsInstalledList = new List<string>();
-            return CollectionController.installCollectionsFromPrivateFolder(cp.core, privateFolder, ref ignoreUserMessage, ref collectionsInstalledList, false, false, ref ignoreList2, logPrefix, true);
+            var context = new Stack<string>(new string[] { "Api call cp.addon.InstallCollectionFromFolder [" + privateFolder + "]" });
+            return CollectionController.installCollectionsFromPrivateFolder(cp.core, context, privateFolder, ref ignoreUserMessage, ref collectionsInstalledList, false, false, ref ignoreList2, logPrefix, true);
         }
         //
         public override int InstallCollectionsFromFolderAsync(string privateFolder, bool deleteFolderWhenDone) { throw new NotImplementedException(); }
@@ -196,7 +198,8 @@ namespace Contensive.Processor {
             var installedCollections = new List<string>();
             string logPrefix = "installCollectionFromLibrary";
             var nonCriticalErrorList = new List<string>();
-            return CollectionController.installCollectionFromRegistry(cp.core, collectionGuid, ref ignoreUserMessage, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+            var context = new Stack<string>(new string[] { "Api call cp.addon.InstallCollectionFromLibrary [" + collectionGuid + "]" });
+            return CollectionController.installCollectionFromLibrary(cp.core, context, collectionGuid, ref ignoreUserMessage, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
         }
         //
         public override int InstallCollectionFromLibraryAsync(string collectionGuid) { throw new NotImplementedException(); }

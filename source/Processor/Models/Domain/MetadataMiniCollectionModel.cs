@@ -164,6 +164,7 @@ namespace Contensive.Processor.Models.Domain {
                     // 
                     // -- method 1, just install
                     MetadataMiniCollectionModel baseCollection = loadXML(core, srcXml, true, true, isNewBuild, new MetadataMiniCollectionModel(), logPrefix);
+                    
                     installMetaDataMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix);
                 } else {
                     //
