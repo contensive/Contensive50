@@ -298,9 +298,9 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
                         Stream.Add(getTabs(core,adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Groups", EmailRuleEditor.get(core, adminData, adminData.editRecord.userReadOnly & (!core.session.isAuthenticatedDeveloper(core))), adminData.allowAdminTabs));
-                        Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Topics", EmailTopicEditor.get(core, adminData, adminData.editRecord.userReadOnly & (!core.session.isAuthenticatedDeveloper(core))), adminData.allowAdminTabs));
-                        Stream.Add(addTab(core, adminMenu, "Bounce&nbsp;Control", EmailBounceEditor.get(core, adminData), adminData.allowAdminTabs));
+                        //Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Groups", EmailRuleEditor.get(core, adminData, adminData.editRecord.userReadOnly & (!core.session.isAuthenticatedDeveloper(core))), adminData.allowAdminTabs));
+                        //Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Topics", EmailTopicEditor.get(core, adminData, adminData.editRecord.userReadOnly & (!core.session.isAuthenticatedDeveloper(core))), adminData.allowAdminTabs));
+                        //Stream.Add(addTab(core, adminMenu, "Bounce&nbsp;Control", EmailBounceEditor.get(core, adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
@@ -330,8 +330,8 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly || EmailSubmitted, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(addTab(core, adminMenu, "Condition&nbsp;Groups", EmailRuleEditor.get(core, adminData, adminData.editRecord.userReadOnly || EmailSubmitted), adminData.allowAdminTabs));
-                        Stream.Add(addTab(core, adminMenu, "Bounce&nbsp;Control", EmailBounceEditor.get(core, adminData), adminData.allowAdminTabs));
+                        //Stream.Add(addTab(core, adminMenu, "Condition&nbsp;Groups", EmailRuleEditor.get(core, adminData, adminData.editRecord.userReadOnly || EmailSubmitted), adminData.allowAdminTabs));
+                        //Stream.Add(addTab(core, adminMenu, "Bounce&nbsp;Control", EmailBounceEditor.get(core, adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
@@ -360,9 +360,9 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly || EmailSubmitted || EmailSent, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Groups", EmailRuleEditor.get(core, adminData, adminData.editRecord.userReadOnly || EmailSubmitted || EmailSent), adminData.allowAdminTabs));
-                        Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Topics", EmailTopicEditor.get(core, adminData, adminData.editRecord.userReadOnly || EmailSubmitted || EmailSent), adminData.allowAdminTabs));
-                        Stream.Add(addTab(core, adminMenu, "Bounce&nbsp;Control", EmailBounceEditor.get(core, adminData), adminData.allowAdminTabs));
+                        //Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Groups", EmailRuleEditor.get(core, adminData, adminData.editRecord.userReadOnly || EmailSubmitted || EmailSent), adminData.allowAdminTabs));
+                        //Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Topics", EmailTopicEditor.get(core, adminData, adminData.editRecord.userReadOnly || EmailSubmitted || EmailSent), adminData.allowAdminTabs));
+                        //Stream.Add(addTab(core, adminMenu, "Bounce&nbsp;Control", EmailBounceEditor.get(core, adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);

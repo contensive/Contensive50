@@ -62,12 +62,12 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- new build
                 // 20171029 -- upgrading should restore base collection fields as a fix to deleted required fields
-                const string baseCollectionFilename = "aoBase5.xml";
+                const string baseCollectionFilename = "aoBase51.xml";
                 string baseCollectionXml = core.programFiles.readFileText(baseCollectionFilename);
                 if (string.IsNullOrEmpty(baseCollectionXml)) {
                     //
                     // -- base collection notfound
-                    throw new GenericException("Cannot load [" + core.programFiles.localAbsRootPath + "aoBase5.xml]");
+                    throw new GenericException("Cannot load [" + core.programFiles.localAbsRootPath + "aoBase51.xml]");
                 }
                 {
                     //

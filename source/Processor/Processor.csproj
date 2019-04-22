@@ -331,8 +331,9 @@
   <ItemGroup>
     <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow2.html" />
     <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow.html" />
-    <Content Include="aoBase5.xml">
+    <Content Include="aoBase51.xml">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Licenses\clearscript-license.txt" />
     <Content Include="Licenses\v8-license.txt" />
