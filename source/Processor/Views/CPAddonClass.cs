@@ -183,8 +183,9 @@ namespace Contensive.Processor {
             List<string> ignoreList2 = new List<string>();
             string logPrefix = "CPUtilsClass.installCollectionsFromFolder";
             var collectionsInstalledList = new List<string>();
+            var collectionsDownloaded = new List<string>();
             var context = new Stack<string>(new string[] { "Api call cp.addon.InstallCollectionFromFolder [" + privateFolder + "]" });
-            return CollectionController.installCollectionsFromPrivateFolder(cp.core, context, privateFolder, ref ignoreUserMessage, ref collectionsInstalledList, false, false, ref ignoreList2, logPrefix, true);
+            return CollectionController.installCollectionsFromPrivateFolder(cp.core, context, privateFolder, ref ignoreUserMessage, ref collectionsInstalledList, false, false, ref ignoreList2, logPrefix, true, ref collectionsDownloaded);
         }
         //
         public override int InstallCollectionsFromFolderAsync(string privateFolder, bool deleteFolderWhenDone) { throw new NotImplementedException(); }

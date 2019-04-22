@@ -523,7 +523,8 @@ namespace Contensive.Addons.SafeAddonManager {
                             if (core.privateFiles.pathExists(privateFilesInstallPath)) {
                                 string logPrefix = "SafeModeAddonManager";
                                 var context = new Stack<string>(new string[] { "AddonManager install from path [" + privateFilesInstallPath + "]" });
-                                UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core,context, privateFilesInstallPath, ref ErrorMessage, ref collectionsInstalledList, false, true, ref nonCriticalErrorList, logPrefix, true);
+                                var collectionsDownloaded = new List<string>();
+                                UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core,context, privateFilesInstallPath, ref ErrorMessage, ref collectionsInstalledList, false, true, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
                                         ErrorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");

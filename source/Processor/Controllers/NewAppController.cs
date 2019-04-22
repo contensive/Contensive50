@@ -32,7 +32,6 @@ namespace Contensive.Processor.Controllers {
                 //
                 LogController.logInfo(core, "AppBuilderController.upgrade, app [" + core.appConfig.name + "], repair [" + repair.ToString() + "]");
                 string logPrefix = "upgrade[" + core.appConfig.name + "]";
-                var installedCollections = new List<string>();
                 //
                 {
                     string DataBuildVersion = core.siteProperties.dataBuildVersion;
@@ -63,7 +62,7 @@ namespace Contensive.Processor.Controllers {
                     // -- verify base collection
                     LogController.logInfo(core, logPrefix + ", install base collection");
                     var context = new Stack<string>(new string[] { "NewAppController.upgrade call installbasecollection, repair [" + repair.ToString() + "]" });
-                    CollectionController.installBaseCollection(core, context, isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                    CollectionController.installBaseCollection(core, context, isNewBuild, repair, ref nonCriticalErrorList, logPrefix);
                     //
                     // -- verify iis configuration
                     LogController.logInfo(core, logPrefix + ", verify iis configuration");
@@ -218,122 +217,6 @@ namespace Contensive.Processor.Controllers {
                     {
                         LogController.logInfo(core, logPrefix + ", internal upgrade complete, set Buildversion to " + core.codeVersion());
                         core.siteProperties.setProperty("BuildVersion", core.codeVersion());
-                            // deprecated, we no longer upgrade all collections
-                        ////
-                        //// ----- Upgrade local collections
-                        //{
-                        //    string ErrorMessage = "";
-                        //    LogController.logInfo(core, logPrefix + ", upgrading All Local Collections to new server build.");
-                        //    bool UpgradeOK = CollectionController.upgradeInstalledCollectionsFromRegistry(core, ref ErrorMessage, isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
-                        //    if (!string.IsNullOrEmpty(ErrorMessage)) {
-                        //        throw (new GenericException("Unexpected exception"));
-                        //    } else if (!UpgradeOK) {
-                        //        throw (new GenericException("Unexpected exception"));
-                        //    }
-                        //    //
-                        //    // ----- Upgrade all collection for this app (in case collections were installed before the upgrade
-                        //    string Collectionname = null;
-                        //    string CollectionGuid = null;
-                        //    bool localCollectionFound = false;
-                        //    LogController.logInfo(core, logPrefix + ", Checking all installed collections for upgrades from Collection Library...Open collectons.xml");
-                        //    try {
-                        //        XmlDocument Doc = new XmlDocument();
-                        //        Doc.LoadXml(CollectionController.getLocalCollectionStoreListXml(core));
-                        //        if (true) {
-                        //            if (GenericController.vbLCase(Doc.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
-                        //                throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
-                        //            } else {
-                        //                if (GenericController.vbLCase(Doc.DocumentElement.Name) == "collectionlist") {
-                        //                    //
-                        //                    // now go through each collection in this app and check the last updated agains the one here
-                        //                    //
-                        //                    LogController.logInfo(core, logPrefix + ", Open site collectons, iterate through all collections");
-                        //                    //Dim dt As DataTable
-                        //                    DataTable dt = core.db.executeQuery("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)");
-                        //                    if (dt.Rows.Count > 0) {
-                        //                        int rowptr = 0;
-                        //                        for (rowptr = 0; rowptr < dt.Rows.Count; rowptr++) {
-
-                        //                            ErrorMessage = "";
-                        //                            CollectionGuid = GenericController.vbLCase(dt.Rows[rowptr]["ccguid"].ToString());
-                        //                            Collectionname = dt.Rows[rowptr]["name"].ToString();
-                        //                            LogController.logInfo(core, logPrefix + ", checking collection [" + Collectionname + "], guid [" + CollectionGuid + "]");
-                        //                            if (CollectionGuid != "{7c6601a7-9d52-40a3-9570-774d0d43d758}") {
-                        //                                //
-                        //                                // upgrade all except base collection from the local collections
-                        //                                //
-                        //                                localCollectionFound = false;
-                        //                                bool upgradeCollection = false;
-                        //                                DateTime LastChangeDate = GenericController.encodeDate(dt.Rows[rowptr]["LastChangeDate"]);
-                        //                                if (LastChangeDate == DateTime.MinValue) {
-                        //                                    //
-                        //                                    // app version has no lastchangedate
-                        //                                    //
-                        //                                    upgradeCollection = true;
-                        //                                    appendUpgradeLog(core, core.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection installed in the application has no LastChangeDate. It may have been installed manually.");
-                        //                                } else {
-                        //                                    //
-                        //                                    // compare to last change date in collection config file
-                        //                                    //
-                        //                                    string LocalGuid = "";
-                        //                                    DateTime LocalLastChangeDate = DateTime.MinValue;
-                        //                                    foreach (XmlNode LocalListNode in Doc.DocumentElement.ChildNodes) {
-                        //                                        switch (GenericController.vbLCase(LocalListNode.Name)) {
-                        //                                            case "collection":
-                        //                                                foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
-                        //                                                    switch (GenericController.vbLCase(CollectionNode.Name)) {
-                        //                                                        case "guid":
-                        //                                                            //
-                        //                                                            LocalGuid = GenericController.vbLCase(CollectionNode.InnerText);
-                        //                                                            break;
-                        //                                                        case "lastchangedate":
-                        //                                                            //
-                        //                                                            LocalLastChangeDate = GenericController.encodeDate(CollectionNode.InnerText);
-                        //                                                            break;
-                        //                                                    }
-                        //                                                }
-                        //                                                break;
-                        //                                        }
-                        //                                        if (CollectionGuid == GenericController.vbLCase(LocalGuid)) {
-                        //                                            localCollectionFound = true;
-                        //                                            LogController.logInfo(core, logPrefix + ", local collection found");
-                        //                                            if (LocalLastChangeDate != DateTime.MinValue) {
-                        //                                                if (LocalLastChangeDate > LastChangeDate) {
-                        //                                                    appendUpgradeLog(core, core.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.");
-                        //                                                    upgradeCollection = true;
-                        //                                                }
-                        //                                            }
-                        //                                            break;
-                        //                                        }
-                        //                                    }
-                        //                                }
-                        //                                ErrorMessage = "";
-                        //                                if (!localCollectionFound) {
-                        //                                    LogController.logInfo(core, logPrefix + ", site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
-                        //                                    bool addonInstallOk = CollectionController.installCollectionFromRegistry(core, CollectionGuid, ref ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
-                        //                                    if (!addonInstallOk) {
-                        //                                        //
-                        //                                        // this may be OK so log, but do not call it an error
-                        //                                        //
-                        //                                        LogController.logInfo(core, logPrefix + ", site collection [" + Collectionname + "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" + CollectionGuid + "]");
-                        //                                    }
-                        //                                } else {
-                        //                                    if (upgradeCollection) {
-                        //                                        LogController.logInfo(core, logPrefix + ", upgrading collection");
-                        //                                        CollectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections, true);
-                        //                                    }
-                        //                                }
-                        //                            }
-                        //                        }
-                        //                    }
-                        //                }
-                        //            }
-                        //        }
-
-                        //    } catch (Exception ex9) {
-                        //        LogController.handleError(core, ex9);
-                        //    }
-                        //}
                     }
                     //
                     // ----- Explain, put up a link and exit without continuing

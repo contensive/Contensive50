@@ -115,82 +115,57 @@ namespace Contensive.CLI {
                     appConfig.domainList.Add(domainName);
                     //
                     // -- file architectur
-                    string appArchitecture;
                     if (!promptForArguments) {
-                        //
-                        // -- default file archtecture -- localmode
-                        appArchitecture = "1";
-                        appConfig.localWwwPath = cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\www\\";
-                        appConfig.localFilesPath = cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files\\";
-                        appConfig.localPrivatePath = cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private\\";
-                        appConfig.localTempPath = cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\temp\\";
-                        appConfig.remoteWwwPath = "";
-                        appConfig.remoteFilePath = "";
-                        appConfig.remotePrivatePath = "";
-                        appConfig.cdnFileUrl = "/" + appConfig.name + "/files/";
-                        //
+                        if (cp.core.serverConfig.isLocalFileSystem) {
+                            //
+                            // -- no prompts, local file system
+                            appConfig.localWwwPath = cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\www\\";
+                            appConfig.localFilesPath = cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files\\";
+                            appConfig.localPrivatePath = cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private\\";
+                            appConfig.localTempPath = cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\temp\\";
+                            appConfig.remoteWwwPath = "";
+                            appConfig.remoteFilePath = "";
+                            appConfig.remotePrivatePath = "";
+                            appConfig.cdnFileUrl = "/" + appConfig.name + "/files/";
+                        } else {
+                            //
+                            // -- no prompts, remote file system
+                            appConfig.localWwwPath = cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\www\\";
+                            appConfig.localFilesPath = cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files\\";
+                            appConfig.localPrivatePath = cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private\\";
+                            appConfig.localTempPath = cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\temp\\";
+                            appConfig.remoteWwwPath = "/" + appConfig.name + "/www/";
+                            appConfig.remoteFilePath = "/" + appConfig.name + "/files/";
+                            appConfig.remotePrivatePath = "/" + appConfig.name + "/private/";
+                            appConfig.cdnFileUrl = "https://s3.amazonaws.com/" + cp.core.serverConfig.awsBucketName + "/" + appConfig.name + "/files/";
+                        }
                     } else {
-                        Console.Write("\nSelect application architecture.");
-                        Console.Write("\n1 = Local Mode, scale-up architecture. Files are stored and accessed on the local server.");
-                        Console.Write("\n2 = Remote Mode, scale-out architecture. wwwRoot, public files and private files are stored in subfolders of an S3 Bucket. A local mirror is used to file transfer.");
-                        appArchitecture = GenericController.promptForReply("Enter 1 or 2", "1");
-                        switch (appArchitecture) {
-                            case "1":
-                                //
-                                // Local Mode, compatible with v4.1, cdn in appRoot folder as /" + appConfig.name + "/files/
-                                //
-                                appConfig.localWwwPath = GenericController.promptForReply("\napp files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\www\\");
-                                appConfig.localFilesPath = GenericController.promptForReply("cdn files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files\\");
-                                appConfig.localPrivatePath = GenericController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private\\");
-                                appConfig.localTempPath = GenericController.promptForReply("temp files (ephemeral storage)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\temp\\");
-                                appConfig.remoteWwwPath = "";
-                                appConfig.remoteFilePath = "";
-                                appConfig.remotePrivatePath = "";
-                                appConfig.cdnFileUrl = GenericController.promptForReply("files Url (typically a virtual path on the application website)", "/" + appConfig.name + "/files/");
-                                break;
-                            case "2":
-                                //
-                                // 2 Scale Mode, cdn as AWS S3 bucket, FilePrivate as AWS S3 bucket"
-                                //
-                                appConfig.localWwwPath = GenericController.promptForReply("\napp files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\www\\");
-                                appConfig.localFilesPath = GenericController.promptForReply("cdn files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files\\");
-                                appConfig.localPrivatePath = GenericController.promptForReply("private files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private\\");
-                                appConfig.localTempPath = GenericController.promptForReply("temp files (local only storage)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\temp\\");
-                                appConfig.remoteWwwPath = GenericController.promptForReply("AWS S3 folder for app www storage", "/" + appConfig.name + "/www/");
-                                appConfig.remoteFilePath = GenericController.promptForReply("AWS S3 folder for cdn file storage", "/" + appConfig.name + "/files/");
-                                appConfig.remotePrivatePath = GenericController.promptForReply("AWS S3 folder for private file storage", "/" + appConfig.name + "/private/");
-                                appConfig.cdnFileUrl = GenericController.promptForReply("files Url (typically a public folder in CDN website)", "https://s3.amazonaws.com/" + cp.core.serverConfig.awsBucketName + "/" + appConfig.name + "/files/");
-                                break;
-                                //case "4":
-                                //    //
-                                //    // Local Mode, cdn in appRoot folder as /cdn/
-                                //    //
-                                //    appConfig.localWwwPath = cliController.promptForReply("www files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\wwwRoot");
-                                //    appConfig.localFilesPath = cliController.promptForReply("cdn files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files");
-                                //    appConfig.localPrivatePath = cliController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private");
-                                //    appConfig.localTempPath = cliController.promptForReply("temp files (ephemeral storage)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\temp");
-                                //    cdnDomainName = domainName;
-                                //    appConfig.remoteFilesPath = cliController.promptForReply("CDN files Url (virtual path)", "/cdn/");
-                                //    break;
-                                //case "3":
-                                //    //
-                                //    // 3 Local Mode, cdn as second iis site as cdn." + appConfig.name
-                                //    //
-                                //    appConfig.localWwwPath = cliController.promptForReply("App Root", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\wwwRoot");
-                                //    appConfig.localFilesPath = cliController.promptForReply("CDN files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files");
-                                //    appConfig.localPrivatePath = cliController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private");
-                                //    appConfig.localTempPath = cliController.promptForReply("temp files (ephemeral storage)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\temp");
-                                //    cdnDomainName = cliController.promptForReply("domain for CDN", domainName);
-                                //    if (cdnDomainName == domainName)
-                                //    {
-                                //        appConfig.remoteFilesPath = cliController.promptForReply("CDN files Url (virtual path)", "/cdn/");
-                                //    }
-                                //    else
-                                //    {
-                                //        appConfig.remoteFilesPath = cliController.promptForReply("CDN files Url (website)", "http://" + cdnDomainName + "/");
-                                //    }
-                                //    cdnDomainName = domainName;
-                                //    break;
+                        if(cp.core.serverConfig.isLocalFileSystem) {
+                            //
+                            // Server is local file Mode, compatible with v4.1, cdn in appRoot folder as /" + appConfig.name + "/files/
+                            //
+                            Console.Write("\nThe Server Group is configured for a local filesystem (Local Mode, scale-up architecture. Files are stored and accessed on the local server.)");
+                            appConfig.localWwwPath = GenericController.promptForReply("\napp files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\www\\");
+                            appConfig.localFilesPath = GenericController.promptForReply("cdn files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files\\");
+                            appConfig.localPrivatePath = GenericController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private\\");
+                            appConfig.localTempPath = GenericController.promptForReply("temp files (ephemeral storage)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\temp\\");
+                            appConfig.remoteWwwPath = "";
+                            appConfig.remoteFilePath = "";
+                            appConfig.remotePrivatePath = "";
+                            appConfig.cdnFileUrl = GenericController.promptForReply("files Url (typically a virtual path on the application website)", "/" + appConfig.name + "/files/");
+                        } else {
+                            //
+                            // Server is remote file mode
+                            //
+                            Console.Write("\nThe Server Group is configured for a remote filesystem.");
+                            appConfig.localWwwPath = GenericController.promptForReply("\napp files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\www\\");
+                            appConfig.localFilesPath = GenericController.promptForReply("cdn files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files\\");
+                            appConfig.localPrivatePath = GenericController.promptForReply("private files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private\\");
+                            appConfig.localTempPath = GenericController.promptForReply("temp files (local only storage)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\temp\\");
+                            appConfig.remoteWwwPath = GenericController.promptForReply("AWS S3 folder for app www storage", "/" + appConfig.name + "/www/");
+                            appConfig.remoteFilePath = GenericController.promptForReply("AWS S3 folder for cdn file storage", "/" + appConfig.name + "/files/");
+                            appConfig.remotePrivatePath = GenericController.promptForReply("AWS S3 folder for private file storage", "/" + appConfig.name + "/private/");
+                            appConfig.cdnFileUrl = GenericController.promptForReply("files Url (typically a public folder in CDN website)", "https://s3.amazonaws.com/" + cp.core.serverConfig.awsBucketName + "/" + appConfig.name + "/files/");
                         }
                     }
                     Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Create local folders.");

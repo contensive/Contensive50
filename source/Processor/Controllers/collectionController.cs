@@ -18,6 +18,8 @@ using NLog;
 
 namespace Contensive.Processor.Controllers {
     //
+    // install = means everything nessesary
+    // buildfolder = means download and build out site
     //
     // todo: rework how adds are installed, this change can be done after weave launch
     // - current addon folder is called local addon folder and not in shared environment /local/addons
@@ -53,7 +55,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="nonCriticalErrorList"></param>
         /// <param name="logPrefix"></param>
         /// <param name="collectionsInstalledList">A list of collection guids that are already installed this pass. All collections that install will be added to it. </param>
-        public static void installBaseCollection(CoreController core, Stack<string> contextLog, bool isNewBuild, bool isRepairMode, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList) {
+        public static void installBaseCollection(CoreController core, Stack<string> contextLog, bool isNewBuild, bool isRepairMode, ref List<string> nonCriticalErrorList, string logPrefix) {
             try {
                 contextLog.Push("installBaseCollection");
                 traceContextLog(core, contextLog);
@@ -82,6 +84,7 @@ namespace Contensive.Processor.Controllers {
                         core.programFiles.copyFile(baseCollectionFilename, installPrivatePath + baseCollectionFilename, core.privateFiles);
                         string installErrorMessage = "";
                         string installedCollectionGuid = "";
+                        var collectionsInstalledList = new List<string>();
                         if (!installCollectionFromPrivateFile(core, contextLog, installPrivatePath + baseCollectionFilename, ref installErrorMessage, ref installedCollectionGuid, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList)) {
                             throw new GenericException(installErrorMessage);
                         }
@@ -104,7 +107,19 @@ namespace Contensive.Processor.Controllers {
         /// Primary collection installation method. 
         /// If collection not already installed during this install, mark it installed and install
         /// </summary>
-        public static bool installCollectionFromCollectionFolder(CoreController core, Stack<string> contextLog, string collectionGuid, ref string return_ErrorMessage, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList, bool includeBaseMetaDataInstall) {
+        /// <param name="core"></param>
+        /// <param name="contextLog"></param>
+        /// <param name="collectionGuid"></param>
+        /// <param name="return_ErrorMessage"></param>
+        /// <param name="IsNewBuild"></param>
+        /// <param name="repair"></param>
+        /// <param name="nonCriticalErrorList"></param>
+        /// <param name="logPrefix"></param>
+        /// <param name="collectionsInstalledList"></param>
+        /// <param name="includeBaseMetaDataInstall"></param>
+        /// <param name="collectionsDownloaded">Collections downloaded but not installed yet. Do not need to download them again.</param>
+        /// <returns></returns>
+        public static bool installCollectionFromCollectionFolder(CoreController core, Stack<string> contextLog, string collectionGuid, ref string return_ErrorMessage, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList, bool includeBaseMetaDataInstall, ref List<string> collectionsDownloaded) {
             bool result = false;
             try {
                 //
@@ -112,9 +127,11 @@ namespace Contensive.Processor.Controllers {
                 traceContextLog(core, contextLog);
                 //
                 if (collectionsInstalledList.Contains(collectionGuid.ToLower())) {
-                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder not found.");
-                    return_ErrorMessage += "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>";
-                    return false;
+                    //
+                    // -- this collection has already been installed during this installation process. Skip and return success
+                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", [" + collectionGuid + "] was not installed because it was previously installed during this installation.");
+                    //return_ErrorMessage += "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>";
+                    return true;
                 }
                 // -- collection needs to be 
                 if (!collectionsInstalledList.Contains(collectionGuid.ToLower())) { collectionsInstalledList.Add(collectionGuid.ToLower()); }
@@ -317,7 +334,7 @@ namespace Contensive.Processor.Controllers {
                                                                 } else {
                                                                     //
                                                                     // -- all included collections should already be installed, because buildfolder is called before call
-                                                                    installCollectionFromCollectionFolder(core, contextLog, ChildCollectionGUID, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList,false);
+                                                                    installCollectionFromCollectionFolder(core, contextLog, ChildCollectionGUID, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, false, ref collectionsDownloaded);
                                                                     //installCollectionFromLibrary(core, contextLog, ChildCollectionGUID, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList);
                                                                 }
                                                                 break;
@@ -829,8 +846,10 @@ namespace Contensive.Processor.Controllers {
                                                     foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
                                                         switch (GenericController.vbLCase(metaDataSection.Name)) {
                                                             case "data":
+                                                                int recordPtr = 0;
                                                                 foreach (XmlNode ContentNode in metaDataSection.ChildNodes) {
                                                                     if (ContentNode.Name.ToLowerInvariant() == "record") {
+                                                                        recordPtr += 1;
                                                                         string ContentName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "content", "");
                                                                         if (string.IsNullOrEmpty(ContentName)) {
                                                                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
@@ -866,7 +885,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                     }
                                                                                                 }
                                                                                                 if (IsFieldFound) {
-                                                                                                    string recordGuid = FieldNode.InnerText;
+                                                                                                    string fieldValue = FieldNode.InnerText;
                                                                                                     switch (fieldTypeId) {
                                                                                                         case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
                                                                                                         case CPContentBaseClass.fileTypeIdEnum.Redirect: {
@@ -877,25 +896,28 @@ namespace Contensive.Processor.Controllers {
                                                                                                         case CPContentBaseClass.fileTypeIdEnum.Lookup: {
                                                                                                                 //
                                                                                                                 // read in text value, if a guid, use it, otherwise assume name
-                                                                                                                if (FieldLookupContentID != 0) {
-                                                                                                                    var lookupContentMetadata = ContentMetadataModel.create(core, FieldLookupContentID);
-                                                                                                                    if (lookupContentMetadata != null) {
-                                                                                                                        int fieldLookupId = lookupContentMetadata.getRecordId(core, recordGuid);
-                                                                                                                        if (fieldLookupId <= 0) {
-                                                                                                                            return_ErrorMessage += "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
-                                                                                                                        } else {
-                                                                                                                            csData.set(FieldName, fieldLookupId);
+                                                                                                                if (!string.IsNullOrWhiteSpace(fieldValue)) {
+                                                                                                                    if (FieldLookupContentID != 0) {
+                                                                                                                        var lookupContentMetadata = ContentMetadataModel.create(core, FieldLookupContentID);
+                                                                                                                        if (lookupContentMetadata != null) {
+                                                                                                                            int fieldLookupId = lookupContentMetadata.getRecordId(core, fieldValue);
+                                                                                                                            if (fieldLookupId <= 0) {
+                                                                                                                                return_ErrorMessage += "<P>Warning: In collection [" + CollectionName + "], data section, record number [" + recordPtr + "], the lookup field [" + FieldName + "], value [" + fieldValue + "] was not found in lookup content [" + lookupContentMetadata.name + "].</P>";
+                                                                                                                            } else {
+                                                                                                                                csData.set(FieldName, fieldLookupId);
+                                                                                                                            }
                                                                                                                         }
+                                                                                                                    } else if (fieldValue.IsNumeric()) {
+                                                                                                                        //
+                                                                                                                        // must be lookup list
+                                                                                                                        csData.set(FieldName, fieldValue);
                                                                                                                     }
-                                                                                                                } else if (recordGuid.IsNumeric()) {
-                                                                                                                    //
-                                                                                                                    // must be lookup list
-                                                                                                                    csData.set(FieldName, recordGuid);
+
                                                                                                                 }
                                                                                                                 break;
                                                                                                             }
                                                                                                         default: {
-                                                                                                                csData.set(FieldName, recordGuid);
+                                                                                                                csData.set(FieldName, fieldValue);
                                                                                                                 break;
                                                                                                             }
                                                                                                     }
@@ -981,8 +1003,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="nonCriticalErrorList"></param>
         /// <param name="logPrefix"></param>
         /// <param name="includeBaseMetaDataInstall"></param>
+        /// <param name="collectionsDownloaded">List of collections that have been downloaded during this istall pass but have not been installed yet. Do no need to download them again.</param>
         /// <returns></returns>
-        public static bool installCollectionsFromPrivateFolder(CoreController core, Stack<string> contextLog, string installPrivatePath, ref string return_ErrorMessage, ref List<string> collectionsInstalledList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, bool includeBaseMetaDataInstall) {
+        public static bool installCollectionsFromPrivateFolder(CoreController core, Stack<string> contextLog, string installPrivatePath, ref string return_ErrorMessage, ref List<string> collectionsInstalledList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, bool includeBaseMetaDataInstall, ref List<string> collectionsDownloaded) {
             bool returnSuccess = false;
             try {
                 contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + installPrivatePath + "]");
@@ -1000,7 +1023,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
                 } else {
                     foreach (string collectionGuid in collectionsToInstall) {
-                        if (!installCollectionFromCollectionFolder(core, contextLog, collectionGuid, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, includeBaseMetaDataInstall)) {
+                        if (!installCollectionFromCollectionFolder(core, contextLog, collectionGuid, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, includeBaseMetaDataInstall, ref collectionsDownloaded)) {
                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
                             break;
                         }
@@ -1025,27 +1048,29 @@ namespace Contensive.Processor.Controllers {
         /// Calls installCollectionFromCollectionFolder.
         /// </summary>
         public static bool installCollectionFromPrivateFile(CoreController core, Stack<string> contextLog, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList) {
-            bool returnSuccess = false;
+            bool returnSuccess = true;
             try {
                 contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + pathFilename + "]");
                 traceContextLog(core, contextLog);
                 DateTime CollectionLastChangeDate;
                 //
                 CollectionLastChangeDate = DateTime.Now;
-                var collectionsToInstallList = new List<string>();
+                var collectionsDownloaded = new List<string>();
                 var collectionsBuildingFolder = new List<string>();
-                if (!buildCollectionFolderFromCollectionZip(core, contextLog, pathFilename, CollectionLastChangeDate, ref return_ErrorMessage, ref collectionsToInstallList, ref collectionsInstalledList, ref collectionsBuildingFolder)) {
+                if (!buildCollectionFolderFromCollectionZip(core, contextLog, pathFilename, CollectionLastChangeDate, ref return_ErrorMessage, ref collectionsDownloaded, ref collectionsInstalledList, ref collectionsBuildingFolder)) {
                     //
                     // BuildLocal failed, log it and do not upgrade
                     //
+                    returnSuccess = false;
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
-                } else if (collectionsToInstallList.Count > 0) {
-                    return_CollectionGUID = collectionsToInstallList.First();
-                    foreach (var collection in collectionsToInstallList) {
-                        if (!installCollectionFromCollectionFolder(core, contextLog, collection, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, true)) {
+                } else if (collectionsDownloaded.Count > 0) {
+                    return_CollectionGUID = collectionsDownloaded.First();
+                    foreach (var collection in collectionsDownloaded) {
+                        if (!installCollectionFromCollectionFolder(core, contextLog, collection, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, true, ref collectionsDownloaded)) {
                             //
                             // Upgrade all apps failed
                             //
+                            returnSuccess = false;
                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
                         }
                     }
@@ -1098,8 +1123,8 @@ namespace Contensive.Processor.Controllers {
                     if (downloadCollectionFromLibrary(core, privateFilesDownloadPath, collectionGuid, ref CollectionLastChangeDate, ref return_ErrorMessage)) {
                         //
                         // -- build the collection folders for all collection files in the download path and created a list of collection Guids that need to be installed
-                        var collectionsToInstallList = new List<string>();
-                        installCollectionsFromPrivateFolder(core, contextLog, privateFilesDownloadPath, ref return_ErrorMessage, ref collectionsInstalledList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, true);
+                        var collectionsDownloaded = new List<string>();
+                        installCollectionsFromPrivateFolder(core, contextLog, privateFilesDownloadPath, ref return_ErrorMessage, ref collectionsInstalledList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
                     }
                     //
                     core.privateFiles.deleteFolder(privateFilesDownloadPath);
@@ -1161,11 +1186,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="CollectionLastChangeDate"></param>
         /// <param name="collectionGuid"></param>
         /// <param name="return_ErrorMessage"></param>
-        /// <param name="collectionsToInstallList">collection guids that have been saved to the collection folder and need to be saved to the database druing this install.</param>
+        /// <param name="collectionsDownloaded">collection guids that have been saved to the collection folder and need to be saved to the database druing this install.</param>
         /// <param name="collectionsInstalledList">collection guids that have been saved to the database during this install.</param>
         /// <param name="collectionsBuildingFolder">folder building is recursive. These are the collection guids whose folders are currently being built.</param>
         /// <returns></returns>
-        public static bool buildCollectionFolderFromCollectionZip(CoreController core, Stack<string> contextLog, string sourcePrivateFolderPathFilename, DateTime CollectionLastChangeDate, ref string return_ErrorMessage, ref List<string> collectionsToInstallList, ref List<string> collectionsInstalledList, ref List<string> collectionsBuildingFolder) {
+        public static bool buildCollectionFolderFromCollectionZip(CoreController core, Stack<string> contextLog, string sourcePrivateFolderPathFilename, DateTime CollectionLastChangeDate, ref string return_ErrorMessage, ref List<string> collectionsDownloaded, ref List<string> collectionsInstalledList, ref List<string> collectionsBuildingFolder) {
             try {
                 //
                 contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + sourcePrivateFolderPathFilename + "]");
@@ -1232,7 +1257,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         string Collectionname = XmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "name", "");
                                         string collectionGuid = XmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "guid", Collectionname);
-                                        if ((!collectionsInstalledList.Contains(collectionGuid.ToLower())) && (!collectionsToInstallList.Contains(collectionGuid.ToLower()))) {
+                                        if ((!collectionsInstalledList.Contains(collectionGuid.ToLower())) && (!collectionsDownloaded.Contains(collectionGuid.ToLower()))) {
                                             if (string.IsNullOrEmpty(Collectionname)) {
                                                 //
                                                 // ----- Error condition -- it must have a collection name
@@ -1245,7 +1270,7 @@ namespace Contensive.Processor.Controllers {
                                                 // Build Collection folder structure in /Add-ons folder
                                                 //------------------------------------------------------------------
                                                 //
-                                                collectionsToInstallList.Add(collectionGuid.ToLower());
+                                                collectionsDownloaded.Add(collectionGuid.ToLower());
                                                 CollectionFileFound = true;
                                                 if (string.IsNullOrEmpty(collectionGuid)) {
                                                     //
@@ -1348,7 +1373,7 @@ namespace Contensive.Processor.Controllers {
                                                                     return_ErrorMessage = statusMsg + ". The installation can not continue because an imported collection could not be downloaded because it does not include a valid GUID.";
                                                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, return message [" + return_ErrorMessage + "]");
                                                                 } else {
-                                                                    if ((!collectionsBuildingFolder.Contains(ChildCollectionGUID)) && (!collectionsToInstallList.Contains(ChildCollectionGUID)) && (!collectionsInstalledList.Contains(ChildCollectionGUID))) {
+                                                                    if ((!collectionsBuildingFolder.Contains(ChildCollectionGUID)) && (!collectionsDownloaded.Contains(ChildCollectionGUID)) && (!collectionsInstalledList.Contains(ChildCollectionGUID))) {
                                                                         //
                                                                         // -- add to the list of building folders to block recursive loop
                                                                         collectionsBuildingFolder.Add(ChildCollectionGUID);
@@ -1374,7 +1399,7 @@ namespace Contensive.Processor.Controllers {
                                                                             //
                                                                             // install the downloaded file
                                                                             //
-                                                                            if (!buildCollectionFoldersFromCollectionZips(core, contextLog, ChildWorkingPath, ChildCollectionLastChangeDate, ref collectionsToInstallList, ref return_ErrorMessage, ref collectionsInstalledList, ref collectionsBuildingFolder)) {
+                                                                            if (!buildCollectionFoldersFromCollectionZips(core, contextLog, ChildWorkingPath, ChildCollectionLastChangeDate, ref collectionsDownloaded, ref return_ErrorMessage, ref collectionsInstalledList, ref collectionsBuildingFolder)) {
                                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, [" + statusMsg + "], BuildLocalCollectionFolder returned error state, message [" + return_ErrorMessage + "]");
                                                                                 if (string.IsNullOrEmpty(return_ErrorMessage)) {
                                                                                     return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error installing the included collection file, guid [" + ChildCollectionGUID + "].";
