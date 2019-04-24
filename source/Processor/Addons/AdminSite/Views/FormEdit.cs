@@ -278,7 +278,9 @@ namespace Contensive.Addons.AdminSite {
                         EmailSubmitted = false;
                         if (adminData.editRecord.id != 0) {
                             if (adminData.editRecord.fieldsLc.ContainsKey("testmemberid")) {
-                                adminData.editRecord.fieldsLc["testmemberid"].value = core.session.user.id;
+                                if (encodeInteger(adminData.editRecord.fieldsLc["testmemberid"].value) == 0) {
+                                    adminData.editRecord.fieldsLc["testmemberid"].value = core.session.user.id;
+                                }
                             }
                         }
                         string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
