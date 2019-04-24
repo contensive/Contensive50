@@ -505,6 +505,7 @@ namespace Contensive.Processor.Controllers {
                 var state = Models.Db.StateModel.createByUniqueName(core, Name);
                 if (state == null) state = StateModel.addEmpty(core);
                 state.abbreviation = Abbreviation;
+                state.name = Name;
                 state.salesTax = SaleTax;
                 state.countryID = CountryID;
                 state.save(core, true);
