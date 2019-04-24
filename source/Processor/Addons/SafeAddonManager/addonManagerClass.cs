@@ -689,8 +689,6 @@ namespace Contensive.Addons.SafeAddonManager {
                                             bool IsOnServer = false;
                                             bool IsOnSite = false;
                                             if (RowPtr >= Cells3.GetUpperBound(0)) {
-                                                //todo  NOTE: The following block reproduces what 'ReDim Preserve' does behind the scenes in VB:
-                                                //ORIGINAL LINE: ReDim Preserve Cells3(RowPtr + 100, ColumnCnt)
                                                 string[,] tempVar2 = new string[RowPtr + 101, ColumnCnt + 1];
                                                 if (Cells3 != null) {
                                                     for (int Dimension0 = 0; Dimension0 < Cells3.GetLength(0); Dimension0++) {

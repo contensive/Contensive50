@@ -2060,10 +2060,7 @@ namespace Contensive.Processor.Controllers {
                                         if (PosACInstanceID != 0) {
                                             //
                                             // found the instance
-                                            //
                                             PosACInstanceID = PosACInstanceID + 13;
-                                            //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                            //ORIGINAL LINE: Exit Do
                                             goto ExitLabel1;
                                         }
                                         break;

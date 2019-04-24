@@ -19,7 +19,7 @@ namespace Contensive.Addons.Primitives {
         //
         //====================================================================================================
         /// <summary>
-        /// getFieldEditorPreference remote method
+        /// legacy - getFieldEditorPreference remote method
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>

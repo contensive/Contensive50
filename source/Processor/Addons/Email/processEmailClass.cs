@@ -287,55 +287,6 @@ namespace Contensive.Addons.Email {
                         }
                         csList.close();
                     }
-                    ////
-                    //// Send Conditional Email - Birthday
-                    ////
-                    //using (var CSEmailBig = new CsModel(core)) {
-                    //    string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, ccMembers.ID AS MemberID, ccMemberRules.DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
-                    //    string SQL = "SELECT DISTINCT " + FieldList + " FROM ((((ccEmail"
-                    //        + " LEFT JOIN ccEmailGroups ON ccEmail.ID = ccEmailGroups.EmailID)"
-                    //        + " LEFT JOIN ccGroups ON ccEmailGroups.GroupID = ccGroups.ID)"
-                    //        + " LEFT JOIN ccMemberRules ON ccGroups.ID = ccMemberRules.GroupID)"
-                    //        + " LEFT JOIN ccMembers ON ccMemberRules.MemberID = ccMembers.ID)"
-                    //        + " Where (ccEmail.id Is Not Null)"
-                    //        + " AND (ccEmail.ConditionExpireDate > " + SQLDateNow + " OR ccEmail.ConditionExpireDate IS NULL)"
-                    //        + " AND (ccEmail.ScheduleDate < " + SQLDateNow + " OR ccEmail.ScheduleDate IS NULL)"
-                    //        + " AND (ccEmail.Submitted <> 0)"
-                    //        + " AND (ccEmail.ConditionID = 3)"
-                    //        + " AND (ccGroups.Active <> 0)"
-                    //        + " AND (ccGroups.AllowBulkEmail <> 0)"
-                    //        + " AND ((ccMemberRules.DateExpires is null)or(ccMemberRules.DateExpires > " + SQLDateNow + "))"
-                    //        + " AND (ccMembers.ID IS NOT NULL)"
-                    //        + " AND (ccMembers.Active <> 0)"
-                    //        + " AND (ccMembers.AllowBulkEmail <> 0)"
-                    //        + " AND (ccMembers.BirthdayMonth=" + DateTime.Now.Month + ")"
-                    //        + " AND (ccMembers.BirthdayDay=" + DateTime.Now.Day + ")"
-                    //        + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=ccMembers.ID and ccEmailLog.DateAdded>=" + DbController.encodeSQLDate(DateTime.Now.Date) + "))";
-                    //    CSEmailBig.openSql(SQL, "Default");
-                    //    while (CSEmailBig.ok()) {
-                    //        int emailID = CSEmailBig.getInteger("EmailID");
-                    //        int EmailMemberID = CSEmailBig.getInteger("MemberID");
-                    //        DateTime EmailDateExpires = CSEmailBig.getDate( "DateExpires");
-                    //        //
-                    //        //
-
-                    //        using (var CSEmail = new CsModel(core)) {
-                    //            CSEmail.openRecord("Conditional Email", emailID);
-                    //            if (CSEmail.ok()) {
-                    //                int EmailTemplateID = CSEmail.getInteger("EmailTemplateID");
-                    //                string EmailTemplate = getEmailTemplate(core, EmailTemplateID);
-                    //                string FromAddress = CSEmail.getText("FromAddress");
-                    //                int ConfirmationMemberID = CSEmail.getInteger("testmemberid");
-                    //                bool EmailAddLinkEID = CSEmail.getBoolean("AddLinkEID");
-                    //                string EmailSubject = CSEmail.getText("Subject");
-                    //                string EmailCopy = CSEmail.getText("CopyFilename");
-                    //                string EmailStatus = queueEmailRecord(core, EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, CSEmail.getText("Subject"), CSEmail.getText("CopyFilename"), CSEmail.getBoolean("AllowSpamFooter"), CSEmail.getBoolean("AddLinkEID"), "");
-                    //                queueConfirmationEmail(core, ConfirmationMemberID, 0, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
-                    //            }
-                    //        }
-                    //        CSEmailBig.goNext();
-                    //    }
-                    //}
                     //
                     // -- save this processing date to all email records to document last process, and as a way to block re-process of conditional email
                     core.db.executeNonQuery("update ccemail set lastProcessDate=" + SQLDateNow);

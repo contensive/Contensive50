@@ -951,48 +951,21 @@ namespace Contensive.Addons.AdminSite {
         //
         public static void setIndexSQL( CoreController core, AdminDataModel adminData, IndexConfigClass IndexConfig, ref bool Return_AllowAccess, ref string return_sqlFieldList, ref string return_sqlFrom, ref string return_SQLWhere, ref string return_SQLOrderBy, ref bool return_IsLimitedToSubContent, ref string return_ContentAccessLimitMessage, ref Dictionary<string, bool> FieldUsedInColumns, Dictionary<string, bool> IsLookupFieldValid) {
             try {
-                string LookupQuery = null;
-                string ContentName = null;
-                string SortFieldName = null;
-                //
-                int LookupPtr = 0;
-                string[] lookups = null;
-                string FindWordName = null;
-                string FindWordValue = null;
-                int FindMatchOption = 0;
-                int WCount = 0;
-                string SubContactList = "";
-                int ContentID = 0;
-                int Pos = 0;
-                int Cnt = 0;
-                string[] ListSplit = null;
-                int SubContentCnt = 0;
-                string list = null;
-                string SubQuery = null;
-                int GroupID = 0;
-                string GroupName = null;
-                //Dim FieldName As String
-                int Ptr = 0;
-                bool IncludedInLeftJoin = false;
-                //  Dim SupportWorkflowFields As Boolean
-                int FieldPtr = 0;
-                bool IncludedInColumns = false;
-                //Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
-                //
                 Return_AllowAccess = true;
                 //
                 // ----- Workflow Fields
-                //
                 return_sqlFieldList = return_sqlFieldList + adminData.adminContent.tableName + ".ID";
                 //
                 // ----- From Clause - build joins for Lookup fields in columns, in the findwords, and in sorts
-                //
                 return_sqlFrom = adminData.adminContent.tableName;
+                int FieldPtr = 0;
                 foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
                     ContentFieldMetadataModel field = keyValuePair.Value;
-                    FieldPtr = field.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
-                    IncludedInColumns = false;
-                    IncludedInLeftJoin = false;
+                    //
+                    // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
+                    FieldPtr = field.id; 
+                    bool IncludedInColumns = false;
+                    bool IncludedInLeftJoin = false;
                     if (!IsLookupFieldValid.ContainsKey(field.nameLc)) {
                         IsLookupFieldValid.Add(field.nameLc, false);
                     }
@@ -1001,11 +974,9 @@ namespace Contensive.Addons.AdminSite {
                     }
                     //
                     // test if this field is one of the columns we are displaying
-                    //
                     IncludedInColumns = (IndexConfig.columns.Find(x => (x.Name == field.nameLc)) != null);
                     //
                     // disallow IncludedInColumns if a non-supported field type
-                    //
                     switch (field.fieldTypeId) {
                         case CPContentBaseClass.fileTypeIdEnum.FileCSS:
                         case CPContentBaseClass.fileTypeIdEnum.File:
@@ -1021,7 +992,6 @@ namespace Contensive.Addons.AdminSite {
                             IncludedInColumns = false;
                             break;
                     }
-                    //FieldName = genericController.vbLCase(.Name)
                     if ((field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.MemberSelect) || ((field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Lookup) && (field.lookupContentID != 0))) {
                         //
                         // This is a lookup field -- test if IncludedInLeftJoins
@@ -1029,7 +999,6 @@ namespace Contensive.Addons.AdminSite {
                         if (IndexConfig.findWords.Count > 0) {
                             //
                             // test findwords
-                            //
                             if (IndexConfig.findWords.ContainsKey(field.nameLc)) {
                                 if (IndexConfig.findWords[field.nameLc].MatchOption != FindWordMatchEnum.MatchIgnore) {
                                     IncludedInLeftJoin = true;
@@ -1039,7 +1008,6 @@ namespace Contensive.Addons.AdminSite {
                         if ((!IncludedInLeftJoin) && IndexConfig.sorts.Count > 0) {
                             //
                             // test sorts
-                            //
                             if (IndexConfig.sorts.ContainsKey(field.nameLc.ToLowerInvariant())) {
                                 IncludedInLeftJoin = true;
                             }
@@ -1065,77 +1033,67 @@ namespace Contensive.Addons.AdminSite {
                     if (IncludedInColumns) {
                         //
                         // This field is included in the columns, so include it in the select
-                        //
                         return_sqlFieldList = return_sqlFieldList + " ," + adminData.adminContent.tableName + "." + field.nameLc;
                         FieldUsedInColumns[field.nameLc] = true;
                     }
                 }
                 //
                 // Sub CDef filter
-                //
                 if (IndexConfig.subCDefID > 0) {
                     var contentMetadata = Contensive.Processor.Models.Domain.ContentMetadataModel.create(core, IndexConfig.subCDefID);
                     if ( contentMetadata != null ) { return_SQLWhere += "AND(" + contentMetadata.legacyContentControlCriteria + ")"; }
                 }
                 //
                 // Return_sqlFrom and Where Clause for Groups filter
-                //
                 DateTime rightNow = DateTime.Now;
                 string sqlRightNow = DbController.encodeSQLDate(rightNow);
+                int Ptr = 0;
                 if (adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") {
                     if (IndexConfig.groupListCnt > 0) {
                         for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
-                            GroupName = IndexConfig.groupList[Ptr];
+                            string GroupName = IndexConfig.groupList[Ptr];
                             if (!string.IsNullOrEmpty(GroupName)) {
-                                GroupID = MetadataController.getRecordIdByUniqueName( core,"Groups", GroupName);
+                                int GroupID = MetadataController.getRecordIdByUniqueName(core, "Groups", GroupName);
                                 if (GroupID == 0 && GroupName.IsNumeric()) {
                                     GroupID = GenericController.encodeInteger(GroupName);
                                 }
                                 string groupTableAlias = "GroupFilter" + Ptr;
                                 return_SQLWhere += "AND(" + groupTableAlias + ".GroupID=" + GroupID + ")and((" + groupTableAlias + ".dateExpires is null)or(" + groupTableAlias + ".dateExpires>" + sqlRightNow + "))";
                                 return_sqlFrom = "(" + return_sqlFrom + " INNER JOIN ccMemberRules AS GroupFilter" + Ptr + " ON GroupFilter" + Ptr + ".MemberID=ccMembers.ID)";
-                                //Return_sqlFrom = "(" & Return_sqlFrom & " INNER JOIN ccMemberRules AS GroupFilter" & Ptr & " ON GroupFilter" & Ptr & ".MemberID=ccmembers.ID)"
                             }
                         }
                     }
                 }
                 //
                 // Add Name into Return_sqlFieldList
-                //
-                //If Not SQLSelectIncludesName Then
-                // SQLSelectIncludesName is declared, but not initialized
                 return_sqlFieldList = return_sqlFieldList + " ," + adminData.adminContent.tableName + ".Name";
-                //End If
                 //
                 // paste sections together and do where clause
-                //
                 if (AdminDataModel.userHasContentAccess(core, adminData.adminContent.id)) {
                     //
                     // This person can see all the records
-                    //
                     return_SQLWhere += "AND(" + adminData.adminContent.legacyContentControlCriteria + ")";
-                    //return_SQLWhere += "AND(" + MetadataController.getContentControlCriteria(core, adminData.adminContent.name) + ")";
                 } else {
                     //
                     // Limit the Query to what they can see
-                    //
                     return_IsLimitedToSubContent = true;
-                    SubQuery = "";
-                    list = adminData.adminContent.legacyContentControlCriteria;
+                    string SubQuery = "";
+                    string list = adminData.adminContent.legacyContentControlCriteria;
                     adminData.adminContent.id = adminData.adminContent.id;
-                    SubContentCnt = 0;
+                    int SubContentCnt = 0;
                     if (!string.IsNullOrEmpty(list)) {
                         LogController.logInfo(core, "appendlog - adminContext.adminContext.content.contentControlCriteria=" + list);
-                        ListSplit = list.Split('=');
-                        Cnt = ListSplit.GetUpperBound(0) + 1;
+                        string[] ListSplit = list.Split('=');
+                        int Cnt = ListSplit.GetUpperBound(0) + 1;
                         if (Cnt > 0) {
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
-                                Pos = GenericController.vbInstr(1, ListSplit[Ptr], ")");
+                                int Pos = GenericController.vbInstr(1, ListSplit[Ptr], ")");
                                 if (Pos > 0) {
-                                    ContentID = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
+                                    int ContentID = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
                                     if (ContentID > 0 && (ContentID != adminData.adminContent.id) & AdminDataModel.userHasContentAccess(core, ContentID)) {
                                         SubQuery = SubQuery + "OR(" + adminData.adminContent.tableName + ".ContentControlID=" + ContentID + ")";
                                         return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + MetadataController.getContentNameByID(core, ContentID) + "</a>'";
+                                        string SubContactList = "";
                                         SubContactList += "," + ContentID;
                                         SubContentCnt = SubContentCnt + 1;
                                     }
@@ -1146,7 +1104,6 @@ namespace Contensive.Addons.AdminSite {
                     if (string.IsNullOrEmpty(SubQuery)) {
                         //
                         // Person has no access
-                        //
                         Return_AllowAccess = false;
                         return;
                     } else {
@@ -1162,43 +1119,37 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 // Where Clause: edited by me
-                //
                 if (IndexConfig.lastEditedByMe) {
                     return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedBy=" + core.session.user.id + ")";
                 }
                 //
                 // Where Clause: edited today
-                //
                 if (IndexConfig.lastEditedToday) {
                     return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date) + ")";
                 }
                 //
                 // Where Clause: edited past week
-                //
                 if (IndexConfig.lastEditedPast7Days) {
                     return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-7)) + ")";
                 }
                 //
                 // Where Clause: edited past month
-                //
                 if (IndexConfig.lastEditedPast30Days) {
                     return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-30)) + ")";
                 }
+                int WCount = 0;
                 //
                 // Where Clause: Where Pairs
-                //
                 for (WCount = 0; WCount <= 9; WCount++) {
                     if (!string.IsNullOrEmpty(adminData.WherePair[1, WCount])) {
                         //
                         // Verify that the fieldname called out is in this table
-                        //
                         if (adminData.adminContent.fields.Count > 0) {
                             foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
                                 ContentFieldMetadataModel field = keyValuePair.Value;
                                 if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(adminData.WherePair[0, WCount])) {
                                     //
                                     // found it, add it in the sql
-                                    //
                                     return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + adminData.WherePair[0, WCount] + "=";
                                     if (adminData.WherePair[1, WCount].IsNumeric()) {
                                         return_SQLWhere += adminData.WherePair[1, WCount] + ")";
@@ -1213,20 +1164,19 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 // Where Clause: findwords
-                //
                 if (IndexConfig.findWords.Count > 0) {
                     foreach (var kvp in IndexConfig.findWords) {
                         IndexConfigClass.IndexConfigFindWordClass findword = kvp.Value;
-                        FindMatchOption = (int)findword.MatchOption;
+                        int FindMatchOption = (int)findword.MatchOption;
                         if (FindMatchOption != (int)FindWordMatchEnum.MatchIgnore) {
-                            FindWordName = GenericController.vbLCase(findword.Name);
-                            FindWordValue = findword.Value;
+                            string FindWordName = GenericController.vbLCase(findword.Name);
+                            string FindWordValue = findword.Value;
                             //
                             // Get FieldType
-                            //
                             if (adminData.adminContent.fields.Count > 0) {
                                 foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
                                     ContentFieldMetadataModel field = keyValuePair.Value;
+                                    //
                                     // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                                     FieldPtr = field.id;
                                     if (GenericController.vbLCase(field.nameLc) == FindWordName) {
@@ -1255,15 +1205,12 @@ namespace Contensive.Addons.AdminSite {
                                                         return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
                                                         break;
                                                 }
-                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
 
                                             case CPContentBaseClass.fileTypeIdEnum.Currency:
                                             case CPContentBaseClass.fileTypeIdEnum.Float:
                                                 //
                                                 // double
-                                                //
                                                 double FindWordValueDouble = GenericController.encodeNumber(FindWordValue);
                                                 switch (FindMatchOption) {
                                                     case (int)FindWordMatchEnum.MatchEmpty:
@@ -1283,14 +1230,11 @@ namespace Contensive.Addons.AdminSite {
                                                         return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
                                                         break;
                                                 }
-                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
                                             case CPContentBaseClass.fileTypeIdEnum.File:
                                             case CPContentBaseClass.fileTypeIdEnum.FileImage:
                                                 //
                                                 // Date
-                                                //
                                                 switch (FindMatchOption) {
                                                     case (int)FindWordMatchEnum.MatchEmpty:
                                                         return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
@@ -1299,13 +1243,10 @@ namespace Contensive.Addons.AdminSite {
                                                         return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
                                                         break;
                                                 }
-                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
                                             case CPContentBaseClass.fileTypeIdEnum.Date:
                                                 //
                                                 // Date
-                                                //
                                                 DateTime findDate = DateTime.MinValue;
                                                 if (GenericController.IsDate(FindWordValue)) {
                                                     findDate = DateTime.Parse(FindWordValue);
@@ -1328,18 +1269,14 @@ namespace Contensive.Addons.AdminSite {
                                                         return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLDate(findDate) + ")";
                                                         break;
                                                 }
-                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
                                             case CPContentBaseClass.fileTypeIdEnum.Lookup:
                                             case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
                                                 //
                                                 // Lookup
-                                                //
                                                 if (IsLookupFieldValid[field.nameLc]) {
                                                     //
                                                     // Content Lookup
-                                                    //
                                                     switch (FindMatchOption) {
                                                         case (int)FindWordMatchEnum.MatchEmpty:
                                                             return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is null)";
@@ -1355,9 +1292,12 @@ namespace Contensive.Addons.AdminSite {
                                                             break;
                                                     }
                                                 } else if (field.lookupList != "") {
+                                                    string LookupQuery = null;
+                                                    //
+                                                    int LookupPtr = 0;
+                                                    string[] lookups = null;
                                                     //
                                                     // LookupList
-                                                    //
                                                     switch (FindMatchOption) {
                                                         case (int)FindWordMatchEnum.MatchEmpty:
                                                             return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
@@ -1373,9 +1313,6 @@ namespace Contensive.Addons.AdminSite {
                                                                 if (!lookups[LookupPtr].Contains(FindWordValue)) {
                                                                     LookupQuery = LookupQuery + "OR(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(LookupPtr + 1) + ")";
                                                                 }
-                                                                //if (genericController.vbInstr(1, lookups[LookupPtr], FindWordValue, 1) != 0) {
-                                                                //    LookupQuery = LookupQuery + "OR(" + adminContext.adminContext.content.ContentTableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(LookupPtr + 1) + ")";
-                                                                //}
                                                             }
                                                             if (!string.IsNullOrEmpty(LookupQuery)) {
                                                                 return_SQLWhere += "AND(" + LookupQuery.Substring(2) + ")";
@@ -1383,13 +1320,10 @@ namespace Contensive.Addons.AdminSite {
                                                             break;
                                                     }
                                                 }
-                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
                                             case CPContentBaseClass.fileTypeIdEnum.Boolean:
                                                 //
                                                 // Boolean
-                                                //
                                                 switch (FindMatchOption) {
                                                     case (int)FindWordMatchEnum.matchincludes:
                                                         if (GenericController.encodeBoolean(FindWordValue)) {
@@ -1405,13 +1339,10 @@ namespace Contensive.Addons.AdminSite {
                                                         return_SQLWhere += "AND((" + adminData.adminContent.tableName + "." + FindWordName + "=0)or(" + adminData.adminContent.tableName + "." + FindWordName + " is null))";
                                                         break;
                                                 }
-                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
                                             default:
                                                 //
                                                 // Text (and the rest)
-                                                //
                                                 switch (FindMatchOption) {
                                                     case (int)FindWordMatchEnum.MatchEmpty:
                                                         return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
@@ -1428,11 +1359,8 @@ namespace Contensive.Addons.AdminSite {
                                                         return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLText(FindWordValue) + ")";
                                                         break;
                                                 }
-                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
                                         }
-                                        //break;
                                     }
                                 }
                                 ExitLabel1:;
@@ -1443,15 +1371,13 @@ namespace Contensive.Addons.AdminSite {
                 return_SQLWhere = return_SQLWhere.Substring(3);
                 //
                 // SQL Order by
-                //
                 return_SQLOrderBy = "";
                 string orderByDelim = " ";
                 foreach (var kvp in IndexConfig.sorts) {
                     IndexConfigClass.IndexConfigSortClass sort = kvp.Value;
-                    SortFieldName = GenericController.vbLCase(sort.fieldName);
+                    string SortFieldName = GenericController.vbLCase(sort.fieldName);
                     //
                     // Get FieldType
-                    //
                     if (adminData.adminContent.fields.ContainsKey(sort.fieldName)) {
                         var tempVar = adminData.adminContent.fields[sort.fieldName];
                         FieldPtr = tempVar.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string

@@ -741,7 +741,7 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.LoadEditRecord(cp.core);
                                         if (string.IsNullOrEmpty(cp.core.doc.debug_iUserError)) {
                                             using (var csData = new CsModel(cp.core)) {
-                                                if( csData.openRecord("Conditional Email", adminData.editRecord.id)) {  csData.set("submitted", false); }
+                                                if (csData.openRecord("Conditional Email", adminData.editRecord.id)) { csData.set("submitted", false); }
                                                 csData.close();
                                             }
                                         }
@@ -1561,41 +1561,26 @@ namespace Contensive.Addons.AdminSite {
                             if (recordChanged) {
                                 //
                                 // -- clear cache
-                                string tableName = "";
+                                string tableName;
                                 if (editRecord.contentControlId == 0) {
-                                    tableName = MetadataController.getContentTablename(cp.core, adminData.adminContent.name);
+                                    tableName = MetadataController.getContentTablename(cp.core, adminData.adminContent.name).ToLowerInvariant();
                                 } else {
-                                    tableName = MetadataController.getContentTablename(cp.core, editRecord.contentControlId_Name);
+                                    tableName = MetadataController.getContentTablename(cp.core, editRecord.contentControlId_Name).ToLowerInvariant();
                                 }
-                                //todo  NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
-                                //							Select Case tableName.ToLowerInvariant()
-                                var tempVar = tableName.ToLowerInvariant();
-                                //ORIGINAL LINE: Case linkAliasModel.contentTableName.ToLowerInvariant()
-                                if (tempVar == LinkAliasModel.contentTableName.ToLowerInvariant()) {
-                                    //
+                                if (tableName == LinkAliasModel.contentTableName.ToLowerInvariant()) {
                                     LinkAliasModel.invalidateRecordCache(cp.core, editRecord.id);
-                                    //Models.Complex.routeDictionaryModel.invalidateCache(cp.core)
-                                }
-                                //ORIGINAL LINE: Case addonModel.contentTableName.ToLowerInvariant()
-                                else if (tempVar == AddonModel.contentTableName.ToLowerInvariant()) {
-                                    //
+                                } else if (tableName == AddonModel.contentTableName.ToLowerInvariant()) {
                                     AddonModel.invalidateRecordCache(cp.core, editRecord.id);
-                                    //Models.Complex.routeDictionaryModel.invalidateCache(cp.core)
-                                }
-                                //ORIGINAL LINE: Case Else
-                                else {
+                                } else {
                                     LinkAliasModel.invalidateRecordCache(cp.core, editRecord.id);
                                 }
-
                             }
                             //
                             // ----- clear/set authoring controls
-                            //
                             var contentTable = TableModel.createByUniqueName(cp.core, adminData.adminContent.tableName);
                             if (contentTable != null) WorkflowController.clearEditLock(cp.core, contentTable.id, editRecord.id);
                             //
                             // ----- if admin content is changed, reload the adminContext.content data in case this is a save, and not an OK
-                            //
                             if (recordChanged && SaveCCIDValue != 0) {
                                 adminData.adminContent.setContentControlId(cp.core, editRecord.id, SaveCCIDValue);
                                 editRecord.contentControlId_Name = MetadataController.getContentNameByID(cp.core, SaveCCIDValue);
@@ -2036,145 +2021,68 @@ namespace Contensive.Addons.AdminSite {
                     //
                     //
                     if (!(cp.core.doc.debug_iUserError != "")) {
-                        //todo  NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
-                        //						Select Case genericController.vbUCase(adminContext.content.ContentTableName)
-                        //ORIGINAL LINE: Case genericController.vbUCase("ccMembers")
                         if (GenericController.vbUCase(adminData.adminContent.tableName) == GenericController.vbUCase("ccMembers")) {
                             //
                             //
-                            //
-
                             SaveEditRecord(cp, adminData);
                             SaveMemberRules(cp, editRecord.id);
-                            //Call SaveTopicRules
-                        }
-                        //ORIGINAL LINE: Case "CCEMAIL"
-                        else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCEMAIL") {
-                            //
+                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCEMAIL") {
                             //
                             //
                             SaveEditRecord(cp, adminData);
-                            // NO - ignore wwwroot styles, and create it on the fly during send
-                            //If cp.core.main_GetSiteProperty2("BuildVersion") >= "3.3.291" Then
-                            //    Call cp.core.app.executeSql( "update ccEmail set InlineStyles=" & encodeSQLText(cp.core.main_GetStyleSheetProcessed) & " where ID=" & EditRecord.ID)
-                            //End If
-                            cp.core.html.processCheckList("EmailGroups", "Group Email", GenericController.encodeText(editRecord.id), "Groups", "Email Groups", "EmailID", "GroupID");
-                            cp.core.html.processCheckList("EmailTopics", "Group Email", GenericController.encodeText(editRecord.id), "Topics", "Email Topics", "EmailID", "TopicID");
-                        }
-                        //ORIGINAL LINE: Case "CCCONTENT"
-                        else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCCONTENT") {
-                            //
+                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCCONTENT") {
                             //
                             //
                             SaveEditRecord(cp, adminData);
                             LoadAndSaveGroupRules(cp, editRecord);
-                        }
-                        //ORIGINAL LINE: Case "CCPAGECONTENT"
-                        else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCPAGECONTENT") {
-                            //
+                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCPAGECONTENT") {
                             //
                             //
                             SaveEditRecord(cp, adminData);
                             adminData.LoadContentTrackingDataBase(cp.core);
                             adminData.LoadContentTrackingResponse(cp.core);
-                            //Call LoadAndSaveMetaContent()
                             SaveLinkAlias(cp, adminData);
-                            //Call SaveTopicRules
                             SaveContentTracking(cp, adminData);
-                        }
-                        //ORIGINAL LINE: Case "CCLIBRARYFOLDERS"
-                        else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCLIBRARYFOLDERS") {
-                            //
+                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCLIBRARYFOLDERS") {
                             //
                             //
                             SaveEditRecord(cp, adminData);
                             adminData.LoadContentTrackingDataBase(cp.core);
                             adminData.LoadContentTrackingResponse(cp.core);
-                            //Call LoadAndSaveCalendarEvents
-                            //Call LoadAndSaveMetaContent()
                             cp.core.html.processCheckList("LibraryFolderRules", adminData.adminContent.name, GenericController.encodeText(editRecord.id), "Groups", "Library Folder Rules", "FolderID", "GroupID");
-                            //call SaveTopicRules
                             SaveContentTracking(cp, adminData);
-                        }
-                        //ORIGINAL LINE: Case "CCSETUP"
-                        else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCSETUP") {
+                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCSETUP") {
                             //
                             // Site Properties
-                            //
                             SaveEditRecord(cp, adminData);
                             if (editRecord.nameLc.ToLowerInvariant() == "allowlinkalias") {
                                 if (cp.core.siteProperties.getBoolean("AllowLinkAlias")) {
                                     TurnOnLinkAlias(cp, UseContentWatchLink);
                                 }
                             }
-                        }
-                        //ORIGINAL LINE: Case genericController.vbUCase("ccGroups")
-                        else if (GenericController.vbUCase(adminData.adminContent.tableName) == GenericController.vbUCase("ccGroups")) {
-                            //Case "CCGROUPS"
-                            //
+                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == GenericController.vbUCase("ccGroups")) {
                             //
                             //
                             SaveEditRecord(cp, adminData);
                             adminData.LoadContentTrackingDataBase(cp.core);
                             adminData.LoadContentTrackingResponse(cp.core);
                             LoadAndSaveContentGroupRules(cp, editRecord.id);
-                            //Call LoadAndSaveCalendarEvents
-                            //Call LoadAndSaveMetaContent()
-                            //call SaveTopicRules
                             SaveContentTracking(cp, adminData);
-                            //Dim EditorStyleRulesFilename As String
-                        }
-                        //ORIGINAL LINE: Case "CCTEMPLATES"
-                        else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCTEMPLATES") {
+                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCTEMPLATES") {
                             //
                             // save and clear editorstylerules for this template
-                            //
                             SaveEditRecord(cp, adminData);
                             adminData.LoadContentTrackingDataBase(cp.core);
                             adminData.LoadContentTrackingResponse(cp.core);
-                            //Call LoadAndSaveCalendarEvents
-                            //Call LoadAndSaveMetaContent()
-                            //call SaveTopicRules
                             SaveContentTracking(cp, adminData);
-                            //
                             EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString(), 1, 99, 1);
                             cp.core.privateFiles.deleteFile(EditorStyleRulesFilename);
-                            //Case "CCSHAREDSTYLES"
-                            //    '
-                            //    ' save and clear editorstylerules for any template
-                            //    '
-                            //    Call SaveEditRecord(cp,adminContext.content, editRecord)
-                            //    Call LoadContentTrackingDataBase(adminContext.content, editRecord)
-                            //    Call LoadContentTrackingResponse(adminContext.content, editRecord)
-                            //    'Call LoadAndSaveCalendarEvents
-                            //    Call LoadAndSaveMetaContent()
-                            //    'call SaveTopicRules
-                            //    Call SaveContentTracking(cp,adminContext.content, editRecord)
-                            //    '
-                            //    EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
-                            //    Call cp.core.cdnFiles.deleteFile(EditorStyleRulesFilename)
-                            //    '
-                            //    CS = csData.cs_openCsSql_rev( "select id from cctemplates")
-                            //    Do While csData.cs_ok(CS)
-                            //        EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csData.cs_get(CS, "ID"), 1, 99, vbTextCompare)
-                            //        Call cp.core.cdnFiles.deleteFile(EditorStyleRulesFilename)
-                            //        Call csData.cs_goNext(CS)
-                            //    Loop
-                            //    Call csData.cs_Close(CS)
-
-
-                        }
-                        //ORIGINAL LINE: Case Else
-                        else {
-                            //
+                        } else {
                             //
                             //
                             SaveEditRecord(cp, adminData);
                             adminData.LoadContentTrackingDataBase(cp.core);
                             adminData.LoadContentTrackingResponse(cp.core);
-                            //Call LoadAndSaveCalendarEvents
-                            //Call LoadAndSaveMetaContent()
-                            //call SaveTopicRules
                             SaveContentTracking(cp, adminData);
                         }
                     }
@@ -2191,22 +2099,13 @@ namespace Contensive.Addons.AdminSite {
             }
         }
         //
-        //
-        //
-        //=============================================================================================
-        //   Create a duplicate record
         //=============================================================================================
         //
         private void ProcessActionDuplicate(CPClass cp, AdminDataModel adminData) {
             try {
-                // todo
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
-                //
-                // converted array to dictionary - Dim FieldPointer As Integer
-                //
                 if (!(cp.core.doc.debug_iUserError != "")) {
-                    switch (GenericController.vbUCase(adminData.adminContent.tableName)) {
-                        case "CCEMAIL":
+                    switch (adminData.adminContent.tableName.ToLower()) {
+                        case "ccemail":
                             //
                             // --- preload array with values that may not come back in response
                             //
@@ -2218,74 +2117,68 @@ namespace Contensive.Addons.AdminSite {
                                 // ----- Convert this to the Duplicate
                                 //
                                 if (adminData.adminContent.fields.ContainsKey("submitted")) {
-                                    editRecord.fieldsLc["submitted"].value = false;
+                                    adminData.editRecord.fieldsLc["submitted"].value = false;
                                 }
                                 if (adminData.adminContent.fields.ContainsKey("sent")) {
-                                    editRecord.fieldsLc["sent"].value = false;
+                                    adminData.editRecord.fieldsLc["sent"].value = false;
                                 }
                                 if (adminData.adminContent.fields.ContainsKey("lastsendtestdate")) {
-                                    editRecord.fieldsLc["lastsendtestdate"].value = "";
+                                    adminData.editRecord.fieldsLc["lastsendtestdate"].value = "";
                                 }
                                 //
-                                editRecord.id = 0;
-                                cp.core.doc.addRefreshQueryString("id", GenericController.encodeText(editRecord.id));
+                                adminData.editRecord.id = 0;
+                                cp.core.doc.addRefreshQueryString("id", GenericController.encodeText(adminData.editRecord.id));
                             }
                             break;
                         default:
                             //
-                            //
-                            //
-                            //
                             // --- preload array with values that may not come back in response
-                            //
                             adminData.LoadEditRecord(cp.core);
                             adminData.LoadEditRecord_Request(cp.core);
                             //
                             if (!(cp.core.doc.debug_iUserError != "")) {
                                 //
                                 // ----- Convert this to the Duplicate
-                                //
-                                editRecord.id = 0;
+                                adminData.editRecord.id = 0;
                                 //
                                 // block fields that should not duplicate
-                                //
-                                if (editRecord.fieldsLc.ContainsKey("ccguid")) {
-                                    editRecord.fieldsLc["ccguid"].value = "";
+                                if (adminData.editRecord.fieldsLc.ContainsKey("ccguid")) {
+                                    adminData.editRecord.fieldsLc["ccguid"].value = "";
                                 }
                                 //
-                                if (editRecord.fieldsLc.ContainsKey("dateadded")) {
-                                    editRecord.fieldsLc["dateadded"].value = DateTime.MinValue;
+                                if (adminData.editRecord.fieldsLc.ContainsKey("dateadded")) {
+                                    adminData.editRecord.fieldsLc["dateadded"].value = DateTime.MinValue;
                                 }
                                 //
-                                if (editRecord.fieldsLc.ContainsKey("modifieddate")) {
-                                    editRecord.fieldsLc["modifieddate"].value = DateTime.MinValue;
+                                if (adminData.editRecord.fieldsLc.ContainsKey("modifieddate")) {
+                                    adminData.editRecord.fieldsLc["modifieddate"].value = DateTime.MinValue;
                                 }
                                 //
-                                if (editRecord.fieldsLc.ContainsKey("modifiedby")) {
-                                    editRecord.fieldsLc["modifiedby"].value = 0;
+                                if (adminData.editRecord.fieldsLc.ContainsKey("modifiedby")) {
+                                    adminData.editRecord.fieldsLc["modifiedby"].value = 0;
                                 }
                                 //
                                 // block fields that must be unique
-                                //
                                 foreach (KeyValuePair<string, Contensive.Processor.Models.Domain.ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
                                     ContentFieldMetadataModel field = keyValuePair.Value;
                                     if (GenericController.vbLCase(field.nameLc) == "email") {
                                         if ((adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") && (GenericController.encodeBoolean(cp.core.siteProperties.getBoolean("allowemaillogin", false)))) {
-                                            editRecord.fieldsLc[field.nameLc].value = "";
+                                            adminData.editRecord.fieldsLc[field.nameLc].value = "";
                                         }
                                     }
                                     if (field.uniqueName) {
-                                        editRecord.fieldsLc[field.nameLc].value = "";
+                                        adminData.editRecord.fieldsLc[field.nameLc].value = "";
                                     }
                                 }
                                 //
-                                cp.core.doc.addRefreshQueryString("id", GenericController.encodeText(editRecord.id));
+                                cp.core.doc.addRefreshQueryString("id", GenericController.encodeText(adminData.editRecord.id));
                             }
-                            //Call cp.core.htmldoc.main_AddUserError("The create duplicate action is not supported for this content.")
                             break;
                     }
                     adminData.AdminForm = adminData.AdminSourceForm;
-                    adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                    //
+                    // convert so action can be used in as a refresh
+                    adminData.Admin_Action = Constants.AdminActionNop;
                 }
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
@@ -2438,7 +2331,7 @@ namespace Contensive.Addons.AdminSite {
                         NewGroup = cp.core.docProperties.getBoolean("NewGroup");
                         NewGroupName = cp.core.docProperties.getText("NewGroupName");
                         //
-                        if ((parentContentMetadata==null) || (string.IsNullOrEmpty(ChildContentName))) {
+                        if ((parentContentMetadata == null) || (string.IsNullOrEmpty(ChildContentName))) {
                             Processor.Controllers.ErrorController.addUserError(cp.core, "You must select a parent and provide a child name.");
                         } else {
                             //
