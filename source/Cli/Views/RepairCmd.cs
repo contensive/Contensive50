@@ -12,7 +12,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        public const string helpText = ""
+        internal const string  helpText = ""
             + "\r\n"
             + "\r\n--repair (-r)"
             + "\r\n    reinstall the base collection and all it's dependancies. For all applications, or just one if specified with -a"

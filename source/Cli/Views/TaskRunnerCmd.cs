@@ -13,7 +13,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        public const string helpText = ""
+        internal const string  helpText = ""
             + "\r\n"
             + "\r\n--taskrunner run|on|off"
             + "\r\n    Use 'run' to execute the taskrunner in the console (temporary). Use 'on' or 'off' to manage the taskrunner service."

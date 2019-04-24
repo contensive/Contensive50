@@ -12,7 +12,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        public const string helpText = ""
+        internal const string  helpText = ""
             + "\r\n"
             + "\r\n--flushcache"
             + "\r\n    invalidate cache. Use with -a"

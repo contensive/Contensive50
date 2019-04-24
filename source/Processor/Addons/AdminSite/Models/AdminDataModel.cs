@@ -181,19 +181,19 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// 
         /// </summary>
-        public const string OpenLiveWindowTable = "<div ID=\"LiveWindowTable\">";
+        public static readonly string OpenLiveWindowTable = "<div ID=\"LiveWindowTable\">";
         /// <summary>
         /// 
         /// </summary>
-        public const string CloseLiveWindowTable = "</div>";
+        public static readonly string CloseLiveWindowTable = "</div>";
         /// <summary>
         /// 
         /// </summary>
-        public const string AdminFormErrorOpen = "<table border=\"0\" cellpadding=\"20\" cellspacing=\"0\" width=\"100%\"><tr><td align=\"left\">";
+        public static readonly string AdminFormErrorOpen = "<table border=\"0\" cellpadding=\"20\" cellspacing=\"0\" width=\"100%\"><tr><td align=\"left\">";
         /// <summary>
         /// 
         /// </summary>
-        public const string AdminFormErrorClose = "</td></tr></table>";
+        public static readonly string AdminFormErrorClose = "</td></tr></table>";
         /// <summary>
         /// these were defined different in csv
         /// </summary>
@@ -206,7 +206,7 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// 
         /// </summary>
-        public const string IndexConfigPrefix = "IndexConfig:";
+        public static readonly string IndexConfigPrefix = "IndexConfig:";
         /// <summary>
         /// 
         /// </summary>

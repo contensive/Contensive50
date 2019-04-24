@@ -20,7 +20,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        public const string helpText = ""
+        internal const string  helpText = ""
             + "\r\n"
             + "\r\n--newapp (-n)"
             + "\r\n    new application wizard";

@@ -157,7 +157,8 @@ namespace Contensive.Processor {
                 var tmpList = new List<string> { };
                 string logPrefix = "CPSiteClass.installCollectionFile";
                 var installedCollections = new List<string>();
-                var context = new Stack<string>(new string[] { "Api call cp.addon.InstallCollectionFile [" + privatePathFilename + "]" });
+                var context = new Stack<string>();
+                context.Push("Api call cp.addon.InstallCollectionFile [" + privatePathFilename + "]");
                 returnOk = Controllers.CollectionController.installCollectionFromPrivateFile(cp.core, context, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
             } catch (Exception ex) {
                 Controllers.LogController.handleError(cp.core, ex);
@@ -184,7 +185,8 @@ namespace Contensive.Processor {
             string logPrefix = "CPUtilsClass.installCollectionsFromFolder";
             var collectionsInstalledList = new List<string>();
             var collectionsDownloaded = new List<string>();
-            var context = new Stack<string>(new string[] { "Api call cp.addon.InstallCollectionFromFolder [" + privateFolder + "]" });
+            var context = new Stack<string>();
+            context.Push("Api call cp.addon.InstallCollectionFromFolder [" + privateFolder + "]");
             return CollectionController.installCollectionsFromPrivateFolder(cp.core, context, privateFolder, ref ignoreUserMessage, ref collectionsInstalledList, false, false, ref ignoreList2, logPrefix, true, ref collectionsDownloaded);
         }
         //
@@ -199,7 +201,8 @@ namespace Contensive.Processor {
             var installedCollections = new List<string>();
             string logPrefix = "installCollectionFromLibrary";
             var nonCriticalErrorList = new List<string>();
-            var context = new Stack<string>(new string[] { "Api call cp.addon.InstallCollectionFromLibrary [" + collectionGuid + "]" });
+            var context = new Stack<string>();
+            context.Push("Api call cp.addon.InstallCollectionFromLibrary [" + collectionGuid + "]");
             return CollectionController.installCollectionFromLibrary(cp.core, context, collectionGuid, ref ignoreUserMessage, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
         }
         //

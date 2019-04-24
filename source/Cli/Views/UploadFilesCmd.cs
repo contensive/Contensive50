@@ -21,7 +21,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        public const string helpText = ""
+        internal const string  helpText = ""
             + "\r\n"
             + "\r\n--uploadfiles"
             + "\r\n    Copies all local files to remote files. Use for migration to a remote file system."

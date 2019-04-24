@@ -19,7 +19,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        public const string helpText = ""
+        internal const string  helpText = ""
             + "\r\n"
             + "\r\n--delete"
             + "\r\n    Deletes an application. You must first specify the application first with -a appName. The application must have delete protection off."

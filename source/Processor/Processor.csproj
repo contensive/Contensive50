@@ -101,7 +101,6 @@
     <Compile Include="Addons\AdminNavigator\Views\getNodeClass.cs" />
     <Compile Include="Addons\AdminSite\Constants.cs" />
     <Compile Include="Addons\Monitor\configClass.cs" />
-    <Compile Include="Addons\Monitor\constants.cs" />
     <Compile Include="Addons\Monitor\serverStatusClass.cs" />
     <Compile Include="Addons\Monitor\siteCheckClass.cs" />
     <Compile Include="Addons\Monitor\GetStatus.cs" />

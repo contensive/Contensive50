@@ -57,29 +57,29 @@ namespace Contensive.Processor {
         //========================================================================
         // html
         //
-        public const string iconNotAvailable = "<i title=\"not available\" class=\"fas fa-ban\"></i>";
-        public const string iconExpand = "<i title=\"expand\" class=\"fas fa-chevron-circle-up\"></i>";
-        public const string iconContract = "<i title=\"contract\" class=\"fas fa-chevron-circle-down\"></i>";
-        public const string iconArrowUp = "<i title=\"right\" class=\"fas fa-arrow-circle-up\"></i>";
-        public const string iconArrowDown = "<i title=\"right\" class=\"fas fa-arrow-circle-down\"></i>";
-        public const string iconArrowRight = "<i title=\"right\" class=\"fas fa-arrow-circle-right\"></i>";
-        public const string iconArrowLeft = "<i title=\"left\" class=\"fas fa-arrow-circle-left\"></i>";
-        public const string iconDelete = "<i title=\"delete\" class=\"fas fa-times\"></i>";
-        public const string iconDelete_Red = "<span style=\"color:#f00\">" + iconDelete + "</span>";
-        public const string iconAdd = "<i title=\"add\" class=\"fas fa-plus-circle\"></i>";
-        public const string iconAdd_Green = "<span style=\"color:#0c0\">" + iconAdd + "</span>";
-        public const string iconEdit = "<i title=\"edit\" class=\"fas fa-pen-square\"></i>";
-        public const string iconEdit_Green = "<span style=\"color:#0c0\">" + iconEdit + "</span>";
-        public const string iconRefresh = "<i title=\"refresh\" class=\"fas fa-sync-alt\"></i>";
-        public const string iconContentCut = "<i title=\"cut\" class=\"fas fa-cut\"></i>";
-        public const string iconContentPaste = "<i title=\"paste\" class=\"fas fa-paste\"></i>";
-        public const string iconClose = "<i title=\"close\" class=\"fas fa-times\"></i>";
-        public const string iconClose_White = "<span style=\"color:#fff\">" + iconClose + "</span>";
-        public const string iconClose_Red = "<span style=\"color:#f00\">" + iconClose + "</span>";
-        public const string iconOpen = "<i title=\"open\" class=\"fas fa-angle-double-right\"></i>";
-        public const string iconOpen_White = "<span style=\"color:#fff\">" + iconOpen + "</span>";
-        public const string iconGrip = "<i title=\"paste content\" class=\"fas fa-grip-horizontal\"></i>";
-        public const string iconContentPaste_Green = "<span style=\"color:#0c0\">" + iconContentPaste + "</span>";
+        public static readonly string iconNotAvailable = "<i title=\"not available\" class=\"fas fa-ban\"></i>";
+        public static readonly string iconExpand = "<i title=\"expand\" class=\"fas fa-chevron-circle-up\"></i>";
+        public static readonly string iconContract = "<i title=\"contract\" class=\"fas fa-chevron-circle-down\"></i>";
+        public static readonly string iconArrowUp = "<i title=\"right\" class=\"fas fa-arrow-circle-up\"></i>";
+        public static readonly string iconArrowDown = "<i title=\"right\" class=\"fas fa-arrow-circle-down\"></i>";
+        public static readonly string iconArrowRight = "<i title=\"right\" class=\"fas fa-arrow-circle-right\"></i>";
+        public static readonly string iconArrowLeft = "<i title=\"left\" class=\"fas fa-arrow-circle-left\"></i>";
+        public static readonly string iconDelete = "<i title=\"delete\" class=\"fas fa-times\"></i>";
+        public static readonly string iconDelete_Red = "<span style=\"color:#f00\">" + iconDelete + "</span>";
+        public static readonly string iconAdd = "<i title=\"add\" class=\"fas fa-plus-circle\"></i>";
+        public static readonly string iconAdd_Green = "<span style=\"color:#0c0\">" + iconAdd + "</span>";
+        public static readonly string iconEdit = "<i title=\"edit\" class=\"fas fa-pen-square\"></i>";
+        public static readonly string iconEdit_Green = "<span style=\"color:#0c0\">" + iconEdit + "</span>";
+        public static readonly string iconRefresh = "<i title=\"refresh\" class=\"fas fa-sync-alt\"></i>";
+        public static readonly string iconContentCut = "<i title=\"cut\" class=\"fas fa-cut\"></i>";
+        public static readonly string iconContentPaste = "<i title=\"paste\" class=\"fas fa-paste\"></i>";
+        public static readonly string iconClose = "<i title=\"close\" class=\"fas fa-times\"></i>";
+        public static readonly string iconClose_White = "<span style=\"color:#fff\">" + iconClose + "</span>";
+        public static readonly string iconClose_Red = "<span style=\"color:#f00\">" + iconClose + "</span>";
+        public static readonly string iconOpen = "<i title=\"open\" class=\"fas fa-angle-double-right\"></i>";
+        public static readonly string iconOpen_White = "<span style=\"color:#fff\">" + iconOpen + "</span>";
+        public static readonly string iconGrip = "<i title=\"paste content\" class=\"fas fa-grip-horizontal\"></i>";
+        public static readonly string iconContentPaste_Green = "<span style=\"color:#0c0\">" + iconContentPaste + "</span>";
         //
         // -- buttons
         internal const string ButtonCreateFields = " Create Fields ";
@@ -139,7 +139,7 @@ namespace Contensive.Processor {
         internal const int addonRecursionLimit = 5;
         //
         // -- templates
-        public const string guidBootstrapStarterTemplate = "{810894df-e740-4a9b-bb6a-b7fbff892e63}";
+        public static readonly string guidBootstrapStarterTemplate = "{810894df-e740-4a9b-bb6a-b7fbff892e63}";
         //
         // -- content
         internal const string DefaultLandingPageGuid = "{925F4A57-32F7-44D9-9027-A91EF966FB0D}";

@@ -196,7 +196,6 @@
     <Compile Include="Views\HousekeepCmd.cs" />
     <Compile Include="Views\FlushCacheCmd.cs" />
     <Compile Include="Views\RepairCmd.cs" />
-    <Compile Include="Views\LoggingCmd.cs" />
     <Compile Include="Views\TasksCmd.cs" />
     <Compile Include="Views\TaskRunnerCmd.cs" />
     <Compile Include="Views\UpgradeCmd.cs" />

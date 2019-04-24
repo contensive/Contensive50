@@ -495,7 +495,8 @@ namespace Contensive.Addons.SafeAddonManager {
                             Cnt = LibGuids.GetUpperBound(0) + 1;
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                 RegisterList = "";
-                                var context = new Stack<string>(new string[] { "AddonManager Install Library Collection [" + LibGuids[Ptr] + "]" });
+                                var context = new Stack<string>();
+                                context.Push( "AddonManager Install Library Collection [" + LibGuids[Ptr] + "]" );
                                 UpgradeOK = CollectionController.installCollectionFromLibrary(core, context, LibGuids[Ptr], ref ErrorMessage, false, true, ref nonCriticalErrorList, "AddonManagerClass.GetForm_SaveModeAddonManager", ref collectionsInstalledList);
                                 if (!UpgradeOK) {
                                     //
@@ -522,7 +523,8 @@ namespace Contensive.Addons.SafeAddonManager {
                             //InstallFolder = core.asv.config.physicalFilePath & InstallFolderName & "\"
                             if (core.privateFiles.pathExists(privateFilesInstallPath)) {
                                 string logPrefix = "SafeModeAddonManager";
-                                var context = new Stack<string>(new string[] { "AddonManager install from path [" + privateFilesInstallPath + "]" });
+                                var context = new Stack<string>();
+                                context.Push("AddonManager install from path [" + privateFilesInstallPath + "]");
                                 var collectionsDownloaded = new List<string>();
                                 UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core,context, privateFilesInstallPath, ref ErrorMessage, ref collectionsInstalledList, false, true, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
                                 if (!UpgradeOK) {
@@ -544,30 +546,12 @@ namespace Contensive.Addons.SafeAddonManager {
                             }
                         }
                         //
-                        // --------------------------------------------------------------------------------
-                        //   Register ActiveX files
-                        // --------------------------------------------------------------------------------
-                        //
-                        if (!string.IsNullOrEmpty(RegisterList)) {
-                            //  Call addonInstall.RegisterActiveXFiles(RegisterList)
-                            //  Call addonInstall.RegisterDotNet(RegisterList)
-                            RegisterList = "";
-                        }
-                        //
-                        // --------------------------------------------------------------------------------
                         //   Forward to help page
-                        // --------------------------------------------------------------------------------
-                        //
                         if ((collectionsInstalledIDList.Count > 0) && ( string.IsNullOrEmpty( core.doc.debug_iUserError ))) {
                             return core.webServer.redirect("/" + core.appConfig.adminRoute + "?helpcollectionid=" + collectionsInstalledIDList[0].ToString(), "Redirecting to help page after collection installation");
                         }
                         //
-                        // --------------------------------------------------------------------------------
-                        // Get Form
-                        //
-                        // --------------------------------------------------------------------------------
                         // Get the Collection Library tab
-                        // --------------------------------------------------------------------------------
                         //
                         ColumnCnt = 4;
                         ColCaption = new string[4];

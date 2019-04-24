@@ -61,7 +61,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- verify base collection
                     LogController.logInfo(core, logPrefix + ", install base collection");
-                    var context = new Stack<string>(new string[] { "NewAppController.upgrade call installbasecollection, repair [" + repair.ToString() + "]" });
+                    var context = new Stack<string>();
+                    context.Push("NewAppController.upgrade call installbasecollection, repair [" + repair.ToString() + "]");
                     CollectionController.installBaseCollection(core, context, isNewBuild, repair, ref nonCriticalErrorList, logPrefix);
                     //
                     // -- verify iis configuration
@@ -282,7 +283,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sqlName"></param>
         /// <param name="sqlValue"></param>
         /// <param name="inActive"></param>
-        private static void verifyRecord(CoreController core, string contentName, string name, string sqlName = "", string sqlValue = "") {
+        private static void verifyRecord(CoreController core, string contentName, string name, string sqlName, string sqlValue) {
             try {
                 var metaData = ContentMetadataModel.createByUniqueName(core, contentName);
                 DataTable dt = core.db.executeQuery("SELECT ID FROM " + metaData.tableName + " WHERE NAME=" + DbController.encodeSQLText(name) + ";");
@@ -301,6 +302,12 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
+        //
+        private static void verifyRecord(CoreController core, string contentName, string name, string sqlName)
+            => verifyRecord(core, contentName, name, sqlName, "");
+        //
+        private static void verifyRecord(CoreController core, string contentName, string name)
+        => verifyRecord(core, contentName, name, "", "");
         //
         //====================================================================================================
         /// <summary>
@@ -793,7 +800,7 @@ namespace Contensive.Processor.Controllers {
             int returnEntry = 0;
             try {
                 if (!string.IsNullOrEmpty(menu.name.Trim())) {
-                    if(!string.IsNullOrWhiteSpace(menu.AddonGuid)) {
+                    if (!string.IsNullOrWhiteSpace(menu.AddonGuid)) {
                         returnEntry = 0;
                     }
                     AddonModel addon = ((!string.IsNullOrWhiteSpace(menu.AddonGuid)) ? AddonModel.create(core, menu.AddonGuid) : null);
@@ -1025,7 +1032,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static void verifyBasicWebSiteData( CoreController core ) {
+        public static void verifyBasicWebSiteData(CoreController core) {
             //
             // -- determine primary domain
             string primaryDomain = core.appConfig.name;

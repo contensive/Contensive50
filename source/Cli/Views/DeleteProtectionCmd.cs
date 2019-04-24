@@ -13,7 +13,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        public const string helpText = ""
+        internal const string  helpText = ""
             + "\r\n"
             + "\r\n--deleteprotection on|off"
             + "\r\n    Enables or Disables delete protection for an application. You must specify the application first with -a appName."

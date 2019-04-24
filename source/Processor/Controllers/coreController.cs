@@ -160,7 +160,7 @@ namespace Contensive.Processor.Controllers {
             cache.storeObject(AssemblyFileDictCacheName, _assemblyFileDict);
         }
         private Dictionary<string, AssemblyFileDetails> _assemblyFileDict;
-        public const string AssemblyFileDictCacheName = "assemblyFileDict";
+        private const string AssemblyFileDictCacheName = "assemblyFileDict";
         public class AssemblyFileDetails {
             public string path;
             public string pathFilename;

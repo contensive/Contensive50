@@ -13,7 +13,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        public const string helpText = ""
+        internal const string  helpText = ""
             + "\r\n"
             + "\r\n--runtask guid-of-assigned-taskrunner"
             + "\r\n    Run a task in the task table. Used internally to run tasks in other processes. Requires you first set the application with -appname."

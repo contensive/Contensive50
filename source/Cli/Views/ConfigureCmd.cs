@@ -15,7 +15,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        public const string helpText = ""
+        internal const string  helpText = ""
             + "\r\n"
             + "\r\n--configure"
             + "\r\n    setup or review server configuration (Sql, cache, filesystem, etc)";

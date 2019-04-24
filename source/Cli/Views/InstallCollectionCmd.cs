@@ -12,7 +12,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        public const string helpText = ""
+        internal const string  helpText = ""
             + "\r\n"
             + "\r\n--install CollectionName"
             + "\r\n    downloads and installed the addon collection named from the Contensive Support Library"
@@ -55,7 +55,8 @@ namespace Contensive.CLI {
                     if (string.IsNullOrEmpty(appName)) {
                         foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
                             using (CPClass cpApp = new CPClass(kvp.Key)) {
-                                var context = new Stack<string>(new string[] { "command line interface install command [" + collectionName + ", " + collectionGuid + "]" });
+                                var context = new Stack<string>();
+                                context.Push("command line interface install command [" + collectionName + ", " + collectionGuid + "]");
                                 CollectionController.installCollectionFromLibrary(cpApp.core, context, collectionGuid, ref returnErrorMessage, false, false, ref nonCritialErrorList, logPrefix, ref collectionsInstalledList);
                                 if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                     Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
@@ -65,7 +66,8 @@ namespace Contensive.CLI {
                         }
                     } else {
                         using (CPClass cpApp = new CPClass(appName)) {
-                            var context = new Stack<string>(new string[] { "command line interface install command [" + collectionName + ", " + collectionGuid + "]" });
+                            var context = new Stack<string>();
+                            context.Push( "command line interface install command [" + collectionName + ", " + collectionGuid + "]" );
                             CollectionController.installCollectionFromLibrary(cpApp.core, context, collectionGuid, ref returnErrorMessage, false, false, ref nonCritialErrorList, logPrefix, ref collectionsInstalledList);
                             if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                 Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);

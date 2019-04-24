@@ -27,8 +27,8 @@ namespace Contensive.Processor.Controllers {
     public class WebServerController {
         //
         // enum this, not consts --  https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-        public const string httpResponseStatus200 = "200 OK";
-        public const string httpResponseStatus404 = "404 Not Found";
+        internal const string httpResponseStatus200 = "200 OK";
+        internal const string httpResponseStatus404 = "404 Not Found";
         //
         private CoreController core;
         //
