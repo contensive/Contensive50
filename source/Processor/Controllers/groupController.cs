@@ -83,18 +83,32 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="groupId"></param>
-        /// <param name="userid"></param>
+        /// <param name="userId"></param>
         /// <param name="dateExpires"></param>
-        public static void addUser(CoreController core, int groupId, int userid, DateTime dateExpires) {
+        public static void addUser(CoreController core, int groupId, int userId, DateTime dateExpires) {
             var group = Models.Db.GroupModel.create(core, groupId);
             if (group == null) {
-                LogController.handleError(core, new GenericException("addUser called with invalid groupId"));
-            } else {
-                var user = Models.Db.PersonModel.create(core, userid);
-                if ( user != null ) {
-                    addUser(core, group, user, dateExpires);
-                }
+                //
+                // -- invalid groupId
+                LogController.handleError(core, new GenericException("addUser called with invalid groupId [" + groupId + "]"));
+                return;
             }
+            Models.Db.PersonModel user = null;
+            if (userId.Equals(0)) {
+                //
+                // -- default to keyboard user
+                user = Models.Db.PersonModel.create(core, core.session.user.id);
+                addUser(core, group, user, dateExpires);
+                return;
+            }
+            user = Models.Db.PersonModel.create(core, userId);
+            if (user == null) {
+                //
+                // -- invalid userId
+                LogController.handleError(core, new GenericException("addUser called with invalid userId [" + userId + "]"));
+                return;
+            }
+            addUser(core, group, user, dateExpires);
         }
         //
         //====================================================================================================
@@ -110,7 +124,7 @@ namespace Contensive.Processor.Controllers {
             if ( groupNameIdOrGuid.IsNumeric()) {
                 group = Models.Db.GroupModel.create(core, GenericController.encodeInteger(groupNameIdOrGuid));
                 if (group == null) {
-                    LogController.handleError(core, new GenericException("addUser called with invalid groupId"));
+                    LogController.handleError(core, new GenericException("addUser called with invalid groupId [" + groupNameIdOrGuid + "]"));
                     return;
                 }
             } else if ( GenericController.isGuid( groupNameIdOrGuid )) {

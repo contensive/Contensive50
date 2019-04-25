@@ -21,6 +21,7 @@ namespace Contensive.Processor.Controllers {
         public DocController(CoreController core) {
             this.core = core;
             //
+            errorList = new List<string>();
             pageController = new PageContentController();
             domain = new DomainModel();
             wysiwygAddonList = new Dictionary<CPHtml5BaseClass.EditorContentType, string>();
