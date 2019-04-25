@@ -1871,7 +1871,7 @@ namespace Contensive.Processor.Controllers {
                                     Body = Body + kmaEndTable;
                                     string queryStringForLinkAppend = "";
                                     string emailStatus = "";
-                                    EmailController.queuePersonEmail(core, person, core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain), "Page Hit Notification", Body, "", "", false, true, 0, "", false, ref emailStatus, queryStringForLinkAppend);
+                                    EmailController.queuePersonEmail(core, person, core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain), "Page Hit Notification", Body, "", "", false, true, 0, "", false, ref emailStatus, queryStringForLinkAppend, "Page Hit Notification, page [" + core.doc.pageController.page.id + "]");
                                 }
                             }
                         }
@@ -2406,7 +2406,7 @@ namespace Contensive.Processor.Controllers {
                         if (person != null) {
                             string sendStatus = "";
                             string queryStringForLinkAppend = "";
-                            EmailController.queuePersonEmail(core, person, NoteFromEmail, "Feedback Form Submitted", NoteCopy, "", "", false, true, 0, "", false, ref sendStatus, queryStringForLinkAppend);
+                            EmailController.queuePersonEmail(core, person, NoteFromEmail, "Feedback Form Submitted", NoteCopy, "", "", false, true, 0, "", false, ref sendStatus, queryStringForLinkAppend, "Feedback Form Email");
                         }
                         //
                         // ----- Note sent, say thanks

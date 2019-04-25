@@ -53,13 +53,12 @@ namespace Contensive.Processor.Controllers {
         //
         //===================================================================================================
         /// <summary>
-        /// Set true and sendSmtp adds all email to mockSmtpList of smtpEmailClass
+        /// Set true and email send adds all email to mockEmailList
         /// </summary>
-        public bool mockSmtp = false;
-        public List<SmtpEmailClass> mockSmtpList = new List<SmtpEmailClass>();
-        public class SmtpEmailClass {
+        public bool mockEmail = false;
+        public List<MockEmailClass> mockEmailList = new List<MockEmailClass>();
+        public class MockEmailClass {
             public EmailController.EmailClass email;
-            public string smtpServer;
             public string AttachmentFilename;
         }
         //
@@ -136,8 +135,7 @@ namespace Contensive.Processor.Controllers {
             "\\nustache.core.dll",
             "\\v8-base-ia32.dll",
             "\\v8-ia32.dll",
-            "\\v8-x64.dll",
-            "\\v8-ia32.dll",
+            "\\v8-base-x64.dll",
             "\\v8-x64.dll"
         };
         //

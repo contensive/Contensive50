@@ -13,7 +13,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         [TestMethod]
         public void Controllers_Email_GetBlockedList_test1() {
             using (CPClass cp = new CPClass(testAppName)) {
-                cp.core.mockSmtp = true;
+                cp.core.mockEmail = true;
                 // arrange
                 string test1 = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
                 string test2 = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
@@ -29,7 +29,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         [TestMethod]
         public void Controllers_Email_VerifyEmailAddress_test1() {
             using (CPClass cp = new CPClass(testAppName)) {
-                cp.core.mockSmtp = true;
+                cp.core.mockEmail = true;
                 // arrange
                 // act
                 // assert
@@ -44,18 +44,18 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         [TestMethod]
         public void Controllers_Email_queueAdHocEmail_test1() {
             using (CPClass cp = new CPClass(testAppName)) {
-                cp.core.mockSmtp = true;
+                cp.core.mockEmail = true;
                 // arrange
                 string body = GenericController.GetRandomInteger(cp.core).ToString() ;
                 string sendStatus = "";
                 string ResultLogFilename = "";
                 // act
-                EmailController.queueAdHocEmail(cp.core, "to@kma.net", "from@kma.net", "subject", body,"bounce@kma.net","replyTo@kma.net", ResultLogFilename, true, true, 0, ref sendStatus);
+                EmailController.queueAdHocEmail(cp.core,"Unit Test",0, "to@kma.net", "from@kma.net", "subject", body,"bounce@kma.net","replyTo@kma.net", ResultLogFilename, true, true, 0, ref sendStatus);
                 Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.ProcessEmailClass();
                 addon.Execute(cp);
                 // assert
-                Assert.AreEqual(1, cp.core.mockSmtpList.Count);
-                CoreController.SmtpEmailClass sentEmail = cp.core.mockSmtpList.First();
+                Assert.AreEqual(1, cp.core.mockEmailList.Count);
+                CoreController.MockEmailClass sentEmail = cp.core.mockEmailList.First();
                 Assert.AreEqual("", sentEmail.AttachmentFilename);
                 Assert.AreEqual("to@kma.net", sentEmail.email.toAddress);
                 Assert.AreEqual("from@kma.net", sentEmail.email.fromAddress);
@@ -69,7 +69,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         [TestMethod]
         public void Controllers_Email_queuePersonEmail_test1() {
             using (CPClass cp = new CPClass(testAppName)) {
-                cp.core.mockSmtp = true;
+                cp.core.mockEmail = true;
                 // arrange
                 string body = GenericController.GetRandomInteger(cp.core).ToString();
                 var toPerson = Processor.Models.Db.PersonModel.addDefault(cp.core, Processor.Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, Processor.Models.Db.PersonModel.contentName));
@@ -80,12 +80,12 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 toPerson.save(cp.core);
                 string sendStatus = "";
                 // act
-                Assert.IsTrue( EmailController.queuePersonEmail(cp.core, toPerson, "from@kma.net", "subject", body, "bounce@kma.net", "replyTo@kma.net", true, true, 0, "", true, ref sendStatus, ""));
+                Assert.IsTrue( EmailController.queuePersonEmail(cp.core, "Function Test", toPerson, "from@kma.net", "subject", body, "bounce@kma.net", "replyTo@kma.net", true, true, 0, "", true, ref sendStatus));
                 Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.ProcessEmailClass();
                 addon.Execute(cp);
                 // assert
-                Assert.AreEqual(1, cp.core.mockSmtpList.Count);
-                CoreController.SmtpEmailClass sentEmail = cp.core.mockSmtpList.First();
+                Assert.AreEqual(1, cp.core.mockEmailList.Count);
+                CoreController.MockEmailClass sentEmail = cp.core.mockEmailList.First();
                 Assert.AreEqual("", sentEmail.AttachmentFilename);
                 Assert.AreEqual( toPerson.email, sentEmail.email.toAddress);
                 Assert.AreEqual("from@kma.net", sentEmail.email.fromAddress);

@@ -440,7 +440,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (result) {
                     string sendStatus = "";
-                    EmailController.queueAdHocEmail(core, workingEmail, FromAddress, subject, Message, "", "", "", true, false, 0, ref sendStatus);
+                    EmailController.queueAdHocEmail(core,"Password Email", core.session.user.id, workingEmail, FromAddress, subject, Message, "", "", "", true, false, 0, ref sendStatus);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

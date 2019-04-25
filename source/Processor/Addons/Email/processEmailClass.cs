@@ -125,7 +125,7 @@ namespace Contensive.Addons.Email {
                                         if (string.IsNullOrEmpty(peopleName)) { peopleName = "user #" + peopleID; }
                                         EmailStatusList = EmailStatusList + "Not Sent to " + peopleName + ", duplicate email address (" + peopleEmail + ")" + BR;
                                     } else {
-                                        EmailStatusList = EmailStatusList + queueEmailRecord(core, peopleID, emailID, DateTime.MinValue, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, csPerson.getText("CopyFilename"), csPerson.getBoolean("AllowSpamFooter"), csPerson.getBoolean("AddLinkEID"), "") + BR;
+                                        EmailStatusList = EmailStatusList + queueEmailRecord(core,"Group Email", peopleID, emailID, DateTime.MinValue, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, csPerson.getText("CopyFilename"), csPerson.getBoolean("AllowSpamFooter"), csPerson.getBoolean("AddLinkEID"), "") + BR;
                                     }
                                     LastEmail = peopleEmail;
                                     csPerson.goNext();
@@ -137,7 +137,7 @@ namespace Contensive.Addons.Email {
                             //
                             string EmailCopy = CSEmail.getText("copyfilename");
                             int ConfirmationMemberID = CSEmail.getInteger("testmemberid");
-                            queueConfirmationEmail(core, ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, PrimaryLink, EmailSubject, EmailCopy, "", EmailFrom, EmailStatusList);
+                            queueConfirmationEmail(core, ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, PrimaryLink, EmailSubject, EmailCopy, "", EmailFrom, EmailStatusList, "Group Email");
                             CSEmail.goNext();
                         }
                     }
@@ -195,8 +195,8 @@ namespace Contensive.Addons.Email {
                         + " AND (ccGroups.AllowBulkEmail <> 0)"
                         + " AND (ccMembers.ID IS NOT NULL)"
                         + " AND (ccMembers.Active <> 0)"
-                        + " AND (ccMembers.AllowBulkEmail <> 0)"
-                        + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=ccMembers.ID))";
+                        + " AND (ccMembers.AllowBulkEmail <> 0)";
+                    // + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=ccMembers.ID))";
                     csEmailList.openSql(SQL, "Default");
                     while (csEmailList.ok()) {
                         int emailID = csEmailList.getInteger("EmailID");
@@ -213,8 +213,8 @@ namespace Contensive.Addons.Email {
                                 bool EmailAddLinkEID = csEmail.getBoolean("AddLinkEID");
                                 string EmailSubject = csEmail.getText("Subject");
                                 string EmailCopy = csEmail.getText("CopyFilename");
-                                string EmailStatus = queueEmailRecord(core, EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, csEmail.getBoolean("AllowSpamFooter"), EmailAddLinkEID, "");
-                                queueConfirmationEmail(core, ConfirmationMemberID, 0, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
+                                string EmailStatus = queueEmailRecord(core, "Conditional Email", EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, csEmail.getBoolean("AllowSpamFooter"), EmailAddLinkEID, "");
+                                queueConfirmationEmail(core, ConfirmationMemberID, 0, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>", "Conditional Email");
                             }
                             csEmail.close();
                         }
@@ -277,8 +277,8 @@ namespace Contensive.Addons.Email {
                                     bool EmailAddLinkEID = csEmail.getBoolean("AddLinkEID");
                                     string EmailSubject = csEmail.getText("Subject");
                                     string EmailCopy = csEmail.getText("CopyFilename");
-                                    string EmailStatus = queueEmailRecord(core, EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, csEmail.getText("Subject"), csEmail.getText("CopyFilename"), csEmail.getBoolean("AllowSpamFooter"), csEmail.getBoolean("AddLinkEID"), "");
-                                    queueConfirmationEmail(core, ConfirmationMemberID, 0, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
+                                    string EmailStatus = queueEmailRecord(core, "Conditional Email", EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, csEmail.getText("Subject"), csEmail.getText("CopyFilename"), csEmail.getBoolean("AllowSpamFooter"), csEmail.getBoolean("AddLinkEID"), "");
+                                    queueConfirmationEmail(core, ConfirmationMemberID, 0, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>", "Conditional Email");
                                 }
                                 csEmail.close();
                             }
@@ -314,53 +314,37 @@ namespace Contensive.Addons.Email {
         /// <param name="EmailAllowLinkEID"></param>
         /// <param name="emailStyles"></param>
         /// <returns>OK if successful, else returns user error.</returns>
-        private string queueEmailRecord(CoreController core, int MemberID, int emailID, DateTime DateBlockExpires, int emailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
+        private string queueEmailRecord(CoreController core, string emailContextMessage, int MemberID, int emailID, DateTime DateBlockExpires, int emailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
             string returnStatus = "";
             try {
-                string defaultPage = null;
-                string emailToName = null;
-                string ClickFlagQuery = null;
-                string EmailStatus = null;
-                string emailWorkingStyles = null;
-                string urlProtocolDomainSlash = null;
-                string protocolHostLink = null;
-                string emailToAddress = null;
-                string EmailBodyEncoded = null;
-                string EmailSubjectEncoded = null;
-                string EmailTemplateEncoded = "";
-                string openTriggerCode = "";
-                //
-                EmailBodyEncoded = EmailBody;
-                EmailSubjectEncoded = EmailSubject;
+                string EmailBodyEncoded = EmailBody;
+                string EmailSubjectEncoded = EmailSubject;
                 using (var CSLog = new CsModel(core)) {
                     CSLog.insert("Email Log");
                     if (CSLog.ok()) {
-                        CSLog.set("Name", "Sent " + encodeText(DateTime.Now));
+                        CSLog.set("Name", "Queued: " + emailContextMessage);
                         CSLog.set("EmailDropID", emailDropID);
                         CSLog.set("EmailID", emailID);
                         CSLog.set("MemberID", MemberID);
                         CSLog.set("LogType", EmailLogTypeDrop);
                         CSLog.set("DateBlockExpires", DateBlockExpires);
                         CSLog.set("SendStatus", "Send attempted but not completed");
-                        if (true) {
-                            CSLog.set("fromaddress", FromAddress);
-                            CSLog.set("Subject", EmailSubject);
-                        }
+                        CSLog.set("fromaddress", FromAddress);
+                        CSLog.set("Subject", EmailSubject);
                         CSLog.save();
                         //
                         // Get the Template
-                        //
-                        protocolHostLink = "http://" + core.appConfig.domainList[0];
+                        string protocolHostLink = "http://" + core.appConfig.domainList[0];
                         //
                         // Get the Member
-                        //
                         using (var CSPeople = new CsModel(core)) {
                             CSPeople.openRecord("People", MemberID, "Email,Name");
                             if (CSPeople.ok()) {
-                                emailToAddress = CSPeople.getText("Email");
-                                emailToName = CSPeople.getText("Name");
-                                defaultPage = core.siteProperties.serverPageDefault;
-                                urlProtocolDomainSlash = protocolHostLink + "/";
+                                string emailToAddress = CSPeople.getText("Email");
+                                string emailToName = CSPeople.getText("Name");
+                                string defaultPage = core.siteProperties.serverPageDefault;
+                                string urlProtocolDomainSlash = protocolHostLink + "/";
+                                string openTriggerCode = "";
                                 if (emailDropID != 0) {
                                     switch (core.siteProperties.getInteger("GroupEmailOpenTriggerMethod", 0)) {
                                         case 1:
@@ -372,73 +356,51 @@ namespace Contensive.Addons.Email {
                                     }
                                 }
                                 //
-                                emailWorkingStyles = emailStyles;
+                                string emailWorkingStyles = emailStyles;
                                 emailWorkingStyles = GenericController.vbReplace(emailWorkingStyles, StyleSheetStart, StyleSheetStart + "<!-- ", 1, 99, 1);
                                 emailWorkingStyles = GenericController.vbReplace(emailWorkingStyles, StyleSheetEnd, " // -->" + StyleSheetEnd, 1, 99, 1);
                                 //
                                 // Create the clickflag to be added to all anchors
-                                //
-                                ClickFlagQuery = rnEmailClickFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=" + MemberID;
+                                string ClickFlagQuery = rnEmailClickFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=" + MemberID;
                                 //
                                 // Encode body and subject
-                                //
-                                //EmailBodyEncoded = contentCmdController.executeContentCommands(core, EmailBodyEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, ref errorMessage);
                                 EmailBodyEncoded = ActiveContentController.renderHtmlForEmail(core, EmailBodyEncoded, MemberID, ClickFlagQuery);
-                                //EmailBodyEncoded = core.html.convertActiveContent_internal(EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
-                                //EmailBodyEncoded = core.csv_EncodeContent8(Nothing, EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
-                                //
-                                //EmailSubjectEncoded = contentCmdController.executeContentCommands(core, EmailSubjectEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, ref errorMessage);
                                 EmailSubjectEncoded = ActiveContentController.renderHtmlForEmail(core, EmailSubjectEncoded, MemberID, ClickFlagQuery);
-                                //EmailSubjectEncoded = core.html.convertActiveContent_internal(EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
-                                //EmailSubjectEncoded = core.csv_EncodeContent8(Nothing, EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                                 //
                                 // Encode/Merge Template
-                                //
                                 if (string.IsNullOrEmpty(EmailTemplate)) {
                                     //
                                     // create 20px padding template
-                                    //
                                     EmailBodyEncoded = "<div style=\"padding:10px;\">" + EmailBodyEncoded + "</div>";
                                 } else {
                                     //
                                     // use provided template
-                                    //
                                     // hotfix - templates no longer have wysiwyg editors, so content may not be saved correctly - preprocess to convert wysiwyg content
                                     EmailTemplate = ActiveContentController.processWysiwygResponseForSave(core, EmailTemplate);
-                                    EmailTemplateEncoded = ActiveContentController.renderHtmlForEmail(core, EmailTemplate, MemberID, ClickFlagQuery);
+                                    string EmailTemplateEncoded = ActiveContentController.renderHtmlForEmail(core, EmailTemplate, MemberID, ClickFlagQuery);
                                     if (GenericController.vbInstr(1, EmailTemplateEncoded, fpoContentBox) != 0) {
                                         EmailBodyEncoded = GenericController.vbReplace(EmailTemplateEncoded, fpoContentBox, EmailBodyEncoded);
                                     } else {
                                         EmailBodyEncoded = EmailTemplateEncoded + "<div style=\"padding:10px;\">" + EmailBodyEncoded + "</div>";
                                     }
-                                    //                If genericController.vbInstr(1, EmailTemplateEncoded, ContentPlaceHolder) <> 0 Then
-                                    //                    EmailBodyEncoded = genericController.vbReplace(EmailTemplateEncoded, ContentPlaceHolder, EmailBodyEncoded)
-                                    //                Else
-                                    //                    EmailBodyEncoded = EmailTemplateEncoded & "<div style=""padding:10px;"">" & EmailBodyEncoded & "</div>"
-                                    //                End If
                                 }
                                 //
                                 // Spam Footer under template
                                 // remove the marker for any other place in the email then add it as needed
-                                //
                                 EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, rnEmailBlockRecipientEmail, "", 1, 99, 1);
                                 if (AllowSpamFooter) {
                                     //
                                     // non-authorable, default true - leave it as an option in case there is an important exception
-                                    //
                                     EmailBodyEncoded = EmailBodyEncoded + "<div style=\"padding:10px;\">" + getLinkedText("<a href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailBlockRecipientEmail + "=#member_email#&" + rnEmailBlockRequestDropID + "=" + emailDropID + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
                                 }
                                 //
                                 // open trigger under footer (so it does not shake as the image comes in)
-                                //
                                 EmailBodyEncoded = EmailBodyEncoded + openTriggerCode;
                                 EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, "#member_id#", MemberID);
                                 EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, "#member_email#", emailToAddress);
                                 //
                                 // Now convert URLS to absolute
-                                //
                                 EmailBodyEncoded = convertLinksToAbsolute(EmailBodyEncoded, urlProtocolDomainSlash);
-                                //
                                 EmailBodyEncoded = ""
                                     + "<HTML>"
                                     + "<Head>"
@@ -449,21 +411,18 @@ namespace Contensive.Addons.Email {
                                     + "<Base href=\"" + urlProtocolDomainSlash + "\">"
                                     + emailWorkingStyles + EmailBodyEncoded + "</BODY>"
                                     + "</HTML>";
+                                string EmailStatus = null;
                                 //
                                 // Send
-                                //
-                                EmailController.queueAdHocEmail(core, emailToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, "", true, true, 0, ref EmailStatus);
+                                EmailController.queueAdHocEmail(core, emailContextMessage , MemberID, emailToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, "", true, true, emailID, ref EmailStatus);
                                 if (string.IsNullOrEmpty(EmailStatus)) {
                                     EmailStatus = "ok";
                                 }
-                                returnStatus = returnStatus + "Send to " + emailToName + " at " + emailToAddress + ", Status = " + EmailStatus;
+                                returnStatus = returnStatus + "Added to queue, email for " + emailToName + " at " + emailToAddress;
                                 //
                                 // ----- Log the send
-                                //
                                 CSLog.set("SendStatus", EmailStatus);
-                                if (true) {
-                                    CSLog.set("toaddress", emailToAddress);
-                                }
+                                CSLog.set("toaddress", emailToAddress);
                                 CSLog.save();
                             }
                         }
@@ -514,7 +473,7 @@ namespace Contensive.Addons.Email {
         /// <param name="emailStyles"></param>
         /// <param name="EmailFrom"></param>
         /// <param name="EmailStatusList"></param>
-        private void queueConfirmationEmail(CoreController core, int ConfirmationMemberID, int EmailDropID, string EmailTemplate, bool EmailAllowLinkEID, string PrimaryLink, string EmailSubject, string emailBody, string emailStyles, string EmailFrom, string EmailStatusList) {
+        private void queueConfirmationEmail(CoreController core, int ConfirmationMemberID, int EmailDropID, string EmailTemplate, bool EmailAllowLinkEID, string PrimaryLink, string EmailSubject, string emailBody, string emailStyles, string EmailFrom, string EmailStatusList, string emailContextMessage) {
             try {
                 PersonModel person = PersonModel.create(core, ConfirmationMemberID);
                 if (person != null) {
@@ -536,7 +495,7 @@ namespace Contensive.Addons.Email {
                         + BR;
                     string queryStringForLinkAppend = rnEmailClickFlag + "=" + EmailDropID + "&" + rnEmailMemberID + "=" + person.id;
                     string sendStatus = "";
-                    EmailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + core.appConfig.domainList[0], ConfirmBody, "", "", true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend);
+                    EmailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + core.appConfig.domainList[0], ConfirmBody, "", "", true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend, emailContextMessage);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

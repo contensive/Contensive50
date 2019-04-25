@@ -46,7 +46,7 @@ namespace Contensive.Processor {
         /// <param name="bodyIsHTML"></param>
         public override void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage) {
             try {
-                EmailController.queueAdHocEmail(cp.core, toAddress, fromAddress, subject, body, fromAddress, fromAddress, "", sendImmediately, bodyIsHTML,0 , ref userErrorMessage);
+                EmailController.queueAdHocEmail(cp.core, "Ad Hoc email from api", 0, toAddress, fromAddress, subject, body, fromAddress, fromAddress, "", sendImmediately, bodyIsHTML,0 , ref userErrorMessage);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -228,7 +228,7 @@ namespace Contensive.Processor {
                 userErrorMessage = "An email could not be sent because the user could not be located.";
                 return;
             }
-            EmailController.queuePersonEmail(cp.core, person, fromAddress, subject, body, "", "", sendImmediately, bodyIsHtml, 0,"",false, ref userErrorMessage);
+            EmailController.queuePersonEmail(cp.core, "Ad Hoc Email", person, fromAddress, subject, body, "", "", sendImmediately, bodyIsHtml, 0,"",false, ref userErrorMessage);
         }
         //
         public override void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
