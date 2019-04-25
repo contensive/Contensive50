@@ -155,19 +155,20 @@ namespace Contensive.Processor.Controllers {
         // -- todo
         public bool redirectBecausePageNotFound { get; set; } = false;
         //
-        // -- todo
-        internal List<string> errList { get; set; } // exceptions collected during document construction
+        /// <summary>
+        /// exceptions collected during document construction
+        /// </summary>
+        internal List<string> errorList { get; set; }
         //
-        // -- todo
-        public int errorCount { get; set; } = 0;
-        //
-        // -- todo
+        /// <summary>
+        /// user errors collected during this document
+        /// </summary>
         internal List<string> userErrorList = new List<string>();
         //
-        // -- todo
-        public string debug_iUserError { get; set; } = ""; // User Error String
-        //
-        // -- todo
+        // todo convert to list
+        /// <summary>
+        /// List of test points displayed on debug footer
+        /// </summary>
         public string testPointMessage { get; set; } = "";
         //
         // -- todo

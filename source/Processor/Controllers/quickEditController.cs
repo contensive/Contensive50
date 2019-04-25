@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
                 //        & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & OptionsPanelAuthoringStatus & "</div></td>" _
                 //        & cr & "</tr>"
                 //End If
-                if (core.doc.debug_iUserError != "") {
+                if (!core.doc.userErrorList.Count.Equals(0)) {
                     result += ""
                         + "\r<tr>"
                         + cr2 + "<td colspan=2 class=\"qeRow\"><div class=\"qeHeadCon\">" + ErrorController.getUserError(core) + "</div></td>"

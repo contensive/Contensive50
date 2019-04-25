@@ -49,10 +49,10 @@ namespace Contensive.Addons.Primitives {
                 // Close page
                 //
                 core.webServer.clearResponseBuffer();
-                if (core.doc.errorCount == 0) {
+                if (core.doc.errorList.Count == 0) {
                     result = "Contensive OK";
                 } else {
-                    result = "Contensive Error Count = " + core.doc.errorCount;
+                    result = "Contensive Error Count = " + core.doc.errorList.Count;
                 }
                 result = core.html.getHtmlBodyEnd(false, false);
                 core.doc.continueProcessing = false;

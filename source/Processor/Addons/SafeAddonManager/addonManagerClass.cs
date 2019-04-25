@@ -547,7 +547,7 @@ namespace Contensive.Addons.SafeAddonManager {
                         }
                         //
                         //   Forward to help page
-                        if ((collectionsInstalledIDList.Count > 0) && ( string.IsNullOrEmpty( core.doc.debug_iUserError ))) {
+                        if ((collectionsInstalledIDList.Count > 0) && (  core.doc.userErrorList.Count.Equals(0))) {
                             return core.webServer.redirect("/" + core.appConfig.adminRoute + "?helpcollectionid=" + collectionsInstalledIDList[0].ToString(), "Redirecting to help page after collection installation");
                         }
                         //

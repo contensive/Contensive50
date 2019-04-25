@@ -142,7 +142,7 @@ namespace Contensive.Addons.AdminSite {
                     //-------------------------------------------------------------------------------
                     //
                     if (adminData.AdminSourceForm == AdminFormEdit) {
-                        if (string.IsNullOrEmpty(cp.core.doc.debug_iUserError) && (adminData.requestButton.Equals(ButtonOK) || adminData.requestButton.Equals(ButtonCancel) || adminData.requestButton.Equals(ButtonDelete))) {
+                        if (cp.core.doc.userErrorList.Count.Equals(0) && (adminData.requestButton.Equals(ButtonOK) || adminData.requestButton.Equals(ButtonCancel) || adminData.requestButton.Equals(ButtonDelete))) {
                             string EditReferer = cp.core.docProperties.getText("EditReferer");
                             string CurrentLink = GenericController.modifyLinkQuery(cp.core.webServer.requestUrl, "editreferer", "", false);
                             CurrentLink = GenericController.vbLCase(CurrentLink);
@@ -376,7 +376,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                     //
                     // add user errors
-                    if (!string.IsNullOrEmpty(cp.core.doc.debug_iUserError)) {
+                    if (!cp.core.doc.userErrorList.Count.Equals(0)) {
                         adminBody = HtmlController.div(Processor.Controllers.ErrorController.getUserError(cp.core), "ccAdminMsg") + adminBody;
                     }
                     Stream.Add(getAdminHeader(cp, adminData));
@@ -708,7 +708,7 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.LoadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
                                         cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
-                                        if (string.IsNullOrEmpty(cp.core.doc.debug_iUserError)) {
+                                        if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                             using (var csData = new CsModel(cp.core)) {
                                                 csData.openRecord("Group Email", adminData.editRecord.id);
                                                 if (!csData.ok()) {
@@ -739,7 +739,7 @@ namespace Contensive.Addons.AdminSite {
                                     } else {
                                         // no save, page was read only - Call ProcessActionSave
                                         adminData.LoadEditRecord(cp.core);
-                                        if (string.IsNullOrEmpty(cp.core.doc.debug_iUserError)) {
+                                        if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                             using (var csData = new CsModel(cp.core)) {
                                                 if (csData.openRecord("Conditional Email", adminData.editRecord.id)) { csData.set("submitted", false); }
                                                 csData.close();
@@ -759,7 +759,7 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.LoadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
                                         cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
-                                        if (string.IsNullOrEmpty(cp.core.doc.debug_iUserError)) {
+                                        if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                             using (var csData = new CsModel(cp.core)) {
                                                 csData.openRecord("Conditional Email", adminData.editRecord.id);
                                                 if (!csData.ok()) {
@@ -787,7 +787,7 @@ namespace Contensive.Addons.AdminSite {
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
                                         cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                         //
-                                        if (!(cp.core.doc.debug_iUserError != "")) {
+                                        if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                             //
                                             EmailToConfirmationMemberID = 0;
                                             if (adminData.editRecord.fieldsLc.ContainsKey("testmemberid")) {
@@ -1256,7 +1256,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 int SaveCCIDValue = 0;
                 int ActivityLogOrganizationID = -1;
-                if (cp.core.doc.debug_iUserError != "") {
+                if (!cp.core.doc.userErrorList.Count.Equals(0)) {
                     //
                     // -- If There is an error, block the save
                     adminData.Admin_Action = Constants.AdminActionNop;
@@ -2020,7 +2020,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     //
                     //
-                    if (!(cp.core.doc.debug_iUserError != "")) {
+                    if (cp.core.doc.userErrorList.Count.Equals(0)) {
                         if (GenericController.vbUCase(adminData.adminContent.tableName) == GenericController.vbUCase("ccMembers")) {
                             //
                             //
@@ -2090,7 +2090,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // If the content supports datereviewed, mark it
                 //
-                if (cp.core.doc.debug_iUserError != "") {
+                if (!cp.core.doc.userErrorList.Count.Equals(0)) {
                     adminData.AdminForm = adminData.AdminSourceForm;
                 }
                 adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
@@ -2103,7 +2103,7 @@ namespace Contensive.Addons.AdminSite {
         //
         private void ProcessActionDuplicate(CPClass cp, AdminDataModel adminData) {
             try {
-                if (!(cp.core.doc.debug_iUserError != "")) {
+                if (cp.core.doc.userErrorList.Count.Equals(0)) {
                     switch (adminData.adminContent.tableName.ToLower()) {
                         case "ccemail":
                             //
@@ -2112,7 +2112,7 @@ namespace Contensive.Addons.AdminSite {
                             adminData.LoadEditRecord(cp.core);
                             adminData.LoadEditRecord_Request(cp.core);
                             //
-                            if (!(cp.core.doc.debug_iUserError != "")) {
+                            if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                 //
                                 // ----- Convert this to the Duplicate
                                 //
@@ -2136,7 +2136,7 @@ namespace Contensive.Addons.AdminSite {
                             adminData.LoadEditRecord(cp.core);
                             adminData.LoadEditRecord_Request(cp.core);
                             //
-                            if (!(cp.core.doc.debug_iUserError != "")) {
+                            if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                 //
                                 // ----- Convert this to the Duplicate
                                 adminData.editRecord.id = 0;
@@ -2681,7 +2681,7 @@ namespace Contensive.Addons.AdminSite {
                 string ErrorList = null;
                 string linkAlias = null;
                 //
-                if (cp.core.doc.debug_iUserError != "") {
+                if (!cp.core.doc.userErrorList.Count.Equals(0)) {
                     Processor.Controllers.ErrorController.addUserError(cp.core, "Existing pages could not be checked for Link Alias names because there was another error on this page. Correct this error, and turn Link Alias on again to rerun the verification.");
                 } else {
                     using (var csData = new CsModel(cp.core)) {
@@ -2709,7 +2709,7 @@ namespace Contensive.Addons.AdminSite {
                             csData.goNext();
                         }
                     }
-                    if (cp.core.doc.debug_iUserError != "") {
+                    if (!cp.core.doc.userErrorList.Count.Equals(0)) {
                         //
                         // Throw out all the details of what happened, and add one simple error
                         //

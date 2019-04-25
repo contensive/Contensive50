@@ -29,7 +29,7 @@ namespace Contensive.Addons.AdminSite {
                 bool AllowajaxTabs = (core.siteProperties.getBoolean("AllowAjaxEditTabBeta", false));
                 var adminMenu = new TabController();
                 //
-                if ((core.doc.debug_iUserError != "") & adminData.editRecord.Loaded) {
+                if (( !core.doc.userErrorList.Count.Equals(0)) & adminData.editRecord.Loaded) {
                     //
                     // block load if there was a user error and it is already loaded (assume error was from response )
                 } else if (adminData.adminContent.id <= 0) {

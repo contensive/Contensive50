@@ -196,7 +196,6 @@ namespace Contensive.Addons.Email {
                         + " AND (ccMembers.ID IS NOT NULL)"
                         + " AND (ccMembers.Active <> 0)"
                         + " AND (ccMembers.AllowBulkEmail <> 0)";
-                    // + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=ccMembers.ID))";
                     csEmailList.openSql(SQL, "Default");
                     while (csEmailList.ok()) {
                         int emailID = csEmailList.getInteger("EmailID");
@@ -250,6 +249,7 @@ namespace Contensive.Addons.Email {
                             + " Where (ccEmail.id Is Not Null)"
                             + " and(DATEADD(day, -ccEmail.ConditionPeriod, ccMemberRules.DateExpires) < " + SQLDateNow + ")" // dont send before
                             + " and(DATEADD(day, -ccEmail.ConditionPeriod-1.0, ccMemberRules.DateExpires) > " + SQLDateNow + ")" // don't send after 1-day
+                            + " and(DATEADD(day, ccEmail.ConditionPeriod, ccMemberRules.DateExpires) > ccemail.lastProcessDate )" // don't send if condition occured before last proces date
                             + " AND (ccEmail.ConditionExpireDate > " + SQLDateNow + " OR ccEmail.ConditionExpireDate IS NULL)"
                             + " AND (ccEmail.ScheduleDate < " + SQLDateNow + " OR ccEmail.ScheduleDate IS NULL)"
                             + " AND (ccEmail.Submitted <> 0)"

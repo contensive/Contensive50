@@ -51,7 +51,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool OK() {
-            return !(cp.core.doc.debug_iUserError != "");
+            return cp.core.doc.userErrorList.Count.Equals(0);
         }
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.

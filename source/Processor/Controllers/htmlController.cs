@@ -1798,7 +1798,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- Read in and save the Member profile values from the tools panel
                 //
                 if (core.session.user.id > 0) {
-                    if (!(core.doc.debug_iUserError != "")) {
+                    if (!(!core.doc.userErrorList.Count.Equals(0))) {
                         Button = core.docProperties.getText(legacyFormSn + "mb");
                         switch (Button) {
                             case ButtonLogout:

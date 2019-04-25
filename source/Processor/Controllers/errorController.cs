@@ -13,22 +13,19 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public static void addUserError(CoreController core, string Message) {
-            if (!string.IsNullOrEmpty(Message)) {
-                if (core.doc.debug_iUserError.IndexOf(Message, System.StringComparison.OrdinalIgnoreCase) == -1) {
-                    core.doc.debug_iUserError = core.doc.debug_iUserError + "\r<li class=\"ccExceptionListRow\">" + GenericController.encodeText(Message) + "</LI>";
-                }
-            }
+            if(!core.doc.userErrorList.Contains(Message)) { core.doc.userErrorList.Add(Message); }
         }
         //
         //====================================================================================================
         //
         public static string getUserError(CoreController core) {
+            if ( core.doc.userErrorList.Count.Equals(0)) { return string.Empty; }
             string result = "";
-            if (!string.IsNullOrEmpty(core.doc.debug_iUserError)) {
-                result = UserErrorHeadline + "<ul class=\"ccExceptionList\">" + core.doc.debug_iUserError + "\r</ul>";
-                core.doc.debug_iUserError = "";
+            foreach ( var userError in core.doc.userErrorList ) {
+                result += "\r<li class=\"ccExceptionListRow\">" + GenericController.encodeText(userError) + "</LI>";
             }
-            return result;
+            core.doc.userErrorList.Clear();
+            return "<ul class=\"ccExceptionList\">" + result + "\r</ul>";
         }
         //
         //====================================================================================================
@@ -40,9 +37,9 @@ namespace Contensive.Processor.Controllers {
         public static string getDocExceptionHtmlList(CoreController core) {
             string returnHtmlList = "";
             try {
-                if (core.doc.errList != null) {
-                    if (core.doc.errList.Count > 0) {
-                        foreach (string exMsg in core.doc.errList) {
+                if (core.doc.errorList != null) {
+                    if (core.doc.errorList.Count > 0) {
+                        foreach (string exMsg in core.doc.errorList) {
                             returnHtmlList += cr2 + "<li class=\"ccExceptionListRow\">" + cr3 + core.html.convertTextToHtml(exMsg) + cr2 + "</li>";
                         }
                         returnHtmlList = "\r<ul class=\"ccExceptionList\">" + returnHtmlList + "\r</ul>";

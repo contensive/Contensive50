@@ -94,7 +94,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- add user errors
                     loginForm = loginForm.Replace("{message}", ErrorController.getUserError(core));
-                    if (!core.doc.errorCount.Equals(0)) {
+                    if (!core.doc.errorList.Count.Equals(0)) {
                     }
                     //
                     // -- create the action query
@@ -473,7 +473,7 @@ namespace Contensive.Processor.Controllers {
                     if (!core.session.isNewCredentialOK(core, loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
                         ErrorController.addUserError(core, ErrorMessage);
                     } else {
-                        if (!(core.doc.debug_iUserError != "")) {
+                        if (!(!core.doc.userErrorList.Count.Equals(0))) {
                             using (var csData = new CsModel(core)) {
                                 csData.open("people", "ID=" + DbController.encodeSQLNumber(core.session.user.id));
                                 if (!csData.ok()) {

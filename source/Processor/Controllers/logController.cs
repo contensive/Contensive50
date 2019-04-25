@@ -353,13 +353,13 @@ namespace Contensive.Processor.Controllers {
                 //
                 // add to doc exception list to display at top of webpage
                 //
-                if (core.doc.errList == null) {
-                    core.doc.errList = new List<string>();
+                if (core.doc.errorList == null) {
+                    core.doc.errorList = new List<string>();
                 }
-                if (core.doc.errList.Count == 10) {
-                    core.doc.errList.Add("Exception limit exceeded");
-                } else if (core.doc.errList.Count < 10) {
-                    core.doc.errList.Add(errMsg);
+                if (core.doc.errorList.Count == 10) {
+                    core.doc.errorList.Add("Exception limit exceeded");
+                } else if (core.doc.errorList.Count < 10) {
+                    core.doc.errorList.Add(errMsg);
                 }
                 //
                 core._handlingExceptionRecursionBlock = false;

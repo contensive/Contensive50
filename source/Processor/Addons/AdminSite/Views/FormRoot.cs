@@ -73,7 +73,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Display the Addon
                     //
-                    if (core.doc.debug_iUserError != "") {
+                    if (!core.doc.userErrorList.Count.Equals(0)) {
                         returnHtml = returnHtml + "<div style=\"clear:both;margin-top:20px;\">&nbsp;</div>"
                         + "<div style=\"clear:both;margin-top:20px;\">" + Processor.Controllers.ErrorController.getUserError(core) + "</div>";
                     }
@@ -96,7 +96,7 @@ namespace Contensive.Addons.AdminSite {
                     + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\"><a Href=\"?" + RequestNameDashboardReset + "=" + core.session.visit.id + "\">Run Dashboard</A></div></div>"
                     + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\"><a Href=\"?addonguid=" + addonGuidAddonManager + "\">Add-on Manager</A></div></div>";
                     //
-                    if (core.doc.debug_iUserError != "") {
+                    if (!core.doc.userErrorList.Count.Equals(0)) {
                         returnHtml = returnHtml + "<div style=\"clear:both;margin-top:20px;\">&nbsp;</div>"
                         + "<div style=\"clear:both;margin-top:20px;\">" + Processor.Controllers.ErrorController.getUserError(core) + "</div>";
                     }

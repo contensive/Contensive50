@@ -166,7 +166,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         public static string getTitleBar(CoreController core, string Description) {
             string result = string.Empty;
             try {
-                if (core.doc.debug_iUserError != "") { Description += HtmlController.div( ErrorController.getUserError(core)); }
+                if (!core.doc.userErrorList.Count.Equals(0)) { Description += HtmlController.div( ErrorController.getUserError(core)); }
                 if (!string.IsNullOrEmpty(Description)) { result += HtmlController.div(Description); }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

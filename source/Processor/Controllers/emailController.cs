@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -574,151 +575,140 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ConfirmationMemberID"></param>
         public static void queueConfirmationTestEmail(CoreController core, int EmailID, int ConfirmationMemberID) {
             try {
-                string ConfirmFooter = "";
-                int TotalCnt = 0;
-                int BlankCnt = 0;
-                int DupCnt = 0;
-                string DupList = "";
-                int BadCnt = 0;
-                string BadList = "";
-                int EmailLen = 0;
-                string LastEmail = null;
-                string Emailtext = null;
-                string LastDupEmail = "";
-                string EmailLine = null;
-                string TotalList = "";
-                string EMailName = null;
-                int EmailMemberID = 0;
-                int Posat = 0;
-                int PosDot = 0;
-                string EmailSubject = null;
-                string EmailBody = null;
-                string EmailTemplate = null;
-                int EMailTemplateID = 0;
-                string EmailStatus = null;
                 //
                 using (var csData = new CsModel(core)) {
                     csData.openRecord("email", EmailID);
                     if (!csData.ok()) {
+                        //
+                        // -- email not found
                         ErrorController.addUserError(core, "There was a problem sending the email confirmation. The email record could not be found.");
-                    } else {
-                        EmailSubject = csData.getText("Subject");
-                        EmailBody = csData.getText("copyFilename");
-                        //
-                        // merge in template
-                        //
-                        EmailTemplate = "";
-                        EMailTemplateID = csData.getInteger("EmailTemplateID");
-                        if (EMailTemplateID != 0) {
-                            using (var CSTemplate = new CsModel(core)) {
-                                CSTemplate.openRecord("Email Templates", EMailTemplateID, "BodyHTML");
-                                if (csData.ok()) {
-                                    EmailTemplate = CSTemplate.getText("BodyHTML");
-                                }
+                        return;
+                    }
+                    //
+                    // merge in template
+                    string EmailTemplate = "";
+                    int EMailTemplateID = csData.getInteger("EmailTemplateID");
+                    if (EMailTemplateID != 0) {
+                        using (var CSTemplate = new CsModel(core)) {
+                            CSTemplate.openRecord("Email Templates", EMailTemplateID, "BodyHTML");
+                            if (csData.ok()) {
+                                EmailTemplate = CSTemplate.getText("BodyHTML");
                             }
                         }
+                    }
+                    //
+                    // spam footer
+                    string EmailBody = csData.getText("copyFilename");
+                    if (csData.getBoolean("AllowSpamFooter")) {
                         //
-                        // spam footer
+                        // AllowSpamFooter is default true, and non-authorable
+                        // It will be true in all cases, except a possible unforseen exception
                         //
-                        if (csData.getBoolean("AllowSpamFooter")) {
-                            //
-                            // This field is default true, and non-authorable
-                            // It will be true in all cases, except a possible unforseen exception
-                            //
-                            EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;\">" + GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(core.webServer.requestProtocol + core.webServer.requestDomain + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
-                            EmailBody = GenericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress");
-                        }
-                        //
-                        // Confirm footer
-                        //
-                        var personIdList = PersonModel.createidListForEmail(core, EmailID);
-                        if (personIdList.Count == 0) {
-                            ErrorController.addUserError(core, "There are no valid recipients of this email, other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.");
-                        } else {
-                            foreach (var personId in personIdList) {
-                                var person = PersonModel.create(core, personId);
-                                Emailtext = person.email;
-                                EMailName = person.name;
-                                EmailMemberID = person.id;
-                                if (string.IsNullOrEmpty(EMailName)) {
-                                    EMailName = "no name (member id " + EmailMemberID + ")";
-                                }
-                                EmailLine = Emailtext + " for " + EMailName;
-                                if (string.IsNullOrEmpty(Emailtext)) {
-                                    BlankCnt = BlankCnt + 1;
-                                } else {
-                                    if (Emailtext == LastEmail) {
-                                        DupCnt = DupCnt + 1;
-                                        if (Emailtext != LastDupEmail) {
-                                            DupList = DupList + "<div class=i>" + Emailtext + "</div>" + BR;
-                                            LastDupEmail = Emailtext;
-                                        }
+                        EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;\">" + GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(core.webServer.requestProtocol + core.webServer.requestDomain + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                        EmailBody = GenericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress");
+                    }
+                    //
+                    // Confirm footer
+                    //
+                    int TotalCnt = 0;
+                    int BlankCnt = 0;
+                    int DupCnt = 0;
+                    string DupList = "";
+                    int BadCnt = 0;
+                    string BadList = "";
+                    string TotalList = "";
+                    int contentControlId = csData.getInteger("contentControlId");
+                    bool isGroupEmail = contentControlId.Equals(ContentMetadataModel.getContentId(core, "Group Email"));
+                    var personIdList = PersonModel.createidListForEmail(core, EmailID);
+                    if (isGroupEmail && personIdList.Count.Equals(0)) {
+                        ErrorController.addUserError(core, "There are no valid recipients of this email other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.");
+                    } else {
+                        foreach (var personId in personIdList) {
+                            var person = PersonModel.create(core, personId);
+                            string Emailtext = person.email;
+                            string EMailName = person.name;
+                            int EmailMemberID = person.id;
+                            if (string.IsNullOrEmpty(EMailName)) {
+                                EMailName = "no name (member id " + EmailMemberID + ")";
+                            }
+                            string EmailLine = Emailtext + " for " + EMailName;
+                            string LastEmail = null;
+                            if (string.IsNullOrEmpty(Emailtext)) {
+                                BlankCnt = BlankCnt + 1;
+                            } else {
+                                if (Emailtext == LastEmail) {
+                                    DupCnt = DupCnt + 1;
+                                    string LastDupEmail = "";
+                                    if (Emailtext != LastDupEmail) {
+                                        DupList = DupList + "<div class=i>" + Emailtext + "</div>" + BR;
+                                        LastDupEmail = Emailtext;
                                     }
                                 }
-                                EmailLen = Emailtext.Length;
-                                Posat = GenericController.vbInstr(1, Emailtext, "@");
-                                PosDot = Emailtext.LastIndexOf(".") + 1;
-                                if (EmailLen < 6) {
-                                    BadCnt = BadCnt + 1;
-                                    BadList = BadList + EmailLine + BR;
-                                } else if ((Posat < 2) || (Posat > (EmailLen - 4))) {
-                                    BadCnt = BadCnt + 1;
-                                    BadList = BadList + EmailLine + BR;
-                                } else if ((PosDot < 4) || (PosDot > (EmailLen - 2))) {
-                                    BadCnt = BadCnt + 1;
-                                    BadList = BadList + EmailLine + BR;
-                                }
-                                TotalList = TotalList + EmailLine + BR;
-                                LastEmail = Emailtext;
-                                TotalCnt = TotalCnt + 1;
                             }
+                            int EmailLen = Emailtext.Length;
+                            int Posat = GenericController.vbInstr(1, Emailtext, "@");
+                            int PosDot = Emailtext.LastIndexOf(".") + 1;
+                            if (EmailLen < 6) {
+                                BadCnt = BadCnt + 1;
+                                BadList = BadList + EmailLine + BR;
+                            } else if ((Posat < 2) || (Posat > (EmailLen - 4))) {
+                                BadCnt = BadCnt + 1;
+                                BadList = BadList + EmailLine + BR;
+                            } else if ((PosDot < 4) || (PosDot > (EmailLen - 2))) {
+                                BadCnt = BadCnt + 1;
+                                BadList = BadList + EmailLine + BR;
+                            }
+                            TotalList = TotalList + EmailLine + BR;
+                            LastEmail = Emailtext;
+                            TotalCnt = TotalCnt + 1;
                         }
-                        //
-                        if (DupCnt == 1) {
-                            ErrorController.addUserError(core, "There is 1 duplicate email address. See the test email for details.");
-                            ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There is 1 duplicate email address. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=\"margin:20px;\">" + DupList + "</div></div>";
-                        } else if (DupCnt > 1) {
-                            ErrorController.addUserError(core, "There are " + DupCnt + " duplicate email addresses. See the test email for details");
-                            ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There are " + DupCnt + " duplicate email addresses. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=\"margin:20px;\">" + DupList + "</div></div>";
-                        }
-                        //
-                        if (BadCnt == 1) {
-                            ErrorController.addUserError(core, "There is 1 invalid email address. See the test email for details.");
-                            ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There is 1 invalid email address<div style=\"margin:20px;\">" + BadList + "</div></div>";
-                        } else if (BadCnt > 1) {
-                            ErrorController.addUserError(core, "There are " + BadCnt + " invalid email addresses. See the test email for details");
-                            ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There are " + BadCnt + " invalid email addresses<div style=\"margin:20px;\">" + BadList + "</div></div>";
-                        }
-                        //
-                        if (BlankCnt == 1) {
-                            ErrorController.addUserError(core, "There is 1 blank email address. See the test email for details");
-                            ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There is 1 blank email address.</div>";
-                        } else if (BlankCnt > 1) {
-                            ErrorController.addUserError(core, "There are " + DupCnt + " blank email addresses. See the test email for details.");
-                            ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There are " + BlankCnt + " blank email addresses.</div>";
-                        }
-                        //
-                        if (TotalCnt == 0) {
-                            ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There are no recipients for this email.</div>";
-                        } else if (TotalCnt == 1) {
-                            ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">There is 1 recipient<div style=\"margin:20px;\">" + TotalList + "</div></div>";
-                        } else {
-                            ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">There are " + TotalCnt + " recipients<div style=\"margin:20px;\">" + TotalList + "</div></div>";
-                        }
-                        //
-                        if (ConfirmationMemberID == 0) {
+                    }
+                    string ConfirmFooter = "";
+                    //
+                    if (DupCnt == 1) {
+                        ErrorController.addUserError(core, "There is 1 duplicate email address. See the test email for details.");
+                        ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There is 1 duplicate email address. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=\"margin:20px;\">" + DupList + "</div></div>";
+                    } else if (DupCnt > 1) {
+                        ErrorController.addUserError(core, "There are " + DupCnt + " duplicate email addresses. See the test email for details");
+                        ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There are " + DupCnt + " duplicate email addresses. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=\"margin:20px;\">" + DupList + "</div></div>";
+                    }
+                    //
+                    if (BadCnt == 1) {
+                        ErrorController.addUserError(core, "There is 1 invalid email address. See the test email for details.");
+                        ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There is 1 invalid email address<div style=\"margin:20px;\">" + BadList + "</div></div>";
+                    } else if (BadCnt > 1) {
+                        ErrorController.addUserError(core, "There are " + BadCnt + " invalid email addresses. See the test email for details");
+                        ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There are " + BadCnt + " invalid email addresses<div style=\"margin:20px;\">" + BadList + "</div></div>";
+                    }
+                    //
+                    if (BlankCnt == 1) {
+                        ErrorController.addUserError(core, "There is 1 blank email address. See the test email for details");
+                        ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There is 1 blank email address.</div>";
+                    } else if (BlankCnt > 1) {
+                        ErrorController.addUserError(core, "There are " + DupCnt + " blank email addresses. See the test email for details.");
+                        ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There are " + BlankCnt + " blank email addresses.</div>";
+                    }
+                    //
+                    if (TotalCnt == 0) {
+                        ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There are no recipients for this email.</div>";
+                    } else if (TotalCnt == 1) {
+                        ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">There is 1 recipient<div style=\"margin:20px;\">" + TotalList + "</div></div>";
+                    } else {
+                        ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">There are " + TotalCnt + " recipients<div style=\"margin:20px;\">" + TotalList + "</div></div>";
+                    }
+                    //
+                    if (ConfirmationMemberID == 0) {
+                        ErrorController.addUserError(core, "No confirmation email was send because a Confirmation member is not selected");
+                    } else {
+                        PersonModel person = PersonModel.create(core, ConfirmationMemberID);
+                        if (person == null) {
                             ErrorController.addUserError(core, "No confirmation email was send because a Confirmation member is not selected");
                         } else {
-                            PersonModel person = PersonModel.create(core, ConfirmationMemberID);
-                            if (person == null) {
-                                ErrorController.addUserError(core, "No confirmation email was send because a Confirmation member is not selected");
-                            } else {
-                                EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;margin:10px;border:1px dashed #888;\">Administrator<br><br>" + ConfirmFooter + "</div>";
-                                string queryStringForLinkAppend = "";
-                                string sendStatus = "";
-                                if (!queuePersonEmail(core, person, csData.getText("FromAddress"), EmailSubject, EmailBody, "", "", true, true, EmailID, EmailTemplate, false, ref sendStatus, queryStringForLinkAppend, "Test Email")) {
-                                    ErrorController.addUserError(core, EmailStatus);
-                                }
+                            EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;margin:10px;border:1px dashed #888;\">Administrator<br><br>" + ConfirmFooter + "</div>";
+                            string queryStringForLinkAppend = "";
+                            string sendStatus = "";
+                            if (!queuePersonEmail(core, person, csData.getText("FromAddress"), csData.getText("Subject"), EmailBody, "", "", true, true, EmailID, EmailTemplate, false, ref sendStatus, queryStringForLinkAppend, "Test Email")) {
+                                ErrorController.addUserError(core, sendStatus);
                             }
                         }
                     }

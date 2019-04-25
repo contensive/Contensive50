@@ -1058,7 +1058,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // No Link Forward, no Link Alias, no RemoteMethodFromPage, not Robots.txt
                             //
-                            if ((core.doc.errorCount == 0) && core.siteProperties.getBoolean("LinkForwardAutoInsert") && (!IsInLinkForwardTable)) {
+                            if ((core.doc.errorList.Count == 0) && core.siteProperties.getBoolean("LinkForwardAutoInsert") && (!IsInLinkForwardTable)) {
                                 //
                                 // Add a new Link Forward entry
                                 //
@@ -2829,7 +2829,7 @@ namespace Contensive.Processor.Controllers {
                 //    Call WorkflowController.main_SubmitEdit(pageCdef.name, RecordID)
                 //    Call sendPublishSubmitNotice(pageCdef.name, RecordID, "")
                 //End If
-                if ((!(core.doc.debug_iUserError != "")) && ((button == ButtonOK) || (button == ButtonCancel))) {
+                if ((!(!core.doc.userErrorList.Count.Equals(0))) && ((button == ButtonOK) || (button == ButtonCancel))) {
                     //
                     // ----- Turn off Quick Editor if not save or add child
                     //

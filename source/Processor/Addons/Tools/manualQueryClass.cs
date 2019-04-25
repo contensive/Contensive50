@@ -107,7 +107,7 @@ namespace Contensive.Addons.Tools {
                         if (!string.IsNullOrWhiteSpace(errSql)) {
                             Stream.Add("<br>" + DateTime.Now + " SQL execution returned the following error");
                             Stream.Add("<br>" + errSql);
-                            core.doc.errList.Clear();
+                            core.doc.errorList.Clear();
                         } else {
                             Stream.Add("<br>" + DateTime.Now + " SQL executed successfully");
                             if (dt == null) {

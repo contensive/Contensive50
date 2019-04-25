@@ -329,13 +329,13 @@
 //                                                        errors[ErrorCount] = ("[" + AppName + "] ERROR - Last status check returned [" + AppLog[AppLogPtr].LastStatusResponse + "]");
 //                                                        ErrorCount = ErrorCount + 1;
 //                                                    }
-//                                                    if (AppLog[AppLogPtr].ErrorCount != 0) {
+//                                                    if (AppLog[AppLogPtr].errList.Count != 0) {
 //                                                        if (monitorConfig.ClearErrorsOnMonitorHit) {
-//                                                            Content = Content + StatusLine(2, "errors detected since last monitor hit [" + AppLog[AppLogPtr].ErrorCount + "]");
-//                                                            AppLog[AppLogPtr].ErrorCount = 0;
+//                                                            Content = Content + StatusLine(2, "errors detected since last monitor hit [" + AppLog[AppLogPtr].errList.Count + "]");
+//                                                            AppLog[AppLogPtr].errList.Count = 0;
 //                                                            AppLog[AppLogPtr].LastCheckOK = true;
 //                                                        } else {
-//                                                            Content = Content + StatusLine(2, "errors detected since monitor started [" + AppLog[AppLogPtr].ErrorCount + "]");
+//                                                            Content = Content + StatusLine(2, "errors detected since monitor started [" + AppLog[AppLogPtr].errList.Count + "]");
 //                                                        }
 //                                                    } else {
 //                                                        Content = Content + StatusLine(2, "no monitor errors detected");
@@ -368,7 +368,7 @@
 //                                                Content = Content + StatusLine(2, "Active Connections [" + "AppServices.ConnectionsActive" + "]");
 //                                                Content = Content + StatusLine(2, "Started [" + "AppServices.DateStarted" + "]");
 //                                                Content = Content + StatusLine(2, "Hits [" + "AppServices.HitCounter" + "]");
-//                                                Content = Content + StatusLine(2, "Errors [" + "AppServices.ErrorCount" + "]");
+//                                                Content = Content + StatusLine(2, "Errors [" + "AppServices.errList.Count" + "]");
 //                                                //
 //                                                cp.Dispose();
 //                                                cp = null;

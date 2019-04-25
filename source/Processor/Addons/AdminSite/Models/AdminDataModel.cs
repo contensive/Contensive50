@@ -1279,7 +1279,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             if (AllowAdminFieldCheck(core)) {
                                 if (!core.docProperties.containsKey(field.nameLc.ToUpper())) {
-                                    if (!(core.doc.debug_iUserError != "")) {
+                                    if (!(!core.doc.userErrorList.Count.Equals(0))) {
                                         //
                                         // Add user error only for the first missing field
                                         //
