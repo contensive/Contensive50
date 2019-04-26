@@ -28,29 +28,24 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     //
                     // -- send email
-                    // Replace USWest2 with the AWS Region you're using for Amazon SES.
-                    // Acceptable values are EUWest1, USEast1, and USWest2.
+                    Body messageBody = new Body { };
+                    if (!string.IsNullOrEmpty(email.htmlBody)) {
+                        messageBody.Html = new Content { Charset = "UTF-8", Data = email.htmlBody };
+                    }
+                    if (!string.IsNullOrEmpty(email.textBody)) {
+                        messageBody.Text = new Content { Charset = "UTF-8", Data = email.textBody };
+                    }
                     AmazonSimpleEmailServiceConfig sesConfig = new AmazonSimpleEmailServiceConfig();
                     using (var client = new AmazonSimpleEmailServiceClient(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.USEast1)) {
                         var sendRequest = new SendEmailRequest {
                             Source = email.fromAddress,
                             Destination = new Destination {
-                                ToAddresses =
-                                new List<string> { email.toAddress }
+                                ToAddresses = new List<string> { email.toAddress }
                             },
                             Message = new Message {
                                 Subject = new Content(email.subject),
-                                Body = new Body {
-                                    Html = new Content {
-                                        Charset = "UTF-8",
-                                        Data = email.htmlBody
-                                    },
-                                    Text = new Content {
-                                        Charset = "UTF-8",
-                                        Data = email.textBody
-                                    }
-                                }
-                            },
+                                Body = messageBody
+                            }
                         };
                         try {
                             LogController.logInfo(core, "sendSmtp, to [" + email.toAddress + "], from [" + email.fromAddress + "], subject [" + email.subject + "]");

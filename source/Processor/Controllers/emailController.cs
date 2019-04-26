@@ -388,12 +388,21 @@ namespace Contensive.Processor.Controllers {
         public static bool queueSystemEmail(CoreController core, string emailName, string appendedCopy, int additionalMemberID, ref string userErrorMessage) {
             SystemEmailModel email = SystemEmailModel.createByUniqueName(core, emailName);
             if (email == null) {
-                email = SystemEmailModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, SystemEmailModel.contentName));
-                email.name = emailName;
-                email.subject = emailName;
-                email.fromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
-                email.save(core);
-                LogController.handleError(core, new GenericException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
+                if (emailName.IsNumeric()) {
+                    //
+                    // -- compatibility for really ugly legacy nonsense where old interface has argument "EmailIdOrName".
+                    email = SystemEmailModel.create(core, GenericController.encodeInteger(emailName));
+                }
+                if (email == null) {
+                    //
+                    // -- create new system email with this name - exposure of possible integer used as name
+                    email = SystemEmailModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, SystemEmailModel.contentName));
+                    email.name = emailName;
+                    email.subject = emailName;
+                    email.fromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
+                    email.save(core);
+                    LogController.handleError(core, new GenericException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
+                }
             }
             return queueSystemEmail(core, email, appendedCopy, additionalMemberID, ref userErrorMessage);
         }
@@ -944,7 +953,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- fail, add back to end of queue for retry
                             string sendStatus = "Retrying unsuccessful send (" + email.attempts.ToString() + " of 3), reason [" + reasonForFail + "]";
-                            sendStatus = sendStatus.Substring(0, (sendStatus.Length > 254) ? 254: sendStatus.Length);
+                            sendStatus = sendStatus.Substring(0, (sendStatus.Length > 254) ? 254 : sendStatus.Length);
                             email.attempts += 1;
                             var log = EmailLogModel.addEmpty(core);
                             log.name = "Failed send queued for retry: " + queueRecord.name;
