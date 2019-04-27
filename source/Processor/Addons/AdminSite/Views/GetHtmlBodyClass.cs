@@ -744,6 +744,8 @@ namespace Contensive.Addons.AdminSite {
                                                 if (csData.openRecord("Conditional Email", adminData.editRecord.id)) { csData.set("submitted", false); }
                                                 csData.close();
                                             }
+                                            adminData.LoadEditRecord(cp.core);
+                                            adminData.LoadEditRecord_Request(cp.core);
                                         }
                                     }
                                     adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
@@ -773,6 +775,8 @@ namespace Contensive.Addons.AdminSite {
                                                     }
                                                 }
                                             }
+                                            adminData.LoadEditRecord(cp.core);
+                                            adminData.LoadEditRecord_Request(cp.core);
                                         }
                                     }
                                     adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh

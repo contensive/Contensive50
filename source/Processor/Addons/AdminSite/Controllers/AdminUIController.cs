@@ -969,7 +969,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="htmlName"></param>
         /// <param name="htmlValue"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_Bool(CoreController core, string htmlName, bool htmlValue, bool readOnly = false, string htmlId = "") {
+        public static string getDefaultEditor_bool(CoreController core, string htmlName, bool htmlValue, bool readOnly = false, string htmlId = "") {
             string result = HtmlController.div(HtmlController.checkbox(htmlName, htmlValue, htmlId, false, "", readOnly), "checkbox");
             if (readOnly)  result += HtmlController.inputHidden(htmlName, htmlValue);
             return result;
@@ -986,7 +986,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="isPassword"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_Text(CoreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
+        public static string getDefaultEditor_text(CoreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
             if ((fieldValue.IndexOf("\n") == -1) && (fieldValue.Length < 80)) {
                 //
                 // text field shorter then 40 characters without a CR
@@ -1059,7 +1059,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="fieldRequired"></param>
         /// <param name="IsEmptyList"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_LookupContent( CoreController core, string fieldName, int fieldValue, int lookupContentId, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
+        public static string getDefaultEditor_lookupContent( CoreController core, string fieldName, int fieldValue, int lookupContentId, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
             string result = "";
             ContentMetadataModel lookupContentMetacontent = ContentMetadataModel.create( core, lookupContentId );
             if ( lookupContentMetacontent == null) {
@@ -1074,9 +1074,9 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     csData.openRecord(lookupContentMetacontent.name, fieldValue, "Name,ContentControlID");
                     if (csData.ok()) {
                         if (csData.getText("Name") == "") {
-                            result += getDefaultEditor_Text(core, fieldName + "-readonly-fpo", "No Name", readOnly, htmlId);
+                            result += getDefaultEditor_text(core, fieldName + "-readonly-fpo", "No Name", readOnly, htmlId);
                         } else {
-                            result += getDefaultEditor_Text(core, fieldName + "-readonly-fpo", csData.getText("Name"), readOnly, htmlId);
+                            result += getDefaultEditor_text(core, fieldName + "-readonly-fpo", csData.getText("Name"), readOnly, htmlId);
                         }
                         result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentId + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                     } else {
@@ -1117,18 +1117,18 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="WhyReadOnlyMsg"></param>
         /// <param name="fieldRequired"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_LookupList(CoreController core, string htmlName, int defaultLookupIndexBaseOne, string[] lookupArray, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
+        public static string getDefaultEditor_lookupList(CoreController core, string htmlName, int defaultLookupIndexBaseOne, string[] lookupArray, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
             string result = "";
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
                 result += (HtmlController.inputHidden(htmlName, defaultLookupIndexBaseOne.ToString()));
                 if (defaultLookupIndexBaseOne < 1) {
-                    result += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
+                    result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
                 } else if (defaultLookupIndexBaseOne > (lookupArray.GetUpperBound(0) + 1)) {
-                    result += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
+                    result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
                 } else {
-                    result += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", lookupArray[defaultLookupIndexBaseOne - 1], readOnly, htmlId);
+                    result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", lookupArray[defaultLookupIndexBaseOne - 1], readOnly, htmlId);
                 }
                 result += WhyReadOnlyMsg;
             } else {
@@ -1149,9 +1149,9 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 result += (HtmlController.inputHidden(htmlName, GenericController.encodeText(defaultValue)));
                 NameValueClass nameValue = lookupList.Find(x => x.name.ToLowerInvariant() == htmlName.ToLowerInvariant());
                 if (nameValue == null) {
-                    result += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
+                    result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
                 } else {
-                    result += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", nameValue.value, readOnly, htmlId);
+                    result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", nameValue.value, readOnly, htmlId);
                 }
                 result += WhyReadOnlyMsg;
             } else {
@@ -1168,7 +1168,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_DateTime( CoreController core, string fieldName, DateTime FieldValueDate, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
+        public static string getDefaultEditor_dateTime( CoreController core, string fieldName, DateTime FieldValueDate, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
             string inputDate = "";
             if (FieldValueDate.CompareTo(new DateTime(1900,1,1))>0) {
                 if (FieldValueDate.Hour.Equals(0) && FieldValueDate.Minute.Equals(0) && FieldValueDate.Second.Equals(0)) {
@@ -1177,26 +1177,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     inputDate = FieldValueDate.ToString();
                 }
             }
-            return getDefaultEditor_Text(core, fieldName, inputDate, readOnly, htmlId);
-            //string result = "";
-            //string fieldValue_text = "";
-            //if (FieldValueDate == DateTime.MinValue) {
-            //    fieldValue_text = "";
-            //} else {
-            //    fieldValue_text = encodeText(FieldValueDate);
-            //}
-            //if (readOnly) {
-            //    //
-            //    // -- readOnly
-            //    result += HtmlController.inputHidden(fieldName, fieldValue_text);
-            //    result += HtmlController.inputText( core,fieldName, fieldValue_text, -1, -1, "", false, true, "date form-control");
-            //    result += WhyReadOnlyMsg;
-            //} else {
-            //    //
-            //    // -- editable
-            //    result += HtmlController.inputDateTime( core,fieldName, encodeDate(fieldValue_text),"",htmlId, "date form-control", readOnly, fieldRequired);
-            //}
-            //return result;
+            return getDefaultEditor_text(core, fieldName, inputDate, readOnly, htmlId);
         }
         //
         // ====================================================================================================
@@ -1219,9 +1200,9 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 } else {
                     var selectedUser = PersonModel.create(core, selectedRecordId);
                     if ( selectedUser==null) {
-                        EditorString += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", "(deleted)", readOnly, htmlId);
+                        EditorString += getDefaultEditor_text(core, htmlName + "-readonly-fpo", "(deleted)", readOnly, htmlId);
                     } else {
-                        EditorString += getDefaultEditor_Text(core, htmlName + "-readonly-fpo", (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : HtmlController.encodeHtml(selectedUser.name), readOnly, htmlId);
+                        EditorString += getDefaultEditor_text(core, htmlName + "-readonly-fpo", (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : HtmlController.encodeHtml(selectedUser.name), readOnly, htmlId);
                         EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                     }
                 }
@@ -1254,7 +1235,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
             string MTMRuleContent = MetadataController.getContentNameByID(core, field.manyToManyRuleContentID);
             string MTMRuleField0 = field.manyToManyRulePrimaryField;
             string MTMRuleField1 = field.manyToManyRuleSecondaryField;
-            result += core.html.getCheckList(htmlName, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false, false, currentValueCommaList);
+            result += core.html.getCheckList(htmlName, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "",readOnly, false, currentValueCommaList);
             //result += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1);
             result += WhyReadOnlyMsg;
             return result;
@@ -1374,7 +1355,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     //
 
                     selector = GenericController.decodeNvaArgument(selector);
-                    result = getDefaultEditor_Text(core, SitePropertyName, selector);
+                    result = getDefaultEditor_text(core, SitePropertyName, selector);
                 }
 
                 //FastString = null;

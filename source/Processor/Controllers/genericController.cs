@@ -1494,7 +1494,7 @@ namespace Contensive.Processor.Controllers {
             if (Expression is string) {
                 // visual basic - when converting a date to a string, it converts minDate to "12:00:00 AM". 
                 // however, Convert.ToDateTime() converts "12:00:00 AM" to the current date.
-                // this is a terrible hack, but to be compatible with current software, "#12:00:00 AM#" must return mindate
+                // this is a terrible hack, but to be compatible with current software, "#12:00:00 AM#" must return mindate 
                 if ((String)Expression == "12:00:00 AM") { return DateTime.MinValue; }
             }
             if (GenericController.IsDate(Expression)) { return Convert.ToDateTime(Expression); }

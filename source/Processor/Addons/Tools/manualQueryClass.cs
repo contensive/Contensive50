@@ -188,7 +188,7 @@ namespace Contensive.Addons.Tools {
                 //
                 // -- data source
                 bool isEmptyList = false;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_LookupContent(core, "DataSourceID", datasource.id, ContentMetadataModel.getContentId(core, "data sources"), ref isEmptyList)));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_lookupContent(core, "DataSourceID", datasource.id, ContentMetadataModel.getContentId(core, "data sources"), ref isEmptyList)));
                 {
                     //
                     // -- sql list
@@ -206,15 +206,15 @@ namespace Contensive.Addons.Tools {
                 //
                 // -- page size
                 if (IsNull(PageSize)) PageSize = 100;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Page Size", AdminUIController.getDefaultEditor_Text(core, "PageSize", PageSize.ToString())));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Page Size", AdminUIController.getDefaultEditor_text(core, "PageSize", PageSize.ToString())));
                 //
                 // -- page number
                 if (IsNull(PageNumber)) PageNumber = 1;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Page Number", AdminUIController.getDefaultEditor_Text(core, "PageNumber", PageNumber.ToString())));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Page Number", AdminUIController.getDefaultEditor_text(core, "PageNumber", PageNumber.ToString())));
                 //
                 // -- timeout
                 if (IsNull(Timeout)) Timeout = 30;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Timeout (sec)", AdminUIController.getDefaultEditor_Text(core, "Timeout", Timeout.ToString())));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Timeout (sec)", AdminUIController.getDefaultEditor_text(core, "Timeout", Timeout.ToString())));
                 //
                 // -- assemble form
                 returnHtml = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonRun);

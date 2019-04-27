@@ -45,7 +45,7 @@ namespace Contensive.Addons.AdminSite {
                 // ----- RecordID
                 {
                     string fieldValue = (editRecord.id == 0) ? "(available after save)" : editRecord.id.ToString();
-                    string fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore", fieldValue, true, "");
+                    string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore", fieldValue, true, "");
                     string fieldHelp = "This is the unique number that identifies this record within this content.";
                     tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Record Number", fieldHelp, true, false, ""));
                 }
@@ -97,12 +97,12 @@ namespace Contensive.Addons.AdminSite {
                         // add a set button
                         string fieldId = "setGuid" + GenericController.GetRandomInteger(core).ToString();
                         string buttonCell = HtmlController.div(AdminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + GenericController.getGUID(true) + "';this.disabled=true;}"), "col-xs-1");
-                        string inputCell = HtmlController.div(AdminUIController.getDefaultEditor_Text(core, "ccguid", "", false, htmlId), "col-xs-11");
+                        string inputCell = HtmlController.div(AdminUIController.getDefaultEditor_text(core, "ccguid", "", false, htmlId), "col-xs-11");
                         fieldEditor = HtmlController.div(HtmlController.div(buttonCell + inputCell, "row"), "container-fluid");
                     } else {
                         //
                         // field is read-only except for developers
-                        fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ccguid", fieldValue, !core.session.isAuthenticatedDeveloper(core), htmlId);
+                        fieldEditor = AdminUIController.getDefaultEditor_text(core, "ccguid", fieldValue, !core.session.isAuthenticatedDeveloper(core), htmlId);
                     }
                     tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "GUID", FieldHelp, false, false, htmlId));
                 }
@@ -128,7 +128,7 @@ namespace Contensive.Addons.AdminSite {
                             }
                             fieldHelp += " To enable, disable or modify this feature, use the security tab on the Preferences page.";
                             fieldHelp += "<br>For example: " + sampleUrl;
-                            fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_eid", eidQueryString, true, htmlId);
+                            fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_eid", eidQueryString, true, htmlId);
                         }
                         tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Member Link Login Querystring", fieldHelp, true, false, htmlId));
                     }
@@ -172,7 +172,7 @@ namespace Contensive.Addons.AdminSite {
                                 // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                                 string sqlFilter = "(ContentTableID=" + TableID + ")";
                                 int contentCID = MetadataController.getRecordIdByUniqueName(core, Processor.Models.Db.ContentModel.contentName, Processor.Models.Db.ContentModel.contentName);
-                                HTMLFieldString += AdminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, false, "", "", true, sqlFilter);
+                                HTMLFieldString += AdminUIController.getDefaultEditor_lookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, false, "", "", true, sqlFilter);
                                 FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)";
                             }
                         }
@@ -208,7 +208,7 @@ namespace Contensive.Addons.AdminSite {
                             }
                         }
                     }
-                    string fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_createdBy", fieldValue, true, "");
+                    string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_createdBy", fieldValue, true, "");
                     tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Created By", FieldHelp, FieldRequired, false, ""));
                 }
                 //
@@ -225,7 +225,7 @@ namespace Contensive.Addons.AdminSite {
                             fieldValue = editRecord.dateAdded.ToString();
                         }
                     }
-                    string fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_createdDate", fieldValue, true, "");
+                    string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_createdDate", fieldValue, true, "");
                     //string fieldEditor = htmlController.inputText( core,"ignore", fieldValue, -1, -1, "", false, true);
                     tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Created Date", FieldHelp, FieldRequired, false, ""));
                 }
@@ -255,7 +255,7 @@ namespace Contensive.Addons.AdminSite {
                             }
                         }
                     }
-                    string fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_modifiedBy", fieldValue, true, "");
+                    string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_modifiedBy", fieldValue, true, "");
                     tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Modified By", FieldHelp, FieldRequired, false, ""));
                 }
                 //
@@ -272,7 +272,7 @@ namespace Contensive.Addons.AdminSite {
                             fieldValue = editRecord.modifiedDate.ToString();
                         }
                     }
-                    string fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_modifiedBy", fieldValue, true, "");
+                    string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_modifiedBy", fieldValue, true, "");
                     tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Modified Date", FieldHelp, false, false, ""));
                 }
                 string s = AdminUIController.editTable(tabPanel.Text);

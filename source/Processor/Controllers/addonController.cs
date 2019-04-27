@@ -990,16 +990,16 @@ namespace Contensive.Processor.Controllers {
                                                                 switch (GenericController.vbLCase(fieldType)) {
                                                                     case "integer":
                                                                         //
-                                                                        Copy = AdminUIController.getDefaultEditor_Text(core, FieldName, FieldValue, FieldReadOnly);
+                                                                        Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
                                                                         break;
                                                                     case "boolean":
-                                                                        Copy = AdminUIController.getDefaultEditor_Bool(core, FieldName, GenericController.encodeBoolean(FieldValue), FieldReadOnly);
+                                                                        Copy = AdminUIController.getDefaultEditor_bool(core, FieldName, GenericController.encodeBoolean(FieldValue), FieldReadOnly);
                                                                         break;
                                                                     case "float":
-                                                                        Copy = AdminUIController.getDefaultEditor_Text(core, FieldName, FieldValue, FieldReadOnly);
+                                                                        Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
                                                                         break;
                                                                     case "date":
-                                                                        Copy = AdminUIController.getDefaultEditor_DateTime(core, FieldName, encodeDate(FieldValue), FieldReadOnly);
+                                                                        Copy = AdminUIController.getDefaultEditor_dateTime(core, FieldName, encodeDate(FieldValue), FieldReadOnly);
                                                                         break;
                                                                     case "file":
                                                                     case "imagefile":
@@ -1026,7 +1026,7 @@ namespace Contensive.Processor.Controllers {
                                                                         if (!string.IsNullOrEmpty(FieldValue)) {
                                                                             FieldValue = String.Format("C", FieldValue);
                                                                         }
-                                                                        Copy = AdminUIController.getDefaultEditor_Text(core, FieldName, FieldValue, FieldReadOnly);
+                                                                        Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
                                                                         break;
                                                                     case "textfile":
                                                                         if (FieldReadOnly) {
@@ -1058,7 +1058,7 @@ namespace Contensive.Processor.Controllers {
                                                                         if (FieldHTML) {
                                                                             Copy = AdminUIController.getDefaultEditor_Html(core, FieldName, FieldValue, "", "", "", FieldReadOnly);
                                                                         } else {
-                                                                            Copy = AdminUIController.getDefaultEditor_Text(core, FieldName, FieldValue, FieldReadOnly);
+                                                                            Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
                                                                         }
                                                                         break;
                                                                 }
@@ -1098,7 +1098,7 @@ namespace Contensive.Processor.Controllers {
                                                             if (FieldHTML) {
                                                                 Copy = AdminUIController.getDefaultEditor_Html(core, FieldName, FieldValue, "", "", "", FieldReadOnly);
                                                             } else {
-                                                                Copy = AdminUIController.getDefaultEditor_Text(core, FieldName, FieldValue, FieldReadOnly);
+                                                                Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
                                                             }
                                                             TabCell.Add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
