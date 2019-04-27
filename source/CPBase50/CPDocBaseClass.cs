@@ -4,12 +4,12 @@ using System;
 namespace Contensive.BaseClasses {
     public abstract class CPDocBaseClass {
         public abstract string Content { get; set; }
-        [Obsolete("Use addon navigation.", true)] public abstract string NavigationStructure { get; }
+        [Obsolete("Use addon navigation.", false)] public abstract string NavigationStructure { get; }
         public abstract bool NoFollow { get; set; }
         public abstract int PageId { get; }
         public abstract string PageName { get; }
         public abstract string RefreshQueryString { get; }
-        [Obsolete("Section is no longer supported", true)] public abstract int SectionId { get; }
+        [Obsolete("Section is no longer supported", false)] public abstract int SectionId { get; }
         public abstract DateTime StartTime { get; }
         public abstract int TemplateId { get; }
         public abstract string Type { get; }
@@ -23,7 +23,7 @@ namespace Contensive.BaseClasses {
         public abstract void AddTitle(string PageTitle);
         public abstract void AddBodyEnd(string html);
         public abstract string Body { get; set; }
-        [Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", true)] public abstract string SiteStylesheet { get; }
+        [Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", false)] public abstract string SiteStylesheet { get; }
         public abstract void SetProperty(string FieldName, string FieldValue);
         public abstract string GetProperty(string PropertyName, string DefaultValue = "");
         public abstract string GetText(string PropertyName, string DefaultValue = "");

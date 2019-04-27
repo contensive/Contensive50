@@ -281,7 +281,7 @@ namespace Contensive.BaseClasses {
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("Deprecated, template link is not supported", true)]
+        [Obsolete("Deprecated, template link is not supported", false)]
         public abstract string GetTemplateLink(int TemplateID);
         //
         [Obsolete("workflow editing is deprecated", false)]
@@ -299,7 +299,7 @@ namespace Contensive.BaseClasses {
         [Obsolete("workflow editing is deprecated", false)]
         public abstract void ApproveEdit(string ContentName, int RecordId); //Implements BaseClasses.CPContentBaseClass.ApproveEdit
         //
-        [Obsolete("Please use AddRecord(ContentName as String)", true)]
+        [Obsolete("Please use AddRecord(ContentName as String)", false)]
         public abstract int AddRecord(object ContentName);
     }
 

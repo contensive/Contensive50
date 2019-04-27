@@ -131,7 +131,7 @@ namespace Contensive.Processor {
         /// <param name="ContentNameList"></param>
         /// <remarks></remarks>
         ///
-        [Obsolete("Use Clear(dependentKeyList)", true)]
+        [Obsolete("Use Clear(dependentKeyList)", false)]
         public override void Clear(string ContentNameList) {
             if (!string.IsNullOrEmpty(ContentNameList)) {
                 List<string> tableNameList = new List<string>();
@@ -173,46 +173,46 @@ namespace Contensive.Processor {
         }
         //
         [Obsolete("deprecated",true)]
-        public override void setKey(string key, object value) {
+        public override void SetKey(string key, object value) {
             cp.core.cache.storeObject(key, value);
         }
         //
         [Obsolete("deprecated",true)]
-        public override void setKey(string key, object value, DateTime invalidationDate) {
+        public override void SetKey(string key, object value, DateTime invalidationDate) {
             cp.core.cache.storeObject(key, value, invalidationDate, new List<string> { });
         }
         //
         [Obsolete("deprecated",true)]
-        public override void setKey(string key, object value, List<string> tagList) {
+        public override void SetKey(string key, object value, List<string> tagList) {
             cp.core.cache.storeObject(key, value, tagList);
         }
         //
         [Obsolete("deprecated",true)]
-        public override void setKey(string key, object value, DateTime invalidationDate, List<string> tagList) {
+        public override void SetKey(string key, object value, DateTime invalidationDate, List<string> tagList) {
             cp.core.cache.storeObject(key, value, invalidationDate, tagList);
         }
         //
         [Obsolete("deprecated",true)]
-        public override void setKey(string key, object value, string tag) {
+        public override void SetKey(string key, object value, string tag) {
             cp.core.cache.storeObject(key, value, tag);
         }
         //
         [Obsolete("deprecated",true)]
-        public override void setKey(string key, object Value, DateTime invalidationDate, string tag) {
+        public override void SetKey(string key, object Value, DateTime invalidationDate, string tag) {
             List<string> depKeyList = (string.IsNullOrWhiteSpace(tag) ? new List<string> { } : tag.Split(',').ToList());
             cp.core.cache.storeObject(key, Value, invalidationDate, depKeyList);
         }
         //
-        [Obsolete("Use GetText()", true)]
+        [Obsolete("Use GetText()", false)]
         public override string Read(string Name) => cp.core.cache.getText(Name);
         /// 
-        [Obsolete("Use StoreObject()", true)]
+        [Obsolete("Use StoreObject()", false)]
         public override void Save(string key, string Value) => Store(key, Value);
         //
-        [Obsolete("Use StoreObject()", true)]
+        [Obsolete("Use StoreObject()", false)]
         public override void Save(string key, string Value, string invalidationTagCommaList) => Save(key, Value, invalidationTagCommaList, DateTime.MinValue);
         //
-        [Obsolete("Use StoreObject()", true)]
+        [Obsolete("Use StoreObject()", false)]
         public override void Save(string key, string Value, string invalidationTagCommaList, DateTime invalidationDate) {
             try {
                 List<string> invalidationTagList = new List<string>();

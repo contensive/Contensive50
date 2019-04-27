@@ -351,49 +351,49 @@ namespace Contensive.BaseClasses {
         //====================================================================================================
         // Deprecated
         //
-        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", true)]
+        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", false)]
         public abstract bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria, string SortFieldList, bool ActiveOnly, int PageSize, int PageNumber);
         //
-        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", true)]
+        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", false)]
         public abstract bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria, string SortFieldList, bool ActiveOnly, int PageSize);
         //
-        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", true)]
+        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", false)]
         public abstract bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria, string SortFieldList, bool ActiveOnly);
         //
-        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", true)]
+        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", false)]
         public abstract bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria, string SortFieldList);
         //
-        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", true)]
+        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", false)]
         public abstract bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria);
         //
-        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", true)]
+        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", false)]
         public abstract bool OpenGroupListUsers(string GroupCommaList);
         //
         [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)",true)]
         public abstract void SetFile(string FieldName, string Copy, string ContentName);
         //
-        [Obsolete("Use getText to get copy, getFilename to get file.", true)]
+        [Obsolete("Use getText to get copy, getFilename to get file.", false)]
         public abstract string GetTextFile(string FieldName);
         //
-        [Obsolete("Use OpenSql", true)]
+        [Obsolete("Use OpenSql", false)]
         public abstract bool OpenSQL2(string SQL, string DataSourcename, int PageSize, int PageNumber);
         //
-        [Obsolete("Use OpenSql", true)]
+        [Obsolete("Use OpenSql", false)]
         public abstract bool OpenSQL2(string SQL, string DataSourcename, int PageSize);
         //
-        [Obsolete("Use OpenSql", true)]
+        [Obsolete("Use OpenSql", false)]
         public abstract bool OpenSQL2(string SQL, string DataSourcename);
         //
-        [Obsolete("Use OpenSql", true)]
+        [Obsolete("Use OpenSql", false)]
         public abstract bool OpenSQL2(string SQL);
         //
-        [Obsolete("Use GetFormInput(string,string,int,int,string)", true)]
+        [Obsolete("Use GetFormInput(string,string,int,int,string)", false)]
         public abstract object GetFormInput(string contentName, string fieldName, string height, string width, string htmlId);
         //
-        [Obsolete("Use GetFormInput(string,string,int,int)", true)]
+        [Obsolete("Use GetFormInput(string,string,int,int)", false)]
         public abstract object GetFormInput(string contentName, string fieldName, string height, string width);
         //
-        [Obsolete("Use GetFormInput(string,string,int)", true)]
+        [Obsolete("Use GetFormInput(string,string,int)", false)]
         public abstract object GetFormInput(string contentName, string fieldName, string height);
         //
         //====================================================================================================

@@ -150,28 +150,28 @@ namespace Contensive.BaseClasses {
         // deprecated
         //
         //
-        [Obsolete("Use Get of the correct type", true)]
+        [Obsolete("Use Get of the correct type", false)]
         public abstract string GetProperty(string key, string defaultValue, int targetVisitId);
         //
-        [Obsolete("Use Get of the correct type", true)]
+        [Obsolete("Use Get of the correct type", false)]
         public abstract string GetProperty(string key, string defaultValue);
         //
-        [Obsolete("Use Get of the correct type", true)]
+        [Obsolete("Use Get of the correct type", false)]
         public abstract string GetProperty(string key);
         //
-        [Obsolete("Deprecated. Set and get only the current visit", true)]
+        [Obsolete("Deprecated. Set and get only the current visit", false)]
         public abstract void SetProperty(string key, string value, int targetVisitId);
         //
-        [Obsolete("Deprecated. Use the get with the correct default argumnet type", true)]
+        [Obsolete("Deprecated. Use the get with the correct default argumnet type", false)]
         public abstract bool GetBoolean(string key, string defaultValue);
         //
-        [Obsolete("Deprecated. Use the get with the correct default argumnet type", true)]
+        [Obsolete("Deprecated. Use the get with the correct default argumnet type", false)]
         public abstract DateTime GetDate(string key, string defaultValue);
         //
-        [Obsolete("Deprecated. Use the get with the correct default argumnet type", true)]
+        [Obsolete("Deprecated. Use the get with the correct default argumnet type", false)]
         public abstract int GetInteger(string key, string defaultValue);
         //
-        [Obsolete("Deprecated. Use the get with the correct default argumnet type", true)]
+        [Obsolete("Deprecated. Use the get with the correct default argumnet type", false)]
         public abstract double GetNumber(string key, string defaultValue);
     }
 }

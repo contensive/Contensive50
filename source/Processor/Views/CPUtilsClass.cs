@@ -290,7 +290,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("Installation upgrade through the cp interface is deprecated. Please use the command line tool.", true)]
+        [Obsolete("Installation upgrade through the cp interface is deprecated. Please use the command line tool.", false)]
         public override void Upgrade(bool isNewApp) {
             try {
                 throw new GenericException("Installation upgrade through the cp interface is deprecated. Please use the command line tool.");
@@ -300,17 +300,17 @@ namespace Contensive.Processor {
             }
         }
         //
-        [Obsolete("deprecated", true)]
+        [Obsolete("deprecated", false)]
         public override string DecodeUrl(string Url) {
             return GenericController.decodeURL(Url);
         }
         //
-        [Obsolete("deprecated", true)]
+        [Obsolete("deprecated", false)]
         public override string DecodeHTML(string Source) {
             return HtmlController.decodeHtml(Source);
         }
         //
-        [Obsolete("deprecated", true)]
+        [Obsolete("deprecated", false)]
         public override string EncodeHTML(string Source) {
             string returnValue = "";
             //
@@ -320,17 +320,17 @@ namespace Contensive.Processor {
             return returnValue;
         }
         //
-        [Obsolete("deprecated", true)]
+        [Obsolete("deprecated", false)]
         public override string EncodeUrl(string Source) {
             return GenericController.encodeURL(Source);
         }
         //
-        [Obsolete("deprecated", true)]
+        [Obsolete("deprecated", false)]
         public override string GetPleaseWaitEnd() {
             return cp.core.programFiles.readFileText("resources\\WaitPageClose.htm");
         }
         //
-        [Obsolete("deprecated", true)]
+        [Obsolete("deprecated", false)]
         public override string GetPleaseWaitStart() {
             return cp.core.programFiles.readFileText("Resources\\WaitPageOpen.htm");
         }
@@ -350,16 +350,16 @@ namespace Contensive.Processor {
             }
         }
         //
-        [Obsolete("Deprecated, use cp.addon.Execute", true)]
+        [Obsolete("Deprecated, use cp.addon.Execute", false)]
         public override string ExecuteAddon(string addonIDGuidOrName) => ExecuteAddon(addonIDGuidOrName, 0, addonContext.ContextPage);
         //
-        [Obsolete("Deprecated, use cp.addon.Execute", true)]
+        [Obsolete("Deprecated, use cp.addon.Execute", false)]
         public override string ExecuteAddon(string addonIDGuidOrName, int WrapperId) => ExecuteAddon(addonIDGuidOrName, WrapperId, addonContext.ContextPage);
         //
-        [Obsolete("Deprecated, use cp.addon.Execute", true)]
+        [Obsolete("Deprecated, use cp.addon.Execute", false)]
         public override string ExecuteAddon(string addonIDGuidOrName, addonContext context) => ExecuteAddon(addonIDGuidOrName, 0, context);
         //
-        [Obsolete("Deprecated, use cp.addon.Execute", true)]
+        [Obsolete("Deprecated, use cp.addon.Execute", false)]
         public override string ExecuteAddonAsProcess(string addonIDGuidOrName) {
             try {
                 Models.Db.AddonModel addon = null;
@@ -393,17 +393,17 @@ namespace Contensive.Processor {
             }
         }
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath) {
             return GenericController.ConvertLinkToShortLink(URL, ServerHost, ServerVirtualPath);
         }
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string ConvertShortLinkToLink(string url, string pathPagePrefix) {
             return GenericController.removeUrlPrefix(url, pathPagePrefix);
         }
         //
-        [Obsolete("Deprecated. Use native methods to convert date formats.", true)]
+        [Obsolete("Deprecated. Use native methods to convert date formats.", false)]
         public override DateTime DecodeGMTDate(string GMTDate) {
             return GenericController.deprecatedDecodeGMTDate(GMTDate);
         }
@@ -412,47 +412,47 @@ namespace Contensive.Processor {
             SeparateURL(url, ref return_protocol, ref return_domain, ref return_port, ref return_path, ref return_queryString);
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override string EncodeJavascript(string Source) {
             return GenericController.EncodeJavascriptStringSingleQuote(Source);
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override string EncodeQueryString(string Source) {
             return GenericController.encodeQueryString(Source);
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override DateTime GetFirstNonZeroDate(DateTime Date0, DateTime Date1) {
             return GenericController.getFirstNonZeroDate(Date0, Date1);
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override int GetFirstNonZeroInteger(int Integer0, int Integer1) {
             return GenericController.getFirstNonZeroInteger(Integer0, Integer1);
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override string GetIntegerString(int Value, int DigitCount) {
             return GenericController.getIntegerString(Value, DigitCount);
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override string GetLine(string Body) {
             return GenericController.getLine(ref Body);
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override int GetProcessID() {
             return Process.GetCurrentProcess().Id;
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override void Sleep(int timeMSec) {
             System.Threading.Thread.Sleep(timeMSec);
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override string hashMd5(string source) {
             throw new NotImplementedException("hashMd5 not implemented");
             //Return HashPasswordForStoringInConfigFile(source, "md5")
@@ -464,7 +464,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="privateFile"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use cp.addon methods.", true)]
+        [Obsolete("Deprecated, use cp.addon methods.", false)]
         public override int installCollectionFromFile(string privateFile) {
             string ignore = "";
             cp.Addon.InstallCollectionFile(privateFile, ref ignore);
@@ -478,7 +478,7 @@ namespace Contensive.Processor {
         /// <param name="privateFolder"></param>
         /// <param name="deleteFolderWhenDone"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use cp.addon methods.", true)]
+        [Obsolete("Deprecated, use cp.addon methods.", false)]
         public override int installCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone) {
             string ignore = "";
             cp.Addon.InstallCollectionsFromFolder(privateFolder, deleteFolderWhenDone, ref ignore);
@@ -491,7 +491,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="privateFolder"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use cp.addon methods.", true)]
+        [Obsolete("Deprecated, use cp.addon methods.", false)]
         public override int installCollectionsFromFolder(string privateFolder) {
             string ignore = "";
             cp.Addon.InstallCollectionsFromFolder(privateFolder, false, ref ignore);
@@ -502,7 +502,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// Install an addon collections from the collection library asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
         /// </summary>
-        [Obsolete("Deprecated, use cp.addon methods.", true)]
+        [Obsolete("Deprecated, use cp.addon methods.", false)]
         public override int installCollectionFromLibrary(string collectionGuid) {
             string ignore = "";
             cp.Addon.InstallCollectionFromLibrary(collectionGuid, ref ignore);
@@ -516,7 +516,7 @@ namespace Contensive.Processor {
         /// <param name="privateFolder"></param>
         /// <param name="deleteFolderWhenDone"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use cp.addon methods.", true)]
+        [Obsolete("Deprecated, use cp.addon methods.", false)]
         public override int installCollectionFromLink(string link) {
             string ignore = "";
             cp.Addon.InstallCollectionFromLink(link, ref ignore);

@@ -145,10 +145,10 @@ namespace Contensive.BaseClasses {
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("Deprecated", true)] public abstract bool BrowserIsIE { get; }
-        [Obsolete("Deprecated", true)] public abstract bool BrowserIsMac { get; }
-        [Obsolete("Deprecated", true)] public abstract bool BrowserIsWindows { get; }
-        [Obsolete("Deprecated", true)] public abstract string BrowserVersion { get; }
+        [Obsolete("Deprecated", false)] public abstract bool BrowserIsIE { get; }
+        [Obsolete("Deprecated", false)] public abstract bool BrowserIsMac { get; }
+        [Obsolete("Deprecated", false)] public abstract bool BrowserIsWindows { get; }
+        [Obsolete("Deprecated", false)] public abstract string BrowserVersion { get; }
     }
 }
 

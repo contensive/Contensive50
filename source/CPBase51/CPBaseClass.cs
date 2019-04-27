@@ -205,7 +205,7 @@ namespace Contensive.BaseClasses {
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        [Obsolete("Legacy object. To determine addon properties of the current addon, use CP.Addon.id to create a model.", true)]
+        [Obsolete("Legacy object. To determine addon properties of the current addon, use CP.Addon.id to create a model.", false)]
         public abstract CPAddonBaseClass MyAddon { get; }
         //
         //====================================================================================================

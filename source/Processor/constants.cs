@@ -1184,9 +1184,9 @@ namespace Contensive.Processor {
         internal const int navStruc_TemplateId = 7;
         internal const string blockMessageDefault = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=\"?method=login\" rel=\"nofollow\">Click Here</a>. For more information, please contact the administrator.</p>";
         internal const int main_BlockSourceDefaultMessage = 0;
-        internal const int main_BlockSourceCustomMessage = 1;
-        internal const int main_BlockSourceLogin = 2;
-        internal const int main_BlockSourceRegistration = 3;
+        internal const int ContentBlockWithCustomMessage = 1;
+        internal const int ContentBlockWithLogin = 2;
+        internal const int ContentBlockWithRegistration = 3;
         internal const string main_FieldDelimiter = " , ";
         internal const string main_LineDelimiter = " ,, ";
         internal const int main_IPosType = 0;

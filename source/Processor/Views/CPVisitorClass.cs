@@ -199,7 +199,7 @@ namespace Contensive.Processor {
         //=======================================================================================================
         // deprecated
         //
-        [Obsolete("Cannot set the property of a different visitor.", true)]
+        [Obsolete("Cannot set the property of a different visitor.", false)]
         public override string GetProperty(string PropertyName, string DefaultValue, int TargetVisitorId) {
             if (TargetVisitorId == 0) {
                 return cp.core.visitorProperty.getText(PropertyName, DefaultValue);
@@ -208,29 +208,29 @@ namespace Contensive.Processor {
             }
         }
         //
-        [Obsolete("Use the get for the appropriate return type.", true)]
+        [Obsolete("Use the get for the appropriate return type.", false)]
         public override string GetProperty(string PropertyName, string DefaultValue) {
             return cp.core.visitorProperty.getText(PropertyName, DefaultValue);
         }
         //
-        [Obsolete("Use the get for the appropriate return type.", true)]
+        [Obsolete("Use the get for the appropriate return type.", false)]
         public override string GetProperty(string PropertyName) {
             return cp.core.visitorProperty.getText(PropertyName);
         }
         //
-        [Obsolete("Use the get for the appropriate default type.", true)]
+        [Obsolete("Use the get for the appropriate default type.", false)]
         public override DateTime GetDate(string key, string defaultValue) => cp.core.visitorProperty.getDate(key, encodeDate(defaultValue));
         //
-        [Obsolete("Use the get for the appropriate default type.", true)]
+        [Obsolete("Use the get for the appropriate default type.", false)]
         public override int GetInteger(string key, string defaultValue) => cp.core.visitorProperty.getInteger(key, encodeInteger(defaultValue));
         //
-        [Obsolete("Use the get for the appropriate default type.", true)]
+        [Obsolete("Use the get for the appropriate default type.", false)]
         public override double GetNumber(string key, string defaultValue) => cp.core.visitorProperty.getNumber(key, encodeNumber(defaultValue));
         //
-        [Obsolete("Use the get for the appropriate default type.", true)]
+        [Obsolete("Use the get for the appropriate default type.", false)]
         public override bool GetBoolean(string key, string defaultValue) => cp.core.visitorProperty.getBoolean(key, encodeBoolean(defaultValue));
         //
-        [Obsolete("Cannot set the visitor property of another visitor.", true)]
+        [Obsolete("Cannot set the visitor property of another visitor.", false)]
         public override void SetProperty(string PropertyName, string Value, int TargetVisitorid) {
             if (TargetVisitorid == 0) {
                 cp.core.visitorProperty.setProperty(PropertyName, Value);

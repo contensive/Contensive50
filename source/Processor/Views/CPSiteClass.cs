@@ -177,100 +177,100 @@ namespace Contensive.Processor {
         // Deprecated
         //
         //
-        [Obsolete("Use AddLinkAlias()", true)]
+        [Obsolete("Use AddLinkAlias()", false)]
         public override void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "") => LinkAliasController.addLinkAlias(cp.core, linkAlias, pageId, queryStringSuffix);
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override bool MultiDomainMode { get { return false; } }
         //
-        [Obsolete("Use GetText()", true)]
+        [Obsolete("Use GetText()", false)]
         public override string GetProperty(string propertyName, string DefaultValue) {
             return cp.core.siteProperties.getText(propertyName, DefaultValue);
         }
         //
-        [Obsolete("Use GetText()", true)]
+        [Obsolete("Use GetText()", false)]
         public override string GetProperty(string propertyName) {
             return cp.core.siteProperties.getText(propertyName, "");
         }
         //
-        [Obsolete("Use methods with matching types", true)]
+        [Obsolete("Use methods with matching types", false)]
         public override bool GetBoolean(string propertyName, string DefaultValue) {
             return cp.core.siteProperties.getBoolean(propertyName, GenericController.encodeBoolean(DefaultValue));
         }
         //
-        [Obsolete("Use methods with matching types", true)]
+        [Obsolete("Use methods with matching types", false)]
         public override DateTime GetDate(string propertyName, string DefaultValue) {
             return cp.core.siteProperties.getDate(propertyName, GenericController.encodeDate(DefaultValue));
         }
         //
-        [Obsolete("Use methods with matching types", true)]
+        [Obsolete("Use methods with matching types", false)]
         public override int GetInteger(string propertyName, string DefaultValue) {
             return cp.core.siteProperties.getInteger(propertyName, GenericController.encodeInteger(DefaultValue));
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override double GetNumber(string propertyName, string DefaultValue) {
             return cp.core.siteProperties.getNumber(propertyName, GenericController.encodeNumber(DefaultValue));
         }
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
         public override string PhysicalFilePath {
             get {
                 return cp.core.cdnFiles.localAbsRootPath;
             }
         }
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
         public override string PhysicalInstallPath {
             get {
                 return cp.core.privateFiles.localAbsRootPath;
             }
         }
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
         public override string PhysicalWWWPath {
             get {
                 return cp.core.wwwFiles.localAbsRootPath;
             }
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override bool TrapErrors {
             get {
                 return GenericController.encodeBoolean(GetProperty("TrapErrors", "1"));
             }
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override string AppPath {
             get {
                 return AppRootPath;
             }
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override string AppRootPath {
             get {
                 return appRootPath;
             }
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override string VirtualPath {
             get {
                 return "/" + cp.core.appConfig.name;
             }
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override bool IsTesting() { return false; }
         //
-        [Obsolete("Use GetInteger(LandingPageID)", true)]
+        [Obsolete("Use GetInteger(LandingPageID)", false)]
         public override int LandingPageId() {
             return GetInteger("LandingPageID", 0);
         }
         //
-        [Obsolete("Use GetInteger(LandingPageID)", true)]
+        [Obsolete("Use GetInteger(LandingPageID)", false)]
         public override int LandingPageId(string domainName) {
             if (string.IsNullOrWhiteSpace(domainName)) return GetInteger("LandingPageID", 0);
             var domain = DomainModel.createByUniqueName(cp.core, domainName);
@@ -278,20 +278,20 @@ namespace Contensive.Processor {
             return domain.rootPageId;
         }
         //
-        [Obsolete("Use CP.Utils.ExportCsv()", true)]
+        [Obsolete("Use CP.Utils.ExportCsv()", false)]
         public override void RequestTask(string command, string sql, string exportName, string filename) {
             cp.Utils.ExportCsv(sql, exportName, filename);
         }
         //
-        [Obsolete("Use CP.Addon.InstallCollectionFile()", true)]
+        [Obsolete("Use CP.Addon.InstallCollectionFile()", false)]
         public override bool installCollectionFile(string privatePathFilename, ref string returnUserError) 
             => cp.Addon.InstallCollectionFile(privatePathFilename, ref returnUserError);
         //
-        [Obsolete("Use CP.Utils.InstallCollectionFromLibrary()", true)]
+        [Obsolete("Use CP.Utils.InstallCollectionFromLibrary()", false)]
         public override bool installCollectionFromLibrary(string collectionGuid, ref string returnUserError)
             => cp.Addon.InstallCollectionFromLibrary(collectionGuid, ref returnUserError);
         //
-        [Obsolete("Use CP.Utils.EncodeAppRootPath()", true)]
+        [Obsolete("Use CP.Utils.EncodeAppRootPath()", false)]
         public override string EncodeAppRootPath(string link) 
             => cp.Utils.EncodeAppRootPath(link);
         //

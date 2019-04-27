@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Contensive.CPBaseClass</id>
-    <version>5.1.11</version>
+    <version>5.1.12</version>
     <title>Contensive Addon API Base Classes</title>
     <authors>Contensive</authors>
     <owners>Contensive</owners>
@@ -19,7 +19,7 @@
 	The CP object includes properties, methods, and objects that can be used in the application. 
 	For example, cp.file.read( filename ) reads the content from a text file from a repository configured in the application, which could be the local file system, Amazon S3 bucket, etc.
 	</description>
-    <releaseNotes>revert cp.email methods back to camel case, returning void for compatibility with 5.0</releaseNotes>
+    <releaseNotes>Base class issues with compatiblity in cache object methods</releaseNotes>
     <copyright>Copyright 2019</copyright>
     <tags></tags>
   </metadata>

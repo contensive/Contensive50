@@ -36,7 +36,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string AdminHint(string innerHtml) {
+        public override string adminHint(string innerHtml) {
             if (cp.core.session.isEditingAnything() || cp.core.session.user.admin) {
                 return ""
                     + "<div class=\"ccHintWrapper\">"
@@ -356,68 +356,68 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         // deprecated
-        [Obsolete("Use InputText(string, string, integer, string, string ) instead", true)]
+        [Obsolete("Use InputText(string, string, integer, string, string ) instead", false)]
         public override string InputText(string HtmlName, string HtmlValue, string Height, string Width, bool IsPassword, string HtmlClass, string HtmlId)
             => InputText(HtmlName, HtmlValue, -1, HtmlClass, HtmlId);
         //
-        [Obsolete("Use InputText(string, string, integer, string, string ) instead", true)]
+        [Obsolete("Use InputText(string, string, integer, string, string ) instead", false)]
         public override string InputText(string HtmlName, string HtmlValue, string Height, string Width, bool IsPassword, string HtmlClass)
             => InputText(HtmlName, HtmlValue, -1, HtmlClass);
         //
-        [Obsolete("Use InputText(string, string, integer, string, string ) instead", true)]
+        [Obsolete("Use InputText(string, string, integer, string, string ) instead", false)]
         public override string InputText(string HtmlName, string HtmlValue, string Height, string Width, bool IsPassword)
             => InputText(HtmlName, HtmlValue);
         //
-        [Obsolete("Use InputText(string, string, integer, string, string ) instead", true)]
+        [Obsolete("Use InputText(string, string, integer, string, string ) instead", false)]
         public override string InputText(string HtmlName, string HtmlValue, string Height, string Width)
             => InputText(HtmlName, HtmlValue);
         //
-        [Obsolete("Use InputText(string, string, integer, string, string ) instead", true)]
+        [Obsolete("Use InputText(string, string, integer, string, string ) instead", false)]
         public override string InputText(string HtmlName, string HtmlValue, string Height)
             => InputText(HtmlName, HtmlValue);
         //
-        [Obsolete("Use html5 methods instead", true)]
+        [Obsolete("Use html5 methods instead", false)]
         public override string RadioBox(string HtmlName, int HtmlValue, int CurrentValue, string HtmlClass = "", string HtmlId = "") {
             return cp.core.html.inputRadio(HtmlName, HtmlValue, CurrentValue, HtmlId, HtmlClass);
         }
         //
-        [Obsolete("Use html5 methods instead", true)]
+        [Obsolete("Use html5 methods instead", false)]
         public override string InputDate(string HtmlName, string HtmlValue = "", string Width = "", string HtmlClass = "", string HtmlId = "")
              => HtmlController.inputDate(cp.core, HtmlName, encodeDate(HtmlValue), "", HtmlId, HtmlClass);
         //
-        [Obsolete("Use html5 methods instead", true)]
+        [Obsolete("Use html5 methods instead", false)]
         public override string Hidden(string HtmlName, int HtmlValue)
             => HtmlController.inputHidden(HtmlName, HtmlValue);
         //
-        [Obsolete("Use html5 methods instead", true)]
+        [Obsolete("Use html5 methods instead", false)]
         public override string Hidden(string HtmlName, int HtmlValue, string HtmlClass)
             => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass);
         //
-        [Obsolete("Use html5 methods instead", true)]
+        [Obsolete("Use html5 methods instead", false)]
         public override string Hidden(string HtmlName, int HtmlValue, string HtmlClass, string HtmlId = "")
             => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass, HtmlId);
         //
-        [Obsolete("Use html5 methods instead", true)]
+        [Obsolete("Use html5 methods instead", false)]
         public override string Hidden(string HtmlName, bool HtmlValue)
             => HtmlController.inputHidden(HtmlName, HtmlValue);
         //
-        [Obsolete("Use html5 methods instead", true)]
+        [Obsolete("Use html5 methods instead", false)]
         public override string Hidden(string HtmlName, bool HtmlValue, string HtmlClass)
             => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass);
         //
-        [Obsolete("Use html5 methods instead", true)]
+        [Obsolete("Use html5 methods instead", false)]
         public override string Hidden(string HtmlName, bool HtmlValue, string HtmlClass, string HtmlId = "")
             => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass, HtmlId);
         //
-        [Obsolete("Use html5 methods instead", true)]
+        [Obsolete("Use html5 methods instead", false)]
         public override string Hidden(string HtmlName, DateTime HtmlValue)
             => HtmlController.inputHidden(HtmlName, HtmlValue);
         //
-        [Obsolete("Use html5 methods instead", true)]
+        [Obsolete("Use html5 methods instead", false)]
         public override string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass)
             => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass);
         //
-        [Obsolete("Use html5 methods instead", true)]
+        [Obsolete("Use html5 methods instead", false)]
         public override string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass, string HtmlId = "")
             => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass, HtmlId);
         //

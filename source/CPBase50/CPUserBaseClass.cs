@@ -56,16 +56,16 @@ namespace Contensive.BaseClasses {
         //
         // -- deprecated
         //
-        [Obsolete("correct default type", true)]
+        [Obsolete("correct default type", false)]
         public abstract bool GetBoolean(string PropertyName, string DefaultValue);
         //
-        [Obsolete("correct default type", true)]
+        [Obsolete("correct default type", false)]
         public abstract DateTime GetDate(string PropertyName, string DefaultValue);
         //
-        [Obsolete("correct default type", true)]
+        [Obsolete("correct default type", false)]
         public abstract int GetInteger(string PropertyName, string DefaultValue);
         //
-        [Obsolete("correct default type", true)]
+        [Obsolete("correct default type", false)]
         public abstract double GetNumber(string PropertyName, string DefaultValue);
         //
         //====================================================================================================

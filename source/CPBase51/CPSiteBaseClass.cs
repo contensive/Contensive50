@@ -184,73 +184,73 @@ namespace Contensive.BaseClasses {
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("Use CP.Addon.InstallCollectionFile()", true)]
+        [Obsolete("Use CP.Addon.InstallCollectionFile()", false)]
         public abstract bool installCollectionFile(string privatePathFilename, ref string returnUserError);
         //
-        [Obsolete("Use CP.Addon.InstallCollectionFromLibrary()", true)]
+        [Obsolete("Use CP.Addon.InstallCollectionFromLibrary()", false)]
         public abstract bool installCollectionFromLibrary(string collectionGuid, ref string returnUserError);
         //
         [Obsolete("Use correct defaultValue type",true)]
         public abstract bool GetBoolean(string key, string defaultValue);
         //
-        [Obsolete("Use correct defaultValue type", true)]
+        [Obsolete("Use correct defaultValue type", false)]
         public abstract DateTime GetDate(string key, string defaultValue);
         //
-        [Obsolete("Use correct defaultValue type", true)]
+        [Obsolete("Use correct defaultValue type", false)]
         public abstract int GetInteger(string key, string defaultValue);
         //
-        [Obsolete("Use correct defaultValue type", true)]
+        [Obsolete("Use correct defaultValue type", false)]
         public abstract double GetNumber(string key, string defaultValue);
         //
-        [Obsolete("Use GetText()", true)]
+        [Obsolete("Use GetText()", false)]
         public abstract string GetProperty(string key, string value);
         //
-        [Obsolete("Use GetText()", true)]
+        [Obsolete("Use GetText()", false)]
         public abstract string GetProperty(string key);
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public abstract bool MultiDomainMode { get; }
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
         public abstract string PhysicalFilePath { get; }
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
         public abstract string PhysicalInstallPath { get; }
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
         public abstract string PhysicalWWWPath { get; }
         //
         // 20151121 - not needed, removed to resolve compile issue with com compatibility
         //Public MustOverride Sub ErrorReport(ByVal Err As Microsoft.VisualBasic.ErrObject, Optional ByVal Message As String = "")
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public abstract bool TrapErrors { get; }
         //
-        [Obsolete("Deprecated. This was the url path to the application for virtually hosted sites. Should be a blank.", true)]
+        [Obsolete("Deprecated. This was the url path to the application for virtually hosted sites. Should be a blank.", false)]
         public abstract string AppPath { get; }
         //
-        [Obsolete("Deprecated. This was the url path to the application for virtually hosted sites. Should be a blank.", true)]
+        [Obsolete("Deprecated. This was the url path to the application for virtually hosted sites. Should be a blank.", false)]
         public abstract string AppRootPath { get; }
         //
-        [Obsolete("Deprecated. This was a slash followed by the application name.", true)]
+        [Obsolete("Deprecated. This was a slash followed by the application name.", false)]
         public abstract string VirtualPath { get; }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public abstract bool IsTesting();
         //
-        [Obsolete("Use uppercase method", true)]
+        [Obsolete("Use uppercase method", false)]
         public abstract void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "");
         //
-        [Obsolete("Use CP.Utils.ExportCsv()", true)]
+        [Obsolete("Use CP.Utils.ExportCsv()", false)]
         public abstract void RequestTask(string command, string SQL, string exportName, string filename);
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public abstract int LandingPageId(string domainName);
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public abstract int LandingPageId();
         //
-        [Obsolete("Use CP.Utils.EncodeAppRootPath()", true)]
+        [Obsolete("Use CP.Utils.EncodeAppRootPath()", false)]
         public abstract string EncodeAppRootPath(string link);
     }
 }

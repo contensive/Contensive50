@@ -273,7 +273,7 @@ namespace Contensive.Processor {
         //=======================================================================================================
         // Deprecated
         //
-        [Obsolete("Filter addons are deprecated", true)]
+        [Obsolete("Filter addons are deprecated", false)]
         public override string Content {
             get {
                 return cp.core.doc.bodyContent;
@@ -283,67 +283,67 @@ namespace Contensive.Processor {
             }
         }
         //
-        [Obsolete("Use addon navigation.", true)]
+        [Obsolete("Use addon navigation.", false)]
         public override string NavigationStructure {
             get {
                 return string.Empty;
             }
         }
         //
-        [Obsolete("Section is no longer supported", true)]
+        [Obsolete("Section is no longer supported", false)]
         public override int SectionId {
             get {
                 return 0;
             }
         }
         //
-        [Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", true)]
+        [Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", false)]
         public override string SiteStylesheet {
             get {
                 return "";
             }
         }
         //
-        [Obsolete("var is deprecated.", true)]
+        [Obsolete("var is deprecated.", false)]
         public override string get_GlobalVar(string Index) {
             return get_Var(Index);
         }
         //
-        [Obsolete("var is deprecated.", true)]
+        [Obsolete("var is deprecated.", false)]
         public override bool get_IsGlobalVar(string Index) {
             return get_IsVar(Index);
         }
         //
-        [Obsolete("var is deprecated.", true)]
+        [Obsolete("var is deprecated.", false)]
         public override bool get_IsVar(string Index) {
             return cp.core.docProperties.containsKey(Index);
         }
         //
-        [Obsolete("var is deprecated.", true)]
+        [Obsolete("var is deprecated.", false)]
         public override string get_Var(string Index) {
             return cp.core.docProperties.getText(Index);
         }
         //
-        [Obsolete("var is deprecated.", true)]
+        [Obsolete("var is deprecated.", false)]
         public override void set_Var(string Index, string Value) {
             cp.core.docProperties.setProperty(Index, Value);
         }
         //
-        [Obsolete("var is deprecated.", true)]
+        [Obsolete("var is deprecated.", false)]
         public override void set_GlobalVar(string Index, string Value) {
             cp.core.docProperties.setProperty(Index, Value);
         }
         //
-        [Obsolete("Use GetBoolean(string,bool).", true)]
+        [Obsolete("Use GetBoolean(string,bool).", false)]
         public override bool GetBoolean(string key, string defaultValue) => GetBoolean(key, GenericController.encodeBoolean(defaultValue));
         //
-        [Obsolete("Use GetDate(string,DateTime).", true)]
+        [Obsolete("Use GetDate(string,DateTime).", false)]
         public override DateTime GetDate(string key, string defaultValue) => GetDate(key, GenericController.encodeDate(defaultValue));
         //
-        [Obsolete("Use GetInteger(string,int).", true)]
+        [Obsolete("Use GetInteger(string,int).", false)]
         public override int GetInteger(string key, string defaultValue) => GetInteger(key, GenericController.encodeInteger(defaultValue));
         //
-        [Obsolete("Use GetNumber(string,double).", true)]
+        [Obsolete("Use GetNumber(string,double).", false)]
         public override double GetNumber(string key, string defaultValue) => GetNumber(key, GenericController.encodeNumber(defaultValue));
         //
         //=======================================================================================================

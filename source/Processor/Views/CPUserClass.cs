@@ -384,22 +384,22 @@ namespace Contensive.Processor {
         [Obsolete("Use IsEditing",true)]
         public override bool IsAuthoring(string contentName) => cp.core.session.isEditing(contentName);
         //
-        [Obsolete("Use IsContentManager( Page Content )", true)]
+        [Obsolete("Use IsContentManager( Page Content )", false)]
         public override bool IsContentManager() => IsContentManager("Page Content");
         //
-        [Obsolete("Use LoginById(integer) instead", true)]
+        [Obsolete("Use LoginById(integer) instead", false)]
         public override bool LoginByID(string RecordID, bool SetAutoLogin = false) {
             return SessionController.authenticateById(cp.core, encodeInteger(RecordID), cp.core.session);
         }
         //
-        [Obsolete("Deprecated.", true)]
+        [Obsolete("Deprecated.", false)]
         public override void SetProperty(string PropertyName, string Value, int TargetMemberId) {
             cp.core.userProperty.setProperty(PropertyName, Value, TargetMemberId);
         }
         //
         //=======================================================================================================
         //
-        [Obsolete("Use Get with correct type", true)]
+        [Obsolete("Use Get with correct type", false)]
         public override string GetProperty(string PropertyName, string DefaultValue = "", int TargetMemberId = 0) {
             if (TargetMemberId == 0) {
                 return cp.core.userProperty.getText(PropertyName, DefaultValue);
@@ -408,17 +408,17 @@ namespace Contensive.Processor {
             }
         }
         //
-        [Obsolete("Use Get with correct type", true)]
+        [Obsolete("Use Get with correct type", false)]
         public override string GetProperty(string PropertyName, string DefaultValue) {
             return cp.core.userProperty.getText(PropertyName, DefaultValue);
         }
         //
-        [Obsolete("Use Get with correct type", true)]
+        [Obsolete("Use Get with correct type", false)]
         public override string GetProperty(string PropertyName) {
             return cp.core.userProperty.getText(PropertyName);
         }
         //
-        [Obsolete("deprecated", true)]
+        [Obsolete("deprecated", false)]
         public override string Password {
             get {
                 return cp.core.session.user.password;

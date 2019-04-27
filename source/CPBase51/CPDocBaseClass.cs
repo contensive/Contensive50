@@ -137,46 +137,46 @@ namespace Contensive.BaseClasses {
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("Use addon navigation.", true)]
+        [Obsolete("Use addon navigation.", false)]
         public abstract string NavigationStructure { get; }
         //
-        [Obsolete("Section is no longer supported", true)]
+        [Obsolete("Section is no longer supported", false)]
         public abstract int SectionId { get; }
         //
-        [Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", true)]
+        [Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", false)]
         public abstract string SiteStylesheet { get; }
         //
-        [Obsolete("Use GetText().", true)]
+        [Obsolete("Use GetText().", false)]
         public abstract string get_GlobalVar(string Index);
         //
-        [Obsolete("Use SetProperty().", true)]
+        [Obsolete("Use SetProperty().", false)]
         public abstract void set_GlobalVar(string Index, string Value);
         //
-        [Obsolete("Use IsProperty().", true)]
+        [Obsolete("Use IsProperty().", false)]
         public abstract bool get_IsGlobalVar(string Index);
         //
-        [Obsolete("Use IsProperty().", true)]
+        [Obsolete("Use IsProperty().", false)]
         public abstract bool get_IsVar(string Index);
         //
-        [Obsolete("Use GetText().", true)]
+        [Obsolete("Use GetText().", false)]
         public abstract string get_Var(string Index);
         //
-        [Obsolete("Use SetProperty().", true)]
+        [Obsolete("Use SetProperty().", false)]
         public abstract void set_Var(string Index, string Value);
         //
-        [Obsolete("Filter addons are deprecated", true)]
+        [Obsolete("Filter addons are deprecated", false)]
         public abstract string Content { get; set; }
         //
-        [Obsolete("Use GetBoolean(string,bool)", true)]
+        [Obsolete("Use GetBoolean(string,bool)", false)]
         public abstract bool GetBoolean(string key, string defaultValue);
         //
-        [Obsolete("Use GetDate(string,DateTime)", true)]
+        [Obsolete("Use GetDate(string,DateTime)", false)]
         public abstract DateTime GetDate(string key, string defaultValue);
         //
-        [Obsolete("Use GetInteger(string,int)", true)]
+        [Obsolete("Use GetInteger(string,int)", false)]
         public abstract int GetInteger(string key, string defaultValue);
         //
-        [Obsolete("Use GetNumber(string,double)", true)]
+        [Obsolete("Use GetNumber(string,double)", false)]
         public abstract double GetNumber(string key, string defaultValue);
     }
 }

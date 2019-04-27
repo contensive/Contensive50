@@ -231,16 +231,16 @@ namespace Contensive.BaseClasses {
         [Obsolete("Use GetDataSourceType( dataSourceName )")]
         public abstract int DbGetDataSourceType(string DataSourcename);
         //
-        [Obsolete("Use GetTableId instead.", true)]
+        [Obsolete("Use GetTableId instead.", false)]
         public abstract int DbGetTableID(string TableName);
         //
-        [Obsolete("Use isTable instead", true)]
+        [Obsolete("Use isTable instead", false)]
         public abstract bool DbIsTable(string DataSourcename, string TableName);
         //
-        [Obsolete("Use isTableField instead", true)]
+        [Obsolete("Use isTableField instead", false)]
         public abstract bool DbIsTableField(string DataSourcename, string TableName, string FieldName);
         //
-        [Obsolete("Only Sql Server currently supported", true)]
+        [Obsolete("Only Sql Server currently supported", false)]
         public abstract int GetDataSourceType(string DataSourcename);
     }
 

@@ -199,17 +199,17 @@ namespace Contensive.Processor {
             }
         }
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string GetProperty(string key, string defaultValue) {
             return cp.core.visitProperty.getText(key, defaultValue);
         }
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string GetProperty(string key) {
             return cp.core.visitProperty.getText(key);
         }
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override void SetProperty(string key, string value, int TargetVisitId) {
             if (TargetVisitId == 0) {
                 cp.core.visitProperty.setProperty(key, value);
@@ -218,22 +218,22 @@ namespace Contensive.Processor {
             }
         }
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool GetBoolean(string key, string defaultValue) {
             return GetBoolean(key, GenericController.encodeBoolean(defaultValue));
         }
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override DateTime GetDate(string key, string defaultValue) {
             return GetDate(key, GenericController.encodeDate(defaultValue));
         }
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override int GetInteger(string key, string defaultValue) {
             return GetInteger(key, GenericController.encodeInteger(defaultValue));
         }
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override double GetNumber(string key, string defaultValue) {
             return GetNumber(key, GenericController.encodeNumber(defaultValue));
         }

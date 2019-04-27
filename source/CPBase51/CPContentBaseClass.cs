@@ -283,31 +283,31 @@ namespace Contensive.BaseClasses {
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("Deprecated, template link is not supported", true)]
+        [Obsolete("Deprecated, template link is not supported", false)]
         public abstract string GetTemplateLink(int TemplateID);
         //
-        [Obsolete("workflow editing is deprecated", true)]
+        [Obsolete("workflow editing is deprecated", false)]
         public abstract bool IsWorkflow(string ContentName);
         //
-        [Obsolete("workflow editing is deprecated", true)]
+        [Obsolete("workflow editing is deprecated", false)]
         public abstract void PublishEdit(string ContentName, int RecordID);
         //
-        [Obsolete("workflow editing is deprecated", true)]
+        [Obsolete("workflow editing is deprecated", false)]
         public abstract void SubmitEdit(string ContentName, int RecordID);
         //
-        [Obsolete("workflow editing is deprecated", true)]
+        [Obsolete("workflow editing is deprecated", false)]
         public abstract void AbortEdit(string ContentName, int RecordId);
         //
-        [Obsolete("workflow editing is deprecated", true)]
+        [Obsolete("workflow editing is deprecated", false)]
         public abstract void ApproveEdit(string ContentName, int RecordId);
         //
-        [Obsolete("Please use AddRecord(ContentName as String)", true)]
+        [Obsolete("Please use AddRecord(ContentName as String)", false)]
         public abstract int AddRecord(object ContentName);
         //
-        [Obsolete("Use models to access record fields)", true)]
+        [Obsolete("Use models to access record fields)", false)]
         public abstract string GetProperty(string ContentName, string PropertyName);
         //
-        [Obsolete("deprecated, use GetFieldMeta and use the property", true)]
+        [Obsolete("deprecated, use GetFieldMeta and use the property", false)]
         public abstract string GetFieldProperty(string ContentName, string FieldName, string PropertyName);
         //
         public enum GoogleVisualizationStatusEnum {

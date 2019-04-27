@@ -411,79 +411,79 @@ namespace Contensive.BaseClasses {
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("Deprecated, use AppendLog", true)]
+        [Obsolete("Deprecated, use AppendLog", false)]
         public abstract void AppendLogFile(string Text);
         //
-        [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages", true)]
+        [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages", false)]
         public abstract void AppendLog(string pathFilename, string logText);
         //
-        [Obsolete("Deprecated. use cp.addon.execute()", true)]
+        [Obsolete("Deprecated. use cp.addon.execute()", false)]
         public abstract string ExecuteAddon(string idGuidOrName);
         //
-        [Obsolete("Deprecated. use cp.addon.execute() and manage the wrapper manually.", true)]
+        [Obsolete("Deprecated. use cp.addon.execute() and manage the wrapper manually.", false)]
         public abstract string ExecuteAddon(string IdGuidOrName, int WrapperId);
         //
-        [Obsolete("Deprecated. use cp.addon.execute()", true)]
+        [Obsolete("Deprecated. use cp.addon.execute()", false)]
         public abstract string ExecuteAddon(string IdGuidOrName, addonContext context);
         //
-        [Obsolete("Deprecated. use cp.addon.executeAsync()", true)]
+        [Obsolete("Deprecated. use cp.addon.executeAsync()", false)]
         public abstract string ExecuteAddonAsProcess(string IdGuidOrName);
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public abstract string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath);
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public abstract string ConvertShortLinkToLink(string URL, string PathPagePrefix);
         //
-        [Obsolete("Deprecated. Use native methods to convert date formats.", true)]
+        [Obsolete("Deprecated. Use native methods to convert date formats.", false)]
         public abstract DateTime DecodeGMTDate(string GMTDate);
         //
-        [Obsolete("Installation upgrade through the cp interface is deprecated. Please use the command line tool.", true)]
+        [Obsolete("Installation upgrade through the cp interface is deprecated. Please use the command line tool.", false)]
         public abstract void Upgrade(bool isNewApp);
         //
-        [Obsolete("Use System.Net.WebUtility.UrlDecode()", true)]
+        [Obsolete("Use System.Net.WebUtility.UrlDecode()", false)]
         public abstract string DecodeUrl(string Url);
         //
-        [Obsolete("Use System.Net.WebUtility.HtmlDecode()", true)]
+        [Obsolete("Use System.Net.WebUtility.HtmlDecode()", false)]
         public abstract string DecodeHTML(string source);
         //
-        [Obsolete("Use System.Net.WebUtility.HtmlEncode()", true)]
+        [Obsolete("Use System.Net.WebUtility.HtmlEncode()", false)]
         public abstract string EncodeHTML(string source);
         //
-        [Obsolete("Use System.Net.WebUtility.UrlEncode()", true)]
+        [Obsolete("Use System.Net.WebUtility.UrlEncode()", false)]
         public abstract string EncodeUrl(string source);
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public abstract string GetPleaseWaitEnd();
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public abstract string GetPleaseWaitStart();
         //
-        [Obsolete("Use System.Net.HttpUtility.JavaScriptStringEncode()", true)]
+        [Obsolete("Use System.Net.HttpUtility.JavaScriptStringEncode()", false)]
         public abstract string EncodeJavascript(string source);
         //
-        [Obsolete("Encode each key value first with EncodeResponseVariable(), then assemble them into the querystring.", true)]
+        [Obsolete("Encode each key value first with EncodeResponseVariable(), then assemble them into the querystring.", false)]
         public abstract string EncodeQueryString(string Source);
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public abstract DateTime GetFirstNonZeroDate(DateTime Date0, DateTime Date1);
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public abstract int GetFirstNonZeroInteger(int Integer0, int Integer1);
         //
-        [Obsolete("Use string.PadRight() and string.PadLeft()", true)]
+        [Obsolete("Use string.PadRight() and string.PadLeft()", false)]
         public abstract string GetIntegerString(int Value, int DigitCount);
         //
-        [Obsolete("Use new StringReader(str).ReadLine()", true)]
+        [Obsolete("Use new StringReader(str).ReadLine()", false)]
         public abstract string GetLine(string Body);
         //
-        [Obsolete("Use Process.GetCurrentProcess().Id", true)]
+        [Obsolete("Use Process.GetCurrentProcess().Id", false)]
         public abstract int GetProcessID();
         //
-        [Obsolete("Use SeparateUrl", true)]
+        [Obsolete("Use SeparateUrl", false)]
         public abstract void ParseURL(string SourceURL, ref string Protocol, ref string Host, ref string Port, ref string Path, ref string Page, ref string QueryString);
         //
-        [Obsolete("Use System.Threading.Thread.Sleep()", true)]
+        [Obsolete("Use System.Threading.Thread.Sleep()", false)]
         public abstract void Sleep(int timeMSec);
         //
         [Obsolete("Deprecated, some server audits fail if Md5 use detected.")]
@@ -496,7 +496,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="privateFile"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", true)]
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", false)]
         public abstract int installCollectionFromFile(string privateFile);
         //
         //====================================================================================================
@@ -506,7 +506,7 @@ namespace Contensive.BaseClasses {
         /// <param name="privateFolder"></param>
         /// <param name="deleteFolderWhenDone"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", true)]
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", false)]
         public abstract int installCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone);
         //
         //====================================================================================================
@@ -515,7 +515,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="privateFolder"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", true)]
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", false)]
         public abstract int installCollectionsFromFolder(string privateFolder);
         //
         //====================================================================================================
@@ -524,7 +524,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="collectionGuid"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFromLibrary().", true)]
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFromLibrary().", false)]
         public abstract int installCollectionFromLibrary(string collectionGuid);
         //
         //====================================================================================================
@@ -533,7 +533,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFromLink().", true)]
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFromLink().", false)]
         public abstract int installCollectionFromLink(string link);
     }
 }

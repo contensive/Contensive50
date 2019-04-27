@@ -217,247 +217,247 @@ namespace Contensive.Processor {
         //====================================================================================================
         // Deprecated methods
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool Admin => cp.core.doc.addonModelStack.Peek().admin;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string ArgumentList => cp.core.doc.addonModelStack.Peek().argumentList;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool AsAjax => cp.core.doc.addonModelStack.Peek().admin;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string BlockDefaultStyles => "";
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override int CollectionID => cp.core.doc.addonModelStack.Peek().collectionID;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool Content => cp.core.doc.addonModelStack.Peek().content;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string Copy => cp.core.doc.addonModelStack.Peek().copy;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string CopyText => cp.core.doc.addonModelStack.Peek().copyText;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string CustomStyles => "";
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string DefaultStyles => cp.core.doc.addonModelStack.Peek().stylesFilename.content;
         //
         //====================================================================================================
         // 
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string Description => "";
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string DotNetClass => cp.core.doc.addonModelStack.Peek().dotNetClass;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string FormXML => cp.core.doc.addonModelStack.Peek().formXML;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string Help => cp.core.doc.addonModelStack.Peek().help;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string HelpLink => cp.core.doc.addonModelStack.Peek().helpLink;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string IconFilename => cp.core.doc.addonModelStack.Peek().iconFilename;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override int IconHeight => cp.core.doc.addonModelStack.Peek().iconHeight;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override int IconSprites => cp.core.doc.addonModelStack.Peek().iconSprites;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override int IconWidth => cp.core.doc.addonModelStack.Peek().iconWidth;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool InFrame => cp.core.doc.addonModelStack.Peek().inFrame;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool IsInline => cp.core.doc.addonModelStack.Peek().isInline;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string JavaScriptBodyEnd => "";
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string JavascriptInHead => "";
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string JavaScriptOnLoad => "";
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string Link => cp.core.doc.addonModelStack.Peek().link;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string MetaDescription => cp.core.doc.addonModelStack.Peek().metaDescription;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string MetaKeywordList => cp.core.doc.addonModelStack.Peek().metaKeywordList;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string Name => cp.core.doc.addonModelStack.Peek().name;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string NavIconType => "";
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string ObjectProgramID => cp.core.doc.addonModelStack.Peek().objectProgramID;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool OnBodyEnd => cp.core.doc.addonModelStack.Peek().onBodyEnd;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool OnBodyStart => cp.core.doc.addonModelStack.Peek().onBodyStart;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool OnContentEnd => cp.core.doc.addonModelStack.Peek().onPageEndEvent;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool OnContentStart => cp.core.doc.addonModelStack.Peek().onPageStartEvent;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool Open(int AddonId) => false;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool Open(string AddonNameOrGuid) => false;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string OtherHeadTags => cp.core.doc.addonModelStack.Peek().otherHeadTags;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string PageTitle => cp.core.doc.addonModelStack.Peek().pageTitle;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string ProcessInterval => cp.core.doc.addonModelStack.Peek().processInterval.ToString();
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override DateTime ProcessNextRun => cp.core.doc.addonModelStack.Peek().processNextRun;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool ProcessRunOnce => cp.core.doc.addonModelStack.Peek().processRunOnce;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string RemoteAssetLink => cp.core.doc.addonModelStack.Peek().remoteAssetLink;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool RemoteMethod => cp.core.doc.addonModelStack.Peek().remoteMethod;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string RobotsTxt => cp.core.doc.addonModelStack.Peek().robotsTxt;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string ScriptCode => cp.core.doc.addonModelStack.Peek().scriptingCode;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string ScriptEntryPoint => cp.core.doc.addonModelStack.Peek().scriptingEntryPoint;
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string ScriptLanguage => "";
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override string SharedStyles => "";
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public override bool Template => cp.core.doc.addonModelStack.Peek().template;
         //
         #region  IDisposable Support 

@@ -165,19 +165,19 @@ namespace Contensive.BaseClasses {
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", true)]
+        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
         public abstract object ExecuteSQL(string SQL, string DataSourcename, string Retries, string PageSize, string PageNumber);
         //
-        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", true)]
+        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
         public abstract object ExecuteSQL(string SQL, string DataSourcename, string Retries, string PageSize);
         //
-        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", true)]
+        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
         public abstract object ExecuteSQL(string SQL, string DataSourcename, string Retries);
         //
-        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", true)]
+        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
         public abstract object ExecuteSQL(string SQL, string DataSourcename);
         //
-        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", true)]
+        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
         public abstract object ExecuteSQL(string SQL);
         //
         [Obsolete("Use GetConnectionString( dataSourceName )")]
@@ -186,19 +186,19 @@ namespace Contensive.BaseClasses {
         [Obsolete("Use GetDataSourceType( dataSourceName )")]
         public abstract int DbGetDataSourceType(string DataSourcename);
         //
-        [Obsolete("Use GetTableId instead.", true)]
+        [Obsolete("Use GetTableId instead.", false)]
         public abstract int DbGetTableID(string TableName);
         //
-        [Obsolete("Use isTable instead", true)]
+        [Obsolete("Use isTable instead", false)]
         public abstract bool DbIsTable(string DataSourcename, string TableName);
         //
-        [Obsolete("Use isTableField instead", true)]
+        [Obsolete("Use isTableField instead", false)]
         public abstract bool DbIsTableField(string DataSourcename, string TableName, string FieldName);
         //
-        [Obsolete("Deprecated. Use CP.Content.GetTableId().", true)]
+        [Obsolete("Deprecated. Use CP.Content.GetTableId().", false)]
         public abstract int GetTableID(string tableName);
         //
-        [Obsolete("Only Sql Server currently supported", true)]
+        [Obsolete("Only Sql Server currently supported", false)]
         public abstract int GetDataSourceType(string DataSourcename);
         //
 		[Obsolete("Deprecated. Use methods without datasource reference. Instead create non-default datasource with CP.DbNew(datasourcename).", false)]

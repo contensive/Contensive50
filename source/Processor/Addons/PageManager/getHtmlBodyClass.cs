@@ -25,14 +25,13 @@ namespace Contensive.Addons.PageManager {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
-            string returnHtml = "";
             try {
-                CoreController core = ((CPClass)cp).core;
-                returnHtml = "<div class=\"ccBodyWeb\">" + PageContentController.getHtmlBody(core) + "</div>";
+                // removed "<div class=\"ccBodyWeb\">" + PageContentController.getHtmlBody(core) + "</div>";
+                return PageContentController.getHtmlBody(((CPClass)cp).core);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
+                return "<div style=\"width:600px;margin:20px auto;\"><h1>Server Error</h1><p>There was an issue on this site that blocked your content. Thank you for your patience.</p></div>";
             }
-            return returnHtml;
         }
     }
-}
+}   

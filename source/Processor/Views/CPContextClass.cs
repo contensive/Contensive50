@@ -275,7 +275,7 @@ namespace Contensive.Processor {
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        [Obsolete("Deprecated", true)]
+        [Obsolete("Deprecated", false)]
         public string formFiles {
             get {
                 return "";

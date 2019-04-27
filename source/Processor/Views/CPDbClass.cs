@@ -173,31 +173,31 @@ namespace Contensive.Processor {
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("deprecated. Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", true)]
+        [Obsolete("deprecated. Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
         public override object ExecuteSQL(string sql, string ignoreDataSourceName, string ignoreRetries, string ignorePageSize, string ignorePageNumber) {
             db.executeNonQuery(sql);
             return null;
         }
         //
-        [Obsolete("Convert to datatables or use models", true)]
+        [Obsolete("Convert to datatables or use models", false)]
         public override object ExecuteSQL(string sql, string ignoreDataSourceName, string Retries, string PageSize) {
             db.executeNonQuery(sql);
             return null;
         }
         //
-        [Obsolete("Convert to datatables or use models", true)]
+        [Obsolete("Convert to datatables or use models", false)]
         public override object ExecuteSQL(string sql, string ignoreDataSourceName, string Retries) {
             db.executeNonQuery(sql);
             return null;
         }
         //
-        [Obsolete("Convert to datatables or use models", true)]
+        [Obsolete("Convert to datatables or use models", false)]
         public override object ExecuteSQL(string sql, string ignoreDataSourceName) {
             db.executeNonQuery(sql);
             return null;
         }
         //
-        [Obsolete("Convert to datatables or use models", true)]
+        [Obsolete("Convert to datatables or use models", false)]
         public override object ExecuteSQL(string sql) {
             db.executeNonQuery(sql);
             return null;
@@ -208,7 +208,7 @@ namespace Contensive.Processor {
             return GetConnectionString();
         }
         //
-        [Obsolete("Only Sql Server currently supported", true)]
+        [Obsolete("Only Sql Server currently supported", false)]
         public override int GetDataSourceType(string ignoreDataSourceName) {
             return db.getDataSourceType();
         }
@@ -218,62 +218,62 @@ namespace Contensive.Processor {
             return db.getDataSourceType();
         }
         //
-        [Obsolete("Use Db.Content.GetTableId instead.", true)]
+        [Obsolete("Use Db.Content.GetTableId instead.", false)]
         public override int DbGetTableID(string TableName) {
             return GetTableID(TableName);
         }
         //
-        [Obsolete("Use isTable instead", true)]
+        [Obsolete("Use isTable instead", false)]
         public override bool DbIsTable(string ignoreDataSourceName, string TableName) {
             return IsTable(TableName);
         }
         //
-        [Obsolete("Use isTableField instead", true)]
+        [Obsolete("Use isTableField instead", false)]
         public override bool DbIsTableField(string ignoreDataSourceName, string TableName, string FieldName) {
             return IsTableField(TableName, FieldName);
         }
         //
-        [Obsolete("Deprecated. Use methods without explicit datasource.", true)]
+        [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override DataTable ExecuteQuery(string sql, string ignoreDataSourceName) {
             return db.executeQuery(sql);
         }
         //
-        [Obsolete("Deprecated. Use methods without explicit datasource.", true)]
+        [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override DataTable ExecuteQuery(string sql, string ignoreDataSourceName, int startRecord) {
             return db.executeQuery(sql, startRecord);
         }
         //
-        [Obsolete("Deprecated. Use methods without explicit datasource.", true)]
+        [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override DataTable ExecuteQuery(string sql, string ignoreDataSourceName, int startRecord, int maxRecords) {
             return db.executeQuery(sql, startRecord, maxRecords);
         }
         //
-        [Obsolete("Deprecated. Use methods without explicit datasource.", true)]
+        [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override void Delete(string ignoreDataSourceName, string TableName, int RecordId) {
             db.deleteTableRecord(RecordId, TableName);
         }
         //
-        [Obsolete("Deprecated. Use methods without explicit datasource.", true)]
+        [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override string GetConnectionString(string ignoreDataSourceName) {
             return db.getConnectionStringADONET(cp.core.appConfig.name);
         }
         //
-        [Obsolete("Deprecated. Use CP.Content.GetTableId().", true)]
+        [Obsolete("Deprecated. Use CP.Content.GetTableId().", false)]
         public override int GetTableID(string TableName) {
             return DbController.getTableID(cp.core, TableName);
         }
         //
-        [Obsolete("Deprecated. Use methods without explicit datasource.", true)]
+        [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override bool IsTable(string ignoreDataSourceName, string TableName) {
             return db.isSQLTable(TableName);
         }
         //
-        [Obsolete("Deprecated. Use methods without explicit datasource.", true)]
+        [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override bool IsTableField(string ignoreDataSourceName, string TableName, string FieldName) {
             return db.isSQLTableField(TableName, FieldName);
         }
         //
-        [Obsolete("Deprecated. Use methods without explicit datasource.", true)]
+        [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override string GetRemoteQueryKey(string sql, string ignoreDataSourceName, int pageSize) {
             string returnKey = "";
             try {
@@ -302,21 +302,21 @@ namespace Contensive.Processor {
             return returnKey;
         }
         //
-        [Obsolete("Deprecated. Use methods without explicit datasource.", true)]
+        [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override string GetRemoteQueryKey(string sql, string ignoreDataSourceName)
             => GetRemoteQueryKey(sql, Constants.sqlPageSizeDefault);
         //
-        [Obsolete("Deprecated. Use methods without explicit datasource.", true)]
+        [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override void ExecuteNonQuery(string sql, string ignoreDataSourceName) {
             db.executeNonQuery(sql);
         }
         //
-        [Obsolete("Deprecated. Use methods without explicit datasource.", true)]
+        [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override void ExecuteNonQuery(string sql, string ignoreDataSourceName, ref int recordsAffected) {
             db.executeNonQuery(sql, ref recordsAffected);
         }
         //
-        [Obsolete("Deprecated. Use methods without explicit datasource.", true)]
+        [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override void ExecuteNonQueryAsync(string sql, string ignoreDataSourceName) {
             db.executeNonQueryAsync(sql);
         }

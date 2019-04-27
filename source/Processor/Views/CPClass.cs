@@ -597,7 +597,7 @@ namespace Contensive.Processor {
         //=========================================================================================================
         // deprecated
         //
-        [Obsolete("Use cp.Doc.SetProperty.", true)]
+        [Obsolete("Use cp.Doc.SetProperty.", false)]
         public void addVar(string key, string value) {
             try {
                 if (!string.IsNullOrEmpty(key)) {

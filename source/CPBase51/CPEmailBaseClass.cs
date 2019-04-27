@@ -119,44 +119,44 @@ namespace Contensive.BaseClasses {
         //====================================================================================================
         // deprecated
         //
-        //[Obsolete("Use uppercase version", true)]
+        //[Obsolete("Use uppercase version", false)]
         //public abstract string fromAddressDefault { get; }
         ////
-        //[Obsolete("Use uppercase version", true)]
+        //[Obsolete("Use uppercase version", false)]
         //public abstract void send(string ToAddress, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
         ////
-        //[Obsolete("Use uppercase version", true)]
+        //[Obsolete("Use uppercase version", false)]
         //public abstract void send(string ToAddress, string FromAddress, string Subject, string Body, bool SendImmediately);
         ////
-        //[Obsolete("Use uppercase version", true)]
+        //[Obsolete("Use uppercase version", false)]
         //public abstract void send(string ToAddress, string FromAddress, string Subject, string Body);
         ////
-        //[Obsolete("Use uppercase version", true)]
+        //[Obsolete("Use uppercase version", false)]
         //public abstract void sendForm(string ToAddress, string FromAddress, string Subject);
         //
-        //[Obsolete("Use SendToGroup()", true)]
+        //[Obsolete("Use SendToGroup()", false)]
         //public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
         ////
-        //[Obsolete("Use SendToGroup()", true)]
+        //[Obsolete("Use SendToGroup()", false)]
         //public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body, bool SendImmediately);
         ////
-        //[Obsolete("Use SendToGroup()", true)]
+        //[Obsolete("Use SendToGroup()", false)]
         //public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body);
 
         ////
-        //[Obsolete("Use uppercase version", true)]
+        //[Obsolete("Use uppercase version", false)]
         //public abstract void sendPassword(string UserEmailAddress);
         ////
-        //[Obsolete("Use uppercase version", true)]
+        //[Obsolete("Use uppercase version", false)]
         //public abstract void sendSystem(string EmailIdOrName, string AdditionalCopy = "", int AdditionalUserID = 0);
         ////
-        //[Obsolete("Use uppercase version", true)]
+        //[Obsolete("Use uppercase version", false)]
         //public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
         ////
-        //[Obsolete("Use uppercase version", true)]
+        //[Obsolete("Use uppercase version", false)]
         //public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body, bool SendImmediately);
         ////
-        //[Obsolete("Use uppercase version", true)]
+        //[Obsolete("Use uppercase version", false)]
         //public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body);
     }
 }

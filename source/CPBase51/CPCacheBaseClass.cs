@@ -269,40 +269,40 @@ namespace Contensive.BaseClasses {
         //public abstract void Save(string key, string Value);
         //public abstract void Save(string key, string Value, string tagCommaList);
         //
-        [Obsolete("use Store() instead", true)]
-        public abstract void setKey(string key, object Value);
+        [Obsolete("use Store() instead", false)]
+        public abstract void SetKey(string key, object Value);
         //
-        [Obsolete("use Store() instead", true)]
-        public abstract void setKey(string key, object Value, DateTime invalidationDate);
+        [Obsolete("use Store() instead", false)]
+        public abstract void SetKey(string key, object Value, DateTime invalidationDate);
         //
-        [Obsolete("use Store() instead", true)]
-        public abstract void setKey(string key, object Value, List<string> tagList);
+        [Obsolete("use Store() instead", false)]
+        public abstract void SetKey(string key, object Value, List<string> tagList);
         //
-        [Obsolete("use Store() instead", true)]
-        public abstract void setKey(string key, object Value, DateTime invalidationDate, List<string> tagList);
+        [Obsolete("use Store() instead", false)]
+        public abstract void SetKey(string key, object Value, DateTime invalidationDate, List<string> tagList);
         //
-        [Obsolete("use Store() instead", true)]
-        public abstract void setKey(string key, object Value, string tag);
+        [Obsolete("use Store() instead", false)]
+        public abstract void SetKey(string key, object Value, string tag);
         //
-        [Obsolete("use Store() instead", true)]
-        public abstract void setKey(string key, object Value, DateTime invalidationDate, string tag);
+        [Obsolete("use Store() instead", false)]
+        public abstract void SetKey(string key, object Value, DateTime invalidationDate, string tag);
         //
-        [Obsolete("Use Clear(dependentKeyList)", true)]
+        [Obsolete("Use Clear(dependentKeyList)", false)]
         public abstract void Clear(string ContentNameList);
         //
-        [Obsolete("Use GetText(key) instead", true)]
+        [Obsolete("Use GetText(key) instead", false)]
         public abstract string Read(string key);
         //
-        [Obsolete("Use Invalidate(key)", true)]
+        [Obsolete("Use Invalidate(key)", false)]
         public abstract void InvalidateTag(string tag);
         //
-        [Obsolete("Use Store()", true)]
+        [Obsolete("Use Store()", false)]
         public abstract void Save(string key, string Value);
         //
-        [Obsolete("Use Store()", true)]
+        [Obsolete("Use Store()", false)]
         public abstract void Save(string key, string Value, string tagCommaList);
         //
-        [Obsolete("Use Store()", true)]
+        [Obsolete("Use Store()", false)]
         public abstract void Save(string key, string Value, string tagCommaList, DateTime ClearOnDate);
     }
 

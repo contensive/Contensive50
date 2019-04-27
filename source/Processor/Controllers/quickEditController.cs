@@ -35,9 +35,12 @@ namespace Contensive.Processor.Controllers {
         /// <param name="main_AllowChildListComposite"></param>
         /// <param name="ArchivePage"></param>
         /// <returns></returns>
-        internal static string getQuickEditing( CoreController core, int rootPageId, string OrderByClause, bool AllowPageList, bool AllowReturnLink, bool ArchivePages, int contactMemberID, int childListSortMethodId, bool main_AllowChildListComposite, bool ArchivePage) {
+        internal static string getQuickEditing(CoreController core) {
             string result = "";
             try {
+                int childListSortMethodId = core.doc.pageController.page.childListSortMethodID;
+                int contactMemberID = core.doc.pageController.page.contactMemberID;
+                int rootPageId = core.doc.pageController.pageToRootList.Last().id;
                 core.html.addStyleLink("/quickEditor/styles.css", "Quick Editor");
                 //
                 // -- First Active Record - Output Quick Editor form
@@ -51,7 +54,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Set Editing Authoring Control
                 //
-                WorkflowController.setEditLock( core, pageContentTable.id, core.doc.pageController.page.id);
+                WorkflowController.setEditLock(core, pageContentTable.id, core.doc.pageController.page.id);
                 //
                 // SubPanel: Authoring Status
                 //
@@ -60,7 +63,7 @@ namespace Contensive.Processor.Controllers {
                 if (userContentPermissions.allowSave) {
                     ButtonList = ButtonList + "," + ButtonSave + "," + ButtonOK;
                 }
-                if (userContentPermissions.allowDelete && (core.doc.pageController.pageToRootList.Count==1)) {
+                if (userContentPermissions.allowDelete && (core.doc.pageController.pageToRootList.Count == 1)) {
                     //
                     // -- allow delete and not root page
                     ButtonList = ButtonList + "," + ButtonDelete;
@@ -94,12 +97,12 @@ namespace Contensive.Processor.Controllers {
                 if (!userContentPermissions.allowSave) {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, !userContentPermissions.allowSave, AllowReturnLink, PageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, "", true, true, rootPageId, !userContentPermissions.allowSave, true, PageContentModel.contentName, false, contactMemberID) + "</td>"
                     + "\r</tr>";
                 } else {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, !userContentPermissions.allowSave, AllowReturnLink, PageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, "", true, true, rootPageId, !userContentPermissions.allowSave, true, PageContentModel.contentName, false, contactMemberID) + "</td>"
                     + "\r</tr>";
                 }
                 result += "\r<tr>"
@@ -192,7 +195,7 @@ namespace Contensive.Processor.Controllers {
             // At this point we do now know the the template so we can not main_Get the stylelist.
             // Put in main_fpo_QuickEditing to be replaced after template known
             //
-           core.doc.quickEditCopy = pageCopy;
+            core.doc.quickEditCopy = pageCopy;
             return html_quickEdit_fpo;
         }
         //
@@ -216,8 +219,8 @@ namespace Contensive.Processor.Controllers {
         ~QuickEditController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
-            
-            
+
+
         }
         //
         //====================================================================================================

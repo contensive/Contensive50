@@ -74,7 +74,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        [Obsolete("deprecated, instead create contentMeta, lookup field and use property of field", true)]
+        [Obsolete("deprecated, instead create contentMeta, lookup field and use property of field", false)]
         public override string GetFieldProperty(string contentName, string fieldName, string propertyName) {
             throw new GenericException("getContentFieldProperty deprecated, instead create contentMeta, lookup field and use property of field");
         }
@@ -286,44 +286,44 @@ namespace Contensive.Processor {
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("Use AddRecord( string contentName ) ", true)]
+        [Obsolete("Use AddRecord( string contentName ) ", false)]
         public override int AddRecord(object ContentName) {
             return AddRecord(cp.Utils.EncodeText(ContentName));
         }
         //
-        [Obsolete("workflow editing is deprecated", true)]
+        [Obsolete("workflow editing is deprecated", false)]
         public override bool IsWorkflow(string ContentName) {
             //
             // -- workflow no longer supported (but may come back)
             return false;
         }
         //
-        [Obsolete("workflow editing is deprecated", true)]
+        [Obsolete("workflow editing is deprecated", false)]
         public override void PublishEdit(string ContentName, int RecordID) {
             // Call WorkflowController.publishEdit(ContentName, RecordID, 0)
         }
         //
-        [Obsolete("workflow editing is deprecated", true)]
+        [Obsolete("workflow editing is deprecated", false)]
         public override void SubmitEdit(string ContentName, int RecordID) {
             //Call WorkflowController.submitEdit2(ContentName, RecordID, 0)
         }
         //
-        [Obsolete("workflow editing is deprecated", true)]
+        [Obsolete("workflow editing is deprecated", false)]
         public override void AbortEdit(string ContentName, int RecordId) {
             // Call WorkflowController.abortEdit2(ContentName, RecordId, 0)
         }
         //
-        [Obsolete("workflow editing is deprecated", true)]
+        [Obsolete("workflow editing is deprecated", false)]
         public override void ApproveEdit(string ContentName, int RecordId) {
             //Call WorkflowController.approveEdit(ContentName, RecordId, 0)
         }
         //
-        [Obsolete("Deprecated, template link is not supported", true)]
+        [Obsolete("Deprecated, template link is not supported", false)]
         public override string GetTemplateLink(int TemplateID) {
             return "";
         }
         //
-        [Obsolete("Deprecated, access model properties instead", true)]
+        [Obsolete("Deprecated, access model properties instead", false)]
         public override string GetProperty(string ContentName, string PropertyName) {
             var contentMetadata = Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, ContentName);
             return contentMetadata.getContentProperty(cp.core, PropertyName);

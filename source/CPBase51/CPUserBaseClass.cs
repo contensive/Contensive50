@@ -365,46 +365,46 @@ namespace Contensive.BaseClasses {
         //
         // -- deprecated
         //
-        [Obsolete("Use LoginById(integer) instead", true)]
+        [Obsolete("Use LoginById(integer) instead", false)]
         public abstract bool LoginByID(string RecordID, bool SetAutoLogin = false);
         //
-        [Obsolete("correct default type", true)]
+        [Obsolete("correct default type", false)]
         public abstract bool GetBoolean(string PropertyName, string DefaultValue);
         //
-        [Obsolete("correct default type", true)]
+        [Obsolete("correct default type", false)]
         public abstract DateTime GetDate(string PropertyName, string DefaultValue);
         //
-        [Obsolete("correct default type", true)]
+        [Obsolete("correct default type", false)]
         public abstract int GetInteger(string PropertyName, string DefaultValue);
         //
-        [Obsolete("correct default type", true)]
+        [Obsolete("correct default type", false)]
         public abstract double GetNumber(string PropertyName, string DefaultValue);
         //
         [Obsolete("Use IsEditing()",true)]
         public abstract bool IsAuthoring(string contentName);
         //
-        [Obsolete("deprecated", true)]
+        [Obsolete("deprecated", false)]
         public abstract bool IsWorkflowRendering { get; }
         //
-        [Obsolete("deprecated. Use another method to differentiate types of users, like groups, select lists, etc.", true)]
+        [Obsolete("deprecated. Use another method to differentiate types of users, like groups, select lists, etc.", false)]
         public abstract bool IsMember { get; }
         //
-        [Obsolete("deprecated.", true)]
+        [Obsolete("deprecated.", false)]
         public abstract string Password { get; }
         //
-        [Obsolete("Use the Get method with the correct type.", true)]
+        [Obsolete("Use the Get method with the correct type.", false)]
         public abstract string GetProperty(string key, string defaultValue, int targetVisitId);
         //
-        [Obsolete("Use the Get method with the correct type.", true)]
+        [Obsolete("Use the Get method with the correct type.", false)]
         public abstract string GetProperty(string key, string defaultValue);
         //
-        [Obsolete("Use the Get method with the correct type.", true)]
+        [Obsolete("Use the Get method with the correct type.", false)]
         public abstract string GetProperty(string key);
         //
-        [Obsolete("Do not expose other user's properties.", true)]
+        [Obsolete("Do not expose other user's properties.", false)]
         public abstract void SetProperty(string key, string value, int userId);
         //
-        [Obsolete("Use isContentManager( Page Content ). This method returned true if the user isContentManager( Page Content )", true)]
+        [Obsolete("Use isContentManager( Page Content ). This method returned true if the user isContentManager( Page Content )", false)]
         public abstract bool IsContentManager();
     }
 }

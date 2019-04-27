@@ -542,62 +542,62 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        [Obsolete("Use OpenGroupUsers()", true)]
+        [Obsolete("Use OpenGroupUsers()", false)]
         public override bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria, string SortFieldList, bool ActiveOnly, int PageSize, int PageNumber) {
             List<string> groupList = new List<string>();
             groupList.AddRange(GroupCommaList.Split(','));
             return OpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
         }
         //
-        [Obsolete("Use OpenGroupUsers()", true)]
+        [Obsolete("Use OpenGroupUsers()", false)]
         public override bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria, string SortFieldList, bool ActiveOnly, int PageSize) {
             List<string> groupList = new List<string>();
             groupList.AddRange(GroupCommaList.Split(','));
             return OpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize);
         }
         //
-        [Obsolete("Use OpenGroupUsers()", true)]
+        [Obsolete("Use OpenGroupUsers()", false)]
         public override bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria, string SortFieldList, bool ActiveOnly) {
             List<string> groupList = new List<string>();
             groupList.AddRange(GroupCommaList.Split(','));
             return OpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly);
         }
         //
-        [Obsolete("Use OpenGroupUsers()", true)]
+        [Obsolete("Use OpenGroupUsers()", false)]
         public override bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria, string SortFieldList) {
             List<string> groupList = new List<string>();
             groupList.AddRange(GroupCommaList.Split(','));
             return OpenGroupUsers(groupList, SQLCriteria, SortFieldList);
         }
         //
-        [Obsolete("Use OpenGroupUsers()", true)]
+        [Obsolete("Use OpenGroupUsers()", false)]
         public override bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria) {
             List<string> groupList = new List<string>();
             groupList.AddRange(GroupCommaList.Split(','));
             return OpenGroupUsers(groupList, SQLCriteria);
         }
         //
-        [Obsolete("Use OpenGroupUsers()", true)]
+        [Obsolete("Use OpenGroupUsers()", false)]
         public override bool OpenGroupListUsers(string GroupCommaList) {
             List<string> groupList = new List<string>();
             groupList.AddRange(GroupCommaList.Split(','));
             return OpenGroupUsers(groupList);
         }
         //
-        [Obsolete("Use GetFormInput(string,string,int,int,string)", true)]
+        [Obsolete("Use GetFormInput(string,string,int,int,string)", false)]
         public override object GetFormInput(string contentName, string fieldName, string height, string width, string htmlId)
             => GetFormInput(contentName, fieldName, GenericController.encodeInteger(height), GenericController.encodeInteger(width), htmlId);
         //
-        [Obsolete("Use GetFormInput(string,string,int,int)", true)]
+        [Obsolete("Use GetFormInput(string,string,int,int)", false)]
         public override object GetFormInput(string contentName, string fieldName, string height, string width)
             => GetFormInput(contentName, fieldName, GenericController.encodeInteger(height), GenericController.encodeInteger(width));
         //
         //
-        [Obsolete("Use GetFormInput(string,string,int)", true)]
+        [Obsolete("Use GetFormInput(string,string,int)", false)]
         public override object GetFormInput(string contentName, string fieldName, string height)
             => GetFormInput(contentName, fieldName, GenericController.encodeInteger(height));
         //
-        [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)")]
+        [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)",false)]
         public override void SetFile(string FieldName, string Copy, string ContentName) {
             try {
                 cs.setTextFile(FieldName, Copy, ContentName);
@@ -607,27 +607,27 @@ namespace Contensive.Processor {
             }
         }
         //
-        [Obsolete("Use OpenSql()", true)]
+        [Obsolete("Use OpenSql()", false)]
         public override bool OpenSQL2(string sql, string DataSourcename, int PageSize, int PageNumber) {
             return cs.openSql(sql, DataSourcename, PageSize, PageNumber);
         }
         //
-        [Obsolete("Use OpenSql()", true)]
+        [Obsolete("Use OpenSql()", false)]
         public override bool OpenSQL2(string sql, string DataSourcename, int PageSize) {
             return cs.openSql(sql, DataSourcename, PageSize);
         }
         //
-        [Obsolete("Use OpenSql()", true)]
+        [Obsolete("Use OpenSql()", false)]
         public override bool OpenSQL2(string sql, string DataSourcename) {
             return cs.openSql(sql, DataSourcename);
         }
         //
-        [Obsolete("Use OpenSql()", true)]
+        [Obsolete("Use OpenSql()", false)]
         public override bool OpenSQL2(string sql) {
             return cs.openSql(sql);
         }
         //
-        [Obsolete("Use getText for a fields copy and getFilename for the fields filename if the field stores copy in a file", true)]
+        [Obsolete("Use getText for a fields copy and getFilename for the fields filename if the field stores copy in a file", false)]
         public override string GetTextFile(string FieldName) {
             return cs.getText(FieldName);
         }
