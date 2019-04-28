@@ -624,9 +624,9 @@ namespace Contensive.Processor.Controllers {
                                             string SiteStylesEditIcon = ""; // ?????
                                             string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, ref DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
                                             ToolBar = GenericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, 1);
-                                            result = AdminUIController.getEditWrapper(core, "<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
+                                            result = AdminUIController.getAddonEditWrapper(core, "<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
                                         } else if (core.visitProperty.getBoolean("AllowEditing")) {
-                                            result = AdminUIController.getEditWrapper(core, "<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
+                                            result = AdminUIController.getAddonEditWrapper(core, "<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
                                         }
                                     }
                                 }

@@ -10,6 +10,7 @@ using Contensive.Processor.Models.Domain;
 using Contensive.Addons.AdminSite.Controllers;
 using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.BaseClasses;
+using System.Text;
 
 namespace Contensive.Addons.AdminSite {
     public class FormIndex {
@@ -302,7 +303,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             //   select and print Records
                             //
-                            string DataTable_DataRows = "";
+                            var DataTableRows = new StringBuilder();
                             string RowColor = "";
                             int RecordPointer = 0;
                             int RecordLast = 0;
@@ -319,27 +320,27 @@ namespace Contensive.Addons.AdminSite {
                                         } else {
                                             RowColor = "class=\"ccAdminListRowOdd\"";
                                         }
-                                        DataTable_DataRows += "\r\n<tr>";
+                                        DataTableRows.Append( "\r\n<tr>");
                                         //
                                         // --- Edit button column
-                                        DataTable_DataRows += "<td align=center " + RowColor + ">";
+                                        DataTableRows.Append( "<td align=center " + RowColor + ">");
                                         string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + Constants.AdminActionNop + "&cid=" + adminData.adminContent.id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.TitleExtension) + "&ad=" + adminData.ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminData.AdminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
                                         if (adminData.WherePairCount > 0) {
                                             for (int WhereCount = 0; WhereCount < adminData.WherePairCount; WhereCount++) {
                                                 URI = URI + "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[1, WhereCount]);
                                             }
                                         }
-                                        DataTable_DataRows += AdminUIController.getIconEditLink(URI);
-                                        DataTable_DataRows += ("</td>");
+                                        DataTableRows.Append( AdminUIController.getIconEditLink(URI));
+                                        DataTableRows.Append( ("</td>"));
                                         //
                                         // --- Record Number column
-                                        //DataTable_DataRows += "<td align=right " + RowColor + ">" + SpanClassAdminSmall + "[" + (RecordPointer + 1) + "]</span></td>";
+                                        //DataTable_DataRows.Append( "<td align=right " + RowColor + ">" + SpanClassAdminSmall + "[" + (RecordPointer + 1) + "]</span></td>";
                                         //
                                         // --- Delete Checkbox Columns
                                         if (AllowDelete) {
-                                            DataTable_DataRows += "<td align=center " + RowColor + "><input TYPE=CheckBox NAME=row" + RecordPointer + " VALUE=1 ID=\"DelCheck\"><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>";
+                                            DataTableRows.Append( "<td align=center " + RowColor + "><input TYPE=CheckBox NAME=row" + RecordPointer + " VALUE=1 ID=\"DelCheck\"><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>");
                                         } else {
-                                            DataTable_DataRows += "<td align=center " + RowColor + "><input TYPE=CheckBox disabled=\"disabled\" NAME=row" + RecordPointer + " VALUE=1><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>";
+                                            DataTableRows.Append( "<td align=center " + RowColor + "><input TYPE=CheckBox disabled=\"disabled\" NAME=row" + RecordPointer + " VALUE=1><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>");
                                         }
                                         //
                                         // --- field columns
@@ -347,17 +348,17 @@ namespace Contensive.Addons.AdminSite {
                                             string columnNameLc = column.Name.ToLowerInvariant();
                                             if (FieldUsedInColumns.ContainsKey(columnNameLc)) {
                                                 if (FieldUsedInColumns[columnNameLc]) {
-                                                    DataTable_DataRows += ("\r\n<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal);
-                                                    DataTable_DataRows += getForm_Index_GetCell(core, adminData, column.Name, csData, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail");
-                                                    DataTable_DataRows += ("&nbsp;</span></td>");
+                                                    DataTableRows.Append( ("\r\n<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal));
+                                                    DataTableRows.Append( getForm_Index_GetCell(core, adminData, column.Name, csData, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail"));
+                                                    DataTableRows.Append( ("&nbsp;</span></td>"));
                                                 }
                                             }
                                         }
-                                        DataTable_DataRows += ("\n    </tr>");
+                                        DataTableRows.Append( ("\n    </tr>"));
                                         csData.goNext();
                                         RecordPointer = RecordPointer + 1;
                                     }
-                                    DataTable_DataRows += "<input type=hidden name=rowcnt value=" + RecordPointer + ">";
+                                    DataTableRows.Append( "<input type=hidden name=rowcnt value=" + RecordPointer + ">");
                                     //
                                     // --- print out the stuff at the bottom
                                     //
@@ -383,18 +384,18 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // No records found
                                 //
-                                DataTable_DataRows += ("<tr><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td colspan=" + IndexConfig.columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">no records were found</td></tr>");
+                                DataTableRows.Append( ("<tr><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td colspan=" + IndexConfig.columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">no records were found</td></tr>"));
                             } else {
                                 if (RecordPointer < RecordLast) {
                                     //
                                     // End of list
                                     //
-                                    DataTable_DataRows += ("<tr><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td colspan=" + IndexConfig.columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">----- end of list</td></tr>");
+                                    DataTableRows.Append( ("<tr><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td colspan=" + IndexConfig.columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">----- end of list</td></tr>"));
                                 }
                                 //
                                 // Add another header to the data rows
                                 //
-                                DataTable_DataRows += DataTable_HdrRow;
+                                DataTableRows.Append( DataTable_HdrRow);
                             }
                             //
                             // ----- DataTable_FindRow
@@ -430,7 +431,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             string grid = ""
                                 + "<table ID=\"DataTable\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"Background-Color:white;\">"
-                                + DataTable_HdrRow + DataTable_DataRows + DataTable_FindRow + "</table>";
+                                + DataTable_HdrRow + DataTableRows.ToString() + DataTable_FindRow + "</table>";
                             //DataTable = BodyIndexAdvancedSearchClass.get( core, )
                             //
                             // Assemble DataFilterTable

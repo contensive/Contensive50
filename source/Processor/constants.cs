@@ -60,8 +60,8 @@ namespace Contensive.Processor {
         public static readonly string iconNotAvailable = "<i title=\"not available\" class=\"fas fa-ban\"></i>";
         public static readonly string iconExpand = "<i title=\"expand\" class=\"fas fa-chevron-circle-up\"></i>";
         public static readonly string iconContract = "<i title=\"contract\" class=\"fas fa-chevron-circle-down\"></i>";
-        public static readonly string iconArrowUp = "<i title=\"right\" class=\"fas fa-arrow-circle-up\"></i>";
-        public static readonly string iconArrowDown = "<i title=\"right\" class=\"fas fa-arrow-circle-down\"></i>";
+        public static readonly string iconArrowUp = "<i title=\"up\" class=\"fas fa-arrow-circle-up\"></i>";
+        public static readonly string iconArrowDown = "<i title=\"down\" class=\"fas fa-arrow-circle-down\"></i>";
         public static readonly string iconArrowRight = "<i title=\"right\" class=\"fas fa-arrow-circle-right\"></i>";
         public static readonly string iconArrowLeft = "<i title=\"left\" class=\"fas fa-arrow-circle-left\"></i>";
         public static readonly string iconDelete = "<i title=\"delete\" class=\"fas fa-times\"></i>";
@@ -78,7 +78,7 @@ namespace Contensive.Processor {
         public static readonly string iconClose_Red = "<span style=\"color:#f00\">" + iconClose + "</span>";
         public static readonly string iconOpen = "<i title=\"open\" class=\"fas fa-angle-double-right\"></i>";
         public static readonly string iconOpen_White = "<span style=\"color:#fff\">" + iconOpen + "</span>";
-        public static readonly string iconGrip = "<i title=\"paste content\" class=\"fas fa-grip-horizontal\"></i>";
+        public static readonly string iconGrip = "<i title=\"drag and drop\" class=\"fas fa-grip-horizontal\"></i>";
         public static readonly string iconContentPaste_Green = "<span style=\"color:#0c0\">" + iconContentPaste + "</span>";
         //
         // -- buttons

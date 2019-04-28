@@ -20,8 +20,7 @@ namespace Contensive.Addons.AdminSite {
         public static string get(CoreController core, AdminDataModel adminData) {
             string result = null;
             try {
-                // todo
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
+                bool disabled = false;
                 //
                 var tabPanel = new StringBuilderLegacyController();
                 if (string.IsNullOrEmpty(adminData.adminContent.name)) {
@@ -44,7 +43,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- RecordID
                 {
-                    string fieldValue = (editRecord.id == 0) ? "(available after save)" : editRecord.id.ToString();
+                    string fieldValue = (adminData.editRecord.id == 0) ? "(available after save)" : adminData.editRecord.id.ToString();
                     string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore", fieldValue, true, "");
                     string fieldHelp = "This is the unique number that identifies this record within this content.";
                     tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Record Number", fieldHelp, true, false, ""));
@@ -53,46 +52,22 @@ namespace Contensive.Addons.AdminSite {
                 // -- Active
                 {
                     string htmlId = "fieldActive";
-                    string fieldEditor = HtmlController.checkbox("active", editRecord.active, htmlId);
+                    string fieldEditor = HtmlController.checkbox("active", adminData.editRecord.active, htmlId, disabled, "", adminData.editRecord.userReadOnly);
                     string fieldHelp = "When unchecked, add-ons can ignore this record as if it was temporarily deleted.";
                     tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Active", fieldHelp, false, false, htmlId));
                 }
-                ////
-                //// ----- If Page Content , check if this is the default PageNotFound page
-                //if (adminContext.adminContent.contentTableName.ToLowerInvariant() == "ccpagecontent") {
-                //    //
-                //    // Landing Page
-                //    {
-                //        string fieldHelp = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docore.main_";
-                //        bool Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("LandingPageID", 0))));
-                //        string fieldEditor = (core.session.isAuthenticatedAdmin(core)) ? htmlController.checkbox("LandingPageID", Checked) : "<b>" + genericController.getYesNo(Checked) + "</b>" + htmlController.inputHidden("LandingPageID", Checked);
-                //        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Default Landing Page", fieldHelp, false, false, ""));
-                //    }
-                //    //
-                //    // Page Not Found
-                //    {
-                //        string fieldHelp = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked.";
-                //        bool isPageNotFoundRecord = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("PageNotFoundPageID", 0))));
-                //        string fieldEditor = (core.session.isAuthenticatedAdmin(core)) ? htmlController.checkbox("PageNotFound", isPageNotFoundRecord) : "<b>" + genericController.getYesNo(isPageNotFoundRecord) + "</b>" + htmlController.inputHidden("PageNotFound", isPageNotFoundRecord);
-                //        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Default Page Not Found", fieldHelp, false, false, ""));
-                //    }
-                //    //
-                //    // ----- Last Known Public Site URL
-                //    {
-                //        string FieldHelp = "This is the URL where this record was last displayed on the site. It may be blank if the record has not been displayed yet.";
-                //        string fieldValue = linkAliasController.getLinkAlias(core, editRecord.id, "", "");
-                //        string fieldEditor = (string.IsNullOrEmpty(fieldValue)) ? "unknown" : "<a href=\"" + htmlController.encodeHtml(fieldValue) + "\" target=\"_blank\">" + fieldValue + "</a>";
-                //        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Last Known Public URL", FieldHelp, false, false, ""));
-                //    }
-                //}
                 //
                 // -- GUID
                 {
                     string htmlId = "fieldGuid";
-                    string fieldValue = GenericController.encodeText(editRecord.fieldsLc["ccguid"].value);
+                    string fieldValue = GenericController.encodeText(adminData.editRecord.fieldsLc["ccguid"].value);
                     string FieldHelp = "This is a unique number that identifies this record globally. A GUID is not required, but when set it should never be changed. GUIDs are used to synchronize records. When empty, you can create a new guid. Only Developers can modify the guid.";
                     string fieldEditor = "";
-                    if (string.IsNullOrEmpty(fieldValue)) {
+                    if (adminData.editRecord.userReadOnly) {
+                        //
+                        // -- readonly
+                        fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore", fieldValue, true, "");
+                    } else if (string.IsNullOrEmpty(fieldValue)) {
                         //
                         // add a set button
                         string fieldId = "setGuid" + GenericController.GetRandomInteger(core).ToString();
@@ -116,10 +91,10 @@ namespace Contensive.Addons.AdminSite {
                         string fieldEditor = "";
                         if (!AllowEID) {
                             fieldEditor = "(link login and link recognize are disabled in security preferences)";
-                        } else if (editRecord.id == 0) {
+                        } else if (adminData.editRecord.id == 0) {
                             fieldEditor = "(available after save)";
                         } else {
-                            string eidQueryString = "eid=" + Processor.Controllers.SecurityController.encodeToken(core, editRecord.id, core.doc.profileStartTime);
+                            string eidQueryString = "eid=" + Processor.Controllers.SecurityController.encodeToken(core, adminData.editRecord.id, core.doc.profileStartTime);
                             string sampleUrl = core.webServer.requestProtocol + core.webServer.requestDomain + appRootPath + core.siteProperties.serverPageDefault + "?" + eidQueryString;
                             if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
                                 fieldHelp = "If " + eidQueryString + " is added to a url querystring for this site, the user be logged in as this person.";
@@ -145,20 +120,20 @@ namespace Contensive.Addons.AdminSite {
                         // if this record has a parent id, only include CDefs compatible with the parent record - otherwise get all for the table
                         FieldHelp = GenericController.encodeText(field.helpMessage);
                         FieldRequired = GenericController.encodeBoolean(field.required);
-                        int FieldValueInteger = (editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId;
+                        int FieldValueInteger = (adminData.editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : adminData.editRecord.contentControlId;
                         if (!core.session.isAuthenticatedAdmin(core)) {
                             HTMLFieldString = HTMLFieldString + HtmlController.inputHidden("contentControlId", FieldValueInteger);
                         } else {
-                            string RecordContentName = editRecord.contentControlId_Name;
+                            string RecordContentName = adminData.editRecord.contentControlId_Name;
                             string TableName2 = MetadataController.getContentTablename(core, RecordContentName);
                             int TableID = MetadataController.getRecordIdByUniqueName(core, "Tables", TableName2);
                             //
                             // Test for parentid
                             int ParentID = 0;
                             bool ContentSupportsParentID = false;
-                            if (editRecord.id > 0) {
+                            if (adminData.editRecord.id > 0) {
                                 using (var csData = new CsModel(core)) {
-                                    if (csData.openRecord(RecordContentName, editRecord.id)) {
+                                    if (csData.openRecord(RecordContentName, adminData.editRecord.id)) {
                                         ContentSupportsParentID = csData.isFieldSupported("ParentID");
                                         if (ContentSupportsParentID) {
                                             ParentID = csData.getInteger("ParentID");
@@ -172,13 +147,13 @@ namespace Contensive.Addons.AdminSite {
                                 // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                                 string sqlFilter = "(ContentTableID=" + TableID + ")";
                                 int contentCID = MetadataController.getRecordIdByUniqueName(core, Processor.Models.Db.ContentModel.contentName, Processor.Models.Db.ContentModel.contentName);
-                                HTMLFieldString += AdminUIController.getDefaultEditor_lookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, false, "", "", true, sqlFilter);
+                                HTMLFieldString += AdminUIController.getDefaultEditor_lookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, adminData.editRecord.userReadOnly, "", "", true, sqlFilter);
                                 FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)";
                             }
                         }
                     }
                     if (string.IsNullOrEmpty(HTMLFieldString)) {
-                        HTMLFieldString = editRecord.contentControlId_Name;
+                        HTMLFieldString = adminData.editRecord.contentControlId_Name;
                     }
                     tabPanel.Add(AdminUIController.getEditRow(core, HTMLFieldString, "Controlling Content", FieldHelp, FieldRequired, false, ""));
                 }
@@ -187,10 +162,10 @@ namespace Contensive.Addons.AdminSite {
                 {
                     string FieldHelp = "The people account of the user who created this record.";
                     string fieldValue = "";
-                    if (editRecord.id == 0) {
+                    if (adminData.editRecord.id == 0) {
                         fieldValue = "(available after save)";
                     } else {
-                        int FieldValueInteger = editRecord.createdBy.id;
+                        int FieldValueInteger = adminData.editRecord.createdBy.id;
                         if (FieldValueInteger == 0) {
                             fieldValue = "(not set)";
                         } else {
@@ -216,13 +191,13 @@ namespace Contensive.Addons.AdminSite {
                 {
                     string FieldHelp = "The date and time when this record was originally created.";
                     string fieldValue = "";
-                    if (editRecord.id == 0) {
+                    if (adminData.editRecord.id == 0) {
                         fieldValue = "(available after save)";
                     } else {
-                        if (GenericController.encodeDateMinValue(editRecord.dateAdded) == DateTime.MinValue) {
+                        if (GenericController.encodeDateMinValue(adminData.editRecord.dateAdded) == DateTime.MinValue) {
                             fieldValue = "(not set)";
                         } else {
-                            fieldValue = editRecord.dateAdded.ToString();
+                            fieldValue = adminData.editRecord.dateAdded.ToString();
                         }
                     }
                     string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_createdDate", fieldValue, true, "");
@@ -234,10 +209,10 @@ namespace Contensive.Addons.AdminSite {
                 {
                     string FieldHelp = "The people account of the last user who modified this record.";
                     string fieldValue = "";
-                    if (editRecord.id == 0) {
+                    if (adminData.editRecord.id == 0) {
                         fieldValue = "(available after save)";
                     } else {
-                        int FieldValueInteger = editRecord.modifiedBy.id;
+                        int FieldValueInteger = adminData.editRecord.modifiedBy.id;
                         if (FieldValueInteger == 0) {
                             fieldValue = "(not set)";
                         } else {
@@ -263,13 +238,13 @@ namespace Contensive.Addons.AdminSite {
                 {
                     string FieldHelp = "The date and time when this record was last modified.";
                     string fieldValue = "";
-                    if (editRecord.id == 0) {
+                    if (adminData.editRecord.id == 0) {
                         fieldValue = "(available after save)";
                     } else {
-                        if (GenericController.encodeDateMinValue(editRecord.modifiedDate) == DateTime.MinValue) {
+                        if (GenericController.encodeDateMinValue(adminData.editRecord.modifiedDate) == DateTime.MinValue) {
                             fieldValue = "(not set)";
                         } else {
-                            fieldValue = editRecord.modifiedDate.ToString();
+                            fieldValue = adminData.editRecord.modifiedDate.ToString();
                         }
                     }
                     string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_modifiedBy", fieldValue, true, "");

@@ -1606,13 +1606,13 @@ namespace Contensive.Processor.Controllers {
                     }
                     if (isEditingAnything) {
                         if (result.IndexOf("<!-- AFScript -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
-                            string Copy = AdminUIController.getEditWrapper(core, "Aggregate Script", "##MARKER##");
+                            string Copy = AdminUIController.getAddonEditWrapper(core, "Aggregate Script", "##MARKER##");
                             string[] Wrapper = GenericController.stringSplit(Copy, "##MARKER##");
                             result = GenericController.vbReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, 1);
                             result = GenericController.vbReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, 1);
                         }
                         if (result.IndexOf("<!-- AFReplacement -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
-                            string Copy = AdminUIController.getEditWrapper(core, "Aggregate Replacement", "##MARKER##");
+                            string Copy = AdminUIController.getAddonEditWrapper(core, "Aggregate Replacement", "##MARKER##");
                             string[] Wrapper = GenericController.stringSplit(Copy, "##MARKER##");
                             result = GenericController.vbReplace(result, "<!-- AFReplacement -->", Wrapper[0], 1, 99, 1);
                             result = GenericController.vbReplace(result, "<!-- /AFReplacement -->", Wrapper[1], 1, 99, 1);

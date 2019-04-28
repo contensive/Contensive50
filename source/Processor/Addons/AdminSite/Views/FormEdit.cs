@@ -385,7 +385,6 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(addTab(core, adminMenu, "Authoring Permissions", getForm_Edit_GroupRules(core, adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) {
                             Stream.Add(adminMenu.getTabs(core));

@@ -3151,7 +3151,7 @@ namespace Contensive.Processor.Controllers {
                             if (core.session.isEditingAnything()) {
                                 returnCopy = csData.getRecordEditLink(false) + returnCopy;
                                 if (AllowEditWrapper) {
-                                    returnCopy = AdminUIController.getEditWrapper(core, "copy content", returnCopy);
+                                    returnCopy = AdminUIController.getEditWrapper(core, returnCopy);
                                 }
                             }
                         }

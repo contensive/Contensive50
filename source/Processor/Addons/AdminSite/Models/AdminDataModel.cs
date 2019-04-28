@@ -758,6 +758,9 @@ namespace Contensive.Addons.AdminSite {
                         }
                     }
                     //
+                    // -- set read only for email.submitted
+                    editRecord.userReadOnly |= (adminContent.name.ToLower().Equals("conditional email")) ? encodeBoolean(editRecord.fieldsLc["submitted"].value) : false;
+                    //
                     // ----- Now make sure this record is locked from anyone else
                     //
                     if (!(editRecord.userReadOnly)) {
@@ -1184,55 +1187,28 @@ namespace Contensive.Addons.AdminSite {
                 if (AllowAdminFieldCheck(core) && (FormFieldLcListToBeLoaded.Count == 0)) {
                     //
                     // The field list was not returned
-                    Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [no field list].");
+                    Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The Error Is [no field list].");
                 } else if (AllowAdminFieldCheck(core) && (FormEmptyFieldLcList.Count == 0)) {
                     //
                     // The field list was not returned
-                    Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [no empty field list].");
+                    Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The Error Is [no empty field list].");
                 } else {
                     //
                     // fixup the string so it can be reduced by each field found, leaving and empty string if all correct
                     //
                     var tmpList = new List<string>();
-                    DataSourceModel datasource = DataSourceModel.create(core, adminContent.dataSourceId, ref tmpList);
+                    //DataSourceModel datasource = DataSourceModel.create(core, adminContent.dataSourceId, ref tmpList);
                     //DataSourceName = core.db.getDataSourceNameByID(adminContext.content.dataSourceId)
                     foreach (var keyValuePair in adminContent.fields) {
                         ContentFieldMetadataModel field = keyValuePair.Value;
-                        LoadEditRecord_RequestField(core, field, datasource.name, FormFieldLcListToBeLoaded, FormEmptyFieldLcList);
+                        LoadEditRecord_RequestField(core, field, FormFieldLcListToBeLoaded, FormEmptyFieldLcList);
                     }
                     //
                     // If there are any form fields that were no loaded, flag the error now
                     //
                     if (AllowAdminFieldCheck(core) && (FormFieldLcListToBeLoaded.Count > 0)) {
-                        Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where not found [" + string.Join(",", FormFieldLcListToBeLoaded) + "].");
+                        Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The following fields where not found [" + string.Join(",", FormFieldLcListToBeLoaded) + "].");
                         throw (new GenericException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
-                    } else {
-                        //
-                        // if page content, check for the 'pagenotfound','landingpageid' checkboxes in control tab
-                        //
-                        //if (genericController.vbLCase(adminContext.adminContent.contentTableName) == "ccpagecontent") {
-                        //    ////
-                        //    //PageNotFoundPageID = (core.siteProperties.getInteger("PageNotFoundPageID", 0));
-                        //    //if (core.docProperties.getBoolean("PageNotFound")) {
-                        //    //    editRecord.SetPageNotFoundPageID = true;
-                        //    //} else if (editRecord.id == PageNotFoundPageID) {
-                        //    //    core.siteProperties.setProperty("PageNotFoundPageID", "0");
-                        //    //}
-                        //    //
-                        //    //if (core.docProperties.getBoolean("LandingPageID")) {
-                        //    //    editRecord.SetLandingPageID = true;
-                        //    //} else 
-                        //    //if (editRecord.id == 0) {
-                        //    //    //
-                        //    //    // New record, allow it to be set, but do not compare it to LandingPageID
-                        //    //    //
-                        //    //} else if (editRecord.id == core.siteProperties.landingPageID) {
-                        //    //    //
-                        //    //    // Do not reset the LandingPageID from here -- set another instead
-                        //    //    //
-                        //    //    errorController.addUserError(core, "This page was marked As the Landing Page For the website, And the checkbox has been cleared. This Is not allowed. To remove this page As the Landing Page, locate a New landing page And Select it, Or go To Settings &gt; Page Settings And Select a New Landing Page.");
-                        //    //}
-                        //}
                     }
                 }
             } catch (Exception ex) {
@@ -1243,391 +1219,388 @@ namespace Contensive.Addons.AdminSite {
         // ====================================================================================================
         //   Read the Form into the fields array
         //
-        public void LoadEditRecord_RequestField(CoreController core, ContentFieldMetadataModel field, string ignore, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
+        public void LoadEditRecord_RequestField(CoreController core, ContentFieldMetadataModel field, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
             try {
-                // todo
-                if (field.active) {
-                    const int LoopPtrMax = 100;
-                    bool blockDuplicateUsername = false;
-                    bool blockDuplicateEmail = false;
-                    string lcaseCopy = null;
-                    int EditorPixelHeight = 0;
-                    int EditorRowHeight = 0;
-                    bool ResponseFieldIsEmpty = false;
-                    HtmlParserController HTML = new HtmlParserController(core);
-                    int ParentID = 0;
-                    string UsedIDs = null;
-                    int LoopPtr = 0;
-                    bool ResponseFieldValueIsOKToSave = true;
-                    bool InEmptyFieldList = FormEmptyFieldLcList.Contains(field.nameLc);
-                    bool InLoadedFieldList = FormFieldLcListToBeLoaded.Contains(field.nameLc);
-                    if (InLoadedFieldList) {
-                        FormFieldLcListToBeLoaded.Remove(field.nameLc);
-                    }
-                    bool InResponse = core.docProperties.containsKey(field.nameLc);
-                    string ResponseFieldValueText = core.docProperties.getText(field.nameLc);
-                    ResponseFieldIsEmpty = string.IsNullOrEmpty(ResponseFieldValueText);
-                    string TabCopy = "";
-                    if (field.editTabName != "") {
-                        TabCopy = " in the " + field.editTabName + " tab";
-                    }
-                    //
-                    // -- process reserved fields
-                    switch (field.nameLc) {
-                        case "contentcontrolid":
-                            //
-                            //
-                            if (AllowAdminFieldCheck(core)) {
-                                if (!core.docProperties.containsKey(field.nameLc.ToUpper())) {
-                                    if (!(!core.doc.userErrorList.Count.Equals(0))) {
-                                        //
-                                        // Add user error only for the first missing field
-                                        //
-                                        Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try again, taking care not to submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" + field.nameLc + " not found]. There may have been others.");
-                                    }
-                                    throw (new GenericException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but not found In the response stream.")
+                //
+                // -- if field is not active, no change
+                if (!field.active) { return; }
+                //
+                // -- if field was in request, set bool and remove it from list
+                bool InLoadedFieldList = FormFieldLcListToBeLoaded.Contains(field.nameLc);
+                if (InLoadedFieldList) {
+                    FormFieldLcListToBeLoaded.Remove(field.nameLc);
+                }
+                //
+                // -- if record is read only, exit now
+                if (editRecord.userReadOnly) { return; }
+                //
+                // -- determine if the field value should be saved
+                string ResponseFieldValueText = core.docProperties.getText(field.nameLc);
+                string TabCopy = "";
+                if (field.editTabName != "") {
+                    TabCopy = " in the " + field.editTabName + " tab";
+                }
+                bool ResponseFieldValueIsOKToSave = true;
+                bool InEmptyFieldList = FormEmptyFieldLcList.Contains(field.nameLc);
+                bool InResponse = core.docProperties.containsKey(field.nameLc);
+                bool ResponseFieldIsEmpty = string.IsNullOrEmpty(ResponseFieldValueText);
+                //
+                // -- process reserved fields
+                switch (field.nameLc) {
+                    case "contentcontrolid":
+                        //
+                        // -- admin can change contentcontrolid to any in the same table
+                        if (AllowAdminFieldCheck(core)) {
+                            if (!core.docProperties.containsKey(field.nameLc.ToUpper())) {
+                                if (!(!core.doc.userErrorList.Count.Equals(0))) {
+                                    //
+                                    // Add user error only for the first missing field
+                                    Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try again, taking care not to submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" + field.nameLc + " not found]. There may have been others.");
                                 }
+                                throw (new GenericException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but not found In the response stream.")
                             }
-                            if (GenericController.encodeInteger(ResponseFieldValueText) != GenericController.encodeInteger(editRecord.fieldsLc[field.nameLc].value)) {
-                                //
-                                // new value
-                                editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
-                                ResponseFieldIsEmpty = false;
-                            }
-                            break;
-                        case "active":
+                        }
+                        if (GenericController.encodeInteger(ResponseFieldValueText) != GenericController.encodeInteger(editRecord.fieldsLc[field.nameLc].value)) {
                             //
+                            // new value
+                            editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
+                            ResponseFieldIsEmpty = false;
+                        }
+                        break;
+                    case "active":
+                        //
+                        // anyone can change active
+                        if (AllowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
+                            Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The error is [" + field.nameLc + " not found].");
+                            return;
+                        }
+                        bool responseValue = core.docProperties.getBoolean(field.nameLc);
+                        if (!responseValue.Equals(encodeBoolean(editRecord.fieldsLc[field.nameLc].value))) {
                             //
-                            if (AllowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
-                                Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The rrror is [" + field.nameLc + " not found].");
+                            // new value
+                            editRecord.fieldsLc[field.nameLc].value = responseValue;
+                            ResponseFieldIsEmpty = false;
+                        }
+                        break;
+                    case "ccguid":
+                        //
+                        // -- anyone can change
+                        InEmptyFieldList = FormEmptyFieldLcList.Contains(field.nameLc);
+                        InResponse = core.docProperties.containsKey(field.nameLc);
+                        if (AllowAdminFieldCheck(core)) {
+                            if ((!InResponse) && (!InEmptyFieldList)) {
+                                Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The Error Is [" + field.nameLc + " not found].");
                                 return;
                             }
+                        }
+                        if (ResponseFieldValueText != editRecord.fieldsLc[field.nameLc].value.ToString()) {
                             //
-                            bool responseValue = core.docProperties.getBoolean(field.nameLc);
-
-                            if (!responseValue.Equals(encodeBoolean(editRecord.fieldsLc[field.nameLc].value))) {
-                                //
-                                // new value
-                                //
-                                editRecord.fieldsLc[field.nameLc].value = responseValue;
-                                ResponseFieldIsEmpty = false;
-                            }
-                            break;
-                        case "ccguid":
+                            // new value
+                            editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
+                            ResponseFieldIsEmpty = false;
+                        }
+                        break;
+                    case "id":
+                    case "modifiedby":
+                    case "modifieddate":
+                    case "createdby":
+                    case "dateadded":
+                        //
+                        // -----Control fields that cannot be edited
+                        ResponseFieldValueIsOKToSave = false;
+                        break;
+                    default:
+                        //
+                        // ----- Read response for user fields
+                        //       9/24/2009 - if fieldname is not in FormFieldListToBeLoaded, go with what is there (Db value or default value)
+                        //
+                        if (!field.authorable) {
                             //
+                            // Is blocked from authoring, leave current value
                             //
-                            //
-                            InEmptyFieldList = FormEmptyFieldLcList.Contains(field.nameLc);
-                            InResponse = core.docProperties.containsKey(field.nameLc);
-                            if (AllowAdminFieldCheck(core)) {
-                                if ((!InResponse) && (!InEmptyFieldList)) {
-                                    Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" + field.nameLc + " not found].");
-                                    return;
-                                }
-                            }
-                            if (ResponseFieldValueText != editRecord.fieldsLc[field.nameLc].value.ToString()) {
-                                //
-                                // new value
-                                editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
-                                ResponseFieldIsEmpty = false;
-                            }
-                            break;
-                        case "id":
-                        case "modifiedby":
-                        case "modifieddate":
-                        case "createdby":
-                        case "dateadded":
-                            //
-                            // -----Control fields that cannot be edited
                             ResponseFieldValueIsOKToSave = false;
-                            break;
-                        default:
+                        } else if ((field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement) || (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Redirect) || (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.ManyToMany)) {
                             //
-                            // ----- Read response for user fields
-                            //       9/24/2009 - if fieldname is not in FormFieldListToBeLoaded, go with what is there (Db value or default value)
+                            // These fields types have no values to load, leave current value
+                            // (many to many is handled during save)
                             //
-                            if (!field.authorable) {
-                                //
-                                // Is blocked from authoring, leave current value
-                                //
-                                ResponseFieldValueIsOKToSave = false;
-                            } else if ((field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement) || (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Redirect) || (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.ManyToMany)) {
-                                //
-                                // These fields types have no values to load, leave current value
-                                // (many to many is handled during save)
-                                //
-                                ResponseFieldValueIsOKToSave = false;
-                            } else if ((field.adminOnly) && (!core.session.isAuthenticatedAdmin(core))) {
-                                //
-                                // non-admin and admin only field, leave current value
-                                //
-                                ResponseFieldValueIsOKToSave = false;
-                            } else if ((field.developerOnly) && (!core.session.isAuthenticatedDeveloper(core))) {
-                                //
-                                // non-developer and developer only field, leave current value
-                                //
-                                ResponseFieldValueIsOKToSave = false;
-                            } else if ((field.readOnly) || (field.notEditable & (editRecord.id != 0))) {
-                                //
-                                // read only field, leave current
-                                //
-                                ResponseFieldValueIsOKToSave = false;
-                            } else if (!InLoadedFieldList) {
-                                //
-                                // Was not sent out, so just go with the current value. Also, if the loaded field list is not returned, and the field is not returned, this is the bestwe can do.
-                                ResponseFieldValueIsOKToSave = false;
-                            } else if (AllowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
-                                //
-                                // Was sent out non-blank, and no response back, flag error and leave the current value to a retry
-                                string errorMessage = "There has been an error reading the response from your browser. The field[" + field.caption + "]" + TabCopy + " was missing. Please Try your change again. If this error happens repeatedly, please report this problem to your site administrator.";
-                                Processor.Controllers.ErrorController.addUserError(core, errorMessage);
-                                LogController.handleError(core, new GenericException(errorMessage));
-                                ResponseFieldValueIsOKToSave = false;
-                            } else {
-                                //
-                                // Test input value for valid data
-                                //
-                                switch (field.fieldTypeId) {
-                                    case CPContentBaseClass.fileTypeIdEnum.Integer:
-                                        //
-                                        // ----- Integer
-                                        //
-                                        ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
-                                        if (!ResponseFieldIsEmpty) {
-                                            if (ResponseFieldValueText.IsNumeric()) {
-                                                //ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
-                                            } else {
-                                                Processor.Controllers.ErrorController.addUserError(core, "The record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a numeric value.");
-                                                ResponseFieldValueIsOKToSave = false;
-                                            }
-                                        }
-                                        break;
-                                    case CPContentBaseClass.fileTypeIdEnum.Currency:
-                                    case CPContentBaseClass.fileTypeIdEnum.Float:
-                                        //
-                                        // ----- Floating point number
-                                        //
-                                        ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
-                                        if (!ResponseFieldIsEmpty) {
-                                            if (ResponseFieldValueText.IsNumeric()) {
-                                                //ResponseValueVariant = EncodeNumber(ResponseValueVariant)
-                                            } else {
-                                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a numeric value.");
-                                                ResponseFieldValueIsOKToSave = false;
-                                            }
-                                        }
-                                        break;
-                                    case CPContentBaseClass.fileTypeIdEnum.Lookup:
-                                        //
-                                        // ----- Must be a recordID
-                                        //
-                                        ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
-                                        if (!ResponseFieldIsEmpty) {
-                                            if (ResponseFieldValueText.IsNumeric()) {
-                                                //ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
-                                            } else {
-                                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " had an invalid selection.");
-                                                ResponseFieldValueIsOKToSave = false;
-                                            }
-                                        }
-                                        break;
-                                    case CPContentBaseClass.fileTypeIdEnum.Date:
-                                        //
-                                        // ----- Must be a Date value
-                                        //
-                                        ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
-                                        if (!ResponseFieldIsEmpty) {
-                                            if (!GenericController.IsDate(ResponseFieldValueText)) {
-                                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a date And/Or time in the form mm/dd/yy 0000 AM(PM).");
-                                                ResponseFieldValueIsOKToSave = false;
-                                            }
-                                        }
-                                        //End Case
-                                        break;
-                                    case CPContentBaseClass.fileTypeIdEnum.Boolean:
-                                        //
-                                        // ----- translate to boolean
-                                        //
-                                        ResponseFieldValueText = GenericController.encodeBoolean(ResponseFieldValueText).ToString();
-                                        break;
-                                    case CPContentBaseClass.fileTypeIdEnum.Link:
-                                        //
-                                        // ----- Link field - if it starts with 'www.', add the http:// automatically
-                                        //
-                                        ResponseFieldValueText = GenericController.encodeText(ResponseFieldValueText);
-                                        if (ResponseFieldValueText.ToLowerInvariant().Left(4) == "www.") {
-                                            ResponseFieldValueText = "http//" + ResponseFieldValueText;
-                                        }
-                                        break;
-                                    case CPContentBaseClass.fileTypeIdEnum.HTML:
-                                    case CPContentBaseClass.fileTypeIdEnum.FileHTML:
-                                        //
-                                        // ----- Html fields
-                                        //
-                                        EditorRowHeight = core.docProperties.getInteger(field.nameLc + "Rows");
-                                        if (EditorRowHeight != 0) {
-                                            core.userProperty.setProperty(adminContent.name + "." + field.nameLc + ".RowHeight", EditorRowHeight);
-                                        }
-                                        EditorPixelHeight = core.docProperties.getInteger(field.nameLc + "PixelHeight");
-                                        if (EditorPixelHeight != 0) {
-                                            core.userProperty.setProperty(adminContent.name + "." + field.nameLc + ".PixelHeight", EditorPixelHeight);
-                                        }
-                                        //
-                                        if (!field.htmlContent) {
-                                            lcaseCopy = GenericController.vbLCase(ResponseFieldValueText);
-                                            lcaseCopy = GenericController.vbReplace(lcaseCopy, "\r", "");
-                                            lcaseCopy = GenericController.vbReplace(lcaseCopy, "\n", "");
-                                            lcaseCopy = lcaseCopy.Trim(' ');
-                                            if ((lcaseCopy == HTMLEditorDefaultCopyNoCr) || (lcaseCopy == HTMLEditorDefaultCopyNoCr2)) {
-                                                //
-                                                // if the editor was left blank, remote the default copy
-                                                //
-                                                ResponseFieldValueText = "";
-                                            } else {
-                                                if (GenericController.vbInstr(1, ResponseFieldValueText, HTMLEditorDefaultCopyStartMark) != 0) {
-                                                    //
-                                                    // if the default copy was editing, remote the markers
-                                                    //
-                                                    ResponseFieldValueText = GenericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyStartMark, "");
-                                                    ResponseFieldValueText = GenericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyEndMark, "");
-                                                    //ResponseValueVariant = ResponseValueText
-                                                }
-                                                //
-                                                // If the response is only white space, remove it
-                                                // this is a fix for when Site Managers leave white space in the editor, and do not realize it
-                                                //   then cannot fixgure out how to remove it
-                                                //
-                                                ResponseFieldValueText = ActiveContentController.processWysiwygResponseForSave(core, ResponseFieldValueText);
-                                                if (string.IsNullOrEmpty(ResponseFieldValueText.ToLowerInvariant().Replace(' '.ToString(), "").Replace("&nbsp;", ""))) {
-                                                    ResponseFieldValueText = "";
-                                                }
-                                            }
-                                        }
-                                        break;
-                                    default:
-                                        //
-                                        // ----- text types
-                                        //
-                                        EditorRowHeight = core.docProperties.getInteger(field.nameLc + "Rows");
-                                        if (EditorRowHeight != 0) {
-                                            core.userProperty.setProperty(adminContent.name + "." + field.nameLc + ".RowHeight", EditorRowHeight);
-                                        }
-                                        EditorPixelHeight = core.docProperties.getInteger(field.nameLc + "PixelHeight");
-                                        if (EditorPixelHeight != 0) {
-                                            core.userProperty.setProperty(adminContent.name + "." + field.nameLc + ".PixelHeight", EditorPixelHeight);
-                                        }
-                                        break;
-                                }
-                                if (field.nameLc == "parentid") {
+                            ResponseFieldValueIsOKToSave = false;
+                        } else if ((field.adminOnly) && (!core.session.isAuthenticatedAdmin(core))) {
+                            //
+                            // non-admin and admin only field, leave current value
+                            //
+                            ResponseFieldValueIsOKToSave = false;
+                        } else if ((field.developerOnly) && (!core.session.isAuthenticatedDeveloper(core))) {
+                            //
+                            // non-developer and developer only field, leave current value
+                            //
+                            ResponseFieldValueIsOKToSave = false;
+                        } else if ((field.readOnly) || (field.notEditable & (editRecord.id != 0))) {
+                            //
+                            // read only field, leave current
+                            //
+                            ResponseFieldValueIsOKToSave = false;
+                        } else if (!InLoadedFieldList) {
+                            //
+                            // Was not sent out, so just go with the current value. Also, if the loaded field list is not returned, and the field is not returned, this is the bestwe can do.
+                            ResponseFieldValueIsOKToSave = false;
+                        } else if (AllowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
+                            //
+                            // Was sent out non-blank, and no response back, flag error and leave the current value to a retry
+                            string errorMessage = "There has been an error reading the response from your browser. The field[" + field.caption + "]" + TabCopy + " was missing. Please Try your change again. If this error happens repeatedly, please report this problem to your site administrator.";
+                            Processor.Controllers.ErrorController.addUserError(core, errorMessage);
+                            LogController.handleError(core, new GenericException(errorMessage));
+                            ResponseFieldValueIsOKToSave = false;
+                        } else {
+                            int EditorPixelHeight = 0;
+                            int EditorRowHeight = 0;
+                            //
+                            // Test input value for valid data
+                            //
+                            switch (field.fieldTypeId) {
+                                case CPContentBaseClass.fileTypeIdEnum.Integer:
                                     //
-                                    // check circular reference on all parentid fields
+                                    // ----- Integer
                                     //
-
-                                    ParentID = GenericController.encodeInteger(ResponseFieldValueText);
-                                    LoopPtr = 0;
-                                    UsedIDs = editRecord.id.ToString();
-                                    while ((LoopPtr < LoopPtrMax) && (ParentID != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentID.ToString() + ",") == -1)) {
-                                        UsedIDs = UsedIDs + "," + ParentID.ToString();
-                                        using (var csData = new CsModel(core)) {
-                                            csData.open(adminContent.name, "ID=" + ParentID, "", true, 0, "ParentID");
-                                            if (!csData.ok()) {
-                                                ParentID = 0;
-                                            } else {
-                                                ParentID = csData.getInteger("ParentID");
-                                            }
-                                        }
-                                        LoopPtr = LoopPtr + 1;
-                                    }
-                                    if (LoopPtr == LoopPtrMax) {
-                                        //
-                                        // Too deep
-                                        //
-                                        Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " creates a relationship between records that Is too large. Please limit the depth of this relationship to " + LoopPtrMax + " records.");
-                                        ResponseFieldValueIsOKToSave = false;
-                                    } else if ((editRecord.id != 0) && (editRecord.id == ParentID)) {
-                                        //
-                                        // Reference to iteslf
-                                        //
-                                        Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This record points back to itself. This is not allowed.");
-                                        ResponseFieldValueIsOKToSave = false;
-                                    } else if (ParentID != 0) {
-                                        //
-                                        // Circular reference
-                                        //
-                                        Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This field either points to other records which then point back to this record. This is not allowed.");
-                                        ResponseFieldValueIsOKToSave = false;
-                                    }
-                                }
-                                if (field.textBuffered) {
-                                    //
-                                    // text buffering
-                                    //
-                                    //ResponseFieldValueText = genericController.main_RemoveControlCharacters(ResponseFieldValueText);
-                                }
-                                if ((field.required) && (ResponseFieldIsEmpty)) {
-                                    //
-                                    // field is required and is not given
-                                    //
-                                    Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " Is required but has no value.");
-                                    ResponseFieldValueIsOKToSave = false;
-                                }
-                                //
-                                // special case - people records without Allowduplicateusername require username to be unique
-                                //
-                                if (GenericController.vbLCase(adminContent.tableName) == "ccmembers") {
-                                    if (GenericController.vbLCase(field.nameLc) == "username") {
-                                        blockDuplicateUsername = !(core.siteProperties.getBoolean("allowduplicateusername", false));
-                                    }
-                                    if (GenericController.vbLCase(field.nameLc) == "email") {
-                                        blockDuplicateEmail = (core.siteProperties.getBoolean("allowemaillogin", false));
-                                    }
-                                }
-                                if ((blockDuplicateUsername || blockDuplicateEmail || field.uniqueName) && (!ResponseFieldIsEmpty)) {
-                                    //
-                                    // ----- Do the unique check for this field
-                                    //
-                                    string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + MetadataController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + adminContent.legacyContentControlCriteria + ")";
-                                    if (editRecord.id > 0) {
-                                        //
-                                        // --editing record
-                                        SQLUnique = SQLUnique + "and(id<>" + editRecord.id + ")";
-                                    }
-                                    using (var csData = new CsModel(core)) {
-                                        csData.openSql(SQLUnique, adminContent.dataSourceName);
-                                        if (csData.ok()) {
-                                            //
-                                            // field is not unique, skip it and flag error
-                                            //
-                                            if (blockDuplicateUsername) {
-                                                //
-                                                //
-                                                //
-                                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there Is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Duplicate Usernames' is Not checked.");
-                                            } else if (blockDuplicateEmail) {
-                                                //
-                                                //
-                                                //
-                                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Email Login' is checked.");
-                                            } else {
-                                                //
-                                                // non-workflow
-                                                //
-                                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "].");
-                                            }
+                                    ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
+                                    if (!ResponseFieldIsEmpty) {
+                                        if (ResponseFieldValueText.IsNumeric()) {
+                                            //ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
+                                        } else {
+                                            Processor.Controllers.ErrorController.addUserError(core, "The record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a numeric value.");
                                             ResponseFieldValueIsOKToSave = false;
                                         }
                                     }
+                                    break;
+                                case CPContentBaseClass.fileTypeIdEnum.Currency:
+                                case CPContentBaseClass.fileTypeIdEnum.Float:
+                                    //
+                                    // ----- Floating point number
+                                    //
+                                    ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
+                                    if (!ResponseFieldIsEmpty) {
+                                        if (ResponseFieldValueText.IsNumeric()) {
+                                            //ResponseValueVariant = EncodeNumber(ResponseValueVariant)
+                                        } else {
+                                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a numeric value.");
+                                            ResponseFieldValueIsOKToSave = false;
+                                        }
+                                    }
+                                    break;
+                                case CPContentBaseClass.fileTypeIdEnum.Lookup:
+                                    //
+                                    // ----- Must be a recordID
+                                    //
+                                    ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
+                                    if (!ResponseFieldIsEmpty) {
+                                        if (ResponseFieldValueText.IsNumeric()) {
+                                            //ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
+                                        } else {
+                                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " had an invalid selection.");
+                                            ResponseFieldValueIsOKToSave = false;
+                                        }
+                                    }
+                                    break;
+                                case CPContentBaseClass.fileTypeIdEnum.Date:
+                                    //
+                                    // ----- Must be a Date value
+                                    //
+                                    ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
+                                    if (!ResponseFieldIsEmpty) {
+                                        if (!GenericController.IsDate(ResponseFieldValueText)) {
+                                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a date And/Or time in the form mm/dd/yy 0000 AM(PM).");
+                                            ResponseFieldValueIsOKToSave = false;
+                                        }
+                                    }
+                                    //End Case
+                                    break;
+                                case CPContentBaseClass.fileTypeIdEnum.Boolean:
+                                    //
+                                    // ----- translate to boolean
+                                    //
+                                    ResponseFieldValueText = GenericController.encodeBoolean(ResponseFieldValueText).ToString();
+                                    break;
+                                case CPContentBaseClass.fileTypeIdEnum.Link:
+                                    //
+                                    // ----- Link field - if it starts with 'www.', add the http:// automatically
+                                    //
+                                    ResponseFieldValueText = GenericController.encodeText(ResponseFieldValueText);
+                                    if (ResponseFieldValueText.ToLowerInvariant().Left(4) == "www.") {
+                                        ResponseFieldValueText = "http//" + ResponseFieldValueText;
+                                    }
+                                    break;
+                                case CPContentBaseClass.fileTypeIdEnum.HTML:
+                                case CPContentBaseClass.fileTypeIdEnum.FileHTML:
+                                    //
+                                    // ----- Html fields
+                                    //
+                                    EditorRowHeight = core.docProperties.getInteger(field.nameLc + "Rows");
+                                    if (EditorRowHeight != 0) {
+                                        core.userProperty.setProperty(adminContent.name + "." + field.nameLc + ".RowHeight", EditorRowHeight);
+                                    }
+                                    EditorPixelHeight = core.docProperties.getInteger(field.nameLc + "PixelHeight");
+                                    if (EditorPixelHeight != 0) {
+                                        core.userProperty.setProperty(adminContent.name + "." + field.nameLc + ".PixelHeight", EditorPixelHeight);
+                                    }
+                                    //
+                                    if (!field.htmlContent) {
+                                        string lcaseCopy = GenericController.vbLCase(ResponseFieldValueText);
+                                        lcaseCopy = GenericController.vbReplace(lcaseCopy, "\r", "");
+                                        lcaseCopy = GenericController.vbReplace(lcaseCopy, "\n", "");
+                                        lcaseCopy = lcaseCopy.Trim(' ');
+                                        if ((lcaseCopy == HTMLEditorDefaultCopyNoCr) || (lcaseCopy == HTMLEditorDefaultCopyNoCr2)) {
+                                            //
+                                            // if the editor was left blank, remote the default copy
+                                            //
+                                            ResponseFieldValueText = "";
+                                        } else {
+                                            if (GenericController.vbInstr(1, ResponseFieldValueText, HTMLEditorDefaultCopyStartMark) != 0) {
+                                                //
+                                                // if the default copy was editing, remote the markers
+                                                //
+                                                ResponseFieldValueText = GenericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyStartMark, "");
+                                                ResponseFieldValueText = GenericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyEndMark, "");
+                                                //ResponseValueVariant = ResponseValueText
+                                            }
+                                            //
+                                            // If the response is only white space, remove it
+                                            // this is a fix for when Site Managers leave white space in the editor, and do not realize it
+                                            //   then cannot fixgure out how to remove it
+                                            //
+                                            ResponseFieldValueText = ActiveContentController.processWysiwygResponseForSave(core, ResponseFieldValueText);
+                                            if (string.IsNullOrEmpty(ResponseFieldValueText.ToLowerInvariant().Replace(' '.ToString(), "").Replace("&nbsp;", ""))) {
+                                                ResponseFieldValueText = "";
+                                            }
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    //
+                                    // ----- text types
+                                    //
+                                    EditorRowHeight = core.docProperties.getInteger(field.nameLc + "Rows");
+                                    if (EditorRowHeight != 0) {
+                                        core.userProperty.setProperty(adminContent.name + "." + field.nameLc + ".RowHeight", EditorRowHeight);
+                                    }
+                                    EditorPixelHeight = core.docProperties.getInteger(field.nameLc + "PixelHeight");
+                                    if (EditorPixelHeight != 0) {
+                                        core.userProperty.setProperty(adminContent.name + "." + field.nameLc + ".PixelHeight", EditorPixelHeight);
+                                    }
+                                    break;
+                            }
+                            if (field.nameLc == "parentid") {
+                                //
+                                // check circular reference on all parentid fields
+                                //
+
+                                int ParentID = GenericController.encodeInteger(ResponseFieldValueText);
+                                int LoopPtr = 0;
+                                string UsedIDs = editRecord.id.ToString();
+                                //if (field.active) {
+                                const int LoopPtrMax = 100;
+                                while ((LoopPtr < LoopPtrMax) && (ParentID != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentID.ToString() + ",") == -1)) {
+                                    UsedIDs = UsedIDs + "," + ParentID.ToString();
+                                    using (var csData = new CsModel(core)) {
+                                        csData.open(adminContent.name, "ID=" + ParentID, "", true, 0, "ParentID");
+                                        if (!csData.ok()) {
+                                            ParentID = 0;
+                                        } else {
+                                            ParentID = csData.getInteger("ParentID");
+                                        }
+                                    }
+                                    LoopPtr = LoopPtr + 1;
+                                }
+                                if (LoopPtr == LoopPtrMax) {
+                                    //
+                                    // Too deep
+                                    //
+                                    Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " creates a relationship between records that Is too large. Please limit the depth of this relationship to " + LoopPtrMax + " records.");
+                                    ResponseFieldValueIsOKToSave = false;
+                                } else if ((editRecord.id != 0) && (editRecord.id == ParentID)) {
+                                    //
+                                    // Reference to iteslf
+                                    //
+                                    Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This record points back to itself. This is not allowed.");
+                                    ResponseFieldValueIsOKToSave = false;
+                                } else if (ParentID != 0) {
+                                    //
+                                    // Circular reference
+                                    //
+                                    Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This field either points to other records which then point back to this record. This is not allowed.");
+                                    ResponseFieldValueIsOKToSave = false;
                                 }
                             }
-                            // end case
-                            break;
-                    }
-                    //
-                    // Save response if it is valid
-                    //
-                    if (ResponseFieldValueIsOKToSave) {
-                        editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
-                    }
+                            if (field.textBuffered) {
+                                //
+                                // text buffering
+                                //
+                                //ResponseFieldValueText = genericController.main_RemoveControlCharacters(ResponseFieldValueText);
+                            }
+                            if ((field.required) && (ResponseFieldIsEmpty)) {
+                                //
+                                // field is required and is not given
+                                //
+                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " Is required but has no value.");
+                                ResponseFieldValueIsOKToSave = false;
+                            }
+                            bool blockDuplicateUsername = false;
+                            bool blockDuplicateEmail = false;
+                            //
+                            // special case - people records without Allowduplicateusername require username to be unique
+                            //
+                            if (GenericController.vbLCase(adminContent.tableName) == "ccmembers") {
+                                if (GenericController.vbLCase(field.nameLc) == "username") {
+                                    blockDuplicateUsername = !(core.siteProperties.getBoolean("allowduplicateusername", false));
+                                }
+                                if (GenericController.vbLCase(field.nameLc) == "email") {
+                                    blockDuplicateEmail = (core.siteProperties.getBoolean("allowemaillogin", false));
+                                }
+                            }
+                            if ((blockDuplicateUsername || blockDuplicateEmail || field.uniqueName) && (!ResponseFieldIsEmpty)) {
+                                //
+                                // ----- Do the unique check for this field
+                                //
+                                string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + MetadataController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + adminContent.legacyContentControlCriteria + ")";
+                                if (editRecord.id > 0) {
+                                    //
+                                    // --editing record
+                                    SQLUnique = SQLUnique + "and(id<>" + editRecord.id + ")";
+                                }
+                                using (var csData = new CsModel(core)) {
+                                    csData.openSql(SQLUnique, adminContent.dataSourceName);
+                                    if (csData.ok()) {
+                                        //
+                                        // field is not unique, skip it and flag error
+                                        //
+                                        if (blockDuplicateUsername) {
+                                            //
+                                            //
+                                            //
+                                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there Is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Duplicate Usernames' is Not checked.");
+                                        } else if (blockDuplicateEmail) {
+                                            //
+                                            //
+                                            //
+                                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Email Login' is checked.");
+                                        } else {
+                                            //
+                                            // non-workflow
+                                            //
+                                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "].");
+                                        }
+                                        ResponseFieldValueIsOKToSave = false;
+                                    }
+                                }
+                            }
+                        }
+                        // end case
+                        break;
+                }
+                //
+                // Save response if it is valid
+                //
+                if (ResponseFieldValueIsOKToSave) {
+                    editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
