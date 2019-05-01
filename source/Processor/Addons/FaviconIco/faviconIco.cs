@@ -14,12 +14,12 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
-namespace Contensive.Addons.Primitives {
-    public class faviconIcoClass : Contensive.BaseClasses.AddonBaseClass {
+namespace Contensive.Addons.FaviconIco {
+    public class FaviconIcoClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
-        /// getFieldEditorPreference remote method
+        /// Add meta data for favicon to meta data
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>

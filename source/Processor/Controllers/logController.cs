@@ -261,40 +261,33 @@ namespace Contensive.Processor.Controllers {
         ///       A warning is logged in the site warnings log
         ///           name - a generic description of the warning
         ///               "bad link found on page"
-        ///           short description - a 255 character cause
-        ///               "bad link http://thisisabadlink.com"
+        ///           issueCategory - a generic string that describes the warning. the warning report
+        ///               will display one line for each generalKey (name matches guid)
+        ///               like "bad link"
         ///           location - the URL, service or process that caused the problem
         ///               "http://goodpageThankHasBadLink.com"
         ///           pageid - the record id of the bad page.
         ///               "http://goodpageThankHasBadLink.com"
         ///           description - a specific description
         ///               "link to http://www.this.com/pagename was found on http://www.this.com/About-us"
-        ///           generalKey - a generic string that describes the warning. the warning report
-        ///               will display one line for each generalKey (name matches guid)
-        ///               like "bad link"
-        ///           specificKey - a string created by the addon logging so it does not continue to log exactly the
-        ///               same warning over and over. If there are 100 different link not found warnings,
-        ///               there should be 100 entires with the same guid and name, but 100 different keys. If the
-        ///               an identical key is found the count increments.
-        ///               specifickey is like "link to http://www.this.com/pagename was found on http://www.this.com/About-us"
-        ///           count - the number of times the key was attempted to add. "This error was reported 100 times"
+        ///           count - the number of times the name and issueCategory matched. "This error was reported 100 times"
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="Name"></param>
-        /// <param name="shortDescription"></param>
-        /// <param name="location"></param>
+        /// <param name="Name">A generic description of the warning that describes the problem, but if the issue occurs again the name will match, like Page Not Found on /Home</param>
+        /// <param name="ignore">To be deprecated - same as name</param>
+        /// <param name="location">Where the issue occurred, like on a page, or in a background process.</param>
         /// <param name="PageID"></param>
-        /// <param name="Description"></param>
-        /// <param name="generalKey"></param>
-        /// <param name="specificKey"></param>
+        /// <param name="Description">Any detail the use will need to debug the problem.</param>
+        /// <param name="issueCategory">A general description of the issue that can be grouped in a report, like Page Not Found</param>
+        /// <param name="ignore2">to be deprecated, same a name.</param>
         //
-        public static void addSiteWarning(CoreController core, string Name, string shortDescription, string location, int PageID, string Description, string generalKey, string specificKey) {
+        public static void addSiteWarning(CoreController core, string Name, string ignore, string location, int PageID, string Description, string issueCategory, string ignore2) {
             int warningId = 0;
             //
             warningId = 0;
             string SQL = "select top 1 ID from ccSiteWarnings"
-                + " where (generalKey=" + DbController.encodeSQLText(generalKey) + ")"
-                + " and(specificKey=" + DbController.encodeSQLText(specificKey) + ")"
+                + " where (name=" + DbController.encodeSQLText(Name) + ")"
+                + " and(generalKey=" + DbController.encodeSQLText(issueCategory) + ")"
                 + "";
             DataTable dt = core.db.executeQuery(SQL);
             if (dt.Rows.Count > 0) {
@@ -306,7 +299,7 @@ namespace Contensive.Processor.Controllers {
                 // increment count for matching warning
                 //
                 SQL = "update ccsitewarnings set count=count+1,DateLastReported=" + DbController.encodeSQLDate(DateTime.Now) + " where id=" + warningId;
-                core.db.executeQuery(SQL);
+                core.db.executeNonQuery(SQL);
             } else {
                 //
                 // insert new record
@@ -315,11 +308,9 @@ namespace Contensive.Processor.Controllers {
                     if (csData.insert("Site Warnings")) {
                         csData.set("name", Name);
                         csData.set("description", Description);
-                        csData.set("generalKey", generalKey);
-                        csData.set("specificKey", specificKey);
+                        csData.set("generalKey", issueCategory);
                         csData.set("count", 1);
                         csData.set("DateLastReported", DateTime.Now);
-                        csData.set("shortDescription", shortDescription);
                         csData.set("location", location);
                         csData.set("pageId", PageID);
                     }

@@ -327,18 +327,6 @@ namespace Contensive.Processor.Controllers {
                                 return core.webServer.redirect(linkForward.DestinationLink, "Link Forward #" + linkForward.id + ", " + linkForward.name);
                         }
                     }
-                    if (normalizedRoute.Equals("favicon.ico")) {
-                        //
-                        // -- Favicon.ico
-                        core.doc.continueProcessing = false;
-                        return (new Addons.Primitives.faviconIcoClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
-                    }
-                    if (normalizedRoute.Equals("robots.txt")) {
-                        //
-                        // -- Favicon.ico
-                        core.doc.continueProcessing = false;
-                        return (new Addons.Primitives.robotsTxtClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
-                    }
                     //
                     // -- default route 
                     int defaultAddonId = 0;

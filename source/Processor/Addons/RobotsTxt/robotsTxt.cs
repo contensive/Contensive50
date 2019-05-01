@@ -14,12 +14,12 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
-namespace Contensive.Addons.Primitives {
-    public class robotsTxtClass : Contensive.BaseClasses.AddonBaseClass {
+namespace Contensive.Addons.RobotsTxt {
+    public class RobotsTxtClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
-        /// getFieldEditorPreference remote method
+        /// Return robots.exe. NOTE - this route requires an exception added to web.config
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
