@@ -559,14 +559,13 @@ namespace Contensive.Addons.Housekeeping {
                 core.db.executeQuery(sql);
                 //
                 //addon editor rules with no addon
+                core.db.executeQuery("delete from ccAddonContentFieldTypeRules where id in (select r.id from ccAddonContentFieldTypeRules r left join ccaggregatefunctions a on a.id=r.addonid where a.Id Is Null)");
                 //
-                sql = "delete from ccAddonContentFieldTypeRules where id in ("
-                    + "select r.id from ccAddonContentFieldTypeRules r left join ccaggregatefunctions a on a.id=r.addonid where a.Id Is Null"
-                    + ")";
-                core.db.executeQuery(sql);
+                // -- addon trigger rules
+                core.db.executeQuery("delete from ccAddonContentTriggerRules where id in (select r.id from ccAddonContentTriggerRules r left join ccaggregatefunctions a on a.id = r.addonid where a.Id Is Null)");
+                core.db.executeQuery("delete from ccAddonContentTriggerRules where id in (select r.id from ccAddonContentTriggerRules r left join cccontent c on c.id = r.contentid where c.id is null)");
                 //
                 // convert FieldTypeLongText + htmlContent to FieldTypeHTML
-                //
                 logHousekeeping(core, "convert FieldTypeLongText + htmlContent to FieldTypeHTML.");
                 sql = "update ccfields set type=" + (int)CPContentBaseClass.fileTypeIdEnum.HTML + " where type=" + (int)CPContentBaseClass.fileTypeIdEnum.LongText + " and ( htmlcontent<>0 )";
                 core.db.executeQuery(sql);

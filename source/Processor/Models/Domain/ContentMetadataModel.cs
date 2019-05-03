@@ -364,19 +364,23 @@ namespace Contensive.Processor.Models.Domain {
                             //
                             // load parent metadata fields first so we can overlay the current metadata field
                             //
-                            if (result.parentID == 0) {
+                            if (result.parentID <= 0) {
                                 result.parentID = -1;
                             } else {
                                 Models.Domain.ContentMetadataModel parentMetaData = create(core, result.parentID, loadInvalidFields, forceDbLoad);
-                                foreach (var keyvaluepair in parentMetaData.fields) {
-                                    Models.Domain.ContentFieldMetadataModel parentField = keyvaluepair.Value;
-                                    Models.Domain.ContentFieldMetadataModel childField = new Models.Domain.ContentFieldMetadataModel();
-                                    childField = (Models.Domain.ContentFieldMetadataModel)parentField.Clone();
-                                    childField.inherited = true;
-                                    result.fields.Add(childField.nameLc.ToLowerInvariant(), childField);
-                                    if (!((parentField.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.ManyToMany) || (parentField.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Redirect))) {
-                                        if (!result.selectList.Contains(parentField.nameLc)) {
-                                            result.selectList.Add(parentField.nameLc);
+                                if ( parentMetaData == null ) {
+                                    LogController.handleError(core, new GenericException("ContentMetadataModel error, loading content [" + content.id + ", " + content.name + "], parentId [" + result.parentID + "] but no parent content found."));
+                                } else {
+                                    foreach (var keyvaluepair in parentMetaData.fields) {
+                                        Models.Domain.ContentFieldMetadataModel parentField = keyvaluepair.Value;
+                                        Models.Domain.ContentFieldMetadataModel childField = new Models.Domain.ContentFieldMetadataModel();
+                                        childField = (Models.Domain.ContentFieldMetadataModel)parentField.Clone();
+                                        childField.inherited = true;
+                                        result.fields.Add(childField.nameLc.ToLowerInvariant(), childField);
+                                        if (!((parentField.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.ManyToMany) || (parentField.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Redirect))) {
+                                            if (!result.selectList.Contains(parentField.nameLc)) {
+                                                result.selectList.Add(parentField.nameLc);
+                                            }
                                         }
                                     }
                                 }

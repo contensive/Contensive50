@@ -940,21 +940,23 @@ namespace Contensive.Processor.Controllers {
                             + "\r\nrecordid=" + RecordID + "";
                     }
                     while (csData.ok()) {
-                        int addonId = csData.getInteger("Addonid");
-                        if (onChangeAddonsAsync) {
-                            //
-                            // -- execute addon async
-                            addon.executeAsync(AddonModel.create(this, addonId), instanceArguments);
-                        } else {
-                            //
-                            // -- execute addon
-                            addon.execute(addonId, new CPUtilsBaseClass.addonExecuteContext() {
-                                addonType = CPUtilsBaseClass.addonContext.ContextOnContentChange,
-                                backgroundProcess = false,
-                                errorContextMessage = "",
-                                argumentKeyValuePairs = instanceArguments,
-                                personalizationPeopleId = session.user.id
-                            });
+                        var addon = AddonModel.create(this, csData.getInteger("Addonid"));
+                        if ( addon != null ) {
+                            if (onChangeAddonsAsync) {
+                                //
+                                // -- execute addon async
+                                this.addon.executeAsync(addon, instanceArguments);
+                            } else {
+                                //
+                                // -- execute addon
+                                this.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                                    addonType = CPUtilsBaseClass.addonContext.ContextOnContentChange,
+                                    backgroundProcess = false,
+                                    errorContextMessage = "",
+                                    argumentKeyValuePairs = instanceArguments,
+                                    personalizationPeopleId = session.user.id
+                                });
+                            }
                         }
                         csData.goNext();
                     }

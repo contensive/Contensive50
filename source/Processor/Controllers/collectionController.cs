@@ -1820,12 +1820,6 @@ namespace Contensive.Processor.Controllers {
                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                         } else {
                             int addonId = cs.getInteger("ID");
-                            //
-                            // Initialize the add-on
-                            // Delete any existing related records - so if this is an update with removed relationships, those are removed
-                            //
-                            //Call MetaController.deleteContentRecords(core, "Shared Styles Add-on Rules", "addonid=" & addonId)
-                            //Call MetaController.deleteContentRecords(core, "Add-on Scripting Module Rules", "addonid=" & addonId)
                             MetadataController.deleteContentRecords(core, "Add-on Include Rules", "addonid=" + addonId);
                             MetadataController.deleteContentRecords(core, "Add-on Content Trigger Rules", "addonid=" + addonId);
                             //

@@ -840,8 +840,8 @@ namespace Contensive.Processor {
         internal const string RequestNameCatalogKeywords = "CatalogKeywords";
         internal const string RequestNameCatalogSource = "CatalogSource";
         //
-        internal const string RequestNameLibraryFileID = "fileEID";
-        internal const string RequestNameDownloadID = "downloadid";
+        internal const string RequestNameDownloadFileGuid = "download";
+        internal const string RequestNameDownloadFileId = "downloadid";
         internal const string RequestNameLibraryUpload = "LibraryUpload";
         internal const string RequestNameLibraryName = "LibraryName";
         internal const string RequestNameLibraryDescription = "LibraryDescription";

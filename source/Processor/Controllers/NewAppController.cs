@@ -316,23 +316,28 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="DataBuildVersion"></param>
         private static void verifySqlfieldCompatibility(CoreController core, string logPrefix) {
+            string hint = "0";
             try {
                 //
                 // verify Db field schema for fields handled internally (fix datatime2(0) problem -- need at least 3 digits for precision)
                 var tableList = Models.Db.TableModel.createList(core, "", "dataSourceId");
-                var dataSource = DataSourceModel.addEmpty(core);
+                //var dataSource = DataSourceModel.addEmpty(core);
                 foreach (TableModel table in tableList) {
-                    if (table.dataSourceID != dataSource.id) { dataSource = DataSourceModel.create(core, table.dataSourceID); }
-                    if ((dataSource == null)) { dataSource = DataSourceModel.addEmpty(core); }
+                    hint = "1";
+                    //if (table.dataSourceID != dataSource.id) { dataSource = DataSourceModel.create(core, table.dataSourceID); }
+                    //if ((dataSource == null)) { dataSource = DataSourceModel.addEmpty(core); }
                     var tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, table.name, "default");
-
+                    hint = "2";
                     if (tableSchema != null) {
+                        hint = "3";
                         foreach (Models.Domain.TableSchemaModel.ColumnSchemaModel column in tableSchema.columns) {
+                            hint = "4";
                             if ((column.DATA_TYPE.ToLowerInvariant() == "datetime2") && (column.DATETIME_PRECISION < 3)) {
                                 //
                                 LogController.logInfo(core, logPrefix + ", verifySqlFieldCompatibility, conversion required, table [" + table.name + "], field [" + column.COLUMN_NAME + "], reason [datetime precision too low (" + column.DATETIME_PRECISION.ToString() + ")]");
                                 //
                                 // drop any indexes that use this field
+                                hint = "5";
                                 bool indexDropped = false;
                                 foreach (Models.Domain.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
                                     if (index.indexKeyList.Contains(column.COLUMN_NAME)) {
@@ -343,6 +348,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                     }
                                 }
+                                hint = "6";
                                 //
                                 // -- datetime2(0)...datetime2(2) need to be converted to datetime2(7)
                                 // -- rename column to tempName
@@ -352,6 +358,7 @@ namespace Contensive.Processor.Controllers {
                                 core.db.executeNonQuery("update " + table.name + " set " + column.COLUMN_NAME + "=" + tempName + " ");
                                 core.db.executeNonQuery("ALTER TABLE " + table.name + " DROP COLUMN " + tempName + ";");
                                 //
+                                hint = "7";
                                 // recreate dropped indexes
                                 if (indexDropped) {
                                     foreach (Models.Domain.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
@@ -368,7 +375,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex, "hint [" + hint + "]");
                 throw;
             }
         }

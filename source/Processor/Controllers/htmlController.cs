@@ -2738,7 +2738,7 @@ namespace Contensive.Processor.Controllers {
                         Copy = ""
                             + "\r<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
                             + GenericController.nop(Copy) + "\r</table>";
-                        ToolsPanel.Add(getPanelInput(Copy));
+                        ToolsPanel.Add(getPanelInput(Copy,"100%"));
                         result += getPanel(HtmlController.form(core, ToolsPanel.Text), "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         result += getPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         LinkPanel = null;

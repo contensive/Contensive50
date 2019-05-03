@@ -104,21 +104,21 @@ namespace Contensive.Processor.Controllers {
         /// <param name="executeContext"></param>
         /// <returns></returns>
         public string execute(Models.Db.AddonModel addon, CPUtilsBaseClass.addonExecuteContext executeContext) {
-            //
-            LogController.logInfo(core, "execute addon [" + addon.id + ", " + addon.name + "], context [" + executeContext.addonType + "], context [" + executeContext.errorContextMessage + "]");
-            //
             string result = "";
             //
             // -- setup values that have to be in finalize
             bool rootLevelAddon = core.doc.addonRecursionDepth.Count.Equals(0);
             bool save_forceJavascriptToHead = executeContext.forceJavascriptToHead;
             long addonStart = core.doc.appStopWatch.ElapsedMilliseconds;
+            //
             if (addon == null) {
                 //
                 // -- addon not found
-                LogController.handleError(core, new ArgumentException("AddonExecute called without valid addon [" + executeContext.errorContextMessage + "]."));
+                LogController.handleWarn(core, new ArgumentException("AddonExecute called with null addon, executeContext [" + executeContext.errorContextMessage + "]."));
             } else {
                 try {
+                    //
+                    LogController.logInfo(core, "execute addon [" + addon.id + ", " + addon.name + "], context [" + executeContext.addonType + "], context [" + executeContext.errorContextMessage + "]");
                     //
                     // -- save the addon details in a fifo stack to popoff during exit. The top of the stack represents the addon being executed
                     core.doc.addonModelStack.Push(addon);
@@ -1527,7 +1527,7 @@ namespace Contensive.Processor.Controllers {
                         string returnValue = execute_dotNetClass_assembly(addon, testPathFilename, ref testFileIsValidAddonAssembly, ref AddonFound);
                         //
                         // -- if found, add this assembly to the found-dictionary
-                        if (AddonFound) {
+                        if (AddonFound && !core.assemblyList_AddonsFound.ContainsKey(assemblyFileDictKey)) {
                             core.assemblyList_AddonsFound.Add(assemblyFileDictKey, new CoreController.AssemblyFileDetails() {
                                 pathFilename = testPathFilename,
                                 path = ""

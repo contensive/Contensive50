@@ -156,33 +156,39 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- Active Download hook
-                    string RecordEID = core.docProperties.getText(RequestNameLibraryFileID);
-                    if (!string.IsNullOrEmpty(RecordEID)) {
-                        var downloadToken = SecurityController.decodeToken(core, RecordEID);
-                        if (downloadToken.id != 0) {
-                            //
-                            // -- lookup record and set clicks
-                            LibraryFilesModel file = LibraryFilesModel.create(core, downloadToken.id);
-                            if (file != null) {
-                                file.clicks += 1;
-                                file.save(core);
-                                if (file.filename != "") {
-                                    //
-                                    // -- create log entry
-                                    LibraryFileLogModel log = LibraryFileLogModel.addEmpty(core);
-                                    if (log != null) {
-                                        log.fileID = file.id;
-                                        log.visitID = core.session.visit.id;
-                                        log.memberID = core.session.user.id;
-                                    }
-                                    //
-                                    // -- and go
-                                    string link = GenericController.getCdnFileLink(core, file.filename);
-                                    //string link = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, file.Filename);
-                                    return core.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.");
+                    LibraryFilesModel file = LibraryFilesModel.create(core, core.docProperties.getText(RequestNameDownloadFileGuid));
+                    if (file == null) {
+                        //
+                        // -- compatibility mode, downloadid, this exposes all library files because it exposes the sequential id number
+                        int downloadId = core.docProperties.getInteger(RequestNameDownloadFileId);
+                        if (( downloadId>0 ) && ( core.siteProperties.getBoolean("Allow library file download by id",false))) {
+                            file = LibraryFilesModel.create(core, downloadId);
+                        }
+                    }
+                    if (file != null) {
+                        //
+                        // -- lookup record and set clicks
+                        if (file != null) {
+                            file.clicks += 1;
+                            file.save(core);
+                            if (file.filename != "") {
+                                //
+                                // -- create log entry
+                                LibraryFileLogModel log = LibraryFileLogModel.addEmpty(core);
+                                if (log != null) {
+                                    log.name = DateTime.Now.ToString() + " user [#" + core.session.user.name + ", " + core.session.user.name + "]";
+                                    log.fileID = file.id;
+                                    log.visitID = core.session.visit.id;
+                                    log.memberID = core.session.user.id;
+                                    log.FromUrl = core.webServer.requestPageReferer;
+                                    log.save(core);
                                 }
+                                //
+                                // -- and go
+                                string link = GenericController.getCdnFileLink(core, file.filename);
+                                //string link = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, file.Filename);
+                                return core.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.");
                             }
-                            //
                         }
                     }
                     //

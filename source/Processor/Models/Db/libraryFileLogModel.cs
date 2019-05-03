@@ -20,7 +20,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- const
         public const string contentName = "library File log";
-        public const string contentTableName = "cclibraryFileLog";
+        public const string contentTableName = "ccLibraryDownloadLog";
         public const string contentDataSource = "default";
         public const bool nameFieldIsUnique = false;
         //
@@ -29,6 +29,7 @@ namespace Contensive.Processor.Models.Db {
         public int fileID { get; set; }
         public int memberID { get; set; }
         public int visitID { get; set; }
+        public string FromUrl { get; set; }
         // 
         //====================================================================================================
         public static LibraryFileLogModel addEmpty(CoreController core) {

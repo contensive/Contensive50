@@ -107,6 +107,7 @@
     <Compile Include="Addons\Monitor\serverStatusClass.cs" />
     <Compile Include="Addons\Monitor\siteCheckClass.cs" />
     <Compile Include="Addons\Monitor\GetStatus.cs" />
+    <Compile Include="Addons\Primitives\download.cs" />
     <Compile Include="Controllers\PermissionController.cs" />
     <Compile Include="Controllers\EmailAmazonSESController.cs" />
     <Compile Include="Controllers\UpgradeController.cs" />

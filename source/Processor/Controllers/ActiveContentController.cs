@@ -682,8 +682,8 @@ namespace Contensive.Processor.Controllers {
                     result = Stream.Text;
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
+                LogController.handleError(core, ex);
+                // throw;
             }
             return result;
         }
@@ -1103,19 +1103,18 @@ namespace Contensive.Processor.Controllers {
                                                                                         RecordFilenameExt = RecordFilenameNoExt.Substring(Pos);
                                                                                         RecordFilenameNoExt = RecordFilenameNoExt.Left(Pos - 1);
                                                                                     }
-                                                                                    ImageEditController sf = null;
+                                                                                    //ImageEditController imageEditor = null;
                                                                                     //
                                                                                     // if recordwidth or height are missing, get them from the file
                                                                                     //
                                                                                     if (RecordWidth == 0 || RecordHeight == 0) {
-                                                                                        sf = new ImageEditController();
-                                                                                        if (sf.load(ImageVirtualFilename, core.cdnFiles)) {
-                                                                                            file.width = sf.width;
-                                                                                            file.height = sf.height;
-                                                                                            file.save(core);
+                                                                                        using (var imageEditor = new ImageEditController()) {
+                                                                                            if (imageEditor.load(ImageVirtualFilename, core.cdnFiles)) {
+                                                                                                file.width = imageEditor.width;
+                                                                                                file.height = imageEditor.height;
+                                                                                                file.save(core);
+                                                                                            }
                                                                                         }
-                                                                                        sf.Dispose();
-                                                                                        sf = null;
                                                                                     }
                                                                                     //
                                                                                     // continue only if we have record width and height
@@ -1139,13 +1138,12 @@ namespace Contensive.Processor.Controllers {
                                                                                             // Image has no width or height, default both
                                                                                             // This happens when you hit 'reset' on the image properties dialog
                                                                                             //
-                                                                                            sf = new ImageEditController();
-                                                                                            if (sf.load(ImageVirtualFilename, core.cdnFiles)) {
-                                                                                                ImageWidth = sf.width;
-                                                                                                ImageHeight = sf.height;
+                                                                                            using (var imageEditor = new ImageEditController()) {
+                                                                                                if (imageEditor.load(ImageVirtualFilename, core.cdnFiles)) {
+                                                                                                    ImageWidth = imageEditor.width;
+                                                                                                    ImageHeight = imageEditor.height;
+                                                                                                }
                                                                                             }
-                                                                                            sf.Dispose();
-                                                                                            sf = null;
                                                                                             if ((ImageHeight == 0) && (ImageWidth == 0) && (!string.IsNullOrEmpty(ImageFilenameAltSize))) {
                                                                                                 Pos = GenericController.vbInstr(1, ImageFilenameAltSize, "x");
                                                                                                 if (Pos != 0) {
@@ -1210,69 +1208,71 @@ namespace Contensive.Processor.Controllers {
                                                                                                     //
                                                                                                     // Alt image has not been built
                                                                                                     //
-                                                                                                    sf = new ImageEditController();
-                                                                                                    if (!sf.load(RecordVirtualFilename, core.cdnFiles)) {
-                                                                                                        //
-                                                                                                        // image load failed, use raw filename
-                                                                                                        //
-                                                                                                        throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "coreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
-                                                                                                    } else {
-                                                                                                        //
-                                                                                                        //
-                                                                                                        //
-                                                                                                        RecordWidth = sf.width;
-                                                                                                        RecordHeight = sf.height;
-                                                                                                        if (ImageWidth == 0) {
+                                                                                                    using (var imageEditor = new ImageEditController()) {
+                                                                                                        if (!imageEditor.load(RecordVirtualFilename, core.cdnFiles)) {
                                                                                                             //
+                                                                                                            // image load failed, use raw filename
                                                                                                             //
-                                                                                                            //
-                                                                                                            sf.height = ImageHeight;
-                                                                                                        } else if (ImageHeight == 0) {
-                                                                                                            //
-                                                                                                            //
-                                                                                                            //
-                                                                                                            sf.width = ImageWidth;
-                                                                                                        } else if (RecordHeight == ImageHeight) {
-                                                                                                            //
-                                                                                                            // change the width
-                                                                                                            //
-                                                                                                            sf.width = ImageWidth;
+                                                                                                            LogController.handleWarn(core, new GenericException("ImageEditController failed to load filename [" + RecordVirtualFilename + "]"));
                                                                                                         } else {
                                                                                                             //
-                                                                                                            // change the height
                                                                                                             //
-                                                                                                            sf.height = ImageHeight;
+                                                                                                            //
+                                                                                                            RecordWidth = imageEditor.width;
+                                                                                                            RecordHeight = imageEditor.height;
+                                                                                                            if (ImageWidth == 0) {
+                                                                                                                //
+                                                                                                                //
+                                                                                                                //
+                                                                                                                imageEditor.height = ImageHeight;
+                                                                                                            } else if (ImageHeight == 0) {
+                                                                                                                //
+                                                                                                                //
+                                                                                                                //
+                                                                                                                imageEditor.width = ImageWidth;
+                                                                                                            } else if (RecordHeight == ImageHeight) {
+                                                                                                                //
+                                                                                                                // change the width
+                                                                                                                //
+                                                                                                                imageEditor.width = ImageWidth;
+                                                                                                            } else {
+                                                                                                                //
+                                                                                                                // change the height
+                                                                                                                //
+                                                                                                                imageEditor.height = ImageHeight;
+                                                                                                            }
+                                                                                                            //
+                                                                                                            // if resized only width or height, set the other
+                                                                                                            //
+                                                                                                            if (ImageWidth == 0) {
+                                                                                                                ImageWidth = imageEditor.width;
+                                                                                                                ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
+                                                                                                            }
+                                                                                                            if (ImageHeight == 0) {
+                                                                                                                ImageHeight = imageEditor.height;
+                                                                                                                ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
+                                                                                                            }
+                                                                                                            //
+                                                                                                            // set HTML attributes so image properties will display
+                                                                                                            //
+                                                                                                            if (GenericController.vbInstr(1, ElementText, "height=", 1) == 0) {
+                                                                                                                ElementText = GenericController.vbReplace(ElementText, ">", " height=\"" + ImageHeight + "\">");
+                                                                                                            }
+                                                                                                            if (GenericController.vbInstr(1, ElementText, "width=", 1) == 0) {
+                                                                                                                ElementText = GenericController.vbReplace(ElementText, ">", " width=\"" + ImageWidth + "\">");
+                                                                                                            }
+                                                                                                            //
+                                                                                                            // Save new file
+                                                                                                            //
+                                                                                                            NewImageFilename = RecordFilenameNoExt + "-" + ImageAltSize + "." + RecordFilenameExt;
+                                                                                                            imageEditor.save(ImageVirtualFilePath + NewImageFilename, core.cdnFiles);
+                                                                                                            //
+                                                                                                            // Update image record
+                                                                                                            //
+                                                                                                            RecordAltSizeList = RecordAltSizeList + "\r\n" + ImageAltSize;
                                                                                                         }
-                                                                                                        //
-                                                                                                        // if resized only width or height, set the other
-                                                                                                        //
-                                                                                                        if (ImageWidth == 0) {
-                                                                                                            ImageWidth = sf.width;
-                                                                                                            ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
-                                                                                                        }
-                                                                                                        if (ImageHeight == 0) {
-                                                                                                            ImageHeight = sf.height;
-                                                                                                            ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
-                                                                                                        }
-                                                                                                        //
-                                                                                                        // set HTML attributes so image properties will display
-                                                                                                        //
-                                                                                                        if (GenericController.vbInstr(1, ElementText, "height=", 1) == 0) {
-                                                                                                            ElementText = GenericController.vbReplace(ElementText, ">", " height=\"" + ImageHeight + "\">");
-                                                                                                        }
-                                                                                                        if (GenericController.vbInstr(1, ElementText, "width=", 1) == 0) {
-                                                                                                            ElementText = GenericController.vbReplace(ElementText, ">", " width=\"" + ImageWidth + "\">");
-                                                                                                        }
-                                                                                                        //
-                                                                                                        // Save new file
-                                                                                                        //
-                                                                                                        NewImageFilename = RecordFilenameNoExt + "-" + ImageAltSize + "." + RecordFilenameExt;
-                                                                                                        sf.save(ImageVirtualFilePath + NewImageFilename, core.cdnFiles);
-                                                                                                        //
-                                                                                                        // Update image record
-                                                                                                        //
-                                                                                                        RecordAltSizeList = RecordAltSizeList + "\r\n" + ImageAltSize;
                                                                                                     }
+
                                                                                                 }
                                                                                                 //
                                                                                                 // Change the image src to the AltSize
@@ -1301,7 +1301,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
             }
             return result;
             //
@@ -1336,160 +1336,33 @@ namespace Contensive.Processor.Controllers {
         //
         public static string encode(CoreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool convertHtmlToText, bool addLinkAuthToAllLinks, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
             string result = sourceHtmlContent;
+            string hint = "0";
             try {
                 if (!string.IsNullOrEmpty(sourceHtmlContent)) {
+                    hint = "10";
                     int LineStart = 0;
                     //
                     if (personalizationPeopleId <= 0) {
                         personalizationPeopleId = core.session.user.id;
                     }
-                    // 20180124 removed, cannot find a use case for this
-                    //if (core.siteProperties.getBoolean("ConvertContentCRLF2BR", false) && (!convertHtmlToText)) {
-                    //    result = genericController.vbReplace(result, "\r", "");
-                    //    result = genericController.vbReplace(result, "\n", "<br>");
-                    //}
-                    //
-                    // Convert ACTypeDynamicForm to Add-on
-                    //if (genericController.vbInstr(1, result, "<ac type=\"" + ACTypeDynamicForm, 1) != 0) {
-                    //    result = genericController.vbReplace(result, "type=\"DYNAMICFORM\"", "TYPE=\"aggregatefunction\"", 1, 99, 1);
-                    //    result = genericController.vbReplace(result, "name=\"DYNAMICFORM\"", "name=\"DYNAMIC FORM\"", 1, 99, 1);
-                    //}
                     //
                     // -- resize images
+                    hint = "20";
                     result = optimizeLibraryFileImagesInHtmlContent(core, result);
                     //
                     // -- Do Active Content Conversion
+                    hint = "30";
                     if (addLinkAuthToAllLinks || EncodeActiveFormatting || EncodeActiveImages || EncodeActiveEditIcons) {
                         string AdminURL = "/" + core.appConfig.adminRoute;
                         result = renderActiveContent(core, result, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, addLinkAuthToAllLinks, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostLink, IsEmailContent, AdminURL, personalizationIsAuthenticated, Context);
                     }
                     //
                     // -- Do Plain Text Conversion
+                    hint = "40";
                     if (convertHtmlToText) {
                         NUglify.Html.HtmlToTextOptions options = NUglify.Html.HtmlToTextOptions.KeepFormatting;
-                        result = NUglify.Uglify.HtmlToText(result,options).Code; // htmlToTextControllers.convert(core, result);
+                        result = NUglify.Uglify.HtmlToText(result, options).Code; // htmlToTextControllers.convert(core, result);
                     }
-                    //
-                    // -- Process Active Content that must be run here to access webclass objects parse as {{functionname?querystring}}
-                    //if ((!EncodeActiveEditIcons) && (result.IndexOf("{{") != -1)) {
-                    //    string[] ContentSplit = genericController.stringSplit(result, "{{");
-                    //    result = "";
-                    //    int ContentSplitCnt = ContentSplit.GetUpperBound(0) + 1;
-                    //    int Ptr = 0;
-                    //    while (Ptr < ContentSplitCnt) {
-                    //        //hint = hint & ",200"
-                    //        string Segment = ContentSplit[Ptr];
-                    //        if (Ptr == 0) {
-                    //            //
-                    //            // Add in the non-command text that is before the first command
-                    //            //
-                    //            result += Segment;
-                    //        } else if (!string.IsNullOrEmpty(Segment)) {
-                    //            if (genericController.vbInstr(1, Segment, "}}") == 0) {
-                    //                //
-                    //                // No command found, return the marker and deliver the Segment
-                    //                //
-                    //                //hint = hint & ",210"
-                    //                result += "{{" + Segment;
-                    //            } else {
-                    //                //
-                    //                // isolate the command
-                    //                //
-                    //                //hint = hint & ",220"
-                    //                string[] SegmentSplit = genericController.stringSplit(Segment, "}}");
-                    //                string AcCmd = SegmentSplit[0];
-                    //                SegmentSplit[0] = "";
-                    //                string SegmentSuffix = string.Join("}}", SegmentSplit).Substring(2);
-                    //                if (!string.IsNullOrEmpty(AcCmd.Trim(' '))) {
-                    //                    //
-                    //                    // isolate the arguments
-                    //                    //
-                    //                    //hint = hint & ",230"
-                    //                    string[] AcCmdSplit = AcCmd.Split('?');
-                    //                    string ACType = AcCmdSplit[0].Trim(' ');
-                    //                    string addonOptionString = "";
-                    //                    if (AcCmdSplit.GetUpperBound(0) == 0) {
-                    //                        addonOptionString = "";
-                    //                    } else {
-                    //                        addonOptionString = AcCmdSplit[1];
-                    //                        addonOptionString = HtmlController.decodeHtml(addonOptionString);
-                    //                    }
-                    //                    //
-                    //                    // execute the command
-                    //                    //
-                    //                    switch (genericController.vbUCase(ACType)) {
-                    //                        //case ACTypeDynamicForm:
-                    //                        //    //
-                    //                        //    // Dynamic Form - run the core addon replacement instead
-                    //                        //    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                    //                        //        addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                    //                        //        cssContainerClass = "",
-                    //                        //        cssContainerId = "",
-                    //                        //        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                    //                        //            contentName = ContextContentName,
-                    //                        //            fieldName = "",
-                    //                        //            recordId = ContextRecordID
-                    //                        //        },
-                    //                        //        personalizationAuthenticated = personalizationIsAuthenticated,
-                    //                        //        personalizationPeopleId = personalizationPeopleId,
-                    //                        //        instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString),
-                    //                        //        errorContextMessage = "rendering a dynamic form found in active content"
-                    //                        //    };
-                    //                        //    AddonModel addon = AddonModel.create(core, addonGuidDynamicForm);
-                    //                        //    result += core.addon.execute(addon, executeContext);
-                    //                        //    break;
-                    //                        //case ACTypeChildList:
-                    //                        //    //
-                    //                        //    // Child Page List
-                    //                        //    //
-                    //                        //    //hint = hint & ",320"
-                    //                        //    string ListName = addonController.getAddonOption("name", addonOptionString);
-                    //                        //    result += pageContentController.getChildPageList(core, ListName, ContextContentName, ContextRecordID, true);
-                    //                        //    break;
-                    //                        case ACTypeTemplateText:
-                    //                            //
-                    //                            // Text Box = copied here from gethtmlbody
-                    //                            //
-                    //                            string CopyName = AddonController.getAddonOption("new", addonOptionString);
-                    //                            if (string.IsNullOrEmpty(CopyName)) {
-                    //                                CopyName = AddonController.getAddonOption("name", addonOptionString);
-                    //                                if (string.IsNullOrEmpty(CopyName)) {
-                    //                                    CopyName = "Default";
-                    //                                }
-                    //                            }
-                    //                            result += core.html.getContentCopy(CopyName, "", personalizationPeopleId, false, personalizationIsAuthenticated);
-                    //                            break;
-                    //                        //case ACTypeWatchList:
-                    //                        //    //
-                    //                        //    // Watch List
-                    //                        //    //
-                    //                        //    //hint = hint & ",330"
-                    //                        //    string ListName = AddonController.getAddonOption("LISTNAME", addonOptionString);
-                    //                        //    string SortField = AddonController.getAddonOption("SORTFIELD", addonOptionString);
-                    //                        //    bool SortReverse = genericController.encodeBoolean(AddonController.getAddonOption("SORTDIRECTION", addonOptionString));
-                    //                        //    result += core.doc.main_GetWatchList(core, ListName, SortField, SortReverse);
-                    //                        //    break;
-                    //                        default:
-                    //                            //
-                    //                            // Unrecognized command - put all the syntax back in
-                    //                            //
-                    //                            //hint = hint & ",340"
-                    //                            result += "{{" + AcCmd + "}}";
-                    //                            break;
-                    //                    }
-                    //                }
-                    //                //
-                    //                // add the SegmentSuffix back on
-                    //                //
-                    //                result += SegmentSuffix;
-                    //            }
-                    //        }
-                    //        //
-                    //        // Encode into Javascript if required
-                    //        //
-                    //        Ptr = Ptr + 1;
-                    //    }
-                    //}
                     //
                     // Process Addons
                     //   parse as <!-- Addon "Addon Name","OptionString" -->
@@ -1503,75 +1376,89 @@ namespace Contensive.Processor.Controllers {
                     // (2/16/2010) - if <!-- AC --> has four arguments, the fourth is the addon guid
                     //
                     // todo - deprecate execute addons based on this comment system "<!-- addon"
-                    const string StartFlag = "<!-- ADDON";
-                    const string EndFlag = " -->";
-                    if (result.IndexOf(StartFlag) != -1) {
-                        int LineEnd = 0;
-                        while (result.IndexOf(StartFlag) != -1) {
-                            LineStart = GenericController.vbInstr(1, result, StartFlag);
-                            LineEnd = GenericController.vbInstr(LineStart, result, EndFlag);
-                            string Copy = "";
-                            if (LineEnd == 0) {
-                                LogController.logWarn(core, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly");
-                                break;
-                            } else {
-                                string AddonName = "";
-                                string addonOptionString = "";
-                                string ACInstanceID = "";
-                                string AddonGuid = "";
-                                int copyLength = LineEnd - LineStart - 11;
-                                if(copyLength<=0) {
-                                    //
-                                    // -- nothing between start and end, someone added a comment <!-- ADDON -->
+                    try {
+                        hint = "50";
+                        const string StartFlag = "<!-- ADDON";
+                        const string EndFlag = " -->";
+                        if (result.IndexOf(StartFlag) != -1) {
+                            hint = "51";
+                            int LineEnd = 0;
+                            while (result.IndexOf(StartFlag) != -1) {
+                                hint = "52";
+                                LineStart = GenericController.vbInstr(1, result, StartFlag);
+                                LineEnd = GenericController.vbInstr(LineStart, result, EndFlag);
+                                string Copy = "";
+                                if (LineEnd == 0) {
+                                    LogController.logWarn(core, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly");
+                                    break;
                                 } else {
-                                    Copy = result.Substring(LineStart + 10, copyLength);
-                                    string[] ArgSplit = GenericController.SplitDelimited(Copy, ",");
-                                    int ArgCnt = ArgSplit.GetUpperBound(0) + 1;
-                                    if (!string.IsNullOrEmpty(ArgSplit[0])) {
-                                        AddonName = ArgSplit[0].Substring(1, ArgSplit[0].Length - 2);
-                                        if (ArgCnt > 1) {
-                                            if (!string.IsNullOrEmpty(ArgSplit[1])) {
-                                                addonOptionString = ArgSplit[1].Substring(1, ArgSplit[1].Length - 2);
-                                                addonOptionString = HtmlController.decodeHtml(addonOptionString.Trim(' '));
-                                            }
-                                            if (ArgCnt > 2) {
-                                                if (!string.IsNullOrEmpty(ArgSplit[2])) {
-                                                    ACInstanceID = ArgSplit[2].Substring(1, ArgSplit[2].Length - 2);
+                                    hint = "53";
+                                    string AddonName = "";
+                                    string addonOptionString = "";
+                                    string ACInstanceID = "";
+                                    string AddonGuid = "";
+                                    int copyLength = LineEnd - LineStart - 11;
+                                    if (copyLength <= 0) {
+                                        //
+                                        // -- nothing between start and end, someone added a comment <!-- ADDON -->
+                                    } else {
+                                        hint = "54";
+                                        Copy = result.Substring(LineStart + 10, copyLength);
+                                        string[] ArgSplit = GenericController.SplitDelimited(Copy, ",");
+                                        int ArgCnt = ArgSplit.GetUpperBound(0) + 1;
+                                        if (!string.IsNullOrEmpty(ArgSplit[0])) {
+                                            hint = "55";
+                                            AddonName = ArgSplit[0].Substring(1, ArgSplit[0].Length - 2);
+                                            if (ArgCnt > 1) {
+                                                if (!string.IsNullOrEmpty(ArgSplit[1])) {
+                                                    addonOptionString = ArgSplit[1].Substring(1, ArgSplit[1].Length - 2);
+                                                    addonOptionString = HtmlController.decodeHtml(addonOptionString.Trim(' '));
                                                 }
-                                                if (ArgCnt > 3) {
-                                                    if (!string.IsNullOrEmpty(ArgSplit[3])) {
-                                                        AddonGuid = ArgSplit[3].Substring(1, ArgSplit[3].Length - 2);
+                                                if (ArgCnt > 2) {
+                                                    if (!string.IsNullOrEmpty(ArgSplit[2])) {
+                                                        ACInstanceID = ArgSplit[2].Substring(1, ArgSplit[2].Length - 2);
+                                                    }
+                                                    if (ArgCnt > 3) {
+                                                        if (!string.IsNullOrEmpty(ArgSplit[3])) {
+                                                            AddonGuid = ArgSplit[3].Substring(1, ArgSplit[3].Length - 2);
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                        // dont have any way of getting fieldname yet
-
-                                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                                            addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                                            cssContainerClass = "",
-                                            cssContainerId = "",
-                                            hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                                contentName = ContextContentName,
-                                                fieldName = "",
-                                                recordId = ContextRecordID
-                                            },
-                                            personalizationAuthenticated = personalizationIsAuthenticated,
-                                            personalizationPeopleId = personalizationPeopleId,
-                                            instanceGuid = ACInstanceID,
-                                            argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, addonOptionString),
-                                            errorContextMessage = "rendering active content with guid [" + AddonGuid + "] or name [" + AddonName + "]"
-                                        };
-                                        if (!string.IsNullOrEmpty(AddonGuid)) {
-                                            Copy = core.addon.execute(AddonModel.create(core, AddonGuid), executeContext);
-                                        } else {
-                                            Copy = core.addon.execute(AddonModel.createByUniqueName(core, AddonName), executeContext);
+                                            // dont have any way of getting fieldname yet
+                                            hint = "56";
+                                            CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                                addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                                cssContainerClass = "",
+                                                cssContainerId = "",
+                                                hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                                    contentName = ContextContentName,
+                                                    fieldName = "",
+                                                    recordId = ContextRecordID
+                                                },
+                                                personalizationAuthenticated = personalizationIsAuthenticated,
+                                                personalizationPeopleId = personalizationPeopleId,
+                                                instanceGuid = ACInstanceID,
+                                                argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, addonOptionString),
+                                                errorContextMessage = "rendering active content with guid [" + AddonGuid + "] or name [" + AddonName + "]"
+                                            };
+                                            hint = "57, AddonGuid [" + AddonGuid + "], AddonName [" + AddonName + "]";
+                                            if (!string.IsNullOrEmpty(AddonGuid)) {
+                                                Copy = core.addon.execute(AddonModel.create(core, AddonGuid), executeContext);
+                                            } else {
+                                                Copy = core.addon.execute(AddonModel.createByUniqueName(core, AddonName), executeContext);
+                                            }
                                         }
                                     }
                                 }
+                                hint = "58";
+                                result = result.Left(LineStart - 1) + Copy + result.Substring(LineEnd + 3);
                             }
-                            result = result.Left(LineStart - 1) + Copy + result.Substring(LineEnd + 3);
                         }
+                    } catch (Exception ex) {
+                        //
+                        // -- handle error, but don't abort encode
+                        LogController.handleError(core, ex, "hint [" + hint + "]");
                     }
                     //
                     // process out text block comments inserted by addons
@@ -1580,6 +1467,7 @@ namespace Contensive.Processor.Controllers {
                     // with the marker, encode content is called with the result, which is just the marker, and this
                     // section will remove it
                     //
+                    hint = "60";
                     bool DoAnotherPass = false;
                     if ((!isEditingAnything) && (result != BlockTextStartMarker)) {
                         DoAnotherPass = true;
@@ -1620,12 +1508,13 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // Process Feedback form
+                    hint = "70";
                     if (GenericController.vbInstr(1, result, FeedbackFormNotSupportedComment, 1) != 0) {
                         result = GenericController.vbReplace(result, FeedbackFormNotSupportedComment, PageContentController.getFeedbackForm(core, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, 1);
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex, "hint [" + hint + "]");
             }
             return result;
         }

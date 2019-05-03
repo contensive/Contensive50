@@ -1174,7 +1174,7 @@ namespace Contensive.Processor {
                         if (GenericController.encodeText(rawValueForDb) != getText(field.nameLc)) {
                             SetNeeded = true;
                             if (rawValueForDb.Length > 255) {
-                                LogController.handleError(core, new GenericException("Text length too long saving field [" + fieldName + "], length [" + rawValueForDb.Length + "], but max for Text field is 255. Save will be attempted"));
+                                LogController.handleWarn(core, new GenericException("Text length too long saving field [" + fieldName + "], length [" + rawValueForDb.Length + "], but max for Text field is 255. Save will be attempted"));
                             }
                         }
                         break;
@@ -1186,7 +1186,7 @@ namespace Contensive.Processor {
                         if (GenericController.encodeText(rawValueForDb) != getText(field.nameLc)) {
                             SetNeeded = true;
                             if (rawValueForDb.Length > 65535) {
-                                LogController.handleError(core, new GenericException("Text length too long saving field [" + fieldName + "], length [" + rawValueForDb.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
+                                LogController.handleWarn(core, new GenericException("Text length too long saving field [" + fieldName + "], length [" + rawValueForDb.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
                             }
                         }
                         break;
