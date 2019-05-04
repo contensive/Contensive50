@@ -624,9 +624,9 @@ namespace Contensive.Processor.Controllers {
                                             string SiteStylesEditIcon = ""; // ?????
                                             string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, ref DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
                                             ToolBar = GenericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, 1);
-                                            result = AdminUIController.getAddonEditWrapper(core, "<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
+                                            result = AdminUIController.getEditWrapper(core, "<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
                                         } else if (core.visitProperty.getBoolean("AllowEditing")) {
-                                            result = AdminUIController.getAddonEditWrapper(core, "<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
+                                            result = AdminUIController.getEditWrapper(core, "<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
                                         }
                                     }
                                 }
@@ -1765,7 +1765,7 @@ namespace Contensive.Processor.Controllers {
                 int Pos = 0;
                 //
                 if (core.session.isAuthenticated & ((ACInstanceID == "-2") || (ACInstanceID == "-1") || (ACInstanceID == "0") || (RecordID != 0))) {
-                    if (core.session.isEditingAnything()) {
+                    if (core.session.isEditing()) {
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
@@ -2006,7 +2006,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 if (core.session.isAuthenticated && true) {
-                    if (core.session.isEditingAnything()) {
+                    if (core.session.isEditing()) {
                         AddonModel addon = AddonModel.create(core, addonId);
                         string CopyHeader = ""
                             + "<div class=\"ccHeaderCon\">"
@@ -2062,7 +2062,7 @@ namespace Contensive.Processor.Controllers {
         public string getHelpBubble(int addonId, string helpCopy, int CollectionID, ref string return_DialogList) {
             string result = "";
             if (core.session.isAuthenticated) {
-                if (core.session.isEditingAnything()) {
+                if (core.session.isEditing()) {
                     int StyleSN = GenericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
                     string InnerCopy = helpCopy;
                     if (string.IsNullOrEmpty(InnerCopy)) { InnerCopy = "<p style=\"text-align:center\">No help is available for this add-on.</p>"; }
@@ -2135,7 +2135,7 @@ namespace Contensive.Processor.Controllers {
         public string getHTMLViewerBubble(int addonId, string HTMLSourceID, ref string return_DialogList) {
             string results = "";
             try {
-                if ((core.session.isAuthenticated) && (core.session.isEditingAnything())) {
+                if ((core.session.isAuthenticated) && (core.session.isEditing())) {
                     int StyleSN = GenericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
                     string HTMLViewerBubbleID = "HelpBubble" + core.doc.helpCodes.Count;
                     string CopyHeader = ""

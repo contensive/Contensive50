@@ -58,7 +58,7 @@ namespace Contensive.Processor {
         //
         public override string GetAddLink(string contentName, string presetNameValueList, bool allowPaste, bool isEditing) {
             string result = "";
-            foreach (var link in AdminUIController.getRecordAddLink(cp.core, contentName, presetNameValueList, allowPaste, isEditing)) {
+            foreach (var link in AdminUIController.getAddLink(cp.core, contentName, presetNameValueList, allowPaste, isEditing)) {
                 result += link;
             }
             return result;
@@ -90,7 +90,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetEditLink(string contentName, string recordID, bool allowCut, string recordName, bool isEditing) {
-            return AdminUIController.getRecordEditLink(cp.core, contentName, GenericController.encodeInteger(recordID), allowCut, recordName, isEditing);
+            return AdminUIController.getEditLink(cp.core, contentName, GenericController.encodeInteger(recordID), allowCut, recordName, isEditing);
         }
         //
         //====================================================================================================

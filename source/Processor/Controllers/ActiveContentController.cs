@@ -36,7 +36,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string renderHtmlForWeb(CoreController core, string source, string contextContentName = "", int ContextRecordID = 0, int ContextContactPeopleID = 0, string ProtocolHostString = "", int DefaultWrapperID = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
             string result = ContentCmdController.executeContentCommands(core, source, CPUtilsBaseClass.addonContext.ContextAdmin, core.session.user.id, core.session.visit.visitAuthenticated);
-            return encode(core, result, core.session.user.id, contextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.session.isAuthenticated, null, core.session.isEditingAnything());
+            return encode(core, result, core.session.user.id, contextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.session.isAuthenticated, null, core.session.isEditing());
         }
         //
         //====================================================================================================
@@ -1494,13 +1494,13 @@ namespace Contensive.Processor.Controllers {
                     }
                     if (isEditingAnything) {
                         if (result.IndexOf("<!-- AFScript -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
-                            string Copy = AdminUIController.getAddonEditWrapper(core, "Aggregate Script", "##MARKER##");
+                            string Copy = AdminUIController.getEditWrapper(core, "Aggregate Script", "##MARKER##");
                             string[] Wrapper = GenericController.stringSplit(Copy, "##MARKER##");
                             result = GenericController.vbReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, 1);
                             result = GenericController.vbReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, 1);
                         }
                         if (result.IndexOf("<!-- AFReplacement -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
-                            string Copy = AdminUIController.getAddonEditWrapper(core, "Aggregate Replacement", "##MARKER##");
+                            string Copy = AdminUIController.getEditWrapper(core, "Aggregate Replacement", "##MARKER##");
                             string[] Wrapper = GenericController.stringSplit(Copy, "##MARKER##");
                             result = GenericController.vbReplace(result, "<!-- AFReplacement -->", Wrapper[0], 1, 99, 1);
                             result = GenericController.vbReplace(result, "<!-- /AFReplacement -->", Wrapper[1], 1, 99, 1);
@@ -1595,7 +1595,7 @@ namespace Contensive.Processor.Controllers {
         public static string renderJSONForRemoteMethod(CoreController core, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
             string result = Source;
             result = ContentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, ContextContactPeopleID, false);
-            result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.session.isAuthenticated, null, core.session.isEditingAnything());
+            result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.session.isAuthenticated, null, core.session.isEditing());
             return result;
         }
         //

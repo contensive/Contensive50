@@ -130,7 +130,7 @@ namespace Contensive.Processor {
         //
         public override bool IsEditingAnything {
             get {
-                return cp.core.session.isEditingAnything();
+                return cp.core.session.isEditing();
             }
         }
         //

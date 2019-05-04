@@ -1415,10 +1415,6 @@ div.ccDialogPageNotFound {
     background-color: #4c4;
 }
 
-.ccEditWrapperContent {
-    /* padding: 4px; */
-}
-
 .ccEditWrapper .ccChildList li {
     /* padding-left: 5px !important; */
     border-top: 1px dashed #262;

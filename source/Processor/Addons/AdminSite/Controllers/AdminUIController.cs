@@ -1446,6 +1446,8 @@ namespace Contensive.Addons.AdminSite.Controllers {
         public static string getIconEditLink(string link, string caption, string htmlClass) {
             return HtmlController.a(iconEdit_Green + ((string.IsNullOrWhiteSpace(caption)) ? "" : "&nbsp;" + caption), link, htmlClass);
         }
+        //
+        //====================================================================================================
         /// <summary>
         /// get a link to edit a record in the admin site
         /// </summary>
@@ -1454,7 +1456,25 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <returns></returns>
         public static string getIconEditAdminLink(CoreController core, ContentMetadataModel cdef) => getIconEditAdminLink(core, cdef, 0, "");
         public static string getIconEditAdminLink(CoreController core, ContentMetadataModel cdef, int recordId) => getIconEditAdminLink(core, cdef, recordId, "");
-        public static string getIconEditAdminLink(CoreController core, ContentMetadataModel cdef, int recordId, string caption) { return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, caption, "ccRecordEditLink"); }
+        public static string getIconEditAdminLink(CoreController core, ContentMetadataModel cdef, int recordId, string caption) {
+            return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, caption, "ccRecordEditLink");
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return an addon edit link
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="cdef"></param>
+        /// <param name="addonId"></param>
+        /// <param name="caption"></param>
+        /// <returns></returns>
+        public static string getIconAddonEditLink(CoreController core, int addonId, string caption) {
+            var cdef = ContentMetadataModel.createByUniqueName(core, "add-ons");
+            if ( cdef == null ) { return string.Empty; }
+            string link = "/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + addonId;
+            return HtmlController.a(iconAddon_Green + ((string.IsNullOrWhiteSpace(caption)) ? "" : "&nbsp;" + caption), link, "ccRecordEditLink");
+        }
         //
         //====================================================================================================
         //
@@ -1483,9 +1503,21 @@ namespace Contensive.Addons.AdminSite.Controllers {
         //
         public static string getToolFormInputRow(CoreController core, string label, string input) {
             return getToolFormRow(core, HtmlController.label(label) + "<br>" + input);
-
-            //"<div class=\"p-1\">Page Number:<br>" + htmlController.inputText(core, "PageNumber", PageNumber.ToString()) + "</div>";
         }
+        //
+        //===================================================================================================
+        //
+        public static string getEditWrapper(CoreController core, string caption, string content) {
+            if (!core.session.isEditing()) { return content; }
+            string result = HtmlController.div(content, "ccEditWrapperContent");
+            if (!string.IsNullOrEmpty(caption)) { result = HtmlController.div(caption, "ccEditWrapperCaption") + result; }
+            return HtmlController.div(result, "ccEditWrapper", "editWrapper" + core.doc.editWrapperCnt++);
+        }
+        //
+        //===================================================================================================
+        //
+        public static string getEditWrapper(CoreController core, string content)
+            => getEditWrapper(core, "", content);
         //
         //====================================================================================================
         /// <summary>
@@ -1495,27 +1527,13 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="RecordID"></param>
         /// <param name="AllowCut"></param>
         /// <returns></returns>
-        public static string getRecordEditLink(CoreController core, string ContentName, int RecordID, bool AllowCut = false) {
-            return getRecordEditLink(core, ContentName, RecordID, AllowCut, "", core.session.isEditing(ContentName));
+        public static string getEditLink(CoreController core, string ContentName, int RecordID, bool AllowCut = false) {
+            return getEditLink(core, ContentName, RecordID, AllowCut, "", core.session.isEditing(ContentName));
         }
-        //
-        //===================================================================================================
-        //
-        public static string getAddonEditWrapper(CoreController core, string caption, string content) {
-            if (!core.session.isEditingAnything()) { return content; }
-            string result = HtmlController.div(content, "ccEditWrapperContent");
-            if (!string.IsNullOrEmpty(caption)) { result = HtmlController.div(caption, "ccEditWrapperCaption") + result; }
-            return HtmlController.div(result, "ccEditWrapper", "editWrapper" + core.doc.editWrapperCnt++);
-        }
-        //
-        //===================================================================================================
-        //
-        public static string getEditWrapper(CoreController core, string content)
-            => getAddonEditWrapper(core, "", content);
         //
         //====================================================================================================
         //
-        public static string getRecordEditLink(CoreController core, string contentName, int recordID, bool allowCut, string RecordName, bool IsEditing) {
+        public static string getEditLink(CoreController core, string contentName, int recordID, bool allowCut, string RecordName, bool IsEditing) {
             try {
                 if (!IsEditing) { return string.Empty; }
                 if (string.IsNullOrWhiteSpace(contentName)) { throw (new GenericException("ContentName [" + contentName + "] is invalid")); }
@@ -1550,6 +1568,91 @@ namespace Contensive.Addons.AdminSite.Controllers {
         //
         //====================================================================================================
         /// <summary>
+        /// return caption for edit, cut, paste
+        /// </summary>
+        /// <param name="verb">edit, cut, paste, etc</param>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <param name="recordName"></param>
+        /// <returns></returns>
+        public static string getEditSegmentRecordCaption( string verb, string contentName, int recordId, string recordName ) {
+            string contentCaption = verb + " ";
+            switch (contentName.ToLower()) {
+                case "page content":
+                    contentCaption += "Page";
+                    break;
+                case "page templates":
+                    contentCaption += "Template";
+                    break;
+                default:
+                    contentCaption += HtmlController.encodeHtml(encodeInitialCaps(contentName)) + " record";
+                    break;
+            }
+            return ((string.IsNullOrWhiteSpace(recordName)) ? "" : "&nbsp;'" + recordName + "'");
+        }
+        //
+        //====================================================================================================
+        //
+        public static string getEditAddonSegment(CoreController core, int addonId, string recordName) {
+            try {
+                if (!core.session.isEditing()) { return string.Empty; }
+                if (addonId < 1) { throw (new GenericException("RecordID [" + addonId + "] is invalid")); }
+                return AdminUIController.getIconAddonEditLink(core, addonId, "Edit Add-on" + ((string.IsNullOrEmpty(recordName)) ? "" : " '" + recordName + "'"));
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                return string.Empty;
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public static string getEditRecordSegment(CoreController core, string contentName, int recordId, string recordName) {
+            try {
+                if (!core.session.isEditing()) { return string.Empty; }
+                if (string.IsNullOrWhiteSpace(contentName)) { throw (new GenericException("ContentName [" + contentName + "] is invalid")); }
+                if (recordId < 1) { throw (new GenericException("RecordID [" + recordId + "] is invalid")); }
+                var cdef = ContentMetadataModel.createByUniqueName(core, contentName);
+                if (cdef == null) { throw new GenericException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name."); }
+                return AdminUIController.getIconEditAdminLink(core, cdef, recordId, getEditSegmentRecordCaption("Edit", contentName, recordId, recordName));
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                return string.Empty;
+            }
+        }
+        //
+        public static string getEditRecordSegment(CoreController core, string contentName, int recordID)
+            => getEditRecordSegment(core, contentName, recordID, "");
+        //
+        //====================================================================================================
+        //
+        public static string getCutRecordSegment(CoreController core, string contentName, int recordId) {
+            try {
+                if (!core.session.isEditing()) { return string.Empty; }
+                var cdef = ContentMetadataModel.createByUniqueName(core, contentName);
+                if (cdef == null) { throw new GenericException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name."); }
+                string WorkingLink = GenericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, GenericController.encodeText(cdef.id) + "." + GenericController.encodeText(recordId), true);
+                return "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(WorkingLink) + "\">" + iconContentCut.Replace("content cut", getEditSegmentRecordCaption("Cut", contentName, recordId, "")) + "</a>";
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                return string.Empty;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// An edit link (or left justified pill) is composed of a sequence of edit links (content edit links, cut, paste, addon edit) plus an endcap
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="editSegmentList"></param>
+        /// <returns></returns>
+        public static string getEditLink(CoreController core, List<string> editSegmentList) {
+            if (!core.session.isEditing()) { return string.Empty; }
+            string result = string.Join("", editSegmentList) + HtmlController.div("&nbsp;", "ccEditLinkEndCap");
+            return HtmlController.div(result, "ccRecordLinkCon");
+        }
+        //
+        //====================================================================================================
+        /// <summary>
         /// Return a list of add links for the content plus all valid subbordinate content
         /// </summary>
         /// <param name="core"></param>
@@ -1558,7 +1661,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="allowPaste"></param>
         /// <param name="IsEditing"></param>
         /// <returns></returns>
-        public static List<string> getRecordAddLink(CoreController core, string contentName, string presetNameValueList, bool allowPaste, bool IsEditing) {
+        public static List<string> getAddLink(CoreController core, string contentName, string presetNameValueList, bool allowPaste, bool IsEditing) {
             List<string> result = new List<string>();
             try {
                 if (!IsEditing) { return result; }
@@ -1567,7 +1670,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 // -- convert older QS format to command delimited format
                 presetNameValueList = presetNameValueList.Replace("&", ",");
                 var content = ContentModel.createByUniqueName(core, contentName);
-                result.AddRange(getRecordAddLink_GetChildContentLinks(core, content, presetNameValueList, new List<int>()));
+                result.AddRange(getAddLink_GetChildContentLinks(core, content, presetNameValueList, new List<int>()));
                 //
                 // -- Add in the paste entry, if needed
                 if (!allowPaste) { return result; }
@@ -1610,9 +1713,9 @@ namespace Contensive.Addons.AdminSite.Controllers {
             return result;
         }
         //
-        public static List<string> getRecordAddLink(CoreController core, string ContentName, string PresetNameValueList) => getRecordAddLink(core, ContentName, PresetNameValueList, false, core.session.isEditing(ContentName));
+        public static List<string> getAddLink(CoreController core, string ContentName, string PresetNameValueList, bool AllowPaste) => getAddLink(core, ContentName, PresetNameValueList, AllowPaste, core.session.isEditing(ContentName));
         //
-        public static List<string> getRecordAddLink(CoreController core, string ContentName, string PresetNameValueList, bool AllowPaste) => getRecordAddLink(core, ContentName, PresetNameValueList, AllowPaste, core.session.isEditing(ContentName));
+        public static List<string> getAddLink(CoreController core, string ContentName, string PresetNameValueList) => getAddLink(core, ContentName, PresetNameValueList, false, core.session.isEditing(ContentName));
         //
         //====================================================================================================
         /// <summary>
@@ -1625,7 +1728,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="MenuName"></param>
         /// <param name="ParentMenuName"></param>
         /// <returns></returns>
-        private static List<string> getRecordAddLink_GetChildContentLinks(CoreController core, ContentModel content, string PresetNameValueList, List<int> usedContentIdList) {
+        private static List<string> getAddLink_GetChildContentLinks(CoreController core, ContentModel content, string PresetNameValueList, List<int> usedContentIdList) {
             var result = new List<string>();
             string Link = "";
             if (content != null) {
@@ -1723,7 +1826,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                             // ----- Create the ChildPanel with all Children found
                             //
                             foreach (var child in childList) {
-                                result.AddRange(getRecordAddLink_GetChildContentLinks(core, child, PresetNameValueList, usedContentIdList));
+                                result.AddRange(getAddLink_GetChildContentLinks(core, child, PresetNameValueList, usedContentIdList));
                             }
                         }
                     }
@@ -1731,7 +1834,5 @@ namespace Contensive.Addons.AdminSite.Controllers {
             }
             return result;
         }
-
-
     }
 }

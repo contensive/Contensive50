@@ -107,6 +107,13 @@
     <Compile Include="Addons\Monitor\serverStatusClass.cs" />
     <Compile Include="Addons\Monitor\siteCheckClass.cs" />
     <Compile Include="Addons\Monitor\GetStatus.cs" />
+    <Compile Include="Addons\Personalization\Password.cs" />
+    <Compile Include="Addons\Personalization\Username.cs" />
+    <Compile Include="Addons\Personalization\Company.cs" />
+    <Compile Include="Addons\Personalization\Email.cs" />
+    <Compile Include="Addons\Personalization\Name.cs" />
+    <Compile Include="Addons\Personalization\LastName.cs" />
+    <Compile Include="Addons\Personalization\FirstName.cs" />
     <Compile Include="Addons\Primitives\download.cs" />
     <Compile Include="Controllers\PermissionController.cs" />
     <Compile Include="Controllers\EmailAmazonSESController.cs" />

@@ -162,9 +162,13 @@ namespace Contensive.Addons.AdminSite {
                 {
                     string FieldHelp = "The people account of the user who created this record.";
                     string fieldValue = "";
-                    if (adminData.editRecord.id == 0) {
+                    if (adminData.editRecord == null) {
+                        fieldValue = "(not set)";
+                    } else if (adminData.editRecord.id == 0 )  {
                         fieldValue = "(available after save)";
-                    } else {
+                    } else if (adminData.editRecord.createdBy == null ) {
+                        fieldValue = "(not set)";
+                    } else { 
                         int FieldValueInteger = adminData.editRecord.createdBy.id;
                         if (FieldValueInteger == 0) {
                             fieldValue = "(not set)";
@@ -191,7 +195,9 @@ namespace Contensive.Addons.AdminSite {
                 {
                     string FieldHelp = "The date and time when this record was originally created.";
                     string fieldValue = "";
-                    if (adminData.editRecord.id == 0) {
+                    if (adminData.editRecord == null) {
+                        fieldValue = "(not set)";
+                    } else if (adminData.editRecord.id == 0) {
                         fieldValue = "(available after save)";
                     } else {
                         if (GenericController.encodeDateMinValue(adminData.editRecord.dateAdded) == DateTime.MinValue) {
@@ -201,7 +207,6 @@ namespace Contensive.Addons.AdminSite {
                         }
                     }
                     string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_createdDate", fieldValue, true, "");
-                    //string fieldEditor = htmlController.inputText( core,"ignore", fieldValue, -1, -1, "", false, true);
                     tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Created Date", FieldHelp, FieldRequired, false, ""));
                 }
                 //
@@ -209,8 +214,12 @@ namespace Contensive.Addons.AdminSite {
                 {
                     string FieldHelp = "The people account of the last user who modified this record.";
                     string fieldValue = "";
-                    if (adminData.editRecord.id == 0) {
+                    if (adminData.editRecord == null) {
+                        fieldValue = "(not set)";
+                    } else if (adminData.editRecord.id == 0) {
                         fieldValue = "(available after save)";
+                    } else if (adminData.editRecord.modifiedBy == null) {
+                        fieldValue = "(not set)";
                     } else {
                         int FieldValueInteger = adminData.editRecord.modifiedBy.id;
                         if (FieldValueInteger == 0) {
@@ -238,7 +247,9 @@ namespace Contensive.Addons.AdminSite {
                 {
                     string FieldHelp = "The date and time when this record was last modified.";
                     string fieldValue = "";
-                    if (adminData.editRecord.id == 0) {
+                    if (adminData.editRecord == null) {
+                        fieldValue = "(not set)";
+                    } else if (adminData.editRecord.id == 0) {
                         fieldValue = "(available after save)";
                     } else {
                         if (GenericController.encodeDateMinValue(adminData.editRecord.modifiedDate) == DateTime.MinValue) {

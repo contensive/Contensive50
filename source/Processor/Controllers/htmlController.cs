@@ -3148,7 +3148,7 @@ namespace Contensive.Processor.Controllers {
                         returnCopy = ActiveContentController.renderHtmlForWeb(core, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
                         //
                         if (true) {
-                            if (core.session.isEditingAnything()) {
+                            if (core.session.isEditing()) {
                                 returnCopy = csData.getRecordEditLink(false) + returnCopy;
                                 if (AllowEditWrapper) {
                                     returnCopy = AdminUIController.getEditWrapper(core, returnCopy);

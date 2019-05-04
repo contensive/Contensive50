@@ -80,6 +80,8 @@ namespace Contensive.Processor {
         public static readonly string iconOpen_White = "<span style=\"color:#fff\">" + iconOpen + "</span>";
         public static readonly string iconGrip = "<i title=\"drag and drop\" class=\"fas fa-grip-horizontal\"></i>";
         public static readonly string iconContentPaste_Green = "<span style=\"color:#0c0\">" + iconContentPaste + "</span>";
+        public static readonly string iconAddon = "<i class=\"fa fa-puzzle-piece\" aria-hidden=\"true\"></i>";
+        public static readonly string iconAddon_Green = "<span style=\"color:#0c0\">" + iconAddon + "</span>";
         //
         // -- buttons
         internal const string ButtonCreateFields = " Create Fields ";

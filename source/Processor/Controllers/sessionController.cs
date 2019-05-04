@@ -1059,7 +1059,7 @@ namespace Contensive.Processor.Controllers {
         /// true if editing any content
         /// </summary>
         /// <returns></returns>
-        public bool isEditingAnything() {
+        public bool isEditing() {
             return isEditing("");
         }
         //
