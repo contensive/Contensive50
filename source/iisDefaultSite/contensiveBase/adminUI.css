@@ -1317,6 +1317,7 @@ li.ccExceptionListRow {
     background: -ms-linear-gradient(top, #888, #333);
     background: -o-linear-gradient(top, #888, #333);
     background: -webkit-linear-gradient(top, #888, #333);
+    text-align: left;
 }
 /*
 * edit addon link
@@ -1387,6 +1388,7 @@ a.ccRecordAddLink, a.ccRecordPasteLink,
     display: block;
     white-space: nowrap;
     overflow: hidden;
+    text-align: left;
 }
 
 .ccRecordLinkCon a.ccRecordCutLink {
@@ -1396,8 +1398,6 @@ a.ccRecordAddLink, a.ccRecordPasteLink,
 .ccListItem .ccRecordLinkCon {
     position: static;
 }
-
-
 /*
 * debug mode trace window
 */
