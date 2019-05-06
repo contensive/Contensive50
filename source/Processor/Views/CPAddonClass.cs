@@ -53,7 +53,7 @@ namespace Contensive.Processor {
         //
         public override object Execute(string addonGuid, Dictionary<string, string> argumentKeyValuePairs) {
             return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
-                 argumentKeyValuePairs = argumentKeyValuePairs
+                argumentKeyValuePairs = argumentKeyValuePairs
             });
         }
         //
@@ -110,38 +110,42 @@ namespace Contensive.Processor {
         /// <param name="Addonid"></param>
         /// <param name="keyValuePairs"></param>
         public override void ExecuteAsync(int Addonid, Dictionary<string, string> keyValuePairs) {
-            cp.core.addon.executeAsync(Models.Db.AddonModel.create(cp.core, Addonid), keyValuePairs);
+            if (Addonid <= 0) { throw new ArgumentException("ExecuteAsync called with invalid AddonId [" + Addonid + "]"); }
+            var addon = Models.Db.AddonModel.create(cp.core, Addonid);
+            if (addon == null) { throw new ArgumentException("ExecuteAsync cannot find AddonId [" + Addonid + "]"); }
+            cp.core.addon.executeAsync(addon, keyValuePairs);
         }
         //
         //====================================================================================================
         //
-        public override void ExecuteAsync(int Addonid) {
-            cp.core.addon.executeAsync(Models.Db.AddonModel.create(cp.core, Addonid), new Dictionary<string, string>());
-        }
+        public override void ExecuteAsync(int Addonid) => ExecuteAsync(Addonid, new Dictionary<string, string>());
         //
         //====================================================================================================
         //
         public override void ExecuteAsync(string guid, Dictionary<string, string> keyValuePairs) {
-            cp.core.addon.executeAsync(Models.Db.AddonModel.create(cp.core, guid), keyValuePairs);
+            if (string.IsNullOrEmpty(guid)) { throw new ArgumentException("ExecuteAsync called with invalid guid [" + guid + "]"); }
+            var addon = Models.Db.AddonModel.create(cp.core, guid);
+            if (addon == null) { throw new ArgumentException("ExecuteAsync cannot find Addon for guid [" + guid + "]"); }
+            cp.core.addon.executeAsync(addon, keyValuePairs);
         }
         //
         //====================================================================================================
         //
-        public override void ExecuteAsync(string guid) {
-            cp.core.addon.executeAsync(Models.Db.AddonModel.create(cp.core, guid), new Dictionary<string, string>());
-        }
+        public override void ExecuteAsync(string guid) => ExecuteAsync(guid, new Dictionary<string, string>());
         //
         //====================================================================================================
         //
         public override void ExecuteAsyncByUniqueName(string name, Dictionary<string, string> keyValuePairs) {
-            cp.core.addon.executeAsync(Models.Db.AddonModel.createByUniqueName(cp.core, name), keyValuePairs);
+            if (string.IsNullOrEmpty(name)) { throw new ArgumentException("ExecuteAsyncByUniqueName called with invalid name [" + name + "]"); }
+            var addon = Models.Db.AddonModel.createByUniqueName(cp.core, name);
+            if (addon == null) { throw new ArgumentException("ExecuteAsyncByUniqueName cannot find Addon for name [" + name + "]"); }
+            cp.core.addon.executeAsync(addon, keyValuePairs);
         }
         //
         //====================================================================================================
         //
-        public override void ExecuteAsyncByUniqueName(string name) {
-            cp.core.addon.executeAsync(Models.Db.AddonModel.createByUniqueName(cp.core, name), new Dictionary<string, string>());
-        }
+        public override void ExecuteAsyncByUniqueName(string name) => ExecuteAsyncByUniqueName(name, new Dictionary<string, string>());
+        //
         //==========================================================================================
         /// <summary>
         /// Install an uploaded collection file from a private folder. Return true if successful, else the issue is in the returnUserError
@@ -169,7 +173,7 @@ namespace Contensive.Processor {
             return returnOk;
         }
         //
-        public override int InstallCollectionFileAsync(string privatePathFilename ) { throw new NotImplementedException(); }
+        public override int InstallCollectionFileAsync(string privatePathFilename) { throw new NotImplementedException(); }
         //
         //====================================================================================================
         /// <summary>

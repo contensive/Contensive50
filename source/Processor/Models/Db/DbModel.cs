@@ -8,6 +8,7 @@ using System.Data;
 using Contensive.Processor.Exceptions;
 using System.Text;
 using Contensive.BaseClasses;
+using System.Linq;
 //
 namespace Contensive.Processor.Models.Db {
     //
@@ -265,7 +266,7 @@ namespace Contensive.Processor.Models.Db {
                         if (metaData.fields.ContainsKey(propertyName.ToLowerInvariant())) {
                             propertyValue = metaData.fields[propertyName.ToLowerInvariant()].defaultValue;
                             switch (propertyName.ToLowerInvariant()) {
-                                case "specialcasefield":
+                                case "id":
                                     break;
                                 default:
                                     switch (modelProperty.PropertyType.Name) {
@@ -853,7 +854,17 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public static List<T> createList<T>(CoreController core, string sqlCriteria) where T : DbModel => createList<T>(core, sqlCriteria, "id", new List<string> { });
         //
+        //====================================================================================================
+        //
         public static List<T> createList<T>(CoreController core) where T : DbModel => createList<T>(core, "", "id", new List<string> { });
+        //
+        //====================================================================================================
+        //
+        public static T createFirstOfList<T>(CoreController core, string sqlCriteria, string sqlOrderBy) where T : DbModel {
+            var list = createList<T>(core, sqlCriteria, sqlOrderBy, new List<string>());
+            if (list.Count==0 ) { return null; }
+            return list.First();
+        }
         //
         //====================================================================================================
         /// <summary>

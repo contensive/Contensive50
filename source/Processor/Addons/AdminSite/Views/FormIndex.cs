@@ -330,7 +330,7 @@ namespace Contensive.Addons.AdminSite {
                                                 URI = URI + "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[1, WhereCount]);
                                             }
                                         }
-                                        DataTableRows.Append( AdminUIController.getIconEditLink(URI));
+                                        DataTableRows.Append( AdminUIController.getRecordEditLink(URI));
                                         DataTableRows.Append( ("</td>"));
                                         //
                                         // --- Record Number column
@@ -515,34 +515,36 @@ namespace Contensive.Addons.AdminSite {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
                     var fieldMeta = ContentMetadataModel.getField(core, content, findWord.Name);
-                    string FieldCaption = fieldMeta.caption;
-                    switch (findWord.MatchOption) {
-                        case FindWordMatchEnum.MatchEmpty:
-                            filterLine += ", " + FieldCaption + " is empty";
-                            break;
-                        case FindWordMatchEnum.MatchEquals:
-                            filterLine += ", " + FieldCaption + " = '" + findWord.Value + "'";
-                            break;
-                        case FindWordMatchEnum.MatchFalse:
-                            filterLine += ", " + FieldCaption + " is false";
-                            break;
-                        case FindWordMatchEnum.MatchGreaterThan:
-                            filterLine += ", " + FieldCaption + " &gt; '" + findWord.Value + "'";
-                            break;
-                        case FindWordMatchEnum.matchincludes:
-                            filterLine += ", " + FieldCaption + " includes '" + findWord.Value + "'";
-                            break;
-                        case FindWordMatchEnum.MatchLessThan:
-                            filterLine += ", " + FieldCaption + " &lt; '" + findWord.Value + "'";
-                            break;
-                        case FindWordMatchEnum.MatchNotEmpty:
-                            filterLine += ", " + FieldCaption + " is not empty";
-                            break;
-                        case FindWordMatchEnum.MatchTrue:
-                            filterLine += ", " + FieldCaption + " is true";
-                            break;
-                    }
+                    if ( fieldMeta != null ) {
+                        string FieldCaption = fieldMeta.caption;
+                        switch (findWord.MatchOption) {
+                            case FindWordMatchEnum.MatchEmpty:
+                                filterLine += ", " + FieldCaption + " is empty";
+                                break;
+                            case FindWordMatchEnum.MatchEquals:
+                                filterLine += ", " + FieldCaption + " = '" + findWord.Value + "'";
+                                break;
+                            case FindWordMatchEnum.MatchFalse:
+                                filterLine += ", " + FieldCaption + " is false";
+                                break;
+                            case FindWordMatchEnum.MatchGreaterThan:
+                                filterLine += ", " + FieldCaption + " &gt; '" + findWord.Value + "'";
+                                break;
+                            case FindWordMatchEnum.matchincludes:
+                                filterLine += ", " + FieldCaption + " includes '" + findWord.Value + "'";
+                                break;
+                            case FindWordMatchEnum.MatchLessThan:
+                                filterLine += ", " + FieldCaption + " &lt; '" + findWord.Value + "'";
+                                break;
+                            case FindWordMatchEnum.MatchNotEmpty:
+                                filterLine += ", " + FieldCaption + " is not empty";
+                                break;
+                            case FindWordMatchEnum.MatchTrue:
+                                filterLine += ", " + FieldCaption + " is true";
+                                break;
+                        }
 
+                    }
                 }
             }
             if (IndexConfig.subCDefID > 0) {
@@ -599,12 +601,12 @@ namespace Contensive.Addons.AdminSite {
             int TitleRows = 0;
             if (!string.IsNullOrEmpty(filterLine)) {
                 string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexFilterRemoveAll=1";
-                Title += HtmlController.div(getIconDeleteLink(link) + "&nbsp;Filter: " + HtmlController.encodeHtml(filterLine.Substring(2)));
+                Title += HtmlController.div(getDeleteLink(link) + "&nbsp;Filter: " + HtmlController.encodeHtml(filterLine.Substring(2)));
                 TitleRows = TitleRows + 1;
             }
             if (!string.IsNullOrEmpty(sortLine)) {
                 string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexSortRemoveAll=1";
-                Title += HtmlController.div(getIconDeleteLink(link) + "&nbsp;Sort: " + HtmlController.encodeHtml(sortLine.Substring(6)));
+                Title += HtmlController.div(getDeleteLink(link) + "&nbsp;Sort: " + HtmlController.encodeHtml(sortLine.Substring(6)));
                 TitleRows = TitleRows + 1;
             }
             if (!string.IsNullOrEmpty(ContentAccessLimitMessage)) {
@@ -1425,32 +1427,32 @@ namespace Contensive.Addons.AdminSite {
                     //
                     returnContent += "<div class=\"ccFilterHead\">Remove&nbsp;Filters</div>";
                     Link = "/" + core.appConfig.adminRoute + "?" + GenericController.modifyQueryString(RQS, "IndexFilterRemoveAll", "1");
-                    returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;Remove All", "ccFilterSubHead");
+                    returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;Remove All", "ccFilterSubHead");
                     //
                     // Last Edited Edited by me
                     //
                     SubFilterList = "";
                     if (IndexConfig.lastEditedByMe) {
                         Link = "/" + core.appConfig.adminRoute + "?" + GenericController.modifyQueryString(RQS, "IndexFilterLastEditedByMe", 0.ToString(), true);
-                        SubFilterList += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;By&nbsp;Me", "ccFilterIndent ccFilterList");
+                        SubFilterList += HtmlController.div(getDeleteLink(Link) + "&nbsp;By&nbsp;Me", "ccFilterIndent ccFilterList");
                     }
                     if (IndexConfig.lastEditedToday) {
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterLastEditedToday", 0.ToString(), true);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                        SubFilterList += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;Today", "ccFilterIndent ccFilterList");
+                        SubFilterList += HtmlController.div(getDeleteLink(Link) + "&nbsp;Today", "ccFilterIndent ccFilterList");
                     }
                     if (IndexConfig.lastEditedPast7Days) {
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterLastEditedPast7Days", 0.ToString(), true);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                        SubFilterList += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;Past Week", "ccFilterIndent ccFilterList");
+                        SubFilterList += HtmlController.div(getDeleteLink(Link) + "&nbsp;Past Week", "ccFilterIndent ccFilterList");
                     }
                     if (IndexConfig.lastEditedPast30Days) {
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterLastEditedPast30Days", 0.ToString(), true);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                        SubFilterList += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;Past 30 Days", "ccFilterIndent ccFilterList");
+                        SubFilterList += HtmlController.div(getDeleteLink(Link) + "&nbsp;Past 30 Days", "ccFilterIndent ccFilterList");
                     }
                     if (!string.IsNullOrEmpty(SubFilterList)) {
                         returnContent += "<div class=\"ccFilterSubHead\">Last&nbsp;Edited</div>" + SubFilterList;
@@ -1465,7 +1467,7 @@ namespace Contensive.Addons.AdminSite {
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveCDef", encodeText(IndexConfig.subCDefID));
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                        SubFilterList += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + SubContentName + "", "ccFilterIndent");
+                        SubFilterList += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + SubContentName + "", "ccFilterIndent");
                     }
                     if (!string.IsNullOrEmpty(SubFilterList)) {
                         returnContent += "<div class=\"ccFilterSubHead\">In Sub-content</div>" + SubFilterList;
@@ -1485,7 +1487,7 @@ namespace Contensive.Addons.AdminSite {
                                 QS = RQS;
                                 QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveGroup", IndexConfig.groupList[Ptr]);
                                 Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                                SubFilterList += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + GroupName + "", "ccFilterIndent");
+                                SubFilterList += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + GroupName + "", "ccFilterIndent");
                             }
                         }
                     }
@@ -1500,7 +1502,7 @@ namespace Contensive.Addons.AdminSite {
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterActiveOnly", 0.ToString(), true);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                        SubFilterList += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;Active&nbsp;Only", "ccFilterIndent ccFilterList");
+                        SubFilterList += HtmlController.div(getDeleteLink(Link) + "&nbsp;Active&nbsp;Only", "ccFilterIndent ccFilterList");
                     }
                     if (!string.IsNullOrEmpty(SubFilterList)) {
                         returnContent += "<div class=\"ccFilterSubHead\">Other</div>" + SubFilterList;
@@ -1516,28 +1518,28 @@ namespace Contensive.Addons.AdminSite {
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         switch (findWord.MatchOption) {
                             case FindWordMatchEnum.matchincludes:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;includes&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;includes&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchEmpty:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;empty", "ccFilterIndent");
+                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;empty", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchEquals:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;=&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;=&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchFalse:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;false", "ccFilterIndent");
+                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;false", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchGreaterThan:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;&gt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;&gt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchLessThan:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;&lt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;&lt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchNotEmpty:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;not&nbsp;empty", "ccFilterIndent");
+                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;not&nbsp;empty", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchTrue:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;true", "ccFilterIndent");
+                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;true", "ccFilterIndent");
                                 break;
                         }
                     }

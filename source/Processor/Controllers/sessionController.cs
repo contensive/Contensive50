@@ -80,7 +80,7 @@ namespace Contensive.Processor.Controllers {
                     if (_language == null) {
                         //
                         // -- add english to the table
-                        _language = LanguageModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName( core, LanguageModel.contentName));
+                        _language = LanguageModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, LanguageModel.contentName));
                         _language.name = "English";
                         _language.http_Accept_Language = "en";
                         _language.save(core);
@@ -90,7 +90,8 @@ namespace Contensive.Processor.Controllers {
                 }
                 return _language;
             }
-        } private LanguageModel _language = null;
+        }
+        private LanguageModel _language = null;
         //
         //====================================================================================================
         /// <summary>
@@ -145,7 +146,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.serverConfig == null) {
                     //
                     // -- application error if no server config
-                    LogController.handleError( core,new GenericException("authorization context cannot be created without a server configuration."));
+                    LogController.handleError(core, new GenericException("authorization context cannot be created without a server configuration."));
                 } else {
                     //
                     if (core.appConfig == null) {
@@ -517,7 +518,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             // -- check for changes in interrelationships
-                            if (resultSessionContext.user.id>0) {
+                            if (resultSessionContext.user.id > 0) {
                                 if (resultSessionContext.visitor.MemberID != resultSessionContext.user.id) {
                                     resultSessionContext.visitor.MemberID = resultSessionContext.user.id;
                                     visitor_changes = true;
@@ -543,7 +544,7 @@ namespace Contensive.Processor.Controllers {
                             // -- Save anything that changed
                             LogController.logTrace(core, "SessionController.create(), save visit,visitor,user if updated");
                             if (visit_changes) {
-                                resultSessionContext.visit.save(core,true);
+                                resultSessionContext.visit.save(core, true);
                             }
                             if (visitor_changes) {
                                 resultSessionContext.visitor.save(core, true);
@@ -558,7 +559,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         if (AllowOnNewVisitEvent) {
                             LogController.logTrace(core, "SessionController.create(), execute onNewVisitEvent");
-                            foreach ( var addon in core.addonCache.getOnNewVisitAddonList()) {
+                            foreach (var addon in core.addonCache.getOnNewVisitAddonList()) {
                                 CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                                     addonType = CPUtilsBaseClass.addonContext.ContextOnNewVisit,
                                     errorContextMessage = "new visit event running addon  [" + addon.name + "]"
@@ -569,14 +570,14 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- Write Visit Cookie
                         LogController.logTrace(core, "SessionController.create(), write visit cookie");
-                        visitCookie = SecurityController.encodeToken( core,resultSessionContext.visit.id, core.doc.profileStartTime);
+                        visitCookie = SecurityController.encodeToken(core, resultSessionContext.visit.id, core.doc.profileStartTime);
                         // -- very trial-error fix - W4S site does not send cookies from ajax calls right after changing from requestAppRootPath to appRootPath
                         core.webServer.addResponseCookie(appNameCookiePrefix + Constants.cookieNameVisit, visitCookie, default(DateTime), "", @"/", false);
                         //core.webServer.addResponseCookie(appNameCookiePrefix + constants.cookieNameVisit, visitCookie, default(DateTime), "", appRootPath, false);
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             } finally {
                 //
@@ -597,7 +598,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 result = visit.visitAuthenticated & (user.admin || user.developer);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return result;
@@ -614,7 +615,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 result = visit.visitAuthenticated & (user.admin || user.developer);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return result;
@@ -636,7 +637,7 @@ namespace Contensive.Processor.Controllers {
                 // -- for specific Content
                 returnIsContentManager = PermissionController.getUserContentPermissions(core, contentMetadata).allowEdit;
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 return false;
             }
             return returnIsContentManager;
@@ -725,14 +726,14 @@ namespace Contensive.Processor.Controllers {
                 LogController.addSiteActivity(core, "logout", user.id, user.organizationID);
                 //
                 // new guest
-                user = PersonModel.addDefault(core, ContentMetadataModel.createByUniqueName( core, PersonModel.contentName));
+                user = PersonModel.addDefault(core, ContentMetadataModel.createByUniqueName(core, PersonModel.contentName));
                 visit.memberID = user.id;
                 visit.visitAuthenticated = false;
                 visit.save(core);
                 visitor.MemberID = user.id;
                 visitor.save(core);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
@@ -799,7 +800,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
                     using (var csData = new CsModel(core)) {
-                        csData.open("People", Criteria, "id",true, user.id, "ID,password,admin,developer", PageSize: 2);
+                        csData.open("People", Criteria, "id", true, user.id, "ID,password,admin,developer", PageSize: 2);
                         if (!csData.ok()) {
                             //
                             // ----- loginFieldValue not found, stop here
@@ -864,7 +865,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnUserId;
@@ -915,7 +916,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnOk;
@@ -943,7 +944,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return result;
@@ -971,7 +972,7 @@ namespace Contensive.Processor.Controllers {
                     authContext.visit.save(core);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return result;
@@ -1017,7 +1018,7 @@ namespace Contensive.Processor.Controllers {
                     result = true;
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return result;
@@ -1073,37 +1074,28 @@ namespace Contensive.Processor.Controllers {
             bool result = false;
             try {
                 if (isAuthenticated) {
-                    string cacheTestName = contentNameOrId;
-                    if (string.IsNullOrEmpty(cacheTestName)) {
-                        cacheTestName = "iseditingall";
-                    }
-                    cacheTestName = cacheTestName.ToLowerInvariant();
-                    if (core.doc.contentIsEditingList.Contains(cacheTestName)) {
-                        //
-                        // -- 
-                        return true;
-                    } else if (core.doc.contentNotEditingList.Contains(cacheTestName)) {
-                        //
-                        // -- 
-                        return false;
-                    } else {
-                        if (core.visitProperty.getBoolean("AllowEditing") || core.visitProperty.getBoolean("AllowAdvancedEditor")) {
-                            if (!string.IsNullOrEmpty(contentNameOrId)) {
-                                if (contentNameOrId.IsNumeric()) {
-                                    contentNameOrId = MetadataController.getContentNameByID(core, encodeInteger(contentNameOrId));
-                                }
+                    //
+                    // -- if empty contentid or contentName, return true if admin and editing is turned on
+                    if (string.IsNullOrWhiteSpace(contentNameOrId)) { return ((core.session.user.admin) || (core.session.user.developer)) && (core.visitProperty.getBoolean("AllowEditing") || core.visitProperty.getBoolean("AllowAdvancedEditor")); }
+                    string cacheTestName = contentNameOrId.ToLowerInvariant();
+                    if (core.doc.contentIsEditingList.Contains(cacheTestName)) { return true; }
+                    if (core.doc.contentNotEditingList.Contains(cacheTestName)) { return false; }
+                    if (core.visitProperty.getBoolean("AllowEditing") || core.visitProperty.getBoolean("AllowAdvancedEditor")) {
+                        if (!string.IsNullOrEmpty(contentNameOrId)) {
+                            if (contentNameOrId.IsNumeric()) {
+                                contentNameOrId = MetadataController.getContentNameByID(core, encodeInteger(contentNameOrId));
                             }
-                            result = isAuthenticatedContentManager(core, contentNameOrId);
                         }
-                        if (result) {
-                            core.doc.contentIsEditingList.Add(cacheTestName);
-                        } else {
-                            core.doc.contentNotEditingList.Add(cacheTestName);
-                        }
+                        result = isAuthenticatedContentManager(core, contentNameOrId);
+                    }
+                    if (result) {
+                        core.doc.contentIsEditingList.Add(cacheTestName);
+                    } else {
+                        core.doc.contentNotEditingList.Add(cacheTestName);
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return result;
@@ -1122,7 +1114,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = core.visitProperty.getBoolean("AllowQuickEditor");
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnResult;
@@ -1135,22 +1127,15 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAdvancedEditing(CoreController core, string ContentName) {
-            bool returnResult = false;
-            try {
-                if (isAuthenticatedContentManager(core, ContentName)) {
-                    returnResult = core.visitProperty.getBoolean("AllowAdvancedEditor");
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return returnResult;
+        public bool isAdvancedEditing() {
+            // -- todo consider advancedEditing only for developers
+            if ((!user.admin) && (!user.developer)) { return false; }
+            return core.visitProperty.getBoolean("AllowAdvancedEditor");
         }
         //
         // ================================================================================================
         //
-        public static bool isMobile( string browserUserAgent ) {
+        public static bool isMobile(string browserUserAgent) {
             Regex b = new Regex(@"(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino", RegexOptions.IgnoreCase | RegexOptions.Multiline);
             Regex v = new Regex(@"1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-", RegexOptions.IgnoreCase | RegexOptions.Multiline);
             return (b.IsMatch(browserUserAgent) || v.IsMatch(browserUserAgent.Substring(0, 4)));
@@ -1202,7 +1187,7 @@ namespace Contensive.Processor.Controllers {
                     tempisWorkflowRendering = core.visitProperty.getBoolean("AllowWorkflowRendering");
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return result;

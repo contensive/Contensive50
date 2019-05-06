@@ -150,18 +150,6 @@ namespace Contensive.Processor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;nav class=&quot;navbar navbar-default&quot; role=&quot;navigation&quot;&gt;
-        ///    &lt;div class=&quot;navbar-collapse collapse&quot;&gt;
-        ///        {% {&quot;addon&quot;:{&quot;addon&quot;:&quot;Menu Pages&quot;,&quot;instanceId&quot;:&quot;Home Top Nav&quot;}} %}
-        ///    &lt;/div&gt;
-        ///&lt;/nav&gt;
-        ///&lt;div class=&quot;container&quot;&gt;
-        ///    &lt;div class=&quot;row&quot;&gt;
-        ///        &lt;div class=&quot;col-lg-12&quot;&gt;
-        ///            {% &quot;Content Box&quot; %}
-        ///        &lt;/div&gt;
-        ///    &lt;/div&gt;
-        ///&lt;/div&gt;.
         /// </summary>
         public static string DefaultTemplateHtml {
             get {

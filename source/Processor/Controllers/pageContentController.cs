@@ -519,7 +519,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- add template edit link
                 if (core.session.isAuthenticated && core.visitProperty.getBoolean("AllowAdvancedEditor") && core.session.isEditing("Page Templates")) {
-                    result = AdminUIController.getEditLink(core, "Page Templates", LocalTemplateID, false, LocalTemplateName, core.session.isEditing("Page Templates")) + result;
+                    result = AdminUIController.getRecordEditAndCutLink(core, "Page Templates", LocalTemplateID, false, LocalTemplateName) + result;
                     result = AdminUIController.getEditWrapper(core, result);
                 }
                 //
@@ -829,7 +829,7 @@ namespace Contensive.Processor.Controllers {
                         bool allowChildListComposite = core.doc.pageController.page.allowChildListDisplay;
                         if (allowChildListComposite || core.session.isEditing()) {
                             if (!allowChildListComposite) {
-                                result = result + core.html.getAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.");
+                                result = result + core.html.getAdminHintWrapper("<p>Child page list display is disabled for this page. To enable the child page list, edit this page and check 'Display Child Pages' in the navigation tab.</p>");
                             }
                             AddonModel addon = AddonModel.create(core, addonGuidChildList);
                             CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
@@ -864,7 +864,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     var emailBody = new StringBuilder();
-                                    emailBody.Append("<p><b>Page Hit Notification.</b></p>");
+                                    emailBody.Append("<h1>Page Hit Notification.</h1>");
                                     emailBody.Append("<p>This email was sent to you as a notification of the following viewing details.</p>");
                                     emailBody.Append(HtmlController.tableStart(4, 1, 1));
                                     emailBody.Append("<tr><td align=\"right\" width=\"150\" Class=\"ccPanelHeader\">Description<br><img alt=\"image\" src=\"http://" + core.webServer.requestDomain + "/ContensiveBase/images/spacer.gif\" width=\"150\" height=\"1\"></td><td align=\"left\" width=\"100%\" Class=\"ccPanelHeader\">Value</td></tr>");
@@ -977,11 +977,11 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- edit wrapper
                 bool isRootPage = (core.doc.pageController.pageToRootList.Count == 1);
-                if (core.session.isAdvancedEditing(core, "")) {
-                    result = AdminUIController.getEditLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + result;
+                if (core.session.isAdvancedEditing()) {
+                    result = AdminUIController.getRecordEditAndCutLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage), core.doc.pageController.page.name) + result;
                     result = AdminUIController.getEditWrapper(core, result);
                 } else if (core.session.isEditing(PageContentModel.contentName)) {
-                    result = AdminUIController.getEditLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + result;
+                    result = AdminUIController.getRecordEditAndCutLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage), core.doc.pageController.page.name) + result;
                     result = AdminUIController.getEditWrapper(core, result);
                 }
                 //
@@ -994,7 +994,7 @@ namespace Contensive.Processor.Controllers {
                 // -- display Admin Warnings with Edits for record errors
                 if (core.doc.adminWarning != "") {
                     if (core.doc.adminWarningPageID != 0) {
-                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + AdminUIController.getEditLink(core, "Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
+                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + AdminUIController.getRecordEditAndCutLink(core, "Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID) + "&nbsp;Edit the page<p>";
                         core.doc.adminWarningPageID = 0;
                     }
                     result = core.html.getAdminHintWrapper(core.doc.adminWarning) + result + "";
@@ -1016,7 +1016,7 @@ namespace Contensive.Processor.Controllers {
                 // -- Add admin warning to the top of the content
                 if (core.session.isAuthenticatedAdmin(core) & core.doc.adminWarning != "") {
                     if (core.doc.adminWarningPageID != 0) {
-                        core.doc.adminWarning += "</p>" + AdminUIController.getEditLink(core, "Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
+                        core.doc.adminWarning += "</p>" + AdminUIController.getRecordEditAndCutLink(core, "Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID) + "&nbsp;Edit the page<p>";
                         core.doc.adminWarningPageID = 0;
                     }
                     result = core.html.getAdminHintWrapper(core.doc.adminWarning) + result;
@@ -1350,7 +1350,7 @@ namespace Contensive.Processor.Controllers {
                             // -- ceate new template named Default
                             core.doc.pageController.template = PageTemplateModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, PageTemplateModel.contentName));
                             core.doc.pageController.template.name = defaultTemplateName;
-                            core.doc.pageController.template.bodyHTML = core.wwwFiles.readFileText(defaultTemplateHomeFilename);
+                            core.doc.pageController.template.bodyHTML = Properties.Resources.DefaultTemplateHtml;
                             core.doc.pageController.template.save(core);
                         }
                         //
@@ -2034,7 +2034,7 @@ namespace Contensive.Processor.Controllers {
                                 SeeAlsoLink = core.webServer.requestProtocol + SeeAlsoLink;
                             }
                             if (isEditingLocal) {
-                                result += AdminUIController.getEditLink(core, "See Also", (csData.getInteger("ID")), false, "", core.session.isEditing("See Also"));
+                                result += AdminUIController.getRecordEditLink(core, "See Also", (csData.getInteger("ID")));
                             }
                             result += "<a href=\"" + HtmlController.encodeHtml(SeeAlsoLink) + "\" target=\"_blank\">" + (csData.getText("Name")) + "</A>";
                             string Copy = (csData.getText("Brief"));
@@ -2050,7 +2050,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (isEditingLocal) {
                     SeeAlsoCount = SeeAlsoCount + 1;
-                    result += "\r<li class=\"ccListItem\">" + AdminUIController.getAddLink(core, "See Also", "RecordID=" + RecordID + ",ContentID=" + contentMetadata.id) + "</LI>";
+                    result += "\r<li class=\"ccListItem\">" + AdminUIController.getRecordAddLink(core, "See Also", "RecordID=" + RecordID + ",ContentID=" + contentMetadata.id) + "</LI>";
                 }
                 //
                 if (SeeAlsoCount == 0) {
@@ -2233,7 +2233,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     string pageEditLink = "";
                     if (core.session.isEditing(ContentName)) {
-                        pageEditLink = AdminUIController.getEditLink(core, ContentName, childPage.id, true, childPage.name, true);
+                        pageEditLink = AdminUIController.getRecordEditAndCutLink(core, ContentName, childPage.id, true, childPage.name);
                     }
                     //
                     string link = PageLink;
@@ -2352,7 +2352,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- Add Link
                 //
                 if (!ArchivePages) {
-                    foreach (var AddLink in AdminUIController.getAddLink(core, ContentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true)) {
+                    foreach (var AddLink in AdminUIController.getRecordAddLink(core, ContentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true)) {
                         if (!string.IsNullOrEmpty(AddLink)) { inactiveList = inactiveList + "\r<li class=\"ccListItemNoBullet\">" + AddLink + "</LI>"; }
                     }
                 }

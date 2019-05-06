@@ -749,32 +749,11 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Wrap the content in a common wrapper if authoring is enabled
         /// </summary>
-        /// <param name="Content"></param>
+        /// <param name="content"></param>
         /// <returns></returns>
-        public string getAdminHintWrapper(string Content) {
-            string temphtml_GetAdminHintWrapper = null;
-            try {
-                //
-                //If Not (true) Then Exit Function
-                //
-                temphtml_GetAdminHintWrapper = "";
-                if ((core.session.isEditing("") || core.session.isAuthenticatedAdmin(core))) {
-                    //temphtml_GetAdminHintWrapper = temphtml_GetAdminHintWrapper + html_GetLegacySiteStyles();
-                    temphtml_GetAdminHintWrapper = temphtml_GetAdminHintWrapper + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccHintWrapper\">"
-                            + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccHintWrapperContent\">"
-                            + "<b>Administrator</b>"
-                            + "<br>"
-                            + "<br>" + GenericController.encodeText(Content) + "</td></tr></table>"
-                        + "</td></tr></table>";
-                }
-
-                return temphtml_GetAdminHintWrapper;
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-            }
-            //ErrorTrap:
-            //throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18("main_GetAdminHintWrapper")
-            return temphtml_GetAdminHintWrapper;
+        public string getAdminHintWrapper(string content) {
+            string msg = "<div class=\"ccHintWrapperContent\"><h4>Administrator</h4>" + content + "</div>";
+            return ((core.session.isEditing("") || core.session.isAuthenticatedAdmin(core))) ? msg : string.Empty;
         }
         //
         //====================================================================================================

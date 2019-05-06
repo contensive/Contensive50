@@ -85,7 +85,7 @@ namespace Contensive.Processor {
         /// <param name="contentName"></param>
         /// <returns></returns>
         public override bool IsAdvancedEditing(string contentName) {
-            return cp.core.session.isAdvancedEditing(cp.core, contentName);
+            return cp.core.session.isAdvancedEditing();
         }
         //
         //====================================================================================================

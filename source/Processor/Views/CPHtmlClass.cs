@@ -37,7 +37,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string adminHint(string innerHtml) {
-            if (cp.core.session.isEditing() || cp.core.session.user.admin) {
+            if (cp.core.session.isEditing() || cp.core.session.user.admin || cp.core.session.user.developer) {
                 return ""
                     + "<div class=\"ccHintWrapper\">"
                         + "<div  class=\"ccHintWrapperContent\">"

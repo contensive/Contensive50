@@ -1612,7 +1612,7 @@ namespace Contensive.Addons.AdminSite {
             string result = "";
             try {
                 string LeftSide = cp.core.siteProperties.getText("AdminHeaderHTML", "Contensive Administration Site");
-                string RightSide = cp.core.doc.profileStartTime + "&nbsp;" + getIconRefreshLink("?" + cp.core.doc.refreshQueryString);
+                string RightSide = cp.core.doc.profileStartTime + "&nbsp;" + getRefreshLink("?" + cp.core.doc.refreshQueryString);
                 //
                 // Assemble header
                 //

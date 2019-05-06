@@ -1301,15 +1301,27 @@ li.ccExceptionListRow {
     margin: 10px auto;
 }
 /*
-* Design Block edit wrapper
+* edit addon link wrapper
 */
-.dbSettingWrapper {
-    border: 1px dashed #808080;
-    border-top: none;
+.ccAddonEditLinkCon {
+    z-index: 999;
+    display: block;
+    white-space: nowrap;
+    /* padding: 0 8px 0 4px; */
+    color: white;
+    z-index: 1;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+    background-color: #333;
+    background: -moz-linear-gradient(top, #888, #333);
+    background: -moz-linear-gradient(to bottom, #888, #333);
+    background: -ms-linear-gradient(top, #888, #333);
+    background: -o-linear-gradient(top, #888, #333);
+    background: -webkit-linear-gradient(top, #888, #333);
 }
-
-
-a.ccRecordEditLink, a.ccRecordCutLink, a.ccRecordAddLink, a.ccRecordPasteLink, .dbSettingHeader a, .dbSettingHeader a:hover {
+/*
+* edit addon link
+*/
+a.ccAddonEditLink, a.ccAddonCutLink, a.ccAddonAddLink, a.ccAddonPasteLink {
     color: white;
     z-index: 1;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
@@ -1327,7 +1339,33 @@ a.ccRecordEditLink, a.ccRecordCutLink, a.ccRecordAddLink, a.ccRecordPasteLink, .
     padding: 2px 10px;
     /* box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5); */
 }
-
+/*
+* Record edit link
+*/
+a.ccRecordEditLink, a.ccRecordCutLink,
+a.ccRecordAddLink, a.ccRecordPasteLink,
+.ccEditWrapperContent .dbSettingHeader a,
+.ccEditWrapperContent .dbSettingHeader a:hover {
+    color: white;
+    z-index: 1;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+    color: white;
+    text-decoration: none;
+    background-color: #333;
+    background: -moz-linear-gradient(top, #888, #333);
+    background: -moz-linear-gradient(to bottom, #888, #333);
+    background: -ms-linear-gradient(top, #888, #333);
+    background: -o-linear-gradient(top, #888, #333);
+    background: -webkit-linear-gradient(top, #888, #333);
+    display: inline-block;
+    list-style-type: none;
+    margin: 0 auto auto 0;
+    padding: 2px 10px;
+    /* box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5); */
+}
+/*
+* Record edit link endcap
+*/
 .ccEditLinkEndCap {
     z-index: 1;
     background-color: #333;
@@ -1341,6 +1379,24 @@ a.ccRecordEditLink, a.ccRecordCutLink, a.ccRecordAddLink, a.ccRecordPasteLink, .
     padding: 2px 10px;
     /* box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5); */
 }
+/*
+* edit record link wrapper
+*/
+.ccRecordLinkCon {
+    z-index: 999;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.ccRecordLinkCon a.ccRecordCutLink {
+    padding-right: 5px;
+}
+
+.ccListItem .ccRecordLinkCon {
+    position: static;
+}
+
 
 /*
 * debug mode trace window
@@ -1360,14 +1416,21 @@ div.ccDialogPageNotFound {
     text-align: center;
 }
 /*
-* Design Block common features
+* Override Design Block collection during transition
 */
 .designBlockContainer {
     position: relative;
     background-size: cover;
 }
+/*
+* Design Block collection adopted styles
+*/
+.ccEditWrapperContent .dbSettingWrapper {
+    border: 1px dashed #808080;
+    border-top: none;
+}
 
-.designBlockCover {
+.ccEditWrapperContent .designBlockCover {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -1377,34 +1440,30 @@ div.ccDialogPageNotFound {
     width: 100%;
 }
 
-.dbSettingWrapper {
+.ccEditWrapperContent .dbSettingWrapper {
     border: 1px dashed #808080;
     border-top: none;
 }
 
-.dbSettingHeader {
-    padding: 0 8px 0 4px;
+.ccEditWrapperContent .dbSettingHeader {
+    padding: 0;
     color: white;
     z-index: 1;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-    background-color: #333;
-    background: -moz-linear-gradient(top, #888, #333);
-    background: -moz-linear-gradient(to bottom, #888, #333);
-    background: -ms-linear-gradient(top, #888, #333);
-    background: -o-linear-gradient(top, #888, #333);
-    background: -webkit-linear-gradient(top, #888, #333);
+    background-color: none;
+    background: transparent;
 }
 
-.dbSettingHeader a, .dbSettingHeader a:hover {
+.ccEditWrapperContent .dbSettingHeader a, .dbSettingHeader a:hover {
     color: white;
     text-decoration: none;
 }
-
 /*
     Edit Wrapper
 */
 .ccEditWrapper {
     border: 1px dashed #808080;
+    margin: 1px;
 }
 
 .ccEditWrapperCaption {
@@ -1440,28 +1499,6 @@ div.ccDialogPageNotFound {
     cursor: move;
 }
 
-/*
-* child list
-*/
 .ccEditWrapper .ccChildList li {
     border: 1px dashed #262;
-    /* padding-left: 5px !important; */
-    /* background: white url(/contensiveBase/arrowUpDown.png) no-repeat right; */
-}
-/*
-* edit links, cut links, add link
-*/
-
-.ccRecordLinkCon {
-    z-index: 999;
-    display: block;
-    white-space: nowrap;
-}
-
-.ccListItem .ccRecordLinkCon {
-    position: static;
-}
-
-.ccRecordLinkCon a.ccRecordCutLink {
-    padding-right: 5px;
 }

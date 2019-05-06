@@ -330,11 +330,11 @@ namespace Contensive.Addons.AdminSite {
                                 //string AStart = "<a href=\"?" + core.doc.refreshQueryString + "&FieldName=" + htmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
                                 Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">");
                                 //Stream.Add("<img src=\"/ContensiveBase/images/black.GIF\" width=\"100%\" height=\"1\" >");
-                                Stream.Add(HtmlController.div(AdminUIController.getIconDeleteLink(link + "&dta=" + ToolsActionRemoveField),"text-center"));
-                                Stream.Add(HtmlController.div(AdminUIController.getIconArrowRightLink(link + "&dta=" + ToolsActionMoveFieldRight), "text-center"));
-                                Stream.Add(HtmlController.div(AdminUIController.getIconArrowLeftLink(link + "&dta=" + ToolsActionMoveFieldLeft), "text-center"));
-                                Stream.Add(HtmlController.div(AdminUIController.getIconExpandLink(link + "&dta=" + ToolsActionExpand), "text-center"));
-                                Stream.Add(HtmlController.div(AdminUIController.getIconContractLink(link + "&dta=" + ToolsActionContract), "text-center"));
+                                Stream.Add(HtmlController.div(AdminUIController.getDeleteLink(link + "&dta=" + ToolsActionRemoveField),"text-center"));
+                                Stream.Add(HtmlController.div(AdminUIController.getArrowRightLink(link + "&dta=" + ToolsActionMoveFieldRight), "text-center"));
+                                Stream.Add(HtmlController.div(AdminUIController.getArrowLeftLink(link + "&dta=" + ToolsActionMoveFieldLeft), "text-center"));
+                                Stream.Add(HtmlController.div(AdminUIController.getExpandLink(link + "&dta=" + ToolsActionExpand), "text-center"));
+                                Stream.Add(HtmlController.div(AdminUIController.getContractLink(link + "&dta=" + ToolsActionContract), "text-center"));
                                 Stream.Add("</td>");
                             }
                             Stream.Add("</tr>");
@@ -407,7 +407,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // can be used as column header
                                     string link = "?" + core.doc.refreshQueryString + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldID + "=" + field.id + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
-                                    Stream.Add(HtmlController.div(AdminUIController.getIconPlusLink(link, "&nbsp;" + field.caption)));
+                                    Stream.Add(HtmlController.div(AdminUIController.getPlusLink(link, "&nbsp;" + field.caption)));
                                 }
                             }
                         }

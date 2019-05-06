@@ -346,7 +346,7 @@ namespace Contensive.Addons.Tools {
                             //
                             // edit button
                             //
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\">" + AdminUIController.getIconEditAdminLink(core, contentFieldsCdef, formFieldId) + "</td>");
+                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\">" + AdminUIController.getRecordEditLink(core, contentFieldsCdef, formFieldId) + "</td>");
                             //
                             // Inherited
                             //

@@ -1043,9 +1043,9 @@ namespace Contensive.Processor.Controllers {
             //
             // -- determine primary domain
             string primaryDomain = core.appConfig.name;
-            if (core.appConfig.domainList.Count > 0) {
-                primaryDomain = core.appConfig.domainList[0];
-            }
+            //if (core.appConfig.domainList.Count > 0) {
+            //    primaryDomain = core.appConfig.domainList[0];
+            //}
             var domain = DomainModel.createByUniqueName(core, primaryDomain);
             if (DomainModel.createByUniqueName(core, primaryDomain) == null) {
                 var domainMetadata = ContentMetadataModel.createByUniqueName(core, "domains");
@@ -1056,7 +1056,7 @@ namespace Contensive.Processor.Controllers {
             // -- Landing Page
             PageContentModel landingPage = PageContentModel.create(core, DefaultLandingPageGuid);
             if (landingPage == null) {
-                landingPage = PageContentModel.addEmpty(core);
+                landingPage = PageContentModel.addDefault(core, ContentMetadataModel.createByUniqueName( core, "page content"));
                 landingPage.name = "Home";
                 landingPage.ccguid = DefaultLandingPageGuid;
             }
@@ -1065,12 +1065,32 @@ namespace Contensive.Processor.Controllers {
             PageTemplateModel defaultTemplate = PageTemplateModel.create(core, guidBootstrapStarterTemplate);
             if (defaultTemplate == null) {
                 // -- did not install correctly, build a placeholder
-                defaultTemplate = PageTemplateModel.addEmpty(core);
-                defaultTemplate.name = "Bootstrap Starter Template";
+                defaultTemplate = PageTemplateModel.addDefault(core, ContentMetadataModel.createByUniqueName(core, "page templates"));
+                defaultTemplate.name = "Default";
                 defaultTemplate.ccguid = guidBootstrapStarterTemplate;
             }
             defaultTemplate.bodyHTML = Properties.Resources.DefaultTemplateHtml;
             defaultTemplate.save(core);
+            //
+            // -- verify menu record
+            var menu = MenuModel.create<MenuModel>(core, "Home Top Nav");
+            if(menu == null ) {
+                menu = MenuModel.addDefault<MenuModel>(core, ContentMetadataModel.createByUniqueName(core, "Menus"));
+                menu.ccguid = "Home Top Nav";
+                menu.name = "Home Top Nav";
+                menu.save(core);
+            }
+            //
+            // -- create menu record
+            var menuPageRule = MenuPageRuleModel.createFirstOfList<MenuPageRuleModel>(core, "(menuid=" + menu.id + ")and(pageid=" + landingPage.id + ")", "id");
+            if (menuPageRule == null) {
+                menuPageRule = MenuPageRuleModel.addDefault<MenuPageRuleModel>(core, ContentMetadataModel.createByUniqueName(core, "Menu Page Rules"));
+                menuPageRule.menuId = menu.id;
+                menuPageRule.pageId = landingPage.id;
+                menuPageRule.save(core);
+            }
+            //
+            // -- update domain
             domain.defaultTemplateId = defaultTemplate.id;
             domain.name = primaryDomain;
             domain.pageNotFoundPageId = landingPage.id;

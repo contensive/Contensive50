@@ -577,7 +577,6 @@
     <Content Include="ContensiveBase\Popup\WaitForIISReset.htm" />
     <Content Include="ContensiveBase\Popup\WaitPageClose.htm" />
     <Content Include="ContensiveBase\Popup\WaitPageOpen.htm" />
-    <Content Include="ContensiveBase\TemplateHomeDefault.html" />
     <Content Include="ContensiveBase\WaitForIISReset.htm" />
     <Content Include="ContensiveBase\WaitPageClose.htm" />
     <Content Include="ContensiveBase\WaitPageOpen.htm" />
