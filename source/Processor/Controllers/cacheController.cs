@@ -127,7 +127,7 @@ namespace Contensive.Processor.Controllers {
                         if (dateCompare >= 0) {
                             //
                             // -- global invalidation
-                            LogController.logTrace( core,"GetObject(" + key + "), invalidated because the cacheObject's saveDate [" + cacheDocument.saveDate.ToString() + "] is after the globalInvalidationDate [" + globalInvalidationDate + "]");
+                            LogController.logTrace( core,"GetObject(" + key + "), invalidated because the cacheObject's saveDate [" + cacheDocument.saveDate.ToString() + "] is before the globalInvalidationDate [" + globalInvalidationDate + "]");
                         } else {
                             //
                             // -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
@@ -144,8 +144,10 @@ namespace Contensive.Processor.Controllers {
                                 } else {
                                     dateCompare = dependantCacheDocument.saveDate.CompareTo(cacheDocument.saveDate);
                                     if (dateCompare >= 0) {
+                                        //
+                                        // -- invalidate because a dependent document was changed after the cacheDocument was saved
                                         cacheMiss = true;
-                                        LogController.logTrace(core, "getObject(" + key + "), invalidated because the dependantKey [" + dependentKey + "] has a saveDate [" + dependantCacheDocument.saveDate.ToString() + "] after the cacheDocument's saveDate [" + cacheDocument.saveDate.ToString() + "]");
+                                        LogController.logTrace(core, "getObject(" + key + "), invalidated because the dependantKey [" + dependentKey + "] was modified [" + dependantCacheDocument.saveDate.ToString() + "] after the cacheDocument's saveDate [" + cacheDocument.saveDate.ToString() + "]");
                                         break;
                                     }
                                 }

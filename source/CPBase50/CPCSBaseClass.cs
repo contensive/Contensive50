@@ -4,20 +4,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Contensive.BaseClasses {
-    /// <summary>
-    /// CP.CS - The primary interface to the database. This object is similar to a recordset. It includes features of the content meta data. When a record is inserted, the default values of the record are available to read.
-    /// </summary>
-    /// <remarks></remarks>
-    public abstract class CPCSBaseClass {
-        //public Sub New(ByVal cmcObj As Contensive.Processor.cpCoreClass, ByRef CPParent As CPBaseClass)
-        /// <summary>
-        /// Inserts a new content row
-        /// </summary>
-        /// <param name="ContentName"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract bool Insert(string ContentName);
+namespace Contensive.BaseClasses
+{
+	/// <summary>
+	/// CP.CS - The primary interface to the database. This object is similar to a recordset. It includes features of the content meta data. When a record is inserted, the default values of the record are available to read.
+	/// </summary>
+	/// <remarks></remarks>
+	public abstract class CPCSBaseClass
+	{
+		//public Sub New(ByVal cmcObj As Contensive.Processor.cpCoreClass, ByRef CPParent As CPBaseClass)
+		/// <summary>
+		/// Inserts a new content row
+		/// </summary>
+		/// <param name="ContentName"></param>
+		/// <returns></returns>
+		/// <remarks></remarks>
+		public abstract bool Insert(string ContentName);
         /// <summary>
         /// Opens a record set with the record specified by the recordId
         /// </summary>
@@ -195,18 +197,18 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <remarks></remarks>
         public abstract void Delete();
-        /// <summary>
-        /// Returns true if the given field is valid for this record set
-        /// </summary>
-        /// <param name="FieldName"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract bool FieldOK(string FieldName);
-        /// <summary>
-        /// Move to the first record in the current record set
-        /// </summary>
-        /// <remarks></remarks>
-        public abstract void GoFirst();
+		/// <summary>
+		/// Returns true if the given field is valid for this record set
+		/// </summary>
+		/// <param name="FieldName"></param>
+		/// <returns></returns>
+		/// <remarks></remarks>
+		public abstract bool FieldOK(string FieldName);
+		/// <summary>
+		/// Move to the first record in the current record set
+		/// </summary>
+		/// <remarks></remarks>
+		public abstract void GoFirst();
         /// <summary>
         /// Returns an icon linked to the add function in the admin site for this content
         /// </summary>
@@ -227,13 +229,13 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract bool GetBoolean(string FieldName);
-        /// <summary>
-        /// Returns the field value cast as a date
-        /// </summary>
-        /// <param name="FieldName"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract DateTime GetDate(string FieldName);
+		/// <summary>
+		/// Returns the field value cast as a date
+		/// </summary>
+		/// <param name="FieldName"></param>
+		/// <returns></returns>
+		/// <remarks></remarks>
+		public abstract DateTime GetDate(string FieldName);
         /// <summary>
         /// Returns an icon linked to the edit function in the admin site for this content
         /// </summary>
@@ -265,84 +267,84 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract int GetInteger(string FieldName);
-        /// <summary>
-        /// Returns the field value cast as a number (double)
-        /// </summary>
-        /// <param name="FieldName"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract double GetNumber(string FieldName);
-        /// <summary>
-        /// Returns the number of rows in the result.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract int GetRowCount();
-        /// <summary>
-        /// returns the query used to generate the results
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract string GetSQL();
-        /// <summary>
-        /// Returns the result and converts it to a text type. For field types that store text in files, the text is returned instead of the filename. These include textfile, cssfile, javascriptfile. For file types that do not contain text, the filename is returned. These include filetype and imagefiletype.
-        /// </summary>
-        /// <param name="FieldName"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract string GetText(string FieldName);
-        /// <summary>
-        /// Returns the result of getText() after verifying it's content is valid for use in Html content. If the field is a fieldTypeHtml the content is returned without conversion. If the field is any other type, the content is HtmlEncoded first (> converted to &gt;, etc)
-        /// </summary>
-        /// <param name="FieldName"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract string GetHtml(string FieldName);
-        /// <summary>
-        /// Deprecated. Returns the filename for field types that store text in files.
-        /// </summary>
-        /// <param name="FieldName"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        [Obsolete("Use getText to get copy, getFilename to get file.", false)]
-        public abstract string GetTextFile(string FieldName);
-        /// <summary>
-        /// Move to the next record in a result set.
-        /// </summary>
-        /// <remarks></remarks>
-        public abstract void GoNext();
-        /// <summary>
-        /// Move to the next record in a result set and return true if the row is valid.
-        /// </summary>
-        /// <remarks></remarks>
-        public abstract bool NextOK();
-        /// <summary>
-        /// Returns true if there is valid data in the current row of the result set.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract bool OK();
-        /// <summary>
-        /// Forces a save of any changes made to the current row. A save occurs automatically when the content set is closed or when it moves to another row.
-        /// </summary>
-        /// <remarks></remarks>
-        public abstract void Save();
-        /// <summary>
-        /// Sets a value in a field of the current row.
-        /// </summary>
-        /// <param name="FieldName"></param>
-        /// <param name="FieldValue"></param>
-        /// <remarks></remarks>
-        public abstract void SetField(string FieldName, object FieldValue);
-        public abstract void SetField(string FieldName, string FieldValue);
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="FieldName"></param>
-        /// <param name="Copy"></param>
-        /// <param name="ContentName"></param>
-        /// <remarks></remarks>
-        public abstract void SetFile(string FieldName, string Copy, string ContentName);
+		/// <summary>
+		/// Returns the field value cast as a number (double)
+		/// </summary>
+		/// <param name="FieldName"></param>
+		/// <returns></returns>
+		/// <remarks></remarks>
+		public abstract double GetNumber(string FieldName);
+		/// <summary>
+		/// Returns the number of rows in the result.
+		/// </summary>
+		/// <returns></returns>
+		/// <remarks></remarks>
+		public abstract int GetRowCount();
+		/// <summary>
+		/// returns the query used to generate the results
+		/// </summary>
+		/// <returns></returns>
+		/// <remarks></remarks>
+		public abstract string GetSQL();
+		/// <summary>
+		/// Returns the result and converts it to a text type. For field types that store text in files, the text is returned instead of the filename. These include textfile, cssfile, javascriptfile. For file types that do not contain text, the filename is returned. These include filetype and imagefiletype.
+		/// </summary>
+		/// <param name="FieldName"></param>
+		/// <returns></returns>
+		/// <remarks></remarks>
+		public abstract string GetText(string FieldName);
+		/// <summary>
+		/// Returns the result of getText() after verifying it's content is valid for use in Html content. If the field is a fieldTypeHtml the content is returned without conversion. If the field is any other type, the content is HtmlEncoded first (> converted to &gt;, etc)
+		/// </summary>
+		/// <param name="FieldName"></param>
+		/// <returns></returns>
+		/// <remarks></remarks>
+		public abstract string GetHtml(string FieldName);
+		/// <summary>
+		/// Deprecated. Returns the filename for field types that store text in files.
+		/// </summary>
+		/// <param name="FieldName"></param>
+		/// <returns></returns>
+		/// <remarks></remarks>
+		[Obsolete("Use getText to get copy, getFilename to get file.", false)]
+		public abstract string GetTextFile(string FieldName);
+		/// <summary>
+		/// Move to the next record in a result set.
+		/// </summary>
+		/// <remarks></remarks>
+		public abstract void GoNext();
+		/// <summary>
+		/// Move to the next record in a result set and return true if the row is valid.
+		/// </summary>
+		/// <remarks></remarks>
+		public abstract bool NextOK();
+		/// <summary>
+		/// Returns true if there is valid data in the current row of the result set.
+		/// </summary>
+		/// <returns></returns>
+		/// <remarks></remarks>
+		public abstract bool OK();
+		/// <summary>
+		/// Forces a save of any changes made to the current row. A save occurs automatically when the content set is closed or when it moves to another row.
+		/// </summary>
+		/// <remarks></remarks>
+		public abstract void Save();
+		/// <summary>
+		/// Sets a value in a field of the current row.
+		/// </summary>
+		/// <param name="FieldName"></param>
+		/// <param name="FieldValue"></param>
+		/// <remarks></remarks>
+		public abstract void SetField(string FieldName, object FieldValue);
+		public abstract void SetField(string FieldName, string FieldValue);
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="FieldName"></param>
+		/// <param name="Copy"></param>
+		/// <param name="ContentName"></param>
+		/// <remarks></remarks>
+		public abstract void SetFile(string FieldName, string Copy, string ContentName);
         /// <summary>
         /// Processes a value from the incoming request to a field in the current row.
         /// </summary>
@@ -359,6 +361,6 @@ namespace Contensive.BaseClasses {
         /// <param name="fieldName"></param>
         /// <returns></returns>
         public abstract string GetValue(string fieldName);
-    }
+	}
 }
 

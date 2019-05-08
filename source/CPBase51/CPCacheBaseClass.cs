@@ -102,14 +102,14 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Create a key for a table. A table key is used as a dependent key to invalidate all record cache objects from a table.
-        /// When storing a record object, add the tablekey as a dependent key
-        /// If a db operation modifies records and you cant invalidate the individual records, invalidate the table with this key
+        /// Create a key used only as a dependency. If any record in the table is added/deleted/modified, this key will be updated, invalidating the parent object.
+        /// Uses UpdateLastModified
+        /// Uses the 
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public abstract string CreateKeyForDbTable(string tableName, string dataSourceName);
+        public abstract string CreateDependencyKeyInvalidateOnChange(string tableName, string dataSourceName);
         //
         //====================================================================================================
         /// <summary>
@@ -117,7 +117,15 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public abstract string CreateKeyForDbTable(string tableName);
+        public abstract string CreateDependencyKeyInvalidateOnChange(string tableName);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Updates the cache dependency key for this table that a record in this table has been modified
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public abstract void UpdateLastModified(string tableName);
         //
         //====================================================================================================
         /// <summary>
