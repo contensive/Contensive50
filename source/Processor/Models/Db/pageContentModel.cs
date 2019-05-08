@@ -26,6 +26,13 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         // -- instance properties
+        /// <summary>
+        /// A structured json that holds the list of addons to run on this page. Each element in this list includes
+        /// - addonGuid
+        /// - instanceId (guid of content, etc)
+        /// - childList
+        /// </summary>
+        public string addonList { get; set; }
         public bool allowBrief { get; set; }
         public bool allowChildListDisplay { get; set; }
         public bool allowFeedback { get; set; }
@@ -158,12 +165,12 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<PageContentModel>(core, recordId);
+            invalidateCacheOfRecord<PageContentModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void invalidateTableCache(CoreController core) {
-            invalidateTableCache<PageContentModel>(core);
+            invalidateCacheOfTable<PageContentModel>(core);
         }
         //
         //====================================================================================================

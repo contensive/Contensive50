@@ -30,7 +30,7 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         public string name = "";
         /// <summary>
-        /// status used to signal that the app is ok
+        /// status used to signal that the app is ok. See AppStatusEnum for values
         /// </summary>
         public AppStatusEnum appStatus = AppStatusEnum.maintenance;
         /// <summary>

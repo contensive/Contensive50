@@ -94,12 +94,12 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<GroupRuleModel>(core, recordId);
+            invalidateCacheOfRecord<GroupRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void invalidateTableCache(CoreController core) {
-            invalidateTableCache<GroupRuleModel>(core);
+            invalidateCacheOfTable<GroupRuleModel>(core);
         }
         //
         //====================================================================================================

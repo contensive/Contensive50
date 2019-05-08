@@ -60,9 +60,9 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override string CreateKeyForDbTable(string tableName) => CacheController.createCacheKey_forDbTable(tableName);
+        public override string CreateKeyForDbTable(string tableName) => CacheController.createCacheKey_LastRecordModifiedDate(tableName);
         //
-        public override string CreateKeyForDbTable(string tableName, string dataSourceName) => CacheController.createCacheKey_forDbTable(tableName, dataSourceName);
+        public override string CreateKeyForDbTable(string tableName, string dataSourceName) => CacheController.createCacheKey_LastRecordModifiedDate(tableName, dataSourceName);
         //
         //====================================================================================================
         //
@@ -139,7 +139,7 @@ namespace Contensive.Processor {
                     string tableName = MetadataController.getContentTablename(cp.core, contentName).ToLowerInvariant();
                     if (!tableNameList.Contains(tableName)) {
                         tableNameList.Add(tableName);
-                        cp.core.cache.invalidateAllKeysInTable(tableName);
+                        cp.core.cache.invalidateTableObjects(tableName);
                     }
                 }
             }

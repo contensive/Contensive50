@@ -1389,6 +1389,10 @@ a.ccRecordAddLink, a.ccRecordPasteLink,
     white-space: nowrap;
     overflow: hidden;
     text-align: left;
+    /*
+    border: 1px dashed #808080;
+    border-bottom: none;
+    */
 }
 
 .ccRecordLinkCon a.ccRecordCutLink {
@@ -1426,8 +1430,10 @@ div.ccDialogPageNotFound {
 * Design Block collection adopted styles
 */
 .ccEditWrapperContent .dbSettingWrapper {
+    /*
     border: 1px dashed #808080;
     border-top: none;
+    */
 }
 
 .ccEditWrapperContent .designBlockCover {
@@ -1441,8 +1447,10 @@ div.ccDialogPageNotFound {
 }
 
 .ccEditWrapperContent .dbSettingWrapper {
+    /*
     border: 1px dashed #808080;
     border-top: none;
+    */
 }
 
 .ccEditWrapperContent .dbSettingHeader {

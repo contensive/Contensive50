@@ -127,7 +127,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<VisitModel>(core, recordId);
+            invalidateCacheOfRecord<VisitModel>(core, recordId);
         }
         //
         //====================================================================================================

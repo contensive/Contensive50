@@ -99,6 +99,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addons\AddonListEditor\GetAddonPanelClass.cs" />
+    <Compile Include="Addons\AddonListEditor\SetAddonListClass.cs" />
+    <Compile Include="Addons\AddonListEditor\GetAddonListClass.cs" />
+    <Compile Include="Addons\AddonListEditor\GetAddonListEditorClass.cs" />
     <Compile Include="Addons\AdminNavigator\common.cs" />
     <Compile Include="Addons\AdminNavigator\Views\getFullClass.cs" />
     <Compile Include="Addons\AdminNavigator\Views\getNodeClass.cs" />
@@ -207,6 +211,7 @@
     <Compile Include="Models\Db\ContentFieldTypeModel.cs" />
     <Compile Include="Models\Db\MenuModel.cs" />
     <Compile Include="Models\Db\MenuPageRuleModel.cs" />
+    <Compile Include="Models\Domain\AddonPanelListItemModel.cs" />
     <Compile Include="Models\Domain\CsModel.cs" />
     <Compile Include="Controllers\DbController.cs" />
     <Compile Include="Controllers\DbServerController.cs" />
@@ -272,6 +277,7 @@
     <Compile Include="Models\Db\TaskModel.cs" />
     <Compile Include="Models\Domain\NameValueModel.cs" />
     <Compile Include="Models\Domain\AddonCacheModel.cs" />
+    <Compile Include="Models\Domain\AddonListItemModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

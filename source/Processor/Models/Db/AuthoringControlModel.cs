@@ -91,11 +91,11 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        public static void invalidateRecordCache(CoreController core, int recordId) => invalidateRecordCache<AuthoringControlModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) => invalidateCacheOfRecord<AuthoringControlModel>(core, recordId);
         //
         //====================================================================================================
         //
-        public static void invalidateTableCache(CoreController core) => invalidateTableCache<AuthoringControlModel>(core);
+        public static void invalidateTableCache(CoreController core) => invalidateCacheOfTable<AuthoringControlModel>(core);
         //
         //====================================================================================================
         //

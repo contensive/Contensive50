@@ -23,13 +23,41 @@ namespace Contensive.Processor.Controllers {
     /// ------- pointer keys are read-only, as the content is saved in the primary key
     /// 
     /// 2  types of cache data:
-    ///  -- table record cache -- cache of an entity model (one record)
+    ///  -- record cache -- cache of an Db model (one record in a db table)
     ///     .. saveCache, reachCache in the entity model
     ///     .. invalidateCache in the entity model, includes invalication for complex objects that include the entity
     ///      
-    ///  -- object cache -- cache of an object with mixed data based on the entity data model (an org object that contains a person object)
+    ///  -- complex cache -- cache of a domain model, an object with mixed data based on the entity data model (an org object that contains a person object)
     ///    .. has an id for the topmost object
     ///    .. these objects are in .. ? (another model folder?)
+    ///    
+    /// 3 using dependent keys to track groups of record
+    /// -- "table-objects-invalidate-date" key
+    ///      this cache object contains a date before which all cache objects from this table are considered invalid
+    ///      to update it, use the DbModel method DbModel.()
+    ///      updating this key invalidates all cache objects with data from that table saved before this date
+    ///      when you run a query that updates misc records, invalidate this key
+    ///      when you save an object that includes a table record, make it dependent on this key so it will be cleared if it's save date is before this date
+    ///      
+    /// -- "last-record-modified-date" key
+    ///      this cache object contains the modified date of the record last modified for this table
+    ///      to update it, use the DbModel method DbModel.storeCacheLastRecordModifiedDate()
+    ///      it is updated automatically on every Db record update through models
+    ///      if you update a Db record outside models (update/insert/delete query, etc.) also update this cache object
+    ///      ex: the admin navigator. the object contains many records and we want it to clear if any add-on or navigator entry record is modified/added/deleted
+    ///      for record-cache, only udpate the cache key on save. Do not make any record-cache dependent on this key
+    ///      when you save a complex object and you want it invalidated if any record in a table is updated, make it dependent on this key
+    ///      invalidate this key everytime any a record is updated.
+    ///      
+    /// -- if you add/modify/delete a database record
+    ///      => if you update using DbModels this is handled internally and nothing more needs to be done
+    ///      => otherwise, use the DbModel method setCacheRecordLastModified
+    /// 
+    /// -- save a record that is dependent on many untrackable records 
+    /// 
+    /// -- update any record is a table
+    /// 
+    /// -- update one or more untracked records (an update or delete command with where clause unrelated to id or guid)
     ///    
     /// When a record is saved in admin, an invalidation call is made for tableName/id/#
     /// 
@@ -90,61 +118,61 @@ namespace Contensive.Processor.Controllers {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 if (!(string.IsNullOrEmpty(key))) {
                     //
-                    // -- read cacheWrapper
-                    CacheWrapperClass wrappedContent = getWrappedContent(key);
-                    if (wrappedContent != null) {
+                    // -- read cacheDocument (the object that holds the data object plus control fields)
+                    CacheDocumentClass cacheDocument = getCacheDocument(key);
+                    if (cacheDocument != null) {
                         //
                         // -- test for global invalidation
-                        int dateCompare = globalInvalidationDate.CompareTo(wrappedContent.saveDate);
+                        int dateCompare = globalInvalidationDate.CompareTo(cacheDocument.saveDate);
                         if (dateCompare >= 0) {
                             //
                             // -- global invalidation
-                            LogController.logTrace( core,"GetObject(" + key + "), invalidated because the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "] is after the globalInvalidationDate [" + globalInvalidationDate + "]");
+                            LogController.logTrace( core,"GetObject(" + key + "), invalidated because the cacheObject's saveDate [" + cacheDocument.saveDate.ToString() + "] is after the globalInvalidationDate [" + globalInvalidationDate + "]");
                         } else {
                             //
                             // -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
                             bool cacheMiss = false;
-                            foreach (string dependentKey in wrappedContent.dependentKeyList) {
-                                CacheWrapperClass dependantObject = getWrappedContent(dependentKey);
-                                if (dependantObject == null) {
+                            foreach (string dependentKey in cacheDocument.dependentKeyList) {
+                                CacheDocumentClass dependantCacheDocument = getCacheDocument(dependentKey);
+                                if (dependantCacheDocument == null) {
                                     // create dummy cache to validate future cache requests, fake saveDate as last globalinvalidationdate
-                                    storeWrappedObject(dependentKey, new CacheWrapperClass() {
+                                    storeCacheDocument(dependentKey, new CacheDocumentClass() {
                                         keyPtr = null,
                                         content = "",
                                         saveDate = globalInvalidationDate
                                     });
                                 } else {
-                                    dateCompare = dependantObject.saveDate.CompareTo(wrappedContent.saveDate);
+                                    dateCompare = dependantCacheDocument.saveDate.CompareTo(cacheDocument.saveDate);
                                     if (dateCompare >= 0) {
                                         cacheMiss = true;
-                                        LogController.logTrace(core, "GetObject(" + key + "), invalidated because the dependantobject [" + dependentKey + "] has a saveDate [" + dependantObject.saveDate.ToString() + "] after the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "]");
+                                        LogController.logTrace(core, "getObject(" + key + "), invalidated because the dependantKey [" + dependentKey + "] has a saveDate [" + dependantCacheDocument.saveDate.ToString() + "] after the cacheDocument's saveDate [" + cacheDocument.saveDate.ToString() + "]");
                                         break;
                                     }
                                 }
                             }
                             if (!cacheMiss) {
-                                if (!string.IsNullOrEmpty(wrappedContent.keyPtr)) {
+                                if (!string.IsNullOrEmpty(cacheDocument.keyPtr)) {
                                     //
                                     // -- this is a pointer key, load the primary
-                                    result = getObject<objectClass>(wrappedContent.keyPtr);
-                                } else if (wrappedContent.content is Newtonsoft.Json.Linq.JObject) {
+                                    result = getObject<objectClass>(cacheDocument.keyPtr);
+                                } else if (cacheDocument.content is Newtonsoft.Json.Linq.JObject) {
                                     //
                                     // -- newtonsoft types
-                                    Newtonsoft.Json.Linq.JObject data = (Newtonsoft.Json.Linq.JObject)wrappedContent.content;
+                                    Newtonsoft.Json.Linq.JObject data = (Newtonsoft.Json.Linq.JObject)cacheDocument.content;
                                     result = data.ToObject<objectClass>();
-                                } else if (wrappedContent.content is Newtonsoft.Json.Linq.JArray) {
+                                } else if (cacheDocument.content is Newtonsoft.Json.Linq.JArray) {
                                     //
                                     // -- newtonsoft types
-                                    Newtonsoft.Json.Linq.JArray data = (Newtonsoft.Json.Linq.JArray)wrappedContent.content;
+                                    Newtonsoft.Json.Linq.JArray data = (Newtonsoft.Json.Linq.JArray)cacheDocument.content;
                                     result = data.ToObject<objectClass>();
-                                } else if (wrappedContent.content==null) {
+                                } else if (cacheDocument.content==null) {
                                     //
                                     // -- if cache data was left as a string (might be empty), and return object is not string, there was an error
                                     result = default(objectClass);
                                 } else {
                                     //
                                     // -- all worked
-                                    result = (objectClass)wrappedContent.content;
+                                    result = (objectClass)cacheDocument.content;
                                 }
                             }
                         }
@@ -203,8 +231,8 @@ namespace Contensive.Processor.Controllers {
         /// <typeparam name="returnType"></typeparam>
         /// <param name="key"></param>
         /// <returns></returns>
-        private CacheWrapperClass getWrappedContent(string key) {
-            CacheWrapperClass result = null;
+        private CacheDocumentClass getCacheDocument(string key) {
+            CacheDocumentClass result = null;
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 if (string.IsNullOrEmpty(key)) {
@@ -215,7 +243,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- use remote cache
                         try {
-                            result = cacheClient.Get<CacheWrapperClass>(serverKey);
+                            result = cacheClient.Get<CacheDocumentClass>(serverKey);
                         } catch (Exception ex) {
                             //
                             // --client does not throw its own errors, so try to differentiate by message
@@ -232,20 +260,20 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         if (result != null) {
-                            LogController.logTrace(core, "getWrappedContent(" + key + "), remoteCache hit");
+                            LogController.logTrace(core, "getCacheDocument(" + key + "), remoteCache hit");
                         } else {
-                            LogController.logTrace(core,"getWrappedContent(" + key + "), remoteCache miss");
+                            LogController.logTrace(core, "getCacheDocument(" + key + "), remoteCache miss");
                         }
                     }
                     if ((result == null) && core.serverConfig.enableLocalMemoryCache) {
                         //
                         // -- local memory cache
                         //Dim cache As ObjectCache = MemoryCache.Default
-                        result = (CacheWrapperClass)MemoryCache.Default[serverKey];
+                        result = (CacheDocumentClass)MemoryCache.Default[serverKey];
                         if (result != null) {
-                            LogController.logTrace(core, "getWrappedContent(" + key + "), memoryCache hit");
+                            LogController.logTrace(core, "getCacheDocument(" + key + "), memoryCache hit");
                         } else {
-                            LogController.logTrace(core,"getWrappedContent(" + key + "), memoryCache miss");
+                            LogController.logTrace(core, "getCacheDocument(" + key + "), memoryCache miss");
                         }
                     }
                     if ((result == null) && core.serverConfig.enableLocalFileCache) {
@@ -258,13 +286,13 @@ namespace Contensive.Processor.Controllers {
                             mutex.ReleaseMutex();
                         }
                         if (string.IsNullOrEmpty(serializedDataObject)) {
-                            LogController.logTrace(core,"getWrappedContent(" + key + "), file miss");
+                            LogController.logTrace(core, "getCacheDocument(" + key + "), file miss");
                         } else {
-                            result = Newtonsoft.Json.JsonConvert.DeserializeObject<CacheWrapperClass>(serializedDataObject);
-                            storeWrappedObject_MemoryCache(serverKey, result);
+                            result = Newtonsoft.Json.JsonConvert.DeserializeObject<CacheDocumentClass>(serializedDataObject);
+                            storeCacheDocument_MemoryCache(serverKey, result);
                         }
                         if (result == null) {
-                            LogController.logTrace(core,"getWrappedContent(" + key + "), fileCache miss");
+                            LogController.logTrace(core, "getCacheDocument(" + key + "), fileCache miss");
                         }
                     }
                     if (result != null) {
@@ -275,7 +303,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                //logController.appendCacheLog(core,"getWrappedContent(" + key + "), exit ");
+                //logController.appendCacheLog(core,"getCacheDocument(" + key + "), exit ");
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -296,13 +324,13 @@ namespace Contensive.Processor.Controllers {
         public void storeObject(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                CacheWrapperClass wrappedContent = new CacheWrapperClass {
+                var cacheDocument = new CacheDocumentClass {
                     content = content,
                     saveDate = DateTime.Now,
                     invalidationDate = invalidationDate,
                     dependentKeyList = dependentKeyList
                 };
-                storeWrappedObject(key, wrappedContent);
+                storeCacheDocument(key, cacheDocument);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
             }
@@ -369,7 +397,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="datasourceName"></param>
         /// <param name="modelContent"></param>
-        public void StoreDbModel(string guid, int recordId, string tableName, string datasourceName, object modelContent) {
+        public void storeDbModel(string guid, int recordId, string tableName, string datasourceName, object modelContent) {
             string key = createCacheKey_forDbRecord(recordId, tableName, datasourceName);
             storeObject(key, modelContent);
             string keyPtr = createCachePtr_forDbRecord_guid(guid, tableName, datasourceName);
@@ -384,7 +412,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="guid"></param>
         /// <param name="recordId"></param>
         /// <param name="content"></param>
-        public void StoreDbModel<T>(string guid, int recordId, object content) where T : DbModel {
+        public void storeDbModel<T>(string guid, int recordId, object content) where T : DbModel {
             Type derivedType = this.GetType();
             FieldInfo fieldInfoTable = derivedType.GetField("contentTableName");
             if (fieldInfoTable == null) {
@@ -417,12 +445,12 @@ namespace Contensive.Processor.Controllers {
             try {
                 keyPtr = Regex.Replace(keyPtr, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                CacheWrapperClass cacheWrapper = new CacheWrapperClass {
+                CacheDocumentClass cacheDocument = new CacheDocumentClass {
                     saveDate = DateTime.Now,
                     invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
                     keyPtr = key
                 };
-                storeWrappedObject(keyPtr, cacheWrapper);
+                storeCacheDocument(keyPtr, cacheDocument);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
             }
@@ -436,7 +464,7 @@ namespace Contensive.Processor.Controllers {
         public void invalidateAll() {
             try {
                 string key = Regex.Replace(cacheNameGlobalInvalidationDate, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                storeWrappedObject(key, new CacheWrapperClass { saveDate = DateTime.Now });
+                storeCacheDocument(key, new CacheDocumentClass { saveDate = DateTime.Now });
                 _globalInvalidationDate = null;
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -455,17 +483,17 @@ namespace Contensive.Processor.Controllers {
                 if ((recursionLimit>0) && (!string.IsNullOrWhiteSpace(key.Trim()))) {
                     key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                     // if key is a ptr, we need to invalidate the real key
-                    CacheWrapperClass wrapper = getWrappedContent(key);
-                    if (wrapper == null) {
+                    CacheDocumentClass cacheDocument = getCacheDocument(key);
+                    if (cacheDocument == null) {
                         // no cache for this key, if this is a dependency for another key, save invalidated
-                        storeWrappedObject(key, new CacheWrapperClass { saveDate = DateTime.Now });
+                        storeCacheDocument(key, new CacheDocumentClass { saveDate = DateTime.Now });
                     } else { 
-                        if (!string.IsNullOrWhiteSpace(wrapper.keyPtr)) {
+                        if (!string.IsNullOrWhiteSpace(cacheDocument.keyPtr)) {
                             // this key is an alias, invalidate it's parent key
-                            invalidate(wrapper.keyPtr, --recursionLimit);
+                            invalidate(cacheDocument.keyPtr, --recursionLimit);
                         } else {
                             // key is a valid cache, invalidate it
-                            storeWrappedObject(key, new CacheWrapperClass { saveDate = DateTime.Now });
+                            storeCacheDocument(key, new CacheDocumentClass { saveDate = DateTime.Now });
                         }
                     }
                 }
@@ -483,40 +511,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="recordId"></param>
         public void invalidateDbRecord(int recordId, string tableName, string dataSourceName = "default") {
             invalidate(createCacheKey_forDbRecord(recordId, tableName, dataSourceName));
-        }
-        //
-        //========================================================================
-        /// <summary>
-        /// invalidate all cache entries to this table. "dbTableName"
-        /// when any cache is saved, it should include a dependancy on a cachename=dbtablename
-        /// </summary>
-        /// <param name="dbTableName"></param>
-        public void invalidateAllKeysInTable(string dbTableName) {
-            try {
-                invalidate(createCacheKey_forDbTable(dbTableName));
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-            }
-        }
-        //
-        public void legacyInvalidateAllKeysInTableList(List<string> tableNameList) {
-            foreach (var tableName in tableNameList) {
-                core.cache.invalidateAllKeysInTable(tableName);
-            }
-        }
-        //
-        public void legacyInvalidateAllKeysInContentList(string ContentNameList) {
-            if (!string.IsNullOrEmpty(ContentNameList)) {
-                List<string> tableNameList = new List<string>();
-                foreach (var contentName in new List<string>(ContentNameList.ToLowerInvariant().Split(','))) {
-                    string tableName = MetadataController.getContentTablename(core, contentName).ToLowerInvariant();
-                    if (!tableNameList.Contains(tableName)) {
-                        tableNameList.Add(tableName);
-                    }
-                    legacyInvalidateAllKeysInTableList(tableNameList);
-                }
-            }
-
         }
         //
         //====================================================================================================
@@ -547,19 +541,6 @@ namespace Contensive.Processor.Controllers {
             result = Regex.Replace(result, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return result;
         }
-        /// <summary>
-        /// table keys should only be used to invalidate all records in a table by adding this key as a dependant key to all cache containing records in the table.
-        /// Not automatic (yet)
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-        public static string createCacheKey_forDbTable( string tableName, string dataSourceName ) {
-            string key = (String.IsNullOrWhiteSpace(dataSourceName)) ? "dbtable/default/" + tableName.Trim() + "/" : "dbtable/" + dataSourceName.Trim() + "/" + tableName.Trim() + "/";
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-            return key;
-        }
-        //
-        public static string createCacheKey_forDbTable(string tableName) => createCacheKey_forDbTable(tableName, "default");
         /// <summary>
         /// return the standard key for Db records. 
         /// setObject for this key should only be the object model for this id
@@ -625,10 +606,10 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// cache data wrapper to include tags and save datetime
+        /// cache document that holds the data object and other values used for control
         /// </summary>
         [Serializable]
-        public class CacheWrapperClass {
+        public class CacheDocumentClass {
             //
             // if populated, all other properties are ignored and the primary tag b
             public string keyPtr;
@@ -657,7 +638,7 @@ namespace Contensive.Processor.Controllers {
             get {
                 bool setDefault = false;
                 if (_globalInvalidationDate == null) {
-                    CacheWrapperClass dataObject = getWrappedContent(cacheNameGlobalInvalidationDate);
+                    CacheDocumentClass dataObject = getCacheDocument(cacheNameGlobalInvalidationDate);
                     if (dataObject != null) {
                         _globalInvalidationDate = dataObject.saveDate;
                     }
@@ -674,7 +655,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (setDefault) {
                     _globalInvalidationDate = new DateTime(1990, 8, 7);
-                    storeWrappedObject(cacheNameGlobalInvalidationDate, new CacheWrapperClass { saveDate = encodeDate(_globalInvalidationDate) });
+                    storeCacheDocument(cacheNameGlobalInvalidationDate, new CacheDocumentClass { saveDate = encodeDate(_globalInvalidationDate) });
                 }
                 return encodeDate(_globalInvalidationDate);
             }
@@ -721,10 +702,10 @@ namespace Contensive.Processor.Controllers {
         /// save object directly to cache.
         /// </summary>
         /// <param name="key"></param>
-        /// <param name="wrappedObject">Either a string, a date, or a serializable object</param>
+        /// <param name="cacheDocument">Either a string, a date, or a serializable object</param>
         /// <param name="invalidationDate"></param>
         /// <remarks></remarks>
-        private void storeWrappedObject(string key, CacheWrapperClass wrappedObject) {
+        private void storeCacheDocument(string key, CacheDocumentClass cacheDocument) {
             try {
                 //
                 if (string.IsNullOrEmpty(key)) {
@@ -732,17 +713,17 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     string serverKey = createServerKey(key);
                     //
-                    LogController.logTrace(core, "storeWrappedObject(" + serverKey + "), expires [" + wrappedObject.invalidationDate.ToString() + "], depends on [" + string.Join(",", wrappedObject.dependentKeyList) + "], points to [" + string.Join(",", wrappedObject.keyPtr) + "]");
+                    LogController.logTrace(core, "storeCacheDocument(" + serverKey + "), expires [" + cacheDocument.invalidationDate.ToString() + "], depends on [" + string.Join(",", cacheDocument.dependentKeyList) + "], points to [" + string.Join(",", cacheDocument.keyPtr) + "]");
                     //
                     if (core.serverConfig.enableLocalMemoryCache) {
                         //
                         // -- save local memory cache
-                        storeWrappedObject_MemoryCache(serverKey, wrappedObject);
+                        storeCacheDocument_MemoryCache(serverKey, cacheDocument);
                     }
                     if (core.serverConfig.enableLocalFileCache) {
                         //
                         // -- save local file cache
-                        string serializedData = Newtonsoft.Json.JsonConvert.SerializeObject(wrappedObject);
+                        string serializedData = Newtonsoft.Json.JsonConvert.SerializeObject(cacheDocument);
                         using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, serverKey)) {
                             mutex.WaitOne();
                             core.privateFiles.saveFile("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"), serializedData);
@@ -753,7 +734,7 @@ namespace Contensive.Processor.Controllers {
                         if (remoteCacheInitialized) {
                             //
                             // -- save remote cache
-                            cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, serverKey, wrappedObject, wrappedObject.invalidationDate);
+                            cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, serverKey, cacheDocument, cacheDocument.invalidationDate);
                         }
                     }
                 }
@@ -764,17 +745,68 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// save cacheWrapper to memory cache
+        /// save cacheDocument to memory cache
         /// </summary>
         /// <param name="serverKey">key converted to serverKey with app name and code version</param>
-        /// <param name="wrappedObject"></param>
-        public void storeWrappedObject_MemoryCache(string serverKey, CacheWrapperClass wrappedObject) {
+        /// <param name="cacheDocument"></param>
+        public void storeCacheDocument_MemoryCache(string serverKey, CacheDocumentClass cacheDocument) {
             ObjectCache cache = MemoryCache.Default;
             CacheItemPolicy policy = new CacheItemPolicy {
-                AbsoluteExpiration = wrappedObject.invalidationDate // DateTime.Now.AddMinutes(100);
+                AbsoluteExpiration = cacheDocument.invalidationDate // DateTime.Now.AddMinutes(100);
             };
-            cache.Set(serverKey, wrappedObject, policy);
+            cache.Set(serverKey, cacheDocument, policy);
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// update the cache object that holds the last modified record for any record in this table
+        /// Cache objects that want to be automatically invalidated if any record in a table is updated can add a dependency on this key
+        /// </summary>
+        /// <param name="core"></param>
+        public void store_LastRecordModifiedDate(string tableName) {
+            storeObject(createCacheKey_LastRecordModifiedDate(tableName),DateTime.Now);
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// invalidate all cache entries that include data from this table.
+        /// when a cacheDocument is saved, it should include a dependancy on key = createCacheKey_TableObjectsInvalidationDate(tablename)
+        /// call this method after running a query that updates records that cannot be individually invalidated (like all records created before a specific date, etc.)
+        /// </summary>
+        /// <param name="dbTableName"></param>
+        public void invalidateTableObjects(string dbTableName) {
+            storeObject(createCacheKey_TableObjectsInvalidationDate(dbTableName), DateTime.Now);
+            //invalidate(createCacheKey_TableObjectsInvalidationDate(dbTableName));
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create a key for this table that holds the date of before which all objects created with any data from this table should be invalidated
+        /// see CacheController header for more explaination
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public static string createCacheKey_TableObjectsInvalidationDate(string tableName, string dataSourceName) {
+            string key = "tableobjectsinvalidationdate/" + ((String.IsNullOrWhiteSpace(dataSourceName)) ? "default/" + tableName.Trim().ToLowerInvariant() + "/" : dataSourceName.Trim().ToLowerInvariant() + "/" + tableName.Trim().ToLowerInvariant() + "/");
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
+            return key;
+        }
+        //
+        //====================================================================================================
+        //
+        public static string createCacheKey_TableObjectsInvalidationDate(string tableName) => createCacheKey_TableObjectsInvalidationDate(tableName, "default");
+        //
+        //====================================================================================================
+        //
+        public static string createCacheKey_LastRecordModifiedDate(string tableName, string dataSourceName) {
+            string key = "lastrecordmodifieddate/" + ((String.IsNullOrWhiteSpace(dataSourceName)) ? "default/" + tableName.Trim().ToLowerInvariant() + "/" : dataSourceName.Trim().ToLowerInvariant() + "/" + tableName.Trim().ToLowerInvariant() + "/");
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
+            return key;
+        }
+        //
+        //====================================================================================================
+        //
+        public static string createCacheKey_LastRecordModifiedDate(string tableName) => createCacheKey_LastRecordModifiedDate(tableName, "default");
         //
         //====================================================================================================
         #region  IDisposable Support 

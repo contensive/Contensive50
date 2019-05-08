@@ -26,16 +26,15 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         // -- instance properties
+        /// <summary>
+        /// A structured json that holds the list of addons to run on this page. Each element in this list includes
+        /// - addonGuid
+        /// - instanceId (guid of content, etc)
+        /// - childList
+        /// </summary>
+        public string addonList { get; set; }
         public string bodyHTML { get; set; }
-        // Public Property BodyTag As String
         public bool isSecure { get; set; }
-        // Public Property JSEndBody As String
-        // Public Property JSFilename As String
-        // Public Property JSHead As String
-        // Public Property JSOnLoad As String
-        // Public Property Link As String
-        // Public Property MobileBodyHTML As String
-        // Public Property OtherHeadTags As String
         //
         //====================================================================================================
         public static PageTemplateModel addEmpty(CoreController core) {
@@ -112,7 +111,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<PageTemplateModel>(core, recordId);
+            invalidateCacheOfRecord<PageTemplateModel>(core, recordId);
         }
         //
         //====================================================================================================

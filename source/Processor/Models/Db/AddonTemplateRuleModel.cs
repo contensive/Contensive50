@@ -92,7 +92,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<AddonTemplateRuleModel>(core, recordId);
+            invalidateCacheOfRecord<AddonTemplateRuleModel>(core, recordId);
         }
         //
         //====================================================================================================

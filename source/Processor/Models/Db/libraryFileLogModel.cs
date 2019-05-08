@@ -106,7 +106,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<LibraryFileLogModel>(core, recordId);
+            invalidateCacheOfRecord<LibraryFileLogModel>(core, recordId);
         }
         //
         //====================================================================================================

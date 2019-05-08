@@ -143,14 +143,14 @@ namespace Contensive.Processor.Controllers {
                 swProcess.Start();
                 //
                 foreach (KeyValuePair<string, Models.Domain.AppConfigModel> appKVP in serverCore.serverConfig.apps) {
-                    //
-                    // query tasks that need to be run
-                    //
-                    using (CPClass cpApp = new CPClass(appKVP.Value.name)) {
+                    if ( appKVP.Value.enabled && appKVP.Value.appStatus.Equals(AppConfigModel.AppStatusEnum.ok)){
                         //
-                        LogController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "]");
+                        // query tasks that need to be run
                         //
-                        if (cpApp.core.appConfig.appStatus == AppConfigModel.AppStatusEnum.ok) {
+                        using (CPClass cpApp = new CPClass(appKVP.Value.name)) {
+                            //
+                            LogController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "]");
+                            //
                             try {
                                 int recordsAffected = 0;
                                 int sequentialTaskCount = 0;
@@ -161,7 +161,7 @@ namespace Contensive.Processor.Controllers {
                                         + "\r\n BEGIN TRANSACTION"
                                         + "\r\n update cctasks set cmdRunner=" + DbController.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
                                         + "\r\n COMMIT TRANSACTION";
-                                    cpApp.core.db.executeNonQuery(sql,ref recordsAffected);
+                                    cpApp.core.db.executeNonQuery(sql, ref recordsAffected);
                                     if (recordsAffected == 0) {
                                         //
                                         // -- no tasks found
@@ -171,14 +171,14 @@ namespace Contensive.Processor.Controllers {
                                         swTask.Start();
                                         //
                                         // -- track multiple executions
-                                        if (sequentialTaskCount>0) {
+                                        if (sequentialTaskCount > 0) {
                                             LogController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "], multiple tasks run in a single cycle, sequentialTaskCount [" + sequentialTaskCount + "]");
                                         }
                                         //
                                         // -- two execution methods, 1) run task here, 2) start process and wait (so bad addon code does not memory link)
                                         bool runInServiceProcess = cpApp.Site.GetBoolean("Run tasks in service process");
                                         string cliPathFilename = cpApp.core.programFiles.localAbsRootPath + "cc.exe";
-                                        if(!runInServiceProcess && !System.IO.File.Exists(cliPathFilename)) {
+                                        if (!runInServiceProcess && !System.IO.File.Exists(cliPathFilename)) {
                                             runInServiceProcess = true;
                                             LogController.logError(cpApp.core, "TaskRunner cannot run out of process because command line program cc.exe not found in program files folder [" + cpApp.core.programFiles.localAbsRootPath + "]");
                                         }

@@ -102,9 +102,8 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Create a key for a table. A table key is used as a dependent key to invalidate all record cache objects from a table.
-        /// When storing a record object, add the tablekey as a dependent key
-        /// If a db operation modifies records and you cant invalidate the individual records, invalidate the table with this key
+        /// Use only as a dependency key. Save any cache object with this key as a dependency, and if any record in this table is updated, it will invalidate your cache object
+        /// Internally saved as lastrecordmodifieddate.
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
@@ -113,7 +112,8 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Create a key for a database table. Use this key to invalidate all keys based on thsi table using dependent keys.
+        /// Use only as a dependency key. Save any cache object with this key as a dependency, and if any record in this table is updated, it will invalidate your cache object
+        /// Internally saved as lastrecordmodifieddate.
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>

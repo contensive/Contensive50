@@ -170,7 +170,9 @@ namespace Contensive.Processor.Controllers {
                 // -- log with even so we can pass in the type of our wrapper
                 LogEventInfo logEvent = new LogEventInfo(nLogLevel, nlogLogger.Name, message);
                 nlogLogger.Log(typeof(LogController), logEvent);
-            } catch (Exception) {
+            } catch (Exception ex) {
+                string thing1 = ex.ToString();
+                string thing2 = thing1;
                 // -- ignore errors in error handling
             } finally {
                 //

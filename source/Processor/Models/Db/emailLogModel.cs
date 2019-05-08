@@ -102,7 +102,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<EmailLogModel>(core, recordId);
+            invalidateCacheOfRecord<EmailLogModel>(core, recordId);
         }
         //
         //====================================================================================================

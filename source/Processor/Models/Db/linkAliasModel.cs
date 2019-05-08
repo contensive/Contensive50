@@ -104,14 +104,14 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<LinkAliasModel>(core, recordId);
+            invalidateCacheOfRecord<LinkAliasModel>(core, recordId);
             Domain.RouteMapModel.invalidateCache(core);
             core.routeMapCacheClear();
         }
         //
         //====================================================================================================
         public static void invalidateTableCache(CoreController core) {
-            invalidateTableCache<LinkAliasModel>(core);
+            invalidateCacheOfTable<LinkAliasModel>(core);
             Domain.RouteMapModel.invalidateCache(core);
             core.routeMapCacheClear();
         }

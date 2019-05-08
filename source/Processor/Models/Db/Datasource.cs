@@ -82,12 +82,12 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<DataSourceModel>(core, recordId);
+            invalidateCacheOfRecord<DataSourceModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void invalidateTableCache(CoreController core) {
-            invalidateTableCache<DataSourceModel>(core);
+            invalidateCacheOfTable<DataSourceModel>(core);
         }
         //
         //====================================================================================================

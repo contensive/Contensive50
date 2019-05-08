@@ -29,7 +29,7 @@ namespace Contensive.Addons.Primitives {
                 CoreController core = ((CPClass)cp).core;
                 //
                 // -- Email click detected
-                EmailDropModel emailDrop = EmailDropModel.create(core, core.docProperties.getInteger(rnEmailClickFlag));
+                EmailDropModel emailDrop = DbModel.create<EmailDropModel>(core, core.docProperties.getInteger(rnEmailClickFlag));
                 if (emailDrop != null) {
                     PersonModel recipient = PersonModel.create(core, core.docProperties.getInteger(rnEmailMemberID));
                     if (recipient != null) {

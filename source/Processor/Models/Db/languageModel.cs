@@ -103,7 +103,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<LanguageModel>(core, recordId);
+            invalidateCacheOfRecord<LanguageModel>(core, recordId);
         }
         //
         //====================================================================================================

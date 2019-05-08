@@ -104,12 +104,12 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<RemoteQueryModel>(core, recordId);
+            invalidateCacheOfRecord<RemoteQueryModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void invalidateTableCache(CoreController core) {
-            invalidateTableCache<RemoteQueryModel>(core);
+            invalidateCacheOfTable<RemoteQueryModel>(core);
         }
         //
         //====================================================================================================

@@ -117,12 +117,12 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<ContentModel>(core, recordId);
+            invalidateCacheOfRecord<ContentModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void invalidateTableCache(CoreController core) {
-            invalidateTableCache<ContentModel>(core);
+            invalidateCacheOfTable<ContentModel>(core);
         }
         //
         //====================================================================================================

@@ -267,6 +267,34 @@ namespace Contensive.Processor.Models.Db {
                             propertyValue = metaData.fields[propertyName.ToLowerInvariant()].defaultValue;
                             switch (propertyName.ToLowerInvariant()) {
                                 case "id":
+                                    // -- leave id as-is
+                                    break;
+                                case "ccguid":
+                                    // -- leave guid created during addEmpty
+                                    break;
+                                case "active":
+                                    // -- set true
+                                    modelProperty.SetValue(result, true, null);
+                                    break;
+                                case "contentcontrolid":
+                                    // -- set to content's id
+                                    modelProperty.SetValue(result, metaData.id, null);
+                                    break;
+                                case "createdby":
+                                    // -- set to current user if available
+                                    if (core.session.user != null) { modelProperty.SetValue(result, core.session.user.id, null); }
+                                    break;
+                                case "dateadded":
+                                    // -- set to now
+                                    modelProperty.SetValue(result, DateTime.Now, null);
+                                    break;
+                                case "modifiedby":
+                                    // -- set to current user if available
+                                    if (core.session.user != null) { modelProperty.SetValue(result, core.session.user.id, null); }
+                                    break;
+                                case "modifieddate":
+                                    // -- set to now
+                                    modelProperty.SetValue(result, DateTime.Now, null);
                                     break;
                                 default:
                                     switch (modelProperty.PropertyType.Name) {
@@ -750,11 +778,18 @@ namespace Contensive.Processor.Models.Db {
                     }
                 }
                 //
-                // -- object is here, but the cache was invalidated, setting
+                // -- store the cache object referenced by id
                 string cacheKey = CacheController.createCacheKey_forDbRecord(id, tableName, datasourceName);
                 core.cache.storeObject(cacheKey, this);
+                //
+                // -- store the cache object ptr so this object can be referenced from its guid (as well as id)
                 core.cache.storePtr(CacheController.createCachePtr_forDbRecord_guid(ccguid, tableName, datasourceName), cacheKey);
+                //
+                // -- if the name for this table is unique, store the cache object ptr for name so this object can be referenced by name
                 if (derivedNameFieldIsUnique(instanceType)) core.cache.storePtr(CacheController.createCachePtr_forDbRecord_uniqueName(name, tableName, datasourceName), cacheKey);
+                //
+                // -- update the cache Last-Record-Modified-Date
+                storeCacheLastRecordModifiedDate(core, tableName);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -797,7 +832,7 @@ namespace Contensive.Processor.Models.Db {
                 // todo change cache invalidate to key ptr, and we do not need to open the record first
                 DbModel instance = create<DbModel>(core, guid);
                 if (instance == null) { return; }
-                invalidateRecordCache<T>(core, instance.id);
+                invalidateCacheOfRecord<T>(core, instance.id);
                 using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
                     db.deleteTableRecord(guid, derivedTableName(typeof(T)));
                 }
@@ -864,38 +899,6 @@ namespace Contensive.Processor.Models.Db {
             var list = createList<T>(core, sqlCriteria, sqlOrderBy, new List<string>());
             if (list.Count==0 ) { return null; }
             return list.First();
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// invalidate the cache entry for a record
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="recordId"></param>
-        public static void invalidateRecordCache<T>(CoreController core, int recordId) where T : DbModel {
-            try {
-                if (isAppInvalid(core)) { return; }
-                core.cache.invalidateDbRecord(recordId, derivedTableName(typeof(T)));
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// invalidate all cache entries for the table
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="recordId"></param>
-        public static void invalidateTableCache<T>(CoreController core) where T : DbModel {
-            try {
-                if (isAppInvalid(core)) { return; }
-                core.cache.invalidateAllKeysInTable(derivedTableName(typeof(T)));
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
-            }
         }
         //
         //====================================================================================================
@@ -986,68 +989,6 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// Read record cache by id
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="core"></param>
-        /// <param name="recordId"></param>
-        /// <returns></returns>
-        private static T readRecordCache<T>(CoreController core, int recordId) where T : DbModel {
-            T result = core.cache.getObject<T>(CacheController.createCacheKey_forDbRecord(recordId, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
-            restoreCacheDataObjects(core, result);
-            return result;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Read a record cache by guid
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="core"></param>
-        /// <param name="ccGuid"></param>
-        /// <returns></returns>
-        private static T readRecordCacheByGuidPtr<T>(CoreController core, string ccGuid) where T : DbModel {
-            T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_guid(ccGuid, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
-            restoreCacheDataObjects(core, result);
-            return result;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Read a record cache using unique name (valid only if hasUniqueName is true)
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="core"></param>
-        /// <param name="uniqueName"></param>
-        /// <returns></returns>
-        private static T readRecordCacheByUniqueNamePtr<T>(CoreController core, string uniqueName) where T : DbModel {
-            T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_uniqueName(uniqueName, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
-            restoreCacheDataObjects(core, result);
-            return result;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// After reading a cached Db object, go through instance properties and verify internal core objects populated
-        /// </summary>
-        private static void restoreCacheDataObjects<T>(CoreController core, T restoredInstance) {
-            if (restoredInstance == null) { return; }
-            foreach (PropertyInfo instanceProperty in restoredInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
-                // todo change test to is-subsclass-of-fieldCdnFile
-                switch (instanceProperty.PropertyType.Name) {
-                    case "FieldTypeTextFile":
-                    case "FieldTypeCSSFile":
-                    case "FieldTypeHTMLFile":
-                    case "FieldTypeJavascriptFile":
-                        FieldTypeFileBase fileProperty = (FieldTypeFileBase)instanceProperty.GetValue(restoredInstance);
-                        fileProperty.internalcore = core;
-                        break;
-                }
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// create an sql select for this model
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -1092,7 +1033,7 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public static string getTableCacheKey<T>(CoreController core) {
             try {
-                return CacheController.createCacheKey_forDbTable(derivedTableName(typeof(T)));
+                return CacheController.createCacheKey_TableObjectsInvalidationDate(derivedTableName(typeof(T)));
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -1213,6 +1154,109 @@ namespace Contensive.Processor.Models.Db {
                 }
                 return false;
             }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// invalidate the cache entry for a record
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="recordId"></param>
+        public static void invalidateCacheOfRecord<T>(CoreController core, int recordId) where T : DbModel {
+            try {
+                if (isAppInvalid(core)) { return; }
+                core.cache.invalidateDbRecord(recordId, derivedTableName(typeof(T)));
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// invalidate all cache entries for the table (set invalidate-table-objects-date for this table -- see cache controller for definitions)
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="recordId"></param>
+        public static void invalidateCacheOfTable<T>(CoreController core) where T : DbModel {
+            try {
+                if (isAppInvalid(core)) { return; }
+                core.cache.invalidateTableObjects(derivedTableName(typeof(T)));
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Read record cache by id
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        private static T readRecordCache<T>(CoreController core, int recordId) where T : DbModel {
+            T result = core.cache.getObject<T>(CacheController.createCacheKey_forDbRecord(recordId, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
+            restoreCacheDataObjects(core, result);
+            return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Read a record cache by guid
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="ccGuid"></param>
+        /// <returns></returns>
+        private static T readRecordCacheByGuidPtr<T>(CoreController core, string ccGuid) where T : DbModel {
+            T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_guid(ccGuid, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
+            restoreCacheDataObjects(core, result);
+            return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Read a record cache using unique name (valid only if hasUniqueName is true)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="uniqueName"></param>
+        /// <returns></returns>
+        private static T readRecordCacheByUniqueNamePtr<T>(CoreController core, string uniqueName) where T : DbModel {
+            T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_uniqueName(uniqueName, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
+            restoreCacheDataObjects(core, result);
+            return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// After reading a cached Db object, go through instance properties and verify internal core objects populated
+        /// </summary>
+        private static void restoreCacheDataObjects<T>(CoreController core, T restoredInstance) {
+            if (restoredInstance == null) { return; }
+            foreach (PropertyInfo instanceProperty in restoredInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
+                // todo change test to is-subsclass-of-fieldCdnFile
+                switch (instanceProperty.PropertyType.Name) {
+                    case "FieldTypeTextFile":
+                    case "FieldTypeCSSFile":
+                    case "FieldTypeHTMLFile":
+                    case "FieldTypeJavascriptFile":
+                        FieldTypeFileBase fileProperty = (FieldTypeFileBase)instanceProperty.GetValue(restoredInstance);
+                        fileProperty.internalcore = core;
+                        break;
+                }
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// update the cache object that holds the last modified record for any record in this table. See cacheController for explaination of Last-Record-Modified-Date key
+        /// </summary>
+        /// <param name="core"></param>
+        public static void storeCacheLastRecordModifiedDate(CoreController core, string tableName) {
+            core.cache.store_LastRecordModifiedDate(tableName);
         }
     }
 }

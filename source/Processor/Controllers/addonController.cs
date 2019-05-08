@@ -1632,24 +1632,15 @@ namespace Contensive.Processor.Controllers {
                                 object AddonReturnObj = AddonObj.Execute(core.cp_forAddonExecutionOnly);
                                 if (AddonReturnObj != null) {
                                     switch (AddonReturnObj.GetType().ToString()) {
-                                        case "System.Object[,]":
+                                        case "System.String":
                                             //
-                                            //   a 2-D Array of objects
-                                            //   each cell can contain 
-                                            //   return array for internal use constructing data/layout merge
-                                            //   return xml as dataset to another computer
-                                            //   return json as dataset for browser
-                                            //
-                                            break;
-                                        case "System.String[,]":
-                                            //
-                                            //   return array for internal use constructing data/layout merge
-                                            //   return xml as dataset to another computer
-                                            //   return json as dataset for browser
-                                            //
+                                            // -- return simple string
+                                            result = (string)AddonReturnObj;
                                             break;
                                         default:
-                                            result = AddonReturnObj.ToString();
+                                            //
+                                            // -- if the addon returned an object, json serialize
+                                            result = Newtonsoft.Json.JsonConvert.SerializeObject(AddonReturnObj);
                                             break;
                                     }
                                 }

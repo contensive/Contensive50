@@ -51,7 +51,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 processTimer.Enabled = false;
                 using (CPClass cp = new CPClass()) {
-                    LogController.logTrace(cp.core,"stopTimerEvents");
+                    LogController.logTrace(cp.core, "stopTimerEvents");
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    LogController.handleError(cp.core,ex);
+                    LogController.handleError(cp.core, ex);
                 }
             }
             return returnStartedOk;
@@ -114,7 +114,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.forceNLog("TaskScheduler exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", LogController.LogLevel.Info);
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    LogController.handleError(cp.core,ex);
+                    LogController.handleError(cp.core, ex);
                 }
             } finally {
                 ProcessTimerInProcess = false;
@@ -130,12 +130,9 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- run tasks for each app
                 foreach (KeyValuePair<string, Models.Domain.AppConfigModel> appKvp in coreServer.serverConfig.apps) {
-                    LogController.logTrace(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
-                    using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
-                        if (!(cpApp.core.appConfig.appStatus == AppConfigModel.AppStatusEnum.ok)) {
-                            //
-                            LogController.logTrace(cpApp.core, "scheduleTasks, app status not ok");
-                        } else {
+                    if (appKvp.Value.enabled && appKvp.Value.appStatus.Equals(AppConfigModel.AppStatusEnum.ok)) {
+                        LogController.logTrace(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
+                        using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
                             //
                             // Execute Processes
                             try {
@@ -339,8 +336,8 @@ namespace Contensive.Processor.Controllers {
         }
         ~TaskSchedulerController() {
             Dispose(false);
-            
-            
+
+
         }
         #endregion
     }
