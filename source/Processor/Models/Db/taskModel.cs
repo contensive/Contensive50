@@ -6,7 +6,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class TaskModel : DbModel {
+    public class TaskModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -43,7 +43,7 @@ namespace Contensive.Processor.Models.Db {
         /// if resultDownloadId is null or 0, and the addon return is not empty, the return is saved in a file referenced here.
         /// These files should be deleted in housekeep as the tasks are deleted.
         /// </summary>
-        public DbModel.FieldTypeTextFile filename { get; set; }
+        public DbBaseModel.FieldTypeTextFile filename { get; set; }
         /// <summary>
         /// datetime when the task is started
         /// </summary>
@@ -128,17 +128,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<TaskModel>(core, recordId);
+            return DbBaseModel.getRecordName<TaskModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<TaskModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<TaskModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<TaskModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<TaskModel>(core, ccGuid);
         }
         //
         //====================================================================================================

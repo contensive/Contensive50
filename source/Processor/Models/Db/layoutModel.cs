@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class LayoutModel : DbModel {
+    public class LayoutModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const (must be public const, not property)

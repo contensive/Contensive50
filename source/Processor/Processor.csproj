@@ -209,8 +209,10 @@
     <Compile Include="Controllers\KeyPtrIndexController.cs" />
     <Compile Include="Controllers\ContentCmdController.cs" />
     <Compile Include="Models\Db\ContentFieldTypeModel.cs" />
+    <Compile Include="Models\Db\DbGenericModel.cs" />
     <Compile Include="Models\Db\MenuModel.cs" />
     <Compile Include="Models\Db\MenuPageRuleModel.cs" />
+    <Compile Include="Models\Db\DbBaseFieldsModel.cs" />
     <Compile Include="Models\Domain\AddonPanelListItemModel.cs" />
     <Compile Include="Models\Domain\CsModel.cs" />
     <Compile Include="Controllers\DbController.cs" />
@@ -323,7 +325,7 @@
     <Compile Include="Models\Db\AddonModel.cs" />
     <Compile Include="Models\Db\AddonPageRuleModel.cs" />
     <Compile Include="Models\Db\AddonTemplateRuleModel.cs" />
-    <Compile Include="Models\Db\DbModel.cs" />
+    <Compile Include="Models\Db\DbBaseModel.cs" />
     <Compile Include="Models\Db\ContentFieldHelpModel.cs" />
     <Compile Include="Models\Db\ContentFieldModel.cs" />
     <Compile Include="Models\Db\ContentModel.cs" />

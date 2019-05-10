@@ -109,13 +109,13 @@ namespace Contensive.Processor {
         //
         public override string GetName(string GroupIdOrGuid) {
             if (GroupIdOrGuid.IsNumeric()) {
-                return DbModel.getRecordName<GroupModel>(core, GenericController.encodeInteger(GroupIdOrGuid));
+                return DbBaseModel.getRecordName<GroupModel>(core, GenericController.encodeInteger(GroupIdOrGuid));
             } else {
-                return DbModel.getRecordName<GroupModel>(core, GroupIdOrGuid);
+                return DbBaseModel.getRecordName<GroupModel>(core, GroupIdOrGuid);
             }
         }
         public override string GetName(int GroupId) 
-            => DbModel.getRecordName<GroupModel>(core, GroupId);
+            => DbBaseModel.getRecordName<GroupModel>(core, GroupId);
         //
         //====================================================================================================
         //

@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class PageTemplateModel : DbModel {
+    public class PageTemplateModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -116,17 +116,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<PageTemplateModel>(core, recordId);
+            return DbBaseModel.getRecordName<PageTemplateModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<PageTemplateModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<PageTemplateModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<PageTemplateModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<PageTemplateModel>(core, ccGuid);
         }
         //
         //====================================================================================================

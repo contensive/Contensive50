@@ -44,7 +44,7 @@ namespace Contensive.Addons.Primitives {
                             // -- log entry to track the result of this email drop
                             int emailDropId = core.docProperties.getInteger(rnEmailBlockRequestDropID);
                             if (emailDropId != 0) {
-                                EmailDropModel emailDrop = DbModel.create<EmailDropModel>(core, emailDropId);
+                                EmailDropModel emailDrop = DbBaseModel.create<EmailDropModel>(core, emailDropId);
                                 if (emailDrop != null) {
                                     EmailLogModel log = new EmailLogModel() {
                                         name = "User " + recipient.name + " clicked linked spam block from email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString(),

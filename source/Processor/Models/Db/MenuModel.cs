@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class MenuModel : DbModel {
+    public class MenuModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const (must be const not property)

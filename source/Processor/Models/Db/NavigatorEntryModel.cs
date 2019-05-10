@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class NavigatorEntryModel : DbModel {
+    public class NavigatorEntryModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -122,17 +122,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<NavigatorEntryModel>(core, recordId);
+            return DbBaseModel.getRecordName<NavigatorEntryModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<NavigatorEntryModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<NavigatorEntryModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<NavigatorEntryModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<NavigatorEntryModel>(core, ccGuid);
         }
         //
         //====================================================================================================

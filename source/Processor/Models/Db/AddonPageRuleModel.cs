@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class AddonPageRuleModel : DbModel {
+    public class AddonPageRuleModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -97,17 +97,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<AddonPageRuleModel>(core, recordId);
+            return DbBaseModel.getRecordName<AddonPageRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<AddonPageRuleModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<AddonPageRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<AddonPageRuleModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<AddonPageRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================

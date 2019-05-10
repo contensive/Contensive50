@@ -2683,7 +2683,7 @@ namespace Contensive.Processor.Controllers {
                     int cutClipRecordID = GenericController.encodeInteger(clipBoardArray[1]);
                     if (!pasteParentContentMetadata.isParentOf(core, cutClipContentID)) { return; }
                     var clipChildContentMetadata = Models.Domain.ContentMetadataModel.create(core, cutClipContentID);
-                    if (DbModel.isChildOf<PageContentController>(core, pasteParentRecordID, cutClipRecordID, new List<int>())) {
+                    if (DbBaseModel.isChildOf<PageContentController>(core, pasteParentRecordID, cutClipRecordID, new List<int>())) {
                         ErrorController.addUserError(core, "The paste operation failed because the destination location is a child of the clipboard data record.");
                     } else {
                         //

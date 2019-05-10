@@ -326,7 +326,7 @@ namespace Contensive.Processor.Controllers {
                                         recordId = GenericController.encodeInteger(fieldMeta[f_MemberSelectGroupId, CFieldPtr]);
                                         RecordName = "";
                                         if (recordId > 0) {
-                                            RecordName = Models.Db.DbModel.getRecordName<Models.Db.GroupModel>(core, recordId);
+                                            RecordName = Models.Db.DbBaseModel.getRecordName<Models.Db.GroupModel>(core, recordId);
                                         }
                                         sb.Append(" MemberSelectGroup=\"" + xmlValueText(fieldMeta[f_MemberSelectGroupId, CFieldPtr]) + "\"");
 

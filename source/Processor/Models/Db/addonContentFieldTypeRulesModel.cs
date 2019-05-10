@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class AddonContentFieldTypeRulesModel : DbModel {
+    public class AddonContentFieldTypeRulesModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -97,17 +97,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<AddonContentFieldTypeRulesModel>(core, recordId);
+            return DbBaseModel.getRecordName<AddonContentFieldTypeRulesModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<AddonContentFieldTypeRulesModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<AddonContentFieldTypeRulesModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<AddonContentFieldTypeRulesModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<AddonContentFieldTypeRulesModel>(core, ccGuid);
         }
         //
         //====================================================================================================

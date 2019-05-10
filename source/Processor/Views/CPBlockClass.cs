@@ -175,7 +175,7 @@ namespace Contensive.Processor {
                 if (layoutRecordNameOrGuid.IsNumeric()) {
                     //
                     // -- recordId
-                    layout = DbModel.create<LayoutModel>(cp.core, GenericController.encodeInteger(layoutRecordNameOrGuid));
+                    layout = DbBaseModel.create<LayoutModel>(cp.core, GenericController.encodeInteger(layoutRecordNameOrGuid));
                 } else if (GenericController.isGuid(layoutRecordNameOrGuid)) {
                     //
                     // -- record guid

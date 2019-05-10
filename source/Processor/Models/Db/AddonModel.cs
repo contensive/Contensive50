@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class AddonModel : DbModel {
+    public class AddonModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -174,17 +174,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<AddonModel>(core, recordId);
+            return DbBaseModel.getRecordName<AddonModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<AddonModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<AddonModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<AddonModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<AddonModel>(core, ccGuid);
         }
         //
         public static List<AddonModel> createList_pageDependencies(CoreController core, int pageId) {

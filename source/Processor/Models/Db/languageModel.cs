@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class LanguageModel : DbModel {
+    public class LanguageModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -108,17 +108,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<LanguageModel>(core, recordId);
+            return DbBaseModel.getRecordName<LanguageModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<LanguageModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<LanguageModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<LanguageModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<LanguageModel>(core, ccGuid);
         }
         //
         //====================================================================================================

@@ -254,7 +254,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // -- save output
                                     if (task.resultDownloadId > 0) {
-                                        var download = DbModel.create<DownloadModel>(cp.core, task.resultDownloadId);
+                                        var download = DbBaseModel.create<DownloadModel>(cp.core, task.resultDownloadId);
                                         if (download != null) {
                                             if (string.IsNullOrEmpty(download.name)) {
                                                 download.name = "Download";

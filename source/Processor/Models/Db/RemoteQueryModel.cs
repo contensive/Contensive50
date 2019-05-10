@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class RemoteQueryModel : DbModel {
+    public class RemoteQueryModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -114,17 +114,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<RemoteQueryModel>(core, recordId);
+            return DbBaseModel.getRecordName<RemoteQueryModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<RemoteQueryModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<RemoteQueryModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<RemoteQueryModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<RemoteQueryModel>(core, ccGuid);
         }
         //
         //====================================================================================================

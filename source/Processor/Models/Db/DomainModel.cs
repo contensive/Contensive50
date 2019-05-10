@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class DomainModel : DbModel {
+    public class DomainModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -134,17 +134,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<DomainModel>(core, recordId);
+            return DbBaseModel.getRecordName<DomainModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<DomainModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<DomainModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<DomainModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<DomainModel>(core, ccGuid);
         }
         //
         //====================================================================================================

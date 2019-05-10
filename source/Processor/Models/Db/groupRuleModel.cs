@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class GroupRuleModel : DbModel {
+    public class GroupRuleModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -104,17 +104,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<GroupRuleModel>(core, recordId);
+            return DbBaseModel.getRecordName<GroupRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<GroupRuleModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<GroupRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<GroupRuleModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<GroupRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================

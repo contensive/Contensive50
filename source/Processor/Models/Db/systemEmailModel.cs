@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class SystemEmailModel : DbModel {
+    public class SystemEmailModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -117,17 +117,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<SystemEmailModel>(core, recordId);
+            return DbBaseModel.getRecordName<SystemEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<SystemEmailModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<SystemEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<SystemEmailModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<SystemEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================

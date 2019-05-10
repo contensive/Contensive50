@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class CopyContentModel : DbModel {
+    public class CopyContentModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -96,17 +96,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<CopyContentModel>(core, recordId);
+            return DbBaseModel.getRecordName<CopyContentModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<CopyContentModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<CopyContentModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<CopyContentModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<CopyContentModel>(core, ccGuid);
         }
         //
         //====================================================================================================

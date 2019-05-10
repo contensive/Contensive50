@@ -364,6 +364,9 @@ namespace Contensive.Processor.Models.Domain {
                                             targetMetaData.parentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Parent", DefaultMetaData.parentName);
                                             targetMetaData.whereClause = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "WhereClause", DefaultMetaData.whereClause);
                                             //
+                                            // -- determine id
+                                            targetMetaData.id = DbController.getContentId(core, ContentName);
+                                            //
                                             // Get metadata field nodes
                                             //
                                             foreach (XmlNode MetaDataChildNode in metaData_NodeWithinLoop.ChildNodes) {
@@ -439,6 +442,7 @@ namespace Contensive.Processor.Models.Domain {
                                                     metaDataField.set_manyToManyRuleContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRuleContent", DefaultMetaDataField.get_manyToManyRuleContentName(core)));
                                                     metaDataField.isModifiedSinceInstalled = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "IsModified", DefaultMetaDataField.isModifiedSinceInstalled);
                                                     metaDataField.installedByCollectionGuid = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "installedByCollectionId", DefaultMetaDataField.installedByCollectionGuid);
+                                                    metaDataField.id = DbController.getContentFieldId( core, targetMetaData.id, metaDataField.nameLc);
                                                     metaDataField.dataChanged = setAllDataChanged;
                                                     //
                                                     // ----- handle child nodes (help node)

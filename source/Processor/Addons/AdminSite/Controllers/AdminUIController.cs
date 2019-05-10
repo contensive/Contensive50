@@ -1703,7 +1703,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         BufferString = BufferString.Replace(",", "&");
                         ParentID = encodeInteger(GenericController.main_GetNameValue_Internal(core, BufferString, "Parentid"));
                     }
-                    if ((ParentID != 0) && (!DbModel.isChildOf<PageContentModel>(core, ParentID, 0, new List<int>()))) {
+                    if ((ParentID != 0) && (!DbBaseModel.isChildOf<PageContentModel>(core, ParentID, 0, new List<int>()))) {
                         //
                         // Can not paste as child of itself
                         string PasteLink = core.webServer.requestPage + "?" + core.doc.refreshQueryString;

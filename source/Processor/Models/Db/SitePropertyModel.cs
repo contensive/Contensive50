@@ -5,7 +5,7 @@ using System.Data;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class SitePropertyModel : DbModel {
+    public class SitePropertyModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -103,17 +103,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<SitePropertyModel>(core, recordId);
+            return DbBaseModel.getRecordName<SitePropertyModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<SitePropertyModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<SitePropertyModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<SitePropertyModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<SitePropertyModel>(core, ccGuid);
         }
         //
         //====================================================================================================

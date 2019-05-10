@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class EmailDropModel : DbModel {
+    public class EmailDropModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const

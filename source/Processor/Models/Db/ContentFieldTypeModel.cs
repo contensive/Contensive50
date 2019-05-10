@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class ContentFieldTypeModel : DbModel {
+    public class ContentFieldTypeModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const (must be const not property)

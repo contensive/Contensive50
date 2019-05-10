@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class ContentFieldHelpModel : DbModel {
+    public class ContentFieldHelpModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const
@@ -99,17 +99,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<ContentFieldHelpModel>(core, recordId);
+            return DbBaseModel.getRecordName<ContentFieldHelpModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<ContentFieldHelpModel>(core, ccGuid);
+            return DbBaseModel.getRecordName<ContentFieldHelpModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<ContentFieldHelpModel>(core, ccGuid);
+            return DbBaseModel.getRecordId<ContentFieldHelpModel>(core, ccGuid);
         }
         //
         //====================================================================================================

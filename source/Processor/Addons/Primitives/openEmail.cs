@@ -31,7 +31,7 @@ namespace Contensive.Addons.Primitives {
                 if (emailDropId != 0) {
                     //
                     // -- Email open detected. Log it and redirect to a 1x1 spacer
-                    EmailDropModel emailDrop = DbModel.create<EmailDropModel>(core, emailDropId);
+                    EmailDropModel emailDrop = DbBaseModel.create<EmailDropModel>(core, emailDropId);
                     if (emailDrop != null) {
                         PersonModel recipient = PersonModel.create(core, core.docProperties.getInteger(rnEmailMemberID));
                         if (recipient != null) {
