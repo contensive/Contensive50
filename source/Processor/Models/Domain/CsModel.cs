@@ -1440,12 +1440,15 @@ namespace Contensive.Processor {
                             } else {
                                 db.executeNonQuery(SQLUpdate);
                             }
+                            //
+                            // -- invalidate the special cache name used to detect a change in any record
+                            core.cache.invalidateDbRecord(id, this.contentMeta.tableName, this.contentMeta.dataSourceName);
+                            //
+                            // -- save the table_LastModified key so objects like admin-nav can depend on this key and invalidate
+                            core.cache.store_LastRecordModifiedDate(this.contentMeta.tableName);
                         }
                     }
                     this.lastUsed = DateTime.Now;
-                    //
-                    // -- invalidate the special cache name used to detect a change in any record
-                    core.cache.invalidateDbRecord(id, this.contentMeta.tableName, this.contentMeta.dataSourceName);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

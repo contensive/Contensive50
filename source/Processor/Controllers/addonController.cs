@@ -473,14 +473,21 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- Scripting code
                                 hint = "14";
+                                if (addon == null) { LogController.handleError(core, new GenericException("AddonController.execute, addon became null at hint-14"), ""); }
+                                if (addon.scriptingCode == null) { LogController.handleError(core, new GenericException("AddonController.execute, addon.scriptCode is null at hint-14"), ""); }
                                 if (addon.scriptingCode != "") {
+                                    hint = "14.1";
                                     try {
+                                        hint = "14.2";
                                         if (addon.scriptingLanguageID == (int)ScriptLanguages.Javascript) {
+                                            hint = "14.3";
                                             result += execute_Script_JScript(ref addon);
                                         } else {
+                                            hint = "14.4";
                                             result += execute_Script_VBScript(ref addon);
                                         }
                                     } catch (Exception ex) {
+                                        hint = "14.5";
                                         string addonDescription = getAddonDescription(core, addon);
                                         throw new GenericException("There was an error executing the script component of Add-on " + addonDescription + ". The details of this error follow.</p><p>" + ex.InnerException.Message + "");
                                     }
