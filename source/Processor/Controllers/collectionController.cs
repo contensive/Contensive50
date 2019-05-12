@@ -2375,7 +2375,13 @@ namespace Contensive.Processor.Controllers {
                 collectionFilePathFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
                 returnXml = core.privateFiles.readFileText(collectionFilePathFilename);
                 if (string.IsNullOrWhiteSpace(returnXml)) {
+                    //
+                    LogController.logInfo(core,"Collection Folder XML is blank, rebuild start");
+                    //                     
                     List<FolderDetail> FolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath());
+                    //
+                    LogController.logInfo(core, "Collection Folder XML rebuild, FolderList.count [" + FolderList.Count + "]");
+                    //                     
                     if (FolderList.Count > 0) {
                         foreach (FolderDetail folder in FolderList) {
                             FolderName = folder.Name;
@@ -2406,6 +2412,9 @@ namespace Contensive.Processor.Controllers {
                     }
                     returnXml = "<CollectionList>" + returnXml + "\r\n</CollectionList>";
                     core.privateFiles.saveFile(collectionFilePathFilename, returnXml);
+                    //
+                    LogController.logInfo(core, "Collection Folder XML is blank, rebuild finished and saved");
+                    //                     
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

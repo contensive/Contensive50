@@ -1446,6 +1446,7 @@ namespace Contensive.Processor.Controllers {
                         request.FilePath = joinPath(localAbsRootPath, localDosPathFilename);
                         //
                         // -- Make service call and get back the response.
+                        LogController.logInfo(core, "copyFileLocalToRemote(from [" + request.FilePath + "], to bucket [" + request.BucketName + "], to file [" + request.Key + "])");
                         PutObjectResponse response = s3Client.PutObject(request);
                         result = true;
                     }

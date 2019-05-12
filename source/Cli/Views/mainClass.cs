@@ -141,7 +141,11 @@ namespace Contensive.CLI {
                             case "--uploadfiles":
                                 //
                                 // -- upload files
-                                UploadFilesCmd.execute(cpServer, appName);
+                                UploadFilesCmd.execute(cpServer, appName, new List<string> {
+                                    getNextCmdArg(args, ref argPtr),
+                                    getNextCmdArg(args, ref argPtr),
+                                    getNextCmdArg(args, ref argPtr)
+                                });
                                 break;
                             case "--fixtablefoldercase":
                                 //
