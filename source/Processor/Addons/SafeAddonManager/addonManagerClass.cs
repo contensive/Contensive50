@@ -15,6 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Addons.SafeAddonManager {
     public class AddonManagerClass {
@@ -581,7 +582,7 @@ namespace Contensive.Addons.SafeAddonManager {
                         ColSortable[3] = false;
                         //
                         LocalCollections = new XmlDocument();
-                        LocalCollectionXML = CollectionController.getCollectionFolderConfigXml(core);
+                        LocalCollectionXML = CollectionFolderModel.getCollectionFolderConfigXml(core);
                         LocalCollections.LoadXml(LocalCollectionXML);
                         foreach (XmlNode CDef_Node in LocalCollections.DocumentElement.ChildNodes) {
                             if (GenericController.vbLCase(CDef_Node.Name) == "collection") {

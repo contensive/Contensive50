@@ -219,39 +219,45 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// Return a panel header with the header message reversed out of the left
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="HeaderMessage"></param>
-        /// <param name="RightSideMessage"></param>
+        /// <param name="leftSideMessage"></param>
+        /// <param name="rightSideMessage"></param>
         /// <returns></returns>
-        public static string getHeader(CoreController core, string HeaderMessage, string RightSideMessage = "") {
-            string s = "";
-            try {
-                if (string.IsNullOrEmpty(RightSideMessage)) {
-                    RightSideMessage = core.doc.profileStartTime.ToString("G");
-                }
-                if (isInStr(1, HeaderMessage + RightSideMessage, "\r\n")) {
-                    s = ""
-                        + "\r<td width=\"50%\" valign=Middle class=\"cchLeft\">"
-                        + nop(HeaderMessage) + "\r</td>"
-                        + "\r<td width=\"50%\" valign=Middle class=\"cchRight\">"
-                        + nop(RightSideMessage) + "\r</td>";
-                } else {
-                    s = ""
-                        + "\r<td width=\"50%\" valign=Middle class=\"cchLeft\">" + HeaderMessage + "</td>"
-                        + "\r<td width=\"50%\" valign=Middle class=\"cchRight\">" + RightSideMessage + "</td>";
-                }
-                s = ""
-                    + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
-                    + nop(s) + "\r</tr></table>"
-                    + "";
-                s = ""
-                    + "\r<div class=\"ccHeaderCon\">"
-                    + nop(s) + "\r</div>"
-                    + "";
-                //
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-            }
-            return s;
+        public static string getHeader(CoreController core, string leftSideMessage, string rightSideMessage = "", string rightSideNavHtml = "") {
+            string result =  Processor.Properties.Resources.adminNavBarHtml;
+            result = result.Replace("{navBrand}", core.appConfig.name);
+            result = result.Replace("{leftSideMessage}", leftSideMessage);
+            result = result.Replace("{rightSideMessage}", rightSideMessage);
+            result = result.Replace("{rightSideNavHtml}", rightSideNavHtml);
+            return result;
+            //string s = "";
+            //try {
+            //    if (string.IsNullOrEmpty(rightSideMessage)) {
+            //        rightSideMessage = core.doc.profileStartTime.ToString("G");
+            //    }
+            //    if (isInStr(1, leftSideMessage + rightSideMessage, "\r\n")) {
+            //        s = ""
+            //            + "\r<td width=\"50%\" valign=Middle class=\"cchLeft\">"
+            //            + nop(leftSideMessage) + "\r</td>"
+            //            + "\r<td width=\"50%\" valign=Middle class=\"cchRight\">"
+            //            + nop(rightSideMessage) + "\r</td>";
+            //    } else {
+            //        s = ""
+            //            + "\r<td width=\"50%\" valign=Middle class=\"cchLeft\">" + leftSideMessage + "</td>"
+            //            + "\r<td width=\"50%\" valign=Middle class=\"cchRight\">" + rightSideMessage + "</td>";
+            //    }
+            //    s = ""
+            //        + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
+            //        + nop(s) + "\r</tr></table>"
+            //        + "";
+            //    s = ""
+            //        + "\r<div class=\"ccHeaderCon\">"
+            //        + nop(s) + "\r</div>"
+            //        + "";
+            //    //
+            //} catch (Exception ex) {
+            //    LogController.handleError(core, ex);
+            //}
+            //return s;
         }
         //
         //====================================================================================================

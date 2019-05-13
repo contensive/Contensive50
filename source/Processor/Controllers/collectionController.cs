@@ -136,18 +136,15 @@ namespace Contensive.Processor.Controllers {
                 // -- collection needs to be 
                 if (!collectionsInstalledList.Contains(collectionGuid.ToLower())) { collectionsInstalledList.Add(collectionGuid.ToLower()); }
                 //
-                string collectionVersionFolderName = "";
-                DateTime collectionLastChangeDate = default(DateTime);
-                string collectionName = "";
-                getCollectionFolderConfig(core, collectionGuid, ref collectionVersionFolderName, ref collectionLastChangeDate, ref collectionName);
-                if (string.IsNullOrEmpty(collectionVersionFolderName)) {
+                var collectionFolderConfig =  CollectionFolderModel.getCollectionFolderConfig(core, collectionGuid);
+                if (string.IsNullOrEmpty(collectionFolderConfig.path)) {
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder not found.");
                     return_ErrorMessage += "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>";
                 } else {
                     //
                     // Search Local Collection Folder for collection config file (xml file)
                     //
-                    string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + collectionVersionFolderName + "\\";
+                    string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + collectionFolderConfig.path + "\\";
                     List<FileDetail> srcFileInfoArray = core.privateFiles.getFileList(CollectionVersionFolder);
                     if (srcFileInfoArray.Count == 0) {
                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder is empty.");
@@ -357,10 +354,10 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // Upgrade addon
                                                     //
-                                                    if (collectionLastChangeDate == DateTime.MinValue) {
-                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], App has the collection, but the new version has no lastchangedate, so it will upgrade to this unknown (manual) version.");
+                                                    if (collectionFolderConfig.installedDate == DateTime.MinValue) {
+                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], App has the collection, but the installedDate could not be determined, so it will upgrade.");
                                                         OKToInstall = true;
-                                                    } else if (collection.lastChangeDate < collectionLastChangeDate) {
+                                                    } else if (collectionFolderConfig.installedDate > collection.modifiedDate) {
                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], App has an older version of collection. It will be upgraded.");
                                                         OKToInstall = true;
                                                     } else if (repair) {
@@ -405,7 +402,7 @@ namespace Contensive.Processor.Controllers {
                                                         collection.name = CollectionName;
                                                         collection.help = "";
                                                         collection.ccguid = collectionGuid;
-                                                        collection.lastChangeDate = collectionLastChangeDate;
+                                                        collection.lastChangeDate = collectionFolderConfig.lastChangeDate;
                                                         if (CollectionSystem_fileValueOK) {
                                                             collection.system = CollectionSystem;
                                                         }
@@ -1054,6 +1051,7 @@ namespace Contensive.Processor.Controllers {
                 traceContextLog(core, contextLog);
                 DateTime CollectionLastChangeDate;
                 //
+                // -- build the collection folder and download/install all collection dependencies, return list collectionsDownloaded
                 CollectionLastChangeDate = DateTime.Now;
                 var collectionsDownloaded = new List<string>();
                 var collectionsBuildingFolder = new List<string>();
@@ -1485,7 +1483,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 loadOK = true;
                 try {
-                    Doc.LoadXml(getCollectionFolderConfigXml(core));
+                    Doc.LoadXml(CollectionFolderModel.getCollectionFolderConfigXml(core));
                 } catch (Exception) {
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpdateConfig, Error loading Collections.xml file.");
                 }
@@ -1569,90 +1567,9 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         private static string GetCollectionFolderPath(CoreController core, string CollectionGuid) {
-            string result = "";
-            try {
-                DateTime LastChangeDate = default(DateTime);
-                string Collectionname = "";
-                getCollectionFolderConfig(core, CollectionGuid, ref result, ref LastChangeDate, ref Collectionname);
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
-            }
-            return result;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Return the collection path, lastChangeDate, and collectionName given the guid
-        /// </summary>
-        public static void getCollectionFolderConfig(CoreController core, string CollectionGuid, ref string return_CollectionPath, ref DateTime return_LastChagnedate, ref string return_CollectionName) {
-            try {
-                string LocalGuid = "";
-                XmlDocument Doc = new XmlDocument();
-                string collectionPath = "";
-                DateTime lastChangeDate = default(DateTime);
-                string hint = "";
-                string localName = null;
-                bool loadOK = false;
-                //
-                return_CollectionPath = "";
-                return_LastChagnedate = DateTime.MinValue;
-                loadOK = true;
-                try {
-                    Doc.LoadXml(getCollectionFolderConfigXml(core));
-                } catch (Exception) {
-                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", GetCollectionConfig, Hint=[" + hint + "], Error loading Collections.xml file.");
-                    loadOK = false;
-                }
-                if (loadOK) {
-                    if (GenericController.vbLCase(Doc.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
-                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", Hint=[" + hint + "], The Collections.xml file has an invalid root node");
-                    } else {
-                        foreach (XmlNode LocalListNode in Doc.DocumentElement.ChildNodes) {
-                            localName = "no name found";
-                            switch (GenericController.vbLCase(LocalListNode.Name)) {
-                                case "collection":
-                                    LocalGuid = "";
-                                    foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
-                                        switch (GenericController.vbLCase(CollectionNode.Name)) {
-                                            case "name":
-                                                //
-                                                // no - cannot change the case if files are already saved
-                                                localName = CollectionNode.InnerText;
-                                                //LocalName = genericController.vbLCase(CollectionNode.InnerText);
-                                                break;
-                                            case "guid":
-                                                //
-                                                // no - cannot change the case if files are already saved
-                                                LocalGuid = CollectionNode.InnerText;
-                                                //LocalGuid = genericController.vbLCase(CollectionNode.InnerText);
-                                                break;
-                                            case "path":
-                                                //
-                                                // no - cannot change the case if files are already saved
-                                                collectionPath = CollectionNode.InnerText;
-                                                //CollectionPath = genericController.vbLCase(CollectionNode.InnerText);
-                                                break;
-                                            case "lastchangedate":
-                                                lastChangeDate = GenericController.encodeDate(CollectionNode.InnerText);
-                                                break;
-                                        }
-                                    }
-                                    break;
-                            }
-                            if (CollectionGuid.ToLowerInvariant() == LocalGuid.ToLowerInvariant()) {
-                                return_CollectionPath = collectionPath;
-                                return_LastChagnedate = lastChangeDate;
-                                return_CollectionName = localName;
-                                break;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
-            }
+            var collectionFolder = CollectionFolderModel.getCollectionFolderConfig(core, CollectionGuid);
+            if (collectionFolder != null) { return collectionFolder.path; }
+            return string.Empty;
         }
         //
         //======================================================================================================
@@ -2360,199 +2277,6 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Return the collectionList file stored in the root of the addon folder.
-        /// </summary>
-        /// <returns></returns>
-        public static string getCollectionFolderConfigXml(CoreController core) {
-            string returnXml = "";
-            try {
-                string LastChangeDate = "";
-                string FolderName = null;
-                string collectionFilePathFilename = null;
-                string CollectionGuid = null;
-                string Collectionname = null;
-                //
-                collectionFilePathFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
-                returnXml = core.privateFiles.readFileText(collectionFilePathFilename);
-                if (string.IsNullOrWhiteSpace(returnXml)) {
-                    //
-                    LogController.logInfo(core,"Collection Folder XML is blank, rebuild start");
-                    //                     
-                    List<FolderDetail> FolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath());
-                    //
-                    LogController.logInfo(core, "Collection Folder XML rebuild, FolderList.count [" + FolderList.Count + "]");
-                    //                     
-                    if (FolderList.Count > 0) {
-                        foreach (FolderDetail folder in FolderList) {
-                            FolderName = folder.Name;
-                            if (FolderName.Length > 34) {
-                                if (GenericController.vbLCase(FolderName.Left(4)) != "temp") {
-                                    CollectionGuid = FolderName.Substring(FolderName.Length - 32);
-                                    Collectionname = FolderName.Left(FolderName.Length - CollectionGuid.Length - 1);
-                                    CollectionGuid = CollectionGuid.Left(8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
-                                    CollectionGuid = "{" + CollectionGuid + "}";
-                                    List<FolderDetail> SubFolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath() + "\\" + FolderName);
-                                    if (SubFolderList.Count > 0) {
-                                        FolderDetail lastSubFolder = SubFolderList.Last<FolderDetail>();
-                                        FolderName = FolderName + "\\" + lastSubFolder.Name;
-                                        LastChangeDate = lastSubFolder.Name.Substring(4, 2) + "/" + lastSubFolder.Name.Substring(6, 2) + "/" + lastSubFolder.Name.Left(4);
-                                        if (!GenericController.IsDate(LastChangeDate)) {
-                                            LastChangeDate = "";
-                                        }
-                                    }
-                                    returnXml = returnXml + "\r\n\t<Collection>";
-                                    returnXml = returnXml + "\r\n\t\t<name>" + Collectionname + "</name>";
-                                    returnXml = returnXml + "\r\n\t\t<guid>" + CollectionGuid + "</guid>";
-                                    returnXml = returnXml + "\r\n\t\t<lastchangedate>" + LastChangeDate + "</lastchangedate>";
-                                    returnXml += "\r\n\t\t<path>" + FolderName + "</path>";
-                                    returnXml = returnXml + "\r\n\t</Collection>";
-                                }
-                            }
-                        }
-                    }
-                    returnXml = "<CollectionList>" + returnXml + "\r\n</CollectionList>";
-                    core.privateFiles.saveFile(collectionFilePathFilename, returnXml);
-                    //
-                    LogController.logInfo(core, "Collection Folder XML is blank, rebuild finished and saved");
-                    //                     
-                }
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
-            }
-            return returnXml;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// get a list of collections available on the server
-        /// </summary>
-        public static bool getCollectionFolderConfigCollectionList(CoreController core, ref List<CollectionStoreClass> localCollectionStoreList, ref string return_ErrorMessage) {
-            bool returnOk = true;
-            try {
-                //
-                //-----------------------------------------------------------------------------------------------
-                //   Load LocalCollections from the Collections.xml file
-                //-----------------------------------------------------------------------------------------------
-                //
-                string localCollectionStoreListXml = getCollectionFolderConfigXml(core);
-                if (!string.IsNullOrEmpty(localCollectionStoreListXml)) {
-                    XmlDocument LocalCollections = new XmlDocument();
-                    try {
-                        LocalCollections.LoadXml(localCollectionStoreListXml);
-                    } catch (Exception) {
-                        string Copy = "Error loading privateFiles\\addons\\Collections.xml";
-                        LogController.logInfo(core, Copy);
-                        return_ErrorMessage += "<P>" + Copy + "</P>";
-                        returnOk = false;
-                    }
-                    if (returnOk) {
-                        if (GenericController.vbLCase(LocalCollections.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
-                            string Copy = "The addons\\Collections.xml has an invalid root node, [" + LocalCollections.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.";
-                            LogController.logInfo(core, Copy);
-                            return_ErrorMessage += "<P>" + Copy + "</P>";
-                            returnOk = false;
-                        } else {
-                            //
-                            // Get a list of the collection guids on this server
-                            //
-                            if (GenericController.vbLCase(LocalCollections.DocumentElement.Name) == "collectionlist") {
-                                foreach (XmlNode LocalListNode in LocalCollections.DocumentElement.ChildNodes) {
-                                    switch (GenericController.vbLCase(LocalListNode.Name)) {
-                                        case "collection":
-                                            var collection = new CollectionStoreClass();
-                                            localCollectionStoreList.Add(collection);
-                                            foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
-                                                if (CollectionNode.Name.ToLowerInvariant() == "name") {
-                                                    collection.name = CollectionNode.InnerText;
-                                                } else if (CollectionNode.Name.ToLowerInvariant() == "guid") {
-                                                    collection.guid = CollectionNode.InnerText;
-                                                } else if (CollectionNode.Name.ToLowerInvariant() == "path") {
-                                                    collection.path = CollectionNode.InnerText;
-                                                } else if (CollectionNode.Name.ToLowerInvariant() == "lastchangedate") {
-                                                    collection.lastChangeDate = GenericController.encodeDate(CollectionNode.InnerText);
-                                                }
-                                            }
-                                            break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
-            }
-            return returnOk;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// return a list of collections on the 
-        /// </summary>
-        public static bool getRegistryCollectionList(CoreController core, ref List<CollectionStoreClass> remoteCollectionStoreList) {
-            bool result = false;
-            try {
-                var LibCollections = new XmlDocument();
-                bool parseError = false;
-                try {
-                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&includeSystem=1&includeNonPublic=1");
-                } catch (Exception) {
-                    string UserError = "There was an error reading the Collection Library. The site may be unavailable.";
-                    LogController.logInfo(core, UserError);
-                    ErrorController.addUserError(core, UserError);
-                    parseError = true;
-                }
-                if (!parseError) {
-                    if (GenericController.vbLCase(LibCollections.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
-                        string UserError = "There was an error reading the Collection Library file. The '" + CollectionListRootNode + "' element was not found.";
-                        LogController.logInfo(core, UserError);
-                        ErrorController.addUserError(core, UserError);
-                    } else {
-                        foreach (XmlNode metaData_Node in LibCollections.DocumentElement.ChildNodes) {
-                            var collection = new CollectionStoreClass();
-                            remoteCollectionStoreList.Add(collection);
-                            switch (GenericController.vbLCase(metaData_Node.Name)) {
-                                case "collection":
-                                    //
-                                    // Read the collection
-                                    //
-                                    foreach (XmlNode CollectionNode in metaData_Node.ChildNodes) {
-                                        switch (GenericController.vbLCase(CollectionNode.Name)) {
-                                            case "name":
-                                                collection.name = CollectionNode.InnerText;
-                                                break;
-                                            case "guid":
-                                                collection.guid = CollectionNode.InnerText;
-                                                break;
-                                            case "version":
-                                                collection.version = CollectionNode.InnerText;
-                                                break;
-                                            case "description":
-                                                collection.description = CollectionNode.InnerText;
-                                                break;
-                                            case "contensiveversion":
-                                                collection.contensiveVersion = CollectionNode.InnerText;
-                                                break;
-                                            case "lastchangedate":
-                                                collection.lastChangeDate = GenericController.encodeDate(CollectionNode.InnerText);
-                                                break;
-                                        }
-                                    }
-                                    break;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception) {
-                throw;
-            }
-            return result;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// download a collectionZip from the collection library to a privateFilesPath
         /// </summary>
         /// <param name="core"></param>
@@ -2732,20 +2456,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="contextLog"></param>
         private static void traceContextLog(CoreController core, Stack<string> contextLog) {
             logger.Log(LogLevel.Info, LogController.getLogMsg(core, string.Join(",", contextLog)));
-        }
-        //
-        //======================================================================================================
-        /// <summary>
-        /// data from local collection repository
-        /// </summary>
-        public class CollectionStoreClass {
-            public string name;
-            public string guid;
-            public string path;
-            public DateTime lastChangeDate;
-            public string version;
-            public string description;
-            public string contensiveVersion;
         }
     }
 }

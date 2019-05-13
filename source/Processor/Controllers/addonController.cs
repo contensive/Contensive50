@@ -12,6 +12,7 @@ using System.Data;
 using System.Linq;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -1521,14 +1522,11 @@ namespace Contensive.Processor.Controllers {
                 result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appPath, true, ref AddonFound);
                 if (AddonFound) { return result; }
                 //
-                //
                 // -- try addon folder
-                string AddonVersionPath = "";
-                var tmpDate = new DateTime();
-                string tmpName = "";
-                CollectionController.getCollectionFolderConfig(core, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
-                if (string.IsNullOrEmpty(AddonVersionPath)) { throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection"); };
-                string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
+                var collectionFolderConfig = CollectionFolderModel.getCollectionFolderConfig(core, addonCollection.ccguid);
+                if (collectionFolderConfig == null) { throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection"); };
+                if (string.IsNullOrEmpty(collectionFolderConfig.path)) { throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the path for collection [" + addonCollection.name + "] was not valid in the \\private\\addons\\Collections.xml file. Try re-installing the collection"); };
+                string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), collectionFolderConfig.path);
                 if (!core.privateFiles.pathExists_local(AddonPath)) { core.privateFiles.copyPathRemoteToLocal(AddonPath); }
                 string appAddonPath = core.privateFiles.joinPath(core.privateFiles.localAbsRootPath, AddonPath);
                 result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appAddonPath, false, ref AddonFound);

@@ -280,6 +280,8 @@
     <Compile Include="Models\Domain\NameValueModel.cs" />
     <Compile Include="Models\Domain\AddonCacheModel.cs" />
     <Compile Include="Models\Domain\AddonListItemModel.cs" />
+    <Compile Include="Models\Domain\CollectionFolderModel.cs" />
+    <Compile Include="Models\Domain\CollectionLibraryModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -359,6 +361,7 @@
     <Content Include="Licenses\clearscript-license.txt" />
     <Content Include="Licenses\v8-license.txt" />
     <Content Include="Models\dataModelFields.txt" />
+    <Content Include="Resources\adminNavBarHtml.txt" />
     <Content Include="Resources\adminTemplateHtml.txt" />
     <Content Include="Resources\defaultLogin_email_html.txt" />
     <Content Include="Resources\defaultForgetPassword_html.txt" />

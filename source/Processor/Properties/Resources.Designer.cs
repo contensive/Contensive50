@@ -61,6 +61,20 @@ namespace Contensive.Processor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;nav class=&quot;navbar navbar-expand-md navbar-dark bg-primary&quot; style=&quot;background-color: rgb(237,125,49) !important;&quot;&gt;
+        ///&lt;a class=&quot;navbar-brand&quot; href=&quot;/&quot;&gt;MemberBoss&lt;/a&gt;
+        ///{% {&quot;addon&quot;:{&quot;addon&quot;:&quot;Bootstrap Nav 40&quot;,&quot;instanceId&quot;:&quot;Admin Nav&quot;}} %}
+        ///&lt;div class=&quot;collapse navbar-collapse&quot; id=&quot;navbarText&quot;&gt;
+        ///&lt;a href=&quot;https://www.facebook.com/Contensive&quot; class=&quot;rounded-circle pl-2&quot;&gt;&lt;i class=&quot;fab fa-facebook-f text-white&quot;&gt;&lt;/i&gt;&lt;/a&gt; 
+        ///&lt;a href=&quot;https://twitter.com/Contensive&quot; class=&quot;rounded-circle pl-2&quot;&gt;&lt;i class=&quot;fab fa-twitter t [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string adminNavBarHtml {
+            get {
+                return ResourceManager.GetString("adminNavBarHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
         ///	&lt;h4 class=&quot;form-signin-heading&quot;&gt;Forget Your Password&lt;/h4&gt;
         ///	&lt;!--&lt;p&gt;If you are a member of the system and cannot remember your password, enter your email address below and we will email your matching username(s) and password(s).&lt;/p&gt;--&gt;
@@ -150,6 +164,17 @@ namespace Contensive.Processor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;nav class=&quot;navbar navbar-expand-md navbar-dark bg-dark&quot;&gt;
+        ///	&lt;a class=&quot;navbar-brand&quot; href=&quot;#&quot;&gt;Brand&lt;/a&gt;
+        ///	{% {&quot;addon&quot;:{&quot;addon&quot;:&quot;Bootstrap Nav 40&quot;,&quot;instanceId&quot;:&quot;Home Top Nav&quot;}} %}
+        ///&lt;/nav&gt;
+        ///&lt;div class=&quot;container&quot;&gt;
+        ///    &lt;div class=&quot;row&quot;&gt;
+        ///        &lt;div class=&quot;col-lg-12 mt-2&quot;&gt;
+        ///            {% &quot;Content Box&quot; %}
+        ///        &lt;/div&gt;
+        ///    &lt;/div&gt;
+        ///&lt;/div&gt;.
         /// </summary>
         public static string DefaultTemplateHtml {
             get {
@@ -179,19 +204,18 @@ namespace Contensive.Processor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;tr&gt;
-        ///    &lt;td class=&quot;ccAdminEditCaption&quot;&gt;{{rowCaption}}&lt;/td&gt;
-        ///    &lt;td class=&quot;ccAdminEditField&quot;&gt;
-        ///        &lt;table border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; width=&quot;100%&quot;&gt;
-        ///            &lt;tbody&gt;
-        ///                &lt;tr&gt;
-        ///                    &lt;td width=&quot;40%&quot;&gt;{{{checkboxInput}}}{{groupCaption}}&lt;/td&gt;
-        ///                    &lt;td width=&quot;30%&quot;&gt;Expires{{{expiresInput}}}&lt;/td&gt;
-        ///                    &lt;td width=&quot;30%&quot;&gt;{{{relatedButtonList}}}{{{idHidden}}}&lt;/td&gt;
-        ///                &lt;/tr&gt;
-        ///            &lt;/tbody&gt;
-        ///        &lt;/table&gt;
-        ///    &lt;/td&gt;        /// [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to &lt;div class=&quot;p-2 ccEditRow&quot;&gt;
+        ///    &lt;!-- list caption --&gt;
+        ///    &lt;label for=&quot;name432&quot;&gt;{{listCaption}}&lt;/label&gt;
+        ///    &lt;!-- list --&gt;
+        ///    &lt;div class=&quot;ml-5&quot;&gt;
+        ///        {{#rowList}}
+        ///        &lt;!-- row repeat --&gt;
+        ///        &lt;div class=&quot;row pb-1 border-bottom border-light&quot;&gt;
+        ///            &lt;!-- checkbox and group name --&gt;
+        ///            &lt;div class=&quot;col-sm-4&quot;&gt;&lt;label class=&quot;checkbox-inline&quot;&gt;{{{checkboxInput}}}&amp;nbsp;{{{groupCaption}}}&lt;/label&gt;&lt;/div&gt;
+        ///            &lt;!-- expiration date --&gt;
+        ///            &lt;div class=&quot;col-sm-4&quot;&gt;{{{expiresI [rest of string was truncated]&quot;;.
         /// </summary>
         public static string GroupRuleEditorRow2 {
             get {

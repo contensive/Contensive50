@@ -1611,13 +1611,20 @@ namespace Contensive.Addons.AdminSite {
         private string getAdminHeader(CPClass cp, AdminDataModel adminData, string BackgroundColor = "") {
             string result = "";
             try {
-                string LeftSide = cp.core.siteProperties.getText("AdminHeaderHTML", "Contensive Administration Site");
-                string RightSide = cp.core.doc.profileStartTime + "&nbsp;" + getRefreshLink("?" + cp.core.doc.refreshQueryString);
+                string leftSide = cp.core.siteProperties.getText("AdminHeaderHTML", "Administration Site");
+                string rightSide = HtmlController.a( cp.User.Name, "?af=4&cid=" + cp.Content.GetID("people") + "&id=" + cp.User.Id);
+                string rightSideNavHtml = ""
+                    + "<form class=\"form-inline\" method=post action=\"?method=logout\">"
+                    + "<button class=\"btn btn-success btn-sm ml-2\" type=\"submit\">Logout</button>"
+                    + "</form>";
+                //+"<form class=\"form-inline\" method=get action=\"?" + cp.core.doc.refreshQueryString + "\">"
+                //+ "<button class=\"btn btn-success btn-sm ml-2\" type=\"submit\">Refresh</button>"
+                //+ "</form>"
                 //
                 // Assemble header
                 //
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                Stream.Add(AdminUIController.getHeader(cp.core, LeftSide, RightSide));
+                Stream.Add(AdminUIController.getHeader(cp.core, leftSide, rightSide, rightSideNavHtml));
                 //
                 // --- Content Definition
                 adminData.adminFooter = "";
@@ -1628,13 +1635,6 @@ namespace Contensive.Addons.AdminSite {
                     errorContextMessage = "executing Admin Navigator in Admin"
                 });
                 //
-                // -- shortterm fix - make navigator changes, long term pull it into project
-                // "<ximg title=\"Open Navigator\" alt=\"Open Navigator\" src=\"/ContensiveBase/images/OpenRightRev1313.gif\" width=13 height=13 border=0 style=\"text-align:right;\">";
-                //string src = HtmlController.img("/ContensiveBase/images/OpenRightRev1313.gif", "Open Navigator", 13, 13 ).Replace( ">", "style=\"text-align:right;\">");
-                //AdminNavFull = AdminNavFull.Replace(src, iconOpen_White);
-                //// "<ximg alt=\"Close Navigator\" title=\"Close Navigator\" src=\"/ContensiveBase/images/ClosexRev1313.gif\" width=13 height=13 border=0>";
-                //src = HtmlController.img("/ContensiveBase/images/ClosexRev1313.gif", "Close Navigator", 13, 13);
-                //AdminNavFull = AdminNavFull.Replace(src, iconClose_White);
                 Stream.Add("<table border=0 cellpadding=0 cellspacing=0><tr>\r<td class=\"ccToolsCon\" valign=top>" + AdminNavFull + "</td>\r<td id=\"desktop\" class=\"ccContentCon\" valign=top>");
                 adminData.adminFooter = adminData.adminFooter + "</td></tr></table>";
                 //
