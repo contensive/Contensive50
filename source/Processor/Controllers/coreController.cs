@@ -155,7 +155,10 @@ namespace Contensive.Processor.Controllers {
             }
         }
         public void assemblyList_AddonsFound_save() {
-            cache.storeObject(AssemblyFileDictCacheName, _assemblyFileDict);
+            var dependentKeyList = new List<string>();
+            dependentKeyList.Add(CacheController.createCacheKey_LastRecordModifiedDate(AddonModel.contentTableName));
+            dependentKeyList.Add(CacheController.createCacheKey_LastRecordModifiedDate(AddonCollectionModel.contentTableName));
+            cache.storeObject(AssemblyFileDictCacheName, _assemblyFileDict, dependentKeyList);
         }
         private Dictionary<string, AssemblyFileDetails> _assemblyFileDict;
         private const string AssemblyFileDictCacheName = "assemblyFileDict";

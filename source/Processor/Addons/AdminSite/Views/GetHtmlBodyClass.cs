@@ -1615,11 +1615,8 @@ namespace Contensive.Addons.AdminSite {
                 string rightSide = HtmlController.a( cp.User.Name, "?af=4&cid=" + cp.Content.GetID("people") + "&id=" + cp.User.Id);
                 string rightSideNavHtml = ""
                     + "<form class=\"form-inline\" method=post action=\"?method=logout\">"
-                    + "<button class=\"btn btn-success btn-sm ml-2\" type=\"submit\">Logout</button>"
+                    + "<button class=\"btn btn-warning btn-sm ml-2\" type=\"submit\">Logout</button>"
                     + "</form>";
-                //+"<form class=\"form-inline\" method=get action=\"?" + cp.core.doc.refreshQueryString + "\">"
-                //+ "<button class=\"btn btn-success btn-sm ml-2\" type=\"submit\">Refresh</button>"
-                //+ "</form>"
                 //
                 // Assemble header
                 //
