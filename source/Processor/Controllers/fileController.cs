@@ -17,7 +17,7 @@ namespace Contensive.Processor.Controllers {
     //
     //==============================================================================================================
     /// <summary>
-    /// Basic file access class for all scaling targets (cden, private, approot, etc).
+    /// Basic file access class for all scaling targets (cdn, private, appRoot, etc).
     /// set isLocal true and all files are handled on the local server
     /// set isLocal false:
     /// - the local filesystem becomes a mirror for the remote system

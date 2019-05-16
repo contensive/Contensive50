@@ -140,6 +140,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(collectionFolderConfig.path)) {
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder not found.");
                     return_ErrorMessage += "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>";
+                    return false;
                 } else {
                     //
                     // Search Local Collection Folder for collection config file (xml file)
@@ -149,6 +150,7 @@ namespace Contensive.Processor.Controllers {
                     if (srcFileInfoArray.Count == 0) {
                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder is empty.");
                         return_ErrorMessage += "<P>The collection was not installed because the folder containing the Add-on's resources was empty.</P>";
+                        return false;
                     } else {
                         //
                         // collect list of DLL files and add them to the exec files if they were missed
@@ -198,6 +200,7 @@ namespace Contensive.Processor.Controllers {
                                             //Call AppendAddonLog("UpgradeAppFromLocalCollection, collection has no name")
                                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], collection has no name");
                                             return_ErrorMessage += "<P>The collection was not installed because the collection name in the xml collection file is blank</P>";
+                                            return false;
                                         } else {
                                             bool CollectionSystem_fileValueOK = false;
                                             bool CollectionUpdatable_fileValueOK = false;
@@ -223,6 +226,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], Collection file contains incorrect GUID, correct GUID [" + collectionGuid.ToLowerInvariant() + "], incorrect GUID in file [" + GenericController.vbLCase(FileGuid) + "]");
                                                 return_ErrorMessage += "<P>The collection was not installed because the unique number identifying the collection, called the guid, does not match the collection requested.</P>";
+                                                return false;
                                             } else {
                                                 if (string.IsNullOrEmpty(collectionGuid)) {
                                                     //
@@ -481,7 +485,8 @@ namespace Contensive.Processor.Controllers {
                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], creating navigator entries, there was an error parsing the portion of the collection that contains metadata. Navigator entry creation was aborted. [There was an error reading the Meta data file.]");
                                                                 result = false;
                                                                 return_ErrorMessage += "<P>The collection was not installed because the xml collection file has an error.</P>";
-                                                                loadOK = false;
+                                                                return false;
+                                                                //loadOK = false;
                                                             }
                                                             if (loadOK) {
                                                                 foreach (XmlNode metaDataNode in NavDoc.DocumentElement.ChildNodes) {
@@ -529,14 +534,16 @@ namespace Contensive.Processor.Controllers {
                                                                                 if (string.IsNullOrEmpty(ContentName)) {
                                                                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
                                                                                     result = false;
-                                                                                    return_ErrorMessage += "<P>Collection file contains a data.record node with a blank content attribute.</P>";
+                                                                                    return_ErrorMessage += "<P>Collection file [" + CollectionName + "] contains a data.record node with a blank content attribute.</P>";
+                                                                                    return false;
                                                                                 } else {
                                                                                     string ContentRecordGuid = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
                                                                                     string ContentRecordName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
                                                                                     if ((string.IsNullOrEmpty(ContentRecordGuid)) && (string.IsNullOrEmpty(ContentRecordName))) {
                                                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" + ContentName + "]");
                                                                                         result = false;
-                                                                                        return_ErrorMessage += "<P>The collection was not installed because the Collection file contains a data record node with neither name nor guid. This is not allowed. The content is [" + ContentName + "].</P>";
+                                                                                        return_ErrorMessage += "<P>The collection [" + CollectionName + "] was not installed because the Collection file contains a data record node with neither name nor guid. This is not allowed. The content is [" + ContentName + "].</P>";
+                                                                                        return false;
                                                                                     } else {
                                                                                         //
                                                                                         // create or update the record
@@ -638,7 +645,8 @@ namespace Contensive.Processor.Controllers {
                                                             case "scriptingmodule":
                                                             case "scriptingmodules":
                                                                 result = false;
-                                                                return_ErrorMessage += "<P>Collection includes a scripting module which is no longer supported. Move scripts to the code tab.</P>";
+                                                                return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a scripting module which is no longer supported. Move scripts to the code tab.</P>";
+                                                                return false;
                                                                 //    '
                                                                 //    ' Scripting modules
                                                                 //    '
@@ -703,10 +711,11 @@ namespace Contensive.Processor.Controllers {
                                                                 //        End If
                                                                 //        Call csData.cs_Close(CS)
                                                                 //    End If
-                                                                break;
+                                                                //break;
                                                             case "sharedstyle":
                                                                 result = false;
-                                                                return_ErrorMessage += "<P>Collection includes a shared style which is no longer supported. Move styles to the default styles tab.</P>";
+                                                                return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a shared style which is no longer supported. Move styles to the default styles tab.</P>";
+                                                                return false;
 
                                                                 //    '
                                                                 //    ' added 9/3/2012
@@ -767,7 +776,7 @@ namespace Contensive.Processor.Controllers {
                                                                 //        Call csData.cs_set("sortOrder",xmlController.GetXMLAttribute(core,IsFound, metadataSection, "sortOrder", ""))
                                                                 //    End If
                                                                 //    Call csData.cs_Close(CS)
-                                                                break;
+                                                                //break;
                                                             case "addon":
                                                             case "add-on":
                                                                 //
@@ -775,9 +784,7 @@ namespace Contensive.Processor.Controllers {
                                                                 //   (include add-on node must be done after all add-ons are installed)
                                                                 //
                                                                 InstallAddonNode(core, metaDataSection, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
-                                                                if (!result) {
-                                                                    //result = result;
-                                                                }
+                                                                if (!result) { return result; }
                                                                 break;
                                                             case "interfaces":
                                                                 //
@@ -785,23 +792,8 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 foreach (XmlNode metaDataInterfaces in metaDataSection.ChildNodes) {
                                                                     InstallAddonNode(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
-                                                                    if (!result) {
-                                                                        //result = result;
-                                                                    }
+                                                                    if (!result) { return result; }
                                                                 }
-                                                                //Case "otherxml", "importcollection", "sqlindex", "style", "styles", "stylesheet", "adminmenu", "menuentry", "navigatorentry"
-                                                                //    '
-                                                                //    ' otherxml
-                                                                //    '
-                                                                //    If genericController.vbLCase(metadataSection.OuterXml) <> "<otherxml></otherxml>" Then
-                                                                //        OtherXML = OtherXML & vbCrLf & metadataSection.OuterXml
-                                                                //    End If
-                                                                //    'Case Else
-                                                                //    '    '
-                                                                //    '    ' Unknown node in collection file
-                                                                //    '    '
-                                                                //    '    OtherXML = OtherXML & vbCrLf & metadataSection.OuterXml
-                                                                //    '    Call logcontroller.appendInstallLog(core, "Addon Collection for [" & Collectionname & "] contained an unknown node [" & metadataSection.Name & "]. This node will be ignored.")
                                                                 break;
                                                         }
                                                     }
@@ -821,6 +813,7 @@ namespace Contensive.Processor.Controllers {
                                                                     onInstallAddonGuid = XmlController.GetXMLAttribute(core, IsFound, collectionNode, "guid", collectionNode.Name);
                                                                 }
                                                                 setAddonDependencies(core, collectionNode, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                                if (!result) { return result; }
                                                                 break;
                                                             case "interfaces":
                                                                 //
@@ -828,9 +821,7 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 foreach (XmlNode metaDataInterfaces in collectionNode.ChildNodes) {
                                                                     setAddonDependencies(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
-                                                                    if (!result) {
-                                                                        //result = result;
-                                                                    }
+                                                                    if (!result) { return result; }
                                                                 }
                                                                 break;
                                                         }
@@ -852,6 +843,7 @@ namespace Contensive.Processor.Controllers {
                                                                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
                                                                             result = false;
                                                                             return_ErrorMessage += "<P>Collection file contains a data.record node with a blank content attribute.</P>";
+                                                                            return false;
                                                                         } else {
                                                                             string ContentRecordGuid = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
                                                                             string ContentRecordName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
@@ -900,6 +892,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                                             int fieldLookupId = lookupContentMetadata.getRecordId(core, fieldValue);
                                                                                                                             if (fieldLookupId <= 0) {
                                                                                                                                 return_ErrorMessage += "<P>Warning: In collection [" + CollectionName + "], data section, record number [" + recordPtr + "], the lookup field [" + FieldName + "], value [" + fieldValue + "] was not found in lookup content [" + lookupContentMetadata.name + "].</P>";
+                                                                                                                                return false;
                                                                                                                             } else {
                                                                                                                                 csData.set(FieldName, fieldLookupId);
                                                                                                                             }
@@ -1272,73 +1265,81 @@ namespace Contensive.Processor.Controllers {
                                                 CollectionFileFound = true;
                                                 if (string.IsNullOrEmpty(collectionGuid)) {
                                                     //
-                                                    // I hope I do not regret this
-                                                    //
+                                                    // must have a guid
                                                     collectionGuid = Collectionname;
                                                 }
-                                                collectionGuid = GenericController.normalizeGuid(collectionGuid);
-                                                CollectionVersionFolderName = GetCollectionFolderPath(core, collectionGuid);
-                                                string CollectionFolderName = "";
-                                                if (!string.IsNullOrEmpty(CollectionVersionFolderName)) {
-                                                    //
-                                                    // This is an upgrade
-                                                    //
-                                                    int Pos = GenericController.vbInstr(1, CollectionVersionFolderName, "\\");
-                                                    if (Pos > 0) {
-                                                        CollectionFolderName = CollectionVersionFolderName.Left(Pos - 1);
-                                                    }
-                                                } else {
-                                                    //
-                                                    // This is an install
-                                                    //
-                                                    //hint = hint & ",460"
-                                                    CollectionFolderName = collectionGuid;
-                                                    CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "{", "");
-                                                    CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "}", "");
-                                                    CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "-", "");
-                                                    CollectionFolderName = GenericController.vbReplace(CollectionFolderName, " ", "");
-                                                    CollectionFolderName = Collectionname + "_" + CollectionFolderName;
-                                                    CollectionFolderName = CollectionFolderName.ToLowerInvariant();
-                                                }
-                                                string CollectionFolder = core.addon.getPrivateFilesAddonPath() + CollectionFolderName + "\\";
-                                                core.privateFiles.verifyPath(CollectionFolder);
                                                 //
-                                                // create a collection 'version' folder for these new files
-                                                string TimeStamp = "";
-                                                DateTime NowTime = default(DateTime);
-                                                NowTime = DateTime.Now;
-                                                int NowPart = NowTime.Year;
-                                                TimeStamp += NowPart.ToString();
-                                                NowPart = NowTime.Month;
-                                                if (NowPart < 10) {
-                                                    TimeStamp += "0";
-                                                }
-                                                TimeStamp += NowPart.ToString();
-                                                NowPart = NowTime.Day;
-                                                if (NowPart < 10) {
-                                                    TimeStamp += "0";
-                                                }
-                                                TimeStamp += NowPart.ToString();
-                                                NowPart = NowTime.Hour;
-                                                if (NowPart < 10) {
-                                                    TimeStamp += "0";
-                                                }
-                                                TimeStamp += NowPart.ToString();
-                                                NowPart = NowTime.Minute;
-                                                if (NowPart < 10) {
-                                                    TimeStamp += "0";
-                                                }
-                                                TimeStamp += NowPart.ToString();
-                                                NowPart = NowTime.Second;
-                                                if (NowPart < 10) {
-                                                    TimeStamp += "0";
-                                                }
-                                                TimeStamp += NowPart.ToString();
-                                                CollectionVersionFolderName = CollectionFolderName + "\\" + TimeStamp;
+                                                //
+                                                CollectionVersionFolderName = getCollectionVersionFolderName(core,collectionGuid, Collectionname);
                                                 string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + CollectionVersionFolderName;
-                                                string CollectionVersionPath = CollectionVersionFolder + "\\";
-                                                core.privateFiles.createPath(CollectionVersionPath);
-
+                                                //string CollectionVersionPath = CollectionVersionFolder + "\\";
+                                                ////
+                                                ////
+                                                //collectionGuid = GenericController.normalizeGuid(collectionGuid);
+                                                //CollectionVersionFolderName = GetCollectionConfigFolderPath(core, collectionGuid);
+                                                //string CollectionFolderName = "";
+                                                //if (!string.IsNullOrEmpty(CollectionVersionFolderName)) {
+                                                //    //
+                                                //    // This is an upgrade
+                                                //    //
+                                                //    int Pos = GenericController.vbInstr(1, CollectionVersionFolderName, "\\");
+                                                //    if (Pos > 0) {
+                                                //        CollectionFolderName = CollectionVersionFolderName.Left(Pos - 1);
+                                                //    }
+                                                //} else {
+                                                //    //
+                                                //    // This is an install
+                                                //    //
+                                                //    //hint = hint & ",460"
+                                                //    CollectionFolderName = collectionGuid;
+                                                //    CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "{", "");
+                                                //    CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "}", "");
+                                                //    CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "-", "");
+                                                //    CollectionFolderName = GenericController.vbReplace(CollectionFolderName, " ", "");
+                                                //    CollectionFolderName = Collectionname + "_" + CollectionFolderName;
+                                                //    CollectionFolderName = CollectionFolderName.ToLowerInvariant();
+                                                //}
+                                                //string CollectionFolder = core.addon.getPrivateFilesAddonPath() + CollectionFolderName + "\\";
+                                                //core.privateFiles.verifyPath(CollectionFolder);
+                                                ////
+                                                //// create a collection 'version' folder for these new files
+                                                //string TimeStamp = "";
+                                                //DateTime NowTime = default(DateTime);
+                                                //NowTime = DateTime.Now;
+                                                //int NowPart = NowTime.Year;
+                                                //TimeStamp += NowPart.ToString();
+                                                //NowPart = NowTime.Month;
+                                                //if (NowPart < 10) {
+                                                //    TimeStamp += "0";
+                                                //}
+                                                //TimeStamp += NowPart.ToString();
+                                                //NowPart = NowTime.Day;
+                                                //if (NowPart < 10) {
+                                                //    TimeStamp += "0";
+                                                //}
+                                                //TimeStamp += NowPart.ToString();
+                                                //NowPart = NowTime.Hour;
+                                                //if (NowPart < 10) {
+                                                //    TimeStamp += "0";
+                                                //}
+                                                //TimeStamp += NowPart.ToString();
+                                                //NowPart = NowTime.Minute;
+                                                //if (NowPart < 10) {
+                                                //    TimeStamp += "0";
+                                                //}
+                                                //TimeStamp += NowPart.ToString();
+                                                //NowPart = NowTime.Second;
+                                                //if (NowPart < 10) {
+                                                //    TimeStamp += "0";
+                                                //}
+                                                //TimeStamp += NowPart.ToString();
+                                                //CollectionVersionFolderName = CollectionFolderName + "\\" + TimeStamp;
+                                                //string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + CollectionVersionFolderName;
+                                                //string CollectionVersionPath = CollectionVersionFolder + "\\";
+                                                //core.privateFiles.createPath(CollectionVersionPath);
+                                                //
+                                                //
+                                                //
                                                 core.privateFiles.copyFolder(tmpInstallPath, CollectionVersionFolder);
                                                 //StatusOK = True
                                                 //
@@ -1364,7 +1365,7 @@ namespace Contensive.Processor.Controllers {
                                                             ChildCollectionGUID = GenericController.normalizeGuid(ChildCollectionGUID);
                                                             string statusMsg = "Installing collection [" + ChildCollectionName + ", " + ChildCollectionGUID + "] referenced from collection [" + Collectionname + "]";
                                                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" + ChildCollectionName + "], childCollectionGuid [" + ChildCollectionGUID + "]");
-                                                            if (GenericController.vbInstr(1, CollectionVersionPath, ChildCollectionGUID, 1) == 0) {
+                                                            if (GenericController.vbInstr(1, CollectionVersionFolder, ChildCollectionGUID, 1) == 0) {
                                                                 if (string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                     //
                                                                     // -- Needs a GUID to install
@@ -1379,7 +1380,7 @@ namespace Contensive.Processor.Controllers {
                                                                         //
                                                                         // If it is not already installed, download and install it also
                                                                         //
-                                                                        string ChildWorkingPath = CollectionVersionPath + "\\" + ChildCollectionGUID + "\\";
+                                                                        string ChildWorkingPath = CollectionVersionFolder + "\\" + ChildCollectionGUID + "\\";
                                                                         DateTime ChildCollectionLastChangeDate = default(DateTime);
                                                                         //
                                                                         // down an imported collection file
@@ -1564,14 +1565,6 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //====================================================================================================
-        //
-        private static string GetCollectionFolderPath(CoreController core, string CollectionGuid) {
-            var collectionFolder = CollectionFolderModel.getCollectionFolderConfig(core, CollectionGuid);
-            if (collectionFolder != null) { return collectionFolder.path; }
-            return string.Empty;
-        }
-        //
         //======================================================================================================
         //
         private static int getNavIDByGuid(CoreController core, string ccGuid) {
@@ -1684,6 +1677,9 @@ namespace Contensive.Processor.Controllers {
         //======================================================================================================
         //
         private static void InstallAddonNode(CoreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool return_UpgradeOK, ref string return_ErrorMessage) {
+            // todo - return bool
+            return_ErrorMessage = "";
+            return_UpgradeOK = true;
             try {
                 string Basename = GenericController.vbLCase(AddonNode.Name);
                 if ((Basename == "page") || (Basename == "process") || (Basename == "addon") || (Basename == "add-on")) {
@@ -2456,6 +2452,93 @@ namespace Contensive.Processor.Controllers {
         /// <param name="contextLog"></param>
         private static void traceContextLog(CoreController core, Stack<string> contextLog) {
             logger.Log(LogLevel.Info, LogController.getLogMsg(core, string.Join(",", contextLog)));
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Get the collection folder stored in the collection config file (xml file at root of the collection folder)
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="CollectionGuid"></param>
+        /// <returns></returns>
+        public static string GetCollectionConfigFolderPath(CoreController core, string CollectionGuid) {
+            var collectionFolder = CollectionFolderModel.getCollectionFolderConfig(core, CollectionGuid);
+            if (collectionFolder != null) { return collectionFolder.path; }
+            return string.Empty;
+        }
+        //
+        //======================================================================================================
+        /// <summary>
+        /// determine or create a collection version path (/private/addons/collectionFolder/collectionVersion) 
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="collectionGuid"></param>
+        /// <param name="CollectionName"></param>
+        /// <returns></returns>
+        public static string getCollectionVersionFolderName(CoreController core, string collectionGuid, string CollectionName) {
+            collectionGuid = GenericController.normalizeGuid(collectionGuid);
+            string CollectionVersionFolderName = GetCollectionConfigFolderPath(core, collectionGuid);
+            string CollectionFolderName = "";
+            if (!string.IsNullOrEmpty(CollectionVersionFolderName)) {
+                //
+                // This is an upgrade
+                //
+                int Pos = GenericController.vbInstr(1, CollectionVersionFolderName, "\\");
+                if (Pos > 0) {
+                    CollectionFolderName = CollectionVersionFolderName.Left(Pos - 1);
+                }
+            } else {
+                //
+                // This is an install
+                //
+                //hint = hint & ",460"
+                CollectionFolderName = collectionGuid;
+                CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "{", "");
+                CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "}", "");
+                CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "-", "");
+                CollectionFolderName = GenericController.vbReplace(CollectionFolderName, " ", "");
+                CollectionFolderName = CollectionName + "_" + CollectionFolderName;
+                CollectionFolderName = CollectionFolderName.ToLowerInvariant();
+            }
+            string CollectionFolder = core.addon.getPrivateFilesAddonPath() + CollectionFolderName + "\\";
+            core.privateFiles.verifyPath(CollectionFolder);
+            //
+            // create a collection 'version' folder for these new files
+            string TimeStamp = "";
+            DateTime NowTime = default(DateTime);
+            NowTime = DateTime.Now;
+            int NowPart = NowTime.Year;
+            TimeStamp += NowPart.ToString();
+            NowPart = NowTime.Month;
+            if (NowPart < 10) {
+                TimeStamp += "0";
+            }
+            TimeStamp += NowPart.ToString();
+            NowPart = NowTime.Day;
+            if (NowPart < 10) {
+                TimeStamp += "0";
+            }
+            TimeStamp += NowPart.ToString();
+            NowPart = NowTime.Hour;
+            if (NowPart < 10) {
+                TimeStamp += "0";
+            }
+            TimeStamp += NowPart.ToString();
+            NowPart = NowTime.Minute;
+            if (NowPart < 10) {
+                TimeStamp += "0";
+            }
+            TimeStamp += NowPart.ToString();
+            NowPart = NowTime.Second;
+            if (NowPart < 10) {
+                TimeStamp += "0";
+            }
+            TimeStamp += NowPart.ToString();
+            CollectionVersionFolderName = CollectionFolderName + "\\" + TimeStamp;
+            string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + CollectionVersionFolderName;
+            string CollectionVersionPath = CollectionVersionFolder + "\\";
+            core.privateFiles.createPath(CollectionVersionPath);
+            return CollectionVersionFolderName;
         }
     }
 }
