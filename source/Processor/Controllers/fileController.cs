@@ -728,24 +728,56 @@ namespace Contensive.Processor.Controllers {
         public List<BaseClasses.CPFileSystemBaseClass.FolderDetail> getFolderList_remote(string path) {
             try {
                 path = normalizeDosPath(path);
+                string unixPath = convertToUnixSlash(joinPath(remotePathPrefix, path));
+                //path = normalizeDosPath(path);
                 ListObjectsRequest request = new ListObjectsRequest {
                     BucketName = core.serverConfig.awsBucketName,
-                    Prefix = convertToUnixSlash(path)
+                    Prefix = unixPath,
+                    Delimiter = @"/"                     
                 };
+                int prefixLength = unixPath.Length;
                 // Build your call out to S3 and store the response
-                ListObjectsResponse response = s3Client.ListObjects(request);
-                IEnumerable<S3Object> folderList = response.S3Objects.Where(x => x.Key.EndsWith(@"/") && x.Size == 0);
                 var returnFolders = new List<FolderDetail>();
-                foreach (var folder in folderList) {
+                ListObjectsResponse response = s3Client.ListObjects(request);
+                foreach( var commonPrefix in response.CommonPrefixes) {
+                    string subFolder = commonPrefix.Substring(prefixLength);
+                    if (string.IsNullOrWhiteSpace(subFolder)) { continue; }
+                    // -- remove trailing slash as this returns folder names, not paths (path ends in slash, folder name ends in the name)
+                    subFolder = subFolder.Substring(0, subFolder.Length - 1);
+                    // -- skip subfolders as they match the ends-with-a-slash query
+                    if (subFolder.Contains("/")) { continue; }
+                    //if (subFolder.IndexOf("/") > -1) { continue; }
                     returnFolders.Add(new FolderDetail() {
                         Attributes = 0,
                         Type = "",
-                        DateCreated = folder.LastModified,
-                        DateLastAccessed = folder.LastModified,
-                        DateLastModified = folder.LastModified,
-                        Name = folder.Key
+                        DateCreated = DateTime.MinValue,
+                        DateLastAccessed = DateTime.MinValue,
+                        DateLastModified = DateTime.MinValue,
+                        Name = subFolder
                     });
-                };
+                }
+                //IEnumerable<S3Object> folderList = response.S3Objects;
+                ////IEnumerable<S3Object> folderList = response.S3Objects.Where(x => x.Key.EndsWith(@"/") && x.Size == 0);
+                //var returnFolders = new List<FolderDetail>();
+                //int startIndex = unixPath.Length;
+                //foreach (var folder in folderList) {
+                //    string subFolder = folder.Key.Substring(startIndex);
+                //    // -- skip the path being queried (blank subfolder)
+                //    if (string.IsNullOrWhiteSpace(subFolder)) { continue; }
+                //    // -- remove trailing slash as this returns folder names, not paths (path ends in slash, folder name ends in the name)
+                //    subFolder = subFolder.Substring(0,subFolder.Length - 1);
+                //    // -- skip subfolders as they match the ends-with-a-slash query
+                //    if (subFolder.Contains("/")) { continue; }
+                //    //if (subFolder.IndexOf("/") > -1) { continue; }
+                //    returnFolders.Add(new FolderDetail() {
+                //        Attributes = 0,
+                //        Type = "",
+                //        DateCreated = folder.LastModified,
+                //        DateLastAccessed = folder.LastModified,
+                //        DateLastModified = folder.LastModified,
+                //        Name = subFolder
+                //    });
+                //};
                 return returnFolders;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

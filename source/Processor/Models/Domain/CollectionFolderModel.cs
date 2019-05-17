@@ -1,5 +1,6 @@
 ﻿
 using Contensive.Processor.Controllers;
+using Contensive.Processor.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace Contensive.Processor.Models.Domain {
         public string guid { get; set; }
         public string path { get; set; }
         public DateTime lastChangeDate { get; set; }
-        public DateTime installedDate { get; set; }
+        //public DateTime installedDate { get; set; }
 
         //
         //====================================================================================================
@@ -45,7 +46,6 @@ namespace Contensive.Processor.Models.Domain {
                             name = string.Empty,
                             guid = string.Empty,
                             path = string.Empty,
-                            installedDate = DateTime.Now,
                             lastChangeDate = DateTime.Now
                         };
                         foreach (XmlNode collectionNode in configNode.ChildNodes) {
@@ -61,9 +61,6 @@ namespace Contensive.Processor.Models.Domain {
                                     break;
                                 case "lastchangedate":
                                     result.lastChangeDate = GenericController.encodeDate(collectionNode.InnerText);
-                                    break;
-                                case "installeddate":
-                                    result.installedDate = GenericController.encodeDate(collectionNode.InnerText);
                                     break;
                             }
                         }
@@ -104,6 +101,7 @@ namespace Contensive.Processor.Models.Domain {
                     LogController.logInfo(core, "Collection Folder XML rebuild, FolderList.count [" + FolderList.Count + "]");
                     //                     
                     if (FolderList.Count > 0) {
+                        var collectionsFound = new List<string>();
                         foreach (FolderDetail folder in FolderList) {
                             FolderName = folder.Name;
                             if (FolderName.Length > 34) {
@@ -112,22 +110,28 @@ namespace Contensive.Processor.Models.Domain {
                                     Collectionname = FolderName.Left(FolderName.Length - CollectionGuid.Length - 1);
                                     CollectionGuid = CollectionGuid.Left(8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
                                     CollectionGuid = "{" + CollectionGuid + "}";
-                                    List<FolderDetail> SubFolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath() + "\\" + FolderName);
-                                    if (SubFolderList.Count > 0) {
-                                        FolderDetail lastSubFolder = SubFolderList.Last<FolderDetail>();
-                                        FolderName = FolderName + "\\" + lastSubFolder.Name;
-                                        LastChangeDate = lastSubFolder.Name.Substring(4, 2) + "/" + lastSubFolder.Name.Substring(6, 2) + "/" + lastSubFolder.Name.Left(4);
-                                        if (!GenericController.IsDate(LastChangeDate)) {
-                                            LastChangeDate = "";
+                                    if (collectionsFound.Contains(CollectionGuid)) {
+                                        //
+                                        // -- folder with duplicate Guid not allowed. throw exception and block the folder
+                                        LogController.handleError(core, new GenericException("Add-on Collection Folder contains a mulitple collection folders with the same guid, [" + CollectionGuid + "], duplicate folder ignored [" + folder.Name + "]. Remove or Combine the mulitple instances. Then delete the collections.xml file and it will regenerate without the duplicate."));
+                                    } else {
+                                        collectionsFound.Add(CollectionGuid);
+                                        List<FolderDetail> SubFolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath() + FolderName + "\\");
+                                        if (SubFolderList.Count > 0) {
+                                            FolderDetail lastSubFolder = SubFolderList.Last<FolderDetail>();
+                                            FolderName = FolderName + "\\" + lastSubFolder.Name;
+                                            LastChangeDate = lastSubFolder.Name.Substring(4, 2) + "/" + lastSubFolder.Name.Substring(6, 2) + "/" + lastSubFolder.Name.Left(4);
+                                            if (!GenericController.IsDate(LastChangeDate)) {
+                                                LastChangeDate = "";
+                                            }
                                         }
+                                        returnXml += "\r\n\t<Collection>";
+                                        returnXml += "\r\n\t\t<name>" + Collectionname + "</name>";
+                                        returnXml += "\r\n\t\t<guid>" + CollectionGuid + "</guid>";
+                                        returnXml += "\r\n\t\t<lastchangedate>" + LastChangeDate + "</lastchangedate>";
+                                        returnXml += "\r\n\t\t<path>" + FolderName + "</path>";
+                                        returnXml += "\r\n\t</Collection>";
                                     }
-                                    returnXml += "\r\n\t<Collection>";
-                                    returnXml += "\r\n\t\t<name>" + Collectionname + "</name>";
-                                    returnXml += "\r\n\t\t<guid>" + CollectionGuid + "</guid>";
-                                    returnXml += "\r\n\t\t<lastchangedate>" + LastChangeDate + "</lastchangedate>";
-                                    returnXml += "\r\n\t\t<installeddate>" + folder.DateCreated.ToShortDateString() + "</installeddate>";
-                                    returnXml += "\r\n\t\t<path>" + FolderName + "</path>";
-                                    returnXml += "\r\n\t</Collection>";
                                 }
                             }
                         }

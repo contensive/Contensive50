@@ -358,10 +358,10 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // Upgrade addon
                                                     //
-                                                    if (collectionFolderConfig.installedDate == DateTime.MinValue) {
+                                                    if (collectionFolderConfig.lastChangeDate == DateTime.MinValue) {
                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], App has the collection, but the installedDate could not be determined, so it will upgrade.");
                                                         OKToInstall = true;
-                                                    } else if (collectionFolderConfig.installedDate > collection.modifiedDate) {
+                                                    } else if (collectionFolderConfig.lastChangeDate > collection.modifiedDate) {
                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], App has an older version of collection. It will be upgraded.");
                                                         OKToInstall = true;
                                                     } else if (repair) {

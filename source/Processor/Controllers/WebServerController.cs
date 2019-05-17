@@ -801,6 +801,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Go ahead and redirect
                         //
+                        LogController.logInfo(core, "Redirect called, from [" + requestUrl + "], to [" + NonEncodedLink + "], reason [" + RedirectReason + "]" );
                         if (allowDebugMessage && core.doc.visitPropertyAllowDebugging) {
                             //
                             // -- Verbose - do not redirect, just print the link
