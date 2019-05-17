@@ -87,9 +87,9 @@ namespace Contensive.Addons.AdminSite {
                 Stream.Add(getForm_EditFormStart(core, adminData, AdminFormEdit));
                 bool IsLandingPageParent = false;
                 int TemplateIDForStyles = 0;
-                bool IsTemplateTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.PageTemplateModel.contentTableName);
-                bool IsPageContentTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.PageContentModel.contentTableName);
-                bool IsEmailTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.EmailModel.contentTableName);
+                bool IsTemplateTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.PageTemplateModel.contentTableNameLowerCase);
+                bool IsPageContentTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.PageContentModel.contentTableNameLowerCase);
+                bool IsEmailTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.EmailModel.contentTableNameLowerCase);
                 int emailIdForStyles = IsEmailTable ? adminData.editRecord.id : 0;
                 bool IsLandingPage = false;
                 bool IsRootPage = false;
@@ -224,7 +224,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 LogController.logTrace(core, "getFormEdit, adminInfo.editRecord.contentControlId [" + adminData.editRecord.contentControlId + "]");
                 //
-                if (adminContentTableNameLower == PersonModel.contentTableName.ToLowerInvariant()) {
+                if (adminContentTableNameLower == PersonModel.contentTableNameLowerCase) {
                     //
                     // -- people
                     if (!(core.session.isAuthenticatedAdmin(core))) {
@@ -254,7 +254,7 @@ namespace Contensive.Addons.AdminSite {
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     }
-                } else if (adminContentTableNameLower == EmailModel.contentTableName.ToLowerInvariant()) {
+                } else if (adminContentTableNameLower == EmailModel.contentTableNameLowerCase) {
                     //
                     LogController.logTrace(core, "getFormEdit, treat as email, adminContentTableNameLower [" + adminContentTableNameLower + "]");
                     //
@@ -361,7 +361,7 @@ namespace Contensive.Addons.AdminSite {
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     }
-                } else if (adminData.adminContent.tableName.ToLowerInvariant() == ContentModel.contentTableName.ToLowerInvariant()) {
+                } else if (adminData.adminContent.tableName.ToLowerInvariant() == ContentModel.contentTableNameLowerCase) {
                     if (!(core.session.isAuthenticatedAdmin(core))) {
                         //
                         // Must be admin
@@ -392,7 +392,7 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(EditSectionButtonBar);
                     }
                     //
-                } else if (adminContentTableNameLower == PageContentModel.contentTableName.ToLowerInvariant()) {
+                } else if (adminContentTableNameLower == PageContentModel.contentTableNameLowerCase) {
                     //
                     // Page Content
                     //

@@ -11,7 +11,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- const
         public const string contentName = "tasks";
-        public const string contentTableName = "ccTasks";
+        public const string contentTableNameLowerCase = "cctasks";
         public const string contentDataSource = "default";
         public const bool nameFieldIsUnique = false;
         /// <summary>

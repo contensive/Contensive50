@@ -222,7 +222,7 @@ namespace Contensive.Processor.Controllers {
                                 linkAliasId = csData.getInteger("id");
                                 csData.close();
                             }
-                            core.cache.invalidateDbRecord(linkAliasId, LinkAliasModel.contentTableName);
+                            core.cache.invalidateDbRecord(linkAliasId, LinkAliasModel.contentTableNameLowerCase);
                             //
                             // -- force route reload if this is a webserver page
                             Models.Domain.RouteMapModel.invalidateCache(core);

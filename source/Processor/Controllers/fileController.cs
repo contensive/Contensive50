@@ -365,11 +365,15 @@ namespace Contensive.Processor.Controllers {
         /// <param name="pathFolder"></param>
         public void createPath(string pathFolder) {
             try {
-                if (isLocal) {
-                    createPath_local(pathFolder);
-                } else {
+                if (!isLocal) {
+                    //
+                    // -- veriofy remote path only for remote mode
                     verifyPath_remote(pathFolder);
                 }
+                //
+                // todo - consider making a different method that verifies the local path for cases like this...
+                // -- always verify local path. Added for collection folder case so developer will see path they need to work in.
+                createPath_local(pathFolder);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;

@@ -287,7 +287,7 @@ namespace Contensive.Processor.Controllers {
                     if (!string.IsNullOrEmpty(downloadFilename)) {
                         //
                         // -- if the donwloadfilename is specified, save it in the download record and force the file to save with a space in content
-                        download.filename.filename = FileController.getVirtualRecordUnixPathFilename(DownloadModel.contentTableName, "filename", download.id, downloadFilename);
+                        download.filename.filename = FileController.getVirtualRecordUnixPathFilename(DownloadModel.contentTableNameLowerCase, "filename", download.id, downloadFilename);
                         download.filename.content = " ";
                     }
                     downloadId = download.id;

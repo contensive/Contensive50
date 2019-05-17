@@ -8,7 +8,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- const
         public const string contentName = "add-on Content Field Type Rules";
-        public const string contentTableName = "ccAddonContentFieldTypeRules";
+        public const string contentTableNameLowerCase = "ccaddoncontentfieldtyperules";
         public const string contentDataSource = "default";
         public const bool nameFieldIsUnique = false;
         //

@@ -8,7 +8,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- const
         public const string contentName = "add-on page rules";
-        public const string contentTableName = "ccAddonPageRules";
+        public const string contentTableNameLowerCase = "ccaddonpagerules";
         public const string contentDataSource = "default";
         public const bool nameFieldIsUnique = false;
         //

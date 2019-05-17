@@ -14,7 +14,7 @@ namespace Contensive.Processor.Models.Db {
         /// <summary>
         /// The sql server table name
         /// </summary>
-        public const string contentTableName = "ccMenus";
+        public const string contentTableNameLowerCase = "ccmenus";
         /// <summary>
         /// The Contensive datasource. Use "default" or blank for the default datasource stored in the server config file
         /// </summary>

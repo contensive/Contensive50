@@ -207,7 +207,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="derivedType"></param>
         /// <returns></returns>
         public static string derivedTableName(Type derivedType) {
-            FieldInfo fieldInfo = derivedType.GetField("contentTableName");
+            FieldInfo fieldInfo = derivedType.GetField("contentTableNameLowerCase");
             if (fieldInfo == null) { throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentTableName]."); }
             return fieldInfo.GetRawConstantValue().ToString();
         }

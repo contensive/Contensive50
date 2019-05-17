@@ -10,7 +10,7 @@ namespace Contensive.Processor.Models.Db {
         //-- const
         //
         public const string contentName = "Authoring Controls";
-        public const string contentTableName = "ccAuthoringControls";
+        public const string contentTableNameLowerCase = "ccauthoringcontrols";
         public const string contentDataSource = "default";
         public const bool nameFieldIsUnique = false;
         //

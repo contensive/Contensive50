@@ -20,7 +20,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- const
         public const string contentName = "link aliases";
-        public const string contentTableName = "cclinkaliases";
+        public const string contentTableNameLowerCase = "cclinkaliases";
         public const string contentDataSource = "default";
         public const bool nameFieldIsUnique = true;
         //

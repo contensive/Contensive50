@@ -1571,9 +1571,9 @@ namespace Contensive.Addons.AdminSite {
                                 } else {
                                     tableName = MetadataController.getContentTablename(cp.core, editRecord.contentControlId_Name).ToLowerInvariant();
                                 }
-                                if (tableName == LinkAliasModel.contentTableName.ToLowerInvariant()) {
+                                if (tableName == LinkAliasModel.contentTableNameLowerCase) {
                                     LinkAliasModel.invalidateRecordCache(cp.core, editRecord.id);
-                                } else if (tableName == AddonModel.contentTableName.ToLowerInvariant()) {
+                                } else if (tableName == AddonModel.contentTableNameLowerCase) {
                                     AddonModel.invalidateRecordCache(cp.core, editRecord.id);
                                 } else {
                                     LinkAliasModel.invalidateRecordCache(cp.core, editRecord.id);

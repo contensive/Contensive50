@@ -63,7 +63,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, logPrefix + ", install base collection");
                     var context = new Stack<string>();
                     context.Push("NewAppController.upgrade call installbasecollection, repair [" + repair.ToString() + "]");
-                    CollectionController.installBaseCollection(core, context, isNewBuild, repair, ref nonCriticalErrorList, logPrefix);
+                    CollectionInstallController.installBaseCollection(core, context, isNewBuild, repair, ref nonCriticalErrorList, logPrefix);
                     //
                     // -- verify iis configuration
                     LogController.logInfo(core, logPrefix + ", verify iis configuration");

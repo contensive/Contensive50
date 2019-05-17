@@ -119,6 +119,8 @@
     <Compile Include="Addons\Personalization\LastName.cs" />
     <Compile Include="Addons\Personalization\FirstName.cs" />
     <Compile Include="Addons\Primitives\download.cs" />
+    <Compile Include="Controllers\CollectionFolderController.cs" />
+    <Compile Include="Controllers\CollectionLibraryController.cs" />
     <Compile Include="Controllers\PermissionController.cs" />
     <Compile Include="Controllers\EmailAmazonSESController.cs" />
     <Compile Include="Controllers\UpgradeController.cs" />
@@ -202,7 +204,7 @@
     <Compile Include="Addons\Tools\legacyToolsClass.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Controllers\AddonController.cs" />
-    <Compile Include="Controllers\CollectionController.cs" />
+    <Compile Include="Controllers\CollectionInstallController.cs" />
     <Compile Include="Addons\AdminSite\Controllers\AdminUIController.cs" />
     <Compile Include="Controllers\NewAppController.cs" />
     <Compile Include="Controllers\CacheController.cs" />

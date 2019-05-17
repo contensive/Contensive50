@@ -8,7 +8,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- const
         public const string contentName = "group rules";
-        public const string contentTableName = "ccgrouprules";
+        public const string contentTableNameLowerCase = "ccgrouprules";
         public const string contentDataSource = "default";
         public const bool nameFieldIsUnique = false;
         //

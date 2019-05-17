@@ -156,8 +156,8 @@ namespace Contensive.Processor.Controllers {
         }
         public void assemblyList_AddonsFound_save() {
             var dependentKeyList = new List<string>();
-            dependentKeyList.Add(CacheController.createCacheKey_LastRecordModifiedDate(AddonModel.contentTableName));
-            dependentKeyList.Add(CacheController.createCacheKey_LastRecordModifiedDate(AddonCollectionModel.contentTableName));
+            dependentKeyList.Add(CacheController.createCacheKey_LastRecordModifiedDate(AddonModel.contentTableNameLowerCase));
+            dependentKeyList.Add(CacheController.createCacheKey_LastRecordModifiedDate(AddonCollectionModel.contentTableNameLowerCase));
             cache.storeObject(AssemblyFileDictCacheName, _assemblyFileDict, dependentKeyList);
         }
         private Dictionary<string, AssemblyFileDetails> _assemblyFileDict;
@@ -728,67 +728,88 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Process manual changes needed for special cases
         /// </summary>
-        /// <param name="IsDelete"></param>
-        /// <param name="ContentName"></param>
-        /// <param name="RecordID"></param>
-        /// <param name="RecordName"></param>
-        /// <param name="RecordParentID"></param>
-        /// <param name="UseContentWatchLink"></param>
-        public void processAfterSave(bool IsDelete, string ContentName, int RecordID, string RecordName, int RecordParentID, bool UseContentWatchLink) {
+        /// <param name="isDelete"></param>
+        /// <param name="contentName"></param>
+        /// <param name="recordID"></param>
+        /// <param name="recordName"></param>
+        /// <param name="recordParentID"></param>
+        /// <param name="useContentWatchLink"></param>
+        public void processAfterSave(bool isDelete, string contentName, int recordID, string recordName, int recordParentID, bool useContentWatchLink) {
             try {
-                int ContentID = ContentMetadataModel.getContentId(this, ContentName);
-                string TableName = MetadataController.getContentTablename(this, ContentName);
-                PageContentModel.markReviewed(this, RecordID);
+                int contentID = ContentMetadataModel.getContentId(this, contentName);
+                string tableName = MetadataController.getContentTablename(this, contentName);
+                PageContentModel.markReviewed(this, recordID);
                 //
                 // -- invalidate the specific cache for this record
-                cache.invalidateDbRecord(RecordID, TableName);
-                int ActivityLogOrganizationID = 0;
+                cache.invalidateDbRecord(recordID, tableName);
+                int activityLogOrganizationID = 0;
                 //
-                switch (GenericController.vbLCase(TableName)) {
-                    case LinkForwardModel.contentTableName:
+                switch (tableName.ToLower()) {
+                    case AddonCollectionModel.contentTableNameLowerCase:
                         //
-                        routeMapCacheClear();
-                        break;
-                    case LinkAliasModel.contentTableName:
-                        //
-                        routeMapCacheClear();
-                        break;
-                    case AddonModel.contentTableName:
-                        //
-                        routeMapCacheClear();
-                        cache.invalidateDbRecord(RecordID, TableName);
-                        break;
-                    case PersonModel.contentTableName:
-                        //
-                        using (var csData = new CsModel(this)) {
-                            csData.openRecord("people", RecordID, "Name,OrganizationID");
-                            if (csData.ok()) {
-                                ActivityLogOrganizationID = csData.getInteger("OrganizationID");
+                        // -- if this is an add or delete, manage the collection folders
+                        if (isDelete) {
+                            //
+                            // todo - if a collection is deleted, consider deleting the collection folder (or saving as archive)
+                        } else {
+                            var addonCollection = Models.Db.AddonCollectionModel.create(this, recordID);
+                            if (addonCollection != null) {
+                                string CollectionVersionFolderName = CollectionFolderController.verifyCollectionVersionFolderName(this, addonCollection.ccguid, addonCollection.name);
+                                if (string.IsNullOrEmpty(CollectionVersionFolderName)) {
+                                    //
+                                    // -- new collection
+                                    string CollectionVersionFolder = addon.getPrivateFilesAddonPath() + CollectionVersionFolderName;
+                                    privateFiles.createPath(CollectionVersionFolder);
+                                    CollectionFolderController.updateCollectionFolderConfig(this, addonCollection.name, addonCollection.ccguid, DateTime.Now, CollectionVersionFolderName);
+                                }
+
                             }
                         }
-                        if (IsDelete) {
-                            LogController.addSiteActivity(this, "deleting user #" + RecordID + " (" + RecordName + ")", RecordID, ActivityLogOrganizationID);
+                        break;
+                    case LinkForwardModel.contentTableNameLowerCase:
+                        //
+                        routeMapCacheClear();
+                        break;
+                    case LinkAliasModel.contentTableNameLowerCase:
+                        //
+                        routeMapCacheClear();
+                        break;
+                    case AddonModel.contentTableNameLowerCase:
+                        //
+                        routeMapCacheClear();
+                        cache.invalidateDbRecord(recordID, tableName);
+                        break;
+                    case PersonModel.contentTableNameLowerCase:
+                        //
+                        using (var csData = new CsModel(this)) {
+                            csData.openRecord("people", recordID, "Name,OrganizationID");
+                            if (csData.ok()) {
+                                activityLogOrganizationID = csData.getInteger("OrganizationID");
+                            }
+                        }
+                        if (isDelete) {
+                            LogController.addSiteActivity(this, "deleting user #" + recordID + " (" + recordName + ")", recordID, activityLogOrganizationID);
                         } else {
-                            LogController.addSiteActivity(this, "saving changes to user #" + RecordID + " (" + RecordName + ")", RecordID, ActivityLogOrganizationID);
+                            LogController.addSiteActivity(this, "saving changes to user #" + recordID + " (" + recordName + ")", recordID, activityLogOrganizationID);
                         }
                         break;
-                    case "organizations":
+                    case OrganizationModel.contentTableNameLowerCase:
                         //
                         // Log Activity for changes to people and organizattions
                         //
                         //hint = hint & ",120"
-                        if (IsDelete) {
-                            LogController.addSiteActivity(this, "deleting organization #" + RecordID + " (" + RecordName + ")", 0, RecordID);
+                        if (isDelete) {
+                            LogController.addSiteActivity(this, "deleting organization #" + recordID + " (" + recordName + ")", 0, recordID);
                         } else {
-                            LogController.addSiteActivity(this, "saving changes to organization #" + RecordID + " (" + RecordName + ")", 0, RecordID);
+                            LogController.addSiteActivity(this, "saving changes to organization #" + recordID + " (" + recordName + ")", 0, recordID);
                         }
                         break;
-                    case "ccsetup":
+                    case SitePropertyModel.contentTableNameLowerCase:
                         //
                         // Site Properties
                         //
                         //hint = hint & ",130"
-                        switch (GenericController.vbLCase(RecordName)) {
+                        switch (GenericController.vbLCase(recordName)) {
                             case "allowlinkalias":
                                 PageContentModel.invalidateTableCache(this);
                                 break;
@@ -800,44 +821,44 @@ namespace Contensive.Processor.Controllers {
                                 break;
                         }
                         break;
-                    case "ccpagecontent":
+                    case PageContentModel.contentTableNameLowerCase:
                         //
                         // set ChildPagesFound true for parent page
                         //
                         //hint = hint & ",140"
-                        if (RecordParentID > 0) {
-                            if (!IsDelete) {
-                                db.executeQuery("update ccpagecontent set ChildPagesfound=1 where ID=" + RecordParentID);
+                        if (recordParentID > 0) {
+                            if (!isDelete) {
+                                db.executeQuery("update ccpagecontent set ChildPagesfound=1 where ID=" + recordParentID);
                             }
                         }
                         //
                         // Page Content special cases for delete
                         //
-                        if (IsDelete) {
+                        if (isDelete) {
                             //
                             // Clear the Landing page and page not found site properties
                             //
-                            if (RecordID == GenericController.encodeInteger(siteProperties.getText("PageNotFoundPageID", "0"))) {
+                            if (recordID == GenericController.encodeInteger(siteProperties.getText("PageNotFoundPageID", "0"))) {
                                 siteProperties.setProperty("PageNotFoundPageID", "0");
                             }
-                            if (RecordID == siteProperties.landingPageID) {
+                            if (recordID == siteProperties.landingPageID) {
                                 siteProperties.setProperty("landingPageId", "0");
                             }
                             //
                             // Delete Link Alias entries with this PageID
                             //
-                            db.executeQuery("delete from cclinkAliases where PageID=" + RecordID);
+                            db.executeQuery("delete from cclinkAliases where PageID=" + recordID);
                         }
-                        PageContentModel.invalidateRecordCache(this, RecordID);
+                        PageContentModel.invalidateRecordCache(this, recordID);
                         break;
-                    case "cclibraryfiles":
+                    case LibraryFilesModel.contentTableNameLowerCase:
                         //
                         // if a AltSizeList is blank, make large,medium,small and thumbnails
                         //
                         //hint = hint & ",180"
-                        if (siteProperties.getBoolean("ImageAllowSFResize", true) && (!IsDelete)) {
+                        if (siteProperties.getBoolean("ImageAllowSFResize", true) && (!isDelete)) {
                             using (var csData = new CsModel(this)) {
-                                if (csData.openRecord("library files", RecordID)) {
+                                if (csData.openRecord("library files", recordID)) {
                                     string Filename = csData.getText("filename");
                                     int Pos = Filename.LastIndexOf("/") + 1;
                                     string FilePath = "";
@@ -919,28 +940,28 @@ namespace Contensive.Processor.Controllers {
                 Dictionary<string, string> instanceArguments;
                 bool onChangeAddonsAsync = siteProperties.getBoolean("execute oncontentchange addons async", false);
                 using (var csData = new CsModel(this)) {
-                    csData.open("Add-on Content Trigger Rules", "ContentID=" + ContentID, "", false, 0, "addonid");
+                    csData.open("Add-on Content Trigger Rules", "ContentID=" + contentID, "", false, 0, "addonid");
                     string Option_String = null;
-                    if (IsDelete) {
+                    if (isDelete) {
                         instanceArguments = new Dictionary<string, string>() {
                             {"action","contentdelete"},
-                            {"contentid",ContentID.ToString()},
-                            {"recordid",RecordID.ToString()}
+                            {"contentid",contentID.ToString()},
+                            {"recordid",recordID.ToString()}
                         };
                         Option_String = ""
                             + "\r\naction=contentdelete"
-                            + "\r\ncontentid=" + ContentID
-                            + "\r\nrecordid=" + RecordID + "";
+                            + "\r\ncontentid=" + contentID
+                            + "\r\nrecordid=" + recordID + "";
                     } else {
                         instanceArguments = new Dictionary<string, string>() {
                             {"action","contentchange"},
-                            {"contentid",ContentID.ToString()},
-                            {"recordid",RecordID.ToString()}
+                            {"contentid",contentID.ToString()},
+                            {"recordid",recordID.ToString()}
                         };
                         Option_String = ""
                             + "\r\naction=contentchange"
-                            + "\r\ncontentid=" + ContentID
-                            + "\r\nrecordid=" + RecordID + "";
+                            + "\r\ncontentid=" + contentID
+                            + "\r\nrecordid=" + recordID + "";
                     }
                     while (csData.ok()) {
                         var addon = AddonModel.create(this, csData.getInteger("Addonid"));

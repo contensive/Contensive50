@@ -498,7 +498,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                 RegisterList = "";
                                 var context = new Stack<string>();
                                 context.Push( "AddonManager Install Library Collection [" + LibGuids[Ptr] + "]" );
-                                UpgradeOK = CollectionController.installCollectionFromLibrary(core, context, LibGuids[Ptr], ref ErrorMessage, false, true, ref nonCriticalErrorList, "AddonManagerClass.GetForm_SaveModeAddonManager", ref collectionsInstalledList);
+                                UpgradeOK = CollectionLibraryController.installCollectionFromLibrary(core, context, LibGuids[Ptr], ref ErrorMessage, false, true, ref nonCriticalErrorList, "AddonManagerClass.GetForm_SaveModeAddonManager", ref collectionsInstalledList);
                                 if (!UpgradeOK) {
                                     //
                                     // block the reset because we will loose the error message
@@ -527,7 +527,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                 var context = new Stack<string>();
                                 context.Push("AddonManager install from path [" + privateFilesInstallPath + "]");
                                 var collectionsDownloaded = new List<string>();
-                                UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core,context, privateFilesInstallPath, ref ErrorMessage, ref collectionsInstalledList, false, true, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
+                                UpgradeOK = CollectionInstallController.installCollectionsFromPrivateFolder(core,context, privateFilesInstallPath, ref ErrorMessage, ref collectionsInstalledList, false, true, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
                                         ErrorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");

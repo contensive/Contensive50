@@ -8,7 +8,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- const
         public const string contentName = "add-on template rules";
-        public const string contentTableName = "ccAddonTemplateRules";
+        public const string contentTableNameLowerCase = "ccAddontemplaterules";
         public const string contentDataSource = "default";
         public const bool nameFieldIsUnique = false;
         //

@@ -20,7 +20,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- const
         public const string contentName = "languages";
-        public const string contentTableName = "cclanguages";
+        public const string contentTableNameLowerCase = "cclanguages";
         public const string contentDataSource = "default";
         public const bool nameFieldIsUnique = true;
         // 

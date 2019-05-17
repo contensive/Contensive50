@@ -20,7 +20,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- const
         public const string contentName = "library Files";
-        public const string contentTableName = "cclibraryFiles";
+        public const string contentTableNameLowerCase = "cclibraryfiles";
         public const string contentDataSource = "default";
         public const bool nameFieldIsUnique = false;
         //
