@@ -241,9 +241,11 @@ namespace Contensive.Processor.Controllers {
                     throw new ArgumentException("key cannot be blank");
                 } else {
                     string serverKey = createServerKey(key);
+                    string typeMessage = "";
                     if (remoteCacheInitialized) {
                         //
                         // -- use remote cache
+                        typeMessage = "remote";
                         try {
                             result = cacheClient.Get<CacheDocumentClass>(serverKey);
                         } catch (Exception ex) {
@@ -261,42 +263,43 @@ namespace Contensive.Processor.Controllers {
                                 throw;
                             }
                         }
-                        if (result != null) {
-                            LogController.logTrace(core, "getCacheDocument(" + key + "), remoteCache hit");
-                        } else {
-                            LogController.logTrace(core, "getCacheDocument(" + key + "), remoteCache miss");
-                        }
                     }
                     if ((result == null) && core.serverConfig.enableLocalMemoryCache) {
                         //
                         // -- local memory cache
-                        //Dim cache As ObjectCache = MemoryCache.Default
+                        typeMessage = "local-memory";
                         result = (CacheDocumentClass)MemoryCache.Default[serverKey];
-                        if (result != null) {
-                            LogController.logTrace(core, "getCacheDocument(" + key + "), memoryCache hit");
-                        } else {
-                            LogController.logTrace(core, "getCacheDocument(" + key + "), memoryCache miss");
-                        }
                     }
                     if ((result == null) && core.serverConfig.enableLocalFileCache) {
                         //
                         // -- local file cache
+                        typeMessage = "local-file";
                         string serializedDataObject = null;
                         using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, serverKey)) {
                             mutex.WaitOne();
                             serializedDataObject = core.privateFiles.readFileText("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"));
                             mutex.ReleaseMutex();
                         }
-                        if (string.IsNullOrEmpty(serializedDataObject)) {
-                            LogController.logTrace(core, "getCacheDocument(" + key + "), file miss");
-                        } else {
+                        if (!string.IsNullOrEmpty(serializedDataObject)) {
                             result = Newtonsoft.Json.JsonConvert.DeserializeObject<CacheDocumentClass>(serializedDataObject);
                             storeCacheDocument_MemoryCache(serverKey, result);
                         }
-                        if (result == null) {
-                            LogController.logTrace(core, "getCacheDocument(" + key + "), fileCache miss");
+                    }
+                    //
+                    // -- log result
+                    if (result == null) {
+                        LogController.logTrace(core, "getCacheDocument, miss, type [" + typeMessage + "], key [" + key + "]");
+                    } else {
+                        if (result.content == null) {
+                            LogController.logTrace(core, "getCacheDocument, hit, type [" + typeMessage + "], key [" + key + "], age [" + result.saveDate.ToString() + "], content [null]");
+                        } else {
+                            string content = result.content.ToString();
+                            content = (content.Length > 50) ? (content.Left(50) + "...") : content;
+                            LogController.logTrace(core, "getCacheDocument, hit, type [" + typeMessage + "], key [" + key + "], age [" + result.saveDate.ToString() + "], content [" + content + "]");
                         }
                     }
+                    //
+                    // if dependentKeyList is null, return an empty list, not null
                     if (result != null) {
                         //
                         // -- empty objects return nothing, empty lists return count=0
@@ -713,18 +716,18 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(key)) {
                     throw new ArgumentException("cache key cannot be blank");
                 } else {
+                    string typeMessage = "";
                     string serverKey = createServerKey(key);
-                    //
-                    LogController.logTrace(core, "storeCacheDocument(" + serverKey + "), expires [" + cacheDocument.invalidationDate.ToString() + "], depends on [" + string.Join(",", cacheDocument.dependentKeyList) + "], points to [" + string.Join(",", cacheDocument.keyPtr) + "]");
-                    //
                     if (core.serverConfig.enableLocalMemoryCache) {
                         //
                         // -- save local memory cache
+                        typeMessage = "local-memory";
                         storeCacheDocument_MemoryCache(serverKey, cacheDocument);
                     }
                     if (core.serverConfig.enableLocalFileCache) {
                         //
                         // -- save local file cache
+                        typeMessage = "local-file";
                         string serializedData = Newtonsoft.Json.JsonConvert.SerializeObject(cacheDocument);
                         using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, serverKey)) {
                             mutex.WaitOne();
@@ -733,12 +736,16 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     if (core.serverConfig.enableRemoteCache) {
+                        typeMessage = "remote";
                         if (remoteCacheInitialized) {
                             //
                             // -- save remote cache
                             cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, serverKey, cacheDocument, cacheDocument.invalidationDate);
                         }
                     }
+                    //
+                    LogController.logTrace(core, "storeCacheDocument, type [" + typeMessage + "], key [" + key + "], expires [" + cacheDocument.invalidationDate.ToString() + "], depends on [" + string.Join(",", cacheDocument.dependentKeyList) + "], points to [" + string.Join(",", cacheDocument.keyPtr) + "]");
+                    //
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
