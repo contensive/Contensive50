@@ -877,7 +877,7 @@ namespace Contensive.Addons.SafeAddonManager {
                     core.html.addTitle("Add-on Manager");
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return addonManager;
@@ -912,7 +912,7 @@ namespace Contensive.Addons.SafeAddonManager {
                     MetadataController.deleteContentRecord(core,NavigatorEntryModel.contentName, EntryID);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
         }
         //
@@ -952,7 +952,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             //ErrorTrap:
             HandleClassTrapError("GetXMLAttribute");
@@ -1018,7 +1018,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             //ErrorTrap:
             HandleClassTrapError("GetParentIDFromNameSpace");

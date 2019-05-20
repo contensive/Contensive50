@@ -67,7 +67,7 @@ namespace Contensive.Addons.AdminSite {
                     result = HtmlController.div(result, "container-fluid ccBodyAdmin ccCon");
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
             return result;
         }
@@ -96,7 +96,7 @@ namespace Contensive.Addons.AdminSite {
                     adminData.ContentWatchLoaded = false;
                     //
                     if (string.Compare(cp.core.siteProperties.dataBuildVersion, cp.Version) < 0) {
-                        LogController.handleWarn(cp.core, new GenericException("Application code version (" + cp.Version + ") is newer than Db version (" + cp.core.siteProperties.dataBuildVersion + "). Upgrade site code."));
+                        LogController.logWarn(cp.core, new GenericException("Application code version (" + cp.Version + ") is newer than Db version (" + cp.core.siteProperties.dataBuildVersion + "). Upgrade site code."));
                     }
                     //
                     //// Get Requests, initialize adminContext.content and editRecord objects 
@@ -390,7 +390,7 @@ namespace Contensive.Addons.AdminSite {
                     result = Processor.Controllers.ErrorController.getDocExceptionHtmlList(cp.core) + result;
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
             return result;
         }
@@ -475,7 +475,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
             return addonHelp;
@@ -540,7 +540,7 @@ namespace Contensive.Addons.AdminSite {
                     returnHelp = returnHelp + "</div>";
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
             return returnHelp;
@@ -589,7 +589,7 @@ namespace Contensive.Addons.AdminSite {
                 return;
                 //
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //     
@@ -878,7 +878,7 @@ namespace Contensive.Addons.AdminSite {
                 //
             } catch (Exception ex) {
                 Processor.Controllers.ErrorController.addUserError(cp.core, "There was an unknown error processing this page at " + cp.core.doc.profileStartTime + ". Please try again, Or report this error To the site administrator.");
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -973,7 +973,7 @@ namespace Contensive.Addons.AdminSite {
                     GroupRuleModel.invalidateTableCache(cp.core);
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -992,7 +992,7 @@ namespace Contensive.Addons.AdminSite {
                 return;
                 //
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -1024,7 +1024,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -1111,7 +1111,7 @@ namespace Contensive.Addons.AdminSite {
                 return;
                 //
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //========================================================================
@@ -1154,7 +1154,7 @@ namespace Contensive.Addons.AdminSite {
                             csData.set("clicks", 0);
                         }
                         if (!csData.ok()) {
-                            LogController.handleError(cp.core, new GenericException("SaveContentTracking, can Not create New record"));
+                            LogController.logError(cp.core, new GenericException("SaveContentTracking, can Not create New record"));
                         } else {
                             ContentWatchID = csData.getInteger("ID");
                             csData.set("LinkLabel", adminData.ContentWatchLinkLabel);
@@ -1190,7 +1190,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -1247,7 +1247,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -1292,12 +1292,12 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // Could not insert record
                                 //
-                                LogController.handleError(cp.core, new GenericException("A new record could not be inserted for content [" + adminData.adminContent.name + "]. Verify the Database table and field DateAdded, CreateKey, and ID."));
+                                LogController.logError(cp.core, new GenericException("A new record could not be inserted for content [" + adminData.adminContent.name + "]. Verify the Database table and field DateAdded, CreateKey, and ID."));
                             } else {
                                 //
                                 // Could not locate record you requested
                                 //
-                                LogController.handleError(cp.core, new GenericException("The record you requested (ID=" + editRecord.id + ") could not be found for content [" + adminData.adminContent.name + "]"));
+                                LogController.logError(cp.core, new GenericException("The record you requested (ID=" + editRecord.id + ") could not be found for content [" + adminData.adminContent.name + "]"));
                             }
                         } else {
                             //
@@ -1597,7 +1597,7 @@ namespace Contensive.Addons.AdminSite {
                     editRecord.Saved = true;
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -1637,7 +1637,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 result = Stream.Text;
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
             return result;
@@ -1741,7 +1741,7 @@ namespace Contensive.Addons.AdminSite {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
             return tempGetMenuLink;
         }
@@ -1982,7 +1982,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -2001,7 +2001,7 @@ namespace Contensive.Addons.AdminSite {
                     tempGetForm_Close = AdminFormIndex;
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
             return tempGetForm_Close;
         }
@@ -2096,7 +2096,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -2182,7 +2182,7 @@ namespace Contensive.Addons.AdminSite {
                     adminData.Admin_Action = Constants.AdminActionNop;
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -2267,7 +2267,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -2483,7 +2483,7 @@ namespace Contensive.Addons.AdminSite {
                 Description = "<div>This tool is used to create content definitions that help segregate your content into authorable segments.</div>" + Description;
                 result = AdminUIController.getBody(cp.core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
             return result;
         }
@@ -2521,7 +2521,7 @@ namespace Contensive.Addons.AdminSite {
                     csData.close();
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
             return returnOptions;
@@ -2666,7 +2666,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 cp.core.html.addTitle(Caption);
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
             return tempGetForm_HouseKeepingControl;
         }
@@ -2721,7 +2721,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -2801,7 +2801,7 @@ namespace Contensive.Addons.AdminSite {
                 tempGetForm_BuildCollection = AdminUIController.getBody(cp.core, "Security Settings", ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
             return tempGetForm_BuildCollection;
         }

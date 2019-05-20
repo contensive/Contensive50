@@ -673,7 +673,7 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 contentMetadata.verifyContentField(core, field, true);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -765,7 +765,7 @@ namespace Contensive.Processor.Models.Domain {
                         break;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex); // "Unexpected exception")
+                LogController.logError(core, ex); // "Unexpected exception")
                 throw;
             }
             return returnFieldTypeName;

@@ -123,7 +123,7 @@ namespace Contensive.Processor.Models.Db {
                     result.Add("default", getDefaultDatasource(core));
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -152,7 +152,7 @@ namespace Contensive.Processor.Models.Db {
                     //username = core.serverConfig.username
                 };
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;

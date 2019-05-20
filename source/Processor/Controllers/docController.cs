@@ -271,7 +271,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
             ////throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
@@ -288,7 +288,7 @@ namespace Contensive.Processor.Controllers {
                 string ContentRecordKey = Models.Domain.ContentMetadataModel.getContentId(core, GenericController.encodeText(ContentName)) + "." + GenericController.encodeInteger(RecordID);
                 result = getContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -314,7 +314,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 return GenericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -349,7 +349,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 return result;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -442,7 +442,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 resultLink = GenericController.encodeVirtualPath(resultLink, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return resultLink;
@@ -489,7 +489,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -526,7 +526,7 @@ namespace Contensive.Processor.Controllers {
                     refreshQueryString = GenericController.modifyQueryString(core.doc.refreshQueryString, Name, Value, true);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
 

@@ -470,7 +470,7 @@ namespace Contensive.Processor.Controllers {
                     result = ErrorController.getDocExceptionHtmlList(core) + result;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -534,7 +534,7 @@ namespace Contensive.Processor.Controllers {
                     result = core.doc.docBodyFilter + AddonReturn;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -1028,7 +1028,7 @@ namespace Contensive.Processor.Controllers {
                     return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1148,7 +1148,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1187,7 +1187,7 @@ namespace Contensive.Processor.Controllers {
                 copyRecord.save(core);
                 return result;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 return string.Empty;
             }
         }
@@ -1219,7 +1219,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 result = Copy;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1248,7 +1248,7 @@ namespace Contensive.Processor.Controllers {
                 if (domain == null) {
                     //
                     // -- domain is not valid
-                    LogController.handleError(core, new GenericException("Page could not be determined because the domain was not recognized."));
+                    LogController.logError(core, new GenericException("Page could not be determined because the domain was not recognized."));
                     return;
                 }
                 //
@@ -1402,7 +1402,7 @@ namespace Contensive.Processor.Controllers {
                 core.docProperties.setProperty("Open Graph Description", HtmlController.encodeHtml(core.doc.pageController.page.metaDescription));
                 core.docProperties.setProperty("Open Graph Image", (string.IsNullOrEmpty(core.doc.pageController.page.imageFilename)) ? string.Empty : core.webServer.requestProtocol + core.appConfig.domainList.First() + core.appConfig.cdnFileUrl + core.doc.pageController.page.imageFilename);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -1426,7 +1426,7 @@ namespace Contensive.Processor.Controllers {
                 if (domain == null) {
                     //
                     // -- domain not available
-                    LogController.handleError(core, new GenericException("Landing page could not be determined because the domain was not recognized."));
+                    LogController.logError(core, new GenericException("Landing page could not be determined because the domain was not recognized."));
                 } else {
                     //
                     // -- attempt domain landing page
@@ -1465,7 +1465,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return landingPage;
@@ -1563,7 +1563,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 result = Link;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1650,7 +1650,7 @@ namespace Contensive.Processor.Controllers {
                 // -- assemble
                 result = linkprotocol + linkDomain + linkPathPage;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1823,7 +1823,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1914,7 +1914,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2006,7 +2006,7 @@ namespace Contensive.Processor.Controllers {
                     + ErrorController.getUserError(core)
                     + HtmlController.formMultipart(core, innerHtml, core.doc.refreshQueryString, "", "ccForm");
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2059,7 +2059,7 @@ namespace Contensive.Processor.Controllers {
                     return "<p>See Also\r<ul class=\"ccList\">" + result + "\r</ul></p>";
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 return string.Empty;
             }
         }
@@ -2176,7 +2176,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2374,7 +2374,7 @@ namespace Contensive.Processor.Controllers {
                     result = "[Child Page List with no pages]</p><p>" + result;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2417,7 +2417,7 @@ namespace Contensive.Processor.Controllers {
                     result = AdminUIController.getEditWrapper(core, result);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2595,7 +2595,7 @@ namespace Contensive.Processor.Controllers {
                     csData.close();
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2644,7 +2644,7 @@ namespace Contensive.Processor.Controllers {
                 DataTable dt = core.db.executeQuery(sql, 1, 1, ref recordsReturned);
                 return !recordsReturned.Equals(0);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

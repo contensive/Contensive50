@@ -149,7 +149,7 @@ namespace Contensive.Processor.Models.Db {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnString;

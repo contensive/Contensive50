@@ -474,7 +474,7 @@ namespace Contensive.Addons.AdminSite {
                 result = HtmlController.form(core, Stream.Text, "", "adminForm");
                 //
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -946,7 +946,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //   
@@ -1396,7 +1396,7 @@ namespace Contensive.Addons.AdminSite {
                     orderByDelim = ",";
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1699,7 +1699,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 returnContent = "<div style=\"padding-left:10px;padding-right:10px;\">" + returnContent + "</div>";
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnContent;
@@ -1805,7 +1805,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 return HtmlController.encodeHtml(Stream.Text);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }

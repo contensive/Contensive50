@@ -176,7 +176,7 @@ namespace Contensive.Processor.Models.Domain {
                     installMetaDataMiniCollection_BuildDb(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -231,7 +231,7 @@ namespace Contensive.Processor.Models.Domain {
                     if ((srcXmlDom.DocumentElement.Name.ToLowerInvariant() != CollectionFileRootNode) && (srcXmlDom.DocumentElement.Name.ToLowerInvariant() != "contensivecdef")) {
                         //
                         // -- root node must be collection (or legacy contensivemetadata)
-                        LogController.handleError(core, new GenericException("the archive file has a syntax error. Application name must be the first node."));
+                        LogController.logError(core, new GenericException("the archive file has a syntax error. Application name must be the first node."));
                     } else {
                         result.isBaseCollection = IsccBaseFile;
                         //
@@ -665,7 +665,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -950,7 +950,7 @@ namespace Contensive.Processor.Models.Domain {
                     core.siteProperties.setProperty("StylesheetSerialNumber", "-1");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1484,7 +1484,7 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 //
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnOk;
@@ -1502,7 +1502,7 @@ namespace Contensive.Processor.Models.Domain {
                     result = MetadataMiniCollectionModel.loadXML(core, applicationMetaDataMiniCollectionXml, false, false, isNewBuild, new MetadataMiniCollectionModel(), logPrefix);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -1566,7 +1566,7 @@ namespace Contensive.Processor.Models.Domain {
                     //content.save(core, true);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1602,7 +1602,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnAttr;

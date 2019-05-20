@@ -158,7 +158,7 @@ namespace Contensive.Processor {
                     result = IsInGroupList(groupId.ToString(), userId);
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core,ex);
+                LogController.logError(cp.core,ex);
                 result = false;
             }
             return result;
@@ -177,7 +177,7 @@ namespace Contensive.Processor {
                 }
                 result = GroupController.isInGroupList(cp.core, userId, IsAuthenticated, groupIDList, false);
             } catch (Exception ex) {
-                LogController.handleError(cp.core,ex);
+                LogController.logError(cp.core,ex);
                 result = false;
             }
             return result;

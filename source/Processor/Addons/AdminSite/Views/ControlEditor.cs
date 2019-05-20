@@ -28,12 +28,12 @@ namespace Contensive.Addons.AdminSite {
                     // Content not found or not loaded
                     if (adminData.adminContent.id == 0) {
                         //
-                        LogController.handleError(core, new GenericException("No content definition was specified for this page"));
+                        LogController.logError(core, new GenericException("No content definition was specified for this page"));
                         return HtmlController.p("No content was specified.");
                     } else {
                         //
                         // Content Definition was not specified
-                        LogController.handleError(core, new GenericException("The content definition specified for this page [" + adminData.adminContent.id + "] was not found"));
+                        LogController.logError(core, new GenericException("The content definition specified for this page [" + adminData.adminContent.id + "] was not found"));
                         return HtmlController.p("No content was specified.");
                     }
                 }
@@ -266,7 +266,7 @@ namespace Contensive.Addons.AdminSite {
                 adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
                 tabPanel = null;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

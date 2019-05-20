@@ -144,7 +144,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 var ExportCSVAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportCSV);
                                 if (ExportCSVAddon == null) {
-                                    LogController.handleError(core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
+                                    LogController.logError(core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
                                 } else {
                                     var docProperties = new Dictionary<string, string> {
                                                 { "sql", SQL },
@@ -215,7 +215,7 @@ namespace Contensive.Addons.AdminSite {
                         + AdminUIController.getBody(core, adminData.adminContent.name + " Export", ButtonList, "", false, false, Description, "", 10, Content);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

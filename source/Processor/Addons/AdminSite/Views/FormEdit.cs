@@ -459,7 +459,7 @@ namespace Contensive.Addons.AdminSite {
                     core.html.addTitle("Edit " + adminData.editRecord.nameLc + " in " + adminData.editRecord.contentControlId_Name);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnHtml;
@@ -502,7 +502,7 @@ namespace Contensive.Addons.AdminSite {
                 if (adminData.adminContent.fields.Count <= 0) {
                     //
                     // There are no visible fiels, return empty
-                    LogController.handleError(core, new GenericException("There is no metadata for this field."));
+                    LogController.logError(core, new GenericException("There is no metadata for this field."));
                 } else {
                     //
                     // ----- Build an index to sort the fields by EditSortOrder
@@ -745,7 +745,7 @@ namespace Contensive.Addons.AdminSite {
                                         } else {
                                             //
                                             // -- log exception but dont throw
-                                            LogController.handleWarn(core, new GenericException("Field [" + adminData.adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
+                                            LogController.logWarn(core, new GenericException("Field [" + adminData.adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
                                             EditorString += "[Selection not configured]";
                                         }
                                         break;
@@ -903,7 +903,7 @@ namespace Contensive.Addons.AdminSite {
                                         } else {
                                             //
                                             // -- log exception but dont throw
-                                            LogController.handleWarn(core, new GenericException("Field [" + adminData.adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
+                                            LogController.logWarn(core, new GenericException("Field [" + adminData.adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
                                             EditorString += "[Selection not configured]";
                                         }
                                         break;
@@ -1245,7 +1245,7 @@ namespace Contensive.Addons.AdminSite {
                     resultBody = null;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnHtml;
@@ -1331,7 +1331,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 returnHtml += HtmlController.inputHidden("FormFieldList", FormFieldList);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnHtml;
@@ -1352,7 +1352,7 @@ namespace Contensive.Addons.AdminSite {
                 if (!AllowAdminTabs) { return Content; }
                 adminMenu.addEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return string.Empty;
         }
@@ -1374,7 +1374,7 @@ namespace Contensive.Addons.AdminSite {
                 result += "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminDepth + "\" VALUE=\"" + adminData.ignore_legacyMenuDepth + "\">";
                 result += "\r\n<input TYPE=\"hidden\" NAME=\"FormEmptyFieldList\" ID=\"FormEmptyFieldList\" VALUE=\",\">";
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

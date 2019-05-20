@@ -179,7 +179,7 @@ namespace Contensive.Processor {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
             return result;
@@ -197,7 +197,7 @@ namespace Contensive.Processor {
                 }
                 cs.close();
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
             return recordId;
@@ -214,7 +214,7 @@ namespace Contensive.Processor {
                 }
                 cs.close();
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
             return result;

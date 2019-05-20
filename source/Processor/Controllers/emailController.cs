@@ -72,7 +72,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -94,7 +94,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -118,7 +118,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -200,7 +200,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, "queueAdHocEmail, added to queue, toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -326,7 +326,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -401,7 +401,7 @@ namespace Contensive.Processor.Controllers {
                     email.subject = emailName;
                     email.fromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
                     email.save(core);
-                    LogController.handleError(core, new GenericException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
+                    LogController.logError(core, new GenericException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
                 }
             }
             return queueSystemEmail(core, email, appendedCopy, additionalMemberID, ref userErrorMessage);
@@ -426,7 +426,7 @@ namespace Contensive.Processor.Controllers {
             SystemEmailModel email = SystemEmailModel.create(core, emailid);
             if (email == null) {
                 userErrorMessage = "The notification email could not be sent.";
-                LogController.handleError(core, new GenericException("No system email was found with the id [" + emailid + "]"));
+                LogController.logError(core, new GenericException("No system email was found with the id [" + emailid + "]"));
                 return false;
             }
             return queueSystemEmail(core, email, appendedCopy, additionalMemberID, ref userErrorMessage);
@@ -556,7 +556,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return true;
         }
@@ -723,7 +723,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -763,7 +763,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 return queueAdHocEmail(core, "Form Submission Email", core.session.user.id, toAddress, fromAddress, emailSubject, Message, "", "", "", false, false, 0, ref userErrorMessage);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 userErrorMessage += " The form could not be delivered due to an unknown error.";
                 return false;
             }
@@ -785,7 +785,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrWhiteSpace(groupCommaList)) { return true; }
                 return queueGroupEmail(core, groupCommaList.Split(',').ToList<string>().FindAll(t => !string.IsNullOrWhiteSpace(t)), fromAddress, subject, body, isImmediate, isHtml, ref userErrorMessage);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 userErrorMessage = "There was an unknown error sending the email;";
                 return false;
             }
@@ -816,7 +816,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 return true;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 userErrorMessage = "There was an unknown error sending the email;";
                 return false;
             }
@@ -847,7 +847,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 return true;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 userErrorMessage = "There was an unknown error sending the email;";
                 return false;
             }
@@ -887,7 +887,7 @@ namespace Contensive.Processor.Controllers {
                 emailQueue.attempts = email.attempts;
                 emailQueue.save(core);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -973,7 +973,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 return;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //

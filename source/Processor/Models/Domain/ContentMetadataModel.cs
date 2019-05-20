@@ -369,7 +369,7 @@ namespace Contensive.Processor.Models.Domain {
                             } else {
                                 Models.Domain.ContentMetadataModel parentMetaData = create(core, result.parentID, loadInvalidFields, forceDbLoad);
                                 if ( parentMetaData == null ) {
-                                    LogController.handleError(core, new GenericException("ContentMetadataModel error, loading content [" + content.id + ", " + content.name + "], parentId [" + result.parentID + "] but no parent content found."));
+                                    LogController.logError(core, new GenericException("ContentMetadataModel error, loading content [" + content.id + ", " + content.name + "], parentId [" + result.parentID + "] but no parent content found."));
                                 } else {
                                     foreach (var keyvaluepair in parentMetaData.fields) {
                                         Models.Domain.ContentFieldMetadataModel parentField = keyvaluepair.Value;
@@ -586,7 +586,7 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 core.metaDataDictionary.Add(content.id.ToString(), result);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -682,7 +682,7 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 return returnCriteria;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -746,7 +746,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -796,7 +796,7 @@ namespace Contensive.Processor.Models.Domain {
                 try {
                     result = core.cache.getObject<Models.Domain.ContentMetadataModel>(getCacheKey(contentId));
                 } catch (Exception ex) {
-                    LogController.handleError(core, ex);
+                    LogController.logError(core, ex);
                 }
             } catch (Exception) { }
             return result;
@@ -818,7 +818,7 @@ namespace Contensive.Processor.Models.Domain {
                 core.contentNameIdDictionary.Add(nameLower, content.id);
                 return content.id;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -874,7 +874,7 @@ namespace Contensive.Processor.Models.Domain {
                     if ((!fieldMetadata.isBaseField) && (RecordIsBaseField)) {
                         //
                         // This update is not allowed
-                        LogController.handleWarn(core, new GenericException("Warning, updating non-base field with base field, content [" + name + "], field [" + fieldMetadata.nameLc + "]"));
+                        LogController.logWarn(core, new GenericException("Warning, updating non-base field with base field, content [" + name + "], field [" + fieldMetadata.nameLc + "]"));
                     }
                     using (var db = new DbController(core, dataSourceName)) {
                         //
@@ -1011,7 +1011,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1320,7 +1320,7 @@ namespace Contensive.Processor.Models.Domain {
                 ContentFieldModel.invalidateTableCache(core);
                 core.clearMetaData();
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return contentMetadata.id;
@@ -1405,7 +1405,7 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 return contentMetadata;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1520,7 +1520,7 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 return false;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1574,7 +1574,7 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 return create(core, childContent);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 return null;
             }
         }
@@ -1619,7 +1619,7 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 return string.Empty;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1635,7 +1635,7 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 return 0;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1649,7 +1649,7 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 return 0;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }

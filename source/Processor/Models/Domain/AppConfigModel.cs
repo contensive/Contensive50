@@ -147,7 +147,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex, "exception in serverConfigModel.getObject");
+                LogController.logError( core,ex, "exception in serverConfigModel.getObject");
             }
             return returnModel;
         }
@@ -169,7 +169,7 @@ namespace Contensive.Processor.Models.Domain {
                     core.serverConfig.save(core);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
         }
     }

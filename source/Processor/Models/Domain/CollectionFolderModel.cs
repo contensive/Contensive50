@@ -71,7 +71,7 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 return null;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -113,7 +113,7 @@ namespace Contensive.Processor.Models.Domain {
                                     if (collectionsFound.Contains(CollectionGuid)) {
                                         //
                                         // -- folder with duplicate Guid not allowed. throw exception and block the folder
-                                        LogController.handleError(core, new GenericException("Add-on Collection Folder contains a mulitple collection folders with the same guid, [" + CollectionGuid + "], duplicate folder ignored [" + folder.Name + "]. Remove or Combine the mulitple instances. Then delete the collections.xml file and it will regenerate without the duplicate."));
+                                        LogController.logError(core, new GenericException("Add-on Collection Folder contains a mulitple collection folders with the same guid, [" + CollectionGuid + "], duplicate folder ignored [" + folder.Name + "]. Remove or Combine the mulitple instances. Then delete the collections.xml file and it will regenerate without the duplicate."));
                                     } else {
                                         collectionsFound.Add(CollectionGuid);
                                         List<FolderDetail> SubFolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath() + FolderName + "\\");
@@ -143,7 +143,7 @@ namespace Contensive.Processor.Models.Domain {
                     //                     
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnXml;
@@ -208,7 +208,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnOk;

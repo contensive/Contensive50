@@ -136,7 +136,7 @@ namespace Contensive.Processor {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -215,7 +215,7 @@ namespace Contensive.Processor {
                 }
 
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -265,7 +265,7 @@ namespace Contensive.Processor {
                 }
                 MetadataController.deleteContentRules(core, contentMeta, recordId);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -377,7 +377,7 @@ namespace Contensive.Processor {
                 // ----- Get the record back so we can use the ID
                 return open(contentName, "(ccguid=" + sqlGuid + ")And(DateAdded=" + sqlDateAdded + ")", "ID DESC", false, userId);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -478,7 +478,7 @@ namespace Contensive.Processor {
                 this.writeCache = new Dictionary<string, string>();
                 this.readCacheRowPtr = this.readCacheRowPtr + 1;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -496,7 +496,7 @@ namespace Contensive.Processor {
                 this.writeCache = new Dictionary<string, string>();
                 this.readCacheRowPtr = 0;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -556,7 +556,7 @@ namespace Contensive.Processor {
                     this.lastUsed = DateTime.Now;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnValue;
@@ -574,7 +574,7 @@ namespace Contensive.Processor {
                 this.fieldPointer = 0;
                 return getNextFieldName();
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -594,7 +594,7 @@ namespace Contensive.Processor {
                 }
                 return "";
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -611,7 +611,7 @@ namespace Contensive.Processor {
                 if (ok() && this.createdByQuery && !string.IsNullOrEmpty(this.contentMeta.name)) { return this.contentMeta.fields[fieldName.ToLowerInvariant()].fieldTypeId; }
                 return 0;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -633,7 +633,7 @@ namespace Contensive.Processor {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnResult;
@@ -650,7 +650,7 @@ namespace Contensive.Processor {
                 if (ok()) { return string.Join(",", this.fieldNames); }
                 return string.Empty;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -668,7 +668,7 @@ namespace Contensive.Processor {
                 if (!ok()) { throw new ArgumentException("dataset is not valid"); }
                 return GenericController.isInDelimitedString(getSelectFieldList(), fieldName, ",");
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -788,7 +788,7 @@ namespace Contensive.Processor {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnFilename;
@@ -817,7 +817,7 @@ namespace Contensive.Processor {
                 }
                 this.writeCache.Add(fieldName.ToLowerInvariant(), filename);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -854,7 +854,7 @@ namespace Contensive.Processor {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -873,7 +873,7 @@ namespace Contensive.Processor {
                 // -- normal open
                 return this.isOpen & (this.readCacheRowPtr >= 0) && (this.readCacheRowPtr < this.readCacheRowCnt);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -888,7 +888,7 @@ namespace Contensive.Processor {
                 if (!ok()) { throw new ArgumentException("the dataset is not valid"); }
                 return this.sqlSource;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1027,7 +1027,7 @@ namespace Contensive.Processor {
                         throw new GenericException("Cannot use field [" + fieldName + "] because the fieldType [" + field.fieldTypeId + "] is not valid.");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1175,7 +1175,7 @@ namespace Contensive.Processor {
                         if (GenericController.encodeText(rawValueForDb) != getText(field.nameLc)) {
                             SetNeeded = true;
                             if (rawValueForDb.Length > 255) {
-                                LogController.handleWarn(core, new GenericException("Text length too long saving field [" + fieldName + "], length [" + rawValueForDb.Length + "], but max for Text field is 255. Save will be attempted"));
+                                LogController.logWarn(core, new GenericException("Text length too long saving field [" + fieldName + "], length [" + rawValueForDb.Length + "], but max for Text field is 255. Save will be attempted"));
                             }
                         }
                         break;
@@ -1187,7 +1187,7 @@ namespace Contensive.Processor {
                         if (GenericController.encodeText(rawValueForDb) != getText(field.nameLc)) {
                             SetNeeded = true;
                             if (rawValueForDb.Length > 65535) {
-                                LogController.handleWarn(core, new GenericException("Text length too long saving field [" + fieldName + "], length [" + rawValueForDb.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
+                                LogController.logWarn(core, new GenericException("Text length too long saving field [" + fieldName + "], length [" + rawValueForDb.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
                             }
                         }
                         break;
@@ -1211,7 +1211,7 @@ namespace Contensive.Processor {
                     this.lastUsed = DateTime.Now;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1234,7 +1234,7 @@ namespace Contensive.Processor {
                 if (!ok()) { throw new ArgumentException("dataset is not valid"); }
                 this.writeCache.Clear();
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1451,7 +1451,7 @@ namespace Contensive.Processor {
                     this.lastUsed = DateTime.Now;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1489,7 +1489,7 @@ namespace Contensive.Processor {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1564,7 +1564,7 @@ namespace Contensive.Processor {
                     return openSql(SQL, "Default", pageSize, pageNumber);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return false;
@@ -1616,7 +1616,7 @@ namespace Contensive.Processor {
             try {
                 return this.contentName;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1634,7 +1634,7 @@ namespace Contensive.Processor {
                 if (!string.IsNullOrEmpty(ContentName)) { return AdminUIController.getRecordEditAndCutLink(core, ContentName, getInteger("ID"), allowCut, getText("Name")); }
                 return string.Empty;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1715,7 +1715,7 @@ namespace Contensive.Processor {
                 if (string.IsNullOrEmpty(this.contentName)) { throw new GenericException("getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent."); }
                 foreach (var AddLink in Addons.AdminSite.Controllers.AdminUIController.getRecordAddLink(core, this.contentName, PresetNameValueList, AllowPaste)) { result += AddLink; }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1738,7 +1738,7 @@ namespace Contensive.Processor {
             try {
                 return openContentWatchList(core, "What's New", SortFieldList);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1808,7 +1808,7 @@ namespace Contensive.Processor {
                 }
                 return true;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1922,7 +1922,7 @@ namespace Contensive.Processor {
                     return true;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -1976,7 +1976,7 @@ namespace Contensive.Processor {
                 initAfterOpen(0);
                 return ok();
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }

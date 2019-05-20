@@ -465,7 +465,7 @@ namespace Contensive.Addons.AdminSite {
                 //    GetForm_Index_SetColumns = Stream.Text
                 core.html.addTitle(Title);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

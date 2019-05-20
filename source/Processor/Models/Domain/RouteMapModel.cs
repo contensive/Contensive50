@@ -83,7 +83,7 @@ namespace Contensive.Processor.Models.Domain {
                         string route = GenericController.normalizeRoute(remoteMethod.name);
                         if (!string.IsNullOrWhiteSpace(route)) {
                             if (result.routeDictionary.ContainsKey(route)) {
-                                LogController.handleWarn(core, new GenericException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
+                                LogController.logWarn(core, new GenericException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
                             } else {
                                 result.routeDictionary.Add(route, new routeClass() {
                                     physicalRoute = physicalFile,
@@ -115,7 +115,7 @@ namespace Contensive.Processor.Models.Domain {
                         string route = GenericController.normalizeRoute(linkForward.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.routeDictionary.ContainsKey(route)) {
-                                LogController.handleError( core,new GenericException("Link Foward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
+                                LogController.logError( core,new GenericException("Link Foward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
                             } else {
                                 result.routeDictionary.Add(route, new routeClass() {
                                     physicalRoute = physicalFile,
@@ -132,7 +132,7 @@ namespace Contensive.Processor.Models.Domain {
                         string route = GenericController.normalizeRoute(linkAlias.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.routeDictionary.ContainsKey(route)) {
-                                LogController.handleError( core,new GenericException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
+                                LogController.logError( core,new GenericException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
                             } else {
                                 result.routeDictionary.Add(route, new routeClass() {
                                     physicalRoute = physicalFile,
@@ -146,7 +146,7 @@ namespace Contensive.Processor.Models.Domain {
                     setCache(core, result);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }

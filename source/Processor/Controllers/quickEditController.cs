@@ -172,7 +172,7 @@ namespace Contensive.Processor.Controllers {
                 result = HtmlController.formMultipart(core, result, core.webServer.requestQueryString, "", "ccForm");
                 result = "<div class=\"ccCon\">" + result + "</div>";
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

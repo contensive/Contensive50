@@ -369,7 +369,7 @@ namespace Contensive.Processor.Controllers {
                     tempGetXMLContentDefinition3 = "<" + CollectionFileRootNode + " name=\"Application\" guid=\"" + ApplicationCollectionGuid + "\">" + sb.ToString() + "\r\n</" + CollectionFileRootNode + ">";
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return tempGetXMLContentDefinition3;
         }
@@ -452,7 +452,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 result = sb.ToString();
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -470,7 +470,7 @@ namespace Contensive.Processor.Controllers {
                 s = s + getAdminMenus_MenuEntries(core);
                 s = s + getAdminMenus_NavigatorEntries(core);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return s;
         }
@@ -520,7 +520,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 result = sb.ToString();
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -556,7 +556,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 result = sb.ToString();
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -590,7 +590,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return "";
         }
@@ -669,7 +669,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

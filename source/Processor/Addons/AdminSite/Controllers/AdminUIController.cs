@@ -169,7 +169,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 if (!core.doc.userErrorList.Count.Equals(0)) { Description += HtmlController.div(ErrorController.getUserError(core)); }
                 if (!string.IsNullOrEmpty(Description)) { result += HtmlController.div(Description); }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return HtmlController.div(result, "ccAdminTitleBar");
         }
@@ -206,7 +206,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 }
                 buttonsRight += getButtonDanger(ButtonDelete, JSOnClick, !info.allowDelete);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             //
             LogController.logTrace(core, "getButtonBarForEdit, exit");
@@ -278,7 +278,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
 
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return s;
         }
@@ -402,7 +402,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     + "\r</div>";
                 result += Nav;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -439,7 +439,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     + ButtonBar;
                 result = HtmlController.formMultipart(core, result, core.doc.refreshQueryString, "", "ccForm");
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -468,7 +468,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 result.Append((!string.IsNullOrEmpty(PanelDescription)) ? "<p class=\"p-2 ccAdminEditDescription\">" + PanelDescription + "</p>" : "");
                 result.Append(PanelBody + "</div>");
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result.ToString();
         }
@@ -565,7 +565,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 }
                 result = "\r\n<td style=\"" + Style + "\" class=\"" + ClassStyle + "\">" + Copy + "</td>";
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -629,7 +629,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 //
                 result = getReport2(core, RowCount, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, ClassStyle, ColSortable, 0);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -791,7 +791,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 + result + "</td></tr></table>"
                 + PostTableCopy + "";
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1366,7 +1366,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
 
                 //FastString = null;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1514,7 +1514,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 //result += HtmlController.div("&nbsp;", "ccEditLinkEndCap");
                 //return HtmlController.div(result, "ccRecordLinkCon");
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 return string.Empty;
             }
         }
@@ -1588,7 +1588,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 if (addonId < 1) { throw (new GenericException("RecordID [" + addonId + "] is invalid")); }
                 return AdminUIController.getAddonEditLink(core, addonId, "Edit Add-on" + ((string.IsNullOrEmpty(addonName)) ? "" : " '" + addonName + "'"));
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 return string.Empty;
             }
         }
@@ -1611,7 +1611,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 if (cdef == null) { throw new GenericException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name."); }
                 return AdminUIController.getRecordEditLink(core, cdef, recordId, getEditSegmentRecordCaption("Edit", contentName, recordId, recordName));
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 return string.Empty;
             }
         }
@@ -1635,7 +1635,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 string WorkingLink = GenericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, GenericController.encodeText(cdef.id) + "." + GenericController.encodeText(recordId), true);
                 return "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(WorkingLink) + "\">" + iconContentCut.Replace("content cut", getEditSegmentRecordCaption("Cut", contentName, recordId, "")) + "</a>";
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 return string.Empty;
             }
         }
@@ -1723,7 +1723,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

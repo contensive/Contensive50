@@ -645,7 +645,7 @@ namespace Contensive.Addons.Housekeeping {
                 return;
                 //
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -693,7 +693,7 @@ namespace Contensive.Addons.Housekeeping {
                 return;
                 //
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -718,7 +718,7 @@ namespace Contensive.Addons.Housekeeping {
                     + " and(email is null)";
                 core.db.deleteTableRecordChunks( "ccmembers", SQLCriteria, 1000, 10000);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             } finally {
                 //
                 // restore sved timeout
@@ -999,7 +999,7 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 return;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -1023,7 +1023,7 @@ namespace Contensive.Addons.Housekeeping {
                 return;
                 //
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -1064,7 +1064,7 @@ namespace Contensive.Addons.Housekeeping {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return loadOK;
         }
@@ -1088,7 +1088,7 @@ namespace Contensive.Addons.Housekeeping {
                 XmlDocument LocalCollections = new XmlDocument();
                 XmlDocument Doc = new XmlDocument();
                 if (string.CompareOrdinal(BuildVersion, core.codeVersion()) < 0) {
-                    LogController.handleError(core, new GenericException("Can not summarize analytics until this site's data needs been upgraded."));
+                    LogController.logError(core, new GenericException("Can not summarize analytics until this site's data needs been upgraded."));
                 } else {
                     hint = 1;
                     DateTime PeriodStart = default(DateTime);
@@ -1288,7 +1288,7 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 return;
             } catch (Exception ex) {
-                LogController.handleError(core, ex, "hint [" + hint + "]");
+                LogController.logError(core, ex, "hint [" + hint + "]");
             }
         }
         //

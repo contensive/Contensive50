@@ -219,7 +219,7 @@ namespace Contensive.Addons.Tools {
                 // -- assemble form
                 returnHtml = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonRun);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnHtml;

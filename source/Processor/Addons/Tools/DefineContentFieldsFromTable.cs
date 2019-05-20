@@ -100,7 +100,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

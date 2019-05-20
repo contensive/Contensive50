@@ -257,7 +257,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 core.html.addTitle("Custom Reports");
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return tempGetForm_CustomReports;
         }

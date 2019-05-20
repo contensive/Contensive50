@@ -239,7 +239,7 @@ namespace Contensive.Processor {
             try {
                 var ExportCSVAddon = AddonModel.create(cp.core, addonGuidExportCSV);
                 if (ExportCSVAddon == null) {
-                    LogController.handleError(cp.core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
+                    LogController.logError(cp.core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
                 } else {
                     var cmdDetail = new TaskModel.CmdDetailClass() {
                         addonId = ExportCSVAddon.id,
@@ -296,7 +296,7 @@ namespace Contensive.Processor {
                 throw new GenericException("Installation upgrade through the cp interface is deprecated. Please use the command line tool.");
                 // Controllers.appBuilderController.upgrade(CP.core, isNewApp)
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
         }
         //
@@ -374,7 +374,7 @@ namespace Contensive.Processor {
                     cp.core.addon.executeAsync(addon);
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
             return string.Empty;
         }

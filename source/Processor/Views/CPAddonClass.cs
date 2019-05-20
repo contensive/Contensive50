@@ -165,7 +165,7 @@ namespace Contensive.Processor {
                 context.Push("Api call cp.addon.InstallCollectionFile [" + privatePathFilename + "]");
                 returnOk = Controllers.CollectionInstallController.installCollectionFromPrivateFile(cp.core, context, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
             } catch (Exception ex) {
-                Controllers.LogController.handleError(cp.core, ex);
+                Controllers.LogController.logError(cp.core, ex);
                 if (!cp.core.siteProperties.trapErrors) {
                     throw;
                 }

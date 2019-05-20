@@ -189,6 +189,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Views\ConfigureCmd.cs" />
+    <Compile Include="Views\FileUploadCmd.cs" />
     <Compile Include="Views\FixTableFolderCaseCmd.cs" />
     <Compile Include="Views\ExecuteAddonCmd.cs" />
     <Compile Include="Views\DeleteProtectionCmd.cs" />
@@ -205,7 +206,7 @@
     <Compile Include="Views\RunTaskCmd.cs" />
     <Compile Include="Views\_BlankCmd.cs" />
     <Compile Include="Views\InstallCollectionCmd.cs" />
-    <Compile Include="Views\UploadFilesCmd.cs" />
+    <Compile Include="Views\FileDownloadCmd.cs" />
     <Compile Include="Views\DeleteAppCmd.cs" />
     <Compile Include="Views\GenericController.cs" />
     <Compile Include="Views\NewAppCmd.cs" />

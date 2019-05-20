@@ -53,7 +53,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnValue;
@@ -89,7 +89,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnValue;
@@ -131,7 +131,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnValue;
@@ -166,7 +166,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return result;
@@ -330,7 +330,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnValue;
@@ -514,13 +514,13 @@ namespace Contensive.Processor.Controllers {
                     //
                     //
                     if (LoopPtr >= 10000) {
-                        LogController.handleError( core,new GenericException("Tag limit of 10000 tags per block reached."));
+                        LogController.logError( core,new GenericException("Tag limit of 10000 tags per block reached."));
                     }
                 }
                 //
                 returnValue = returnPos;
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnValue;
@@ -638,7 +638,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnValue;

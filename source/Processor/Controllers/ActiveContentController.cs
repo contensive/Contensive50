@@ -682,7 +682,7 @@ namespace Contensive.Processor.Controllers {
                     result = Stream.Text;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 // throw;
             }
             return result;
@@ -1213,7 +1213,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                             //
                                                                                                             // image load failed, use raw filename
                                                                                                             //
-                                                                                                            LogController.handleWarn(core, new GenericException("ImageEditController failed to load filename [" + RecordVirtualFilename + "]"));
+                                                                                                            LogController.logWarn(core, new GenericException("ImageEditController failed to load filename [" + RecordVirtualFilename + "]"));
                                                                                                         } else {
                                                                                                             //
                                                                                                             //
@@ -1301,7 +1301,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
             //
@@ -1458,7 +1458,7 @@ namespace Contensive.Processor.Controllers {
                     } catch (Exception ex) {
                         //
                         // -- handle error, but don't abort encode
-                        LogController.handleError(core, ex, "hint [" + hint + "]");
+                        LogController.logError(core, ex, "hint [" + hint + "]");
                     }
                     //
                     // process out text block comments inserted by addons
@@ -1514,7 +1514,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex, "hint [" + hint + "]");
+                LogController.logError(core, ex, "hint [" + hint + "]");
             }
             return result;
         }
@@ -1565,7 +1565,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 return htmlContentUpdated;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 return htmlContent;
             }
         }

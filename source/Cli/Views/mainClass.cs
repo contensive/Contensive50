@@ -138,10 +138,19 @@ namespace Contensive.CLI {
                                 // delete 
                                 DeleteAppCmd.deleteApp(cpServer, appName);
                                 break;
-                            case "--uploadfiles":
+                            case "--fileupload":
                                 //
                                 // -- upload files
-                                UploadFilesCmd.execute(cpServer, appName, new List<string> {
+                                FileUploadCmd.execute(cpServer, appName, new List<string> {
+                                    getNextCmdArg(args, ref argPtr),
+                                    getNextCmdArg(args, ref argPtr),
+                                    getNextCmdArg(args, ref argPtr)
+                                });
+                                break;
+                            case "--filedownload":
+                                //
+                                // -- download files
+                                FileDownloadCmd.execute(cpServer, appName, new List<string> {
                                     getNextCmdArg(args, ref argPtr),
                                     getNextCmdArg(args, ref argPtr),
                                     getNextCmdArg(args, ref argPtr)

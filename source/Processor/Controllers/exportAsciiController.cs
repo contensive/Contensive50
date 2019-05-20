@@ -167,7 +167,7 @@ namespace Contensive.Processor.Controllers {
                 result = core.wwwFiles.readFileText(TestFilename);
                 core.wwwFiles.deleteFile(TestFilename);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }

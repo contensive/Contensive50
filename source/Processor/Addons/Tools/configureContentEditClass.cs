@@ -537,7 +537,7 @@ namespace Contensive.Addons.Tools {
                 // -- assemble form
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

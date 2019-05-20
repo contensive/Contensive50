@@ -34,7 +34,7 @@ namespace Contensive.Addons.AdminSite {
                 s = AdminUIController.editTable( s );
                 s = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Email Rules", "Send email to people in these groups", s);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return s;
         }

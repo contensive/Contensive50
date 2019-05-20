@@ -213,7 +213,7 @@ namespace Contensive.Processor.Models.Db {
                     page.save(core);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
     }

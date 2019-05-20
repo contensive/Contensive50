@@ -33,7 +33,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             var sw = new Stopwatch();
             sw.Start();
-            LogController.forceNLog("CoreController executeRoute, enter", LogController.LogLevel.Trace);
+            LogController.logRaw("CoreController executeRoute, enter", LogController.LogLevel.Trace);
             try {
                 if (core.appConfig != null) {
                     //
@@ -258,7 +258,7 @@ namespace Contensive.Processor.Controllers {
                                     // -- admin site
                                     AddonModel addon = AddonModel.create(core, addonGuidAdminSite);
                                     if (addon == null) {
-                                        LogController.handleError(core, new GenericException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
+                                        LogController.logError(core, new GenericException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
                                         return "The default admin site addon could not be found. Please run an upgrade on this application to restore default services (command line> cc -a appName -r )";
                                     } else {
                                         return core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
@@ -272,7 +272,7 @@ namespace Contensive.Processor.Controllers {
                                     // -- remote method
                                     AddonModel addon = core.addonCache.getAddonById(route.remoteMethodAddonId);
                                     if (addon == null) {
-                                        LogController.handleError(core, new GenericException("The addon for remoteMethodAddonId [" + route.remoteMethodAddonId + "] could not be opened."));
+                                        LogController.logError(core, new GenericException("The addon for remoteMethodAddonId [" + route.remoteMethodAddonId + "] could not be opened."));
                                         return "";
                                     } else {
                                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
@@ -360,10 +360,10 @@ namespace Contensive.Processor.Controllers {
                     result = "<p>This site is not configured for website traffic. Please set the default route.</p>";
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             } finally {
                 // if (core.doc.routeDictionaryChanges) { DefaultSite.configurationClass.loadRouteMap(cp))}
-                LogController.forceNLog("CoreController executeRoute, exit", LogController.LogLevel.Trace);
+                LogController.logRaw("CoreController executeRoute, exit", LogController.LogLevel.Trace);
             }
             return result;
         }

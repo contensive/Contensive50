@@ -42,7 +42,7 @@ namespace Contensive.Processor.Controllers {
                     Found = true;
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnAttr;

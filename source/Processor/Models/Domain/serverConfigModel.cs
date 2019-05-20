@@ -122,7 +122,7 @@ namespace Contensive.Processor.Models.Domain {
                     returnModel = json_serializer.Deserialize<ServerConfigModel>(JSONTemp);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex, "exception in serverConfigModel.getObject");
+                LogController.logError( core,ex, "exception in serverConfigModel.getObject");
             }
             return returnModel;
         }
@@ -138,7 +138,7 @@ namespace Contensive.Processor.Models.Domain {
                 string jsonTemp = core.json.Serialize(this);
                 core.programDataFiles.saveFile("config.json", jsonTemp);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return 0;
         }

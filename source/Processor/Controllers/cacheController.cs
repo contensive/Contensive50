@@ -113,77 +113,76 @@ namespace Contensive.Processor.Controllers {
         /// <param name="key"></param>
         /// <returns></returns>
         public objectClass getObject<objectClass>(string key) {
-            objectClass result = default(objectClass);
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                if (!(string.IsNullOrEmpty(key))) {
+                if (string.IsNullOrEmpty(key)) { return default(objectClass); }
+                //
+                // -- read cacheDocument (the object that holds the data object plus control fields)
+                CacheDocumentClass cacheDocument = getCacheDocument(key);
+                if (cacheDocument == null) { return default(objectClass); }
+                //
+                // -- test for global invalidation
+                int dateCompare = globalInvalidationDate.CompareTo(cacheDocument.saveDate);
+                if (dateCompare >= 0) {
                     //
-                    // -- read cacheDocument (the object that holds the data object plus control fields)
-                    CacheDocumentClass cacheDocument = getCacheDocument(key);
-                    if (cacheDocument != null) {
-                        //
-                        // -- test for global invalidation
-                        int dateCompare = globalInvalidationDate.CompareTo(cacheDocument.saveDate);
+                    // -- global invalidation
+                    LogController.logTrace(core, "key [" + key + "], invalidated because cacheObject saveDate [" + cacheDocument.saveDate.ToString() + "] is before the globalInvalidationDate [" + globalInvalidationDate + "]");
+                    return default(objectClass);
+                }
+                //
+                // -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
+                bool cacheMiss = false;
+                foreach (string dependentKey in cacheDocument.dependentKeyList) {
+                    CacheDocumentClass dependantCacheDocument = getCacheDocument(dependentKey);
+                    if (dependantCacheDocument == null) {
+                        // create dummy cache to validate future cache requests, fake saveDate as last globalinvalidationdate
+                        storeCacheDocument(dependentKey, new CacheDocumentClass() {
+                            keyPtr = null,
+                            content = "",
+                            saveDate = globalInvalidationDate
+                        });
+                    } else {
+                        dateCompare = dependantCacheDocument.saveDate.CompareTo(cacheDocument.saveDate);
                         if (dateCompare >= 0) {
                             //
-                            // -- global invalidation
-                            LogController.logTrace( core,"GetObject(" + key + "), invalidated because the cacheObject's saveDate [" + cacheDocument.saveDate.ToString() + "] is before the globalInvalidationDate [" + globalInvalidationDate + "]");
-                        } else {
-                            //
-                            // -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
-                            bool cacheMiss = false;
-                            foreach (string dependentKey in cacheDocument.dependentKeyList) {
-                                CacheDocumentClass dependantCacheDocument = getCacheDocument(dependentKey);
-                                if (dependantCacheDocument == null) {
-                                    // create dummy cache to validate future cache requests, fake saveDate as last globalinvalidationdate
-                                    storeCacheDocument(dependentKey, new CacheDocumentClass() {
-                                        keyPtr = null,
-                                        content = "",
-                                        saveDate = globalInvalidationDate
-                                    });
-                                } else {
-                                    dateCompare = dependantCacheDocument.saveDate.CompareTo(cacheDocument.saveDate);
-                                    if (dateCompare >= 0) {
-                                        //
-                                        // -- invalidate because a dependent document was changed after the cacheDocument was saved
-                                        cacheMiss = true;
-                                        LogController.logTrace(core, "getObject(" + key + "), invalidated because the dependantKey [" + dependentKey + "] was modified [" + dependantCacheDocument.saveDate.ToString() + "] after the cacheDocument's saveDate [" + cacheDocument.saveDate.ToString() + "]");
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!cacheMiss) {
-                                if (!string.IsNullOrEmpty(cacheDocument.keyPtr)) {
-                                    //
-                                    // -- this is a pointer key, load the primary
-                                    result = getObject<objectClass>(cacheDocument.keyPtr);
-                                } else if (cacheDocument.content is Newtonsoft.Json.Linq.JObject) {
-                                    //
-                                    // -- newtonsoft types
-                                    Newtonsoft.Json.Linq.JObject data = (Newtonsoft.Json.Linq.JObject)cacheDocument.content;
-                                    result = data.ToObject<objectClass>();
-                                } else if (cacheDocument.content is Newtonsoft.Json.Linq.JArray) {
-                                    //
-                                    // -- newtonsoft types
-                                    Newtonsoft.Json.Linq.JArray data = (Newtonsoft.Json.Linq.JArray)cacheDocument.content;
-                                    result = data.ToObject<objectClass>();
-                                } else if (cacheDocument.content==null) {
-                                    //
-                                    // -- if cache data was left as a string (might be empty), and return object is not string, there was an error
-                                    result = default(objectClass);
-                                } else {
-                                    //
-                                    // -- all worked
-                                    result = (objectClass)cacheDocument.content;
-                                }
-                            }
+                            // -- invalidate because a dependent document was changed after the cacheDocument was saved
+                            cacheMiss = true;
+                            LogController.logTrace(core, "[" + key + "], invalidated because the dependantKey [" + dependentKey + "] was modified [" + dependantCacheDocument.saveDate.ToString() + "] after the cacheDocument's saveDate [" + cacheDocument.saveDate.ToString() + "]");
+                            break;
                         }
                     }
                 }
+                objectClass result = default(objectClass);
+                if (!cacheMiss) {
+                    if (!string.IsNullOrEmpty(cacheDocument.keyPtr)) {
+                        //
+                        // -- this is a pointer key, load the primary
+                        result = getObject<objectClass>(cacheDocument.keyPtr);
+                    } else if (cacheDocument.content is Newtonsoft.Json.Linq.JObject) {
+                        //
+                        // -- newtonsoft types
+                        Newtonsoft.Json.Linq.JObject data = (Newtonsoft.Json.Linq.JObject)cacheDocument.content;
+                        result = data.ToObject<objectClass>();
+                    } else if (cacheDocument.content is Newtonsoft.Json.Linq.JArray) {
+                        //
+                        // -- newtonsoft types
+                        Newtonsoft.Json.Linq.JArray data = (Newtonsoft.Json.Linq.JArray)cacheDocument.content;
+                        result = data.ToObject<objectClass>();
+                    } else if (cacheDocument.content == null) {
+                        //
+                        // -- if cache data was left as a string (might be empty), and return object is not string, there was an error
+                        result = default(objectClass);
+                    } else {
+                        //
+                        // -- all worked
+                        result = (objectClass)cacheDocument.content;
+                    }
+                }
+                return result;
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError(core, ex);
+                return default(objectClass);
             }
-            return result;
         }
         //
         //========================================================================
@@ -236,81 +235,81 @@ namespace Contensive.Processor.Controllers {
         private CacheDocumentClass getCacheDocument(string key) {
             CacheDocumentClass result = null;
             try {
-                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
+                // - verified in createServerKey() -- key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 if (string.IsNullOrEmpty(key)) {
-                    throw new ArgumentException("key cannot be blank");
-                } else {
-                    string serverKey = createServerKey(key);
-                    string typeMessage = "";
-                    if (remoteCacheInitialized) {
+                    throw new ArgumentException("cache key cannot be blank");
+                }
+                string serverKey = createServerKey(key);
+                string typeMessage = "";
+                if (remoteCacheInitialized) {
+                    //
+                    // -- use remote cache
+                    typeMessage = "remote";
+                    try {
+                        result = cacheClient.Get<CacheDocumentClass>(serverKey);
+                    } catch (Exception ex) {
                         //
-                        // -- use remote cache
-                        typeMessage = "remote";
-                        try {
-                            result = cacheClient.Get<CacheDocumentClass>(serverKey);
-                        } catch (Exception ex) {
+                        // --client does not throw its own errors, so try to differentiate by message
+                        if (ex.Message.ToLowerInvariant().IndexOf("unable to load type") >= 0) {
                             //
-                            // --client does not throw its own errors, so try to differentiate by message
-                            if (ex.Message.ToLowerInvariant().IndexOf("unable to load type") >= 0) {
-                                //
-                                // -- trying to deserialize an object and this code does not have a matching class, clear cache and return empty
-                                cacheClient.Remove(serverKey);
-                                result = null;
-                            } else {
-                                //
-                                // -- some other error
-                                LogController.handleError( core,ex);
-                                throw;
-                            }
-                        }
-                    }
-                    if ((result == null) && core.serverConfig.enableLocalMemoryCache) {
-                        //
-                        // -- local memory cache
-                        typeMessage = "local-memory";
-                        result = (CacheDocumentClass)MemoryCache.Default[serverKey];
-                    }
-                    if ((result == null) && core.serverConfig.enableLocalFileCache) {
-                        //
-                        // -- local file cache
-                        typeMessage = "local-file";
-                        string serializedDataObject = null;
-                        using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, serverKey)) {
-                            mutex.WaitOne();
-                            serializedDataObject = core.privateFiles.readFileText("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"));
-                            mutex.ReleaseMutex();
-                        }
-                        if (!string.IsNullOrEmpty(serializedDataObject)) {
-                            result = Newtonsoft.Json.JsonConvert.DeserializeObject<CacheDocumentClass>(serializedDataObject);
-                            storeCacheDocument_MemoryCache(serverKey, result);
-                        }
-                    }
-                    //
-                    // -- log result
-                    if (result == null) {
-                        LogController.logTrace(core, "getCacheDocument, miss, type [" + typeMessage + "], key [" + key + "]");
-                    } else {
-                        if (result.content == null) {
-                            LogController.logTrace(core, "getCacheDocument, hit, type [" + typeMessage + "], key [" + key + "], age [" + result.saveDate.ToString() + "], content [null]");
+                            // -- trying to deserialize an object and this code does not have a matching class, clear cache and return empty
+                            LogController.logWarn(core, ex);
+                            cacheClient.Remove(serverKey);
+                            result = null;
                         } else {
-                            string content = result.content.ToString();
-                            content = (content.Length > 50) ? (content.Left(50) + "...") : content;
-                            LogController.logTrace(core, "getCacheDocument, hit, type [" + typeMessage + "], key [" + key + "], age [" + result.saveDate.ToString() + "], content [" + content + "]");
-                        }
-                    }
-                    //
-                    // if dependentKeyList is null, return an empty list, not null
-                    if (result != null) {
-                        //
-                        // -- empty objects return nothing, empty lists return count=0
-                        if (result.dependentKeyList == null) {
-                            result.dependentKeyList = new List<string>();
+                            //
+                            // -- some other error
+                            LogController.logError(core, ex);
+                            throw;
                         }
                     }
                 }
-                //logController.appendCacheLog(core,"getCacheDocument(" + key + "), exit ");
+                if ((result == null) && core.serverConfig.enableLocalMemoryCache) {
+                    //
+                    // -- local memory cache
+                    typeMessage = "local-memory";
+                    result = (CacheDocumentClass)MemoryCache.Default[serverKey];
+                }
+                if ((result == null) && core.serverConfig.enableLocalFileCache) {
+                    //
+                    // -- local file cache
+                    typeMessage = "local-file";
+                    string serializedDataObject = null;
+                    using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, serverKey)) {
+                        mutex.WaitOne();
+                        serializedDataObject = core.privateFiles.readFileText("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"));
+                        mutex.ReleaseMutex();
+                    }
+                    if (!string.IsNullOrEmpty(serializedDataObject)) {
+                        result = Newtonsoft.Json.JsonConvert.DeserializeObject<CacheDocumentClass>(serializedDataObject);
+                        storeCacheDocument_MemoryCache(serverKey, result);
+                    }
+                }
+                //
+                // -- log result
+                if (result == null) {
+                    LogController.logTrace(core, "miss, cacheType [" + typeMessage + "], key [" + key + "]");
+                } else {
+                    if (result.content == null) {
+                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], age [" + result.saveDate.ToString() + "], content [null]");
+                    } else {
+                        string content = result.content.ToString();
+                        content = (content.Length > 50) ? (content.Left(50) + "...") : content;
+                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], age [" + result.saveDate.ToString() + "], content [" + content + "]");
+                    }
+                }
+                //
+                // if dependentKeyList is null, return an empty list, not null
+                if (result != null) {
+                    //
+                    // -- empty objects return nothing, empty lists return count=0
+                    if (result.dependentKeyList == null) {
+                        result.dependentKeyList = new List<string>();
+                    }
+                }
+
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -337,7 +336,7 @@ namespace Contensive.Processor.Controllers {
                 };
                 storeCacheDocument(key, cacheDocument);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -457,7 +456,7 @@ namespace Contensive.Processor.Controllers {
                 };
                 storeCacheDocument(keyPtr, cacheDocument);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -472,7 +471,7 @@ namespace Contensive.Processor.Controllers {
                 storeCacheDocument(key, new CacheDocumentClass { saveDate = DateTime.Now });
                 _globalInvalidationDate = null;
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -485,14 +484,14 @@ namespace Contensive.Processor.Controllers {
         // <remarks></remarks>
         public void invalidate(string key, int recursionLimit = 5) {
             try {
-                if ((recursionLimit>0) && (!string.IsNullOrWhiteSpace(key.Trim()))) {
+                if ((recursionLimit > 0) && (!string.IsNullOrWhiteSpace(key.Trim()))) {
                     key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                     // if key is a ptr, we need to invalidate the real key
                     CacheDocumentClass cacheDocument = getCacheDocument(key);
                     if (cacheDocument == null) {
                         // no cache for this key, if this is a dependency for another key, save invalidated
                         storeCacheDocument(key, new CacheDocumentClass { saveDate = DateTime.Now });
-                    } else { 
+                    } else {
                         if (!string.IsNullOrWhiteSpace(cacheDocument.keyPtr)) {
                             // this key is an alias, invalidate it's parent key
                             invalidate(cacheDocument.keyPtr, --recursionLimit);
@@ -503,7 +502,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -530,7 +529,7 @@ namespace Contensive.Processor.Controllers {
                     invalidate(key);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -744,11 +743,11 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     //
-                    LogController.logTrace(core, "storeCacheDocument, type [" + typeMessage + "], key [" + key + "], expires [" + cacheDocument.invalidationDate.ToString() + "], depends on [" + string.Join(",", cacheDocument.dependentKeyList) + "], points to [" + string.Join(",", cacheDocument.keyPtr) + "]");
+                    LogController.logTrace(core, "cacheType [" + typeMessage + "], key [" + key + "], expires [" + cacheDocument.invalidationDate.ToString() + "], depends on [" + string.Join(",", cacheDocument.dependentKeyList) + "], points to [" + string.Join(",", cacheDocument.keyPtr) + "]");
                     //
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -773,7 +772,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         public void store_LastRecordModifiedDate(string tableName) {
-            storeObject(createCacheKey_LastRecordModifiedDate(tableName),DateTime.Now);
+            storeObject(createCacheKey_LastRecordModifiedDate(tableName), DateTime.Now);
         }
         //
         //========================================================================

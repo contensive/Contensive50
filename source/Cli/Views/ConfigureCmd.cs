@@ -141,7 +141,7 @@ namespace Contensive.CLI {
                         String reply;
                         do {
                             Console.WriteLine("\n\nThe server requires a caching service. You can choose either the systems local cache or an AWS Elasticache (memCacheD).");
-                            Console.Write("Use (l)ocal cache or (m)emcached server?");
+                            Console.WriteLine("Use (l)ocal cache or (m)emcached server?");
                             if (!String.IsNullOrEmpty(cp.core.serverConfig.awsElastiCacheConfigurationEndpoint)) { Console.Write("(m)"); } else { Console.Write("(l)"); };
                             reply = Console.ReadLine().ToLowerInvariant();
                             if (String.IsNullOrEmpty(reply)) reply = "l";
@@ -152,7 +152,7 @@ namespace Contensive.CLI {
                             cp.core.serverConfig.enableLocalFileCache = false;
                             cp.core.serverConfig.enableLocalMemoryCache = true;
                             cp.core.serverConfig.enableRemoteCache = false;
-                            cp.core.serverConfig.awsElastiCacheConfigurationEndpoint = "";
+                            //cp.core.serverConfig.awsElastiCacheConfigurationEndpoint = "";
                         } else {
                             //
                             // -- remote mcached cache
@@ -160,7 +160,7 @@ namespace Contensive.CLI {
                             cp.core.serverConfig.enableLocalMemoryCache = false;
                             cp.core.serverConfig.enableRemoteCache = true;
                             do {
-                                Console.Write("\n\nEnter the ElasticCache Configuration Endpoint (server:port):");
+                                Console.WriteLine("Enter the ElasticCache Configuration Endpoint (server:port):");
                                 if (!String.IsNullOrEmpty(cp.core.serverConfig.awsElastiCacheConfigurationEndpoint)) Console.Write("(" + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint + ")");
                                 reply = Console.ReadLine();
                                 if (String.IsNullOrEmpty(reply)) reply = cp.core.serverConfig.awsElastiCacheConfigurationEndpoint;

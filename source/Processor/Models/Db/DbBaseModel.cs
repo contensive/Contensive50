@@ -357,7 +357,7 @@ namespace Contensive.Processor.Models.Db {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -378,7 +378,7 @@ namespace Contensive.Processor.Models.Db {
                     return create<T>(core, db.insertTableRecordGetId(derivedTableName(typeof(T)), core.session.user.id));
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -447,7 +447,7 @@ namespace Contensive.Processor.Models.Db {
                 }
                 return result;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -487,7 +487,7 @@ namespace Contensive.Processor.Models.Db {
                 }
                 return result;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -534,7 +534,7 @@ namespace Contensive.Processor.Models.Db {
                 }
                 return result;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -653,7 +653,7 @@ namespace Contensive.Processor.Models.Db {
                 }
                 return modelInstance;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -791,7 +791,7 @@ namespace Contensive.Processor.Models.Db {
                 // -- update the cache Last-Record-Modified-Date
                 storeCacheLastRecordModifiedDate(core, tableName);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return id;
@@ -814,7 +814,7 @@ namespace Contensive.Processor.Models.Db {
                     core.cache.invalidate(CacheController.createCacheKey_forDbRecord(recordId, tableName, dataSourceName));
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -837,7 +837,7 @@ namespace Contensive.Processor.Models.Db {
                     db.deleteTableRecord(guid, derivedTableName(typeof(T)));
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -863,7 +863,7 @@ namespace Contensive.Processor.Models.Db {
                 }
                 return result;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -923,7 +923,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 return getRecordName<T>(core, create<T>(core, recordId));
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -939,7 +939,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 return getRecordName<T>(core, create<T>(core, guid));
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -957,7 +957,7 @@ namespace Contensive.Processor.Models.Db {
                 if (record != null) { return record.id; }
                 return 0;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -982,7 +982,7 @@ namespace Contensive.Processor.Models.Db {
                 instance.GetType().GetProperty("modifiedby", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, core.session.user.id, null);
                 return instance;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1013,7 +1013,7 @@ namespace Contensive.Processor.Models.Db {
                 if (!string.IsNullOrEmpty(sqlOrderBy)) { sb.Append(" order by " + sqlOrderBy); }
                 return sb.ToString();
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1035,7 +1035,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 return CacheController.createCacheKey_TableObjectsInvalidationDate(derivedTableName(typeof(T)));
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1055,7 +1055,7 @@ namespace Contensive.Processor.Models.Db {
                     db.deleteTableRecords(derivedTableName(typeof(T)), sqlCriteria);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1067,7 +1067,7 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         private static bool isAppInvalid(CoreController core) {
             if ((core.serverConfig != null) && (core.appConfig != null)) { return false; }
-            LogController.handleError(core, new GenericException("Cannot use data models without a valid server and application configuration."));
+            LogController.logError(core, new GenericException("Cannot use data models without a valid server and application configuration."));
             return true;
         }
         //
@@ -1167,7 +1167,7 @@ namespace Contensive.Processor.Models.Db {
                 if (isAppInvalid(core)) { return; }
                 core.cache.invalidateDbRecord(recordId, derivedTableName(typeof(T)));
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1183,7 +1183,7 @@ namespace Contensive.Processor.Models.Db {
                 if (isAppInvalid(core)) { return; }
                 core.cache.invalidateTableObjects(derivedTableName(typeof(T)));
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }

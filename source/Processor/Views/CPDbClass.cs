@@ -102,7 +102,7 @@ namespace Contensive.Processor {
                     //
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
             return returnKey;
         }
@@ -297,7 +297,7 @@ namespace Contensive.Processor {
                     //
                 }
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex);
+                LogController.logError(cp.core, ex);
             }
             return returnKey;
         }

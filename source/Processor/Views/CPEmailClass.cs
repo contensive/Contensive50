@@ -48,7 +48,7 @@ namespace Contensive.Processor {
             try {
                 EmailController.queueAdHocEmail(cp.core, "Ad Hoc email from api", 0, toAddress, fromAddress, subject, body, fromAddress, fromAddress, "", sendImmediately, bodyIsHTML,0 , ref userErrorMessage);
             } catch (Exception ex) {
-                LogController.handleError( cp.core,ex);
+                LogController.logError( cp.core,ex);
                 throw;
             }
         }
@@ -79,7 +79,7 @@ namespace Contensive.Processor {
             try {
                 EmailController.queueFormEmail(cp.core, toAddress, fromAddress, subject, ref userErrorMessage);
             } catch (Exception ex) {
-                LogController.handleError( cp.core,ex);
+                LogController.logError( cp.core,ex);
                 throw;
             }
         }

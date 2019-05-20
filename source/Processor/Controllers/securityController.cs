@@ -30,7 +30,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 return twoWayEncrypt(core, keyInteger.ToString() + "\t" + keyDate.ToString());
             } catch (Exception ex) {
-                LogController.handleError(core, ex, "EncodeToken failure. Returning blank result for keyInteger [" + keyInteger + "], keyDate [" + keyDate + "]");
+                LogController.logError(core, ex, "EncodeToken failure. Returning blank result for keyInteger [" + keyInteger + "], keyDate [" + keyDate + "]");
                 return "";
             }
         }
@@ -52,7 +52,7 @@ namespace Contensive.Processor.Controllers {
                     result.timeStamp = GenericController.encodeDate(parts[1]);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex, "DecodeToken failure. Returning blank result for token [" + token + "]");
+                LogController.logError(core, ex, "DecodeToken failure. Returning blank result for token [" + token + "]");
             }
             return result;
         }
@@ -79,7 +79,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 returnResult = HashEncode.computeHash(password, "SHA512", null);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnResult;
@@ -96,7 +96,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 returnResult = HashEncode.verifyHash(sourceToTest, "SHA512", encryptedToken);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnResult;
@@ -186,7 +186,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = Convert.ToBase64String(Buffer);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnResult;
@@ -221,12 +221,12 @@ namespace Contensive.Processor.Controllers {
                     try {
                         returnResult = System.Text.ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(buffer, 0, buffer.Length));
                     } catch (Exception ex) {
-                        LogController.handleError( core,ex);
+                        LogController.logError( core,ex);
                         throw;
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnResult;

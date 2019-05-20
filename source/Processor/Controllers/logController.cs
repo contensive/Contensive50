@@ -47,23 +47,25 @@ namespace Contensive.Processor.Controllers {
         //
         //=============================================================================
         /// <summary>
-        /// v51 logging - each class has its own NLog logger and calls these methods for uniform output
-        /// use:
-        /// logger.Log(LogLevel.Info, LogController.getLogMsg( core, "Sample informational message"));
+        /// v51+ logging - each class has its own NLog logger and calls these methods for uniform output.
+        /// use: logger.Log(LogLevel.Info, LogController.getMessageLine( core, "Sample informational message"));
         /// </summary>
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static string getLogMsg(CoreController core, string message) {
-            string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
-            return "app [" + ((core.appConfig != null) ? core.appConfig.name : "no-app") + ", thread [" + threadName + "], " + message.Replace("\r\n", " ").Replace("\n", " ").Replace("\r", " ");
+        public static string getMessageLine(string appName, string message) {
+            string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("000");
+            return "app [" + appName + "], thread [" + threadName + "], " + message.Replace("\r\n", " ").Replace("\n", " ").Replace("\r", " ");
         }
         //
-        //=============================================================================
-        public static string getLogMsg(CoreController core, Exception ex) => getLogMsg(core, ex.ToString());
+        public static string getMessageLine(CoreController core, string message) {
+            string appName = ((core.appConfig != null) ? core.appConfig.name : "no-app");
+            return getMessageLine(appName, message);
+        }
         //
-        // v5 logging
-        //
+        public static string getMessageLine(CoreController core, Exception ex) {
+            return getMessageLine(core, ex.ToString());
+        }
         //
         //=============================================================================
         /// <summary>
@@ -72,9 +74,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logDebug(CoreController core, string message) {
-            log(core, message, LogLevel.Debug);
-        }
+        public static void logDebug(CoreController core, string message) => log(core, message, LogLevel.Debug);
         //
         //=============================================================================
         /// <summary>
@@ -83,9 +83,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logError(CoreController core, string message) {
-            log(core, message, LogLevel.Error);
-        }
+        public static void logError(CoreController core, string message) => log(core, message, LogLevel.Error);
         //
         //=============================================================================
         /// <summary>
@@ -94,9 +92,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logFatal(CoreController core, string message) {
-            log(core, message, LogLevel.Fatal);
-        }
+        public static void logFatal(CoreController core, string message) => log(core, message, LogLevel.Fatal);
         //
         //=============================================================================
         /// <summary>
@@ -105,9 +101,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logInfo(CoreController core, string message) {
-            log(core, message, LogLevel.Info);
-        }
+        public static void logInfo(CoreController core, string message) => log(core, message, LogLevel.Info);
         //
         //=============================================================================
         /// <summary>
@@ -116,9 +110,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logTrace(CoreController core, string message) {
-            log(core, message, LogLevel.Trace);
-        }
+        public static void logTrace(CoreController core, string message)  => log(core, message, LogLevel.Trace);
         //
         //=============================================================================
         /// <summary>
@@ -127,22 +119,17 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logWarn(CoreController core, string message) {
-            log(core, message, LogLevel.Warn);
-        }
+        public static void logWarn(CoreController core, string message) => log(core, message, LogLevel.Warn);
         //
         //=============================================================================
         /// <summary>
-        /// log any level with NLOG without considering configuration. Only use in extreme cases where the application environment is not stable.
+        /// log any level with NLOG without messageLine formatting. Only use in extreme cases where the application environment is not stable.
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="message"></param>
+        /// <param name="messageLine"></param>
         /// <param name="level"></param>
-        public static void forceNLog(string message, LogLevel level) {
+        public static void logRaw(string messageLine, LogLevel level) {
             try {
-                string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
-                string logContent = level.ToString() + "\tthread:" + threadName + "\t" + message;
-                Logger nlogLogger = LogManager.GetCurrentClassLogger();
                 //
                 // -- decouple NLog types from internal enum
                 NLog.LogLevel nLogLevel = NLog.LogLevel.Info;
@@ -168,8 +155,8 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- log with even so we can pass in the type of our wrapper
-                LogEventInfo logEvent = new LogEventInfo(nLogLevel, nlogLogger.Name, message);
-                nlogLogger.Log(typeof(LogController), logEvent);
+                Logger nlogLogger = LogManager.GetCurrentClassLogger();
+                nlogLogger.Log(typeof(LogController), new LogEventInfo(nLogLevel, nlogLogger.Name, messageLine));
             } catch (Exception ex) {
                 string thing1 = ex.ToString();
                 string thing2 = thing1;
@@ -187,24 +174,54 @@ namespace Contensive.Processor.Controllers {
         /// <param name="message"></param>
         /// <param name="level"></param>
         public static void log(CoreController core, string message, LogLevel level) {
-            try {
-                //
-                // -- use enableLogging to block application logging
-                //if ((level >= LogLevel.Error) || core.serverConfig.enableLogging) 
-                {
-                    //
-                    // -- log to Nlog
-                    if (core.appConfig != null) {
-                        forceNLog("app [" + core.appConfig.name + "], " + message, level);
-                    } else {
-                        forceNLog("non-app instance, " + message, level);
-                    }
-                }
-            } catch (Exception) {
-                // -- ignore errors in error handling
-            } finally {
-                //
+            string messageLine = getMessageLine(core, message);
+            logRaw(messageLine, level);
+            //
+            // add to doc exception list to display at top of webpage
+            //
+            if (level < LogLevel.Warn) { return; }
+            if (core.doc.errorList == null) { core.doc.errorList = new List<string>(); }
+            if (core.doc.errorList.Count < 10) {
+                core.doc.errorList.Add(messageLine);
+                return;
             }
+            if (core.doc.errorList.Count == 10) { core.doc.errorList.Add("Exception limit exceeded");}
+        }
+        //
+        //====================================================================================================
+        //
+        public static void logError(CoreController core, Exception ex, string cause) {
+            log(core, cause + ", exception [" + ex.ToString() + "]", LogLevel.Error);
+        }
+        //
+        //====================================================================================================
+        //
+        public static void logError(CoreController core, Exception ex) {
+            log(core, "exception [" + ex.ToString() + "]", LogLevel.Error);
+        }
+        //
+        //====================================================================================================
+        //
+        public static void logWarn(CoreController core, Exception ex, string cause) {
+            log(core, cause + ", exception [" + ex.ToString() + "]", LogLevel.Warn);
+        }
+        //
+        //====================================================================================================
+        //
+        public static void logWarn(CoreController core, Exception ex) {
+            log(core, "exception [" + ex.ToString() + "]", LogLevel.Warn);
+        }
+        //
+        //====================================================================================================
+        //
+        public static void logFatal(CoreController core, Exception ex, string cause) {
+            log(core, cause + ", exception [" + ex.ToString() + "]", LogLevel.Fatal);
+        }
+        //
+        //====================================================================================================
+        //
+        public static void logFatal(CoreController core, Exception ex) {
+            log(core, "exception [" + ex.ToString() + "]", LogLevel.Fatal);
         }
         //
         //=====================================================================================================
@@ -238,7 +255,7 @@ namespace Contensive.Processor.Controllers {
                 return;
                 //
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
             throw (new Exception("Unexpected exception"));
@@ -319,80 +336,6 @@ namespace Contensive.Processor.Controllers {
                 }
             }
             //
-        }
-        //
-        //==========================================================================================
-        /// <summary>
-        /// Generic handle exception. Determines method name and class of caller from stack. 
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="ex"></param>
-        /// <param name="cause"></param>
-        /// <param name="stackPtr">How far down in the stack to look for the method error. Pass 1 if the method calling has the error, 2 if there is an intermediate routine.</param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public static void handleException(CoreController core, Exception ex, LogLevel level, string cause, int stackPtr) {
-            if (!core._handlingExceptionRecursionBlock) {
-                core._handlingExceptionRecursionBlock = true;
-                StackFrame frame = new StackFrame(stackPtr);
-                System.Reflection.MethodBase method = frame.GetMethod();
-                System.Type type = method.DeclaringType;
-                string methodName = method.Name;
-                string errMsg = type.Name + "." + methodName + ", cause=[" + cause + "], ex=[" + ex.ToString() + "]";
-                //
-                // append to daily trace log
-                //
-                LogController.log(core, errMsg, level);
-                //
-                // add to doc exception list to display at top of webpage
-                //
-                if (core.doc.errorList == null) {
-                    core.doc.errorList = new List<string>();
-                }
-                if (core.doc.errorList.Count == 10) {
-                    core.doc.errorList.Add("Exception limit exceeded");
-                } else if (core.doc.errorList.Count < 10) {
-                    core.doc.errorList.Add(errMsg);
-                }
-                //
-                core._handlingExceptionRecursionBlock = false;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public static void handleError(CoreController core, Exception ex, string cause) {
-            handleException(core, ex, LogLevel.Error, cause, 2);
-        }
-        //
-        //====================================================================================================
-        //
-        public static void handleError(CoreController core, Exception ex) {
-            handleException(core, ex, LogLevel.Error, "n/a", 2);
-        }
-        //
-        //====================================================================================================
-        //
-        public static void handleWarn(CoreController core, Exception ex, string cause) {
-            handleException(core, ex, LogLevel.Warn, cause, 2);
-        }
-        //
-        //====================================================================================================
-        //
-        public static void handleWarn(CoreController core, Exception ex) {
-            handleException(core, ex, LogLevel.Warn, "n/a", 2);
-        }
-        //
-        //====================================================================================================
-        //
-        public static void handleFatal(CoreController core, Exception ex, string cause) {
-            handleException(core, ex, LogLevel.Fatal, cause, 2);
-        }
-        //
-        //====================================================================================================
-        //
-        public static void handleFatal(CoreController core, Exception ex) {
-            handleException(core, ex, LogLevel.Fatal, "n/a", 2);
         }
     }
 }

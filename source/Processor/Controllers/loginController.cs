@@ -47,7 +47,7 @@ namespace Contensive.Processor.Controllers {
                 //    + nop(result)
                 //    + "</div>";
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return result;
@@ -113,7 +113,7 @@ namespace Contensive.Processor.Controllers {
                     result = HtmlController.div(result, "ccLoginFormCon"); 
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return result;
@@ -158,7 +158,7 @@ namespace Contensive.Processor.Controllers {
                     returnHtml = getLoginForm_Default(core);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnHtml;
@@ -203,7 +203,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = HtmlController.form( core,returnResult,QueryString);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnResult;
@@ -242,7 +242,7 @@ namespace Contensive.Processor.Controllers {
                 }
 
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnREsult;
@@ -256,7 +256,7 @@ namespace Contensive.Processor.Controllers {
                 string returnUserMessage = "";
                 sendPassword(core, core.docProperties.getText("email"), ref returnUserMessage);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
         }
@@ -443,7 +443,7 @@ namespace Contensive.Processor.Controllers {
                     EmailController.queueAdHocEmail(core,"Password Email", core.session.user.id, workingEmail, FromAddress, subject, Message, "", "", "", true, false, 0, ref sendStatus);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return result;
@@ -477,7 +477,7 @@ namespace Contensive.Processor.Controllers {
                             using (var csData = new CsModel(core)) {
                                 csData.open("people", "ID=" + DbController.encodeSQLNumber(core.session.user.id));
                                 if (!csData.ok()) {
-                                    LogController.handleError(core, new Exception("Could not open the current members account to set the username and password."));
+                                    LogController.logError(core, new Exception("Could not open the current members account to set the username and password."));
                                 } else {
                                     if ((csData.getText("username") != "") || (csData.getText("password") != "") || (csData.getBoolean("admin")) || (csData.getBoolean("developer"))) {
                                         //
@@ -503,7 +503,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 PersonModel.invalidateRecordCache(core, core.session.user.id);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
         }

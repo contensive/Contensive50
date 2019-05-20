@@ -252,7 +252,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //========================================================================
@@ -292,7 +292,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -365,7 +365,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return tempIsVisibleUserField;
         }
@@ -388,7 +388,7 @@ namespace Contensive.Addons.AdminSite {
                     return core.session.isAuthenticatedContentManager(core, cdef.name);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return false;
         }
@@ -652,7 +652,7 @@ namespace Contensive.Addons.AdminSite {
                 //SpellCheckSupported = false;
                 //SpellCheckRequest = false;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return;
         }
@@ -769,7 +769,7 @@ namespace Contensive.Addons.AdminSite {
                     editRecord.Loaded = true;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -884,7 +884,7 @@ namespace Contensive.Addons.AdminSite {
                     editRecord.fieldsLc[field.nameLc].dbValue = editRecord.fieldsLc[field.nameLc].value;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -934,7 +934,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -960,21 +960,21 @@ namespace Contensive.Addons.AdminSite {
                     //
                     BlockEditForm = true;
                     Processor.Controllers.ErrorController.addUserError(core, "No content definition was found For Content ID [" + editRecord.id + "]. Please contact your application developer For more assistance.");
-                    LogController.handleError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, No content definition was found For Content ID [" + editRecord.id + "]."));
+                    LogController.logError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, No content definition was found For Content ID [" + editRecord.id + "]."));
                 } else if (string.IsNullOrEmpty(adminContent.name)) {
                     //
                     // ----- Error: no content name
                     //
                     BlockEditForm = true;
                     Processor.Controllers.ErrorController.addUserError(core, "No content definition could be found For ContentID [" + adminContent.id + "]. This could be a menu Error. Please contact your application developer For more assistance.");
-                    LogController.handleError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, No content definition For ContentID [" + adminContent.id + "] could be found."));
+                    LogController.logError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, No content definition For ContentID [" + adminContent.id + "] could be found."));
                 } else if (adminContent.tableName == "") {
                     //
                     // ----- Error: no content table
                     //
                     BlockEditForm = true;
                     Processor.Controllers.ErrorController.addUserError(core, "The content definition [" + adminContent.name + "] is not associated With a valid database table. Please contact your application developer For more assistance.");
-                    LogController.handleError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, No content definition For ContentID [" + adminContent.id + "] could be found."));
+                    LogController.logError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, No content definition For ContentID [" + adminContent.id + "] could be found."));
                     //
                     // move block to the edit and listing pages - to handle content editor cases - so they can edit 'pages', and just get the records they are allowed
                     //
@@ -991,7 +991,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     BlockEditForm = true;
                     Processor.Controllers.ErrorController.addUserError(core, "The content definition [" + adminContent.name + "] has no field records defined. Please contact your application developer For more assistance.");
-                    LogController.handleError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, Content [" + adminContent.name + "] has no fields defined."));
+                    LogController.logError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, Content [" + adminContent.name + "] has no fields defined."));
                 } else {
                     //
                     //   Open Content Sets with the data
@@ -1145,7 +1145,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1212,7 +1212,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -1349,7 +1349,7 @@ namespace Contensive.Addons.AdminSite {
                             // Was sent out non-blank, and no response back, flag error and leave the current value to a retry
                             string errorMessage = "There has been an error reading the response from your browser. The field[" + field.caption + "]" + TabCopy + " was missing. Please Try your change again. If this error happens repeatedly, please report this problem to your site administrator.";
                             Processor.Controllers.ErrorController.addUserError(core, errorMessage);
-                            LogController.handleError(core, new GenericException(errorMessage));
+                            LogController.logError(core, new GenericException(errorMessage));
                             ResponseFieldValueIsOKToSave = false;
                         } else {
                             int EditorPixelHeight = 0;
@@ -1603,7 +1603,7 @@ namespace Contensive.Addons.AdminSite {
                     editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //

@@ -307,7 +307,7 @@ namespace Contensive.Addons.Tools {
                     tempGetForm = Stream.Text;
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return tempGetForm;
         }
@@ -350,7 +350,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result; 
         }
@@ -376,7 +376,7 @@ namespace Contensive.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return tempGetForm_RootRow;
         }
@@ -468,7 +468,7 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("</SPAN>");
                 result = AdminUIController.getBody(core,Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -904,7 +904,7 @@ namespace Contensive.Addons.Tools {
                 Stream.Add(HtmlController.inputHidden("ReloadCDef", ReloadCDef));
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -1024,7 +1024,7 @@ namespace Contensive.Addons.Tools {
                 }
                 return;
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
         }
         //
@@ -1110,7 +1110,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -1142,7 +1142,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -1197,7 +1197,7 @@ namespace Contensive.Addons.Tools {
                 }
                 returnValue = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnValue;
@@ -1446,7 +1446,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -1464,7 +1464,7 @@ namespace Contensive.Addons.Tools {
                     tempLocal_GetContentID = GenericController.encodeInteger(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return tempLocal_GetContentID;
         }
@@ -1485,7 +1485,7 @@ namespace Contensive.Addons.Tools {
                     tempLocal_GetContentNameByID = GenericController.encodeText(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return tempLocal_GetContentNameByID;
         }
@@ -1506,7 +1506,7 @@ namespace Contensive.Addons.Tools {
                     tempLocal_GetContentTableName = GenericController.encodeText(RS.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return tempLocal_GetContentTableName;
         }
@@ -1764,7 +1764,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -1932,7 +1932,7 @@ namespace Contensive.Addons.Tools {
                     result = AdminUIController.getToolForm(core, result, ButtonList);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -2009,7 +2009,7 @@ namespace Contensive.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -2032,7 +2032,7 @@ namespace Contensive.Addons.Tools {
                 tempGetForm_LogFiles = AdminUIController.getToolForm(core, tempGetForm_LogFiles, ButtonList);
                 //tempGetForm_LogFiles = adminUIController.getToolFormOpen(core, ButtonList) + tempGetForm_LogFiles + (adminUIController.getToolFormClose(core, ButtonList));
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return tempGetForm_LogFiles;
         }
@@ -2168,7 +2168,7 @@ namespace Contensive.Addons.Tools {
                     result += GetTableEnd;
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -2243,7 +2243,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return result;
@@ -2304,7 +2304,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -2598,7 +2598,7 @@ namespace Contensive.Addons.Tools {
                 string ButtonList = ButtonApply + "," + ButtonCancel;
                 result = AdminUIController.getBody(core,"Content File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -2622,7 +2622,7 @@ namespace Contensive.Addons.Tools {
                 string ButtonList = ButtonApply + "," + ButtonCancel;
                 result = AdminUIController.getBody(core,"Website File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -2738,7 +2738,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonFindAndReplace);
                 //result = adminUIController.getToolFormOpen(core, ) + Stream.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -2777,7 +2777,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonIISReset);
                 //result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonIISReset) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonIISReset);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -2803,7 +2803,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonCreateGUID);
                 //result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonCreateGUID);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }

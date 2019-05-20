@@ -147,7 +147,7 @@ namespace Contensive.Processor.Controllers {
                 Copy = GenericController.vbReplace(Copy, "\r", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
         }
@@ -173,7 +173,7 @@ namespace Contensive.Processor.Controllers {
                 Copy = GenericController.vbReplace(Copy, "\r", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
         }
@@ -199,7 +199,7 @@ namespace Contensive.Processor.Controllers {
                 Copy = GenericController.vbReplace(Copy, "\r", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
         }
@@ -222,7 +222,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
         }
@@ -574,7 +574,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- done at last
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return core.doc.continueProcessing;
@@ -670,7 +670,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
         }
@@ -717,7 +717,7 @@ namespace Contensive.Processor.Controllers {
                     bufferResponseHeader = bufferResponseHeader + GenericController.vbReplace(HeaderName, "\r\n", "") + "\r\n" + GenericController.vbReplace(GenericController.encodeText(HeaderValue), "\r\n", "");
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }  
         }
         //
@@ -767,7 +767,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Link is not valid
                         //
-                        LogController.handleError( core,new GenericException("Redirect was called with a blank Link. Redirect Reason [" + RedirectReason + "]"));
+                        LogController.logError( core,new GenericException("Redirect was called with a blank Link. Redirect Reason [" + RedirectReason + "]"));
                         return string.Empty;
                         //
                         // changed to main_ServerLinksource because if a redirect is caused by a link forward, and the host page for the iis 404 is
@@ -778,7 +778,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Loop redirect error, throw trap and block redirect to prevent loop
                         //
-                        LogController.handleError( core,new GenericException("Redirect was called to the same URL, main_ServerLink is [" + requestUrl + "], main_ServerLinkSource is [" + requestUrlSource + "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" + RedirectReason + "]"));
+                        LogController.logError( core,new GenericException("Redirect was called to the same URL, main_ServerLink is [" + requestUrl + "], main_ServerLinkSource is [" + requestUrlSource + "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" + RedirectReason + "]"));
                         return string.Empty;
                     } else if (IsPageNotFound) {
                         //
@@ -826,7 +826,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.continueProcessing = false;
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return result;
         }
@@ -861,7 +861,7 @@ namespace Contensive.Processor.Controllers {
                 verifyAppPool(core, appName);
                 verifyWebsite(core, appName, DomainName, rootPublicFilesPath, appName);
             } catch (Exception ex) {
-                LogController.handleError( core,ex, "verifySite");
+                LogController.logError( core,ex, "verifySite");
             }
         }
         //
@@ -894,7 +894,7 @@ namespace Contensive.Processor.Controllers {
                     serverManager.CommitChanges();
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex, "verifyAppPool");
+                LogController.logError( core,ex, "verifyAppPool");
             }
         }
         //
@@ -952,7 +952,7 @@ namespace Contensive.Processor.Controllers {
                     iisManager.CommitChanges();
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex, "verifyWebsite");
+                LogController.logError( core,ex, "verifyWebsite");
             }
         }
         //
@@ -986,7 +986,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex, "verifyWebsite_Binding");
+                LogController.logError( core,ex, "verifyWebsite_Binding");
             }
         }
         //
@@ -1029,7 +1029,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex, "verifyWebsite_VirtualDirectory");
+                LogController.logError( core,ex, "verifyWebsite_VirtualDirectory");
             }
         }
         //========================================================================
@@ -1152,7 +1152,7 @@ namespace Contensive.Processor.Controllers {
                     CommaPosition = GenericController.vbInstr(1, AcceptLanguageString, ",");
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
             return "";
         }

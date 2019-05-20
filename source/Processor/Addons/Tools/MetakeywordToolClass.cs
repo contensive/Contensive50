@@ -121,7 +121,7 @@ namespace Contensive.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return tempGetForm_MetaKeywordTool;
         }

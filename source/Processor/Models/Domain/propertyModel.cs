@@ -159,7 +159,7 @@ namespace Contensive.Processor.Models.Domain {
                     core.db.executeQuery("update ccProperties set FieldValue=" + DbController.encodeSQLText(propertyValue) + ",ModifiedDate=" + SQLNow + " where id=" + RecordID);
                 }
             } catch( Exception ex ) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
         }
         //
@@ -292,7 +292,7 @@ namespace Contensive.Processor.Models.Domain {
                     setProperty(propertyName, defaultValue, keyId);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnString;
@@ -322,7 +322,7 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 propertyCacheLoaded = true;
             } catch( Exception ex ) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
             }
         }
     }

@@ -145,7 +145,7 @@ namespace Contensive.Addons.Email {
                 }
                 return;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw (new GenericException("Unexpected exception"));
             }
         }
@@ -292,7 +292,7 @@ namespace Contensive.Addons.Email {
                     core.db.executeNonQuery("update ccemail set lastProcessDate=" + SQLDateNow);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -498,7 +498,7 @@ namespace Contensive.Addons.Email {
                     EmailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + core.appConfig.domainList[0], ConfirmBody, "", "", true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend, emailContextMessage);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }

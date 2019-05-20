@@ -125,7 +125,7 @@ namespace Contensive.Processor.Controllers {
                     connectionStringDict.Add(key, returnConnString);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnConnString;
@@ -183,8 +183,8 @@ namespace Contensive.Processor.Controllers {
             DataTable returnData = new DataTable();
             try {
                 if (!dbEnabled) { return new DataTable(); }
-                if (core.serverConfig == null) { LogController.handleError(core, new GenericException("Cannot execute Sql in dbController without an application")); }
-                if (core.appConfig == null) { LogController.handleError(core, new GenericException("Cannot execute Sql in dbController without an application")); }
+                if (core.serverConfig == null) { LogController.logError(core, new GenericException("Cannot execute Sql in dbController without an application")); }
+                if (core.appConfig == null) { LogController.logError(core, new GenericException("Cannot execute Sql in dbController without an application")); }
                 //
                 // REFACTOR
                 // consider writing cs intrface to sql dataReader object -- one row at a time, vaster.
@@ -219,7 +219,7 @@ namespace Contensive.Processor.Controllers {
                 dbVerified = true;
                 saveTransactionLog(sql, sw.ElapsedMilliseconds, "query", recordsReturned);
             } catch (Exception ex) {
-                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "], recordsReturned [" + recordsReturned + "]", ex));
+                LogController.logError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "], recordsReturned [" + recordsReturned + "]", ex));
                 throw;
             }
             return returnData;
@@ -258,7 +258,7 @@ namespace Contensive.Processor.Controllers {
                 dbVerified = true;
                 saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query", recordsAffected);
             } catch (Exception ex) {
-                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], recordsAffected [" + recordsAffected + "]", ex));
+                LogController.logError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], recordsAffected [" + recordsAffected + "]", ex));
                 throw;
             }
         }
@@ -285,7 +285,7 @@ namespace Contensive.Processor.Controllers {
                 dbVerified = true;
                 saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query-async", -1);
             } catch (Exception ex) {
-                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "]", ex));
+                LogController.logError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "]", ex));
                 throw;
             }
         }
@@ -307,7 +307,7 @@ namespace Contensive.Processor.Controllers {
                     executeNonQueryAsync(SQL);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] updating table [" + tableName + "], criteria [" + criteria + "], dataSourceName [" + dataSourceName + "]", ex));
+                LogController.logError(core, new GenericException("Exception [" + ex.Message + "] updating table [" + tableName + "], criteria [" + criteria + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
         }
@@ -330,7 +330,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 return 0;
             } catch (Exception ex) {
-                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
+                LogController.logError(core, new GenericException("Exception [" + ex.Message + "] inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
         }
@@ -363,7 +363,7 @@ namespace Contensive.Processor.Controllers {
                 insertTableRecord(tableName, sqlList);
                 return openTable(tableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1, 1);
             } catch (Exception ex) {
-                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
+                LogController.logError(core, new GenericException("Exception [" + ex.Message + "] inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
         }
@@ -388,7 +388,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 executeNonQueryAsync(sql);
             } catch (Exception ex) {
-                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "], inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
+                LogController.logError(core, new GenericException("Exception [" + ex.Message + "], inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
         }
@@ -427,7 +427,7 @@ namespace Contensive.Processor.Controllers {
                 //SQL &= ";"
                 returnDataTable = executeQuery(SQL, (pageNumber - 1) * pageSize, pageSize);
             } catch (Exception ex) {
-                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "], opening table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
+                LogController.logError(core, new GenericException("Exception [" + ex.Message + "], opening table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
             return returnDataTable;
@@ -463,7 +463,7 @@ namespace Contensive.Processor.Controllers {
                     returnOK = (null != tableSchema.columns.Find(x => x.COLUMN_NAME.ToLowerInvariant() == fieldName.ToLowerInvariant()));
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnOK;
@@ -480,7 +480,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 ReturnOK = (!(Models.Domain.TableSchemaModel.getTableSchema(core, tableName, dataSourceName) == null));
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return ReturnOK;
@@ -555,7 +555,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 Models.Domain.TableSchemaModel.tableSchemaListClear(core);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -586,7 +586,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -603,7 +603,7 @@ namespace Contensive.Processor.Controllers {
                 core.cache.invalidateAll();
                 core.clearMetaData();
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -621,7 +621,7 @@ namespace Contensive.Processor.Controllers {
                     executeQuery("ALTER TABLE " + TableName + " DROP COLUMN " + FieldName + ";");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -650,7 +650,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -740,7 +740,7 @@ namespace Contensive.Processor.Controllers {
                         throw new GenericException("Can not proceed because the field being created has an invalid FieldType [" + fieldType + "]");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnType;
@@ -774,7 +774,7 @@ namespace Contensive.Processor.Controllers {
                 }
 
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -835,7 +835,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnType;
@@ -936,7 +936,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnTypeId;
@@ -1077,7 +1077,7 @@ namespace Contensive.Processor.Controllers {
                 if (recordId <= 0) { throw new GenericException("record id is not valid [" + recordId + "]"); }
                 executeNonQuery("delete from " + tableName + " where id=" + recordId);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1093,7 +1093,7 @@ namespace Contensive.Processor.Controllers {
                 if (!isGuid(guid)) { throw new GenericException("Guid is not valid [" + guid + "]"); }
                 executeNonQuery("delete from " + tableName + " where ccguid=" + encodeSQLText(guid));
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1112,7 +1112,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(criteria)) { throw new ArgumentException("Criteria cannot be blank"); }
                 executeQuery("delete from " + tableName + " where " + criteria);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1171,7 +1171,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnList;
@@ -1193,7 +1193,7 @@ namespace Contensive.Processor.Controllers {
                     returnDt = connSQL.GetSchema("Tables", new[] { core.appConfig.name, null, tableName, null });
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnDt;
@@ -1219,7 +1219,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnDt;
@@ -1243,7 +1243,7 @@ namespace Contensive.Processor.Controllers {
                 returnDt = executeQuery("sys.sp_helpindex @objname = N'" + tableName + "'");
                 // EXEC sys.sp_helpindex @objname = N'cccontent' returns index_name, index_keys (comma delimited field list)
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnDt;
@@ -1266,7 +1266,7 @@ namespace Contensive.Processor.Controllers {
                     sqlCriteria = "name=" + encodeSQLText(nameIdOrGuid);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return sqlCriteria;
@@ -1304,7 +1304,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return rows;
@@ -1378,12 +1378,12 @@ namespace Contensive.Processor.Controllers {
                     //
                     // records did not delete
                     //
-                    LogController.handleError(core, new GenericException("Error deleting record chunks. No records were deleted and the process was not complete."));
+                    LogController.logError(core, new GenericException("Error deleting record chunks. No records were deleted and the process was not complete."));
                 } else if (LoopCount >= iChunkCount) {
                     //
                     // records did not delete
                     //
-                    LogController.handleError(core, new GenericException("Error deleting record chunks. The maximum chunk count was exceeded while deleting records."));
+                    LogController.logError(core, new GenericException("Error deleting record chunks. The maximum chunk count was exceeded while deleting records."));
                 }
             }
         }
@@ -1453,7 +1453,7 @@ namespace Contensive.Processor.Controllers {
                     result = executeQuery(remoteQuery.SQLQuery);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 result = null;
             }
             return result;

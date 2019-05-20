@@ -95,7 +95,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             } finally {
                 contextLog.Pop();
@@ -970,7 +970,7 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 //
                 // Log error and exit with failure. This way any other upgrading will still continue
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             } finally {
                 contextLog.Pop();
@@ -1020,7 +1020,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 returnSuccess = false;
                 if (string.IsNullOrEmpty(return_ErrorMessage)) {
                     return_ErrorMessage = "There was an unexpected error installing the collection, details [" + ex.Message + "]";
@@ -1067,7 +1067,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 returnSuccess = false;
                 if (string.IsNullOrEmpty(return_ErrorMessage)) {
                     return_ErrorMessage = "There was an unexpected error installing the collection, details [" + ex.Message + "]";
@@ -1129,7 +1129,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1164,7 +1164,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -1536,7 +1536,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // Bad field name - need to report it somehow
                                                     //
-                                                    LogController.handleError(core, new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + MetadataController.getRecordName(core, "add-on collections", CollectionID) + "]"));
+                                                    LogController.logError(core, new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + MetadataController.getRecordName(core, "add-on collections", CollectionID) + "]"));
                                                 } else {
                                                     cs.set(FieldName, FieldValue);
                                                 }
@@ -1660,7 +1660,7 @@ namespace Contensive.Processor.Controllers {
                     //Call csCollection.cs_Close(CS)
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1760,7 +1760,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -1775,7 +1775,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="contextLog"></param>
         private static void traceContextLog(CoreController core, Stack<string> contextLog) {
-            logger.Log(LogLevel.Info, LogController.getLogMsg(core, string.Join(",", contextLog)));
+            logger.Log(LogLevel.Info, LogController.getMessageLine(core, string.Join(",", contextLog)));
         }
     }
 }

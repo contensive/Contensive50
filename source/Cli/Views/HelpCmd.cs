@@ -20,6 +20,8 @@ namespace Contensive.CLI {
             Console.Write(DeleteAppCmd.helpText);
             Console.Write(DeleteProtectionCmd.helpText);
             Console.Write(ExecuteAddonCmd.helpText);
+            Console.Write(FileDownloadCmd.helpText);
+            Console.Write(FileUploadCmd.helpText);
             Console.Write(FixTableFolderCaseCmd.helpText);
             Console.Write(FlushCacheCmd.helpText);
             Console.Write(HousekeepCmd.helpText);
@@ -32,7 +34,6 @@ namespace Contensive.CLI {
             Console.Write(TaskSchedulerCmd.helpText);
             Console.Write(TasksCmd.helpText);
             Console.Write(UpgradeCmd.helpText);
-            Console.Write(UploadFilesCmd.helpText);
             Console.Write(VersionCmd.helpText);
         }
         //

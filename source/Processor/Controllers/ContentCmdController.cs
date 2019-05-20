@@ -327,7 +327,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 returnValue = dst;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnValue;
@@ -401,7 +401,7 @@ namespace Contensive.Processor.Controllers {
                         try {
                             cmdDictionary = core.json.Deserialize<Dictionary<string, object>>(cmdSrc);
                         } catch (Exception ex) {
-                            LogController.handleError(core, ex);
+                            LogController.logError(core, ex);
                             throw;
                         }
                         //
@@ -786,7 +786,7 @@ namespace Contensive.Processor.Controllers {
                                         errorContextMessage = "calling Addon [" + addonName + "] during content cmd execution"
                                     };
                                     if (addon == null) {
-                                        LogController.handleError(core, new GenericException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
+                                        LogController.logError(core, new GenericException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
                                     } else {
                                         CmdAccumulator = core.addon.execute(addon, executeContext);
                                     }
@@ -875,7 +875,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 returnValue = CmdAccumulator;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnValue;

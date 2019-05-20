@@ -39,7 +39,7 @@ namespace Contensive.Addons.AdminSite {
                 result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Bounced Email Handling", "", AdminUIController.editTable( f.Text ));
                 adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

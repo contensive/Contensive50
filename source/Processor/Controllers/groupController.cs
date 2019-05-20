@@ -64,7 +64,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -90,7 +90,7 @@ namespace Contensive.Processor.Controllers {
             if (group == null) {
                 //
                 // -- invalid groupId
-                LogController.handleError(core, new GenericException("addUser called with invalid groupId [" + groupId + "]"));
+                LogController.logError(core, new GenericException("addUser called with invalid groupId [" + groupId + "]"));
                 return;
             }
             Models.Db.PersonModel user = null;
@@ -105,7 +105,7 @@ namespace Contensive.Processor.Controllers {
             if (user == null) {
                 //
                 // -- invalid userId
-                LogController.handleError(core, new GenericException("addUser called with invalid userId [" + userId + "]"));
+                LogController.logError(core, new GenericException("addUser called with invalid userId [" + userId + "]"));
                 return;
             }
             addUser(core, group, user, dateExpires);
@@ -124,7 +124,7 @@ namespace Contensive.Processor.Controllers {
             if ( groupNameIdOrGuid.IsNumeric()) {
                 group = Models.Db.GroupModel.create(core, GenericController.encodeInteger(groupNameIdOrGuid));
                 if (group == null) {
-                    LogController.handleError(core, new GenericException("addUser called with invalid groupId [" + groupNameIdOrGuid + "]"));
+                    LogController.logError(core, new GenericException("addUser called with invalid groupId [" + groupNameIdOrGuid + "]"));
                     return;
                 }
             } else if ( GenericController.isGuid( groupNameIdOrGuid )) {
@@ -253,7 +253,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 result = isInGroupList(core, "," + GroupController.getGroupId(core, GroupName), userId, true);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -273,7 +273,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 result = isInGroupList(core, checkMemberID, core.session.isAuthenticated, GroupIDList, adminReturnsTrue);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -378,7 +378,7 @@ namespace Contensive.Processor.Controllers {
                 }
 
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnREsult;

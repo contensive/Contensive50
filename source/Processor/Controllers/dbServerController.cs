@@ -26,7 +26,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 this.core = core;
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
         }
@@ -60,7 +60,7 @@ namespace Contensive.Processor.Controllers {
                     + "Password=" + core.serverConfig.defaultDataSourcePassword + ";"
                     + "";
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnConnString;
@@ -75,7 +75,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 executeQuery("create database " + catalogName);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
         }
@@ -97,7 +97,7 @@ namespace Contensive.Processor.Controllers {
                 returnOk = (dt.Rows.Count > 0);
                 dt.Dispose();
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return returnOk;
@@ -128,7 +128,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 ApplicationException newEx = new GenericException("Exception [" + ex.Message + "] executing master sql [" + sql + "]", ex);
-                LogController.handleError( core,newEx);
+                LogController.logError( core,newEx);
             }
             return returnData;
         }

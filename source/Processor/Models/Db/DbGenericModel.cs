@@ -29,7 +29,7 @@ namespace Contensive.Processor.Models.Db {
                 }
                 return 0;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -53,7 +53,7 @@ namespace Contensive.Processor.Models.Db {
                 }
                 return 0;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -89,7 +89,7 @@ namespace Contensive.Processor.Models.Db {
                     return result;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }

@@ -192,7 +192,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 result = createList(core, "(id in (select addonId from ccAddonPageRules where (pageId=" + pageId + ")))");
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return result;
@@ -203,7 +203,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 result = createList(core, "(id in (select addonId from ccAddonTemplateRules where (templateId=" + templateId + ")))");
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.logError( core,ex);
                 throw;
             }
             return result;

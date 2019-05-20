@@ -225,7 +225,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, logPrefix + ", Upgrade Complete");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -246,7 +246,7 @@ namespace Contensive.Processor.Controllers {
                 core.cache.invalidateAll();
                 core.clearMetaData();
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -268,7 +268,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -298,7 +298,7 @@ namespace Contensive.Processor.Controllers {
                     core.db.executeQuery(sql1 + sql2 + sql3);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -375,7 +375,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex, "hint [" + hint + "]");
+                LogController.logError(core, ex, "hint [" + hint + "]");
                 throw;
             }
         }
@@ -395,7 +395,7 @@ namespace Contensive.Processor.Controllers {
                 verifyRecord(core, "Languages", "French", "HTTP_Accept_Language", "'fr'");
                 verifyRecord(core, "Languages", "Any", "HTTP_Accept_Language", "'any'");
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -415,7 +415,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library Folders", "Downloads");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -500,7 +500,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Default", "IsFlash", "0");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -524,7 +524,7 @@ namespace Contensive.Processor.Controllers {
                 state.countryID = CountryID;
                 state.save(core, true);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -598,7 +598,7 @@ namespace Contensive.Processor.Controllers {
                 verifyState(core, "West Virginia", "WV", 0.0D, CountryID);
                 verifyState(core, "Wyoming", "WY", 0.0D, CountryID);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -631,7 +631,7 @@ namespace Contensive.Processor.Controllers {
                     csData.close();
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -657,7 +657,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -675,7 +675,7 @@ namespace Contensive.Processor.Controllers {
                 string SQL = "Update ccContent Set EditorGroupID=" + DbController.encodeSQLNumber(GroupID) + " where EditorGroupID is null;";
                 core.db.executeQuery(SQL);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -778,7 +778,7 @@ namespace Contensive.Processor.Controllers {
                     core.db.createSQLTable("ccFieldTypes");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -844,7 +844,7 @@ namespace Contensive.Processor.Controllers {
                     returnEntry = entry.id;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnEntry;
@@ -891,7 +891,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return parentRecordId;
@@ -924,7 +924,7 @@ namespace Contensive.Processor.Controllers {
                     core.db.insertTableRecord("ccSortMethods", sqlList);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -942,7 +942,7 @@ namespace Contensive.Processor.Controllers {
                 verifySortMethod(core, "By Date Reverse", "DateAdded Desc");
                 verifySortMethod(core, "By Alpha Sort Order Then Oldest First", "SortOrder,ID");
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -998,7 +998,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Problem
                         //
-                        LogController.handleError(core, new GenericException("Content Field Types content definition was not found"));
+                        LogController.logError(core, new GenericException("Content Field Types content definition was not found"));
                     } else {
                         while (RowsNeeded > 0) {
                             core.db.executeQuery("Insert into ccFieldTypes (active,contentcontrolid)values(1," + CID + ")");
@@ -1032,7 +1032,7 @@ namespace Contensive.Processor.Controllers {
                 core.db.executeQuery("Update ccFieldTypes Set active=1,Name='HTML' where ID=21;");
                 core.db.executeQuery("Update ccFieldTypes Set active=1,Name='HTML File' where ID=22;");
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }

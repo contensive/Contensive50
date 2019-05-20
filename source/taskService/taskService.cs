@@ -40,7 +40,7 @@ namespace Contensive.WindowsServices {
                 }
                 LogController.logTrace(cp.core, "Services.OnStart exit");
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex, "taskService.OnStart Exception");
+                LogController.logError(cp.core, ex, "taskService.OnStart Exception");
             }
         }
 
@@ -68,7 +68,7 @@ namespace Contensive.WindowsServices {
                 }
                 LogController.logTrace(cp.core, "Services.OnStop exit");
             } catch (Exception ex) {
-                LogController.handleError(cp.core, ex, "taskService.OnStop Exception");
+                LogController.logError(cp.core, ex, "taskService.OnStop Exception");
             }
         }
     }

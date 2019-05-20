@@ -2310,7 +2310,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnList;
@@ -2347,7 +2347,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnList;
@@ -2424,7 +2424,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     } catch (Exception ex) {
-                        LogController.handleError(core, ex);
+                        LogController.logError(core, ex);
                         throw;
                     }
                 }

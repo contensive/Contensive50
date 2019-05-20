@@ -37,7 +37,7 @@ namespace Contensive.Addons.AdminSite {
         public static string processAjaxData(CoreController core) {
             string result = "";
             try {
-                LogController.handleError(core, new GenericException("executeRoute_ProcessAjaxData deprecated"));
+                LogController.logError(core, new GenericException("executeRoute_ProcessAjaxData deprecated"));
                 //string RemoteKey = core.docProperties.getText("key");
                 //string EncodedArgs = core.docProperties.getText("args");
                 //int PageSize = core.docProperties.getInteger("pagesize");

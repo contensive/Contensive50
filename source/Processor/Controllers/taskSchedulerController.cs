@@ -55,7 +55,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    LogController.handleError(cp.core, ex);
+                    LogController.logError(cp.core, ex);
                 }
             }
         }
@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    LogController.handleError(cp.core, ex);
+                    LogController.logError(cp.core, ex);
                 }
             }
             return returnStartedOk;
@@ -111,10 +111,10 @@ namespace Contensive.Processor.Controllers {
                 long workingSetMemory = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
                 long virtualMemory = System.Diagnostics.Process.GetCurrentProcess().VirtualMemorySize64;
                 long privateMemory = System.Diagnostics.Process.GetCurrentProcess().PrivateMemorySize64;
-                LogController.forceNLog("TaskScheduler exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", LogController.LogLevel.Info);
+                LogController.logRaw("TaskScheduler exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", LogController.LogLevel.Info);
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    LogController.handleError(cp.core, ex);
+                    LogController.logError(cp.core, ex);
                 }
             } finally {
                 ProcessTimerInProcess = false;
@@ -176,14 +176,14 @@ namespace Contensive.Processor.Controllers {
                                 }
                             } catch (Exception ex) {
                                 LogController.logTrace(cpApp.core, "scheduleTasks, exception [" + ex.ToString() + "]");
-                                LogController.handleError(cpApp.core, ex);
+                                LogController.logError(cpApp.core, ex);
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
                 LogController.logTrace(coreServer, "scheduleTasks, exeception [" + ex.ToString() + "]");
-                LogController.handleError(coreServer, ex);
+                LogController.logError(coreServer, ex);
             }
         }
         //private void scheduleTasks(CoreController coreServer) {
@@ -314,7 +314,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 LogController.logTrace(core, "addTaskToQueue, exeception [" + ex.ToString() + "]");
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return resultTaskAdded;
         }

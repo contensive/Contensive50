@@ -138,7 +138,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static SessionController create(CoreController core, bool trackVisits) {
             //
-            LogController.logTrace(core, "SessionController.create(), enter");
+            LogController.logTrace(core, "enter");
             //
             SessionController resultSessionContext = null;
             var sw = Stopwatch.StartNew();
@@ -146,442 +146,439 @@ namespace Contensive.Processor.Controllers {
                 if (core.serverConfig == null) {
                     //
                     // -- application error if no server config
-                    LogController.handleError(core, new GenericException("authorization context cannot be created without a server configuration."));
-                } else {
+                    LogController.logError(core, new GenericException("authorization context cannot be created without a server configuration."));
+                    return default(SessionController) ;
+                }
+                resultSessionContext = new SessionController(core);
+                if (core.appConfig == null) {
                     //
-                    if (core.appConfig == null) {
+                    // -- no application, this is a server-only call not related to a 
+                    LogController.logTrace(core, "app.config null, create server session");
+                    return resultSessionContext;
+                }
+                //
+                string appNameCookiePrefix = encodeCookieName(core.appConfig.name);
+                string visitCookie = core.webServer.getRequestCookie(appNameCookiePrefix + cookieNameVisit);
+                string memberLinkinEID = core.docProperties.getText("eid");
+                int memberLinkRecognizeID = 0;
+                //
+                LogController.logTrace(core, "visitCookie [" + visitCookie + "], MemberLinkinEID [" + memberLinkinEID + "]");
+                //
+                var linkToken = new SecurityController.TokenData();
+                if (!string.IsNullOrEmpty(memberLinkinEID)) {
+                    //
+                    // -- attempt link authentication
+                    if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
                         //
-                        // -- no application, this is a server-only call not related to a 
-                        resultSessionContext = new SessionController(core);
-                        LogController.logTrace(core, "SessionController.create(), app.config null, create server session");
+                        // -- allow Link Login
+                        linkToken = SecurityController.decodeToken(core, memberLinkinEID);
+                    } else if (core.siteProperties.getBoolean("AllowLinkRecognize", true)) {
+                        //
+                        // -- allow Link Recognize
+                        linkToken = SecurityController.decodeToken(core, memberLinkinEID);
                     } else {
                         //
-                        resultSessionContext = new SessionController(core);
-                        string appNameCookiePrefix = encodeCookieName(core.appConfig.name);
-                        string visitCookie = core.webServer.getRequestCookie(appNameCookiePrefix + cookieNameVisit);
-                        string memberLinkinEID = core.docProperties.getText("eid");
-                        int memberLinkRecognizeID = 0;
-                        //
-                        LogController.logTrace(core, "SessionController.create(), visitCookie [" + visitCookie + "], MemberLinkinEID [" + memberLinkinEID + "]");
-                        //
-                        var linkToken = new SecurityController.TokenData();
-                        if (!string.IsNullOrEmpty(memberLinkinEID)) {
-                            //
-                            // -- attempt link authentication
-                            if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
-                                //
-                                // -- allow Link Login
-                                linkToken = SecurityController.decodeToken(core, memberLinkinEID);
-                            } else if (core.siteProperties.getBoolean("AllowLinkRecognize", true)) {
-                                //
-                                // -- allow Link Recognize
-                                linkToken = SecurityController.decodeToken(core, memberLinkinEID);
-                            } else {
-                                //
-                                // -- block link login
-                                memberLinkinEID = "";
-                            }
-                        }
-                        bool AllowOnNewVisitEvent = false;
-                        if ((trackVisits) || (!string.IsNullOrEmpty(visitCookie)) || (linkToken.id != 0) || (memberLinkRecognizeID != 0)) {
-                            //
-                            // -- Visit Tracking
-                            //
-                            LogController.logTrace(core, "SessionController.create(), visittracking");
-                            var visitToken = new SecurityController.TokenData();
-                            if (!string.IsNullOrEmpty(visitCookie)) {
-                                //
-                                // -- visit cookie found
-                                visitToken = SecurityController.decodeToken(core, visitCookie);
-                                if (visitToken.id == 0) {
-                                    //
-                                    // -- Bad Cookie, clear it so a new one will be written
-                                    visitCookie = "";
-                                    LogController.logInfo(core, "SessionController.create(), BAD COOKIE");
-                                }
-                            }
-                            if (visitToken.id != 0) {
-                                //
-                                // -- Visit is good, setup visit, then secondary visitor/user if possible
-                                LogController.logTrace(core, "SessionController.create(), valid cookieVisit [" + visitToken.id + "]");
-                                resultSessionContext.visit = VisitModel.create(core, visitToken.id);
-                                if (resultSessionContext.visit == null) {
-                                    //
-                                    // -- visit record is missing, create a new visit
-                                    LogController.logTrace(core, "SessionController.create(), visit record is missing, create a new visit");
-                                    resultSessionContext.visit = VisitModel.addEmpty(core);
-                                } else if (resultSessionContext.visit.lastVisitTime.AddHours(1) < core.doc.profileStartTime) {
-                                    //
-                                    // -- visit has expired, create new visit
-                                    LogController.logTrace(core, "SessionController.create(), visit has expired, create new visit");
-                                    resultSessionContext.visit = VisitModel.addEmpty(core);
-                                } else {
-                                    //
-                                    // -- visit object is valid, share its data with other objects
-                                    resultSessionContext.visit.timeToLastHit = 0;
-                                    if (resultSessionContext.visit.startTime > DateTime.MinValue) {
-                                        resultSessionContext.visit.timeToLastHit = encodeInteger((core.doc.profileStartTime - resultSessionContext.visit.startTime).TotalSeconds);
-                                    }
-                                    resultSessionContext.visit.cookieSupport = true;
-                                    if (resultSessionContext.visit.visitorID > 0) {
-                                        //
-                                        // -- try visit's visitor object
-                                        VisitorModel testVisitor = VisitorModel.create(core, resultSessionContext.visit.visitorID);
-                                        if (testVisitor != null) {
-                                            resultSessionContext.visitor = testVisitor;
-                                        }
-                                    }
-                                    if (resultSessionContext.visit.memberID > 0) {
-                                        //
-                                        // -- try visit's person object
-                                        PersonModel testUser = PersonModel.create(core, resultSessionContext.visit.memberID);
-                                        if (testUser != null) {
-                                            resultSessionContext.user = testUser;
-                                        }
-                                    }
-                                    if (((visitToken.timeStamp - resultSessionContext.visit.lastVisitTime).TotalSeconds) > 2) {
-                                        LogController.logTrace(core, "SessionController.create(), visit cookie timestamp [" + visitToken.timeStamp + "] does not match lastvisittime [" + resultSessionContext.visit.lastVisitTime + "]");
-                                        resultSessionContext.visitStateOk = false;
-                                    }
-                                }
-                            }
-                            //
-                            LogController.logTrace(core, "SessionController.create(), load session from cookied complete, visit.id [" + resultSessionContext.visit.id + "], visitor.id [" + resultSessionContext.visitor.id + "], user.id [" + resultSessionContext.user.id + "]");
-                            //
-                            bool visit_changes = false;
-                            bool visitor_changes = false;
-                            bool user_changes = false;
-                            if (resultSessionContext.visit.id == 0) {
-                                //
-                                // -- create new visit record
-                                LogController.logTrace(core, "SessionController.create(), visit id=0, create new visit");
-                                resultSessionContext.visit = VisitModel.addEmpty(core);
-                                if (string.IsNullOrEmpty(resultSessionContext.visit.name)) {
-                                    resultSessionContext.visit.name = "User";
-                                }
-                                resultSessionContext.visit.pageVisits = 0;
-                                resultSessionContext.visit.startTime = core.doc.profileStartTime;
-                                resultSessionContext.visit.startDateValue = encodeInteger(core.doc.profileStartTime.ToOADate());
-                                //
-                                // -- setup referrer
-                                if (!string.IsNullOrEmpty(core.webServer.requestReferrer)) {
-                                    string WorkingReferer = core.webServer.requestReferrer;
-                                    int SlashPosition = GenericController.vbInstr(1, WorkingReferer, "//");
-                                    if ((SlashPosition != 0) && (WorkingReferer.Length > (SlashPosition + 2))) {
-                                        WorkingReferer = WorkingReferer.Substring(SlashPosition + 1);
-                                    }
-                                    SlashPosition = GenericController.vbInstr(1, WorkingReferer, "/");
-                                    if (SlashPosition == 0) {
-                                        resultSessionContext.visit.refererPathPage = "";
-                                        resultSessionContext.visit.http_referer = WorkingReferer;
-                                    } else {
-                                        resultSessionContext.visit.refererPathPage = WorkingReferer.Substring(SlashPosition - 1);
-                                        resultSessionContext.visit.http_referer = WorkingReferer.Left(SlashPosition - 1);
-                                    }
-                                }
-                                //
-                                if (resultSessionContext.visitor.id == 0) {
-                                    //
-                                    // -- visit.visitor not valid, create visitor from cookie
-                                    string CookieVisitor = GenericController.encodeText(core.webServer.getRequestCookie(appNameCookiePrefix + main_cookieNameVisitor));
-                                    if (core.siteProperties.getBoolean("AllowAutoRecognize", true)) {
-                                        //
-                                        // -- auto recognize, setup user based on visitor
-                                        var visitorToken = SecurityController.decodeToken(core, CookieVisitor);
-                                        if (visitorToken.id != 0) {
-                                            //
-                                            // -- visitor cookie good
-                                            VisitorModel testVisitor = VisitorModel.create(core, visitorToken.id);
-                                            if (testVisitor != null) {
-                                                resultSessionContext.visitor = testVisitor;
-                                                visitor_changes = true;
-                                            }
-                                        }
-                                    }
-                                }
-                                //
-                                if (resultSessionContext.visitor.id == 0) {
-                                    //
-                                    // -- create new visitor
-                                    resultSessionContext.visitor = VisitorModel.addEmpty(core);
-                                    visitor_changes = false;
-                                    //
-                                    resultSessionContext.visit.visitorNew = true;
-                                    visit_changes = true;
-                                }
-                                //
-                                // -- find  identity from the visitor
-                                if (resultSessionContext.visitor.MemberID > 0) {
-                                    //
-                                    // -- recognize by the main_VisitorMemberID
-                                    if (recognizeById(core, resultSessionContext.visitor.MemberID, ref resultSessionContext)) {
-                                        //    //
-                                        //    // -- id presented, but did not work. create dummy user
-                                        //    resultSessionContext.user = new personModel();
-                                        //} else {
-                                        //
-                                        // -- if successful, now test for autologin (authentication)
-                                        if (core.siteProperties.allowAutoLogin & resultSessionContext.user.autoLogin & resultSessionContext.visit.cookieSupport) {
-                                            //
-                                            // -- they allow it, now Check if they were logged in on their last visit
-                                            VisitModel lastVisit = VisitModel.getLastVisitByVisitor(core, resultSessionContext.visit.id, resultSessionContext.visitor.id);
-                                            if (lastVisit != null) {
-                                                if (lastVisit.visitAuthenticated && (lastVisit.memberID == resultSessionContext.visit.id)) {
-                                                    if (authenticateById(core, resultSessionContext.user.id, resultSessionContext)) {
-                                                        LogController.addSiteActivity(core, "autologin", resultSessionContext.user.id, resultSessionContext.user.organizationID);
-                                                        visitor_changes = true;
-                                                        user_changes = true;
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            //
-                                            // -- Recognized, not auto login
-                                            LogController.addSiteActivity(core, "recognized", resultSessionContext.user.id, resultSessionContext.user.organizationID);
-                                        }
-                                    }
-                                }
-                                if (core.webServer.requestBrowser == "") {
-                                    //
-                                    // blank browser, Blank-Browser-Bot
-                                    //
-                                    resultSessionContext.visit.name = "Blank-Browser-Bot";
-                                    resultSessionContext.visit.bot = true;
-                                    resultSessionContext.visitBadBot = false;
-                                    resultSessionContext.visit.mobile = false;
-                                } else {
-                                    //
-                                    // -- mobile detect
-                                    switch (resultSessionContext.visitor.ForceBrowserMobile) {
-                                        case 1:
-                                            resultSessionContext.visit.mobile = true;
-                                            break;
-                                        case 2:
-                                            resultSessionContext.visit.mobile = false;
-                                            break;
-                                        default:
-                                            resultSessionContext.visit.mobile = isMobile(core.webServer.requestBrowser);
-                                            break;
-                                    }
-                                    //
-                                    // -- bot and badBot detect
-                                    resultSessionContext.visit.bot = false;
-                                    resultSessionContext.visitBadBot = false;
-                                    string botFileContent = core.cache.getObject<string>("DefaultBotNameList");
-                                    if (string.IsNullOrEmpty(botFileContent)) {
-                                        string Filename = "config\\VisitNameList.txt";
-                                        botFileContent = core.privateFiles.readFileText(Filename);
-                                        if (string.IsNullOrEmpty(botFileContent)) {
-                                            botFileContent = ""
-                                                + "\r\n//"
-                                                + "\r\n// Default Bot Name list"
-                                                + "\r\n// This file is maintained by the server. On the first hit of a visit,"
-                                                + "\r\n// the default member name is overridden with this name if there is a match"
-                                                + "\r\n// in either the user agent or the ipaddress."
-                                                + "\r\n// format:  name -tab- browser-user-agent-substring -tab- ip-address-substring -tab- type "
-                                                + "\r\n// This text is cached by the server for 1 hour, so changes take"
-                                                + "\r\n// effect when the cache expires. It is updated daily from the"
-                                                + "\r\n// support site feed. Manual changes may be over written."
-                                                + "\r\n// type - r=robot (default), b=bad robot, u=user"
-                                                + "\r\n//"
-                                                + "\r\nContensive MonitorContensive Monitor\t\tr"
-                                                + "\r\nGoogle-Bot\tgooglebot\t\tr"
-                                                + "\r\nMSN-Bot\tmsnbot\t\tr"
-                                                + "\r\nYahoo-Bot\tslurp\t\tr"
-                                                + "\r\nSearchMe-Bot\tsearchme.com\t\tr"
-                                                + "\r\nTwiceler-Bot\twww.cuil.com\t\tr"
-                                                + "\r\nUnknown Bot\trobot\t\tr"
-                                                + "\r\nUnknown Bot\tcrawl\t\tr"
-                                                + "";
-                                            core.privateFiles.saveFile(Filename, botFileContent);
-                                        }
-                                        core.cache.storeObject("DefaultBotNameList", botFileContent, DateTime.Now.AddHours(1), new List<string>());
-                                    }
-                                    //
-                                    if (!string.IsNullOrEmpty(botFileContent)) {
-                                        botFileContent = GenericController.vbReplace(botFileContent, "\r\n", "\n");
-                                        List<string> botList = new List<string>();
-                                        botList.AddRange(botFileContent.Split(Convert.ToChar("\n")));
-                                        foreach (string srcLine in botList) {
-                                            string line = srcLine.Trim();
-                                            if (!string.IsNullOrWhiteSpace(line)) {
-                                                // -- remove comment
-                                                int posComment = line.IndexOf("//");
-                                                if (posComment >= 0) {
-                                                    line = line.Left(posComment);
-                                                }
-                                                if (!string.IsNullOrWhiteSpace(line)) {
-                                                    // -- parse line on tab characters
-                                                    string[] Args = GenericController.stringSplit(line, "\t");
-                                                    if (Args.GetUpperBound(0) > 0) {
-                                                        // -- process argument 1
-                                                        if (!string.IsNullOrEmpty(Args[1].Trim(' '))) {
-                                                            if (GenericController.vbInstr(1, core.webServer.requestBrowser, Args[1], 1) != 0) {
-                                                                resultSessionContext.visit.name = Args[0];
-                                                                //visitNameFound = True
-                                                                break;
-                                                            }
-                                                        }
-                                                        if (Args.GetUpperBound(0) > 1) {
-                                                            // -- process argument 2
-                                                            if (!string.IsNullOrEmpty(Args[2].Trim(' '))) {
-                                                                if (GenericController.vbInstr(1, core.webServer.requestRemoteIP, Args[2], 1) != 0) {
-                                                                    resultSessionContext.visit.name = Args[0];
-                                                                    //visitNameFound = True
-                                                                    break;
-                                                                }
-                                                            }
-                                                            if (Args.GetUpperBound(0) <= 2) {
-                                                                resultSessionContext.visit.bot = true;
-                                                                resultSessionContext.visitBadBot = false;
-                                                            } else {
-                                                                resultSessionContext.visitBadBot = (Args[3].ToLowerInvariant() == "b");
-                                                                resultSessionContext.visit.bot = resultSessionContext.visitBadBot || (Args[3].ToLowerInvariant() == "r");
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                //
-                                // -- new visit, update the persistant visitor cookie
-                                if (trackVisits) {
-                                    core.webServer.addResponseCookie(appNameCookiePrefix + main_cookieNameVisitor, SecurityController.encodeToken(core, resultSessionContext.visitor.id, resultSessionContext.visit.startTime), resultSessionContext.visit.startTime.AddYears(1), "", appRootPath, false);
-                                }
-                                //
-                                // -- OnNewVisit Add-on call
-                                AllowOnNewVisitEvent = true;
-                            }
-                            // -- update the last visit time - this seems to force the visit to always save - to be revisited. Impact is low because visit save is async
-                            resultSessionContext.visit.lastVisitTime = core.doc.profileStartTime;
-                            visit_changes = true;
-                            //
-                            // -- verify visitor
-                            if (resultSessionContext.visitor.id == 0) {
-                                //
-                                // -- create new visitor
-                                resultSessionContext.visitor = VisitorModel.addEmpty(core);
-                                visitor_changes = true;
-                                //
-                                resultSessionContext.visit.visitorNew = true;
-                                resultSessionContext.visit.visitorID = resultSessionContext.visitor.id;
-                                visit_changes = true;
-                            }
-                            //
-                            // -- Attempt Link-in recognize or login
-                            if (linkToken.id != 0) {
-                                //
-                                // -- Link Login
-                                LogController.logTrace(core, "SessionController.create(), attempt link Login, linkToken.id [" + linkToken.id + "]");
-                                if (authenticateById(core, linkToken.id, resultSessionContext)) {
-                                    LogController.addSiteActivity(core, "link login with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.organizationID);
-                                }
-                            } else if (memberLinkRecognizeID != 0) {
-                                //
-                                // -- Link Recognize
-                                LogController.logTrace(core, "SessionController.create(), attempt link Recognize, memberLinkRecognizeID [" + memberLinkRecognizeID + "]");
-                                if (recognizeById(core, memberLinkRecognizeID, ref resultSessionContext)) {
-                                    LogController.addSiteActivity(core, "Successful link recognize with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.organizationID);
-                                } else {
-                                    LogController.addSiteActivity(core, "Unsuccessful link recognize with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.organizationID);
-                                }
-                            }
-                            //
-                            // -- create guest identity if no identity
-                            if (resultSessionContext.user.id < 1) {
-                                //
-                                // if a user record has not been created, do not automatically create it.
-                                // lazy create a user if/when it is needed
-                                string DefaultMemberName = resultSessionContext.visit.name;
-                                if (DefaultMemberName.Left(5).ToLowerInvariant() == "visit") {
-                                    DefaultMemberName = "Guest";
-                                }
-                                resultSessionContext.user = new PersonModel {
-                                    name = DefaultMemberName
-                                };
-                                //user_changes = false;
-                                if (!resultSessionContext.visitor.MemberID.Equals(0)) {
-                                    resultSessionContext.visitor.MemberID = 0;
-                                    visitor_changes = true;
-                                }
-                                if (!resultSessionContext.visit.memberID.Equals(0)) {
-                                    resultSessionContext.visit.memberID = 0;
-                                    resultSessionContext.visit.visitAuthenticated = false;
-                                    visit_changes = true;
-                                }
-                                if (resultSessionContext.visit.visitAuthenticated) {
-                                    resultSessionContext.visit.visitAuthenticated = false;
-                                    visit_changes = true;
-                                }
-                            }
-                            //
-                            // -- check for changes in interrelationships
-                            if (resultSessionContext.user.id > 0) {
-                                if (resultSessionContext.visitor.MemberID != resultSessionContext.user.id) {
-                                    resultSessionContext.visitor.MemberID = resultSessionContext.user.id;
-                                    visitor_changes = true;
-                                }
-                                if (resultSessionContext.visit.memberID != resultSessionContext.user.id) {
-                                    resultSessionContext.visit.memberID = resultSessionContext.user.id;
-                                    visit_changes = true;
-                                }
-                                if (resultSessionContext.visit.visitorID != resultSessionContext.visitor.id) {
-                                    resultSessionContext.visit.visitorID = resultSessionContext.visitor.id;
-                                    visit_changes = true;
-                                }
-                            }
-                            //
-                            // -- count the page hit
-                            LogController.logTrace(core, "SessionController.create(), attempt visit count update");
-                            resultSessionContext.visit.excludeFromAnalytics |= resultSessionContext.visit.bot || resultSessionContext.user.excludeFromAnalytics || resultSessionContext.user.admin || resultSessionContext.user.developer;
-                            if (!core.webServer.pageExcludeFromAnalytics) {
-                                resultSessionContext.visit.pageVisits += 1;
-                                visit_changes = true;
-                            }
-                            //
-                            // -- Save anything that changed
-                            LogController.logTrace(core, "SessionController.create(), save visit,visitor,user if updated");
-                            if (visit_changes) {
-                                resultSessionContext.visit.save(core, true);
-                            }
-                            if (visitor_changes) {
-                                resultSessionContext.visitor.save(core, true);
-                            }
-                            if (user_changes) {
-                                resultSessionContext.user.save(core, true);
-                            }
-                            string visitCookieNew = SecurityController.encodeToken(core, resultSessionContext.visit.id, resultSessionContext.visit.lastVisitTime);
-                            if (trackVisits && (visitCookie != visitCookieNew)) {
-                                visitCookie = visitCookieNew;
-                            }
-                        }
-                        if (AllowOnNewVisitEvent) {
-                            LogController.logTrace(core, "SessionController.create(), execute onNewVisitEvent");
-                            foreach (var addon in core.addonCache.getOnNewVisitAddonList()) {
-                                CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                                    addonType = CPUtilsBaseClass.addonContext.ContextOnNewVisit,
-                                    errorContextMessage = "new visit event running addon  [" + addon.name + "]"
-                                };
-                                core.addon.execute(addon, executeContext);
-                            }
-                        }
-                        //
-                        // -- Write Visit Cookie
-                        LogController.logTrace(core, "SessionController.create(), write visit cookie");
-                        visitCookie = SecurityController.encodeToken(core, resultSessionContext.visit.id, core.doc.profileStartTime);
-                        // -- very trial-error fix - W4S site does not send cookies from ajax calls right after changing from requestAppRootPath to appRootPath
-                        core.webServer.addResponseCookie(appNameCookiePrefix + Constants.cookieNameVisit, visitCookie, default(DateTime), "", @"/", false);
-                        //core.webServer.addResponseCookie(appNameCookiePrefix + constants.cookieNameVisit, visitCookie, default(DateTime), "", appRootPath, false);
+                        // -- block link login
+                        memberLinkinEID = "";
                     }
                 }
+                bool AllowOnNewVisitEvent = false;
+                if ((trackVisits) || (!string.IsNullOrEmpty(visitCookie)) || (linkToken.id != 0) || (memberLinkRecognizeID != 0)) {
+                    //
+                    // -- Visit Tracking
+                    //
+                    LogController.logTrace(core, "visittracking");
+                    var visitToken = new SecurityController.TokenData();
+                    if (!string.IsNullOrEmpty(visitCookie)) {
+                        //
+                        // -- visit cookie found
+                        visitToken = SecurityController.decodeToken(core, visitCookie);
+                        if (visitToken.id == 0) {
+                            //
+                            // -- Bad Cookie, clear it so a new one will be written
+                            visitCookie = "";
+                            LogController.logInfo(core, "BAD COOKIE");
+                        }
+                    }
+                    if (visitToken.id != 0) {
+                        //
+                        // -- Visit is good, setup visit, then secondary visitor/user if possible
+                        LogController.logTrace(core, "valid cookieVisit [" + visitToken.id + "]");
+                        resultSessionContext.visit = VisitModel.create(core, visitToken.id);
+                        if (resultSessionContext.visit == null) {
+                            //
+                            // -- visit record is missing, create a new visit
+                            LogController.logTrace(core, "visit record is missing, create a new visit");
+                            resultSessionContext.visit = VisitModel.addEmpty(core);
+                        } else if (resultSessionContext.visit.lastVisitTime.AddHours(1) < core.doc.profileStartTime) {
+                            //
+                            // -- visit has expired, create new visit
+                            LogController.logTrace(core, "visit has expired, create new visit, lastVisitTime [" + resultSessionContext.visit.lastVisitTime + "], profileStartTime [" + core.doc.profileStartTime + "]");
+                            resultSessionContext.visit = VisitModel.addEmpty(core);
+                        } else {
+                            //
+                            // -- visit object is valid, share its data with other objects
+                            resultSessionContext.visit.timeToLastHit = 0;
+                            if (resultSessionContext.visit.startTime > DateTime.MinValue) {
+                                resultSessionContext.visit.timeToLastHit = encodeInteger((core.doc.profileStartTime - resultSessionContext.visit.startTime).TotalSeconds);
+                            }
+                            resultSessionContext.visit.cookieSupport = true;
+                            if (resultSessionContext.visit.visitorID > 0) {
+                                //
+                                // -- try visit's visitor object
+                                VisitorModel testVisitor = VisitorModel.create(core, resultSessionContext.visit.visitorID);
+                                if (testVisitor != null) {
+                                    resultSessionContext.visitor = testVisitor;
+                                }
+                            }
+                            if (resultSessionContext.visit.memberID > 0) {
+                                //
+                                // -- try visit's person object
+                                PersonModel testUser = PersonModel.create(core, resultSessionContext.visit.memberID);
+                                if (testUser != null) {
+                                    resultSessionContext.user = testUser;
+                                }
+                            }
+                            if (((visitToken.timeStamp - resultSessionContext.visit.lastVisitTime).TotalSeconds) > 2) {
+                                LogController.logTrace(core, "visit cookie timestamp [" + visitToken.timeStamp + "] does not match lastvisittime [" + resultSessionContext.visit.lastVisitTime + "]");
+                                resultSessionContext.visitStateOk = false;
+                            }
+                        }
+                    }
+                    //
+                    LogController.logTrace(core, "load session from cookied complete, visit.id [" + resultSessionContext.visit.id + "], visitor.id [" + resultSessionContext.visitor.id + "], user.id [" + resultSessionContext.user.id + "]");
+                    //
+                    bool visit_changes = false;
+                    bool visitor_changes = false;
+                    bool user_changes = false;
+                    if (resultSessionContext.visit.id == 0) {
+                        //
+                        // -- create new visit record
+                        LogController.logTrace(core, "visit id=0, create new visit");
+                        resultSessionContext.visit = VisitModel.addEmpty(core);
+                        if (string.IsNullOrEmpty(resultSessionContext.visit.name)) {
+                            resultSessionContext.visit.name = "User";
+                        }
+                        resultSessionContext.visit.pageVisits = 0;
+                        resultSessionContext.visit.startTime = core.doc.profileStartTime;
+                        resultSessionContext.visit.startDateValue = encodeInteger(core.doc.profileStartTime.ToOADate());
+                        //
+                        // -- setup referrer
+                        if (!string.IsNullOrEmpty(core.webServer.requestReferrer)) {
+                            string WorkingReferer = core.webServer.requestReferrer;
+                            int SlashPosition = GenericController.vbInstr(1, WorkingReferer, "//");
+                            if ((SlashPosition != 0) && (WorkingReferer.Length > (SlashPosition + 2))) {
+                                WorkingReferer = WorkingReferer.Substring(SlashPosition + 1);
+                            }
+                            SlashPosition = GenericController.vbInstr(1, WorkingReferer, "/");
+                            if (SlashPosition == 0) {
+                                resultSessionContext.visit.refererPathPage = "";
+                                resultSessionContext.visit.http_referer = WorkingReferer;
+                            } else {
+                                resultSessionContext.visit.refererPathPage = WorkingReferer.Substring(SlashPosition - 1);
+                                resultSessionContext.visit.http_referer = WorkingReferer.Left(SlashPosition - 1);
+                            }
+                        }
+                        //
+                        if (resultSessionContext.visitor.id == 0) {
+                            //
+                            // -- visit.visitor not valid, create visitor from cookie
+                            string CookieVisitor = GenericController.encodeText(core.webServer.getRequestCookie(appNameCookiePrefix + main_cookieNameVisitor));
+                            if (core.siteProperties.getBoolean("AllowAutoRecognize", true)) {
+                                //
+                                // -- auto recognize, setup user based on visitor
+                                var visitorToken = SecurityController.decodeToken(core, CookieVisitor);
+                                if (visitorToken.id != 0) {
+                                    //
+                                    // -- visitor cookie good
+                                    VisitorModel testVisitor = VisitorModel.create(core, visitorToken.id);
+                                    if (testVisitor != null) {
+                                        resultSessionContext.visitor = testVisitor;
+                                        visitor_changes = true;
+                                    }
+                                }
+                            }
+                        }
+                        //
+                        if (resultSessionContext.visitor.id == 0) {
+                            //
+                            // -- create new visitor
+                            resultSessionContext.visitor = VisitorModel.addEmpty(core);
+                            visitor_changes = false;
+                            //
+                            resultSessionContext.visit.visitorNew = true;
+                            visit_changes = true;
+                        }
+                        //
+                        // -- find  identity from the visitor
+                        if (resultSessionContext.visitor.MemberID > 0) {
+                            //
+                            // -- recognize by the main_VisitorMemberID
+                            if (recognizeById(core, resultSessionContext.visitor.MemberID, ref resultSessionContext)) {
+                                //    //
+                                //    // -- id presented, but did not work. create dummy user
+                                //    resultSessionContext.user = new personModel();
+                                //} else {
+                                //
+                                // -- if successful, now test for autologin (authentication)
+                                if (core.siteProperties.allowAutoLogin & resultSessionContext.user.autoLogin & resultSessionContext.visit.cookieSupport) {
+                                    //
+                                    // -- they allow it, now Check if they were logged in on their last visit
+                                    VisitModel lastVisit = VisitModel.getLastVisitByVisitor(core, resultSessionContext.visit.id, resultSessionContext.visitor.id);
+                                    if (lastVisit != null) {
+                                        if (lastVisit.visitAuthenticated && (lastVisit.memberID == resultSessionContext.visit.id)) {
+                                            if (authenticateById(core, resultSessionContext.user.id, resultSessionContext)) {
+                                                LogController.addSiteActivity(core, "autologin", resultSessionContext.user.id, resultSessionContext.user.organizationID);
+                                                visitor_changes = true;
+                                                user_changes = true;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    //
+                                    // -- Recognized, not auto login
+                                    LogController.addSiteActivity(core, "recognized", resultSessionContext.user.id, resultSessionContext.user.organizationID);
+                                }
+                            }
+                        }
+                        if (core.webServer.requestBrowser == "") {
+                            //
+                            // blank browser, Blank-Browser-Bot
+                            //
+                            resultSessionContext.visit.name = "Blank-Browser-Bot";
+                            resultSessionContext.visit.bot = true;
+                            resultSessionContext.visitBadBot = false;
+                            resultSessionContext.visit.mobile = false;
+                        } else {
+                            //
+                            // -- mobile detect
+                            switch (resultSessionContext.visitor.ForceBrowserMobile) {
+                                case 1:
+                                    resultSessionContext.visit.mobile = true;
+                                    break;
+                                case 2:
+                                    resultSessionContext.visit.mobile = false;
+                                    break;
+                                default:
+                                    resultSessionContext.visit.mobile = isMobile(core.webServer.requestBrowser);
+                                    break;
+                            }
+                            //
+                            // -- bot and badBot detect
+                            resultSessionContext.visit.bot = false;
+                            resultSessionContext.visitBadBot = false;
+                            string botFileContent = core.cache.getObject<string>("DefaultBotNameList");
+                            if (string.IsNullOrEmpty(botFileContent)) {
+                                string Filename = "config\\VisitNameList.txt";
+                                botFileContent = core.privateFiles.readFileText(Filename);
+                                if (string.IsNullOrEmpty(botFileContent)) {
+                                    botFileContent = ""
+                                        + "\r\n//"
+                                        + "\r\n// Default Bot Name list"
+                                        + "\r\n// This file is maintained by the server. On the first hit of a visit,"
+                                        + "\r\n// the default member name is overridden with this name if there is a match"
+                                        + "\r\n// in either the user agent or the ipaddress."
+                                        + "\r\n// format:  name -tab- browser-user-agent-substring -tab- ip-address-substring -tab- type "
+                                        + "\r\n// This text is cached by the server for 1 hour, so changes take"
+                                        + "\r\n// effect when the cache expires. It is updated daily from the"
+                                        + "\r\n// support site feed. Manual changes may be over written."
+                                        + "\r\n// type - r=robot (default), b=bad robot, u=user"
+                                        + "\r\n//"
+                                        + "\r\nContensive MonitorContensive Monitor\t\tr"
+                                        + "\r\nGoogle-Bot\tgooglebot\t\tr"
+                                        + "\r\nMSN-Bot\tmsnbot\t\tr"
+                                        + "\r\nYahoo-Bot\tslurp\t\tr"
+                                        + "\r\nSearchMe-Bot\tsearchme.com\t\tr"
+                                        + "\r\nTwiceler-Bot\twww.cuil.com\t\tr"
+                                        + "\r\nUnknown Bot\trobot\t\tr"
+                                        + "\r\nUnknown Bot\tcrawl\t\tr"
+                                        + "";
+                                    core.privateFiles.saveFile(Filename, botFileContent);
+                                }
+                                core.cache.storeObject("DefaultBotNameList", botFileContent, DateTime.Now.AddHours(1), new List<string>());
+                            }
+                            //
+                            if (!string.IsNullOrEmpty(botFileContent)) {
+                                botFileContent = GenericController.vbReplace(botFileContent, "\r\n", "\n");
+                                List<string> botList = new List<string>();
+                                botList.AddRange(botFileContent.Split(Convert.ToChar("\n")));
+                                foreach (string srcLine in botList) {
+                                    string line = srcLine.Trim();
+                                    if (!string.IsNullOrWhiteSpace(line)) {
+                                        // -- remove comment
+                                        int posComment = line.IndexOf("//");
+                                        if (posComment >= 0) {
+                                            line = line.Left(posComment);
+                                        }
+                                        if (!string.IsNullOrWhiteSpace(line)) {
+                                            // -- parse line on tab characters
+                                            string[] Args = GenericController.stringSplit(line, "\t");
+                                            if (Args.GetUpperBound(0) > 0) {
+                                                // -- process argument 1
+                                                if (!string.IsNullOrEmpty(Args[1].Trim(' '))) {
+                                                    if (GenericController.vbInstr(1, core.webServer.requestBrowser, Args[1], 1) != 0) {
+                                                        resultSessionContext.visit.name = Args[0];
+                                                        //visitNameFound = True
+                                                        break;
+                                                    }
+                                                }
+                                                if (Args.GetUpperBound(0) > 1) {
+                                                    // -- process argument 2
+                                                    if (!string.IsNullOrEmpty(Args[2].Trim(' '))) {
+                                                        if (GenericController.vbInstr(1, core.webServer.requestRemoteIP, Args[2], 1) != 0) {
+                                                            resultSessionContext.visit.name = Args[0];
+                                                            //visitNameFound = True
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (Args.GetUpperBound(0) <= 2) {
+                                                        resultSessionContext.visit.bot = true;
+                                                        resultSessionContext.visitBadBot = false;
+                                                    } else {
+                                                        resultSessionContext.visitBadBot = (Args[3].ToLowerInvariant() == "b");
+                                                        resultSessionContext.visit.bot = resultSessionContext.visitBadBot || (Args[3].ToLowerInvariant() == "r");
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        //
+                        // -- new visit, update the persistant visitor cookie
+                        if (trackVisits) {
+                            core.webServer.addResponseCookie(appNameCookiePrefix + main_cookieNameVisitor, SecurityController.encodeToken(core, resultSessionContext.visitor.id, resultSessionContext.visit.startTime), resultSessionContext.visit.startTime.AddYears(1), "", appRootPath, false);
+                        }
+                        //
+                        // -- OnNewVisit Add-on call
+                        AllowOnNewVisitEvent = true;
+                    }
+                    // -- update the last visit time - this seems to force the visit to always save - to be revisited. Impact is low because visit save is async
+                    resultSessionContext.visit.lastVisitTime = core.doc.profileStartTime;
+                    visit_changes = true;
+                    //
+                    // -- verify visitor
+                    if (resultSessionContext.visitor.id == 0) {
+                        //
+                        // -- create new visitor
+                        resultSessionContext.visitor = VisitorModel.addEmpty(core);
+                        visitor_changes = true;
+                        //
+                        resultSessionContext.visit.visitorNew = true;
+                        resultSessionContext.visit.visitorID = resultSessionContext.visitor.id;
+                        visit_changes = true;
+                    }
+                    //
+                    // -- Attempt Link-in recognize or login
+                    if (linkToken.id != 0) {
+                        //
+                        // -- Link Login
+                        LogController.logTrace(core, "attempt link Login, linkToken.id [" + linkToken.id + "]");
+                        if (authenticateById(core, linkToken.id, resultSessionContext)) {
+                            LogController.addSiteActivity(core, "link login with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.organizationID);
+                        }
+                    } else if (memberLinkRecognizeID != 0) {
+                        //
+                        // -- Link Recognize
+                        LogController.logTrace(core, "attempt link Recognize, memberLinkRecognizeID [" + memberLinkRecognizeID + "]");
+                        if (recognizeById(core, memberLinkRecognizeID, ref resultSessionContext)) {
+                            LogController.addSiteActivity(core, "Successful link recognize with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.organizationID);
+                        } else {
+                            LogController.addSiteActivity(core, "Unsuccessful link recognize with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.organizationID);
+                        }
+                    }
+                    //
+                    // -- create guest identity if no identity
+                    if (resultSessionContext.user.id < 1) {
+                        //
+                        // if a user record has not been created, do not automatically create it.
+                        // lazy create a user if/when it is needed
+                        string DefaultMemberName = resultSessionContext.visit.name;
+                        if (DefaultMemberName.Left(5).ToLowerInvariant() == "visit") {
+                            DefaultMemberName = "Guest";
+                        }
+                        resultSessionContext.user = new PersonModel {
+                            name = DefaultMemberName
+                        };
+                        //user_changes = false;
+                        if (!resultSessionContext.visitor.MemberID.Equals(0)) {
+                            resultSessionContext.visitor.MemberID = 0;
+                            visitor_changes = true;
+                        }
+                        if (!resultSessionContext.visit.memberID.Equals(0)) {
+                            resultSessionContext.visit.memberID = 0;
+                            resultSessionContext.visit.visitAuthenticated = false;
+                            visit_changes = true;
+                        }
+                        if (resultSessionContext.visit.visitAuthenticated) {
+                            resultSessionContext.visit.visitAuthenticated = false;
+                            visit_changes = true;
+                        }
+                    }
+                    //
+                    // -- check for changes in interrelationships
+                    if (resultSessionContext.user.id > 0) {
+                        if (resultSessionContext.visitor.MemberID != resultSessionContext.user.id) {
+                            resultSessionContext.visitor.MemberID = resultSessionContext.user.id;
+                            visitor_changes = true;
+                        }
+                        if (resultSessionContext.visit.memberID != resultSessionContext.user.id) {
+                            resultSessionContext.visit.memberID = resultSessionContext.user.id;
+                            visit_changes = true;
+                        }
+                        if (resultSessionContext.visit.visitorID != resultSessionContext.visitor.id) {
+                            resultSessionContext.visit.visitorID = resultSessionContext.visitor.id;
+                            visit_changes = true;
+                        }
+                    }
+                    //
+                    // -- count the page hit
+                    LogController.logTrace(core, "attempt visit count update");
+                    resultSessionContext.visit.excludeFromAnalytics |= resultSessionContext.visit.bot || resultSessionContext.user.excludeFromAnalytics || resultSessionContext.user.admin || resultSessionContext.user.developer;
+                    if (!core.webServer.pageExcludeFromAnalytics) {
+                        resultSessionContext.visit.pageVisits += 1;
+                        visit_changes = true;
+                    }
+                    //
+                    // -- Save anything that changed
+                    LogController.logTrace(core, "save visit,visitor,user if updated");
+                    if (visit_changes) {
+                        resultSessionContext.visit.save(core, true);
+                    }
+                    if (visitor_changes) {
+                        resultSessionContext.visitor.save(core, true);
+                    }
+                    if (user_changes) {
+                        resultSessionContext.user.save(core, true);
+                    }
+                    string visitCookieNew = SecurityController.encodeToken(core, resultSessionContext.visit.id, resultSessionContext.visit.lastVisitTime);
+                    if (trackVisits && (visitCookie != visitCookieNew)) {
+                        visitCookie = visitCookieNew;
+                    }
+                }
+                if (AllowOnNewVisitEvent) {
+                    LogController.logTrace(core, "execute onNewVisitEvent");
+                    foreach (var addon in core.addonCache.getOnNewVisitAddonList()) {
+                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                            addonType = CPUtilsBaseClass.addonContext.ContextOnNewVisit,
+                            errorContextMessage = "new visit event running addon  [" + addon.name + "]"
+                        };
+                        core.addon.execute(addon, executeContext);
+                    }
+                }
+                //
+                // -- Write Visit Cookie
+                LogController.logTrace(core, "write visit cookie");
+                visitCookie = SecurityController.encodeToken(core, resultSessionContext.visit.id, core.doc.profileStartTime);
+                // -- very trial-error fix - W4S site does not send cookies from ajax calls right after changing from requestAppRootPath to appRootPath
+                core.webServer.addResponseCookie(appNameCookiePrefix + Constants.cookieNameVisit, visitCookie, default(DateTime), "", @"/", false);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             } finally {
                 //
-                LogController.logTrace(core, "SessionController.create(), finally");
+                LogController.logTrace(core, "finally");
                 //
             }
             return resultSessionContext;
@@ -598,7 +595,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 result = visit.visitAuthenticated & (user.admin || user.developer);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -615,7 +612,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 result = visit.visitAuthenticated & (user.admin || user.developer);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -637,7 +634,7 @@ namespace Contensive.Processor.Controllers {
                 // -- for specific Content
                 returnIsContentManager = PermissionController.getUserContentPermissions(core, contentMetadata).allowEdit;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 return false;
             }
             return returnIsContentManager;
@@ -667,7 +664,7 @@ namespace Contensive.Processor.Controllers {
                     returnIsContentManager = PermissionController.getUserContentPermissions(core, cdef).allowEdit;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 return false;
             }
             return returnIsContentManager;
@@ -706,7 +703,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 returnIsContentManager = _isAuthenticatedContentManagerAnything;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnIsContentManager;
@@ -733,7 +730,7 @@ namespace Contensive.Processor.Controllers {
                 visitor.MemberID = user.id;
                 visitor.save(core);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -865,7 +862,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnUserId;
@@ -916,7 +913,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnOk;
@@ -944,7 +941,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -972,7 +969,7 @@ namespace Contensive.Processor.Controllers {
                     authContext.visit.save(core);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -1018,7 +1015,7 @@ namespace Contensive.Processor.Controllers {
                     result = true;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -1095,7 +1092,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -1114,7 +1111,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = core.visitProperty.getBoolean("AllowQuickEditor");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnResult;
@@ -1187,7 +1184,7 @@ namespace Contensive.Processor.Controllers {
                     tempisWorkflowRendering = core.visitProperty.getBoolean("AllowWorkflowRendering");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;

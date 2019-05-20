@@ -391,7 +391,7 @@ namespace Contensive.Addons.AdminSite {
                 returnForm = HtmlController.form(core, Stream.Text);
                 core.html.addTitle(adminData.adminContent.name + " Advanced Search");
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnForm;

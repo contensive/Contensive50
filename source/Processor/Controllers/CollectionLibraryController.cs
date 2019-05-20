@@ -208,7 +208,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -257,7 +257,7 @@ namespace Contensive.Processor.Controllers {
                     core.privateFiles.deleteFolder(privateFilesDownloadPath);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             } finally {
                 contextLog.Pop();
@@ -273,7 +273,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="contextLog"></param>
         private static void traceContextLog(CoreController core, Stack<string> contextLog) {
-            logger.Log(LogLevel.Info, LogController.getLogMsg(core, string.Join(",", contextLog)));
+            logger.Log(LogLevel.Info, LogController.getMessageLine(core, string.Join(",", contextLog)));
         }
     }
 }

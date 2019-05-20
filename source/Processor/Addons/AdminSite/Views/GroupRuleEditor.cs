@@ -130,7 +130,7 @@ namespace Contensive.Addons.AdminSite {
                 result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Group Membership", "", body.Text );
                 adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

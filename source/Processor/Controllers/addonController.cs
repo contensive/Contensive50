@@ -71,7 +71,7 @@ namespace Contensive.Processor.Controllers {
             if (addon == null) {
                 //
                 // -- addon not found
-                LogController.handleError(core, new ArgumentException("AddonExecute called without valid guid [" + addonGuid + "] from context [" + executeContext.errorContextMessage + "]."));
+                LogController.logError(core, new ArgumentException("AddonExecute called without valid guid [" + addonGuid + "] from context [" + executeContext.errorContextMessage + "]."));
                 return "";
             } else {
                 return execute(addon, executeContext);
@@ -90,7 +90,7 @@ namespace Contensive.Processor.Controllers {
             if (addon == null) {
                 //
                 // -- addon not found
-                LogController.handleError(core, new ArgumentException("AddonExecute called without valid id [" + addonId + "] from context [" + executeContext.errorContextMessage + "]."));
+                LogController.logError(core, new ArgumentException("AddonExecute called without valid id [" + addonId + "] from context [" + executeContext.errorContextMessage + "]."));
                 return "";
             } else {
                 return execute(addon, executeContext);
@@ -116,7 +116,7 @@ namespace Contensive.Processor.Controllers {
             if (addon == null) {
                 //
                 // -- addon not found
-                LogController.handleWarn(core, new ArgumentException("AddonExecute called with null addon, executeContext [" + executeContext.errorContextMessage + "]."));
+                LogController.logWarn(core, new ArgumentException("AddonExecute called with null addon, executeContext [" + executeContext.errorContextMessage + "]."));
             } else {
                 try {
                     hint = "01";
@@ -128,7 +128,7 @@ namespace Contensive.Processor.Controllers {
                     if (executeContext == null) {
                         //
                         // -- context not configured 
-                        LogController.handleError(core, new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."));
+                        LogController.logError(core, new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."));
                     } else if (!string.IsNullOrEmpty(addon.objectProgramID)) {
                         //
                         // -- addons with activeX components are deprecated
@@ -163,7 +163,7 @@ namespace Contensive.Processor.Controllers {
                             // -- run included add-ons before their parent
                             foreach (var dependentAddon in core.addonCache.getDependsOnList(addon.id)) {
                                 if (dependentAddon == null) {
-                                    LogController.handleError(core, new GenericException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                                    LogController.logError(core, new GenericException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
                                 } else {
                                     executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + executeContext.errorContextMessage + "]";
                                     result += executeDependency(dependentAddon, executeContext);
@@ -474,8 +474,8 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- Scripting code
                                 hint = "14";
-                                if (addon == null) { LogController.handleError(core, new GenericException("AddonController.execute, addon became null at hint-14"), ""); }
-                                if (addon.scriptingCode == null) { LogController.handleError(core, new GenericException("AddonController.execute, addon.scriptCode is null at hint-14"), ""); }
+                                if (addon == null) { LogController.logError(core, new GenericException("AddonController.execute, addon became null at hint-14"), ""); }
+                                if (addon.scriptingCode == null) { LogController.logError(core, new GenericException("AddonController.execute, addon.scriptCode is null at hint-14"), ""); }
                                 if (addon.scriptingCode != "") {
                                     hint = "14.1";
                                     try {
@@ -702,7 +702,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 } catch (Exception ex) {
-                    LogController.handleError(core, ex, "hint [" + hint + "]");
+                    LogController.logError(core, ex, "hint [" + hint + "]");
                 } finally {
                     //
                     // -- this completes the execute of this core.addon. remove it from the 'running' list
@@ -1320,7 +1320,7 @@ namespace Contensive.Processor.Controllers {
                 result = AdminUIController.getBody(core, Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1395,7 +1395,7 @@ namespace Contensive.Processor.Controllers {
                     throw new GenericException(errorMessage, ex);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnText;
@@ -1474,7 +1474,7 @@ namespace Contensive.Processor.Controllers {
                     throw new GenericException(errorMessage, ex);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnText;
@@ -1534,7 +1534,7 @@ namespace Contensive.Processor.Controllers {
                     throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "] or collection path [" + appAddonPath + "].");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             } finally {
                 LogController.logTrace(core, "execute_assembly dotNetClass [" + addon.dotNetClass + "], exit");
@@ -1580,7 +1580,7 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 //
                 // -- this exception should interrupt the caller
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -1654,7 +1654,7 @@ namespace Contensive.Processor.Controllers {
                                 // Error in the addon
                                 //
                                 string detailedErrorMessage = "There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + assemblyPathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + Ex.ToString() + "]";
-                                LogController.handleError(core, Ex, detailedErrorMessage);
+                                LogController.logError(core, Ex, detailedErrorMessage);
                                 //Throw new GenericException(detailedErrorMessage)
                             }
                         } catch (ReflectionTypeLoadException ex) {
@@ -1688,12 +1688,12 @@ namespace Contensive.Processor.Controllers {
                     LogController.logDebug(core, "Assembly Exception-2, [" + assemblyPathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
                     core.assemblyList_NonAddonsFound.Add(assemblyPathname);
                     string detailedErrorMessage = "A non-load exception occured while loading the addon [" + addon.name + "], DLL [" + assemblyPathname + "]. The error was [" + ex.ToString() + "].";
-                    LogController.handleError(core, new GenericException(detailedErrorMessage));
+                    LogController.logError(core, new GenericException(detailedErrorMessage));
                 }
             } catch (Exception ex) {
                 //
                 // -- this exception should interrupt the caller
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -1733,7 +1733,7 @@ namespace Contensive.Processor.Controllers {
                     TaskSchedulerController.addTaskToQueue(core, cmdDetail, false);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex, "executeAsync");
+                LogController.logError(core, ex, "executeAsync");
             }
         }
         //
@@ -2024,7 +2024,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempgetInstanceBubble;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
             //throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetInstanceBubble")
@@ -2081,7 +2081,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2207,7 +2207,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 return results;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 return "";
             }
         }
@@ -2336,7 +2336,7 @@ namespace Contensive.Processor.Controllers {
                     addonArgumentListPassToBubbleEditor = addonArgumentListPassToBubbleEditor.Substring(2);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -2419,7 +2419,7 @@ namespace Contensive.Processor.Controllers {
                     csData.close();
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2446,7 +2446,7 @@ namespace Contensive.Processor.Controllers {
                     Found = true;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2574,11 +2574,11 @@ namespace Contensive.Processor.Controllers {
                         });
                     }
                 } catch (Exception ex) {
-                    LogController.handleError(core, new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
+                    LogController.logError(core, new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
                     AddonStatusOK = false;
                 }
                 if (string.IsNullOrEmpty(result)) {
-                    LogController.handleError(core, new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."));
+                    LogController.logError(core, new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."));
                     AddonStatusOK = false;
                 }
                 if (!AddonStatusOK) {
@@ -2586,7 +2586,7 @@ namespace Contensive.Processor.Controllers {
                     result = AddonMan.getForm_SafeModeAddonManager();
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -2649,7 +2649,7 @@ namespace Contensive.Processor.Controllers {
                     cs.close();
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.logError(core, ex);
             }
             return returnString;
         }
