@@ -2,11 +2,12 @@
 using Contensive.Processor.Controllers;
 using System.Collections.Generic;
 //
-namespace Contensive.Processor.Models.Domain {        
+namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// The structure of an included addon list, stored in page and template records
     /// get and put remote methods in Processor addons
     /// </summary>
+    [System.Serializable]
     public class AddonPanelListItemModel {
         /// <summary>
         /// The guid of the design block addon

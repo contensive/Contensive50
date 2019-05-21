@@ -8,6 +8,11 @@ using static Contensive.Processor.Constants;
 using System.Runtime.Caching;
 using Contensive.Processor.Exceptions;
 using System.Reflection;
+using Enyim.Caching;
+using NLog;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -81,14 +86,8 @@ namespace Contensive.Processor.Controllers {
     ///         - objects like addonList depend on it, and are flushed if ANY record in that table is updated
     ///         
     /// </summary>
+    [Serializable]
     public class CacheController : IDisposable {
-        //
-        // ====================================================================================================
-        // ----- constants
-        /// <summary>
-        /// default number of days that a cache is invalidated
-        /// </summary>
-        private const double invalidationDaysDefault = 365;
         //
         // ====================================================================================================
         // ----- objects passed in constructor, do not dispose
@@ -107,19 +106,19 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// get an object from cache. If the cache misses or is invalidated, null object is returned
+        /// get an object of type TData from cache. If the cache misses or is invalidated, null object is returned
         /// </summary>
-        /// <typeparam name="objectClass"></typeparam>
+        /// <typeparam name="TData"></typeparam>
         /// <param name="key"></param>
         /// <returns></returns>
-        public objectClass getObject<objectClass>(string key) {
+        public TData getObject<TData>(string key) {
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                if (string.IsNullOrEmpty(key)) { return default(objectClass); }
+                if (string.IsNullOrEmpty(key)) { return default(TData); }
                 //
                 // -- read cacheDocument (the object that holds the data object plus control fields)
                 CacheDocumentClass cacheDocument = getCacheDocument(key);
-                if (cacheDocument == null) { return default(objectClass); }
+                if (cacheDocument == null) { return default(TData); }
                 //
                 // -- test for global invalidation
                 int dateCompare = globalInvalidationDate.CompareTo(cacheDocument.saveDate);
@@ -127,7 +126,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- global invalidation
                     LogController.logTrace(core, "key [" + key + "], invalidated because cacheObject saveDate [" + cacheDocument.saveDate.ToString() + "] is before the globalInvalidationDate [" + globalInvalidationDate + "]");
-                    return default(objectClass);
+                    return default(TData);
                 }
                 //
                 // -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
@@ -152,36 +151,36 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                objectClass result = default(objectClass);
+                TData result = default(TData);
                 if (!cacheMiss) {
                     if (!string.IsNullOrEmpty(cacheDocument.keyPtr)) {
                         //
                         // -- this is a pointer key, load the primary
-                        result = getObject<objectClass>(cacheDocument.keyPtr);
+                        result = getObject<TData>(cacheDocument.keyPtr);
                     } else if (cacheDocument.content is Newtonsoft.Json.Linq.JObject) {
                         //
                         // -- newtonsoft types
                         Newtonsoft.Json.Linq.JObject data = (Newtonsoft.Json.Linq.JObject)cacheDocument.content;
-                        result = data.ToObject<objectClass>();
+                        result = data.ToObject<TData>();
                     } else if (cacheDocument.content is Newtonsoft.Json.Linq.JArray) {
                         //
                         // -- newtonsoft types
                         Newtonsoft.Json.Linq.JArray data = (Newtonsoft.Json.Linq.JArray)cacheDocument.content;
-                        result = data.ToObject<objectClass>();
+                        result = data.ToObject<TData>();
                     } else if (cacheDocument.content == null) {
                         //
                         // -- if cache data was left as a string (might be empty), and return object is not string, there was an error
-                        result = default(objectClass);
+                        result = default(TData);
                     } else {
                         //
                         // -- all worked
-                        result = (objectClass)cacheDocument.content;
+                        result = (TData)cacheDocument.content;
                     }
                 }
                 return result;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
-                return default(objectClass);
+                return default(TData);
             }
         }
         //
@@ -246,10 +245,12 @@ namespace Contensive.Processor.Controllers {
                     // -- use remote cache
                     typeMessage = "remote";
                     try {
+                        LogController.logTrace(core, "cacheClient.Get, serverKey [" + serverKey + "]");
                         result = cacheClient.Get<CacheDocumentClass>(serverKey);
                     } catch (Exception ex) {
                         //
                         // --client does not throw its own errors, so try to differentiate by message
+                        LogController.logTrace(core, "***** cacheClient exception *****, [" + ex.ToString() + "]");
                         if (ex.Message.ToLowerInvariant().IndexOf("unable to load type") >= 0) {
                             //
                             // -- trying to deserialize an object and this code does not have a matching class, clear cache and return empty
@@ -285,6 +286,9 @@ namespace Contensive.Processor.Controllers {
                         storeCacheDocument_MemoryCache(serverKey, result);
                     }
                 }
+                string returnContentSegment = Newtonsoft.Json.JsonConvert.SerializeObject(result);
+                returnContentSegment = (returnContentSegment.Length > 50) ? returnContentSegment.Substring(0, 50) : returnContentSegment;
+                LogController.logTrace(core, "return content [" + returnContentSegment + "]");
                 //
                 // -- log result
                 if (result == null) {
@@ -328,7 +332,7 @@ namespace Contensive.Processor.Controllers {
         public void storeObject(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                var cacheDocument = new CacheDocumentClass {
+                var cacheDocument = new CacheDocumentClass() {
                     content = content,
                     saveDate = DateTime.Now,
                     invalidationDate = invalidationDate,
@@ -610,29 +614,6 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// cache document that holds the data object and other values used for control
-        /// </summary>
-        [Serializable]
-        public class CacheDocumentClass {
-            //
-            // if populated, all other properties are ignored and the primary tag b
-            public string keyPtr;
-            //
-            // this object is invalidated if any of these objects are invalidated
-            public List<string> dependentKeyList = new List<string>();
-            //
-            // the date this object was last saved.
-            public DateTime saveDate = DateTime.Now;
-            //
-            // the future date when this object self-invalidates
-            public DateTime invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault);
-            //
-            // the data storage
-            public object content;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// returns the system globalInvalidationDate. This is the date/time when the entire cache was last cleared. Every cache object saved before this date is considered invalid.
         /// </summary>
         /// <value></value>
@@ -678,6 +659,7 @@ namespace Contensive.Processor.Controllers {
                 _globalInvalidationDate = null;
                 remoteCacheInitialized = false;
                 if (core.serverConfig.enableRemoteCache) {
+                    Enyim.Caching.LogManager.AssignFactory(new NLogFactory());
                     string cacheEndpoint = core.serverConfig.awsElastiCacheConfigurationEndpoint;
                     if (!string.IsNullOrEmpty(cacheEndpoint)) {
                         string[] cacheEndpointSplit = cacheEndpoint.Split(':');
@@ -714,38 +696,42 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (string.IsNullOrEmpty(key)) {
                     throw new ArgumentException("cache key cannot be blank");
-                } else {
-                    string typeMessage = "";
-                    string serverKey = createServerKey(key);
-                    if (core.serverConfig.enableLocalMemoryCache) {
-                        //
-                        // -- save local memory cache
-                        typeMessage = "local-memory";
-                        storeCacheDocument_MemoryCache(serverKey, cacheDocument);
-                    }
-                    if (core.serverConfig.enableLocalFileCache) {
-                        //
-                        // -- save local file cache
-                        typeMessage = "local-file";
-                        string serializedData = Newtonsoft.Json.JsonConvert.SerializeObject(cacheDocument);
-                        using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, serverKey)) {
-                            mutex.WaitOne();
-                            core.privateFiles.saveFile("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"), serializedData);
-                            mutex.ReleaseMutex();
-                        }
-                    }
-                    if (core.serverConfig.enableRemoteCache) {
-                        typeMessage = "remote";
-                        if (remoteCacheInitialized) {
-                            //
-                            // -- save remote cache
-                            cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, serverKey, cacheDocument, cacheDocument.invalidationDate);
-                        }
-                    }
-                    //
-                    LogController.logTrace(core, "cacheType [" + typeMessage + "], key [" + key + "], expires [" + cacheDocument.invalidationDate.ToString() + "], depends on [" + string.Join(",", cacheDocument.dependentKeyList) + "], points to [" + string.Join(",", cacheDocument.keyPtr) + "]");
-                    //
                 }
+                string typeMessage = "";
+                string serverKey = createServerKey(key);
+                if (core.serverConfig.enableLocalMemoryCache) {
+                    //
+                    // -- save local memory cache
+                    typeMessage = "local-memory";
+                    storeCacheDocument_MemoryCache(serverKey, cacheDocument);
+                }
+                if (core.serverConfig.enableLocalFileCache) {
+                    //
+                    // -- save local file cache
+                    typeMessage = "local-file";
+                    string serializedData = Newtonsoft.Json.JsonConvert.SerializeObject(cacheDocument);
+                    using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, serverKey)) {
+                        mutex.WaitOne();
+                        core.privateFiles.saveFile("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"), serializedData);
+                        mutex.ReleaseMutex();
+                    }
+                }
+                if (core.serverConfig.enableRemoteCache) {
+                    typeMessage = "remote";
+                    if (remoteCacheInitialized) {
+                        //
+                        // -- save remote cache
+                        LogController.logTrace(core, "cacheClient.Store, mode [Enyim.Caching.Memcached.StoreMode.Set], serverKey [" + serverKey + "], cacheDocument [" + cacheDocument + "], cacheDocument.invalidationDate [" + cacheDocument.invalidationDate + "]");
+                        if( !cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, serverKey, cacheDocument, cacheDocument.invalidationDate)) {
+                            //
+                            // -- store failed
+                            LogController.logError(core, "Enyim cacheClient.Store failed, no details available.");
+                        }
+                    }
+                }
+                //
+                LogController.logTrace(core, "cacheType [" + typeMessage + "], key [" + key + "], expires [" + cacheDocument.invalidationDate.ToString() + "], depends on [" + string.Join(",", cacheDocument.dependentKeyList) + "], points to [" + string.Join(",", cacheDocument.keyPtr) + "]");
+                //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
@@ -817,6 +803,30 @@ namespace Contensive.Processor.Controllers {
         public static string createCacheKey_LastRecordModifiedDate(string tableName) => createCacheKey_LastRecordModifiedDate(tableName, "default");
         //
         //====================================================================================================
+        //
+        private static TData DeserializeFromString<TData>(string settings) {
+            byte[] b = Convert.FromBase64String(settings);
+            using (var stream = new MemoryStream(b)) {
+                var formatter = new BinaryFormatter();
+                stream.Seek(0, SeekOrigin.Begin);
+                return (TData)formatter.Deserialize(stream);
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        private static string SerializeToString<TData>(TData settings) {
+            using (var stream = new MemoryStream()) {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(stream, settings);
+                stream.Flush();
+                stream.Position = 0;
+                return Convert.ToBase64String(stream.ToArray());
+            }
+        }
+        //
+        //====================================================================================================
+        //
         #region  IDisposable Support 
         //
         // this class must implement System.IDisposable

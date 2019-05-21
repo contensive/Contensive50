@@ -12,6 +12,7 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// This model represents the folder where collections are stored, and dotnet assemblies are run for this application
     /// </summary>
+    [System.Serializable]
     public class CollectionFolderModel {
         public string name { get; set; }
         public string guid { get; set; }

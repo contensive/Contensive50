@@ -1,9 +1,10 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class _BlankModel : DbBaseModel {
+    [Serializable] public class _BlankModel : DbBaseModel {
         //
         //====================================================================================================
         //-- const (must be const not property)

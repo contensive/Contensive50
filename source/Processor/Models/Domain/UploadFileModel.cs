@@ -15,6 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Domain {
+    [System.Serializable]
     public class UploadFileModel {
         //
         internal string filename {

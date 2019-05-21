@@ -15,6 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
+    [System.Serializable]
     public class VisitModel : DbBaseModel {
         //
         //====================================================================================================

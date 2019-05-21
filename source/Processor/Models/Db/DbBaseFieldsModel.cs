@@ -9,6 +9,7 @@ namespace Contensive.Processor.Models.Db {
     /// This model represents the basic fields used in every Contensive table. 
     /// It is the base model for both the GenericModel (when you supply the tablename) and all the specific Db Models
     /// </summary>
+    [System.Serializable]
     public class DbBaseFieldsModel {
         //
         //====================================================================================================

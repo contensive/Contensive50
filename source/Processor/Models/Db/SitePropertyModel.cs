@@ -5,6 +5,7 @@ using System.Data;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
+    [System.Serializable]
     public class SitePropertyModel : DbBaseModel {
         //
         //====================================================================================================

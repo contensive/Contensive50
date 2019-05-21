@@ -610,7 +610,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="HtmlClass"></param>
         /// <returns></returns>
-        public static string selectFromList(CoreController core, string MenuName, string CurrentValue, List<NameValueClass> lookupList, string NoneCaption, string htmlId, string HtmlClass = "") {
+        public static string selectFromList(CoreController core, string MenuName, string CurrentValue, List<NameValueModel> lookupList, string NoneCaption, string htmlId, string HtmlClass = "") {
             string result = "";
             try {
                 StringBuilderLegacyController FastString = new StringBuilderLegacyController();
@@ -626,7 +626,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- select values
                 string CurrentValueLower = CurrentValue.ToLowerInvariant();
-                foreach (NameValueClass nameValue in lookupList) {
+                foreach (NameValueModel nameValue in lookupList) {
                     string selected = (nameValue.value.ToLowerInvariant() == CurrentValueLower) ? " selected" : "";
                     FastString.Add("<option value=\"" + nameValue.value + "\" " + selected + ">" + nameValue.name + "</option>");
                 }

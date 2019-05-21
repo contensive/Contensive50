@@ -16,6 +16,7 @@ namespace Contensive.Processor {
     /// <summary>
     /// A layer on top of DbController that accesses data using the 'content' metadata
     /// </summary>
+    [System.Serializable]
     public class CsModel : IDisposable {
         /// <summary>
         /// dependencies

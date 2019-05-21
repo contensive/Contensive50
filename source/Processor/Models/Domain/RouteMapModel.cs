@@ -9,6 +9,7 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// Dictionary of Routes
     /// </summary>
+    [Serializable]
     public class RouteMapModel {
         /// <summary>
         /// cache object name
@@ -19,10 +20,11 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// model for stored route
         /// </summary>
-        public class routeClass {
+        [Serializable]
+        public class RouteClass {
             public string virtualRoute;
             public string physicalRoute;
-            public routeTypeEnum routeType;
+            public RouteTypeEnum routeType;
             public int remoteMethodAddonId;
             public int linkAliasId;
             public int linkForwardId;
@@ -32,7 +34,8 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Types of routes stored
         /// </summary>
-        public enum routeTypeEnum {
+        [Serializable]
+        public enum RouteTypeEnum {
             admin,
             remoteMethod,
             linkAlias,
@@ -49,7 +52,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// public dictionary of routes in the model
         /// </summary>
-        public Dictionary<string, routeClass> routeDictionary;
+        public Dictionary<string, RouteClass> routeDictionary;
         //
         //===================================================================================================
         /// <summary>
@@ -64,17 +67,17 @@ namespace Contensive.Processor.Models.Domain {
                 if (result == null) {
                     result = new RouteMapModel {
                         dateCreated = DateTime.Now,
-                        routeDictionary = new Dictionary<string, routeClass>()
+                        routeDictionary = new Dictionary<string, RouteClass>()
                     };
                     string physicalFile = "~/" + core.siteProperties.serverPageDefault;
                     //
                     // -- admin route
                     string adminRoute = GenericController.normalizeRoute(core.appConfig.adminRoute);
                     if (!string.IsNullOrWhiteSpace(adminRoute)) {
-                        result.routeDictionary.Add(adminRoute, new routeClass() {
+                        result.routeDictionary.Add(adminRoute, new RouteClass() {
                             physicalRoute = physicalFile,
                             virtualRoute = adminRoute,
-                            routeType = routeTypeEnum.admin
+                            routeType = RouteTypeEnum.admin
                         });
                     }
                     //
@@ -85,10 +88,10 @@ namespace Contensive.Processor.Models.Domain {
                             if (result.routeDictionary.ContainsKey(route)) {
                                 LogController.logWarn(core, new GenericException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
                             } else {
-                                result.routeDictionary.Add(route, new routeClass() {
+                                result.routeDictionary.Add(route, new RouteClass() {
                                     physicalRoute = physicalFile,
                                     virtualRoute = route,
-                                    routeType = routeTypeEnum.remoteMethod,
+                                    routeType = RouteTypeEnum.remoteMethod,
                                     remoteMethodAddonId = remoteMethod.id
                                 });
                             }
@@ -117,10 +120,10 @@ namespace Contensive.Processor.Models.Domain {
                             if (result.routeDictionary.ContainsKey(route)) {
                                 LogController.logError( core,new GenericException("Link Foward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
                             } else {
-                                result.routeDictionary.Add(route, new routeClass() {
+                                result.routeDictionary.Add(route, new RouteClass() {
                                     physicalRoute = physicalFile,
                                     virtualRoute = route,
-                                    routeType = routeTypeEnum.linkForward,
+                                    routeType = RouteTypeEnum.linkForward,
                                     linkForwardId = linkForward.id
                                 });
                             }
@@ -134,10 +137,10 @@ namespace Contensive.Processor.Models.Domain {
                             if (result.routeDictionary.ContainsKey(route)) {
                                 LogController.logError( core,new GenericException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
                             } else {
-                                result.routeDictionary.Add(route, new routeClass() {
+                                result.routeDictionary.Add(route, new RouteClass() {
                                     physicalRoute = physicalFile,
                                     virtualRoute = route,
-                                    routeType = routeTypeEnum.linkAlias,
+                                    routeType = RouteTypeEnum.linkAlias,
                                     linkAliasId = linkAlias.id
                                 });
                             }

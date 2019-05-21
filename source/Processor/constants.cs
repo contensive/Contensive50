@@ -54,6 +54,11 @@ namespace Contensive.Processor {
         //
         internal const string cacheName_addonCachePersistent = "addonCache";
         //
+        /// <summary>
+        /// default number of days that a cache is invalidated
+        /// </summary>
+        internal const double invalidationDaysDefault = 365;
+        //
         //========================================================================
         // html
         //
@@ -945,11 +950,6 @@ namespace Contensive.Processor {
         internal const string contentReplaceEscapeStart = "{%";
         internal const string contentReplaceEscapeEnd = "%}";
         //
-        public class FieldEditorType {
-            public int fieldId;
-            public int addonid;
-        }
-        //
         private const int TimerStackMax = 20;
         //
         internal const string TextSearchStartTagDefault = "<!--TextSearchStart-->";
@@ -1032,47 +1032,6 @@ namespace Contensive.Processor {
         internal const int QueryTypeOpenContent = 2;
         internal const int QueryTypeUpdateContent = 3;
         internal const int QueryTypeInsertContent = 4;
-        //
-        // Google Data Object construction in GetRemoteQuery
-        //
-        public class ColsType {
-            public string Type;
-            public string Id;
-            public string Label;
-            public string Pattern;
-        }
-        //
-        public class CellType {
-            public string v;
-            public string f;
-            public string p;
-        }
-        //
-        public class RowsType {
-            public List<CellType> Cell;
-        }
-        //
-        public class GoogleDataType {
-            public bool IsEmpty;
-            public List<ColsType> col;
-            public List<RowsType> row;
-        }
-        //
-        public enum GoogleVisualizationStatusEnum {
-            OK = 1,
-            warning = 2,
-            ErrorStatus = 3
-        }
-        //
-        public class GoogleVisualizationType {
-            public string version;
-            public string reqid;
-            public GoogleVisualizationStatusEnum status;
-            public string[] warnings;
-            public string[] errors;
-            public string sig;
-            public GoogleDataType table;
-        }
         public enum RemoteFormatEnum {
             RemoteFormatJsonTable = 1,
             RemoteFormatJsonNameArray = 2,
@@ -1099,10 +1058,6 @@ namespace Contensive.Processor {
         // put content definitions here
         //
         //
-        public class NameValueClass {
-            public string name;
-            public string value;
-        }
         //
         //========================================================================
         //   defined errors (event log eventId)

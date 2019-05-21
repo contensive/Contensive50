@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
 using Amazon;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
     public class EmailAmazonSESController {
@@ -21,7 +22,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.mockEmail) {
                     //
                     // -- for unit tests, mock interface by adding email to core.mockSmptList
-                    core.mockEmailList.Add(new CoreController.MockEmailClass() {
+                    core.mockEmailList.Add(new MockEmailClass() {
                         email = email
                     });
                     status = true;

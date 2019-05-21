@@ -17,6 +17,7 @@ using static Contensive.Processor.Constants;
 using System.Net.Mail;
 using System.Net.Mime;
 using System.IO;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
     public class EmailSmtpController {
@@ -76,7 +77,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.mockEmail) {
                     //
                     // -- for unit tests, mock interface by adding email to core.mockSmptList
-                    core.mockEmailList.Add(new CoreController.MockEmailClass() {
+                    core.mockEmailList.Add(new MockEmailClass() {
                         email = email
                     });
                     status = true;

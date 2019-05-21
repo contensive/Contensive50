@@ -2,6 +2,7 @@
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Domain {
+    [System.Serializable]
     public class _BlankModel {
         private CoreController core;
         //

@@ -57,10 +57,6 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public bool mockEmail = false;
         public List<MockEmailClass> mockEmailList = new List<MockEmailClass>();
-        public class MockEmailClass {
-            public EmailController.EmailClass email;
-            public string AttachmentFilename;
-        }
         //
         /// <summary>
         /// when enable, use MS trace logging. An attempt to stop file append permission issues
@@ -157,10 +153,6 @@ namespace Contensive.Processor.Controllers {
         }
         private Dictionary<string, AssemblyFileDetails> _assemblyFileDict;
         private const string AssemblyFileDictCacheName = "assemblyFileDict";
-        public class AssemblyFileDetails {
-            public string path;
-            public string pathFilename;
-        }
         //
         //===================================================================================================
         //

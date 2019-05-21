@@ -6,6 +6,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
+    [System.Serializable]
     public class TaskModel : DbBaseModel {
         //
         //====================================================================================================
@@ -23,6 +24,7 @@ namespace Contensive.Processor.Models.Db {
         /// <summary>
         /// model for cmdDetail field. Field contains a JSON serialization of this class
         /// </summary>
+        [Serializable]
         public class CmdDetailClass {
             public int addonId;
             public string addonName;

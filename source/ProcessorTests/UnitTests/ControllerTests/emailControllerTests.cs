@@ -5,6 +5,7 @@ using Contensive.Processor.Controllers;
 using static Tests.testConstants;
 using System.Linq;
 using Contensive.Processor;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     [TestClass]
@@ -55,7 +56,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 addon.Execute(cp);
                 // assert
                 Assert.AreEqual(1, cp.core.mockEmailList.Count);
-                CoreController.MockEmailClass sentEmail = cp.core.mockEmailList.First();
+                MockEmailClass sentEmail = cp.core.mockEmailList.First();
                 Assert.AreEqual("", sentEmail.AttachmentFilename);
                 Assert.AreEqual("to@kma.net", sentEmail.email.toAddress);
                 Assert.AreEqual("from@kma.net", sentEmail.email.fromAddress);
@@ -85,7 +86,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 addon.Execute(cp);
                 // assert
                 Assert.AreEqual(1, cp.core.mockEmailList.Count);
-                CoreController.MockEmailClass sentEmail = cp.core.mockEmailList.First();
+                MockEmailClass sentEmail = cp.core.mockEmailList.First();
                 Assert.AreEqual("", sentEmail.AttachmentFilename);
                 Assert.AreEqual( toPerson.email, sentEmail.email.toAddress);
                 Assert.AreEqual("from@kma.net", sentEmail.email.fromAddress);

@@ -1147,13 +1147,13 @@ namespace Contensive.Addons.AdminSite.Controllers {
             }
             return result;
         }
-        public static string getDefaultEditor_LookupList(CoreController core, string htmlName, string defaultValue, List<NameValueClass> lookupList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
+        public static string getDefaultEditor_LookupList(CoreController core, string htmlName, string defaultValue, List<NameValueModel> lookupList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
             string result = "";
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
                 result += (HtmlController.inputHidden(htmlName, GenericController.encodeText(defaultValue)));
-                NameValueClass nameValue = lookupList.Find(x => x.name.ToLowerInvariant() == htmlName.ToLowerInvariant());
+                NameValueModel nameValue = lookupList.Find(x => x.name.ToLowerInvariant() == htmlName.ToLowerInvariant());
                 if (nameValue == null) {
                     result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
                 } else {

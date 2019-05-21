@@ -1570,14 +1570,14 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// store
         /// </summary>
-        private List<NameValueClass> _sqlList = new List<NameValueClass>();
+        private List<NameValueModel> _sqlList = new List<NameValueModel>();
         /// <summary>
         /// add a name=value pair to the list. values MUST be punctuated correctly for their type in sql (quoted text, etc)
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
         public void add(string name, string value) {
-            _sqlList.Add(new NameValueClass() {
+            _sqlList.Add(new NameValueModel() {
                 name = name,
                 value = value
             });

@@ -147,6 +147,7 @@ namespace Contensive.Processor.Models.Domain {
         /// case insensative dictionary. Use for application lookup
         /// </summary>
         /// <typeparam name="V"></typeparam>
+        [Serializable]
         public class CaseInsensitiveDictionary<S,V> : Dictionary<string, V> {
             public CaseInsensitiveDictionary() : base(StringComparer.OrdinalIgnoreCase) {
             }

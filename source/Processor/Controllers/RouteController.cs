@@ -251,9 +251,9 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- execute route
                     if (routeFound) {
-                        RouteMapModel.routeClass route = core.routeMap.routeDictionary[routeTest];
+                        RouteMapModel.RouteClass route = core.routeMap.routeDictionary[routeTest];
                         switch (route.routeType) {
-                            case RouteMapModel.routeTypeEnum.admin: {
+                            case RouteMapModel.RouteTypeEnum.admin: {
                                     //
                                     // -- admin site
                                     AddonModel addon = AddonModel.create(core, addonGuidAdminSite);
@@ -267,7 +267,7 @@ namespace Contensive.Processor.Controllers {
                                         });
                                     }
                                 }
-                            case RouteMapModel.routeTypeEnum.remoteMethod: {
+                            case RouteMapModel.RouteTypeEnum.remoteMethod: {
                                     //
                                     // -- remote method
                                     AddonModel addon = core.addonCache.getAddonById(route.remoteMethodAddonId);
@@ -291,7 +291,7 @@ namespace Contensive.Processor.Controllers {
                                         return core.addon.execute(addon, executeContext);
                                     }
                                 }
-                            case RouteMapModel.routeTypeEnum.linkAlias:
+                            case RouteMapModel.RouteTypeEnum.linkAlias:
                                 //
                                 // - link alias
                                 // -- all the query string values have already been added to doc properties, so do not over write them.
@@ -320,7 +320,7 @@ namespace Contensive.Processor.Controllers {
 
                                 }
                                 break;
-                            case RouteMapModel.routeTypeEnum.linkForward:
+                            case RouteMapModel.RouteTypeEnum.linkForward:
                                 //
                                 // -- link forward
                                 LinkForwardModel linkForward = LinkForwardModel.create(core, route.linkForwardId);

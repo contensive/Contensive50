@@ -59,6 +59,9 @@
       <HintPath>..\packages\EnyimMemcached.2.16.0\lib\net35\Enyim.Caching.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Enyim.Caching.NLogAdapter, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
+      <HintPath>..\packages\EnyimMemcached-NLog.2.16.0\lib\net35\Enyim.Caching.NLogAdapter.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=1.1.0.145, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.1.1.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
@@ -284,6 +287,11 @@
     <Compile Include="Models\Domain\AddonListItemModel.cs" />
     <Compile Include="Models\Domain\CollectionFolderModel.cs" />
     <Compile Include="Models\Domain\CollectionLibraryModel.cs" />
+    <Compile Include="Models\Domain\AssemblyFileDetails.cs" />
+    <Compile Include="Models\Domain\MockEmailClass.cs" />
+    <Compile Include="Models\Domain\FieldEditorType.cs" />
+    <Compile Include="Models\Domain\GoogleVisualizationModels.cs" />
+    <Compile Include="Models\Domain\CacheDocumentClass.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

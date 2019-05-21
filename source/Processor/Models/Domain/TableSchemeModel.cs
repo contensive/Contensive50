@@ -18,13 +18,16 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// Table Schema caching to speed up update
     /// </summary>
+    [System.Serializable]
     public class TableSchemaModel {
+        [System.Serializable]
         public class ColumnSchemaModel {
             public string COLUMN_NAME;
             public string DATA_TYPE;
             public int DATETIME_PRECISION;
             public int CHARACTER_MAXIMUM_LENGTH;
         }
+        [System.Serializable]
         public class IndexSchemaModel {
             public string index_name;
             public string index_keys;

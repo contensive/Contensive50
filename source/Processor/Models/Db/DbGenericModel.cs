@@ -8,6 +8,7 @@ namespace Contensive.Processor.Models.Db {
     /// <summary>
     /// Use this model when you just need the base fields or need to supply the tablename programmatically
     /// </summary>
+    [System.Serializable]
     public class DbGenericModel : DbBaseFieldsModel {
         //
         //=============================================================

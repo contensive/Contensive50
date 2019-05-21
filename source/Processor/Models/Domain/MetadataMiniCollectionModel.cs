@@ -21,6 +21,7 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// miniCollection - This is an old collection object used in part to load the metadata part xml files. REFACTOR this into CollectionWantList and werialization into jscon
     /// </summary>
+    [System.Serializable]
     public class MetadataMiniCollectionModel : ICloneable {
         //
         //====================================================================================================
@@ -52,6 +53,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Model of sqlIndexes for the collection
         /// </summary>
+        [Serializable]
         public class MiniCollectionSQLIndexModel {
             public string DataSourceName;
             public string TableName;
@@ -70,6 +72,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Model for menu dictionary
         /// </summary>
+        [Serializable]
         public class MiniCollectionMenuModel {
             public string name;
             public bool IsNavigator;

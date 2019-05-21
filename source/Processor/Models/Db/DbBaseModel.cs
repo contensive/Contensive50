@@ -58,6 +58,7 @@ namespace Contensive.Processor.Models.Db {
     //       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
     //
     //
+    [System.Serializable]
     public class DbBaseModel : DbBaseFieldsModel {
         //
         //====================================================================================================
@@ -69,6 +70,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- field types
         //
+        [Serializable]
         public class FieldTypeFileBase {
             //
             // -- 
@@ -138,12 +140,16 @@ namespace Contensive.Processor.Models.Db {
             public CoreController internalcore { get; set; } = null;
         }
         //
+        [Serializable]
         public class FieldTypeTextFile : FieldTypeFileBase {
         }
+        [Serializable]
         public class FieldTypeJavascriptFile : FieldTypeFileBase {
         }
+        [Serializable]
         public class FieldTypeCSSFile : FieldTypeFileBase {
         }
+        [Serializable]
         public class FieldTypeHTMLFile : FieldTypeFileBase {
         }
         //

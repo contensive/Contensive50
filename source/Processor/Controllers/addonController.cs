@@ -1567,7 +1567,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- if found, add this assembly to the found-dictionary
                         if (AddonFound && !core.assemblyList_AddonsFound.ContainsKey(assemblyFileDictKey)) {
-                            core.assemblyList_AddonsFound.Add(assemblyFileDictKey, new CoreController.AssemblyFileDetails() {
+                            core.assemblyList_AddonsFound.Add(assemblyFileDictKey, new AssemblyFileDetails() {
                                 pathFilename = testPathFilename,
                                 path = ""
                             });

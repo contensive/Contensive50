@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
+using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Addons.AdminSite {

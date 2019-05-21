@@ -105,6 +105,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
         /// </summary>
+        [System.Serializable]
         public enum AppModeEnum {
             normal = 0,
             maintainence = 1
@@ -114,6 +115,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
         /// </summary>
+        [System.Serializable]
         public enum AppStatusEnum {
             ok = 0,
             maintenance = 1

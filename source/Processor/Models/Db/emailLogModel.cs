@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
+    [System.Serializable]
     public class EmailLogModel : DbBaseModel {
         //
         //====================================================================================================

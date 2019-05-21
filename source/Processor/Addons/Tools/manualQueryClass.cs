@@ -192,11 +192,11 @@ namespace Contensive.Addons.Tools {
                 {
                     //
                     // -- sql list
-                    var lookupList = new List<NameValueClass> { };
+                    var lookupList = new List<NameValueModel> { };
                     string[] delimiters = new string[] { "\r\n" };
                     List<string> SqlArchiveList = SQLArchive.Split( delimiters,StringSplitOptions.RemoveEmptyEntries).ToList();
                     foreach( string sql in SqlArchiveList) {
-                        lookupList.Add(new NameValueClass() { name = sql, value=sql });
+                        lookupList.Add(new NameValueModel() { name = sql, value=sql });
                     }
 
                     string inputSelect = AdminUIController.getDefaultEditor_LookupList(core, "SQLList", "0" , lookupList,false, "SQLList");
