@@ -379,6 +379,16 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
+        /// Set a site property from a date 
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="Value"></param>
+        public void setProperty(string propertyName, double Value) {
+            setProperty(propertyName, Value.ToString());
+        }
+        //
+        //========================================================================
+        /// <summary>
         /// get site property without a cache check, return as text. If not found, set and return default value
         /// </summary>
         /// <param name="PropertyName"></param>

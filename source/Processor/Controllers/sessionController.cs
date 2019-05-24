@@ -384,7 +384,7 @@ namespace Contensive.Processor.Controllers {
                                         + "\r\n// support site feed. Manual changes may be over written."
                                         + "\r\n// type - r=robot (default), b=bad robot, u=user"
                                         + "\r\n//"
-                                        + "\r\nContensive MonitorContensive Monitor\t\tr"
+                                        + "\r\nContensive Monitor\tContensive Monitor\t\tr"
                                         + "\r\nGoogle-Bot\tgooglebot\t\tr"
                                         + "\r\nMSN-Bot\tmsnbot\t\tr"
                                         + "\r\nYahoo-Bot\tslurp\t\tr"
@@ -402,6 +402,7 @@ namespace Contensive.Processor.Controllers {
                                 botFileContent = GenericController.vbReplace(botFileContent, "\r\n", "\n");
                                 List<string> botList = new List<string>();
                                 botList.AddRange(botFileContent.Split(Convert.ToChar("\n")));
+                                bool visitNameFound = false;
                                 foreach (string srcLine in botList) {
                                     string line = srcLine.Trim();
                                     if (!string.IsNullOrWhiteSpace(line)) {
@@ -414,23 +415,27 @@ namespace Contensive.Processor.Controllers {
                                             // -- parse line on tab characters
                                             string[] Args = GenericController.stringSplit(line, "\t");
                                             if (Args.GetUpperBound(0) > 0) {
-                                                // -- process argument 1
+                                                //
+                                                // -- test browser name
                                                 if (!string.IsNullOrEmpty(Args[1].Trim(' '))) {
                                                     if (GenericController.vbInstr(1, core.webServer.requestBrowser, Args[1], 1) != 0) {
                                                         resultSessionContext.visit.name = Args[0];
-                                                        //visitNameFound = True
-                                                        break;
+                                                        visitNameFound = true;
                                                     }
                                                 }
                                                 if (Args.GetUpperBound(0) > 1) {
-                                                    // -- process argument 2
+                                                    //
+                                                    // -- ip address
                                                     if (!string.IsNullOrEmpty(Args[2].Trim(' '))) {
                                                         if (GenericController.vbInstr(1, core.webServer.requestRemoteIP, Args[2], 1) != 0) {
                                                             resultSessionContext.visit.name = Args[0];
-                                                            //visitNameFound = True
-                                                            break;
+                                                            visitNameFound = true;
                                                         }
                                                     }
+                                                }
+                                                if (visitNameFound) {
+                                                    //
+                                                    // -- set bot and exit
                                                     if (Args.GetUpperBound(0) <= 2) {
                                                         resultSessionContext.visit.bot = true;
                                                         resultSessionContext.visitBadBot = false;
@@ -438,6 +443,7 @@ namespace Contensive.Processor.Controllers {
                                                         resultSessionContext.visitBadBot = (Args[3].ToLowerInvariant() == "b");
                                                         resultSessionContext.visit.bot = resultSessionContext.visitBadBot || (Args[3].ToLowerInvariant() == "r");
                                                     }
+                                                    break;
                                                 }
                                             }
                                         }

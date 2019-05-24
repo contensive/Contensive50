@@ -39,8 +39,32 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void SetProperty(string FieldName, string FieldValue) {
-            cp.core.siteProperties.setProperty(FieldName, FieldValue);
+        public override void SetProperty(string key, string value) {
+            cp.core.siteProperties.setProperty(key, value);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void SetProperty(string key, bool value) {
+            cp.core.siteProperties.setProperty(key, value);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void SetProperty(string key, DateTime value) {
+            cp.core.siteProperties.setProperty(key, value);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void SetProperty(string key, int value) {
+            cp.core.siteProperties.setProperty(key, value);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void SetProperty(string key, double value) {
+            cp.core.siteProperties.setProperty(key, value);
         }
         //
         //====================================================================================================

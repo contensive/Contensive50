@@ -137,7 +137,7 @@ namespace Contensive.Processor.Models.Db {
             public bool contentUpdated { get; set; } = false;
             //
             // -- set by load(). Used by field to read content from filename when needed
-            public CoreController internalcore { get; set; } = null;
+            [NonSerialized] public CoreController internalcore= null;
         }
         //
         [Serializable]

@@ -659,7 +659,9 @@ namespace Contensive.Processor.Controllers {
                 _globalInvalidationDate = null;
                 remoteCacheInitialized = false;
                 if (core.serverConfig.enableRemoteCache) {
-                    Enyim.Caching.LogManager.AssignFactory(new NLogFactory());
+                    //
+                    // -- they recommend commenting this out as it causes a performance hit
+                    //Enyim.Caching.LogManager.AssignFactory(new NLogFactory());
                     string cacheEndpoint = core.serverConfig.awsElastiCacheConfigurationEndpoint;
                     if (!string.IsNullOrEmpty(cacheEndpoint)) {
                         string[] cacheEndpointSplit = cacheEndpoint.Split(':');

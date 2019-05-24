@@ -23,6 +23,14 @@ namespace Contensive.BaseClasses {
         /// <param name="value"></param>
         public abstract void SetProperty(string key, string value);
         //
+        public abstract void SetProperty(string key, bool value);
+        //
+        public abstract void SetProperty(string key, DateTime value);
+        //
+        public abstract void SetProperty(string key, int value);
+        //
+        public abstract void SetProperty(string key, double value);
+        //
         //====================================================================================================
         /// <summary>
         /// Read a site property as a string. If the key is not set, sets and returns the default value.
