@@ -128,6 +128,7 @@
     <Compile Include="Controllers\EmailAmazonSESController.cs" />
     <Compile Include="Controllers\UpgradeController.cs" />
     <Compile Include="Controllers\RouteController.cs" />
+    <Compile Include="Controllers\ContentController.cs" />
     <Compile Include="Exceptions\Exceptions.cs" />
     <Compile Include="Addons\AdminSite\Views\ControlEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\EmailBounceEditor.cs" />

@@ -486,7 +486,7 @@ namespace Contensive.Processor.Controllers {
                 int EmailRecordID = email.id;
                 string EmailSubjectSource = email.subject;
                 // 20180703 -- textFilename fields when configured in the model as a text are read with .getText() which populates the property with the content, not the filename
-                string EmailBodySource = email.copyFilename + appendedCopy;
+                string EmailBodySource = email.copyFilename.content + appendedCopy;
                 bool EmailAllowLinkEID = email.addLinkEID;
                 //
                 // --- Send message to the additional member

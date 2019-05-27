@@ -879,6 +879,8 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
+        
+        //
         //==============================================================================================================
         /// <summary>
         /// Returns true if the folder exists
@@ -1493,6 +1495,10 @@ namespace Contensive.Processor.Controllers {
             return result;
         }
         //
+        private bool remoteFileNewerThanLocal( string pathFilename ) {
+
+        }
+        //
         //====================================================================================================
         /// <summary>
         /// copy a file (object) from remote to local. Returns false if the remote file does not exist. The localDosPath must exist.
@@ -1513,7 +1519,7 @@ namespace Contensive.Processor.Controllers {
                     deleteFile_local(localDosPathFilename);
                     if (fileExists_remote(pathFilename)) {
                         //
-                        // -- remote file exists, verify local folder (or AWS returns error
+                        // -- remote file exists, verify local folder (or AWS returns error)
                         verifyPath_local(getPath(pathFilename));
                         //
                         // -- remote file exists, copy remote to local

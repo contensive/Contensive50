@@ -27,6 +27,12 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
+        public void setProperty(string key, double value) {
+            setProperty(key, value.ToString());
+        }
+        //
+        //====================================================================================================
+        //
         public void setProperty(string key, DateTime value) {
             setProperty(key, value.ToString());
         }
@@ -47,13 +53,14 @@ namespace Contensive.Processor.Controllers {
         //
         public void setProperty(string key, string value, bool isForm) {
             try {
-                DocPropertiesClass prop = new DocPropertiesClass();
-                prop.NameValue = key;
-                prop.FileSize = 0;
-                prop.fileType = "";
-                prop.IsFile = false;
-                prop.IsForm = isForm;
-                prop.Name = key;
+                DocPropertiesClass prop = new DocPropertiesClass {
+                    NameValue = key,
+                    FileSize = 0,
+                    fileType = "",
+                    IsFile = false,
+                    IsForm = isForm,
+                    Name = key
+                };
                 prop.NameValue = key + "=" + value;
                 prop.Value = value;
                 setProperty(key, prop);

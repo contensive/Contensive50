@@ -650,7 +650,7 @@ namespace Contensive.Addons.AdminSite {
                                     } else {
                                         adminData.LoadEditRecord(cp.core);
                                         db.deleteTableRecord(adminData.editRecord.id, adminData.adminContent.tableName);
-                                        cp.core.processAfterSave(true, adminData.editRecord.contentControlId_Name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core,true, adminData.editRecord.contentControlId_Name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     }
                                     adminData.Admin_Action = Constants.AdminActionNop;
                                     break;
@@ -664,7 +664,7 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.LoadEditRecord(cp.core);
                                         adminData.LoadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                        cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core,false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     }
                                     adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                                                                        //
@@ -679,7 +679,7 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.LoadEditRecord(cp.core);
                                         adminData.LoadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                        cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core,false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                         adminData.editRecord.id = 0;
                                         adminData.editRecord.Loaded = false;
                                         //If adminContext.content.fields.Count > 0 Then
@@ -707,7 +707,7 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.LoadEditRecord(cp.core);
                                         adminData.LoadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                        cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core,false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                         if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                             using (var csData = new CsModel(cp.core)) {
                                                 csData.openRecord("Group Email", adminData.editRecord.id);
@@ -760,7 +760,7 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.LoadEditRecord(cp.core);
                                         adminData.LoadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                        cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core,false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                         if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                             using (var csData = new CsModel(cp.core)) {
                                                 csData.openRecord("Conditional Email", adminData.editRecord.id);
@@ -789,7 +789,7 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.LoadEditRecord(cp.core);
                                         adminData.LoadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                        cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core,false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                         //
                                         if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                             //
@@ -828,7 +828,7 @@ namespace Contensive.Addons.AdminSite {
                                                         //
                                                         ContentName = MetadataController.getContentNameByID(cp.core, csData.getInteger("contentControlId"));
                                                         cp.core.cache.invalidateDbRecord(RecordID, adminData.adminContent.tableName);
-                                                        cp.core.processAfterSave(true, ContentName, RecordID, "", 0, UseContentWatchLink);
+                                                        ContentController.processAfterSave(cp.core,true, ContentName, RecordID, "", 0, UseContentWatchLink);
                                                         //
                                                         // Page Content special cases
                                                         //

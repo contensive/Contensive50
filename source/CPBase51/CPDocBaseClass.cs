@@ -74,16 +74,20 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         //
-        public abstract void SetProperty(string key, string FieldValue);
+        public abstract void SetProperty(string key, string value);
+        public abstract void SetProperty(string key, bool value);
+        public abstract void SetProperty(string key, int value);
+        public abstract void SetProperty(string key, DateTime value);
+        public abstract void SetProperty(string key, double value);
         //
         //====================================================================================================
         //
-        public abstract string GetProperty(string key, string DefaultValue);
+        public abstract string GetProperty(string key, string defaultValue);
         public abstract string GetProperty(string key);
         //
         //====================================================================================================
         //
-        public abstract string GetText(string key, string DefaultValue);
+        public abstract string GetText(string key, string defaultValue);
         public abstract string GetText(string key );
         //
         //====================================================================================================

@@ -264,6 +264,30 @@ namespace Contensive.Processor {
         //
         //=======================================================================================================
         //
+        public override void SetProperty(string key, bool value) {
+            cp.core.docProperties.setProperty(key, value);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override void SetProperty(string key, int value) {
+            cp.core.docProperties.setProperty(key, value);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override void SetProperty(string key, DateTime value) {
+            cp.core.docProperties.setProperty(key, value);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override void SetProperty(string key, double value) {
+            cp.core.docProperties.setProperty(key, value);
+        }
+        //
+        //=======================================================================================================
+        //
         public override bool IsAdminSite {
             get {
                 return !cp.Request.PathPage.IndexOf(cp.Site.GetText("adminUrl"), System.StringComparison.OrdinalIgnoreCase).Equals(-1);
@@ -379,6 +403,6 @@ namespace Contensive.Processor {
             }
             this.disposed = true;
         }
-       #endregion
+        #endregion
     }
 }

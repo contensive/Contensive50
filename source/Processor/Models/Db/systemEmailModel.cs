@@ -29,7 +29,7 @@ namespace Contensive.Processor.Models.Db {
         // -- instance properties
         public bool addLinkEID { get; set; }
         public bool allowSpamFooter { get; set; }
-        public string copyFilename { get; set; }
+        public FieldTypeHTMLFile copyFilename { get; set; }
         public int emailTemplateID { get; set; }
         public string fromAddress { get; set; }
         public DateTime scheduleDate { get; set; }

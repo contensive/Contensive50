@@ -2472,7 +2472,7 @@ namespace Contensive.Processor.Controllers {
                         page.save(core);
                         WorkflowController.setEditLock(core, pageTable.id, page.id);
                         if (!SaveButNoChanges) {
-                            core.processAfterSave(false, pageCdef.name, page.id, page.name, page.parentID, false);
+                            ContentController.processAfterSave(core,false, pageCdef.name, page.id, page.name, page.parentID, false);
                             PageContentModel.invalidateRecordCache(core, page.id);
                         }
                     }
