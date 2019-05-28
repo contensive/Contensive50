@@ -32,7 +32,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// return authetnicated user's email
+        /// return authenticated user's email
         /// </summary>
         public override string Email {
             get {
@@ -42,7 +42,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// authetnicate to the provided credentials
+        /// authenticate to the provided credentials
         /// </summary>
         /// <param name="username"></param>
         /// <param name="password"></param>
@@ -70,7 +70,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// Is the current user authenticated and admin role
+        /// Checks if the current user is authenticated and has the admin role.
         /// </summary>
         public override bool IsAdmin {
             get {
@@ -80,7 +80,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// Is the current user authenticated and advanced editing
+        /// Checks if the current user is authenticated and is advanced editting.
         /// </summary>
         /// <param name="contentName"></param>
         /// <returns></returns>
