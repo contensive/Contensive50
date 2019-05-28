@@ -432,6 +432,7 @@ namespace Contensive.Processor.Controllers {
                                                         if (collection.id != 0) {
                                                             MetadataController.deleteContentRecords(core, Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + collection.id);
                                                         }
+                                                        collection.save(core);
                                                     }
                                                     //
                                                     //-------------------------------------------------------------------------------

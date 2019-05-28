@@ -1495,10 +1495,6 @@ namespace Contensive.Processor.Controllers {
             return result;
         }
         //
-        private bool remoteFileNewerThanLocal( string pathFilename ) {
-
-        }
-        //
         //====================================================================================================
         /// <summary>
         /// copy a file (object) from remote to local. Returns false if the remote file does not exist. The localDosPath must exist.
