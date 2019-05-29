@@ -6,6 +6,7 @@ using Contensive.BaseClasses;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
+using static Newtonsoft.Json.JsonConvert;
 //
 namespace Contensive.Addons.AddonListEditor {
     public class SetAddonListClass : AddonBaseClass {
@@ -16,25 +17,25 @@ namespace Contensive.Addons.AddonListEditor {
             try {
                 CoreController core = ((CPClass)CP).core;
                 // 
-                SetAddonList_RequestClass request = Newtonsoft.Json.JsonConvert.DeserializeObject<SetAddonList_RequestClass>(CP.Request.Form);
+                SetAddonList_RequestClass request = DeserializeObject<SetAddonList_RequestClass>(CP.Request.Form);
                 if (request == null) {
-                    return Newtonsoft.Json.JsonConvert.SerializeObject(new SetAddonList_ResponseClass() {
+                    return SerializeObject(new SetAddonList_ResponseClass() {
                         errorList = new List<string> { "The request is invalid" }
                     });
                 }
                 if (String.IsNullOrWhiteSpace(request.parentContentGuid)) {
-                    return Newtonsoft.Json.JsonConvert.SerializeObject(new SetAddonList_ResponseClass() {
+                    return SerializeObject(new SetAddonList_ResponseClass() {
                         errorList = new List<string> { "The request parent content guid is not valid [" + request.parentContentGuid + "]" }
                     });
                 }
                 if (String.IsNullOrWhiteSpace(request.parentRecordGuid)) {
-                    return Newtonsoft.Json.JsonConvert.SerializeObject(new SetAddonList_ResponseClass() {
+                    return SerializeObject(new SetAddonList_ResponseClass() {
                         errorList = new List<string> { "The request parent record guid is not valid [" + request.parentRecordGuid + "]" }
                     });
                 }
                 var metadata = Contensive.Processor.Models.Domain.ContentMetadataModel.create(core, request.parentContentGuid);
                 if (metadata == null) {
-                    return Newtonsoft.Json.JsonConvert.SerializeObject(new SetAddonList_ResponseClass() {
+                    return SerializeObject(new SetAddonList_ResponseClass() {
                         errorList = new List<string> { "The parent content could not be determined from the guid [" + request.parentContentGuid + "]" }
                     });
                 }
@@ -44,25 +45,25 @@ namespace Contensive.Addons.AddonListEditor {
                     case "page content":
                         var page = Contensive.Processor.Models.Db.PageContentModel.create(core, request.parentRecordGuid);
                         if (page == null) {
-                            return Newtonsoft.Json.JsonConvert.SerializeObject(new SetAddonList_ResponseClass() {
+                            return SerializeObject(new SetAddonList_ResponseClass() {
                                 errorList = new List<string> { "The parent record in [Page Content] could not be determined from the guid [" + request.parentRecordGuid + "]" }
                             });
                         }
-                        page.addonList = Newtonsoft.Json.JsonConvert.SerializeObject(request.addonList);
+                        page.addonList = SerializeObject(request.addonList);
                         page.save(core);
                         break;
                     case "page templates":
                         var template = Contensive.Processor.Models.Db.PageTemplateModel.create(core, request.parentRecordGuid);
                         if (template == null) {
-                            return Newtonsoft.Json.JsonConvert.SerializeObject(new SetAddonList_ResponseClass() {
+                            return SerializeObject(new SetAddonList_ResponseClass() {
                                 errorList = new List<string> { "The parent record in [Page Templates] could not be determined from the guid [" + request.parentRecordGuid + "]" }
                             });
                         }
-                        template.addonList = Newtonsoft.Json.JsonConvert.SerializeObject(request.addonList);
+                        template.addonList = SerializeObject(request.addonList);
                         template.save(core);
                         break;
                     default:
-                        return Newtonsoft.Json.JsonConvert.SerializeObject(new SetAddonList_ResponseClass() {
+                        return SerializeObject(new SetAddonList_ResponseClass() {
                             errorList = new List<string> { "The parent content is not valid addonList container [" + metadata.name + "]" }
                         });
                 }

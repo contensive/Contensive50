@@ -13,6 +13,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using static Newtonsoft.Json.JsonConvert;
 using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
@@ -239,7 +240,7 @@ namespace Contensive.Processor.Controllers {
                         LogController.logRaw("taskRunner.runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", LogController.LogLevel.Info);
                         //
                         DateTime dateStarted = DateTime.Now;
-                        var cmdDetail = cp.core.json.Deserialize<TaskModel.CmdDetailClass>(task.cmdDetail);
+                        var cmdDetail = DeserializeObject<TaskModel.CmdDetailClass>(task.cmdDetail);
                         if (cmdDetail != null) {
                             var addon = AddonModel.create(cp.core, cmdDetail.addonId);
                             if ( addon != null ) {

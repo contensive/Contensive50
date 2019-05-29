@@ -6,6 +6,7 @@ using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor.Models.Domain;
+using static Newtonsoft.Json.JsonConvert;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -883,7 +884,7 @@ namespace Contensive.Processor.Controllers {
                 emailQueue.immediate = immediate;
                 emailQueue.toAddress = email.toAddress;
                 emailQueue.subject = email.subject;
-                emailQueue.content = Newtonsoft.Json.JsonConvert.SerializeObject(email);
+                emailQueue.content = SerializeObject(email);
                 emailQueue.attempts = email.attempts;
                 emailQueue.save(core);
             } catch (Exception ex) {
@@ -904,7 +905,7 @@ namespace Contensive.Processor.Controllers {
                 foreach (EmailQueueModel queueRecord in queue) {
                     EmailQueueModel.delete(core, queueRecord.id);
                     bool sendSuccess = false;
-                    EmailClass email = Newtonsoft.Json.JsonConvert.DeserializeObject<EmailClass>(queueRecord.content);
+                    EmailClass email = DeserializeObject<EmailClass>(queueRecord.content);
                     string reasonForFail = "";
                     if (sendWithSES) {
                         //

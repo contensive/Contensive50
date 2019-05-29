@@ -13,6 +13,7 @@ using System.Linq;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -1645,7 +1646,7 @@ namespace Contensive.Processor.Controllers {
                                         default:
                                             //
                                             // -- if the addon returned an object, json serialize
-                                            result = Newtonsoft.Json.JsonConvert.SerializeObject(AddonReturnObj);
+                                            result = SerializeObject(AddonReturnObj);
                                             break;
                                     }
                                 }

@@ -5,6 +5,7 @@ using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using static Tests.testConstants;
 using System.Collections.Generic;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     [TestClass]
@@ -212,7 +213,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             // arrange
             const string test1 = "http://www.a.com/b/c.html?d=e";
             //
-            string expect1 = Newtonsoft.Json.JsonConvert.SerializeObject( new GenericController.urlDetailsClass() {
+            string expect1 = SerializeObject( new GenericController.urlDetailsClass() {
                 filename = "c.html",
                 host = "www.a.com",
                 port = "80",
@@ -221,7 +222,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 queryString = "?d=e"
             });
             // act
-            string result1 = Newtonsoft.Json.JsonConvert.SerializeObject(GenericController.splitUrl(test1));
+            string result1 = SerializeObject(GenericController.splitUrl(test1));
             // assert
             Assert.AreEqual(expect1, result1);
         }
@@ -256,15 +257,15 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             const string test3 = "1\r\n\r\n3";
             const string test4 = "1\r\n\n\r4";
             //
-            string expect1 = Newtonsoft.Json.JsonConvert.SerializeObject(new string[] { "1", "2", "3", "4" });
-            string expect2 = Newtonsoft.Json.JsonConvert.SerializeObject(new string[] { "1 ", " 2", " 3 ", "4" });
-            string expect3 = Newtonsoft.Json.JsonConvert.SerializeObject(new string[] { "1", "", "3" });
-            string expect4 = Newtonsoft.Json.JsonConvert.SerializeObject(new string[] { "1", "", "", "4" });
+            string expect1 = SerializeObject(new string[] { "1", "2", "3", "4" });
+            string expect2 = SerializeObject(new string[] { "1 ", " 2", " 3 ", "4" });
+            string expect3 = SerializeObject(new string[] { "1", "", "3" });
+            string expect4 = SerializeObject(new string[] { "1", "", "", "4" });
             // act
-            string result1 = Newtonsoft.Json.JsonConvert.SerializeObject(GenericController.splitNewLine(test1));
-            string result2 = Newtonsoft.Json.JsonConvert.SerializeObject(GenericController.splitNewLine(test2));
-            string result3 = Newtonsoft.Json.JsonConvert.SerializeObject(GenericController.splitNewLine(test3));
-            string result4 = Newtonsoft.Json.JsonConvert.SerializeObject(GenericController.splitNewLine(test4));
+            string result1 = SerializeObject(GenericController.splitNewLine(test1));
+            string result2 = SerializeObject(GenericController.splitNewLine(test2));
+            string result3 = SerializeObject(GenericController.splitNewLine(test3));
+            string result4 = SerializeObject(GenericController.splitNewLine(test4));
             // assert
             Assert.AreEqual(result1, expect1);
             Assert.AreEqual(result2, expect2);

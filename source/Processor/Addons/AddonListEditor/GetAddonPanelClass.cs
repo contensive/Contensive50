@@ -7,6 +7,7 @@ using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Models.Domain;
+using static Newtonsoft.Json.JsonConvert;
 //
 namespace Contensive.Addons.AddonListEditor {
     public class GetAddonPanelClass : AddonBaseClass {
@@ -24,30 +25,30 @@ namespace Contensive.Addons.AddonListEditor {
                 CoreController core = ((CPClass)CP).core;
                 // 
 
-                GetAddonPanel_RequestClass request = Newtonsoft.Json.JsonConvert.DeserializeObject<GetAddonPanel_RequestClass>(CP.Request.Body);
+                GetAddonPanel_RequestClass request = DeserializeObject<GetAddonPanel_RequestClass>(CP.Request.Body);
                 if (request == null) {
-                    return Newtonsoft.Json.JsonConvert.SerializeObject(new GetAddonPanel_ResponseClass() {
+                    return SerializeObject(new GetAddonPanel_ResponseClass() {
                         errorList = new List<string> { "The request is invalid" }
                     });
                 }
                 if (String.IsNullOrWhiteSpace(request.parentContentGuid)) {
-                    return Newtonsoft.Json.JsonConvert.SerializeObject(new GetAddonPanel_ResponseClass() {
+                    return SerializeObject(new GetAddonPanel_ResponseClass() {
                         errorList = new List<string> { "The request parent content guid is not valid [" + request.parentContentGuid + "]" }
                     });
                 }
                 if (String.IsNullOrWhiteSpace(request.parentRecordGuid)) {
-                    return Newtonsoft.Json.JsonConvert.SerializeObject(new GetAddonPanel_ResponseClass() {
+                    return SerializeObject(new GetAddonPanel_ResponseClass() {
                         errorList = new List<string> { "The request parent record guid is not valid [" + request.parentRecordGuid + "]" }
                     });
                 }
                 var metadata = Contensive.Processor.Models.Domain.ContentMetadataModel.create(core, request.parentContentGuid);
                 if (metadata == null) {
-                    return Newtonsoft.Json.JsonConvert.SerializeObject(new GetAddonPanel_ResponseClass() {
+                    return SerializeObject(new GetAddonPanel_ResponseClass() {
                         errorList = new List<string> { "The parent content could not be determined from the guid [" + request.parentContentGuid + "]" }
                     });
                 }
                 if (!core.session.isEditing(metadata.name)) {
-                    return Newtonsoft.Json.JsonConvert.SerializeObject(new GetAddonPanel_ResponseClass() {
+                    return SerializeObject(new GetAddonPanel_ResponseClass() {
                         errorList = new List<string> { "Your account does not have permission to edit [" + metadata.name + "]" }
                     });
                 }
@@ -60,7 +61,7 @@ namespace Contensive.Addons.AddonListEditor {
                         addonModelList = AddonModel.createList(core, "(active>0)and(template>0)");
                         break;
                     default:
-                        return Newtonsoft.Json.JsonConvert.SerializeObject(new GetAddonPanel_ResponseClass() {
+                        return SerializeObject(new GetAddonPanel_ResponseClass() {
                             errorList = new List<string> { "The parent content is not valid addonList container [" + metadata.name + "]" }
                         });
                 }

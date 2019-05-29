@@ -61,12 +61,12 @@ namespace Contensive.Processor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;nav class=&quot;navbar navbar-expand-md navbar-dark bg-primary&quot; style=&quot;background-color: rgb(237,125,49) !important;&quot;&gt;
-        ///&lt;a class=&quot;navbar-brand&quot; href=&quot;/&quot;&gt;MemberBoss&lt;/a&gt;
-        ///{% {&quot;addon&quot;:{&quot;addon&quot;:&quot;Bootstrap Nav 40&quot;,&quot;instanceId&quot;:&quot;Admin Nav&quot;}} %}
-        ///&lt;div class=&quot;collapse navbar-collapse&quot; id=&quot;navbarText&quot;&gt;
-        ///&lt;a href=&quot;https://www.facebook.com/Contensive&quot; class=&quot;rounded-circle pl-2&quot;&gt;&lt;i class=&quot;fab fa-facebook-f text-white&quot;&gt;&lt;/i&gt;&lt;/a&gt; 
-        ///&lt;a href=&quot;https://twitter.com/Contensive&quot; class=&quot;rounded-circle pl-2&quot;&gt;&lt;i class=&quot;fab fa-twitter t [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to &lt;nav class=&quot;navbar navbar-expand-md navbar-dark bg-dark&quot;&gt;
+        ///&lt;a class=&quot;navbar-brand&quot; href=&quot;/&quot;&gt;{navBrand}&lt;/a&gt;
+        ///&lt;div class=&quot;navbar-text mr-auto&quot;&gt;{leftSideMessage}&lt;/div&gt;
+        ///&lt;div class=&quot;navbar-text ml-auto&quot;&gt;{rightSideMessage}&lt;/div&gt;
+        ///{rightSideNavHtml}
+        ///&lt;/nav&gt;.
         /// </summary>
         public static string adminNavBarHtml {
             get {
