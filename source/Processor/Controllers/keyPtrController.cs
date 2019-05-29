@@ -1,6 +1,7 @@
 ﻿
 using System;
 using static Contensive.Processor.Controllers.GenericController;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -47,11 +48,8 @@ namespace Contensive.Processor.Controllers {
         public string exportPropertyBag() {
             string returnBag = "";
             try {
-                System.Web.Script.Serialization.JavaScriptSerializer json = new System.Web.Script.Serialization.JavaScriptSerializer();
-                //
-
-                returnBag = json.Serialize(store);
-                //returnBag = Newtonsoft.Json.JsonConvert.SerializeObject(store)
+                returnBag = SerializeObject(store);
+                //returnBag = SerializeObject(store)
                 //Catch ex As Newtonsoft.Json.JsonException
                 //    Throw New indexException("ExportPropertyBag JSON error", ex)
             } catch (Exception ex) {
@@ -64,12 +62,7 @@ namespace Contensive.Processor.Controllers {
         //
         public void importPropertyBag(string bag) {
             try {
-                System.Web.Script.Serialization.JavaScriptSerializer json = new System.Web.Script.Serialization.JavaScriptSerializer();
-                //
-                store = json.Deserialize<storageClass>(bag);
-                //store = Newtonsoft.Json.JsonConvert.DeserializeObject(Of storageClass)(bag)
-                //Catch ex As Newtonsoft.Json.JsonException
-                //    Throw New indexException("ImportPropertyBag JSON error", ex)
+                store = DeserializeObject<storageClass>(bag);
             } catch (Exception ex) {
                 throw new indexException("ImportPropertyBag error", ex);
             }

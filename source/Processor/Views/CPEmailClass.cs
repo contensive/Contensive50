@@ -231,20 +231,68 @@ namespace Contensive.Processor {
             EmailController.queuePersonEmail(cp.core, "Ad Hoc Email", person, fromAddress, subject, body, "", "", sendImmediately, bodyIsHtml, 0,"",false, ref userErrorMessage);
         }
         //
+        //====================================================================================================
+        //
         public override void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
             string userErrorMessage = "";
             sendUser(toUserId, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
 
         }
         //
+        //====================================================================================================
+        //
         public override void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately) {
             string userErrorMessage = "";
             sendUser(toUserId, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
         }
         //
+        //====================================================================================================
+        //
         public override void sendUser(int toUserId, string fromAddress, string subject, string body) {
             string userErrorMessage = "";
             sendUser(toUserId, fromAddress, subject, body, true, true, ref userErrorMessage);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// deprecated. Use the integer toUserId method
+        /// </summary>
+        /// <param name="toUserId"></param>
+        /// <param name="FromAddress"></param>
+        /// <param name="Subject"></param>
+        /// <param name="Body"></param>
+        /// <param name="SendImmediately"></param>
+        /// <param name="BodyIsHTML"></param>
+        public override void sendUser(string toUserId, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML) {
+            if (GenericController.encodeInteger(toUserId) <= 0) throw new ArgumentException("The To-User argument is not valid, [" + toUserId + "]");
+            sendUser(GenericController.encodeInteger(toUserId), FromAddress, Subject, Body, SendImmediately, BodyIsHTML);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// deprecated. Use the integer toUserId method
+        /// </summary>
+        /// <param name="toUserId"></param>
+        /// <param name="FromAddress"></param>
+        /// <param name="Subject"></param>
+        /// <param name="Body"></param>
+        /// <param name="SendImmediately"></param>
+        public override void sendUser(string toUserId, string FromAddress, string Subject, string Body, bool SendImmediately) {
+            if (GenericController.encodeInteger(toUserId) <= 0) throw new ArgumentException("The To-User argument is not valid, [" + toUserId + "]");
+            sendUser(GenericController.encodeInteger(toUserId), FromAddress, Subject, Body, SendImmediately);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// deprecated. Use the integer toUserId method
+        /// </summary>
+        /// <param name="toUserId"></param>
+        /// <param name="FromAddress"></param>
+        /// <param name="Subject"></param>
+        /// <param name="Body"></param>
+        public override void sendUser(string toUserId, string FromAddress, string Subject, string Body) {
+            if (GenericController.encodeInteger(toUserId) <= 0) throw new ArgumentException("The To-User argument is not valid, [" + toUserId + "]");
+            sendUser(GenericController.encodeInteger(toUserId), FromAddress, Subject, Body);
         }
         //
         //====================================================================================================
@@ -272,6 +320,7 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         ~CPEmailClass() {
             Dispose(false);
         }

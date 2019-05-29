@@ -8,6 +8,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using static Newtonsoft.Json.JsonConvert;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -346,6 +347,7 @@ namespace Contensive.Processor.Controllers {
                 //Collection<object> cmdCollection = null;
                 Dictionary<string, object> cmdDef = null;
                 Dictionary<string, object> cmdArgDef = new Dictionary<string, object>();
+                var json = new System.Web.Script.Serialization.JavaScriptSerializer();
                 //
                 //htmlDoc = new Controllers.htmlController(core);
                 cmdSrc = cmdSrc.Trim(' ');
@@ -399,7 +401,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         Dictionary<string, object> cmdDictionary = new Dictionary<string, object>();
                         try {
-                            cmdDictionary = core.json.Deserialize<Dictionary<string, object>>(cmdSrc);
+                            cmdDictionary = json.Deserialize<Dictionary<string, object>>(cmdSrc);
                         } catch (Exception ex) {
                             LogController.logError(core, ex);
                             throw;
@@ -425,7 +427,7 @@ namespace Contensive.Processor.Controllers {
                         // JSON is a command list in the form of an array, like:
                         //   [ "clear" , { "import": "test.html" },{ "open" : "myfile.txt" }]
                         //
-                        cmdCollection = core.json.Deserialize<List<object>>(cmdSrc);
+                        cmdCollection = json.Deserialize<List<object>>(cmdSrc);
                         //List<object> testArray = Newtonsoft.Json.JsonConvert.DeserializeObject<List<object>>(cmdSrc);
                         //cmdCollection = core.json.Deserialize<Collection<object>>(cmdSrc);
                         //If True Then
@@ -506,7 +508,7 @@ namespace Contensive.Processor.Controllers {
                             // argument is in the form of an object, like:
                             //   { "text name": "my text" }
                             //
-                            object cmdDictionaryOrCollection = core.json.Deserialize<object>(cmdArg);
+                            object cmdDictionaryOrCollection = json.Deserialize<object>(cmdArg);
                             string cmdDictionaryOrCollectionTypeName = cmdDictionaryOrCollection.GetType().FullName.ToLowerInvariant();
                             if (cmdDictionaryOrCollectionTypeName.Left(37) != "system.collections.generic.dictionary") {
                                 throw new GenericException("Error parsing JSON command argument list, expected a single command, command list [" + cmdSrc + "]");

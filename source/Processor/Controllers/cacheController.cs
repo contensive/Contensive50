@@ -13,6 +13,7 @@ using NLog;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using Contensive.Processor.Models.Domain;
+using static Newtonsoft.Json.JsonConvert;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -282,11 +283,11 @@ namespace Contensive.Processor.Controllers {
                         mutex.ReleaseMutex();
                     }
                     if (!string.IsNullOrEmpty(serializedDataObject)) {
-                        result = Newtonsoft.Json.JsonConvert.DeserializeObject<CacheDocumentClass>(serializedDataObject);
+                        result = DeserializeObject<CacheDocumentClass>(serializedDataObject);
                         storeCacheDocument_MemoryCache(serverKey, result);
                     }
                 }
-                string returnContentSegment = Newtonsoft.Json.JsonConvert.SerializeObject(result);
+                string returnContentSegment = SerializeObject(result);
                 returnContentSegment = (returnContentSegment.Length > 50) ? returnContentSegment.Substring(0, 50) : returnContentSegment;
                 LogController.logTrace(core, "return content [" + returnContentSegment + "]");
                 //
@@ -711,7 +712,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- save local file cache
                     typeMessage = "local-file";
-                    string serializedData = Newtonsoft.Json.JsonConvert.SerializeObject(cacheDocument);
+                    string serializedData = SerializeObject(cacheDocument);
                     using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, serverKey)) {
                         mutex.WaitOne();
                         core.privateFiles.saveFile("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"), serializedData);

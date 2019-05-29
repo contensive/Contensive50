@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace Contensive.Processor.Models.Domain {
     //
@@ -108,7 +109,6 @@ namespace Contensive.Processor.Models.Domain {
             try {
                 //
                 // ----- read/create serverConfig
-                var json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
                 string JSONTemp = core.programDataFiles.readFileText("config.json");
                 if (string.IsNullOrEmpty(JSONTemp)) {
                     //
@@ -117,9 +117,9 @@ namespace Contensive.Processor.Models.Domain {
                     returnModel = new ServerConfigModel();
                     returnModel.allowTaskRunnerService = false;
                     returnModel.allowTaskSchedulerService = false;
-                    core.programDataFiles.saveFile("config.json", json_serializer.Serialize(returnModel));
+                    core.programDataFiles.saveFile("config.json", SerializeObject(returnModel));
                 } else {
-                    returnModel = json_serializer.Deserialize<ServerConfigModel>(JSONTemp);
+                    returnModel = DeserializeObject<ServerConfigModel>(JSONTemp);
                 }
             } catch (Exception ex) {
                 LogController.logError( core,ex, "exception in serverConfigModel.getObject");
@@ -135,7 +135,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <returns></returns>
         public int save(CoreController core) {
             try {
-                string jsonTemp = core.json.Serialize(this);
+                string jsonTemp = SerializeObject(this);
                 core.programDataFiles.saveFile("config.json", jsonTemp);
             } catch (Exception ex) {
                 LogController.logError( core,ex);

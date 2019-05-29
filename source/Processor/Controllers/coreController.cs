@@ -348,7 +348,8 @@ namespace Contensive.Processor.Controllers {
                     if (String.IsNullOrEmpty(serverConfig.programFilesPath)) {
                         //
                         // -- dev environment, setup programfiles path 
-                        string executePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+                        string executePath = System.IO.Path.GetDirectoryName(this.GetType().Assembly.Location);
+                        //string executePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
                         if (!executePath.ToLowerInvariant().IndexOf("\\git\\").Equals(-1)) {
                             //
                             //  -- save if not in developer execution path
@@ -442,17 +443,6 @@ namespace Contensive.Processor.Controllers {
         /// domains configured for this app. keys are lowercase
         /// </summary>
         public Dictionary<string, DomainModel> domainDictionary;
-        //
-        //===================================================================================================
-        public System.Web.Script.Serialization.JavaScriptSerializer json {
-            get {
-                if (_json == null) {
-                    _json = new System.Web.Script.Serialization.JavaScriptSerializer();
-                }
-                return _json;
-            }
-        }
-        private System.Web.Script.Serialization.JavaScriptSerializer _json;
         //
         //===================================================================================================
         public Controllers.CacheController cache {
@@ -814,11 +804,11 @@ namespace Contensive.Processor.Controllers {
                         _siteProperties = null;
                     }
                     //
-                    if (_json != null) {
-                        // no dispose
-                        //Call _json.Dispose()
-                        _json = null;
-                    }
+                    //if (_json != null) {
+                    //    // no dispose
+                    //    //Call _json.Dispose()
+                    //    _json = null;
+                    //}
                     //
                     //If Not (_user Is Nothing) Then
                     //    ' no dispose

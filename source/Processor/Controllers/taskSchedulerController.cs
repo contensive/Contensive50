@@ -13,6 +13,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using static Newtonsoft.Json.JsonConvert;
 using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
@@ -293,7 +294,7 @@ namespace Contensive.Processor.Controllers {
                     downloadId = download.id;
                     download.save(core);
                 }
-                string cmdDetailJson = core.json.Serialize(cmdDetail);
+                string cmdDetailJson = SerializeObject(cmdDetail);
                 if (blockDuplicates) {
                     //
                     // -- Search for a duplicate
