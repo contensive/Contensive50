@@ -216,7 +216,7 @@ namespace Contensive.Processor {
         [Obsolete("deprecated",true)]
         public override bool IsWorkflowRendering {
             get {
-                return cp.core.session.isWorkflowRendering();
+                return false;
             }
         }
         //

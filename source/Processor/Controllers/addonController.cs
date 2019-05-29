@@ -1823,12 +1823,6 @@ namespace Contensive.Processor.Controllers {
                             //
                             CopyContent = "This addon does not support instance options.";
                             CopyContent = "<div style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + CopyContent + "</div>";
-                            //ElseIf (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (core.siteProperties.allowWorkflowAuthoring And Not core.visitProperty.getBoolean("AllowWorkflowRendering")) Then
-                            //    '
-                            //    ' workflow with no rendering (or within admin site)
-                            //    '
-                            //    CopyContent = "With Workflow editing enabled, you can not edit Add-on settings for live records. To make changes to the editable version of this page, turn on Render Workflow Authoring Changes and Advanced Edit together."
-                            //    CopyContent = "<div style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & CopyContent & "</div>"
                         } else if (string.IsNullOrEmpty(ACInstanceID)) {
                             //
                             // No instance ID - must be edited and saved

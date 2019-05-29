@@ -1813,10 +1813,6 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 core.visitProperty.setProperty("AllowAdvancedEditor", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowAdvancedEditor")));
                                 //
-                                // ----- Allow Workflow authoring Render Mode - Visit Property
-                                //
-                                core.visitProperty.setProperty("AllowWorkflowRendering", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowWorkflowRendering")));
-                                //
                                 // ----- developer Only parts
                                 //
                                 core.visitProperty.setProperty("AllowDebugging", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowDebugging")));

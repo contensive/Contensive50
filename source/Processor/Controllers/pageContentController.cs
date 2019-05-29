@@ -811,16 +811,14 @@ namespace Contensive.Processor.Controllers {
                         //
                     } else {
                         int pageViewings = core.doc.pageController.page.Viewings;
-                        if (core.session.isEditing(PageContentModel.contentName) || core.visitProperty.getBoolean("AllowWorkflowRendering")) {
+                        if (core.session.isEditing(PageContentModel.contentName)) {
                             //
-                            // Link authoring, workflow rendering -> do encoding, but no tracking
+                            // Link authoring -> do encoding, but no tracking
                             //
-                            //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
                             result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.contactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                         } else {
                             //
                             // Live content
-                            //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
                             result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.contactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                             core.db.executeQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + core.doc.pageController.page.id);
                         }

@@ -1183,17 +1183,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <returns></returns>
         public bool isWorkflowRendering() {
-            bool tempisWorkflowRendering = false;
-            bool result = false;
-            try {
-                if (isAuthenticatedContentManager(core)) {
-                    tempisWorkflowRendering = core.visitProperty.getBoolean("AllowWorkflowRendering");
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-            return result;
+            return false;
         }
     }
 }
