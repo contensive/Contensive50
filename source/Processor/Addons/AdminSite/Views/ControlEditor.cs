@@ -6,6 +6,7 @@ using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
 using static Contensive.Processor.Constants;
 using Contensive.Addons.AdminSite.Controllers;
+using System.Net;
 
 namespace Contensive.Addons.AdminSite {
     public class ControlEditor {
@@ -94,8 +95,8 @@ namespace Contensive.Addons.AdminSite {
                         } else if (adminData.editRecord.id == 0) {
                             fieldEditor = "(available after save)";
                         } else {
-                            string eidQueryString = "eid=" + Processor.Controllers.SecurityController.encodeToken(core, adminData.editRecord.id, core.doc.profileStartTime);
-                            string sampleUrl = core.webServer.requestProtocol + core.webServer.requestDomain + appRootPath + core.siteProperties.serverPageDefault + "?" + eidQueryString;
+                            string eidQueryString = "eid=" + WebUtility.UrlEncode(Processor.Controllers.SecurityController.encodeToken(core, adminData.editRecord.id, core.doc.profileStartTime));
+                            string sampleUrl = core.webServer.requestProtocol + core.webServer.requestDomain + "/" + core.siteProperties.serverPageDefault + "?" + eidQueryString;
                             if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
                                 fieldHelp = "If " + eidQueryString + " is added to a url querystring for this site, the user be logged in as this person.";
                             } else {
