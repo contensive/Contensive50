@@ -119,16 +119,16 @@ namespace Contensive.Addons.Email {
                                 string LastEmail = null;
                                 LastEmail = "empty";
                                 while (csPerson.ok()) {
-                                    int peopleID = csPerson.getInteger("id");
-                                    string peopleEmail = csPerson.getText("Email");
-                                    string peopleName = csPerson.getText("name");
-                                    if (peopleEmail == LastEmail) {
-                                        if (string.IsNullOrEmpty(peopleName)) { peopleName = "user #" + peopleID; }
-                                        EmailStatusList = EmailStatusList + "Not Sent to " + peopleName + ", duplicate email address (" + peopleEmail + ")" + BR;
+                                    int sendToPersonId = csPerson.getInteger("id");
+                                    string sendToPersonEmail = csPerson.getText("Email");
+                                    string sendToPersonName = csPerson.getText("name");
+                                    if (sendToPersonEmail == LastEmail) {
+                                        if (string.IsNullOrEmpty(sendToPersonName)) { sendToPersonName = "user #" + sendToPersonId; }
+                                        EmailStatusList = EmailStatusList + "Not Sent to " + sendToPersonName + ", duplicate email address (" + sendToPersonEmail + ")" + BR;
                                     } else {
-                                        EmailStatusList = EmailStatusList + queueEmailRecord(core,"Group Email", peopleID, emailID, DateTime.MinValue, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, EmailCopy, CSEmail.getBoolean("AllowSpamFooter"), CSEmail.getBoolean("AddLinkEID"), "") + BR;
+                                        EmailStatusList = EmailStatusList + queueEmailRecord(core, "Group Email", sendToPersonId, emailID, DateTime.MinValue, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, EmailCopy, CSEmail.getBoolean("AllowSpamFooter"), CSEmail.getBoolean("AddLinkEID"), "") + BR;
                                     }
-                                    LastEmail = peopleEmail;
+                                    LastEmail = sendToPersonEmail;
                                     csPerson.goNext();
                                 }
                                 csPerson.close();
@@ -300,7 +300,7 @@ namespace Contensive.Addons.Email {
         /// <summary>
         /// Send email to a memberid
         /// </summary>
-        /// <param name="MemberID"></param>
+        /// <param name="sendToPersonId"></param>
         /// <param name="emailID"></param>
         /// <param name="DateBlockExpires"></param>
         /// <param name="emailDropID"></param>
@@ -314,7 +314,7 @@ namespace Contensive.Addons.Email {
         /// <param name="EmailAllowLinkEID"></param>
         /// <param name="emailStyles"></param>
         /// <returns>OK if successful, else returns user error.</returns>
-        private string queueEmailRecord(CoreController core, string emailContextMessage, int MemberID, int emailID, DateTime DateBlockExpires, int emailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
+        private string queueEmailRecord(CoreController core, string emailContextMessage, int sendToPersonId, int emailID, DateTime DateBlockExpires, int emailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
             string returnStatus = "";
             try {
                 string EmailBodyEncoded = EmailBody;
@@ -325,7 +325,7 @@ namespace Contensive.Addons.Email {
                         CSLog.set("Name", "Queued: " + emailContextMessage);
                         CSLog.set("EmailDropID", emailDropID);
                         CSLog.set("EmailID", emailID);
-                        CSLog.set("MemberID", MemberID);
+                        CSLog.set("MemberID", sendToPersonId);
                         CSLog.set("LogType", EmailLogTypeDrop);
                         CSLog.set("DateBlockExpires", DateBlockExpires);
                         CSLog.set("SendStatus", "Send attempted but not completed");
@@ -338,7 +338,7 @@ namespace Contensive.Addons.Email {
                         //
                         // Get the Member
                         using (var CSPeople = new CsModel(core)) {
-                            CSPeople.openRecord("People", MemberID, "Email,Name");
+                            CSPeople.openRecord("People", sendToPersonId, "Email,Name");
                             if (CSPeople.ok()) {
                                 string emailToAddress = CSPeople.getText("Email");
                                 string emailToName = CSPeople.getText("Name");
@@ -361,11 +361,11 @@ namespace Contensive.Addons.Email {
                                 emailWorkingStyles = GenericController.vbReplace(emailWorkingStyles, StyleSheetEnd, " // -->" + StyleSheetEnd, 1, 99, 1);
                                 //
                                 // Create the clickflag to be added to all anchors
-                                string ClickFlagQuery = rnEmailClickFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=" + MemberID;
+                                string ClickFlagQuery = rnEmailClickFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=" + sendToPersonId;
                                 //
-                                // Encode body and subject
-                                EmailBodyEncoded = ActiveContentController.renderHtmlForEmail(core, EmailBodyEncoded, MemberID, ClickFlagQuery);
-                                EmailSubjectEncoded = ActiveContentController.renderHtmlForEmail(core, EmailSubjectEncoded, MemberID, ClickFlagQuery);
+                                // -- encode body and subject
+                                EmailBodyEncoded = ActiveContentController.renderHtmlForEmail(core, EmailBodyEncoded, sendToPersonId, ClickFlagQuery);
+                                EmailSubjectEncoded = ActiveContentController.renderHtmlForEmail(core, EmailSubjectEncoded, sendToPersonId, ClickFlagQuery);
                                 //
                                 // Encode/Merge Template
                                 if (string.IsNullOrEmpty(EmailTemplate)) {
@@ -377,7 +377,7 @@ namespace Contensive.Addons.Email {
                                     // use provided template
                                     // hotfix - templates no longer have wysiwyg editors, so content may not be saved correctly - preprocess to convert wysiwyg content
                                     EmailTemplate = ActiveContentController.processWysiwygResponseForSave(core, EmailTemplate);
-                                    string EmailTemplateEncoded = ActiveContentController.renderHtmlForEmail(core, EmailTemplate, MemberID, ClickFlagQuery);
+                                    string EmailTemplateEncoded = ActiveContentController.renderHtmlForEmail(core, EmailTemplate, sendToPersonId, ClickFlagQuery);
                                     if (GenericController.vbInstr(1, EmailTemplateEncoded, fpoContentBox) != 0) {
                                         EmailBodyEncoded = GenericController.vbReplace(EmailTemplateEncoded, fpoContentBox, EmailBodyEncoded);
                                     } else {
@@ -396,7 +396,7 @@ namespace Contensive.Addons.Email {
                                 //
                                 // open trigger under footer (so it does not shake as the image comes in)
                                 EmailBodyEncoded = EmailBodyEncoded + openTriggerCode;
-                                EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, "#member_id#", MemberID);
+                                EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, "#member_id#", sendToPersonId);
                                 EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, "#member_email#", emailToAddress);
                                 //
                                 // Now convert URLS to absolute
@@ -414,7 +414,7 @@ namespace Contensive.Addons.Email {
                                 string EmailStatus = null;
                                 //
                                 // Send
-                                EmailController.queueAdHocEmail(core, emailContextMessage , MemberID, emailToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, "", true, true, emailID, ref EmailStatus);
+                                EmailController.queueAdHocEmail(core, emailContextMessage, sendToPersonId, emailToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, "", true, true, emailID, ref EmailStatus);
                                 if (string.IsNullOrEmpty(EmailStatus)) {
                                     EmailStatus = "ok";
                                 }

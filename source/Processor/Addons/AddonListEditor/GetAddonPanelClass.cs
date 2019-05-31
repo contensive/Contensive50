@@ -20,12 +20,20 @@ namespace Contensive.Addons.AddonListEditor {
         // 
         // ====================================================================================================
         // 
-        public override object Execute(CPBaseClass CP) {
+        public override object Execute(CPBaseClass cp) {
             try {
-                CoreController core = ((CPClass)CP).core;
+                CoreController core = ((CPClass)cp).core;
                 // 
 
-                GetAddonPanel_RequestClass request = DeserializeObject<GetAddonPanel_RequestClass>(CP.Request.Body);
+                GetAddonPanel_RequestClass request = DeserializeObject<GetAddonPanel_RequestClass>(cp.Request.Body);
+                //
+                // -- allow simple querystring values
+                if (request == null) {
+                    request = new GetAddonPanel_RequestClass() {
+                        parentRecordGuid = cp.Doc.GetText("parentRecordGuid"),
+                        parentContentGuid = cp.Doc.GetText("parentContentGuid")
+                    };
+                }
                 if (request == null) {
                     return SerializeObject(new GetAddonPanel_ResponseClass() {
                         errorList = new List<string> { "The request is invalid" }
@@ -77,7 +85,7 @@ namespace Contensive.Addons.AddonListEditor {
                         guid = addonModel.ccguid,
                         html = "",
                         children = new List<string>(),
-                        image = (string.IsNullOrWhiteSpace(addonModel.iconFilename) ? "" : CP.Site.FilePath + addonModel.iconFilename )
+                        image = (string.IsNullOrWhiteSpace(addonModel.iconFilename) ? "" : cp.Site.FilePath + addonModel.iconFilename )
                     };
                     
                     result.addonPanelList.Add(item);
@@ -113,7 +121,7 @@ namespace Contensive.Addons.AddonListEditor {
             }
             // 
             catch (Exception ex) {
-                CP.Site.ErrorReport(ex);
+                cp.Site.ErrorReport(ex);
                 return string.Empty;
             }
         }

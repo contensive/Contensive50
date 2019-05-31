@@ -202,7 +202,7 @@ namespace Contensive.Processor {
         internal const string DefaultLandingSectionName = "Home";
         //
         internal const string defaultLandingPageHtml = ""
-            + "<h1>Welcome to Your New Website!</h1>"
+            + "<h1>Welcome {% \"personalization-name\" %}, to Your New Website!</h1>"
             + "<p>This is the landing page initially created for this domain. To edit this page, login as the administrator and click Quick Edit on the tool bar at the top. To edit page features, turn on Edit mode by clicking the Edit icon on the toolbar. Click the green edit icon in the upper left corner of this dotted region.</p>"
             + "<ul>For more control, these areas can also be edited:"
             + "<li>The Domain record controls how pages look for this domain name. A unique Landing Page can be set for each domain. The domain record also determines the default template to be used for pages on this domain name.</li>"
@@ -260,7 +260,7 @@ namespace Contensive.Processor {
         //
         // -- Default username/password
         //
-        internal const string defaultRootUserName = "root";
+        internal const string defaultRootUserName = "Root User";
         internal const string defaultRootUserUsername = "root";
         internal const string defaultRootUserPassword = "contensive";
         internal const string defaultRootUserGuid = "{4445cd14-904f-480f-a7b7-29d70d0c22ca}";

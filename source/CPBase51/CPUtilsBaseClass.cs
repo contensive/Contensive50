@@ -127,16 +127,6 @@ namespace Contensive.BaseClasses {
             /// <returns></returns>
             public string cssContainerClass { get; set; } = "";
             /// <summary>
-            /// Optional. If included with personizationPeopleId, the addon will be run in a authentication context for this people record. If not included, the current documents authentication context is used. This may be used for cases like addons that send email where email content may include personalization.
-            /// </summary>
-            /// <returns></returns>
-            public int personalizationPeopleId { get; set; } = 0;
-            /// <summary>
-            /// Optional. If included with personizationPeopleId, the addon will be run in a authentication context for this people record. If not included, the current documents authentication context is used. This may be used for cases like addons that send email where email content may include personalization.
-            /// </summary>
-            /// <returns></returns>
-            public bool personalizationAuthenticated { get; set; } = false;
-            /// <summary>
             /// Optional. If true, this addon is called because it was a dependancy, and can only be called once within a document.
             /// </summary>
             /// <returns></returns>
@@ -154,6 +144,20 @@ namespace Contensive.BaseClasses {
             /// When true, an addon's javascript will be put in the head. This also forces javascript for all dependant addons to the head.
             /// </summary>
             public bool forceJavascriptToHead { get; set; } = false;
+            //
+            // todo - deprecate personalizationPeopleId - execute against the current session context
+            /// <summary>
+            /// Deprecated.  execute against the current session context
+            /// </summary>
+            /// <returns></returns>
+            public int personalizationPeopleId { get; set; } = 0;
+            //
+            // todo - deprecate personalizationPeopleId - execute against the current session context
+            /// <summary>
+            /// Deprecated.  execute against the current session context
+            /// </summary>
+            /// <returns></returns>
+            public bool personalizationAuthenticated { get; set; } = false;
         }
         //
         //====================================================================================================

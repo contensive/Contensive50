@@ -446,7 +446,7 @@ namespace Contensive.Processor.Controllers {
                                             contentParts = ActiveContentController.renderHtmlForWysiwygEditor(core, contentParts);
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextEmail:
-                                            contentParts = ActiveContentController.renderHtmlForEmail(core, contentParts, executeContext.personalizationPeopleId, "");
+                                            contentParts = ActiveContentController.renderHtmlForEmail(core, contentParts, core.session.user.id, "");
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextFilter:
                                         case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
@@ -457,17 +457,17 @@ namespace Contensive.Processor.Controllers {
                                         case CPUtilsBaseClass.addonContext.ContextTemplate:
                                         case CPUtilsBaseClass.addonContext.ContextAdmin:
                                         case CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml:
-                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, 0, "", 0, executeContext.addonType);
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextOnContentChange:
                                         case CPUtilsBaseClass.addonContext.ContextSimple:
-                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, 0, "", 0, executeContext.addonType);
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextRemoteMethodJson:
-                                            contentParts = ActiveContentController.renderJSONForRemoteMethod(core, contentParts, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType);
+                                            contentParts = ActiveContentController.renderJSONForRemoteMethod(core, contentParts, "", 0, 0, "", 0, "", executeContext.addonType);
                                             break;
                                         default:
-                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, 0, "", 0, executeContext.addonType);
                                             break;
                                     }
                                 }

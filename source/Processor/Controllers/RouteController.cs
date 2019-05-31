@@ -284,8 +284,6 @@ namespace Contensive.Processor.Controllers {
                                                 fieldName = "",
                                                 recordId = core.docProperties.getInteger("HostRecordID")
                                             },
-                                            personalizationAuthenticated = core.session.isAuthenticated,
-                                            personalizationPeopleId = core.session.user.id,
                                             errorContextMessage = "calling remote method addon [" + route.remoteMethodAddonId + "] during execute route method"
                                         };
                                         return core.addon.execute(addon, executeContext);
@@ -348,8 +346,6 @@ namespace Contensive.Processor.Controllers {
                                 fieldName = "",
                                 recordId = 0
                             },
-                            personalizationAuthenticated = core.session.visit.visitAuthenticated,
-                            personalizationPeopleId = core.session.user.id,
                             errorContextMessage = "calling default route addon [" + defaultAddonId + "] during execute route method"
                         };
                         return core.addon.execute(Models.Db.AddonModel.create(core, defaultAddonId), executeContext);

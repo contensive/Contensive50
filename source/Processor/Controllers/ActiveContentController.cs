@@ -29,14 +29,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="source"></param>
         /// <param name="contextContentName">optional, content from which the data being rendered originated (like 'Page Content')</param>
         /// <param name="ContextRecordID">optional, id of the record from which the data being rendered originated</param>
-        /// <param name="ContextContactPeopleID">optional, the id of the person who should be contacted for this content. If 0, uses current user.</param>
+        /// <param name="deprecated_ContextContactPeopleID">optional, the id of the person who should be contacted for this content. If 0, uses current user.</param>
         /// <param name="ProtocolHostString">The protocol + domain to be used to build URLs if the content includes dynamically generated images (resource library active content) and the domain is different from where the content is being rendered already. Leave blank and the URL will start with a slash.</param>
         /// <param name="DefaultWrapperID">optional, if provided and addon is html on a page, the content will be wrapped in the wrapper indicated</param>
         /// <param name="addonContext">Where this addon is being executed, like as a process, or in an email, or on a page. If not provided page context is assumed (adding assets like js and css to document)</param>
         /// <returns></returns>
-        public static string renderHtmlForWeb(CoreController core, string source, string contextContentName = "", int ContextRecordID = 0, int ContextContactPeopleID = 0, string ProtocolHostString = "", int DefaultWrapperID = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
+        public static string renderHtmlForWeb(CoreController core, string source, string contextContentName = "", int ContextRecordID = 0, int deprecated_ContextContactPeopleID = 0, string ProtocolHostString = "", int DefaultWrapperID = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
             string result = ContentCmdController.executeContentCommands(core, source, CPUtilsBaseClass.addonContext.ContextAdmin, core.session.user.id, core.session.visit.visitAuthenticated);
-            return encode(core, result, core.session.user.id, contextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.session.isAuthenticated, null, core.session.isEditing());
+            return encode(core, result, core.session.user.id, contextContentName, ContextRecordID, deprecated_ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.session.isAuthenticated, null, core.session.isEditing());
         }
         //
         //====================================================================================================
@@ -50,7 +50,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="sourceHtmlContent">The html source to be parsed.</param>
-        /// <param name="personalizationPeopleId">The user to whom this rendering will be targeted</param>
+        /// <param name="deprecated_personalizationPeopleId">The user to whom this rendering will be targeted</param>
         /// <param name="ContextContentName">If this content is from a DbModel, this is the content name.</param>
         /// <param name="ContextRecordID">If this content is from a DbModel, this is the record id.</param>
         /// <param name="moreInfoPeopleId">If the content includes either a more-information link, or a feedback form, this is the person to whom the feedback or more-information applies.</param>
@@ -63,17 +63,17 @@ namespace Contensive.Processor.Controllers {
         /// <param name="protocolHost">The protocol plus domain desired if encoding Resource Library Images or encoding for the Wysiwyg editor</param>
         /// <param name="IsEmailContent">If true, this rendering is for an email.</param>
         /// <param name="AdminURL"></param>
-        /// <param name="personalizationIsAuthenticated"></param>
+        /// <param name="deprecated_personalizationIsAuthenticated"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private static string renderActiveContent(CoreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool addLinkAuthenticationToAllLinks, bool ignore, bool encodeACResourceLibraryImages, bool encodeForWysiwygEditor, bool EncodeNonCachableTags, string queryStringToAppendToAllLinks, string protocolHost, bool IsEmailContent, string AdminURL, bool personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
+        private static string renderActiveContent(CoreController core, string sourceHtmlContent, int deprecated_personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool addLinkAuthenticationToAllLinks, bool ignore, bool encodeACResourceLibraryImages, bool encodeForWysiwygEditor, bool EncodeNonCachableTags, string queryStringToAppendToAllLinks, string protocolHost, bool IsEmailContent, string AdminURL, bool deprecated_personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
             string result = sourceHtmlContent;
             try {
                 //
                 // Fixup Anchor Query (additional AddonOptionString pairs to add to the end)
                 string AnchorQuery = "";
-                if (addLinkAuthenticationToAllLinks && (personalizationPeopleId != 0)) {
-                    AnchorQuery += "&eid=" + SecurityController.encodeToken(core, personalizationPeopleId, DateTime.Now);
+                if (addLinkAuthenticationToAllLinks && (deprecated_personalizationPeopleId != 0)) {
+                    AnchorQuery += "&eid=" + SecurityController.encodeToken(core, deprecated_personalizationPeopleId, DateTime.Now);
                 }
                 //
                 if (!string.IsNullOrEmpty(queryStringToAppendToAllLinks)) {
@@ -196,7 +196,7 @@ namespace Contensive.Processor.Controllers {
                                                                     // -- start block text
                                                                     Copy = "";
                                                                     string GroupIDList = HtmlController.getAddonOptionStringValue("AllowGroups", addonOptionString);
-                                                                    if (!GroupController.isInGroupList(core, personalizationPeopleId, true, GroupIDList, true)) {
+                                                                    if (!GroupController.isInGroupList(core, deprecated_personalizationPeopleId, true, GroupIDList, true)) {
                                                                         //
                                                                         // Block content if not allowed
                                                                         //
@@ -232,8 +232,6 @@ namespace Contensive.Processor.Controllers {
                                                                             fieldName = "",
                                                                             recordId = ContextRecordID
                                                                         },
-                                                                        personalizationAuthenticated = personalizationIsAuthenticated,
-                                                                        personalizationPeopleId = personalizationPeopleId,
                                                                         argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, AddonOptionStringHTMLEncoded),
                                                                         instanceGuid = ACInstanceID,
                                                                         errorContextMessage = "rendering addon found in active content within an email"
@@ -1313,7 +1311,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="sourceHtmlContent"></param>
-        /// <param name="personalizationPeopleId"></param>
+        /// <param name="deprecated_personalizationPeopleId"></param>
         /// <param name="ContextContentName"></param>
         /// <param name="ContextRecordID"></param>
         /// <param name="ContextContactPeopleID"></param>
@@ -1334,7 +1332,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="isEditingAnything"></param>
         /// <returns></returns>
         //
-        public static string encode(CoreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool convertHtmlToText, bool addLinkAuthToAllLinks, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
+        public static string encode(CoreController core, string sourceHtmlContent, int deprecated_personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool convertHtmlToText, bool addLinkAuthToAllLinks, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
             string result = sourceHtmlContent;
             string hint = "0";
             try {
@@ -1342,8 +1340,8 @@ namespace Contensive.Processor.Controllers {
                     hint = "10";
                     int LineStart = 0;
                     //
-                    if (personalizationPeopleId <= 0) {
-                        personalizationPeopleId = core.session.user.id;
+                    if (deprecated_personalizationPeopleId <= 0) {
+                        deprecated_personalizationPeopleId = core.session.user.id;
                     }
                     //
                     // -- resize images
@@ -1354,7 +1352,7 @@ namespace Contensive.Processor.Controllers {
                     hint = "30";
                     if (addLinkAuthToAllLinks || EncodeActiveFormatting || EncodeActiveImages || EncodeActiveEditIcons) {
                         string AdminURL = "/" + core.appConfig.adminRoute;
-                        result = renderActiveContent(core, result, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, addLinkAuthToAllLinks, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostLink, IsEmailContent, AdminURL, personalizationIsAuthenticated, Context);
+                        result = renderActiveContent(core, result, deprecated_personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, addLinkAuthToAllLinks, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostLink, IsEmailContent, AdminURL, personalizationIsAuthenticated, Context);
                     }
                     //
                     // -- Do Plain Text Conversion
@@ -1436,8 +1434,6 @@ namespace Contensive.Processor.Controllers {
                                                     fieldName = "",
                                                     recordId = ContextRecordID
                                                 },
-                                                personalizationAuthenticated = personalizationIsAuthenticated,
-                                                personalizationPeopleId = personalizationPeopleId,
                                                 instanceGuid = ACInstanceID,
                                                 argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, addonOptionString),
                                                 errorContextMessage = "rendering active content with guid [" + AddonGuid + "] or name [" + AddonName + "]"
@@ -1586,16 +1582,16 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Source"></param>
         /// <param name="ContextContentName"></param>
         /// <param name="ContextRecordID"></param>
-        /// <param name="ContextContactPeopleID"></param>
+        /// <param name="deprecated_ContextContactPeopleID"></param>
         /// <param name="ProtocolHostString"></param>
         /// <param name="DefaultWrapperID"></param>
         /// <param name="ignore_TemplateCaseOnly_Content"></param>
         /// <param name="addonContext"></param>
         /// <returns></returns>
-        public static string renderJSONForRemoteMethod(CoreController core, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
+        public static string renderJSONForRemoteMethod(CoreController core, string Source, string ContextContentName, int ContextRecordID, int deprecated_ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
             string result = Source;
-            result = ContentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, ContextContactPeopleID, false);
-            result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.session.isAuthenticated, null, core.session.isEditing());
+            result = ContentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, deprecated_ContextContactPeopleID, false);
+            result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, deprecated_ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.session.isAuthenticated, null, core.session.isEditing());
             return result;
         }
         //
@@ -1605,13 +1601,19 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="Source"></param>
-        /// <param name="personalizationPeopleID"></param>
+        /// <param name="sendToPersonId"></param>
         /// <param name="queryStringForLinkAppend"></param>
         /// <returns></returns>
-        public static string renderHtmlForEmail(CoreController core, string Source, int personalizationPeopleID, string queryStringForLinkAppend) {
+        public static string renderHtmlForEmail(CoreController core, string Source, int sendToPersonId, string queryStringForLinkAppend) {
             string result = Source;
-            result = ContentCmdController.executeContentCommands(core, result, CPUtilsClass.addonContext.ContextEmail, personalizationPeopleID, true);
-            result = encode(core, result, personalizationPeopleID, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
+            //
+            // -- create session context for this user and queue the email.
+            using (CPClass cp = new CPClass()) {
+                if(cp.User.LoginByID(sendToPersonId)) {
+                    result = ContentCmdController.executeContentCommands(core, result, CPUtilsClass.addonContext.ContextEmail, sendToPersonId, true);
+                    result = encode(core, result, sendToPersonId, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
+                }
+            };
             return result;
         }
     }

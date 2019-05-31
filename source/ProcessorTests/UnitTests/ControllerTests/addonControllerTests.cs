@@ -40,8 +40,6 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                     argumentKeyValuePairs = new Dictionary<string, string>(),
                     instanceGuid = "",
                     isIncludeAddon = false,
-                    personalizationAuthenticated = false,
-                    personalizationPeopleId = 0,
                     wrapperID = 0
                 });
                 // assert
@@ -83,8 +81,6 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                     argumentKeyValuePairs = new Dictionary<string, string>(),
                     instanceGuid = "",
                     isIncludeAddon = false,
-                    personalizationAuthenticated = false,
-                    personalizationPeopleId = 0,
                     wrapperID = 0
                 });
                 // assert

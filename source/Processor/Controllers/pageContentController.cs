@@ -91,9 +91,7 @@ namespace Contensive.Processor.Controllers {
                             fieldName = "copyfilename",
                             recordId = core.doc.pageController.page.id
                         },
-                        isIncludeAddon = false,
-                        personalizationAuthenticated = core.session.visit.visitAuthenticated,
-                        personalizationPeopleId = core.session.user.id
+                        isIncludeAddon = false
                     };
                     //
                     // -- execute template Dependencies

@@ -186,10 +186,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="src"></param>
         /// <param name="Context"></param>
-        /// <param name="personalizationPeopleId"></param>
-        /// <param name="personalizationIsAuthenticated"></param>
+        /// <param name="deprecated_personalizationPeopleId"></param>
+        /// <param name="deprecated_personalizationIsAuthenticated"></param>
         /// <returns></returns>
-        public static string executeContentCommands(CoreController core, string src, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        public static string executeContentCommands(CoreController core, string src, CPUtilsBaseClass.addonContext Context, int deprecated_personalizationPeopleId, bool deprecated_personalizationIsAuthenticated) {
             //
             // -- exit if no src to process
             if (string.IsNullOrWhiteSpace(src)) return src;
@@ -313,7 +313,7 @@ namespace Contensive.Processor.Controllers {
                         // cmd found, process it and add the results to the dst
                         //
                         Cmd = src.Substring(posOpen + 1, (posClose - posOpen - 2));
-                        cmdResult = executeSingleCommand(core, Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
+                        cmdResult = executeSingleCommand(core, Cmd, badCmd, Context, deprecated_personalizationPeopleId, deprecated_personalizationIsAuthenticated);
                         if (badCmd) {
                             //
                             // the command was bad, put it back in place (?) in case it was not a command
@@ -338,7 +338,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// convert a single command in the command formats to call the execute
         /// </summary>
-        private static string executeSingleCommand(CoreController core, string cmdSrc, bool return_BadCmd, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        private static string executeSingleCommand(CoreController core, string cmdSrc, bool return_BadCmd, CPUtilsBaseClass.addonContext Context, int deprecated_personalizationPeopleId, bool deprecated_personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 //
@@ -782,8 +782,6 @@ namespace Contensive.Processor.Controllers {
                                             fieldName = "",
                                             recordId = 0
                                         },
-                                        personalizationAuthenticated = personalizationIsAuthenticated,
-                                        personalizationPeopleId = personalizationPeopleId,
                                         argumentKeyValuePairs = addonArgDict,
                                         errorContextMessage = "calling Addon [" + addonName + "] during content cmd execution"
                                     };
@@ -825,8 +823,6 @@ namespace Contensive.Processor.Controllers {
                                             fieldName = "",
                                             recordId = 0
                                         },
-                                        personalizationAuthenticated = personalizationIsAuthenticated,
-                                        personalizationPeopleId = personalizationPeopleId,
                                         argumentKeyValuePairs = addonArgDict,
                                         errorContextMessage = "calling Addon [" + addonName + "] during content cmd execution"
                                     };

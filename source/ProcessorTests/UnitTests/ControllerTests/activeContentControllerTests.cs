@@ -31,7 +31,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                     source: source,
                     contextContentName: "",
                     ContextRecordID: 0,
-                    ContextContactPeopleID: 0,
+                    deprecated_ContextContactPeopleID: 0,
                     ProtocolHostString: "",
                     DefaultWrapperID: 0,
                     addonContext: CPUtilsBaseClass.addonContext.ContextPage

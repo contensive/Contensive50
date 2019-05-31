@@ -265,8 +265,7 @@ namespace Contensive.Processor.Controllers {
                                     addonType = CPUtilsBaseClass.addonContext.ContextOnContentChange,
                                     backgroundProcess = false,
                                     errorContextMessage = "",
-                                    argumentKeyValuePairs = instanceArguments,
-                                    personalizationPeopleId = core.session.user.id
+                                    argumentKeyValuePairs = instanceArguments
                                 });
                             }
                         }
