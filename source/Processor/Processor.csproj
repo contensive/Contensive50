@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addons\AddonListEditor\GetAddonPanelClass.cs" />
+    <Compile Include="Addons\AddonListEditor\SetSampleAddonListClass.cs" />
     <Compile Include="Addons\AddonListEditor\SetAddonListClass.cs" />
     <Compile Include="Addons\AddonListEditor\GetAddonListClass.cs" />
     <Compile Include="Addons\AddonListEditor\GetAddonListEditorClass.cs" />

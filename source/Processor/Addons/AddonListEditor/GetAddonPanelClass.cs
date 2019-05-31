@@ -47,7 +47,7 @@ namespace Contensive.Addons.AddonListEditor {
                         errorList = new List<string> { "The parent content could not be determined from the guid [" + request.parentContentGuid + "]" }
                     });
                 }
-                if (!core.session.isEditing(metadata.name)) {
+                if (!core.session.isAuthenticatedContentManager(core, metadata)) {
                     return SerializeObject(new GetAddonPanel_ResponseClass() {
                         errorList = new List<string> { "Your account does not have permission to edit [" + metadata.name + "]" }
                     });

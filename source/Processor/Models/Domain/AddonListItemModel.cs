@@ -22,8 +22,8 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         public bool isStructural;
         /// <summary>
-        /// If this design block contains a list of design blocks
+        /// If this design block is structural, it contains one or more addon lists
         /// </summary>
-        public List<AddonListItemModel> addonList;
+        public List<List<AddonListItemModel>> addonList;
     }
 }

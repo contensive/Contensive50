@@ -13,15 +13,18 @@ namespace Contensive.Addons.AddonListEditor {
         // 
         // ====================================================================================================
         // 
-        public override object Execute(CPBaseClass CP) {
+        public override object Execute(CPBaseClass cp) {
             try {
-                CoreController core = ((CPClass)CP).core;
+                CoreController core = ((CPClass)cp).core;
                 // 
-                GetAddonList_RequestClass request = DeserializeObject<GetAddonList_RequestClass>(CP.Request.Body);
-                if (request == null) {
-                    return SerializeObject(new GetAddonList_ResponseClass() {
-                        errorList = new List<string> { "The request is invalid" }
-                    });
+                GetAddonList_RequestClass request = DeserializeObject<GetAddonList_RequestClass>(cp.Request.Body);
+                if ( request == null ) {
+                    //
+                    // -- allow simple querystring values so SetSampleAddonList can reuse this
+                    request = new GetAddonList_RequestClass() {
+                        parentRecordGuid = cp.Doc.GetText("parentRecordGuid"),
+                        parentContentGuid = cp.Doc.GetText("parentContentGuid")
+                    };
                 }
                 if (String.IsNullOrWhiteSpace(request.parentContentGuid)) {
                     return SerializeObject(new GetAddonList_ResponseClass() {
@@ -39,7 +42,7 @@ namespace Contensive.Addons.AddonListEditor {
                         errorList = new List<string> { "The parent content could not be determined from the guid [" + request.parentContentGuid + "]" }
                     });
                 }
-                if (!core.session.isEditing(metadata.name)) {
+                if (!core.session.isAuthenticatedContentManager(core, metadata)) {
                     return SerializeObject(new GetAddonList_ResponseClass() {
                         errorList = new List<string> { "Your account does not have permission to edit [" + metadata.name + "]" }
                     });
@@ -98,7 +101,7 @@ namespace Contensive.Addons.AddonListEditor {
             }
             // 
             catch (Exception ex) {
-                CP.Site.ErrorReport(ex);
+                cp.Site.ErrorReport(ex);
                 return string.Empty;
             }
         }
