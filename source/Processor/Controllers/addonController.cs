@@ -491,7 +491,7 @@ namespace Contensive.Processor.Controllers {
                                     } catch (Exception ex) {
                                         hint = "14.5";
                                         string addonDescription = getAddonDescription(core, addon);
-                                        throw new GenericException("There was an error executing the script component of Add-on " + addonDescription + ". The details of this error follow.</p><p>" + ex.InnerException.Message + "");
+                                        throw new GenericException("There was an error executing the script component of Add-on [" + addonDescription + "]." + ((ex.InnerException != null) ? " Inner Exception [" + ex.InnerException.Message + "]" : ""));
                                     }
                                 }
                                 //

@@ -993,14 +993,14 @@ namespace Contensive.Processor.Controllers {
         public static bool recognizeById(CoreController core, int userId, ref SessionController sessionContext) {
             bool result = false;
             try {
-                if (sessionContext.visitor.id == 0) {
-                    sessionContext.visitor = VisitorModel.addEmpty(core);
-                }
-                if (sessionContext.visit.id == 0) {
-                    sessionContext.visit = VisitModel.addEmpty(core);
-                }
                 PersonModel contextUser = PersonModel.create(core, userId);
                 if (contextUser != null) {
+                    if ((sessionContext.visitor == null) || (sessionContext.visitor.id == 0)) {
+                        sessionContext.visitor = VisitorModel.addEmpty(core);
+                    }
+                    if ((sessionContext.visit == null) || (sessionContext.visit.id == 0)) {
+                        sessionContext.visit = VisitModel.addEmpty(core);
+                    }
                     sessionContext.user = contextUser;
                     sessionContext.visitor.MemberID = sessionContext.user.id;
                     sessionContext.visit.memberID = sessionContext.user.id;

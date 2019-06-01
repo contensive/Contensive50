@@ -1608,10 +1608,10 @@ namespace Contensive.Processor.Controllers {
             string result = Source;
             //
             // -- create session context for this user and queue the email.
-            using (CPClass cp = new CPClass()) {
+            using (CPClass cp = new CPClass(core.appConfig.name, core.serverConfig)) {
                 if(cp.User.LoginByID(sendToPersonId)) {
-                    result = ContentCmdController.executeContentCommands(core, result, CPUtilsClass.addonContext.ContextEmail, sendToPersonId, true);
-                    result = encode(core, result, sendToPersonId, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
+                    result = ContentCmdController.executeContentCommands(cp.core, result, CPUtilsClass.addonContext.ContextEmail, sendToPersonId, true);
+                    result = encode(cp.core, result, sendToPersonId, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
                 }
             };
             return result;
