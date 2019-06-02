@@ -11,7 +11,7 @@ namespace Contensive.Addons.Login {
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             if ( cp.User.IsAuthenticated ) {
-                return Processor.Properties.Resources.LogoutButtonFormHtml;
+                return Processor.Properties.Resources.LogoutButtonFormHtml.Replace("{{personName}}", cp.User.Name );
             }
             return Processor.Properties.Resources.LoginButtonFormHtml;
         }
