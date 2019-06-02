@@ -222,5 +222,27 @@ namespace Contensive.Processor.Properties {
                 return ResourceManager.GetString("GroupRuleEditorRow2", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;form class=&quot;form-inline&quot; method=&quot;post&quot; action=&quot;?method=login&quot;&gt;
+        ///&lt;button class=&quot;btn btn-warning btn-sm ml-2&quot; type=&quot;submit&quot;&gt;Login&lt;/button&gt;
+        ///&lt;/form&gt;.
+        /// </summary>
+        public static string LoginButtonFormHtml {
+            get {
+                return ResourceManager.GetString("LoginButtonFormHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;form class=&quot;form-inline&quot; method=&quot;post&quot; action=&quot;?method=logout&quot;&gt;
+        ///&lt;button class=&quot;btn btn-warning btn-sm ml-2&quot; type=&quot;submit&quot;&gt;Logout&lt;/button&gt;
+        ///&lt;/form&gt;.
+        /// </summary>
+        public static string LogoutButtonFormHtml {
+            get {
+                return ResourceManager.GetString("LogoutButtonFormHtml", resourceCulture);
+            }
+        }
     }
 }

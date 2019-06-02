@@ -109,6 +109,7 @@
     <Compile Include="Addons\AdminNavigator\Views\getFullClass.cs" />
     <Compile Include="Addons\AdminNavigator\Views\getNodeClass.cs" />
     <Compile Include="Addons\AdminSite\Constants.cs" />
+    <Compile Include="Addons\Login\GetLoginButtonFormClass.cs" />
     <Compile Include="Addons\Monitor\configClass.cs" />
     <Compile Include="Addons\Monitor\serverStatusClass.cs" />
     <Compile Include="Addons\Monitor\siteCheckClass.cs" />
@@ -379,6 +380,8 @@
     <Content Include="Resources\defaultLogin_html.txt" />
     <Content Include="Resources\defaultLogin_autoLogin_html.txt" />
     <Content Include="Resources\DefaultTemplateHtml.txt" />
+    <Content Include="Resources\LogoutButtonFormHtml.txt" />
+    <Content Include="Resources\LoginButtonFormHtml.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Addons\AdminNavigator\Controllers\" />

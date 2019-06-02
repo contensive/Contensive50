@@ -2769,6 +2769,11 @@
     <BlockEditTools>Yes</BlockEditTools>
     <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
   </Addon>
+  <Addon name="Login Button Form" guid="{04aeaacb-4322-4ad2-9817-17439681f8ee}" type="Add-on">
+    <DotNetClass><![CDATA[Contensive.Addons.Login.GetLoginButtonFormClass]]></DotNetClass>
+    <BlockEditTools>Yes</BlockEditTools>
+    <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
+  </Addon>
   <Addon name="Housekeep" guid="{7208D069-8FE3-4BD1-AB76-B25C40C89A45}" type="Add-on">
     <DotNetClass><![CDATA[Contensive.Addons.Housekeeping.houseKeepClass]]></DotNetClass>
     <ProcessInterval>60</ProcessInterval>
