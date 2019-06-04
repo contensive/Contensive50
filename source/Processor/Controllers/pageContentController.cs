@@ -452,7 +452,7 @@ namespace Contensive.Processor.Controllers {
                     // new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
                     //
                     LogController.addSiteWarning(core, "Page Not Found", "Page Not Found", "", 0, "Page Not Found from [" + core.webServer.requestUrlSource + "]", "Page Not Found", "Page Not Found");
-                    core.webServer.setResponseStatus(WebServerController.httpResponseStatus404);
+                    core.webServer.setResponseStatus(WebServerController.httpResponseStatus404_NotFound);
                     core.docProperties.setProperty(rnPageId, getPageNotFoundPageId(core));
                     //Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
                     if (core.session.isAuthenticatedAdmin(core)) {

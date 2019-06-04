@@ -27,8 +27,11 @@ namespace Contensive.Processor.Controllers {
     public class WebServerController {
         //
         // enum this, not consts --  https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-        internal const string httpResponseStatus200 = "200 OK";
-        internal const string httpResponseStatus404 = "404 Not Found";
+        internal const string httpResponseStatus200_Success = "200 OK";
+        internal const string httpResponseStatus401_Unauthorized = "401 Unauthorized";
+        internal const string httpResponseStatus403_Forbidden = "403 Forbidden";
+        internal const string httpResponseStatus404_NotFound = "404 Not Found";
+        internal const string httpResponseStatus500_ServerError = "500 Internal Server Error";
         //
         private CoreController core;
         //
@@ -794,7 +797,7 @@ namespace Contensive.Processor.Controllers {
                             // -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink;
                         } else {
-                            setResponseStatus(WebServerController.httpResponseStatus404);
+                            setResponseStatus(WebServerController.httpResponseStatus404_NotFound);
                         }
                     } else {
 

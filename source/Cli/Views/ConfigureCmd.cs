@@ -139,12 +139,13 @@ namespace Contensive.CLI {
                     // -- cache server local or remote
                     {
                         String reply;
+                        string defaultCacheValue = (String.IsNullOrEmpty(cp.core.serverConfig.awsElastiCacheConfigurationEndpoint)) ? "l" : "m";
                         do {
                             Console.WriteLine("\n\nThe server requires a caching service. You can choose either the systems local cache or an AWS Elasticache (memCacheD).");
                             Console.WriteLine("Use (l)ocal cache or (m)emcached server?");
-                            if (!String.IsNullOrEmpty(cp.core.serverConfig.awsElastiCacheConfigurationEndpoint)) { Console.Write("(m)"); } else { Console.Write("(l)"); };
+                            Console.Write("(" + defaultCacheValue + ")");
                             reply = Console.ReadLine().ToLowerInvariant();
-                            if (String.IsNullOrEmpty(reply)) reply = "l";
+                            if (String.IsNullOrEmpty(reply)) reply = defaultCacheValue;
                         } while ((reply != "l") && (reply != "m"));
                         if ((reply == "l")) {
                             //
@@ -166,6 +167,14 @@ namespace Contensive.CLI {
                                 if (String.IsNullOrEmpty(reply)) reply = cp.core.serverConfig.awsElastiCacheConfigurationEndpoint;
                                 cp.core.serverConfig.awsElastiCacheConfigurationEndpoint = reply;
                             } while (string.IsNullOrEmpty(reply));
+                            //
+                            // -- enableEnyimNLog
+                            {
+                                Console.WriteLine("\nEnable Remote cache drive logging (Enyim Logging). This is helpful as a diagnostic but is a seriou performance hit.");
+                                string prompt = "Enable Logging (y/n)?";
+                                String defaultLoggingValue = (cp.core.serverConfig.enableEnyimNLog) ? "y" : "n";
+                                cp.core.serverConfig.enableEnyimNLog = Equals(GenericController.promptForReply(prompt, defaultLoggingValue).ToLowerInvariant(), "y");
+                            }
                         }
                     }
                     //

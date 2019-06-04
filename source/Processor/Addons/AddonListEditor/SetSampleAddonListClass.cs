@@ -24,6 +24,7 @@ namespace Contensive.Addons.AddonListEditor {
                     request = new SetAddonList_RequestClass() {
                         parentRecordGuid = cp.Doc.GetText("parentRecordGuid"),
                         parentContentGuid = cp.Doc.GetText("parentContentGuid"),
+                        includeRenderedHtml = cp.Doc.GetBoolean("includeRenderedHtml"),
                         addonList = new List<AddonListItemModel>()
                     };
                 }
@@ -46,120 +47,110 @@ namespace Contensive.Addons.AddonListEditor {
                         errorList = new List<string> { "The parent content could not be determined from the guid [" + request.parentContentGuid + "]" }
                     });
                 }
+                if (!core.session.isAuthenticatedContentManager(core, metadata)) {
+                    cp.Response.SetStatus(WebServerController.httpResponseStatus401_Unauthorized);
+                    return SerializeObject(new SetAddonList_ResponseClass() {
+                        errorList = new List<string> { "Your account does not have permission to edit [" + metadata.name + "]" }
+                    });
+                }
                 //
                 // -- create sample addonList
                 request.addonList = new List<AddonListItemModel>() {
                     new AddonListItemModel() {
-                        isStructural = false,
                         designBlockTypeGuid = guidDesignBlockHeroImage,
                         instanceGuid = GenericController.createGuid(),
-                        addonList = null
+                        columns = null
                     },
                     new AddonListItemModel() {
-                        isStructural = false,
                         designBlockTypeGuid = guidDesignBlockContactUs,
                         instanceGuid = GenericController.createGuid(),
-                        addonList = null
+                        columns = null
                     },
                     new AddonListItemModel() {
-                        isStructural = true,
                         designBlockTypeGuid = guidDesignBlockFourColumn,
                         instanceGuid = GenericController.createGuid(),
-                        addonList = new List<List<AddonListItemModel>>() {
+                        columns = new List<List<AddonListItemModel>>() {
                             new List<AddonListItemModel>() {
                                 new AddonListItemModel() {
-                                    isStructural = false,
                                     designBlockTypeGuid = guidDesignBlockTile,
                                     instanceGuid = GenericController.createGuid(),
-                                    addonList = null
+                                    columns = null
                                 }
                             },
                             new List<AddonListItemModel>() {
                                 new AddonListItemModel() {
-                                    isStructural = false,
                                     designBlockTypeGuid = guidDesignBlockTile,
                                     instanceGuid = GenericController.createGuid(),
-                                    addonList = null
+                                    columns = null
                                 }
                             },
                             new List<AddonListItemModel>() {
                                 new AddonListItemModel() {
-                                    isStructural = false,
                                     designBlockTypeGuid = guidDesignBlockTile,
                                     instanceGuid = GenericController.createGuid(),
-                                    addonList = null
+                                    columns = null
                                 }
                             },
                             new List<AddonListItemModel>() {
                                 new AddonListItemModel() {
-                                    isStructural = false,
                                     designBlockTypeGuid = guidDesignBlockTile,
                                     instanceGuid = GenericController.createGuid(),
-                                    addonList = null
+                                    columns = null
                                 }
                             }
                         }
                     },
                     new AddonListItemModel() {
-                        isStructural = true,
                         designBlockTypeGuid = guidDesignBlockTwoColumn,
                         instanceGuid = GenericController.createGuid(),
-                        addonList = new List<List<AddonListItemModel>>() {
+                        columns = new List<List<AddonListItemModel>>() {
                             new List<AddonListItemModel>() {
                                 new AddonListItemModel() {
-                                    isStructural = false,
                                     designBlockTypeGuid = guidDesignBlockTile,
                                     instanceGuid = GenericController.createGuid(),
-                                    addonList = null
+                                    columns = null
                                 },
                                 new AddonListItemModel() {
-                                    isStructural = false,
                                     designBlockTypeGuid = guidDesignBlockTile,
                                     instanceGuid = GenericController.createGuid(),
-                                    addonList = null
+                                    columns = null
                                 }
                             },
                             new List<AddonListItemModel>() {
                                 new AddonListItemModel() {
-                                    isStructural = true,
                                     designBlockTypeGuid = guidDesignBlockTwoColumn,
                                     instanceGuid = GenericController.createGuid(),
-                                    addonList = new List<List<AddonListItemModel>>() {
+                                    columns = new List<List<AddonListItemModel>>() {
                                         new List<AddonListItemModel>() {
                                             new AddonListItemModel() {
-                                                isStructural = false,
                                                 designBlockTypeGuid = guidDesignBlockTile,
                                                 instanceGuid = GenericController.createGuid(),
-                                                addonList = null
+                                                columns = null
                                             },
                                             new AddonListItemModel() {
-                                                isStructural = false,
                                                 designBlockTypeGuid = guidDesignBlockTile,
                                                 instanceGuid = GenericController.createGuid(),
-                                                addonList = null
+                                                columns = null
                                             }
                                         },
                                         new List<AddonListItemModel>() {
                                             new AddonListItemModel() {
-                                                isStructural = true,
                                                 designBlockTypeGuid = guidDesignBlockTwoColumn,
                                                 instanceGuid = GenericController.createGuid(),
-                                                addonList = null
+                                                columns = null
                                             },
                                             new AddonListItemModel() {
-                                                isStructural = false,
                                                 designBlockTypeGuid = guidDesignBlockText,
                                                 instanceGuid = GenericController.createGuid(),
-                                                addonList = null
+                                                columns = null
                                             }
                                         },
                                     }
                                 },
                                 new AddonListItemModel() {
-                                    isStructural = false,
                                     designBlockTypeGuid = guidDesignBlockText,
                                     instanceGuid = GenericController.createGuid(),
-                                    addonList = null
+                                    columns = null
                                 }
                             },
                         }
@@ -197,6 +188,7 @@ namespace Contensive.Addons.AddonListEditor {
                 // -- now call getAddonList to return result
                 cp.Doc.SetProperty("parentRecordGuid", request.parentRecordGuid);
                 cp.Doc.SetProperty("parentContentGuid", request.parentContentGuid);
+                cp.Doc.SetProperty("includeRenderedHtml", request.includeRenderedHtml);
                 return (new GetAddonListClass()).Execute(cp);
             }
             // 
@@ -215,6 +207,10 @@ namespace Contensive.Addons.AddonListEditor {
             /// The guid of the record where this list is stored (content + record define location)
             /// </summary>
             public string parentRecordGuid;
+            /// <summary>
+            /// optional. if true, the addonList returned is populated with html
+            /// </summary>
+            public bool includeRenderedHtml;
             /// <summary>
             /// A list of positions. Positions are the slots where a design block goes
             /// </summary>

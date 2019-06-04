@@ -18,12 +18,13 @@ namespace Contensive.Addons.AddonListEditor {
                 CoreController core = ((CPClass)cp).core;
                 // 
                 GetAddonList_RequestClass request = DeserializeObject<GetAddonList_RequestClass>(cp.Request.Body);
-                if ( request == null ) {
+                if (request == null) {
                     //
                     // -- allow simple querystring values so SetSampleAddonList can reuse this
                     request = new GetAddonList_RequestClass() {
                         parentRecordGuid = cp.Doc.GetText("parentRecordGuid"),
-                        parentContentGuid = cp.Doc.GetText("parentContentGuid")
+                        parentContentGuid = cp.Doc.GetText("parentContentGuid"),
+                        includeRenderedHtml = cp.Doc.GetBoolean("includeRenderedHtml")
                     };
                 }
                 if (String.IsNullOrWhiteSpace(request.parentContentGuid)) {
@@ -43,6 +44,7 @@ namespace Contensive.Addons.AddonListEditor {
                     });
                 }
                 if (!core.session.isAuthenticatedContentManager(core, metadata)) {
+                    cp.Response.SetStatus(WebServerController.httpResponseStatus401_Unauthorized);
                     return SerializeObject(new GetAddonList_ResponseClass() {
                         errorList = new List<string> { "Your account does not have permission to edit [" + metadata.name + "]" }
                     });
@@ -92,6 +94,16 @@ namespace Contensive.Addons.AddonListEditor {
                             errorList = new List<string> { "The parent content is not valid addonList container [" + metadata.name + "]" }
                         });
                 }
+                //
+                // -- render the html for each addon in the addonList that qualifies
+                if (request.includeRenderedHtml) {
+                    foreach (var addon in addonList) {
+                        cp.Doc.SetProperty("instanceId", addon.instanceGuid);
+                        addon.renderedHtml = cp.Addon.Execute(addon.designBlockTypeGuid).ToString();
+                    }
+                }
+                //
+                // -- return the successful response
                 return new GetAddonList_ResponseClass() {
                     errorList = new List<string>(),
                     addonList = addonList,
@@ -115,6 +127,10 @@ namespace Contensive.Addons.AddonListEditor {
             /// The guid of the record where this list is stored (content + record define location)
             /// </summary>
             public string parentRecordGuid;
+            /// <summary>
+            /// if true, the output will include the rendered html
+            /// </summary>
+            public bool includeRenderedHtml;
         }
         // 
         public class GetAddonList_ResponseClass {

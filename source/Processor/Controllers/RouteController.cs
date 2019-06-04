@@ -38,7 +38,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.appConfig != null) {
                     //
                     // -- test fix for 404 response during routing - could it be a response left over from processing before we are called
-                    core.webServer.setResponseStatus(WebServerController.httpResponseStatus200);
+                    core.webServer.setResponseStatus(WebServerController.httpResponseStatus200_Success);
                     //
                     // -- execute intercept methods first, like login, that run before the route that returns the page
                     // -- intercept routes should be addons alos

@@ -13,11 +13,11 @@ namespace Contensive.Addons.AddonListEditor {
         // 
         // ====================================================================================================
         // 
-        public override object Execute(CPBaseClass CP) {
+        public override object Execute(CPBaseClass cp) {
             try {
-                CoreController core = ((CPClass)CP).core;
+                CoreController core = ((CPClass)cp).core;
                 // 
-                SetAddonList_RequestClass request = DeserializeObject<SetAddonList_RequestClass>(CP.Request.Form);
+                SetAddonList_RequestClass request = DeserializeObject<SetAddonList_RequestClass>(cp.Request.Form);
                 if (request == null) {
                     return SerializeObject(new SetAddonList_ResponseClass() {
                         errorList = new List<string> { "The request is invalid" }
@@ -39,6 +39,13 @@ namespace Contensive.Addons.AddonListEditor {
                         errorList = new List<string> { "The parent content could not be determined from the guid [" + request.parentContentGuid + "]" }
                     });
                 }
+                if (!core.session.isAuthenticatedContentManager(core, metadata)) {
+                    cp.Response.SetStatus(WebServerController.httpResponseStatus401_Unauthorized);
+                    return SerializeObject(new SetAddonList_ResponseClass() {
+                        errorList = new List<string> { "Your account does not have permission to edit [" + metadata.name + "]" }
+                    });
+                }
+
                 //
                 // -- validate addonList from UI and set back into a string
                 switch (metadata.name.ToLower()) {
@@ -73,7 +80,7 @@ namespace Contensive.Addons.AddonListEditor {
             }
             // 
             catch (Exception ex) {
-                CP.Site.ErrorReport(ex);
+                cp.Site.ErrorReport(ex);
                 return string.Empty;
             }
         }

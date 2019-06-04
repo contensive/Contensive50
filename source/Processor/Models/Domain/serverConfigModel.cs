@@ -44,6 +44,9 @@ namespace Contensive.Processor.Models.Domain {
         public bool enableRemoteCache { get; set; }
         public string awsElastiCacheConfigurationEndpoint { get; set; }
         //
+        // -- includes NLog logging into Enyim. Leave off as it causes performance issues
+        public bool enableEnyimNLog { get; set; }
+        //
         // -- datasource for the cluster (only sql support for now)
         public DataSourceModel.DataSourceTypeEnum defaultDataSourceType;
         public string defaultDataSourceAddress { get; set; }

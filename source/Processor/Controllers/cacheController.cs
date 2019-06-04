@@ -661,8 +661,10 @@ namespace Contensive.Processor.Controllers {
                 remoteCacheInitialized = false;
                 if (core.serverConfig.enableRemoteCache) {
                     //
-                    // -- they recommend commenting this out as it causes a performance hit
-                    //Enyim.Caching.LogManager.AssignFactory(new NLogFactory());
+                    // -- leave off, it causes a performance hit
+                    if (core.serverConfig.enableEnyimNLog) { Enyim.Caching.LogManager.AssignFactory(new NLogFactory()); };
+                    //
+                    // -- initialize memcached drive (Enyim)
                     string cacheEndpoint = core.serverConfig.awsElastiCacheConfigurationEndpoint;
                     if (!string.IsNullOrEmpty(cacheEndpoint)) {
                         string[] cacheEndpointSplit = cacheEndpoint.Split(':');

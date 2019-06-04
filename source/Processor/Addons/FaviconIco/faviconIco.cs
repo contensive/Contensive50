@@ -32,7 +32,7 @@ namespace Contensive.Addons.FaviconIco {
                     //
                     // no favicon, 404 the call
                     //
-                    core.webServer.setResponseStatus(WebServerController.httpResponseStatus404);
+                    core.webServer.setResponseStatus(WebServerController.httpResponseStatus404_NotFound);
                     core.webServer.setResponseContentType("image/gif");
                     core.doc.continueProcessing = false;
                     return string.Empty;

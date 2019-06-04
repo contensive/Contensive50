@@ -18,24 +18,31 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         public string name;
         /// <summary>
-        /// The full URI of an image that shows the user what it does. Not an icon, but a representation
+        /// imageHref - The full URI of an image that shows the user what it does. Not an icon, but a representation
         /// </summary>
         public string image;
         /// <summary>
-        /// a placeholder for a future feature
+        /// columnList - if the addon creates columns, the list of features for each column
         /// </summary>
-        public List<string> children;
+        public List<AddonPanelListItemColumnModel> columns;
         /// <summary>
         /// placeholder for future feature
         /// </summary>
         public string html;
         /// <summary>
-        /// if true, this addon represents a hole where other addons will go
+        /// 
         /// </summary>
-        public bool isStructural;
+        public string wrapperClass;
+        // we agreed isStructural is true if columns.count>0
+        //public bool isStructural;
+    }
+    //
+    [System.Serializable]
+    public class AddonPanelListItemColumnModel {
         /// <summary>
-        /// if the addon is structural, this is the 12-column spacing. ex - 2 columns should be [6,6], 2 column right [4,8], four column [3,3,3,3]
+        /// 
         /// </summary>
-        public List<int> columnSpacing;
+        public string className;
+        public int width;
     }
 }

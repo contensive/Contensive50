@@ -18,12 +18,13 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         public string instanceGuid;
         /// <summary>
-        /// if true, this addon
+        /// todo - create view model separate from domain model because UI mode might need it
+        /// Not saved in DB, use only for view. 
         /// </summary>
-        public bool isStructural;
+        public string renderedHtml;
         /// <summary>
         /// If this design block is structural, it contains one or more addon lists
         /// </summary>
-        public List<List<AddonListItemModel>> addonList;
+        public List<List<AddonListItemModel>> columns;
     }
 }

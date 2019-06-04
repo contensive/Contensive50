@@ -56,6 +56,7 @@ namespace Contensive.Addons.AddonListEditor {
                     });
                 }
                 if (!core.session.isAuthenticatedContentManager(core, metadata)) {
+                    cp.Response.SetStatus(WebServerController.httpResponseStatus401_Unauthorized);
                     return SerializeObject(new GetAddonPanel_ResponseClass() {
                         errorList = new List<string> { "Your account does not have permission to edit [" + metadata.name + "]" }
                     });
@@ -84,36 +85,50 @@ namespace Contensive.Addons.AddonListEditor {
                         name = addonModel.name,
                         guid = addonModel.ccguid,
                         html = "",
-                        children = new List<string>(),
-                        image = (string.IsNullOrWhiteSpace(addonModel.iconFilename) ? "" : cp.Site.FilePath + addonModel.iconFilename )
+                        columns = new List<AddonPanelListItemColumnModel>(),
+                        image = (string.IsNullOrWhiteSpace(addonModel.iconFilename) ? "" : cp.Site.FilePath + addonModel.iconFilename)
                     };
-                    
+
                     result.addonPanelList.Add(item);
                     // -- hack a structural work-around for now. If this works, build into addon record
                     switch (addonModel.ccguid.ToLower()) {
                         case guidDesignBlockFourColumn:
-                            item.isStructural = true;
-                            item.columnSpacing = new List<int> { 3, 3, 3, 3 };
+                            item.columns = new List<AddonPanelListItemColumnModel> {
+                                new AddonPanelListItemColumnModel() { className="col-3-md", width=3 },
+                                new AddonPanelListItemColumnModel() { className="col-3-md", width=3 },
+                                new AddonPanelListItemColumnModel() { className="col-3-md", width=3 },
+                                new AddonPanelListItemColumnModel() { className="col-3-md", width=3 }
+                            };
                             break;
                         case guidDesignBlockTwoColumn:
-                            item.isStructural = true;
-                            item.columnSpacing = new List<int> { 6, 6 };
+                            item.columns = new List<AddonPanelListItemColumnModel> {
+                                new AddonPanelListItemColumnModel() { className="col-6-md", width=6 },
+                                new AddonPanelListItemColumnModel() { className="col-6-md", width=6 }
+                            };
                             break;
                         case guidDesignBlockThreeColumn:
-                            item.isStructural = true;
-                            item.columnSpacing = new List<int> { 4, 4, 4 };
+                            item.columns = new List<AddonPanelListItemColumnModel> {
+                                new AddonPanelListItemColumnModel() { className="col-4-md", width=4 },
+                                new AddonPanelListItemColumnModel() { className="col-4-md", width=4 },
+                                new AddonPanelListItemColumnModel() { className="col-4-md", width=4 }
+                            };
                             break;
                         case guidDesignBlockTwoColumnLeft:
-                            item.isStructural = true;
-                            item.columnSpacing = new List<int> { 8, 4 };
+                            item.columns = new List<AddonPanelListItemColumnModel> {
+                                new AddonPanelListItemColumnModel() { className="col-8-md", width=8 },
+                                new AddonPanelListItemColumnModel() { className="col-4-md", width=4 }
+                            };
                             break;
                         case guidDesignBlockTwoColumnRight:
-                            item.isStructural = true;
-                            item.columnSpacing = new List<int> { 4, 8 };
+                            item.columns = new List<AddonPanelListItemColumnModel> {
+                                new AddonPanelListItemColumnModel() { className="col-4-md", width=4 },
+                                new AddonPanelListItemColumnModel() { className="col-8-md", width=8 }
+                            };
                             break;
                         default:
-                            item.isStructural = false;
-                            item.columnSpacing = new List<int> { 12 };
+                            item.columns = new List<AddonPanelListItemColumnModel> {
+                                new AddonPanelListItemColumnModel() { className="col-12-md", width=12 }
+                            };
                             break;
                     }
                 }
