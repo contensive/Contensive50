@@ -69,92 +69,104 @@ namespace Contensive.Addons.AddonListEditor {
                     new AddonListItemModel() {
                         designBlockTypeGuid = guidDesignBlockFourColumn,
                         instanceGuid = GenericController.createGuid(),
-                        columns = new List<List<AddonListItemModel>>() {
-                            new List<AddonListItemModel>() {
-                                new AddonListItemModel() {
-                                    designBlockTypeGuid = guidDesignBlockTile,
-                                    instanceGuid = GenericController.createGuid(),
-                                    columns = null
-                                }
+                        columns = new List<AddonListColumnItemModel>() {
+                            new AddonListColumnItemModel() {
+                                 addonList = new List<AddonListItemModel>() {
+                                    new AddonListItemModel() {
+                                        designBlockTypeGuid = guidDesignBlockTile,
+                                        instanceGuid = GenericController.createGuid(),
+                                        columns = null
+                                    }
+                                 },
+                                 className = "",
+                                 col = 3
                             },
-                            new List<AddonListItemModel>() {
-                                new AddonListItemModel() {
-                                    designBlockTypeGuid = guidDesignBlockTile,
-                                    instanceGuid = GenericController.createGuid(),
-                                    columns = null
-                                }
+                            new AddonListColumnItemModel() {
+                                 addonList = new List<AddonListItemModel>() {
+                                    new AddonListItemModel() {
+                                        designBlockTypeGuid = guidDesignBlockTile,
+                                        instanceGuid = GenericController.createGuid(),
+                                        columns = null
+                                    }
+                                 },
+                                 className = "",
+                                 col = 3
                             },
-                            new List<AddonListItemModel>() {
-                                new AddonListItemModel() {
-                                    designBlockTypeGuid = guidDesignBlockTile,
-                                    instanceGuid = GenericController.createGuid(),
-                                    columns = null
-                                }
+                            new AddonListColumnItemModel() {
+                                 addonList = new List<AddonListItemModel>() {
+                                    new AddonListItemModel() {
+                                        designBlockTypeGuid = guidDesignBlockTile,
+                                        instanceGuid = GenericController.createGuid(),
+                                        columns = null
+                                    }
+                                 },
+                                 className = "",
+                                 col = 3
                             },
-                            new List<AddonListItemModel>() {
-                                new AddonListItemModel() {
-                                    designBlockTypeGuid = guidDesignBlockTile,
-                                    instanceGuid = GenericController.createGuid(),
-                                    columns = null
-                                }
+                            new AddonListColumnItemModel() {
+                                 addonList = new List<AddonListItemModel>() {
+                                    new AddonListItemModel() {
+                                        designBlockTypeGuid = guidDesignBlockTile,
+                                        instanceGuid = GenericController.createGuid(),
+                                        columns = null
+                                    }
+                                 },
+                                 className = "",
+                                 col = 3
                             }
                         }
                     },
                     new AddonListItemModel() {
                         designBlockTypeGuid = guidDesignBlockTwoColumn,
                         instanceGuid = GenericController.createGuid(),
-                        columns = new List<List<AddonListItemModel>>() {
-                            new List<AddonListItemModel>() {
-                                new AddonListItemModel() {
-                                    designBlockTypeGuid = guidDesignBlockTile,
-                                    instanceGuid = GenericController.createGuid(),
-                                    columns = null
-                                },
-                                new AddonListItemModel() {
-                                    designBlockTypeGuid = guidDesignBlockTile,
-                                    instanceGuid = GenericController.createGuid(),
-                                    columns = null
-                                }
-                            },
-                            new List<AddonListItemModel>() {
-                                new AddonListItemModel() {
-                                    designBlockTypeGuid = guidDesignBlockTwoColumn,
-                                    instanceGuid = GenericController.createGuid(),
-                                    columns = new List<List<AddonListItemModel>>() {
-                                        new List<AddonListItemModel>() {
-                                            new AddonListItemModel() {
-                                                designBlockTypeGuid = guidDesignBlockTile,
-                                                instanceGuid = GenericController.createGuid(),
-                                                columns = null
-                                            },
-                                            new AddonListItemModel() {
-                                                designBlockTypeGuid = guidDesignBlockTile,
-                                                instanceGuid = GenericController.createGuid(),
-                                                columns = null
-                                            }
-                                        },
-                                        new List<AddonListItemModel>() {
-                                            new AddonListItemModel() {
-                                                designBlockTypeGuid = guidDesignBlockTwoColumn,
-                                                instanceGuid = GenericController.createGuid(),
-                                                columns = null
-                                            },
-                                            new AddonListItemModel() {
-                                                designBlockTypeGuid = guidDesignBlockText,
-                                                instanceGuid = GenericController.createGuid(),
-                                                columns = null
-                                            }
-                                        },
+                        columns = new List<AddonListColumnItemModel>() {
+                            new AddonListColumnItemModel() {
+                                addonList = new List<AddonListItemModel>() {
+                                    new AddonListItemModel() {
+                                        designBlockTypeGuid = guidDesignBlockTile,
+                                        instanceGuid = GenericController.createGuid(),
+                                        columns = null
                                     }
                                 },
-                                new AddonListItemModel() {
-                                    designBlockTypeGuid = guidDesignBlockText,
-                                    instanceGuid = GenericController.createGuid(),
-                                    columns = null
-                                }
+                                col = 6,
+                                className = ""
                             },
+                            new AddonListColumnItemModel() {
+                                 addonList = new List<AddonListItemModel>() {
+                                    new AddonListItemModel() {
+                                        designBlockTypeGuid = guidDesignBlockTwoColumn,
+                                        instanceGuid = GenericController.createGuid(),
+                                        columns = new List<AddonListColumnItemModel>() {
+                                            new AddonListColumnItemModel() {
+                                                 addonList = new List<AddonListItemModel>() {
+                                                    new AddonListItemModel() {
+                                                        designBlockTypeGuid = guidDesignBlockTile,
+                                                        instanceGuid = GenericController.createGuid(),
+                                                        columns = null
+                                                    }
+                                                 },
+                                                 className = "",
+                                                 col = 3
+                                            },
+                                            new AddonListColumnItemModel() {
+                                                 addonList = new List<AddonListItemModel>() {
+                                                    new AddonListItemModel() {
+                                                        designBlockTypeGuid = guidDesignBlockTile,
+                                                        instanceGuid = GenericController.createGuid(),
+                                                        columns = null
+                                                    }
+                                                 },
+                                                 className = "",
+                                                 col = 3
+                                            }
+                                        }
+                                    }
+                                 },
+                                col = 6,
+                                className = ""
+                            }
                         }
-                    },
+                    }
                 };
                 //
                 // -- validate addonList from UI and set back into a string

@@ -116,7 +116,7 @@ namespace Contensive.Processor.Controllers {
                             // -- found in local cache
                             var tempVar = core.dataSourceDictionary[normalizedDataSourceName];
                             returnConnString = ""
-                            + "server=" + tempVar.endpoint + ";"
+                            + "server=tcp:" + tempVar.endpoint + ";"
                             + "User Id=" + tempVar.username + ";"
                             + "Password=" + tempVar.password + ";"
                             + "Database=" + catalogName + ";";

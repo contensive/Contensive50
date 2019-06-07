@@ -98,7 +98,7 @@ namespace Contensive.CLI {
                         bool routeOk = false;
                         do {
                             appConfig.adminRoute = GenericController.promptForReply("Admin Route (non-blank, no leading or trailing slash)", appConfig.adminRoute);
-                            appConfig.adminRoute = Contensive.Processor.Controllers.GenericController.convertToUnixSlash(appConfig.adminRoute);
+                            appConfig.adminRoute = Contensive.Processor.Controllers.FileController.convertToUnixSlash(appConfig.adminRoute);
                             if (!string.IsNullOrEmpty(appConfig.adminRoute)) {
                                 if (!appConfig.adminRoute.Substring(0, 1).Equals("/")) {
                                     if (!appConfig.adminRoute.Substring(appConfig.adminRoute.Length - 1, 1).Equals("/")) {

@@ -387,7 +387,7 @@ namespace Contensive.Processor {
         [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages")]
         public override void AppendLog(string pathFilename, string Text) {
             if ((!string.IsNullOrWhiteSpace(pathFilename)) && (!string.IsNullOrWhiteSpace(Text))) {
-                pathFilename = GenericController.convertToDosSlash(pathFilename);
+                pathFilename = FileController.convertToDosSlash(pathFilename);
                 string[] parts = pathFilename.Split('\\');
                 LogController.logInfo(cp.core, "legacy logFile: [" + pathFilename + "], " + Text);
             }

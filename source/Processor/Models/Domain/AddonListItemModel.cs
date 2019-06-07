@@ -25,6 +25,22 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// If this design block is structural, it contains one or more addon lists
         /// </summary>
-        public List<List<AddonListItemModel>> columns;
+        public List<AddonListColumnItemModel> columns;
     }
+    [System.Serializable]
+    public class AddonListColumnItemModel {
+        /// <summary>
+        /// the integer width of a column, where the row totals 12
+        /// </summary>
+        public int col;
+        /// <summary>
+        /// optional class that represents the width of the column
+        /// </summary>
+        public string className;
+        /// <summary>
+        /// Each column contains an addon list. This extra object layer was created to make it more convenient for the UI javascript
+        /// </summary>
+        public List<AddonListItemModel> addonList;
+    }
+
 }

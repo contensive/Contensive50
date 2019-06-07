@@ -34,8 +34,6 @@ namespace Contensive.Processor.Controllers {
                 SmtpClient client = new SmtpClient(smtpServer);
                 MailMessage mailMessage = new MailMessage();
                 MailAddress fromAddresses = new MailAddress(email.fromAddress.Trim());
-                Attachment data = null;
-                ContentDisposition disposition = null;
                 ContentType mimeType = null;
                 AlternateView alternate = null;
                 //

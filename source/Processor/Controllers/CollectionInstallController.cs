@@ -259,7 +259,7 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], resource found, name [" + filename + "], type [" + resourceType + "], path [" + resourcePath + "]");
                                                                 //
-                                                                filename = GenericController.convertToDosSlash(filename);
+                                                                filename = FileController.convertToDosSlash(filename);
                                                                 string SrcPath = "";
                                                                 string dstPath = resourcePath;
                                                                 int Pos = GenericController.vbInstr(1, filename, "\\");

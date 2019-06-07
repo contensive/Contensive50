@@ -69,14 +69,12 @@ namespace Contensive.Addons.SafeAddonManager {
                 string LocalCollectionXML = null;
                 bool DisplaySystem = false;
                 bool DbUpToDate = false;
-                //CollectionXmlController XMLTools = new CollectionXmlController(core);
                 string GuidFieldName = null;
                 List<int> collectionsInstalledIDList = new List<int>();
                 DateTime DateValue = default(DateTime);
                 string ErrorMessage = "";
                 string OnServerGuidList = "";
                 bool UpgradeOK = false;
-                string RegisterList = "";
                 XmlDocument LocalCollections = null;
                 XmlDocument LibCollections = null;
                 string InstallFolder = null;
@@ -495,7 +493,6 @@ namespace Contensive.Addons.SafeAddonManager {
                             string[] LibGuids = InstallLibCollectionList.Split(',');
                             Cnt = LibGuids.GetUpperBound(0) + 1;
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
-                                RegisterList = "";
                                 var context = new Stack<string>();
                                 context.Push( "AddonManager Install Library Collection [" + LibGuids[Ptr] + "]" );
                                 UpgradeOK = CollectionLibraryController.installCollectionFromLibrary(core, context, LibGuids[Ptr], ref ErrorMessage, false, true, ref nonCriticalErrorList, "AddonManagerClass.GetForm_SaveModeAddonManager", ref collectionsInstalledList);

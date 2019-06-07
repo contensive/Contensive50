@@ -1820,7 +1820,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(normalizedRoute)) {
                     normalizedRoute = "";
                 } else {
-                    normalizedRoute = GenericController.convertToUnixSlash(normalizedRoute);
+                    normalizedRoute = FileController.convertToUnixSlash(normalizedRoute);
                     while (normalizedRoute.IndexOf("//") >= 0) {
                         normalizedRoute = normalizedRoute.Replace("//", "/");
                     }
@@ -2234,51 +2234,6 @@ namespace Contensive.Processor.Controllers {
                 returnString = workingDate.ToShortDateString();
             }
             return returnString;
-        }
-        //
-        //====================================================================================================
-        //
-        public static string convertToDosSlash(string path) {
-            return path.Replace("/", "\\");
-        }
-        //
-        //====================================================================================================
-        //
-        public static string convertToUnixSlash(string path) {
-            return path.Replace("\\", "/");
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// return the path of a pathFilename.
-        /// myfilename.txt returns empty
-        /// mypath\ returns mypath\
-        /// mypath\myfilename returns mypath
-        /// mypath\more\myfilename returns mypath\more\
-        /// </summary>
-        /// <param name="pathFilename"></param>
-        /// <returns></returns>
-        public static string getPath(string pathFilename) {
-            string result = pathFilename;
-            if (string.IsNullOrEmpty(result)) {
-                return "";
-            } else {
-                int slashpos = convertToDosSlash(pathFilename).LastIndexOf("\\");
-                if (slashpos < 0) {
-                    //
-                    // -- pathFilename is all filename
-                    return "";
-                }
-                if (slashpos == pathFilename.Length) {
-                    //
-                    // -- pathfilename is all path
-                    return pathFilename;
-                } else {
-                    //
-                    // -- divide path and filename and return just path
-                    return pathFilename.Left(slashpos + 1);
-                }
-            }
         }
         //
         //======================================================================================
