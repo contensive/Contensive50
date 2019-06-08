@@ -215,6 +215,7 @@ namespace Contensive.Processor.Controllers {
                                                 Active = true,
                                             }, 0);
                                             bool CollectionUpdatable = GenericController.encodeBoolean(XmlController.GetXMLAttribute(core, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""));
+                                            string onInstallAddonGuid = XmlController.GetXMLAttribute(core, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "OnInstallAddonGuid", "");
                                             bool CollectionblockNavigatorNode = GenericController.encodeBoolean(XmlController.GetXMLAttribute(core, CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""));
                                             string FileGuid = XmlController.GetXMLAttribute(core, IsFound, Doc.DocumentElement, "guid", CollectionName);
                                             if (string.IsNullOrEmpty(FileGuid)) {
@@ -234,7 +235,6 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     collectionGuid = CollectionName;
                                                 }
-                                                string onInstallAddonGuid = "";
                                                 //
                                                 //-------------------------------------------------------------------------------
                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-1, save resourses and process collection dependencies");
@@ -809,10 +809,6 @@ namespace Contensive.Processor.Controllers {
                                                             case "add-on":
                                                                 //
                                                                 // Add-on Node, do part 1, verify the addon in the table with name and guid
-                                                                string addonName = XmlController.GetXMLAttribute(core, IsFound, collectionNode, "name", collectionNode.Name);
-                                                                if (addonName.ToLowerInvariant() == "_oninstall") {
-                                                                    onInstallAddonGuid = XmlController.GetXMLAttribute(core, IsFound, collectionNode, "guid", collectionNode.Name);
-                                                                }
                                                                 setAddonDependencies(core, collectionNode, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                 if (!result) { return result; }
                                                                 break;
@@ -943,7 +939,6 @@ namespace Contensive.Processor.Controllers {
                                                 collection.save(core);
                                                 //
                                                 // -- execute onInstall addon if found
-                                                // todo add attribute to collection onInstallAddonGuid
                                                 if (!string.IsNullOrEmpty(onInstallAddonGuid)) {
                                                     var addon = Models.Db.AddonModel.create(core, onInstallAddonGuid);
                                                     if (addon != null) {

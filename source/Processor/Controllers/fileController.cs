@@ -1537,7 +1537,13 @@ namespace Contensive.Processor.Controllers {
                             Key = remoteUnixAbsPathFilename
                         };
                         using (GetObjectResponse response = s3Client.GetObject(request)) {
-                            response.WriteResponseStreamToFile(joinPath(localAbsRootPath, localDosPathFilename));
+                            try {
+                                response.WriteResponseStreamToFile(joinPath(localAbsRootPath, localDosPathFilename));
+                            } catch (System.IO.IOException ioEx) {
+                                // -- pause 1 second and retry
+                                System.Threading.Thread.Sleep(1000);
+                                response.WriteResponseStreamToFile(joinPath(localAbsRootPath, localDosPathFilename));
+                            }
                         }
                         result = true;
                     }
