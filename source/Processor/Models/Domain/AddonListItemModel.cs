@@ -42,5 +42,5 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         public List<AddonListItemModel> addonList;
     }
-
+    //
 }

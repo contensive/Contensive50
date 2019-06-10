@@ -19,9 +19,22 @@ namespace Contensive.Addons.AddonListEditor {
                 // 
                 SetAddonList_RequestClass request = DeserializeObject<SetAddonList_RequestClass>(cp.Request.Form);
                 if (request == null) {
-                    return SerializeObject(new SetAddonList_ResponseClass() {
-                        errorList = new List<string> { "The request is invalid" }
-                    });
+                    //
+                    // -- attempt the tmp data format then convert the resulting object to the request type
+                    SetAddonList_TmpRequestClass tmpRequest = DeserializeObject<SetAddonList_TmpRequestClass>(cp.Request.Form);
+                    if ( tmpRequest != null ) {
+                        request = new SetAddonList_RequestClass();
+                        request.parentContentGuid = tmpRequest.parentContentGuid;
+                        request.parentRecordGuid = tmpRequest.parentRecordGuid;
+                        request.addonList = convertTmpAddonList(cp, tmpRequest.addonList);
+                    }
+                    if (request == null) {
+                        //
+                        // -- request not valid
+                        return SerializeObject(new SetAddonList_ResponseClass() {
+                            errorList = new List<string> { "The request is invalid" }
+                        });
+                    }
                 }
                 if (String.IsNullOrWhiteSpace(request.parentContentGuid)) {
                     return SerializeObject(new SetAddonList_ResponseClass() {
@@ -84,7 +97,9 @@ namespace Contensive.Addons.AddonListEditor {
                 return string.Empty;
             }
         }
-        // 
+        /// <summary>
+        /// The request object
+        /// </summary>
         public class SetAddonList_RequestClass {
             /// <summary>
             /// The guid of the content where this list is stored (content + record define location)
@@ -99,12 +114,91 @@ namespace Contensive.Addons.AddonListEditor {
             /// </summary>
             public List<AddonListItemModel> addonList;
         }
-        // 
+        /// <summary>
+        /// The object returned from this method
+        /// </summary>
         public class SetAddonList_ResponseClass {
             /// <summary>
             /// The guid of the content where this list is stored (content + record define location)
             /// </summary>
             public List<string> errorList;
+        }
+        // ==========================================================================================
+        /// <summary>
+        /// Convert the tmp addonList to an addonList object
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="tmpAddonList"></param>
+        /// <returns></returns>
+        public static List<AddonListItemModel> convertTmpAddonList(CPBaseClass cp, List<TmpAddonListItemModel> tmpAddonList) {
+            var addonList = new List<AddonListItemModel>();
+            foreach (var tmpAddon in tmpAddonList) {
+                string addonGuid = string.Empty;
+                using (CPCSBaseClass cs = cp.CSNew()) {
+                    if (cs.Open("add-ons", "name=" + cp.Db.EncodeSQLText(tmpAddon.guid))) {
+                        addonGuid = cs.GetText("ccGuid");
+                    }
+                }
+                var columnList = new List<AddonListColumnItemModel>();
+                foreach (var tmpColumn in tmpAddon.columns) {
+                    columnList.Add(new AddonListColumnItemModel() {
+                        col = tmpColumn.width,
+                        className = tmpColumn.className,
+                         addonList = convertTmpAddonList( cp, tmpColumn.addonList )
+                    });
+                }
+                addonList.Add(new AddonListItemModel() {
+                    renderedHtml = tmpAddon.html,
+                    instanceGuid = tmpAddon.guid,
+                    designBlockTypeGuid = addonGuid,
+                    columns = columnList
+                });
+            }
+            return addonList;
+        }
+        /// <summary>
+        /// object that matches the UI being sent 20190610
+        /// </summary>
+        public class SetAddonList_TmpRequestClass {
+            /// <summary>
+            /// The guid of the content where this list is stored (content + record define location)
+            /// </summary>
+            public string parentContentGuid;
+            /// <summary>
+            /// The guid of the record where this list is stored (content + record define location)
+            /// </summary>
+            public string parentRecordGuid;
+            /// <summary>
+            /// A list of positions. Positions are the slots where a design block goes
+            /// </summary>
+            public List<TmpAddonListItemModel> addonList;
+        }
+        public class TmpAddonListItemModel {
+            /// <summary>
+            /// map to instanceGuid
+            /// </summary>
+            public string guid;
+            /// <summary>
+            /// map to renderedHtml
+            /// </summary>
+            public string html;
+            /// <summary>
+            /// use to lookup addon instead of designBlockTypeGuid
+            /// </summary>
+            public string name;
+            //
+            public List<TmpAddonListColumnItemModel> columns;
+        }
+        //
+        public class TmpAddonListColumnItemModel {
+            //
+            public string className;
+            /// <summary>
+            /// map to .col
+            /// </summary>
+            public int width;
+            //
+            public List<TmpAddonListItemModel> addonList;
         }
     }
 }
