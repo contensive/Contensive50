@@ -326,15 +326,54 @@ namespace Contensive.Processor.Controllers {
         private FileController _privateFiles = null;
         //
         //===================================================================================================
-        //
+        /// <summary>
+        /// Progam data are data used by the system for operation, unrelated to application data, like config files and logs.
+        /// ProgramData folder is the folder where the config.json file is stored. If it is not found, the default is returned, d:\Contensive or c:\Contensive
+        /// The prefered location is d:\Contensive so the d-drive can be the data drive and the c-drive does not need to be backed up
+        /// If files dont exist, it tries
+        /// </summary>
         public FileController programDataFiles {
             get {
-                if (_programDataFiles == null) {
+                if (_programDataFiles != null) { return _programDataFiles; }
+                //
+                // -- always local -- must be because this object is used to read serverConfig, before the object is valid
+                if (System.IO.File.Exists("D:\\Contensive\\config.json")) {
                     //
-                    // -- always local -- must be because this object is used to read serverConfig, before the object is valid
-                    string programDataPath = FileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\";
-                    _programDataFiles = new FileController(this, true, programDataPath, "");
+                    // -- prefer D:\contensive
+                    _programDataFiles = new FileController(this, true, "D:\\Contensive\\", "");
+                    return _programDataFiles;
                 }
+                var driveNameList = new List<string>();
+                //
+                // -- next check each drive for a \contensive folder and go with it
+                foreach (var drive in System.IO.DriveInfo.GetDrives()) {
+                    if (drive.IsReady && (drive.DriveType == System.IO.DriveType.Fixed)) {
+                        // drive.name looks like "C:\\"
+                        driveNameList.Add(drive.Name);
+                        if (!System.IO.File.Exists(drive.Name + "Contensive\\config.json")) { continue; }
+                        _programDataFiles = new FileController(this, true, drive.Name + "Contensive\\", "");
+                        return _programDataFiles;
+                    }
+                }
+                //
+                // -- legacy, use c:\program data\contensive, deprecated because all application data should be stored on one drive for portability, and decrease backup costs
+                string legacyProgramFilesFolder = FileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\";
+                if (System.IO.Directory.Exists(legacyProgramFilesFolder)) {
+                    _programDataFiles = new FileController(this, true, legacyProgramFilesFolder, "");
+                    return _programDataFiles;
+                }
+                //
+                // -- not found
+                if ( driveNameList.Contains("D:\\")) {
+                    //
+                    // -- d-drive exists, create a new folder in d:\contensive
+                    _programDataFiles = new FileController(this, true, FileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\", "");
+                    return _programDataFiles;
+                }
+                //
+                // -- no d-drive exists, create a new folder in c:\contensive
+                System.IO.Directory.CreateDirectory("C:\\");
+                _programDataFiles = new FileController(this, true, FileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\", "");
                 return _programDataFiles;
             }
         }
@@ -493,7 +532,7 @@ namespace Contensive.Processor.Controllers {
             cp_forAddonExecutionOnly = cp;
             LogController.logRaw("CoreController constructor-0, enter", LogController.LogLevel.Trace);
             //
-            metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
+            metaDataDictionary = new Dictionary<string, ContentMetadataModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -701,7 +740,7 @@ namespace Contensive.Processor.Controllers {
             _contentNameIdDictionary = null;
         }
         //
-        
+
         #region  IDisposable Support 
         //
         protected bool disposed = false;
