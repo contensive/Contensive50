@@ -155,8 +155,12 @@ namespace Contensive.Processor.Controllers {
                             } else {
                                 core.doc.addonRecursionDepth[addon.id] += 1;
                             }
+                            //
+                            // -- if executeContext.instanceGuid is set, save the current instanceId and set the context value. If not set, leave the current in place
                             string parentInstanceId = core.docProperties.getText("instanceId");
-                            core.docProperties.setProperty("instanceId", executeContext.instanceGuid);
+                            if (!string.IsNullOrWhiteSpace(executeContext.instanceGuid)) {
+                                core.docProperties.setProperty("instanceId", executeContext.instanceGuid);
+                            }
                             //
                             // -- if the addon's javascript is required in the head, set it in the executeContext now so it will propigate into the dependant addons as well
                             executeContext.forceJavascriptToHead = executeContext.forceJavascriptToHead || addon.javascriptForceHead;
@@ -748,7 +752,7 @@ namespace Contensive.Processor.Controllers {
                     // Cancel just exits with no content
                     return_ExitAddonBlankWithResponse = true;
                     return string.Empty;
-                } else if (!core.session.isAuthenticatedAdmin(core)) {
+                } else if (!core.session.isAuthenticatedAdmin()) {
                     //
                     // Not Admin Error
                     ButtonList = ButtonCancel;

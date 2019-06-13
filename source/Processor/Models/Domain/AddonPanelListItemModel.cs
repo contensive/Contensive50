@@ -12,7 +12,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// The guid of the design block addon
         /// </summary>
-        public string guid;
+        public string designBlockTypeGuid;
         /// <summary>
         /// The name of the design block addon
         /// </summary>
@@ -28,13 +28,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// placeholder for future feature
         /// </summary>
-        public string html;
-        /// <summary>
-        /// 
-        /// </summary>
-        public string wrapperClass;
-        // we agreed isStructural is true if columns.count>0
-        //public bool isStructural;
+        public string renderedHtml;
     }
     //
     [System.Serializable]
@@ -43,6 +37,6 @@ namespace Contensive.Processor.Models.Domain {
         /// 
         /// </summary>
         public string className;
-        public int width;
+        public int col;
     }
 }

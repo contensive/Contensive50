@@ -183,7 +183,7 @@ namespace Contensive.Addons.AdminSite {
                                     + cr2 + "<td class=\"exportTblCaption\">Record Limit</td>"
                                     + cr2 + "<td class=\"exportTblInput\">" + HtmlController.inputText(core, "RecordLimit", RecordLimitText) + "</td>"
                                     + "\r</tr>";
-                                if (core.session.isAuthenticatedDeveloper(core)) {
+                                if (core.session.isAuthenticatedDeveloper()) {
                                     Content = Content + "\r<tr>"
                                         + cr2 + "<td class=\"exportTblCaption\">Results SQL</td>"
                                         + cr2 + "<td class=\"exportTblInput\"><div style=\"border:1px dashed #ccc;background-color:#fff;padding:10px;\">" + SQL + "</div></td>"
@@ -203,7 +203,7 @@ namespace Contensive.Addons.AdminSite {
                                     + "\r</style>"
                                     + Content + HtmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                                 ButtonList = ButtonCancel + "," + ButtonRequestDownload;
-                                if (core.session.isAuthenticatedDeveloper(core)) {
+                                if (core.session.isAuthenticatedDeveloper()) {
                                     ButtonList = ButtonList + "," + ButtonRefresh;
                                 }
                             }

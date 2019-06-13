@@ -147,7 +147,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- application error if no server config
                     LogController.logError(core, new GenericException("authorization context cannot be created without a server configuration."));
-                    return default(SessionController) ;
+                    return default(SessionController);
                 }
                 resultSessionContext = new SessionController(core);
                 if (core.appConfig == null) {
@@ -596,7 +596,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public bool isAuthenticatedAdmin(CoreController core) {
+        public bool isAuthenticatedAdmin() {
             bool result = false;
             try {
                 result = visit.visitAuthenticated & (user.admin || user.developer);
@@ -613,7 +613,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public bool isAuthenticatedDeveloper(CoreController core) {
+        public bool isAuthenticatedDeveloper() {
             bool result = false;
             try {
                 result = visit.visitAuthenticated & (user.admin || user.developer);
@@ -631,10 +631,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAuthenticatedContentManager(CoreController core, ContentMetadataModel contentMetadata) {
+        public bool isAuthenticatedContentManager(ContentMetadataModel contentMetadata) {
             bool returnIsContentManager = false;
             try {
-                if (core.session.isAuthenticatedAdmin(core)) { return true; }
+                if (core.session.isAuthenticatedAdmin()) { return true; }
                 if (!isAuthenticated) { return false; }
                 //
                 // -- for specific Content
@@ -653,16 +653,16 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAuthenticatedContentManager(CoreController core, string ContentName) {
+        public bool isAuthenticatedContentManager(string ContentName) {
             bool returnIsContentManager = false;
             try {
-                if (core.session.isAuthenticatedAdmin(core)) { return true; }
+                if (core.session.isAuthenticatedAdmin()) { return true; }
                 if (!isAuthenticated) { return false; }
                 //
                 if (string.IsNullOrEmpty(ContentName)) {
                     //
                     // -- for anything
-                    return isAuthenticatedContentManager(core);
+                    return isAuthenticatedContentManager();
                 } else {
                     //
                     // -- for specific Content
@@ -683,10 +683,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAuthenticatedContentManager(CoreController core) {
+        public bool isAuthenticatedContentManager() {
             bool returnIsContentManager = false;
             try {
-                if (core.session.isAuthenticatedAdmin(core)) { return true; }
+                if (core.session.isAuthenticatedAdmin()) { return true; }
                 if (!isAuthenticated) { return false; }
                 //
                 // Is a CM for any content def
@@ -724,7 +724,7 @@ namespace Contensive.Processor.Controllers {
         /// logout user
         /// </summary>
         /// <param name="core"></param>
-        public void logout(CoreController core) {
+        public void logout() {
             try {
                 LogController.addSiteActivity(core, "logout", user.id, user.organizationID);
                 //
@@ -749,27 +749,15 @@ namespace Contensive.Processor.Controllers {
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public int getUserIdForCredentials(CoreController core, string username, string password) {
+        public int getUserIdForCredentials(string username, string password) {
             int returnUserId = 0;
             try {
                 //
                 const string badLoginUserError = "Your login was not successful. Please try again.";
-                //
-                string SQL = null;
-                bool recordIsAdmin = false;
-                bool recordIsDeveloper = false;
-                string Criteria = null;
-                string iPassword = null;
-                bool allowEmailLogin = false;
-                bool allowNoPasswordLogin = false;
-                string iLoginFieldValue;
-                //
-                iLoginFieldValue = GenericController.encodeText(username);
-                iPassword = GenericController.encodeText(password);
-                //
-                returnUserId = 0;
-                allowEmailLogin = core.siteProperties.getBoolean("allowEmailLogin");
-                allowNoPasswordLogin = core.siteProperties.getBoolean("allowNoPasswordLogin");
+                string iLoginFieldValue = GenericController.encodeText(username);
+                string iPassword = GenericController.encodeText(password);
+                bool allowEmailLogin = core.siteProperties.getBoolean("allowEmailLogin");
+                bool allowNoPasswordLogin = core.siteProperties.getBoolean("allowNoPasswordLogin");
                 if (string.IsNullOrEmpty(iLoginFieldValue)) {
                     //
                     // ----- loginFieldValue blank, stop here
@@ -790,6 +778,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     ErrorController.addUserError(core, badLoginUserError);
                 } else {
+                    string Criteria = null;
                     if (allowEmailLogin) {
                         //
                         // login by username or email
@@ -827,23 +816,24 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // no-password-login -- allowNoPassword + no password given + account has no password + account not admin/dev/cm
                                     //
-                                    recordIsAdmin = csData.getBoolean("admin");
-                                    recordIsDeveloper = !csData.getBoolean("admin");
+                                    bool recordIsAdmin = csData.getBoolean("admin");
+                                    bool recordIsDeveloper = !csData.getBoolean("admin");
                                     if (allowNoPasswordLogin && (csData.getText("password") == "") && (!recordIsAdmin) && (recordIsDeveloper)) {
                                         returnUserId = csData.getInteger("ID");
                                         //
                                         // verify they are in no content manager groups
                                         //
                                         using (var csRules = new CsModel(core)) {
-                                            SQL = "SELECT ccGroupRules.ContentID"
-                                                + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
-                                                + " WHERE ("
-                                                + "(ccMemberRules.MemberID=" + DbController.encodeSQLNumber(returnUserId) + ")"
-                                                + " AND(ccMemberRules.active<>0)"
-                                                + " AND(ccGroupRules.active<>0)"
-                                                + " AND(ccGroupRules.ContentID Is not Null)"
-                                                + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
-                                                + ");";
+                                            //
+                                            string SQL = "SELECT ccGroupRules.ContentID"
+                                + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
+                                + " WHERE ("
+                                + "(ccMemberRules.MemberID=" + DbController.encodeSQLNumber(returnUserId) + ")"
+                                + " AND(ccMemberRules.active<>0)"
+                                + " AND(ccGroupRules.active<>0)"
+                                + " AND(ccGroupRules.ContentID Is not Null)"
+                                + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
+                                + ");";
                                             if (csRules.openSql(SQL)) { returnUserId = 0; }
                                         }
                                     }
@@ -884,7 +874,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="returnErrorMessage"></param>
         /// <param name="returnErrorCode"></param>
         /// <returns></returns>
-        public bool isNewCredentialOK(CoreController core, string Username, string Password, ref string returnErrorMessage, ref int returnErrorCode) {
+        public bool isNewCredentialOK(string Username, string Password, ref string returnErrorMessage, ref int returnErrorCode) {
             bool returnOk = false;
             try {
                 returnOk = false;
@@ -934,12 +924,12 @@ namespace Contensive.Processor.Controllers {
         /// <param name="password"></param>
         /// <param name="AllowAutoLogin"></param>
         /// <returns></returns>
-        public bool authenticate(CoreController core, string username, string password, bool AllowAutoLogin = false) {
+        public bool authenticate(string username, string password, bool AllowAutoLogin = false) {
             bool result = false;
             try {
-                int userId = getUserIdForCredentials(core, username, password);
+                int userId = getUserIdForCredentials(username, password);
                 if (userId != 0) {
-                    result = authenticateById(core, userId, this);
+                    result = authenticateById(userId, this);
                     if (result) {
                         LogController.addSiteActivity(core, "successful password login, username [" + username + "]", user.id, user.organizationID);
                     } else {
@@ -955,7 +945,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// Member Login By ID
+        /// Member Login By ID. Static method because it runs in constructor
         /// </summary>
         /// <param name="core"></param>
         /// <param name="userId"></param>
@@ -980,10 +970,19 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
+        //========================================================================
+        /// <summary>
+        /// Member Login By ID.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="userId"></param>
+        /// <param name="authContext"></param>
+        /// <returns></returns>
+        public bool authenticateById(int userId, SessionController authContext) => SessionController.authenticateById(core, userId, authContext);
         //
         //========================================================================
         /// <summary>
-        /// RecognizeMember the current member to be non-authenticated, but recognized
+        /// RecognizeMember the current member to be non-authenticated, but recognized.  Static method because it runs in constructor
         /// </summary>
         /// <param name="core"></param>
         /// <param name="userId"></param>
@@ -1028,11 +1027,21 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //========================================================================
+        /// <summary>
+        /// RecognizeMember the current member to be non-authenticated, but recognized.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="userId"></param>
+        /// <param name="sessionContext"></param>
+        /// <returns></returns>
+        //
+        public bool recognizeById(int userId, ref SessionController sessionContext) => recognizeById(core, userId, ref sessionContext);
+        //========================================================================
         //   IsMember
         //   true if the user is authenticated and is a trusted people (member content)
         //========================================================================
         //
-        public bool isAuthenticatedMember(CoreController core) {
+        public bool isAuthenticatedMember() {
             var userPeopleMetadata = ContentMetadataModel.create(core, user.contentControlID);
             if (userPeopleMetadata == null) { return false; }
             if (userPeopleMetadata.name.ToLower() == "members") { return true; }
@@ -1045,8 +1054,8 @@ namespace Contensive.Processor.Controllers {
         /// is Guest
         /// </summary>
         /// <returns></returns>
-        public bool isGuest(CoreController core) {
-            return !isRecognized(core);
+        public bool isGuest() {
+            return !isRecognized();
         }
         //
         //========================================================================
@@ -1054,7 +1063,7 @@ namespace Contensive.Processor.Controllers {
         /// Is Recognized (not new and not authenticted)
         /// </summary>
         /// <returns></returns>
-        public bool isRecognized(CoreController core) {
+        public bool isRecognized() {
             return !visit.memberNew;
         }
         //
@@ -1089,7 +1098,7 @@ namespace Contensive.Processor.Controllers {
                                 contentNameOrId = MetadataController.getContentNameByID(core, encodeInteger(contentNameOrId));
                             }
                         }
-                        result = isAuthenticatedContentManager(core, contentNameOrId);
+                        result = isAuthenticatedContentManager(contentNameOrId);
                     }
                     if (result) {
                         core.doc.contentIsEditingList.Add(cacheTestName);
@@ -1110,10 +1119,10 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isQuickEditing(CoreController core, string ContentName) {
+        public bool isQuickEditing(string ContentName) {
             bool returnResult = false;
             try {
-                if (isAuthenticatedContentManager(core, ContentName)) {
+                if (isAuthenticatedContentManager(ContentName)) {
                     returnResult = core.visitProperty.getBoolean("AllowQuickEditor");
                 }
             } catch (Exception ex) {
@@ -1146,8 +1155,8 @@ namespace Contensive.Processor.Controllers {
         //
         //   Checks the username and password
         //
-        public bool isLoginOK(CoreController core, string Username, string Password, string ErrorMessage = "", int ErrorCode = 0) {
-            bool result = (getUserIdForCredentials(core, Username, Password) != 0);
+        public bool isLoginOK(string Username, string Password, string ErrorMessage = "", int ErrorCode = 0) {
+            bool result = (getUserIdForCredentials(Username, Password) != 0);
             if (!result) {
                 ErrorMessage = ErrorController.getUserError(core);
             }
@@ -1156,7 +1165,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ================================================================================================
         //
-        public string getAuthoringStatusMessage(CoreController core, bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
+        public string getAuthoringStatusMessage(bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
             string result = "";
             //
             string Copy = null;

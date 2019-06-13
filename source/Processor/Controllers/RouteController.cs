@@ -125,19 +125,19 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- Process Email Open
                         core.doc.continueProcessing = false;
-                        return (new Addons.Primitives.openEmailClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                        return (new Addons.Primitives.OpenEmailClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                     }
                     if (core.docProperties.getInteger(rnEmailClickFlag) > 0) {
                         //
                         // -- Process Email click
                         core.doc.continueProcessing = false;
-                        return (new Addons.Primitives.clickEmailClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                        return (new Addons.Primitives.ClickEmailClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                     }
                     if (core.docProperties.getInteger(rnEmailBlockRecipientEmail) > 0) {
                         //
                         // -- Process Email block
                         core.doc.continueProcessing = false;
-                        return (new Addons.Primitives.blockEmailClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                        return (new Addons.Primitives.BlockEmailClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                     }
                     //
                     // -- legacy form process methods 
@@ -148,11 +148,11 @@ namespace Contensive.Processor.Controllers {
                         switch (formType) {
                             case FormTypeAddonStyleEditor:
                                 //
-                                result = (new Addons.Primitives.processAddonStyleEditorClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.ProcessAddonStyleEditorClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypeAddonSettingsEditor:
                                 //
-                                result = (new Addons.Primitives.processAddonSettingsEditorClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.ProcessAddonSettingsEditorClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypeSendPassword:
                                 //
@@ -161,7 +161,7 @@ namespace Contensive.Processor.Controllers {
                             case FormTypeLogin:
                             case "l09H58a195":
                                 //
-                                result = (new Addons.Primitives.processFormLoginDefaultClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.ProcessLoginDefaultClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypeToolsPanel:
                                 //
@@ -173,7 +173,7 @@ namespace Contensive.Processor.Controllers {
                                 break;
                             case FormTypeActiveEditor:
                                 //
-                                result = (new Addons.Primitives.processActiveEditorClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.ProcessActiveEditorClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypeSiteStyleEditor:
                                 //
@@ -197,38 +197,35 @@ namespace Contensive.Processor.Controllers {
                             case HardCodedPageLogout:
                                 //
                                 // -- logout intercept -- after logout continue
-                                (new Addons.Primitives.processLogoutMethodClass()).Execute(core.cp_forAddonExecutionOnly);
+                                (new Addons.Primitives.ProcessLogoutMethodClass()).Execute(core.cp_forAddonExecutionOnly);
                                 break;
                             case HardCodedPageSendPassword:
                                 //
-                                return (new Addons.Primitives.processSendPasswordMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.ProcessSendPasswordMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageResourceLibrary:
                                 //
-                                return (new Addons.Primitives.processResourceLibraryMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.ProcessResourceLibraryMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageLoginDefault:
                                 //
-                                return (new Addons.Primitives.processLoginDefaultMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.ProcessLoginDefaultMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageLogin:
                                 //
-                                return (new Addons.Primitives.processLoginMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.ProcessLoginMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageLogoutLogin:
                                 //
-                                return (new Addons.Primitives.processLogoutLoginMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.ProcessLogoutLoginMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageSiteExplorer:
                                 //
-                                return (new Addons.Primitives.processSiteExplorerMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.ProcessSiteExplorerMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageStatus:
                                 //
-                                return (new Addons.Primitives.processStatusMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.ProcessStatusMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageRedirect:
                                 //
-                                return (new Addons.Primitives.processRedirectMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.ProcessRedirectMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageExportAscii:
                                 //
-                                return (new Addons.Primitives.processExportAsciiMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
-                                //case HardCodedPagePayPalConfirm:
-                                //    //
-                                //    return (new Addons.Primitives.processPayPalConformMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.ProcessExportAsciiMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                         }
                     }
                     //

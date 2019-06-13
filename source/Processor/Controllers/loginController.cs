@@ -68,7 +68,7 @@ namespace Contensive.Processor.Controllers {
                 if (formType == FormTypeLogin) {
                     //
                     // -- process a previous login for instance, and return blank if it is successful (legacy workflow)
-                    if (processFormLoginDefault(core)) {
+                    if (processLoginFormDefault(core)) {
                         result = "";
                         needLoginForm = false;
                     }
@@ -210,30 +210,27 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //========================================================================
-        // ----- Process the login form
-        //========================================================================
-        //
-        public static bool processFormLoginDefault(CoreController core) {
-            bool returnREsult = false;
+        /// <summary>
+        /// Process the login form username and password
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static bool processLoginFormDefault(CoreController core) {
+            bool returnResult = false;
             try {
-                int LocalMemberID = 0;
-                string loginForm_Username = ""; 
-                string loginForm_Password = ""; 
-                bool loginForm_AutoLogin = false; 
-                returnREsult = false;
-                //
-                loginForm_Username = core.docProperties.getText("username");
-                loginForm_Password = core.docProperties.getText("password");
-                loginForm_AutoLogin = core.docProperties.getBoolean("autologin");
                 //
                 if ((core.session.visit.loginAttempts < core.siteProperties.maxVisitLoginAttempts) && core.session.visit.cookieSupport) {
-                    LocalMemberID = core.session.getUserIdForCredentials(core, loginForm_Username, loginForm_Password);
+                    int LocalMemberID = core.session.getUserIdForCredentials(
+                        core.docProperties.getText("username"), 
+                        core.docProperties.getText("password")
+                    );
                     if (LocalMemberID == 0) {
+                        if((core.session.isAuthenticated) ||(core.session.isRecognized())) { core.session.logout(); }
                         core.session.visit.loginAttempts = core.session.visit.loginAttempts + 1;
                         core.session.visit.save(core);
                     } else {
-                        returnREsult = SessionController.authenticateById(core, LocalMemberID, core.session);
-                        if (returnREsult) {
+                        returnResult = core.session.authenticateById(LocalMemberID, core.session);
+                        if (returnResult) {
                             LogController.addSiteActivity(core, "successful username/password login", core.session.user.id, core.session.user.organizationID);
                         } else {
                             LogController.addSiteActivity(core, "bad username/password login", core.session.user.id, core.session.user.organizationID);
@@ -245,13 +242,13 @@ namespace Contensive.Processor.Controllers {
                 LogController.logError( core,ex);
                 throw;
             }
-            return returnREsult;
+            return returnResult;
         }
         //
         //========================================================================
         // ----- Process the send password form
         //
-        public static void processFormSendPassword(CoreController core) {
+        public static void processSendPasswordForm(CoreController core) {
             try {
                 string returnUserMessage = "";
                 sendPassword(core, core.docProperties.getText("email"), ref returnUserMessage);
@@ -388,7 +385,7 @@ namespace Contensive.Processor.Controllers {
                                             while (!usernameOK && (Ptr < 100)) {
                                                 //hint = "240"
                                                 Username = EMailName + encodeInteger(Math.Floor(encodeNumber(Microsoft.VisualBasic.VBMath.Rnd() * 9999)));
-                                                usernameOK = !core.session.isLoginOK(core, Username, "test");
+                                                usernameOK = !core.session.isLoginOK(Username, "test");
                                                 Ptr = Ptr + 1;
                                             }
                                             //hint = "250"
@@ -450,10 +447,8 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //========================================================================
-        // ----- Process the send password form
-        //========================================================================
         //
-        public static void processFormJoin(CoreController core) {
+        public static void processJoinForm(CoreController core) {
             try {
                 string ErrorMessage = "";
                 string FirstName = null;
@@ -470,7 +465,7 @@ namespace Contensive.Processor.Controllers {
                 if (!GenericController.encodeBoolean(core.siteProperties.getBoolean("AllowMemberJoin", false))) {
                     ErrorController.addUserError(core, "This site does not accept public main_MemberShip.");
                 } else {
-                    if (!core.session.isNewCredentialOK(core, loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
+                    if (!core.session.isNewCredentialOK( loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
                         ErrorController.addUserError(core, ErrorMessage);
                     } else {
                         if (!(!core.doc.userErrorList.Count.Equals(0))) {
@@ -483,7 +478,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // if the current account can be logged into, you can not join 'into' it
                                         //
-                                        core.session.logout(core);
+                                        core.session.logout();
                                     }
                                     FirstName = core.docProperties.getText("firstname");
                                     LastName = core.docProperties.getText("lastname");
@@ -494,7 +489,7 @@ namespace Contensive.Processor.Controllers {
                                     csData.set("Name", FullName);
                                     csData.set("username", loginForm_Username);
                                     csData.set("password", loginForm_Password);
-                                    SessionController.authenticateById(core, core.session.user.id, core.session);
+                                    core.session.authenticateById(core.session.user.id, core.session);
                                 }
                                 csData.close();
                             }

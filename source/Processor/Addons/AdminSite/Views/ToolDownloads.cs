@@ -25,7 +25,7 @@ namespace Contensive.Addons.AdminSite {
                 string ButtonListRight = "";
                 string Content = "";
                 //
-                if (!core.session.isAuthenticatedAdmin(core)) {
+                if (!core.session.isAuthenticatedAdmin()) {
                     //
                     // Must be a developer
                     //

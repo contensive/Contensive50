@@ -78,7 +78,7 @@ namespace Contensive.Addons.AdminSite {
                     } else {
                         //
                         // field is read-only except for developers
-                        fieldEditor = AdminUIController.getDefaultEditor_text(core, "ccguid", fieldValue, !core.session.isAuthenticatedDeveloper(core), htmlId);
+                        fieldEditor = AdminUIController.getDefaultEditor_text(core, "ccguid", fieldValue, !core.session.isAuthenticatedDeveloper(), htmlId);
                     }
                     tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "GUID", FieldHelp, false, false, htmlId));
                 }
@@ -122,7 +122,7 @@ namespace Contensive.Addons.AdminSite {
                         FieldHelp = GenericController.encodeText(field.helpMessage);
                         FieldRequired = GenericController.encodeBoolean(field.required);
                         int FieldValueInteger = (adminData.editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : adminData.editRecord.contentControlId;
-                        if (!core.session.isAuthenticatedAdmin(core)) {
+                        if (!core.session.isAuthenticatedAdmin()) {
                             HTMLFieldString = HTMLFieldString + HtmlController.inputHidden("contentControlId", FieldValueInteger);
                         } else {
                             string RecordContentName = adminData.editRecord.contentControlId_Name;
@@ -143,7 +143,7 @@ namespace Contensive.Addons.AdminSite {
                                 }
                             }
                             bool IsEmptyList = false;
-                            if (core.session.isAuthenticatedAdmin(core)) {
+                            if (core.session.isAuthenticatedAdmin()) {
                                 //
                                 // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                                 string sqlFilter = "(ContentTableID=" + TableID + ")";

@@ -55,7 +55,7 @@ namespace Contensive.Addons.AddonListEditor {
                         errorList = new List<string> { "The parent content could not be determined from the guid [" + request.parentContentGuid + "]" }
                     });
                 }
-                if (!core.session.isAuthenticatedContentManager(core, metadata)) {
+                if (!core.session.isAuthenticatedContentManager(metadata)) {
                     cp.Response.SetStatus(WebServerController.httpResponseStatus401_Unauthorized);
                     return SerializeObject(new GetAddonPanel_ResponseClass() {
                         errorList = new List<string> { "Your account does not have permission to edit [" + metadata.name + "]" }
@@ -81,54 +81,56 @@ namespace Contensive.Addons.AddonListEditor {
                     addonPanelList = new List<AddonPanelListItemModel>()
                 };
                 foreach (var addonModel in addonModelList) {
+                    //
+                    // -- fix iconfilename because it is user typed
+                    string iconFilename = string.Empty;
+                    if (!string.IsNullOrWhiteSpace(addonModel.iconFilename)) {
+                        iconFilename = addonModel.iconFilename.Replace("\\", "/");
+                        iconFilename = cp.Site.FilePath + ((iconFilename.Left(1).Equals("/")) ? iconFilename.Substring(1) : iconFilename);
+                    }
                     var item = new AddonPanelListItemModel() {
                         name = addonModel.name,
-                        guid = addonModel.ccguid,
-                        html = "",
-                        columns = new List<AddonPanelListItemColumnModel>(),
-                        image = (string.IsNullOrWhiteSpace(addonModel.iconFilename) ? "" : cp.Site.FilePath + addonModel.iconFilename)
+                        designBlockTypeGuid = addonModel.ccguid,
+                        renderedHtml = "",
+                        image = iconFilename
                     };
-
                     result.addonPanelList.Add(item);
                     // -- hack a structural work-around for now. If this works, build into addon record
                     switch (addonModel.ccguid.ToLower()) {
                         case guidDesignBlockFourColumn:
                             item.columns = new List<AddonPanelListItemColumnModel> {
-                                new AddonPanelListItemColumnModel() { className="col-3-md", width=3 },
-                                new AddonPanelListItemColumnModel() { className="col-3-md", width=3 },
-                                new AddonPanelListItemColumnModel() { className="col-3-md", width=3 },
-                                new AddonPanelListItemColumnModel() { className="col-3-md", width=3 }
+                                new AddonPanelListItemColumnModel() { className="col-3-md", col=3 },
+                                new AddonPanelListItemColumnModel() { className="col-3-md", col=3 },
+                                new AddonPanelListItemColumnModel() { className="col-3-md", col=3 },
+                                new AddonPanelListItemColumnModel() { className="col-3-md", col=3 }
                             };
                             break;
                         case guidDesignBlockTwoColumn:
                             item.columns = new List<AddonPanelListItemColumnModel> {
-                                new AddonPanelListItemColumnModel() { className="col-6-md", width=6 },
-                                new AddonPanelListItemColumnModel() { className="col-6-md", width=6 }
+                                new AddonPanelListItemColumnModel() { className="col-6-md", col=6 },
+                                new AddonPanelListItemColumnModel() { className="col-6-md", col=6 }
                             };
                             break;
                         case guidDesignBlockThreeColumn:
                             item.columns = new List<AddonPanelListItemColumnModel> {
-                                new AddonPanelListItemColumnModel() { className="col-4-md", width=4 },
-                                new AddonPanelListItemColumnModel() { className="col-4-md", width=4 },
-                                new AddonPanelListItemColumnModel() { className="col-4-md", width=4 }
+                                new AddonPanelListItemColumnModel() { className="col-4-md", col=4 },
+                                new AddonPanelListItemColumnModel() { className="col-4-md", col=4 },
+                                new AddonPanelListItemColumnModel() { className="col-4-md", col=4 }
                             };
                             break;
                         case guidDesignBlockTwoColumnLeft:
                             item.columns = new List<AddonPanelListItemColumnModel> {
-                                new AddonPanelListItemColumnModel() { className="col-8-md", width=8 },
-                                new AddonPanelListItemColumnModel() { className="col-4-md", width=4 }
+                                new AddonPanelListItemColumnModel() { className="col-8-md", col=8 },
+                                new AddonPanelListItemColumnModel() { className="col-4-md", col=4 }
                             };
                             break;
                         case guidDesignBlockTwoColumnRight:
                             item.columns = new List<AddonPanelListItemColumnModel> {
-                                new AddonPanelListItemColumnModel() { className="col-4-md", width=4 },
-                                new AddonPanelListItemColumnModel() { className="col-8-md", width=8 }
+                                new AddonPanelListItemColumnModel() { className="col-4-md", col=4 },
+                                new AddonPanelListItemColumnModel() { className="col-8-md", col=8 }
                             };
                             break;
                         default:
-                            item.columns = new List<AddonPanelListItemColumnModel> {
-                                new AddonPanelListItemColumnModel() { className="col-12-md", width=12 }
-                            };
                             break;
                     }
                 }

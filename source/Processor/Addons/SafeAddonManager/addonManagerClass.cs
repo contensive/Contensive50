@@ -136,7 +136,7 @@ namespace Contensive.Addons.SafeAddonManager {
                     //
                     addonManager = core.webServer.redirect("/" + core.appConfig.adminRoute, "Addon Manager, Cancel Button Pressed");
                 } else {
-                    if (!core.session.isAuthenticatedAdmin(core)) {
+                    if (!core.session.isAuthenticatedAdmin()) {
                         //
                         // ----- Put up error message
                         //
@@ -457,7 +457,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             //// Reinstall core collection
                             ////---------------------------------------------------------------------------------------------
                             ////
-                            //if (core.session.isAuthenticatedDeveloper(core) & core.docProperties.getBoolean("InstallCore")) {
+                            //if (core.session.isAuthenticatedDeveloper() & core.docProperties.getBoolean("InstallCore")) {
                             //    UpgradeOK = CollectionController.installCollectionFromRemoteRepo(core, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
                             //}
                             //
@@ -780,7 +780,7 @@ namespace Contensive.Addons.SafeAddonManager {
                         //
                         DisplaySystem = false;
                         using (var csData = new CsModel(core)) {
-                            if (!core.session.isAuthenticatedDeveloper(core)) {
+                            if (!core.session.isAuthenticatedDeveloper()) {
                                 //
                                 // non-developers
                                 //

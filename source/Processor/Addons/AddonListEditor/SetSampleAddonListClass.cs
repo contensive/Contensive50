@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Contensive.BaseClasses;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
 //
@@ -17,7 +18,7 @@ namespace Contensive.Addons.AddonListEditor {
             try {
                 CoreController core = ((CPClass)cp).core;
                 // 
-                SetAddonList_RequestClass request = DeserializeObject<SetAddonList_RequestClass>(cp.Request.Form);
+                SetAddonList_RequestClass request = DeserializeObject<SetAddonList_RequestClass>(cp.Request.Body);
                 if (request == null) {
                     //
                     // -- allow simple querystring values
@@ -47,7 +48,7 @@ namespace Contensive.Addons.AddonListEditor {
                         errorList = new List<string> { "The parent content could not be determined from the guid [" + request.parentContentGuid + "]" }
                     });
                 }
-                if (!core.session.isAuthenticatedContentManager(core, metadata)) {
+                if (!core.session.isAuthenticatedContentManager(metadata)) {
                     cp.Response.SetStatus(WebServerController.httpResponseStatus401_Unauthorized);
                     return SerializeObject(new SetAddonList_ResponseClass() {
                         errorList = new List<string> { "Your account does not have permission to edit [" + metadata.name + "]" }
@@ -55,25 +56,34 @@ namespace Contensive.Addons.AddonListEditor {
                 }
                 //
                 // -- create sample addonList
+                AddonModel addonHero = DbBaseModel.create<AddonModel>(core, guidDesignBlockHeroImage);
+                AddonModel addonContactUs = DbBaseModel.create<AddonModel>(core, guidDesignBlockContactUs);
+                AddonModel addonFourColumn = DbBaseModel.create<AddonModel>(core, guidDesignBlockFourColumn);
+                AddonModel addonTwoColumn = DbBaseModel.create<AddonModel>(core, guidDesignBlockTwoColumn);
+                AddonModel addonTile = DbBaseModel.create<AddonModel>(core, guidDesignBlockTile);
                 request.addonList = new List<AddonListItemModel>() {
                     new AddonListItemModel() {
-                        designBlockTypeGuid = guidDesignBlockHeroImage,
+                        designBlockTypeGuid = addonHero.ccguid,
+                        designBlockTypeName = addonHero.name,
                         instanceGuid = GenericController.createGuid(),
                         columns = null
                     },
                     new AddonListItemModel() {
-                        designBlockTypeGuid = guidDesignBlockContactUs,
+                        designBlockTypeGuid = addonContactUs.ccguid,
+                        designBlockTypeName = addonContactUs.name,
                         instanceGuid = GenericController.createGuid(),
                         columns = null
                     },
                     new AddonListItemModel() {
-                        designBlockTypeGuid = guidDesignBlockFourColumn,
+                        designBlockTypeGuid = addonFourColumn.ccguid,
+                        designBlockTypeName = addonFourColumn.name,
                         instanceGuid = GenericController.createGuid(),
                         columns = new List<AddonListColumnItemModel>() {
                             new AddonListColumnItemModel() {
                                  addonList = new List<AddonListItemModel>() {
                                     new AddonListItemModel() {
-                                        designBlockTypeGuid = guidDesignBlockTile,
+                                        designBlockTypeGuid = addonTile.ccguid,
+                                        designBlockTypeName = addonTile.name,
                                         instanceGuid = GenericController.createGuid(),
                                         columns = null
                                     }
@@ -84,7 +94,8 @@ namespace Contensive.Addons.AddonListEditor {
                             new AddonListColumnItemModel() {
                                  addonList = new List<AddonListItemModel>() {
                                     new AddonListItemModel() {
-                                        designBlockTypeGuid = guidDesignBlockTile,
+                                        designBlockTypeGuid = addonTile.ccguid,
+                                        designBlockTypeName = addonTile.name,
                                         instanceGuid = GenericController.createGuid(),
                                         columns = null
                                     }
@@ -95,7 +106,8 @@ namespace Contensive.Addons.AddonListEditor {
                             new AddonListColumnItemModel() {
                                  addonList = new List<AddonListItemModel>() {
                                     new AddonListItemModel() {
-                                        designBlockTypeGuid = guidDesignBlockTile,
+                                        designBlockTypeGuid = addonTile.ccguid,
+                                        designBlockTypeName = addonTile.name,
                                         instanceGuid = GenericController.createGuid(),
                                         columns = null
                                     }
@@ -106,7 +118,8 @@ namespace Contensive.Addons.AddonListEditor {
                             new AddonListColumnItemModel() {
                                  addonList = new List<AddonListItemModel>() {
                                     new AddonListItemModel() {
-                                        designBlockTypeGuid = guidDesignBlockTile,
+                                        designBlockTypeGuid = addonTile.ccguid,
+                                        designBlockTypeName = addonTile.name,
                                         instanceGuid = GenericController.createGuid(),
                                         columns = null
                                     }
@@ -117,13 +130,15 @@ namespace Contensive.Addons.AddonListEditor {
                         }
                     },
                     new AddonListItemModel() {
-                        designBlockTypeGuid = guidDesignBlockTwoColumn,
+                        designBlockTypeGuid = addonTwoColumn.ccguid,
+                        designBlockTypeName = addonTwoColumn.name,
                         instanceGuid = GenericController.createGuid(),
                         columns = new List<AddonListColumnItemModel>() {
                             new AddonListColumnItemModel() {
                                 addonList = new List<AddonListItemModel>() {
                                     new AddonListItemModel() {
-                                        designBlockTypeGuid = guidDesignBlockTile,
+                                        designBlockTypeGuid = addonTile.ccguid,
+                                        designBlockTypeName = addonTile.name,
                                         instanceGuid = GenericController.createGuid(),
                                         columns = null
                                     }
@@ -134,13 +149,15 @@ namespace Contensive.Addons.AddonListEditor {
                             new AddonListColumnItemModel() {
                                  addonList = new List<AddonListItemModel>() {
                                     new AddonListItemModel() {
-                                        designBlockTypeGuid = guidDesignBlockTwoColumn,
+                                        designBlockTypeGuid = addonTwoColumn.ccguid,
+                                        designBlockTypeName = addonTwoColumn.name,
                                         instanceGuid = GenericController.createGuid(),
                                         columns = new List<AddonListColumnItemModel>() {
                                             new AddonListColumnItemModel() {
                                                  addonList = new List<AddonListItemModel>() {
                                                     new AddonListItemModel() {
-                                                        designBlockTypeGuid = guidDesignBlockTile,
+                                                        designBlockTypeGuid = addonTile.ccguid,
+                                                        designBlockTypeName = addonTile.name,
                                                         instanceGuid = GenericController.createGuid(),
                                                         columns = null
                                                     }
@@ -151,7 +168,8 @@ namespace Contensive.Addons.AddonListEditor {
                                             new AddonListColumnItemModel() {
                                                  addonList = new List<AddonListItemModel>() {
                                                     new AddonListItemModel() {
-                                                        designBlockTypeGuid = guidDesignBlockTile,
+                                                        designBlockTypeGuid = addonTile.ccguid,
+                                                        designBlockTypeName = addonTile.name,
                                                         instanceGuid = GenericController.createGuid(),
                                                         columns = null
                                                     }

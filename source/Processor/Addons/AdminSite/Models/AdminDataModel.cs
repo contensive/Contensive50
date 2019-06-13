@@ -381,11 +381,11 @@ namespace Contensive.Addons.AdminSite {
         /// <returns></returns>
         public static bool userHasContentAccess(CoreController core, int ContentID) {
             try {
-                if (core.session.isAuthenticatedAdmin(core)) { return true; }
+                if (core.session.isAuthenticatedAdmin()) { return true; }
                 //
                 ContentMetadataModel cdef = ContentMetadataModel.create(core, ContentID);
                 if (cdef != null) {
-                    return core.session.isAuthenticatedContentManager(core, cdef.name);
+                    return core.session.isAuthenticatedContentManager(cdef.name);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -449,7 +449,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // determine user rights to this content
                 UserAllowContentEdit = true;
-                if (!core.session.isAuthenticatedAdmin(core)) {
+                if (!core.session.isAuthenticatedAdmin()) {
                     if (adminContent.id > 0) {
                         UserAllowContentEdit = userHasContentAccess(core, adminContent.id);
                     }
@@ -747,7 +747,7 @@ namespace Contensive.Addons.AdminSite {
                     // ----- Set Read Only: if non-developer tries to edit a developer record
                     //
                     if (GenericController.vbUCase(adminContent.tableName) == GenericController.vbUCase("ccMembers")) {
-                        if (!core.session.isAuthenticatedDeveloper(core)) {
+                        if (!core.session.isAuthenticatedDeveloper()) {
                             if (editRecord.fieldsLc.ContainsKey("developer")) {
                                 if (GenericController.encodeBoolean(editRecord.fieldsLc["developer"].value)) {
                                     editRecord.userReadOnly = true;
@@ -1325,12 +1325,12 @@ namespace Contensive.Addons.AdminSite {
                             // (many to many is handled during save)
                             //
                             ResponseFieldValueIsOKToSave = false;
-                        } else if ((field.adminOnly) && (!core.session.isAuthenticatedAdmin(core))) {
+                        } else if ((field.adminOnly) && (!core.session.isAuthenticatedAdmin())) {
                             //
                             // non-admin and admin only field, leave current value
                             //
                             ResponseFieldValueIsOKToSave = false;
-                        } else if ((field.developerOnly) && (!core.session.isAuthenticatedDeveloper(core))) {
+                        } else if ((field.developerOnly) && (!core.session.isAuthenticatedDeveloper())) {
                             //
                             // non-developer and developer only field, leave current value
                             //

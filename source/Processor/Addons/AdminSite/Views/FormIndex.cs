@@ -45,7 +45,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // No Fields
                     Stream.Add(AdminErrorController.get( core, "This content [" + adminData.adminContent.name + "] cannot be accessed because it has no fields. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
-                } else if (adminData.adminContent.developerOnly & (!core.session.isAuthenticatedDeveloper(core))) {
+                } else if (adminData.adminContent.developerOnly & (!core.session.isAuthenticatedDeveloper())) {
                     //
                     // Developer Content and not developer
                     Stream.Add(AdminErrorController.get( core, "Access to this content [" + adminData.adminContent.name + "] requires developer permissions. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));

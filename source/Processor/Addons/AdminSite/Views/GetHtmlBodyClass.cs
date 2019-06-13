@@ -40,7 +40,7 @@ namespace Contensive.Addons.AdminSite {
                         errorContextMessage = "get Login Page for Html Body",
                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
                     });
-                } else if (!cp.core.session.isAuthenticatedContentManager(cp.core)) {
+                } else if (!cp.core.session.isAuthenticatedContentManager()) {
                     //
                     // --- member must have proper access to continue
                     result = ""
@@ -1264,7 +1264,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // -- If There is an error, block the save
                     adminData.Admin_Action = Constants.AdminActionNop;
-                } else if (!cp.core.session.isAuthenticatedContentManager(cp.core, adminData.adminContent.name)) {
+                } else if (!cp.core.session.isAuthenticatedContentManager( adminData.adminContent.name)) {
                     //
                     // -- must be content manager
                 } else if (editRecord.userReadOnly) {
@@ -2302,7 +2302,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     //
                     return cp.core.webServer.redirect("/" + cp.core.appConfig.adminRoute, "GetContentChildTool, Cancel Button Pressed");
-                } else if (!cp.core.session.isAuthenticatedAdmin(cp.core)) {
+                } else if (!cp.core.session.isAuthenticatedAdmin()) {
                     //
                     //
                     //
@@ -2556,7 +2556,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     //
                     return cp.core.webServer.redirect("/" + cp.core.appConfig.adminRoute, "HouseKeepingControl, Cancel Button Pressed");
-                } else if (!cp.core.session.isAuthenticatedAdmin(cp.core)) {
+                } else if (!cp.core.session.isAuthenticatedAdmin()) {
                     //
                     //
                     //
@@ -2747,7 +2747,7 @@ namespace Contensive.Addons.AdminSite {
                     // Cancel just exits with no content
                     //
                     return tempGetForm_BuildCollection;
-                } else if (!cp.core.session.isAuthenticatedAdmin(cp.core)) {
+                } else if (!cp.core.session.isAuthenticatedAdmin()) {
                     //
                     // Not Admin Error
                     //

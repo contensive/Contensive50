@@ -37,7 +37,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // -- content extras like tool panel
-                if (core.session.isAuthenticatedContentManager(core) && (core.session.user.allowToolsPanel)) {
+                if (core.session.isAuthenticatedContentManager() && (core.session.user.allowToolsPanel)) {
                     if (AllowTools) {
                         result.Add(core.html.getToolsPanel());
                     }
@@ -722,7 +722,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.siteProperties.allowLoginIcon) {
                     result += "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">";
                     result += "<tr><td align=\"right\">";
-                    if (core.session.isAuthenticatedContentManager(core)) {
+                    if (core.session.isAuthenticatedContentManager()) {
                         result += "<a href=\"" + HtmlController.encodeHtml("/" + core.appConfig.adminRoute) + "\" target=\"_blank\">";
                     } else {
                         Link = core.webServer.requestPage + "?" + core.doc.refreshQueryString;
@@ -753,7 +753,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public string getAdminHintWrapper(string content) {
             string msg = "<div class=\"ccHintWrapperContent\"><h4>Administrator</h4>" + content + "</div>";
-            return ((core.session.isEditing("") || core.session.isAuthenticatedAdmin(core))) ? msg : string.Empty;
+            return ((core.session.isEditing("") || core.session.isAuthenticatedAdmin())) ? msg : string.Empty;
         }
         //
         //====================================================================================================
@@ -1784,13 +1784,13 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // Logout - This can only come from the Horizonal Tool Bar
                                 //
-                                core.session.logout(core);
+                                core.session.logout();
                                 break;
                             case ButtonLogin:
                                 //
                                 // Login - This can only come from the Horizonal Tool Bar
                                 //
-                                Controllers.LoginController.processFormLoginDefault(core);
+                                Controllers.LoginController.processLoginFormDefault(core);
                                 break;
                             case ButtonApply:
                                 //
@@ -1798,7 +1798,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 username = core.docProperties.getText(legacyFormSn + "username");
                                 if (!string.IsNullOrEmpty(username)) {
-                                    Controllers.LoginController.processFormLoginDefault(core);
+                                    Controllers.LoginController.processLoginFormDefault(core);
                                 }
                                 //
                                 // ----- AllowAdminLinks
@@ -2373,7 +2373,7 @@ namespace Contensive.Processor.Controllers {
                                     string EndDiv = "";
                                     int CheckBoxCnt = 0;
                                     int DivCheckBoxCnt = 0;
-                                    CanSeeHiddenFields = core.session.isAuthenticatedDeveloper(core);
+                                    CanSeeHiddenFields = core.session.isAuthenticatedDeveloper();
                                     string DivName = htmlNamePrefix + ".All";
                                     while (csData.ok()) {
                                         string OptionName = csData.getText("OptionName");

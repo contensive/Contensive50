@@ -227,7 +227,7 @@ namespace Contensive.Addons.AdminSite {
                 if (adminContentTableNameLower == PersonModel.contentTableNameLowerCase) {
                     //
                     // -- people
-                    if (!(core.session.isAuthenticatedAdmin(core))) {
+                    if (!(core.session.isAuthenticatedAdmin())) {
                         //
                         // Must be admin
                         Stream.Add(AdminErrorController.get(core, "This edit form requires administrator access.", ""));
@@ -266,7 +266,7 @@ namespace Contensive.Addons.AdminSite {
                     if (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
                         LastSendTestDate = GenericController.encodeDate(adminData.editRecord.fieldsLc["lastsendtestdate"].value);
                     }
-                    if (!(core.session.isAuthenticatedAdmin(core))) {
+                    if (!(core.session.isAuthenticatedAdmin())) {
                         //
                         // Must be admin
                         Stream.Add(AdminErrorController.get(core, "This edit form requires Member Administration access.", "This edit form requires Member Administration access."));
@@ -288,7 +288,7 @@ namespace Contensive.Addons.AdminSite {
                             allowAdd = (allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd),
                             allowCancel = true,
                             allowCreateDuplicate = (allowSave && adminData.editRecord.AllowUserSave & (adminData.editRecord.id != 0)),
-                            allowDelete = AllowDelete && adminData.editRecord.AllowUserDelete && core.session.isAuthenticatedDeveloper(core),
+                            allowDelete = AllowDelete && adminData.editRecord.AllowUserDelete && core.session.isAuthenticatedDeveloper(),
                             allowMarkReviewed = false,
                             allowRefresh = AllowRefresh,
                             allowSave = (allowSave && adminData.editRecord.AllowUserSave && (!EmailSubmitted) && (!EmailSent)),
@@ -317,7 +317,7 @@ namespace Contensive.Addons.AdminSite {
                             allowAdd = allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd,
                             allowCancel = true,
                             allowCreateDuplicate = allowAdd && (adminData.editRecord.id != 0),
-                            allowDelete = AllowDelete && adminData.editRecord.AllowUserDelete && core.session.isAuthenticatedDeveloper(core),
+                            allowDelete = AllowDelete && adminData.editRecord.AllowUserDelete && core.session.isAuthenticatedDeveloper(),
                             allowMarkReviewed = false,
                             allowRefresh = AllowRefresh,
                             allowSave = allowSave && adminData.editRecord.AllowUserSave && !EmailSubmitted,
@@ -362,7 +362,7 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(EditSectionButtonBar);
                     }
                 } else if (adminData.adminContent.tableName.ToLowerInvariant() == ContentModel.contentTableNameLowerCase) {
-                    if (!(core.session.isAuthenticatedAdmin(core))) {
+                    if (!(core.session.isAuthenticatedAdmin())) {
                         //
                         // Must be admin
                         //
@@ -1132,7 +1132,7 @@ namespace Contensive.Addons.AdminSite {
                         string HelpMsgOpenedEdit = null;
                         //
                         // field help
-                        if (core.session.isAuthenticatedAdmin(core)) {
+                        if (core.session.isAuthenticatedAdmin()) {
                             //
                             // Admin view
                             //

@@ -159,10 +159,10 @@ namespace Contensive.Addons.Tools {
                                                         + ",HTMLContent=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer))
                                                         + ",EditTab=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer))
                                                         + ",Scramble=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
-                                                    if (core.session.isAuthenticatedAdmin(core)) {
+                                                    if (core.session.isAuthenticatedAdmin()) {
                                                         SQL += ",adminonly=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." + RecordPointer));
                                                     }
-                                                    if (core.session.isAuthenticatedDeveloper(core)) {
+                                                    if (core.session.isAuthenticatedDeveloper()) {
                                                         SQL += ",DeveloperOnly=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." + RecordPointer));
                                                     }
                                                     SQL += " where ID=" + formFieldId;
@@ -496,13 +496,13 @@ namespace Contensive.Addons.Tools {
                             //
                             // Admin Only
                             //
-                            if (core.session.isAuthenticatedAdmin(core)) {
+                            if (core.session.isAuthenticatedAdmin()) {
                                 streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaAdminOnly." + RecordCount, fieldsort.field.adminOnly, fieldsort.field.inherited));
                             }
                             //
                             // Developer Only
                             //
-                            if (core.session.isAuthenticatedDeveloper(core)) {
+                            if (core.session.isAuthenticatedDeveloper()) {
                                 streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, fieldsort.field.developerOnly, fieldsort.field.inherited));
                             }
                             //

@@ -15,6 +15,11 @@ namespace Contensive.Addons.AddonListEditor {
         // 
         public override object Execute(CPBaseClass cp) {
             try {
+                // 
+                cp.Utils.AppendLog("GetAddonListClass, cp.Request.Body [" + cp.Request.Body.ToString() + "]");
+                // 
+                cp.Utils.AppendLog("GetAddonListClass, cp.Doc.GetText(parentContentGuid) [" + cp.Doc.GetText("parentContentGuid") + "]");
+                //
                 CoreController core = ((CPClass)cp).core;
                 // 
                 GetAddonList_RequestClass request = DeserializeObject<GetAddonList_RequestClass>(cp.Request.Body);
@@ -43,12 +48,12 @@ namespace Contensive.Addons.AddonListEditor {
                         errorList = new List<string> { "The parent content could not be determined from the guid [" + request.parentContentGuid + "]" }
                     });
                 }
-                if (!core.session.isAuthenticatedContentManager(core, metadata)) {
-                    cp.Response.SetStatus(WebServerController.httpResponseStatus401_Unauthorized);
-                    return SerializeObject(new GetAddonList_ResponseClass() {
-                        errorList = new List<string> { "Your account does not have permission to edit [" + metadata.name + "]" }
-                    });
-                }
+                //if (!core.session.isAuthenticatedContentManager(core, metadata)) {
+                //    cp.Response.SetStatus(WebServerController.httpResponseStatus401_Unauthorized);
+                //    return SerializeObject(new GetAddonList_ResponseClass() {
+                //        errorList = new List<string> { "Your account does not have permission to edit [" + metadata.name + "]" }
+                //    });
+                //}
                 List<AddonListItemModel> addonList;
                 switch (metadata.name.ToLower()) {
                     case "page content":
@@ -97,10 +102,7 @@ namespace Contensive.Addons.AddonListEditor {
                 //
                 // -- render the html for each addon in the addonList that qualifies
                 if (request.includeRenderedHtml) {
-                    foreach (var addon in addonList) {
-                        cp.Doc.SetProperty("instanceId", addon.instanceGuid);
-                        addon.renderedHtml = cp.Addon.Execute(addon.designBlockTypeGuid).ToString();
-                    }
+                    AddonListController.renderAddonList(cp, addonList);
                 }
                 //
                 // -- return the successful response

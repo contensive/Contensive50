@@ -14,6 +14,10 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         public string designBlockTypeGuid;
         /// <summary>
+        /// The name of the design block to be used for non-rendered mode
+        /// </summary>
+        public string designBlockTypeName;
+        /// <summary>
         /// the Guid of the data instance in this position
         /// </summary>
         public string instanceGuid;
@@ -23,9 +27,33 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         public string renderedHtml;
         /// <summary>
+        /// Assets added to the html document during html rendering
+        /// </summary>
+        public AddonAssetsModel renderedAssets;
+        /// <summary>
         /// If this design block is structural, it contains one or more addon lists
         /// </summary>
         public List<AddonListColumnItemModel> columns;
+    }
+    /// <summary>
+    /// Assets added to the html document during html rendering
+    /// </summary>
+    [System.Serializable]
+    public class AddonAssetsModel {
+        /// <summary>
+        /// css styles added to the head
+        /// </summary>
+        public List<string> headStyles = new List<string>();
+        //
+        public List<string> headStylesheetLinks = new List<string>();
+        //
+        public List<string> headJs = new List<string>();
+        //
+        public List<string> headJsLinks = new List<string>();
+        //
+        public List<string> bodyJs = new List<string>();
+        //
+        public List<string> bodyJsLinks = new List<string>();
     }
     [System.Serializable]
     public class AddonListColumnItemModel {

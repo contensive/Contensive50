@@ -50,7 +50,7 @@ namespace Contensive.Addons.Tools {
                     // Cancel just exits with no content
                     //
                     return tempGetForm_MetaKeywordTool;
-                } else if (!core.session.isAuthenticatedAdmin(core)) {
+                } else if (!core.session.isAuthenticatedAdmin()) {
                     //
                     // Not Admin Error
                     //

@@ -46,7 +46,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- People and member content export
                         //
-                        if (!core.session.isAuthenticatedAdmin(core)) {
+                        if (!core.session.isAuthenticatedAdmin()) {
                             sb.Append("Warning: You must be a site administrator to export this information.");
                         } else {
                             using (var csData = new CsModel(core)) {
@@ -105,7 +105,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- All other content
                         //
-                        if (!core.session.isAuthenticatedContentManager(core, iContentName)) {
+                        if (!core.session.isAuthenticatedContentManager(iContentName)) {
                             sb.Append("Error: You must be a content manager to export this data.");
                         } else {
                             using (var csData = new CsModel(core)) {

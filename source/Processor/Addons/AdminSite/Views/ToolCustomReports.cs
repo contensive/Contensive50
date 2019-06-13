@@ -69,7 +69,7 @@ namespace Contensive.Addons.AdminSite {
                 ButtonListRight = "";
                 SQLFieldName = "SQLQuery";
                 //
-                if (!core.session.isAuthenticatedAdmin(core)) {
+                if (!core.session.isAuthenticatedAdmin()) {
                     //
                     // Must be a developer
                     //

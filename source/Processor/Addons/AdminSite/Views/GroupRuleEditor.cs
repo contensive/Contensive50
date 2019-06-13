@@ -63,7 +63,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // Output all the groups, with the active and dateexpires from those joined
                         //body.Add(adminUIController.EditTableOpen);
-                        bool CanSeeHiddenGroups = core.session.isAuthenticatedDeveloper(core);
+                        bool CanSeeHiddenGroups = core.session.isAuthenticatedDeveloper();
                         csData.openSql(SQL2, "Default");
                         while (csData.ok()) {
                             string GroupName = csData.getText("GroupName");

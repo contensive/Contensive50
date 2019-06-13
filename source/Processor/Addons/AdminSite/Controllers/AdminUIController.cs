@@ -1758,7 +1758,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     bool groupRulesAllowAdd = false;
                     DateTime memberRulesDateExpires = default(DateTime);
                     bool memberRulesAllow = false;
-                    if (core.session.isAuthenticatedAdmin(core)) {
+                    if (core.session.isAuthenticatedAdmin()) {
                         //
                         // Entry was found
                         userHasAccess = true;

@@ -48,7 +48,7 @@ namespace Contensive.Processor {
         /// <param name="password"></param>
         /// <returns></returns>
         public override int GetIdByLogin(string username, string password) {
-            return cp.core.session.getUserIdForCredentials(cp.core, username, password);
+            return cp.core.session.getUserIdForCredentials(username, password);
         }
         //
         //====================================================================================================
@@ -74,7 +74,7 @@ namespace Contensive.Processor {
         /// </summary>
         public override bool IsAdmin {
             get {
-                return cp.core.session.isAuthenticatedAdmin(cp.core);
+                return cp.core.session.isAuthenticatedAdmin();
             }
         }
         //
@@ -109,14 +109,14 @@ namespace Contensive.Processor {
         /// <param name="contentName"></param>
         /// <returns></returns>
         public override bool IsContentManager(string contentName) {
-            return cp.core.session.isAuthenticatedContentManager(cp.core, contentName);
+            return cp.core.session.isAuthenticatedContentManager(contentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsDeveloper {
             get {
-                return cp.core.session.isAuthenticatedDeveloper(cp.core);
+                return cp.core.session.isAuthenticatedDeveloper();
             }
         }
         //
@@ -138,7 +138,7 @@ namespace Contensive.Processor {
         //
         public override bool IsGuest {
             get {
-                return cp.core.session.isGuest(cp.core);
+                return cp.core.session.isGuest();
             }
         }
         //
@@ -193,21 +193,21 @@ namespace Contensive.Processor {
         [Obsolete("deprecated",true)]
         public override bool IsMember {
             get {
-                return cp.core.session.isAuthenticatedMember(cp.core);
+                return cp.core.session.isAuthenticatedMember();
             }
         }
         //
         //====================================================================================================
         //
         public override bool IsQuickEditing(string contentName) {
-            return cp.core.session.isQuickEditing(cp.core, contentName);
+            return cp.core.session.isQuickEditing(contentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsRecognized {
             get {
-                return cp.core.session.isRecognized(cp.core);
+                return cp.core.session.isRecognized();
             }
         }
         //
@@ -242,7 +242,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool Login(string usernameOrEmail, string password, bool setAutoLogin) {
-            return cp.core.session.authenticate(cp.core, usernameOrEmail, password, setAutoLogin);
+            return cp.core.session.authenticate(usernameOrEmail, password, setAutoLogin);
         }
         public override bool Login(string usernameOrEmail, string password) 
             => Login(usernameOrEmail, password, false);
@@ -250,13 +250,13 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool LoginByID(int userId) {
-            return SessionController.authenticateById(cp.core, userId, cp.core.session);
+            return cp.core.session.authenticateById(userId, cp.core.session);
         }
         //
         //====================================================================================================
         //
         public override bool LoginByID(int userId, bool setAutoLogin) {
-            bool result = SessionController.authenticateById(cp.core, userId, cp.core.session);
+            bool result = cp.core.session.authenticateById(userId, cp.core.session);
             if (result) {
                 cp.core.session.user.autoLogin = setAutoLogin;
                 cp.core.session.user.save(cp.core);
@@ -267,13 +267,13 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool LoginIsOK(string usernameOrEmail, string password) {
-            return cp.core.session.isLoginOK(cp.core, usernameOrEmail, password);
+            return cp.core.session.isLoginOK( usernameOrEmail, password);
         }
         //
         //====================================================================================================
         //
         public override void Logout() {
-            cp.core.session.logout(cp.core);
+            cp.core.session.logout();
         }
         //
         //====================================================================================================
@@ -297,7 +297,7 @@ namespace Contensive.Processor {
         public override bool IsNewLoginOK(string username, string password) {
             string errorMessage = "";
             int errorCode = 0;
-            return cp.core.session.isNewCredentialOK(cp.core, username, password, ref errorMessage, ref errorCode);
+            return cp.core.session.isNewCredentialOK(username, password, ref errorMessage, ref errorCode);
         }
         //
         //====================================================================================================
@@ -389,7 +389,7 @@ namespace Contensive.Processor {
         //
         [Obsolete("Use LoginById(integer) instead", false)]
         public override bool LoginByID(string RecordID, bool SetAutoLogin = false) {
-            return SessionController.authenticateById(cp.core, encodeInteger(RecordID), cp.core.session);
+            return cp.core.session.authenticateById(encodeInteger(RecordID), cp.core.session);
         }
         //
         [Obsolete("Deprecated.", false)]

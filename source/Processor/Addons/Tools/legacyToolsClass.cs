@@ -175,7 +175,7 @@ namespace Contensive.Addons.Tools {
                 //
                 // ----- Check permissions
                 //
-                if (!core.session.isAuthenticatedAdmin(core)) {
+                if (!core.session.isAuthenticatedAdmin()) {
                     //
                     // You must be admin to use this feature
                     //
@@ -2659,7 +2659,7 @@ namespace Contensive.Addons.Tools {
                 //
                 Button = core.docProperties.getText("button");
                 //
-                IsDeveloper = core.session.isAuthenticatedDeveloper(core);
+                IsDeveloper = core.session.isAuthenticatedDeveloper();
                 if (Button == ButtonFindAndReplace) {
                     RowCnt = core.docProperties.getInteger("CDefRowCnt");
                     if (RowCnt > 0) {

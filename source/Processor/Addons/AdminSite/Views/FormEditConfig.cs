@@ -30,7 +30,7 @@ namespace Contensive.Addons.AdminSite {
                     string ButtonList = null;
                     //
                     // From here down will return a form
-                    if (!core.session.isAuthenticatedAdmin(core)) {
+                    if (!core.session.isAuthenticatedAdmin()) {
                         //
                         // Does not have permission
                         ButtonList = ButtonCancel;

@@ -28,14 +28,14 @@ namespace Contensive.Processor.Controllers {
                     // -- exit with no rights
                     return result;
                 }
-                if (core.session.isAuthenticatedDeveloper(core)) {
+                if (core.session.isAuthenticatedDeveloper()) {
                     //
                     // developers are always content managers
                     result.allowEdit = true;
                     result.allowSave = true;
                     result.allowAdd = cdef.allowAdd;
                     result.allowDelete = cdef.allowDelete;
-                } else if (core.session.isAuthenticatedAdmin(core)) {
+                } else if (core.session.isAuthenticatedAdmin()) {
                     //
                     // admin is content manager if the CDef is not developer only
                     if (!cdef.developerOnly) {

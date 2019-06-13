@@ -455,7 +455,7 @@ namespace Contensive.Processor.Controllers {
                     core.webServer.setResponseStatus(WebServerController.httpResponseStatus404_NotFound);
                     core.docProperties.setProperty(rnPageId, getPageNotFoundPageId(core));
                     //Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
-                    if (core.session.isAuthenticatedAdmin(core)) {
+                    if (core.session.isAuthenticatedAdmin()) {
                         //string RedirectLink = "";
                         string PageNotFoundReason = "";
                         core.doc.adminWarning = PageNotFoundReason;
@@ -604,7 +604,7 @@ namespace Contensive.Processor.Controllers {
                 // -- Determine if Content Blocking
                 bool ContentBlocked = false;
                 if (!string.IsNullOrEmpty(BlockedRecordIDList)) {
-                    if (core.session.isAuthenticatedAdmin(core)) {
+                    if (core.session.isAuthenticatedAdmin()) {
                         //
                         // Administrators are never blocked
                         //
@@ -704,7 +704,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 string BlockForm = "";
                                 if (!core.session.isAuthenticated) {
-                                    if (!core.session.isRecognized(core)) {
+                                    if (!core.session.isRecognized()) {
                                         //
                                         // -- not recognized
                                         BlockForm = ""
@@ -757,10 +757,10 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // Register Form
                                     //
-                                    if (!core.session.isAuthenticated & core.session.isRecognized(core)) {
+                                    if (!core.session.isAuthenticated & core.session.isRecognized()) {
                                         //
                                         // -- Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
-                                        core.session.logout(core);
+                                        core.session.logout();
                                     }
                                     if (!core.session.isAuthenticated) {
                                         //
@@ -1010,7 +1010,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- Add admin warning to the top of the content
-                if (core.session.isAuthenticatedAdmin(core) & core.doc.adminWarning != "") {
+                if (core.session.isAuthenticatedAdmin() & core.doc.adminWarning != "") {
                     if (core.doc.adminWarningPageID != 0) {
                         core.doc.adminWarning += "</p>" + AdminUIController.getRecordEditAndCutLink(core, "Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID) + "&nbsp;Edit the page<p>";
                         core.doc.adminWarningPageID = 0;
@@ -1060,7 +1060,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- add Page Content
                 string Cell = "";
-                if (core.session.isQuickEditing(core, PageContentModel.contentName)) {
+                if (core.session.isQuickEditing( PageContentModel.contentName)) {
                     //
                     // -- quick editor
                     Cell = Cell + QuickEditController.getQuickEditing(core);
@@ -1103,7 +1103,7 @@ namespace Contensive.Processor.Controllers {
                 // -- Last Modified line
                 if ((core.doc.pageController.page.modifiedDate != DateTime.MinValue) & core.doc.pageController.page.allowLastModifiedFooter) {
                     result += "\r<p>This page was last modified " + core.doc.pageController.page.modifiedDate.ToString("G");
-                    if (core.session.isAuthenticatedAdmin(core)) {
+                    if (core.session.isAuthenticatedAdmin()) {
                         if (core.doc.pageController.page.modifiedBy == 0) {
                             result += " (admin only: modified by unknown)";
                         } else {
@@ -1121,7 +1121,7 @@ namespace Contensive.Processor.Controllers {
                 // -- Last Reviewed line
                 if ((core.doc.pageController.page.dateReviewed != DateTime.MinValue) & core.doc.pageController.page.allowReviewedFooter) {
                     result += "\r<p>This page was last reviewed " + core.doc.pageController.page.dateReviewed.ToString("");
-                    if (core.session.isAuthenticatedAdmin(core)) {
+                    if (core.session.isAuthenticatedAdmin()) {
                         if (core.doc.pageController.page.reviewedBy == 0) {
                             result += " (by unknown)";
                         } else {
@@ -1522,7 +1522,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // Add the Admin Message to the link
-                if (core.session.isAuthenticatedAdmin(core)) {
+                if (core.session.isAuthenticatedAdmin()) {
                     if (string.IsNullOrEmpty(PageNotFoundLink)) {
                         PageNotFoundLink = core.webServer.requestUrl;
                     }
@@ -1682,11 +1682,11 @@ namespace Contensive.Processor.Controllers {
                     // Load the instructions
                     //
                     pageForm = loadFormPageInstructions(core, FormInstructions, Formhtml);
-                    if (pageForm.AuthenticateOnFormProcess & !core.session.isAuthenticated & core.session.isRecognized(core)) {
+                    if (pageForm.AuthenticateOnFormProcess & !core.session.isAuthenticated & core.session.isRecognized()) {
                         //
                         // If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
                         //
-                        core.session.logout(core);
+                        core.session.logout();
                     }
                     bool Success = true;
                     int Ptr = 0;
@@ -1797,7 +1797,7 @@ namespace Contensive.Processor.Controllers {
                         // Authenticate
                         //
                         if (pageForm.AuthenticateOnFormProcess) {
-                            SessionController.authenticateById(core, core.session.user.id, core.session);
+                            core.session.authenticateById(core.session.user.id, core.session);
                         }
                         //
                         // Join Group requested by page that created form
@@ -2424,7 +2424,7 @@ namespace Contensive.Processor.Controllers {
             //
             int recordId = (core.docProperties.getInteger("ID"));
             string button = core.docProperties.getText("Button");
-            if ((!string.IsNullOrEmpty(button)) && (recordId != 0) && (core.session.isAuthenticatedContentManager(core, PageContentModel.contentName))) {
+            if ((!string.IsNullOrEmpty(button)) && (recordId != 0) && (core.session.isAuthenticatedContentManager(PageContentModel.contentName))) {
                 var pageCdef = Models.Domain.ContentMetadataModel.createByUniqueName(core, "page content");
                 var pageTable = Models.Db.TableModel.createByContentName(core, pageCdef.name);
                 WorkflowController.editLockClass editLock = WorkflowController.getEditLock(core, pageTable.id, recordId);
@@ -2438,7 +2438,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Determine is the record should be saved
                 //
-                if (core.session.isAuthenticatedAdmin(core)) {
+                if (core.session.isAuthenticatedAdmin()) {
                     //
                     // cases that admin can save
                     allowSave = (button == ButtonAddChildPage) || (button == ButtonAddSiblingPage) || (button == ButtonSave) || (button == ButtonOK);
@@ -2627,7 +2627,7 @@ namespace Contensive.Processor.Controllers {
         public bool allowThroughPageBlock(CoreController core, int pageId) {
             bool result = false;
             try {
-                if (core.session.isAuthenticatedAdmin(core)) { return true; }
+                if (core.session.isAuthenticatedAdmin()) { return true; }
                 string sql = "SELECT ccMemberRules.MemberID"
                     + " FROM (ccPageContentBlockRules LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID) LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID"
                     + " WHERE (((ccPageContentBlockRules.RecordID)=" + pageId + ")"
@@ -2668,7 +2668,7 @@ namespace Contensive.Processor.Controllers {
             GenericController.modifyQueryString(core.doc.refreshQueryString, RequestNamePasteParentRecordID, "");
 
             {
-                if (!core.session.isAuthenticatedContentManager(core, pasteParentContentMetadata)) {
+                if (!core.session.isAuthenticatedContentManager(pasteParentContentMetadata)) {
                     ErrorController.addUserError(core, "The paste operation failed because you are not a content manager of the Clip Parent");
                 } else {
                     //
