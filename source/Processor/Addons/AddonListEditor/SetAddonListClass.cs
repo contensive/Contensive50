@@ -213,7 +213,7 @@ namespace Contensive.Addons.AddonListEditor {
                         designBlockTypeName = addon.designBlockTypeName,
                         columns = addon.columns,
                     };
-                    AddonListController.renderAddonListItem(cp, renderedAddonItem);
+                    AddonListController.renderEdit(cp, renderedAddonItem);
                     return renderedAddonItem;
                 }
                 if (addon.columns != null) {

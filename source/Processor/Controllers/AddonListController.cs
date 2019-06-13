@@ -4,6 +4,7 @@ using Contensive.Processor.Models.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -12,16 +13,51 @@ namespace Contensive.Processor.Controllers {
     /// static class controller
     /// </summary>
     public class AddonListController : IDisposable {
+        //
+        //====================================================================================================
         /// <summary>
         /// Render the html,css,js for an addonListItem
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="addonListItem"></param>
-        public static void renderAddonListItem(CPBaseClass cp, AddonListItemModel addonListItem) {
+        public static string render(CPBaseClass cp, AddonListItemModel addonListItem) {
+            cp.Doc.SetProperty("instanceId", addonListItem.instanceGuid);
+            return cp.Addon.Execute(addonListItem.designBlockTypeGuid).ToString();
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// render all the renderHtml, css, js nodes in an addon list
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="addonList"></param>
+        public static string render(CPBaseClass cp, List<AddonListItemModel> addonList) {
+            var result = new StringBuilder();
+            foreach (var addon in addonList) {
+                var addonHtml = render(cp, addon);
+                if (addon.columns != null) {
+                    int colPtr = 1;
+                    foreach (var column in addon.columns) {
+                        string replaceTarget = "<!-- column-" + colPtr + " -->";
+                        addonHtml = addonHtml.Replace(replaceTarget, render(cp, column.addonList));
+                        colPtr++;
+                    }
+                }
+                result.Append(addonHtml);
+            }
+            return result.ToString();
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Render for editing the html,css,js for an addonListItem
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="addonListItem"></param>
+        public static void renderEdit(CPBaseClass cp, AddonListItemModel addonListItem) {
             CoreController core = ((CPClass)(cp)).core;
             int assetSkipCnt = core.doc.htmlAssetList.Count;
-            cp.Doc.SetProperty("instanceId", addonListItem.instanceGuid);
-            addonListItem.renderedHtml = cp.Addon.Execute(addonListItem.designBlockTypeGuid).ToString();
+            addonListItem.renderedHtml = render(cp, addonListItem);
             addonListItem.renderedAssets = new AddonAssetsModel();
             foreach (var asset in core.doc.htmlAssetList.Skip(assetSkipCnt)) {
                 string key = ((asset.assetType == Constants.HtmlAssetTypeEnum.script) ? "js" : "css");
@@ -54,18 +90,18 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// render all the renderHtml, css, js nodes in an addon list
+        /// render for editing all the renderHtml, css, js nodes in an addon list
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="addonList"></param>
-        public static void renderAddonList( CPBaseClass cp, List<AddonListItemModel> addonList) {
+        public static void renderEdit(CPBaseClass cp, List<AddonListItemModel> addonList) {
             foreach (var addon in addonList) {
                 if (addon.columns != null) {
                     foreach (var column in addon.columns) {
-                        renderAddonList(cp, column.addonList);
+                        renderEdit(cp, column.addonList);
                     }
                 }
-                renderAddonListItem(cp, addon);
+                renderEdit(cp, addon);
             }
         }
         //

@@ -102,7 +102,7 @@ namespace Contensive.Addons.AddonListEditor {
                 //
                 // -- render the html for each addon in the addonList that qualifies
                 if (request.includeRenderedHtml) {
-                    AddonListController.renderAddonList(cp, addonList);
+                    AddonListController.renderEdit(cp, addonList);
                 }
                 //
                 // -- return the successful response
