@@ -10,6 +10,7 @@ using Contensive.Addons.AdminSite.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Text;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -159,7 +160,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- compatibility mode, downloadid, this exposes all library files because it exposes the sequential id number
                         int downloadId = core.docProperties.getInteger(RequestNameDownloadFileId);
-                        if (( downloadId>0 ) && ( core.siteProperties.getBoolean("Allow library file download by id",false))) {
+                        if ((downloadId > 0) && (core.siteProperties.getBoolean("Allow library file download by id", false))) {
                             file = LibraryFilesModel.create(core, downloadId);
                         }
                     }
@@ -576,7 +577,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- Render the Body
-                result += getContentBox_content_Body(core);
+                result += getHtmlBody_ContentBox_Content(core);
                 //
                 // -- If Link field populated, do redirect
                 if (core.doc.pageController.page.pageLink != "") {
@@ -1033,18 +1034,8 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// render the page content
         /// </summary>
-        /// <param name="ContentName"></param>
-        /// <param name="ContentID"></param>
-        /// <param name="OrderByClause"></param>
-        /// <param name="AllowChildList"></param>
-        /// <param name="Authoring"></param>
-        /// <param name="rootPageId"></param>
-        /// <param name="AllowReturnLink"></param>
-        /// <param name="RootPageContentName"></param>
-        /// <param name="ArchivePage"></param>
-        /// <returns></returns>
-        internal static string getContentBox_content_Body(CoreController core) {
-            string result = "";
+        internal static string getHtmlBody_ContentBox_Content(CoreController core) {
+            StringBuilder result = new StringBuilder();
             try {
                 bool isRootPage = core.doc.pageController.pageToRootList.Count.Equals(1);
                 if (core.doc.pageController.page.allowReturnLinkDisplay && (!isRootPage)) {
@@ -1055,22 +1046,29 @@ namespace Contensive.Processor.Controllers {
                     if (!string.IsNullOrEmpty(breadCrumb)) {
                         breadCrumb = "\r<p class=\"ccPageListNavigation\">" + BreadCrumbPrefix + " " + breadCrumb + "</p>";
                     }
-                    result += breadCrumb;
+                    result.Append(breadCrumb);
                 }
                 //
                 // -- add Page Content
-                string Cell = "";
-                if (core.session.isQuickEditing( PageContentModel.contentName)) {
+                var resultContent = new StringBuilder();
+                //
+                // -- Headline
+                if (!string.IsNullOrWhiteSpace(core.doc.pageController.page.headline)) {
+                    resultContent.Append("\r<h1>").Append(HtmlController.encodeHtml(core.doc.pageController.page.headline)).Append("</h1>");
+                }
+                if (core.session.isQuickEditing(PageContentModel.contentName)) {
                     //
                     // -- quick editor
-                    Cell = Cell + QuickEditController.getQuickEditing(core);
-                } else {
-                    //
-                    // -- Headline
-                    if (core.doc.pageController.page.headline != "") {
-                        string headline = HtmlController.encodeHtml(core.doc.pageController.page.headline);
-                        Cell = Cell + "\r<h1>" + headline + "</h1>";
+                    if (core.siteProperties.getBoolean("Allow AddonList Editor For Quick Editor")) {
+                        core.docProperties.setProperty("contentid", ContentMetadataModel.getContentId(core, PageContentModel.contentName));
+                        core.docProperties.setProperty("recordid", core.doc.pageController.page.id);
+                        core.addon.execute("{92B75A6A-E84B-4551-BBF3-849E91D084BC}", new CPUtilsBaseClass.addonExecuteContext() {
+                             addonType = CPUtilsBaseClass.addonContext.ContextSimple
+                        });
+                    } else {
+                        resultContent.Append(QuickEditController.getQuickEditing(core));
                     }
+                } else {
                     //
                     // -- Page Copy
                     string bodyCopy = core.doc.pageController.page.copyfilename.content;
@@ -1081,58 +1079,68 @@ namespace Contensive.Processor.Controllers {
                             bodyCopy = "\r<p><!-- Empty Content Placeholder --></p>";
                         }
                     }
-                    //
-                    // -- Wrap content body
-                    Cell = Cell + "\r<!-- ContentBoxBodyStart -->" + bodyCopy + "\r<!-- ContentBoxBodyEnd -->";
+                    resultContent.Append("\r<!-- ContentBoxBodyStart -->" + bodyCopy + "\r<!-- ContentBoxBodyEnd -->");
+                }
+                //
+                // -- addonList
+                if (!string.IsNullOrWhiteSpace(core.doc.pageController.page.addonList)) {
+                    try {
+                        List<AddonListItemModel> addonList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<AddonListItemModel>>(core.doc.pageController.page.addonList);
+                        if (addonList == null) {
+                            LogController.logWarn(core, "The addonList for page [" + core.doc.pageController.page.id + ", " + core.doc.pageController.page.name + "] was not empty, but deserialized to null, addonList '" + core.doc.pageController.page.addonList + "'");
+                        }
+                        resultContent.Append(AddonListController.render(core.cp_forAddonExecutionOnly, addonList));
+                    } catch (Exception) {
+                        LogController.logWarn(core, "The addonList for page [" + core.doc.pageController.page.id + ", " + core.doc.pageController.page.name + "] was not empty, but deserialized to null, addonList '" + core.doc.pageController.page.addonList + "'");
+                    }
                 }
                 //
                 // -- End Text Search
-                result += "\r<!-- TextSearchStart -->" + Cell + "\r<!-- TextSearchEnd -->";
+                result.Append("\r<!-- TextSearchStart -->" + resultContent.ToString() + "\r<!-- TextSearchEnd -->");
                 //
                 // -- Page See Also
                 if (core.doc.pageController.page.allowSeeAlso) {
-                    result += "\r<div>" + getSeeAlso(core, PageContentModel.contentName, core.doc.pageController.page.id) + "\r</div>";
+                    result.Append("\r<div>" + getSeeAlso(core, PageContentModel.contentName, core.doc.pageController.page.id) + "\r</div>");
                 }
                 //
                 // -- Allow More Info
                 if ((core.doc.pageController.page.contactMemberID != 0) & core.doc.pageController.page.allowMoreInfo) {
-                    result += getMoreInfoHtml(core, core.doc.pageController.page.contactMemberID);
-                    //result += "\r<ac TYPE=\"" + ACTypeContact + "\">";
+                    result.Append(getMoreInfoHtml(core, core.doc.pageController.page.contactMemberID));
                 }
                 //
                 // -- Last Modified line
                 if ((core.doc.pageController.page.modifiedDate != DateTime.MinValue) & core.doc.pageController.page.allowLastModifiedFooter) {
-                    result += "\r<p>This page was last modified " + core.doc.pageController.page.modifiedDate.ToString("G");
+                    result.Append("\r<p>This page was last modified " + core.doc.pageController.page.modifiedDate.ToString("G"));
                     if (core.session.isAuthenticatedAdmin()) {
                         if (core.doc.pageController.page.modifiedBy == 0) {
-                            result += " (admin only: modified by unknown)";
+                            result.Append(" (admin only: modified by unknown)");
                         } else {
                             string personName = MetadataController.getRecordName(core, "people", core.doc.pageController.page.modifiedBy);
                             if (string.IsNullOrEmpty(personName)) {
-                                result += " (admin only: modified by person with unnamed or deleted record #" + core.doc.pageController.page.modifiedBy + ")";
+                                result.Append(" (admin only: modified by person with unnamed or deleted record #" + core.doc.pageController.page.modifiedBy + ")");
                             } else {
-                                result += " (admin only: modified by " + personName + ")";
+                                result.Append(" (admin only: modified by " + personName + ")");
                             }
                         }
                     }
-                    result += "</p>";
+                    result.Append("</p>");
                 }
                 //
                 // -- Last Reviewed line
                 if ((core.doc.pageController.page.dateReviewed != DateTime.MinValue) & core.doc.pageController.page.allowReviewedFooter) {
-                    result += "\r<p>This page was last reviewed " + core.doc.pageController.page.dateReviewed.ToString("");
+                    result.Append("\r<p>This page was last reviewed " + core.doc.pageController.page.dateReviewed.ToString(""));
                     if (core.session.isAuthenticatedAdmin()) {
                         if (core.doc.pageController.page.reviewedBy == 0) {
-                            result += " (by unknown)";
+                            result.Append(" (by unknown)");
                         } else {
                             string personName = MetadataController.getRecordName(core, "people", core.doc.pageController.page.reviewedBy);
                             if (string.IsNullOrEmpty(personName)) {
-                                result += " (by person with unnamed or deleted record #" + core.doc.pageController.page.reviewedBy + ")";
+                                result.Append(" (by person with unnamed or deleted record #" + core.doc.pageController.page.reviewedBy + ")");
                             } else {
-                                result += " (by " + personName + ")";
+                                result.Append(" (by " + personName + ")");
                             }
                         }
-                        result += ".</p>";
+                        result.Append(".</p>");
                     }
                 }
                 //
@@ -1140,13 +1148,13 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.pageController.page.allowMessageFooter) {
                     string pageContentMessageFooter = core.siteProperties.getText("PageContentMessageFooter", "");
                     if (!string.IsNullOrEmpty(pageContentMessageFooter)) {
-                        result += "\r<p>" + pageContentMessageFooter + "</p>";
+                        result.Append("\r<p>" + pageContentMessageFooter + "</p>");
                     }
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            return result;
+            return result.ToString();
         }
         //
         //====================================================================================================
@@ -2468,7 +2476,7 @@ namespace Contensive.Processor.Controllers {
                         page.save(core);
                         WorkflowController.setEditLock(core, pageTable.id, page.id);
                         if (!SaveButNoChanges) {
-                            ContentController.processAfterSave(core,false, pageCdef.name, page.id, page.name, page.parentID, false);
+                            ContentController.processAfterSave(core, false, pageCdef.name, page.id, page.name, page.parentID, false);
                             PageContentModel.invalidateRecordCache(core, page.id);
                         }
                     }
