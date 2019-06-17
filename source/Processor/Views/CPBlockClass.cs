@@ -108,7 +108,7 @@ namespace Contensive.Processor {
                     if (!string.IsNullOrEmpty(accum)) {
                         headTags = HtmlParseStaticController.getTagInnerHTML(accum, "head", false);
                         if (!string.IsNullOrEmpty(headTags)) {
-                            foreach (string asset in stringSplit( headTags, "\r\n" )) {
+                            foreach (string asset in stringSplit( headTags, Environment.NewLine )) {
                                 cp.core.doc.htmlMetaContent_OtherTags.Add(new HtmlMetaClass() {
                                     addedByMessage = "block.importFile",
                                     content = asset

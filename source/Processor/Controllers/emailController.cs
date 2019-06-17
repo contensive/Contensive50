@@ -32,7 +32,7 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public static bool isOnBlockedList(CoreController core, string emailAddress) {
-            return (getBlockList(core).IndexOf("\r\n" + emailAddress + "\t", StringComparison.CurrentCultureIgnoreCase) >= 0);
+            return (getBlockList(core).IndexOf(Environment.NewLine + emailAddress + "\t", StringComparison.CurrentCultureIgnoreCase) >= 0);
         }
         //
         //====================================================================================================
@@ -51,7 +51,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // add them to the list
                 //
-                core.doc.emailBlockListStore = blockList + "\r\n" + EmailAddress + "\t" + DateTime.Now;
+                core.doc.emailBlockListStore = blockList + Environment.NewLine + EmailAddress + "\t" + DateTime.Now;
                 core.privateFiles.saveFile(emailBlockListFilename, core.doc.emailBlockListStore);
                 core.doc.emailBlockListStoreLoaded = false;
             }
@@ -140,7 +140,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     returnSendStatus = "Email not sent because the from-address is not valid.";
                     LogController.logInfo(core, "queueAdHocEmail, NOT SENT [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
-                } else if (0 != GenericController.vbInstr(1, getBlockList(core), "\r\n" + toAddress + "\r\n", 1)) {
+                } else if (0 != GenericController.vbInstr(1, getBlockList(core), Environment.NewLine + toAddress + Environment.NewLine, 1)) {
                     //
                     returnSendStatus = "Email not sent because the to-address is blocked by this application. See the Blocked Email Report.";
                     LogController.logInfo(core, "queueAdHocEmail, NOT SENT [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
@@ -269,7 +269,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (!verifyEmailAddress(core, fromAddress)) {
                     //
                     userErrorMessage = "Email not sent because the from-address is not valid.";
-                } else if (0 != GenericController.vbInstr(1, getBlockList(core), "\r\n" + person.email + "\r\n", 1)) {
+                } else if (0 != GenericController.vbInstr(1, getBlockList(core), Environment.NewLine + person.email + Environment.NewLine, 1)) {
                     //
                     userErrorMessage = "Email not sent because the to-address is blocked by this application. See the Blocked Email Report.";
                 } else {
@@ -744,21 +744,21 @@ namespace Contensive.Processor.Controllers {
                     toAddress = core.siteProperties.getText("TrapEmail");
                     emailSubject = "EmailForm with bad to-address";
                     Message = "Subject: " + emailSubject;
-                    Message += "\r\n";
+                    Message += Environment.NewLine;
                 }
-                Message += "The form was submitted " + core.doc.profileStartTime + "\r\n";
-                Message += "\r\n";
+                Message += "The form was submitted " + core.doc.profileStartTime + Environment.NewLine;
+                Message += Environment.NewLine;
                 Message += "All text fields are included, completed or not.\r\n";
                 Message += "Only those checkboxes that are checked are included.\r\n";
                 Message += "Entries are not in the order they appeared on the form.\r\n";
-                Message += "\r\n";
+                Message += Environment.NewLine;
                 foreach (string key in core.docProperties.getKeyList()) {
                     var tempVar = core.docProperties.getProperty(key);
                     if (tempVar.IsForm) {
                         if (GenericController.vbUCase(tempVar.Value) == "ON") {
                             Message += tempVar.Name + ": Yes\r\n\r\n";
                         } else {
-                            Message += tempVar.Name + ": " + tempVar.Value + "\r\n\r\n";
+                            Message += tempVar.Name + ": " + tempVar.Value + Environment.NewLine + "\r\n";
                         }
                     }
                 }

@@ -13,10 +13,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string  helpText = ""
-            + "\r\n"
-            + "\r\n--runtask guid-of-assigned-taskrunner"
-            + "\r\n    Run a task in the task table. Used internally to run tasks in other processes. Requires you first set the application with -appname."
+        internal static string  helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--runtask guid-of-assigned-taskrunner"
+            + Environment.NewLine + "    Run a task in the task table. Used internally to run tasks in other processes. Requires you first set the application with -appname."
             + "";
         //
         // ====================================================================================================
@@ -30,17 +30,17 @@ namespace Contensive.CLI {
             if (string.IsNullOrEmpty(appName)) {
                 //
                 // -- invalid argument
-                Console.Write("\r\nInvalid argument. Runtask requires you first set the application with -a appname.");
+                Console.Write(Environment.NewLine + "Invalid argument. Runtask requires you first set the application with -a appname.");
                 Console.Write(helpText);
-                Console.Write("\r\nRun cc --help for a full list of commands.");
+                Console.Write(Environment.NewLine + "Run cc --help for a full list of commands.");
                 return;
             }
             if (string.IsNullOrEmpty(arg) || !Contensive.Processor.Controllers.GenericController.common_isGuid(arg)) {
                 //
                 // -- invalid argument
-                Console.Write("\r\nInvalid argument, task guid [" + arg + "]. Runtask requires a valid task guid argument.");
+                Console.Write(Environment.NewLine + "Invalid argument, task guid [" + arg + "]. Runtask requires a valid task guid argument.");
                 Console.Write(helpText);
-                Console.Write("\r\nRun cc --help for a full list of commands.");
+                Console.Write(Environment.NewLine + "Run cc --help for a full list of commands.");
                 return;
             }
             //

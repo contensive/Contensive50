@@ -289,7 +289,7 @@ namespace Contensive.Processor.Controllers {
                                                                 // -- 
                                                                 switch (resourceType.ToLowerInvariant()) {
                                                                     case "www":
-                                                                        wwwFileList += "\r\n" + dstDosPath + filename;
+                                                                        wwwFileList += Environment.NewLine + dstDosPath + filename;
                                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.localWwwPath + dstDosPath + "].");
                                                                         core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.wwwFiles);
                                                                         if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
@@ -299,7 +299,7 @@ namespace Contensive.Processor.Controllers {
                                                                         break;
                                                                     case "file":
                                                                     case "content":
-                                                                        ContentFileList += "\r\n" + dstDosPath + filename;
+                                                                        ContentFileList += Environment.NewLine + dstDosPath + filename;
                                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, copying file to content, src [" + CollectionVersionFolder + SrcPath + "], dst [" + dstDosPath + "].");
                                                                         core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.cdnFiles);
                                                                         if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
@@ -311,7 +311,7 @@ namespace Contensive.Processor.Controllers {
                                                                         if (assembliesInZip.Contains(filename.ToLowerInvariant())) {
                                                                             assembliesInZip.Remove(filename.ToLowerInvariant());
                                                                         }
-                                                                        ExecFileList = ExecFileList + "\r\n" + filename;
+                                                                        ExecFileList = ExecFileList + Environment.NewLine + filename;
                                                                         break;
                                                                 }
                                                                 break;
@@ -345,7 +345,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // -- any assemblies found in the zip that were not part of the resources section need to be added
                                                 foreach (string filename in assembliesInZip) {
-                                                    ExecFileList = ExecFileList + "\r\n" + filename;
+                                                    ExecFileList = ExecFileList + Environment.NewLine + filename;
                                                 }
                                                 //
                                                 //-------------------------------------------------------------------------------
@@ -449,7 +449,7 @@ namespace Contensive.Processor.Controllers {
                                                                     // old metadata section -- take the inner
                                                                     //
                                                                     foreach (XmlNode ChildNode in metaDataSection.ChildNodes) {
-                                                                        metaDataMiniCollection += "\r\n" + ChildNode.OuterXml;
+                                                                        metaDataMiniCollection += Environment.NewLine + ChildNode.OuterXml;
                                                                     }
                                                                     break;
                                                                 case "cdef":
@@ -574,19 +574,19 @@ namespace Contensive.Processor.Controllers {
                                                                                                     // found by guid, use guid in list and save name
                                                                                                     //
                                                                                                     csData.set("name", ContentRecordName);
-                                                                                                    DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordGuid;
+                                                                                                    DataRecordList = DataRecordList + Environment.NewLine + ContentName + "," + ContentRecordGuid;
                                                                                                 } else if (recordfound) {
                                                                                                     //
                                                                                                     // record found by name, use name is list but do not add guid
                                                                                                     //
-                                                                                                    DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordName;
+                                                                                                    DataRecordList = DataRecordList + Environment.NewLine + ContentName + "," + ContentRecordName;
                                                                                                 } else {
                                                                                                     //
                                                                                                     // record was created
                                                                                                     //
                                                                                                     csData.set("ccguid", ContentRecordGuid);
                                                                                                     csData.set("name", ContentRecordName);
-                                                                                                    DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordGuid;
+                                                                                                    DataRecordList = DataRecordList + Environment.NewLine + ContentName + "," + ContentRecordGuid;
                                                                                                 }
                                                                                             }
                                                                                         }
@@ -1149,7 +1149,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // do not copy the current collection file
                         } else {
-                            result += "\r\n" + SubFolder + file.Name;
+                            result += Environment.NewLine + SubFolder + file.Name;
                         }
                     }
                     //
@@ -1398,7 +1398,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (string.IsNullOrEmpty(ArgumentList)) {
                                                         ArgumentList = NewValue;
                                                     } else if (NewValue != FieldValue) {
-                                                        ArgumentList = ArgumentList + "\r\n" + NewValue;
+                                                        ArgumentList = ArgumentList + Environment.NewLine + NewValue;
                                                     }
                                                 }
                                                 break;
@@ -1414,7 +1414,7 @@ namespace Contensive.Processor.Controllers {
                                                 if (NewValue.Substring(NewValue.Length - 1) != "}") {
                                                     NewValue = NewValue + "}";
                                                 }
-                                                StyleSheet = StyleSheet + "\r\n" + NodeName + " " + NewValue;
+                                                StyleSheet = StyleSheet + Environment.NewLine + NodeName + " " + NewValue;
                                                 break;
                                             case "stylesheet":
                                             case "styles":
@@ -1427,7 +1427,7 @@ namespace Contensive.Processor.Controllers {
                                                 test = GenericController.vbReplace(test, "\n", "");
                                                 test = GenericController.vbReplace(test, "\t", "");
                                                 if (!string.IsNullOrEmpty(test)) {
-                                                    StyleSheet = StyleSheet + "\r\n" + PageInterfaceWithinLoop.InnerText;
+                                                    StyleSheet = StyleSheet + Environment.NewLine + PageInterfaceWithinLoop.InnerText;
                                                 }
                                                 break;
                                             case "template":

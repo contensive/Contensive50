@@ -54,7 +54,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // load values
                     //
-                    ConfigList = ConfigList + "\r\n";
+                    ConfigList = ConfigList + Environment.NewLine;
                     string[] ConfigListLines = GenericController.splitNewLine(ConfigList);
                     int Ptr = 0;
                     while (Ptr < ConfigListLines.GetUpperBound(0)) {
@@ -115,7 +115,7 @@ namespace Contensive.Addons.AdminSite {
                 if (!string.IsNullOrEmpty(ConfigList)) {
                     //
                     // load values
-                    ConfigList = ConfigList + "\r\n";
+                    ConfigList = ConfigList + Environment.NewLine;
                     string[] ConfigListLines = GenericController.splitNewLine(ConfigList);
                     int Ptr = 0;
                     while (Ptr < ConfigListLines.GetUpperBound(0)) {

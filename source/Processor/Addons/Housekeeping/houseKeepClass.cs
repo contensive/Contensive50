@@ -1461,7 +1461,7 @@ namespace Contensive.Addons.Housekeeping {
                                             // register files found in the active folder last
                                             //
                                             if (!string.IsNullOrEmpty(RegisterPathList)) {
-                                                RegisterPaths = GenericController.stringSplit(RegisterPathList, "\r\n");
+                                                RegisterPaths = GenericController.stringSplit(RegisterPathList, Environment.NewLine);
                                                 for (Ptr = 0; Ptr <= RegisterPaths.GetUpperBound(0); Ptr++) {
                                                     RegisterPath = RegisterPaths[Ptr].Trim(' ');
                                                     if (!string.IsNullOrEmpty(RegisterPath)) {

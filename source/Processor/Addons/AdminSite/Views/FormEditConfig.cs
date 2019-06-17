@@ -70,7 +70,7 @@ namespace Contensive.Addons.AdminSite {
                                     }
                                 }
                             }
-                            core.privateFiles.saveFile(InnovaEditorFeaturefilename, "admin:" + AdminList + "\r\ncontentmanager:" + CMList + "\r\npublic:" + PublicList);
+                            core.privateFiles.saveFile(InnovaEditorFeaturefilename, "admin:" + AdminList + Environment.NewLine + "contentmanager:" + CMList + Environment.NewLine + "public:" + PublicList);
                             //
                             // Clear the editor style rules template cache so next edit gets new background color
                             string EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
@@ -90,10 +90,10 @@ namespace Contensive.Addons.AdminSite {
                             // Draw the form
                             string FeatureList = core.cdnFiles.readFileText(InnovaEditorFeaturefilename);
                             if (string.IsNullOrEmpty(FeatureList)) {
-                                FeatureList = "admin:" + InnovaEditorFeatureList + "\r\ncontentmanager:" + InnovaEditorFeatureList + "\r\npublic:" + InnovaEditorPublicFeatureList;
+                                FeatureList = "admin:" + InnovaEditorFeatureList + Environment.NewLine + "contentmanager:" + InnovaEditorFeatureList + Environment.NewLine + "public:" + InnovaEditorPublicFeatureList;
                             }
                             if (!string.IsNullOrEmpty(FeatureList)) {
-                                string[] Features = stringSplit(FeatureList, "\r\n");
+                                string[] Features = stringSplit(FeatureList, Environment.NewLine);
                                 AdminList = Features[0].Replace("admin:", "");
                                 if (Features.GetUpperBound(0) > 0) {
                                     CMList = Features[1].Replace("contentmanager:", "");
@@ -102,7 +102,7 @@ namespace Contensive.Addons.AdminSite {
                                     }
                                 }
                             }
-                            string Copy = "\r\n<tr class=\"ccAdminListCaption\">"
+                            string Copy = Environment.NewLine + "<tr class=\"ccAdminListCaption\">"
                                 + "<td align=left style=\"width:200;\">Feature</td>"
                                 + "<td align=center style=\"width:100;\">Administrators</td>"
                                 + "<td align=center style=\"width:100;\">Content&nbsp;Managers</td>"
@@ -121,7 +121,7 @@ namespace Contensive.Addons.AdminSite {
                                     bool AllowAdmin = GenericController.encodeBoolean("," + AdminList + ",".IndexOf("," + FeatureName + ",", System.StringComparison.OrdinalIgnoreCase) + 1);
                                     bool AllowCM = GenericController.encodeBoolean("," + CMList + ",".IndexOf("," + FeatureName + ",", System.StringComparison.OrdinalIgnoreCase) + 1);
                                     bool AllowPublic = GenericController.encodeBoolean("," + PublicList + ",".IndexOf("," + FeatureName + ",", System.StringComparison.OrdinalIgnoreCase) + 1);
-                                    Copy += "\r\n<tr>"
+                                    Copy += Environment.NewLine + "<tr>"
                                         + TDLeft + FeatureName + "</td>"
                                         + TDCenter + HtmlController.checkbox(FeatureName + ".admin", AllowAdmin) + "</td>"
                                         + TDCenter + HtmlController.checkbox(FeatureName + ".cm", AllowCM) + "</td>"
@@ -131,12 +131,12 @@ namespace Contensive.Addons.AdminSite {
                                 }
                             }
                             Copy = ""
-                                + "\r\n<div><b>body background style color</b> (default='white')</div>"
-                                + "\r\n<div>" + HtmlController.inputText(core, "editorbackgroundcolor", core.siteProperties.getText("Editor Background Color", "white")) + "</div>"
-                                + "\r\n<div>&nbsp;</div>"
-                                + "\r\n<div><b>Toolbar features available</b></div>"
-                                + "\r\n<table border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"500px\" align=left>" + GenericController.nop(Copy) + "\r\n" + kmaEndTable;
-                            Copy = "\r\n" + HtmlController.tableStart(20, 0, 0) + "<tr><td>" + GenericController.nop(Copy) + "</td></tr>\r\n" + kmaEndTable;
+                                + Environment.NewLine + "<div><b>body background style color</b> (default='white')</div>"
+                                + Environment.NewLine + "<div>" + HtmlController.inputText(core, "editorbackgroundcolor", core.siteProperties.getText("Editor Background Color", "white")) + "</div>"
+                                + Environment.NewLine + "<div>&nbsp;</div>"
+                                + Environment.NewLine + "<div><b>Toolbar features available</b></div>"
+                                + Environment.NewLine + "<table border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"500px\" align=left>" + GenericController.nop(Copy) + Environment.NewLine + kmaEndTable;
+                            Copy = Environment.NewLine + HtmlController.tableStart(20, 0, 0) + "<tr><td>" + GenericController.nop(Copy) + "</td></tr>\r\n" + kmaEndTable;
                             Content.Add(Copy);
                             ButtonList = ButtonCancel + "," + ButtonRefresh + "," + ButtonSave + "," + ButtonOK;
                             Content.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormEditorConfig));

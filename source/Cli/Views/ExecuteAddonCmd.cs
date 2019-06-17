@@ -12,10 +12,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string  helpText = ""
-            + "\r\n"
-            + "\r\n--execute addonGuid|addonName"
-            + "\r\n    Executes and addon by guid or name (guid attempted first). Requires a appName be set first with -a."
+        internal static string  helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--execute addonGuid|addonName"
+            + Environment.NewLine + "    Executes and addon by guid or name (guid attempted first). Requires a appName be set first with -a."
             + "";
         //
         // ====================================================================================================

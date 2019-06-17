@@ -20,10 +20,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string  helpText = ""
-            + "\r\n"
-            + "\r\n--newapp (-n)"
-            + "\r\n    new application wizard";
+        internal static string  helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--newapp (-n)"
+            + Environment.NewLine + "    new application wizard";
         //
         // ====================================================================================================
         /// <summary>
@@ -68,7 +68,7 @@ namespace Contensive.CLI {
                             Assembly myAssembly = Assembly.GetAssembly(myType);
                             AssemblyName myAssemblyname = myAssembly.GetName();
                             Version myVersion = myAssemblyname.Version;
-                            string appNameDefault = "app" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0') + "v" + myVersion.Major.ToString("0") + myVersion.Minor.ToString("0");
+                            string appNameDefault = "app" + Contensive.Processor.Controllers.GenericController.getDateNumberString(rightNow) + "v" + myVersion.Major.ToString("0") + myVersion.Minor.ToString("0");
                             Console.Write("\n\nEnter your application name. It must start with a letter and contain only letters and numbers.");
                             appName = GenericController.promptForReply("\nApplication Name:", appNameDefault).ToLowerInvariant();
                             if ( string.IsNullOrWhiteSpace( appName )) {

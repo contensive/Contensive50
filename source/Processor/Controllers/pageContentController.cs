@@ -1058,7 +1058,10 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (core.session.isQuickEditing(PageContentModel.contentName)) {
                     //
-                    // -- quick editor
+                    // -- quick editor for wysiwyg content
+                    resultContent.Append(QuickEditController.getQuickEditing(core));
+                    //
+                    // -- drag-drop editor for addonList
                     if (core.siteProperties.getBoolean("Allow AddonList Editor For Quick Editor")) {
                         core.docProperties.setProperty("contentid", ContentMetadataModel.getContentId(core, PageContentModel.contentName));
                         core.docProperties.setProperty("recordid", core.doc.pageController.page.id);
@@ -1066,33 +1069,34 @@ namespace Contensive.Processor.Controllers {
                              addonType = CPUtilsBaseClass.addonContext.ContextSimple
                         });
                     } else {
-                        resultContent.Append(QuickEditController.getQuickEditing(core));
                     }
                 } else {
                     //
                     // -- Page Copy
-                    string bodyCopy = core.doc.pageController.page.copyfilename.content;
-                    if (string.IsNullOrEmpty(bodyCopy)) {
+                    string htmlPageContent = core.doc.pageController.page.copyfilename.content;
+                    if (string.IsNullOrEmpty(htmlPageContent)) {
                         //
                         // Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
                         if (core.session.isEditing(PageContentModel.contentName)) {
-                            bodyCopy = "\r<p><!-- Empty Content Placeholder --></p>";
+                            htmlPageContent = "\r<p><!-- Empty Content Placeholder --></p>";
                         }
                     }
-                    resultContent.Append("\r<!-- ContentBoxBodyStart -->" + bodyCopy + "\r<!-- ContentBoxBodyEnd -->");
-                }
-                //
-                // -- addonList
-                if (!string.IsNullOrWhiteSpace(core.doc.pageController.page.addonList)) {
-                    try {
-                        List<AddonListItemModel> addonList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<AddonListItemModel>>(core.doc.pageController.page.addonList);
-                        if (addonList == null) {
+                    //
+                    // -- addonList
+                    if (!string.IsNullOrWhiteSpace(core.doc.pageController.page.addonList)) {
+                        try {
+                            List<AddonListItemModel> addonList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<AddonListItemModel>>(core.doc.pageController.page.addonList);
+                            if (addonList == null) {
+                                LogController.logWarn(core, "The addonList for page [" + core.doc.pageController.page.id + ", " + core.doc.pageController.page.name + "] was not empty, but deserialized to null, addonList '" + core.doc.pageController.page.addonList + "'");
+                            }
+                            htmlPageContent += AddonListController.render(core.cp_forAddonExecutionOnly, addonList);
+                        } catch (Exception) {
                             LogController.logWarn(core, "The addonList for page [" + core.doc.pageController.page.id + ", " + core.doc.pageController.page.name + "] was not empty, but deserialized to null, addonList '" + core.doc.pageController.page.addonList + "'");
                         }
-                        resultContent.Append(AddonListController.render(core.cp_forAddonExecutionOnly, addonList));
-                    } catch (Exception) {
-                        LogController.logWarn(core, "The addonList for page [" + core.doc.pageController.page.id + ", " + core.doc.pageController.page.name + "] was not empty, but deserialized to null, addonList '" + core.doc.pageController.page.addonList + "'");
                     }
+                    //
+                    // -- add content into page with comment wrapper
+                    resultContent.Append("\r<!-- ContentBoxBodyStart -->" + htmlPageContent + "\r<!-- ContentBoxBodyEnd -->");
                 }
                 //
                 // -- End Text Search

@@ -15,10 +15,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string  helpText = ""
-            + "\r\n"
-            + "\r\n--configure"
-            + "\r\n    setup or review server configuration (Sql, cache, filesystem, etc)";
+        internal static string  helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--configure"
+            + Environment.NewLine + "    setup or review server configuration (Sql, cache, filesystem, etc)";
 
         //
         // ====================================================================================================

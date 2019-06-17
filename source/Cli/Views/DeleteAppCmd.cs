@@ -19,10 +19,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string  helpText = ""
-            + "\r\n"
-            + "\r\n--delete"
-            + "\r\n    Deletes an application. You must first specify the application first with -a appName. The application must have delete protection off."
+        internal static string  helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--delete"
+            + Environment.NewLine + "    Deletes an application. You must first specify the application first with -a appName. The application must have delete protection off."
             + "";
         //
         // ====================================================================================================

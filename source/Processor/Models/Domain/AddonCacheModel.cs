@@ -1,6 +1,7 @@
 ﻿
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Db;
+using System;
 using System.Collections.Generic;
 //
 namespace Contensive.Processor.Models.Domain {
@@ -78,7 +79,7 @@ namespace Contensive.Processor.Models.Domain {
             if ((addon.onPageEndEvent) && (!OnPageEndIdList.Contains(addon.id))) OnPageEndIdList.Add(addon.id);
             if ((addon.onPageStartEvent) && (!OnPageStartIdList.Contains(addon.id))) OnPageStartIdList.Add(addon.id);
             if ((addon.remoteMethod) && (!remoteMethodIdList.Contains(addon.id))) remoteMethodIdList.Add(addon.id);
-            if (!string.IsNullOrWhiteSpace(addon.robotsTxt)) robotsTxt += "\r\n" + addon.robotsTxt;
+            if (!string.IsNullOrWhiteSpace(addon.robotsTxt)) robotsTxt += Environment.NewLine + addon.robotsTxt;
         }
         //
         //====================================================================================================

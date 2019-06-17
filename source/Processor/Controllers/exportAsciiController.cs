@@ -67,7 +67,7 @@ namespace Contensive.Processor.Controllers {
                                         FieldNameVariant = csData.getNextFieldName();
                                         ///DoEvents
                                     }
-                                    sb.Append("\r\n");
+                                    sb.Append(Environment.NewLine);
                                 }
                                 //
                                 // ----- print out the values
@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
                                                 Copy = csData.getText(FieldName);
                                                 if (!string.IsNullOrEmpty(Copy)) {
                                                     Copy = GenericController.vbReplace(Copy, "\"", "'");
-                                                    Copy = GenericController.vbReplace(Copy, "\r\n", " ");
+                                                    Copy = GenericController.vbReplace(Copy, Environment.NewLine, " ");
                                                     Copy = GenericController.vbReplace(Copy, "\r", " ");
                                                     Copy = GenericController.vbReplace(Copy, "\n", " ");
                                                 }
@@ -93,7 +93,7 @@ namespace Contensive.Processor.Controllers {
                                             }
                                             FieldNameVariant = csData.getNextFieldName();
                                         }
-                                        sb.Append("\r\n");
+                                        sb.Append(Environment.NewLine);
                                     }
                                     csData.goNext();
                                 }
@@ -120,7 +120,7 @@ namespace Contensive.Processor.Controllers {
                                         Delimiter = ",";
                                         FieldNameVariant = csData.getNextFieldName();
                                     }
-                                    core.wwwFiles.appendFile(TestFilename, "\r\n");
+                                    core.wwwFiles.appendFile(TestFilename, Environment.NewLine);
                                 }
                                 //
                                 // ----- print out the values
@@ -148,7 +148,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                         if (!string.IsNullOrEmpty(Copy)) {
                                             Copy = GenericController.vbReplace(Copy, "\"", "'");
-                                            Copy = GenericController.vbReplace(Copy, "\r\n", " ");
+                                            Copy = GenericController.vbReplace(Copy, Environment.NewLine, " ");
                                             Copy = GenericController.vbReplace(Copy, "\r", " ");
                                             Copy = GenericController.vbReplace(Copy, "\n", " ");
                                         }
@@ -157,7 +157,7 @@ namespace Contensive.Processor.Controllers {
                                         FieldNameVariant = csData.getNextFieldName();
                                         ///DoEvents
                                     }
-                                    core.wwwFiles.appendFile(TestFilename, "\r\n");
+                                    core.wwwFiles.appendFile(TestFilename, Environment.NewLine);
                                     csData.goNext();
                                 }
                             }

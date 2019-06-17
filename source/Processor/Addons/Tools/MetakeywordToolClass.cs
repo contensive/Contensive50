@@ -70,7 +70,7 @@ namespace Contensive.Addons.Tools {
                             int Ptr = 0;
                             KeywordList = core.docProperties.getText("KeywordList");
                             if (!string.IsNullOrEmpty(KeywordList)) {
-                                KeywordList = GenericController.vbReplace(KeywordList, "\r\n", ",");
+                                KeywordList = GenericController.vbReplace(KeywordList, Environment.NewLine, ",");
                                 Keywords = KeywordList.Split(',');
                                 Cnt = Keywords.GetUpperBound(0) + 1;
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {

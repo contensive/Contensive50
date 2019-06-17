@@ -166,14 +166,14 @@ namespace Contensive.Processor {
         //
         internal const string unixNewLine = "\n";
         internal const string macNewLine = "\r";
-        internal const string windowsNewLine = "\r\n";
+        internal static string windowsNewLine = Environment.NewLine;
         //
-        internal const string cr = "\r\n\t";
-        internal const string cr2 = cr + "\t";
-        internal const string cr3 = cr2 + "\t";
-        internal const string cr4 = cr3 + "\t";
-        internal const string cr5 = cr4 + "\t";
-        internal const string cr6 = cr5 + "\t";
+        internal static string cr = Environment.NewLine + "\t";
+        internal static string cr2 = cr + "\t";
+        internal static string cr3 = cr2 + "\t";
+        internal static string cr4 = cr3 + "\t";
+        internal static string cr5 = cr4 + "\t";
+        internal static string cr6 = cr5 + "\t";
         //
         internal const string AddonOptionConstructor_BlockNoAjax = "Wrapper=[Default:0|None:-1|ListID(Wrappers)]\r\ncss Container id\r\ncss Container class";
         internal const string AddonOptionConstructor_Block = "Wrapper=[Default:0|None:-1|ListID(Wrappers)]\r\nAs Ajax=[If Add-on is Ajax:0|Yes:1]\r\ncss Container id\r\ncss Container class";
@@ -819,7 +819,7 @@ namespace Contensive.Processor {
         //
         // ----- text delimiter that divides the text and html parts of an email message stored in the queue folder
         //
-        internal const string EmailTextHTMLDelimiter = "\r\n ----- End Text Begin HTML -----\r\n";
+        internal static string EmailTextHTMLDelimiter = Environment.NewLine + " ----- End Text Begin HTML -----\r\n";
         //
         //------------------------------------------------------------------------
         //   Common RequestName Variables

@@ -2123,7 +2123,7 @@ namespace Contensive.Addons.Tools {
 
                     SourceFolders = core.wwwFiles.getFolderNameList(StartPath + CurrentPath);
                     if (!string.IsNullOrEmpty(SourceFolders)) {
-                        FolderSplit = SourceFolders.Split(new[] { "\r\n" }, StringSplitOptions.None);
+                        FolderSplit = SourceFolders.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
                         FolderCount = FolderSplit.GetUpperBound(0) + 1;
                         for (FolderPointer = 0; FolderPointer < FolderCount; FolderPointer++) {
                             FolderLine = FolderSplit[FolderPointer];
@@ -2145,7 +2145,7 @@ namespace Contensive.Addons.Tools {
                         FileDate = "";
                         result += getForm_LogFiles_Details_GetRow(SpacerImage, "no files were found in this folder", FileSize, FileDate, RowEven);
                     } else {
-                        FolderSplit = SourceFolders.Split(new[] { "\r\n" }, StringSplitOptions.None);
+                        FolderSplit = SourceFolders.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
                         FolderCount = FolderSplit.GetUpperBound(0) + 1;
                         for (FolderPointer = 0; FolderPointer < FolderCount; FolderPointer++) {
                             FolderLine = FolderSplit[FolderPointer];

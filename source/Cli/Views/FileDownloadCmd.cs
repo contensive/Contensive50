@@ -21,10 +21,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string  helpText = ""
-            + "\r\n"
-            + "\r\n--fileDownload [cdn] [www] [private]"
-            + "\r\n    Copies all remote files (Amazon S3) to the local file system (this machine). Specify one or more file locals (cdn,www, or private).  An application name is required. (-a applicationName) Use for migration to a remote file system. "
+        internal static string  helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--fileDownload [cdn] [www] [private]"
+            + Environment.NewLine + "    Copies all remote files (Amazon S3) to the local file system (this machine). Specify one or more file locals (cdn,www, or private).  An application name is required. (-a applicationName) Use for migration to a remote file system. "
             + "";
         //
         // ====================================================================================================

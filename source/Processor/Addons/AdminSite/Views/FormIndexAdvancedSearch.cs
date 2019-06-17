@@ -377,7 +377,7 @@ namespace Contensive.Addons.AdminSite {
                 Content = returnForm;
                 //
                 // Assemble LiveWindowTable
-                //Stream.Add("\r\n" + htmlController.form_start(core));
+                //Stream.Add(Environment.NewLine + htmlController.form_start(core));
                 Stream.Add(ButtonBar);
                 Stream.Add(TitleBar);
                 Stream.Add(Content);

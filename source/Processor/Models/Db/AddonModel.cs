@@ -25,6 +25,7 @@ namespace Contensive.Processor.Models.Db {
         public bool content { get; set; }
         public string copy { get; set; }
         public string copyText { get; set; }
+        public bool diagnostic { get; set; }
         public string dotNetClass { get; set; }
         public bool email { get; set; }
         public bool filter { get; set; }

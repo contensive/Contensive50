@@ -12,10 +12,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string helpText = ""
-            + "\r\n"
-            + "\r\n--install CollectionName"
-            + "\r\n    downloads and installed the addon collection named from the Contensive Support Library"
+        internal static string helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--install CollectionName"
+            + Environment.NewLine + "    downloads and installed the addon collection named from the Contensive Support Library"
             + "";
         //
         // ====================================================================================================

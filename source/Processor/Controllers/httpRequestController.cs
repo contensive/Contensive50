@@ -307,7 +307,7 @@ namespace Contensive.Processor.Controllers {
                         returnString += privateResponseProtocol + " " + privateResponseStatusCode + " " + privateResponseStatusDescription;
                         if (privateResponseHeaders.Count > 0) {
                             for (ptr = 0; ptr < privateResponseHeaders.Count; ptr++) {
-                                returnString += "\r\n" + privateResponseHeaders.GetKey(ptr) + ":" + privateResponseHeaders[ptr];
+                                returnString += Environment.NewLine + privateResponseHeaders.GetKey(ptr) + ":" + privateResponseHeaders[ptr];
                             }
                         }
                     }

@@ -13,10 +13,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string  helpText = ""
-            + "\r\n"
-            + "\r\n--deleteprotection on|off"
-            + "\r\n    Enables or Disables delete protection for an application. You must specify the application first with -a appName."
+        internal static string  helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--deleteprotection on|off"
+            + Environment.NewLine + "    Enables or Disables delete protection for an application. You must specify the application first with -a appName."
             + "";
         //
         // ====================================================================================================

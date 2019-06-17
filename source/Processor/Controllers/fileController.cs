@@ -1539,7 +1539,7 @@ namespace Contensive.Processor.Controllers {
                         using (GetObjectResponse response = s3Client.GetObject(request)) {
                             try {
                                 response.WriteResponseStreamToFile(joinPath(localAbsRootPath, localDosPathFilename));
-                            } catch (System.IO.IOException ioEx) {
+                            } catch (System.IO.IOException) {
                                 // -- pause 1 second and retry
                                 System.Threading.Thread.Sleep(1000);
                                 response.WriteResponseStreamToFile(joinPath(localAbsRootPath, localDosPathFilename));

@@ -317,15 +317,15 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             if (SrcOptionList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) == -1) {
                                                                 if (AddonIsInline) {
-                                                                    SrcOptionList = SrcOptionList + "\r\n" + AddonOptionConstructor_Inline;
+                                                                    SrcOptionList = SrcOptionList + Environment.NewLine + AddonOptionConstructor_Inline;
                                                                 } else {
-                                                                    SrcOptionList = SrcOptionList + "\r\n" + AddonOptionConstructor_Block;
+                                                                    SrcOptionList = SrcOptionList + Environment.NewLine + AddonOptionConstructor_Block;
                                                                 }
                                                             }
                                                             string ResultOptionListHTMLEncoded = "";
                                                             if (!string.IsNullOrEmpty(SrcOptionList)) {
                                                                 ResultOptionListHTMLEncoded = "";
-                                                                SrcOptionList = GenericController.vbReplace(SrcOptionList, "\r\n", "\r");
+                                                                SrcOptionList = GenericController.vbReplace(SrcOptionList, Environment.NewLine, "\r");
                                                                 SrcOptionList = GenericController.vbReplace(SrcOptionList, "\n", "\r");
                                                                 string[] SrcOptions = GenericController.stringSplit(SrcOptionList, "\r");
                                                                 for (int Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
@@ -1267,7 +1267,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                             //
                                                                                                             // Update image record
                                                                                                             //
-                                                                                                            RecordAltSizeList = RecordAltSizeList + "\r\n" + ImageAltSize;
+                                                                                                            RecordAltSizeList = RecordAltSizeList + Environment.NewLine + ImageAltSize;
                                                                                                         }
                                                                                                     }
 

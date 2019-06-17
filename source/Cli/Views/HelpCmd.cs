@@ -37,11 +37,11 @@ namespace Contensive.CLI {
             Console.Write(VersionCmd.helpText);
         }
         //
-        const string helpText = ""
-            + "\r\ncc command line"
-            + "\r\n"
-            + "\r\n-a appName"
-            + "\r\n    apply the current command to just one application"
+        internal static string helpText = ""
+            + Environment.NewLine + "cc command line"
+            + Environment.NewLine
+            + Environment.NewLine + "-a appName"
+            + Environment.NewLine + "    apply the current command to just one application"
             + "";
         //
     }

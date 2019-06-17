@@ -13,10 +13,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string  helpText = ""
-            + "\r\n"
-            + "\r\n--version (-v)"
-            + "\r\n    display code version"
+        internal static string  helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--version (-v)"
+            + Environment.NewLine + "    display code version"
             + "";
         //
         // ====================================================================================================

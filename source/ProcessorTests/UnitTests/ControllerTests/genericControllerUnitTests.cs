@@ -168,7 +168,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             Assert.IsTrue(GenericController.isInDelimitedString("1,2,3,4,5", "5", ","));
             Assert.IsFalse(GenericController.isInDelimitedString("1,2,3,4,5", "6", ","));
             Assert.IsTrue(GenericController.isInDelimitedString("1 2 3 4 5", "1", " "));
-            Assert.IsTrue(GenericController.isInDelimitedString("1\r\n2\r\n3", "2", "\r\n"));
+            Assert.IsTrue(GenericController.isInDelimitedString("1\r\n2\r\n3", "2", Environment.NewLine));
         }
         //
         [TestMethod]

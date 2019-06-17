@@ -97,12 +97,12 @@ namespace Contensive.Addons.AdminNavigator {
         }
 
         internal const string AddonManagerGuid = "{1DC06F61-1837-419B-AF36-D5CC41E1C9FD}";
-        internal const string cr = "\r\n" + "\t";
-        internal const string cr2 = cr + "\t";
-        internal const string cr3 = cr2 + "\t";
-        internal const string cr4 = cr3 + "\t";
-        internal const string cr5 = cr4 + "\t";
-        internal const string cr6 = cr5 + "\t";
+        internal static string cr = Environment.NewLine + "\t";
+        internal static string cr2 = cr + "\t";
+        internal static string cr3 = cr2 + "\t";
+        internal static string cr4 = cr3 + "\t";
+        internal static string cr5 = cr4 + "\t";
+        internal static string cr6 = cr5 + "\t";
         internal const string RequestNameRemoteMethodAddon = "remotemethodaddon";
         internal const string NavIconTypeList = "Custom,Advanced,Content,Folder,Email,User,Report,Setting,Tool,Record,Addon,help";
         public const int NavIconTypeCustom = 1;

@@ -73,13 +73,13 @@ namespace Contensive.Addons.Tools {
                     // Add this SQL to the members SQL list
                     //
                     if (!string.IsNullOrEmpty(SQL)) {
-                        string SQLArchiveOld = SQLArchive.Replace(SQL + "\r\n", "");
-                        SQLArchive = SQL.Replace( "\r\n", " ") + "\r\n";
+                        string SQLArchiveOld = SQLArchive.Replace(SQL + Environment.NewLine, "");
+                        SQLArchive = SQL.Replace( Environment.NewLine, " ") + Environment.NewLine;
                         int LineCounter = 0;
                         while ((LineCounter < 10) && (!string.IsNullOrEmpty(SQLArchiveOld))) {
                             string line = getLine(ref SQLArchiveOld).Trim();
                             if (!string.IsNullOrWhiteSpace(line)) {
-                                SQLArchive += line + "\r\n";
+                                SQLArchive += line + Environment.NewLine;
                             }
                         }
                         core.cdnFiles.saveFile(SQLFilename, SQLArchive);
@@ -193,7 +193,7 @@ namespace Contensive.Addons.Tools {
                     //
                     // -- sql list
                     var lookupList = new List<NameValueModel> { };
-                    string[] delimiters = new string[] { "\r\n" };
+                    string[] delimiters = new string[] { Environment.NewLine };
                     List<string> SqlArchiveList = SQLArchive.Split( delimiters,StringSplitOptions.RemoveEmptyEntries).ToList();
                     foreach( string sql in SqlArchiveList) {
                         lookupList.Add(new NameValueModel() { name = sql, value=sql });

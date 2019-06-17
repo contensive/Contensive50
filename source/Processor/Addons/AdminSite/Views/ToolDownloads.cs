@@ -216,31 +216,31 @@ namespace Contensive.Addons.AdminSite {
                                 if (DateCompleted == DateTime.MinValue) {
                                     string RemoteKey = RemoteQueryController.main_GetRemoteQueryKey(core, "select DateCompleted,filename,resultMessage from cctasks where id=" + RecordID, "default", 1);
                                     Cell = "";
-                                    Cell = Cell + "\r\n<div id=\"pending" + RowPointer + "\">Pending <img src=\"/ContensiveBase/images/ajax-loader-small.gif\" width=16 height=16></div>";
+                                    Cell = Cell + Environment.NewLine + "<div id=\"pending" + RowPointer + "\">Pending <img src=\"/ContensiveBase/images/ajax-loader-small.gif\" width=16 height=16></div>";
                                     //
-                                    Cell = Cell + "\r\n<script>";
-                                    Cell = Cell + "\r\nfunction statusHandler" + RowPointer + "(results) {";
-                                    Cell = Cell + "\r\n var jo,isDone=false;";
-                                    Cell = Cell + "\r\n eval('jo='+results);";
-                                    Cell = Cell + "\r\n if (jo){";
-                                    Cell = Cell + "\r\n  if(jo.DateCompleted) {";
-                                    Cell = Cell + "\r\n    var dst=document.getElementById('pending" + RowPointer + "');";
-                                    Cell = Cell + "\r\n    isDone=true;";
-                                    Cell = Cell + "\r\n    if(jo.resultMessage=='OK') {";
-                                    Cell = Cell + "\r\n      dst.innerHTML='" + LinkPrefix + "'+jo.filename+'" + LinkSuffix + "';";
-                                    Cell = Cell + "\r\n    }else{";
-                                    Cell = Cell + "\r\n      dst.innerHTML='error';";
-                                    Cell = Cell + "\r\n    }";
-                                    Cell = Cell + "\r\n  }";
-                                    Cell = Cell + "\r\n }";
-                                    Cell = Cell + "\r\n if(!isDone) setTimeout(\"requestStatus" + RowPointer + "()\",5000)";
-                                    Cell = Cell + "\r\n}";
+                                    Cell = Cell + Environment.NewLine + "<script>";
+                                    Cell = Cell + Environment.NewLine + "function statusHandler" + RowPointer + "(results) {";
+                                    Cell = Cell + Environment.NewLine + " var jo,isDone=false;";
+                                    Cell = Cell + Environment.NewLine + " eval('jo='+results);";
+                                    Cell = Cell + Environment.NewLine + " if (jo){";
+                                    Cell = Cell + Environment.NewLine + "  if(jo.DateCompleted) {";
+                                    Cell = Cell + Environment.NewLine + "    var dst=document.getElementById('pending" + RowPointer + "');";
+                                    Cell = Cell + Environment.NewLine + "    isDone=true;";
+                                    Cell = Cell + Environment.NewLine + "    if(jo.resultMessage=='OK') {";
+                                    Cell = Cell + Environment.NewLine + "      dst.innerHTML='" + LinkPrefix + "'+jo.filename+'" + LinkSuffix + "';";
+                                    Cell = Cell + Environment.NewLine + "    }else{";
+                                    Cell = Cell + Environment.NewLine + "      dst.innerHTML='error';";
+                                    Cell = Cell + Environment.NewLine + "    }";
+                                    Cell = Cell + Environment.NewLine + "  }";
+                                    Cell = Cell + Environment.NewLine + " }";
+                                    Cell = Cell + Environment.NewLine + " if(!isDone) setTimeout(\"requestStatus" + RowPointer + "()\",5000)";
+                                    Cell = Cell + Environment.NewLine + "}";
                                     //
-                                    Cell = Cell + "\r\nfunction requestStatus" + RowPointer + "() {";
-                                    Cell = Cell + "\r\n  cj.ajax.getNameValue(statusHandler" + RowPointer + ",'" + RemoteKey + "');";
-                                    Cell = Cell + "\r\n}";
-                                    Cell = Cell + "\r\nrequestStatus" + RowPointer + "();";
-                                    Cell = Cell + "\r\n</script>";
+                                    Cell = Cell + Environment.NewLine + "function requestStatus" + RowPointer + "() {";
+                                    Cell = Cell + Environment.NewLine + "  cj.ajax.getNameValue(statusHandler" + RowPointer + ",'" + RemoteKey + "');";
+                                    Cell = Cell + Environment.NewLine + "}";
+                                    Cell = Cell + Environment.NewLine + "requestStatus" + RowPointer + "();";
+                                    Cell = Cell + Environment.NewLine + "</script>";
                                     //
                                     Cells[RowPointer, 4] = Cell;
                                 } else if (ResultMessage == "ok") {

@@ -12,10 +12,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string  helpText = ""
-            + "\r\n"
-            + "\r\n--upgrade (-u)"
-            + "\r\n    upgrade all applications, or just one if specified with -a"
+        internal static string  helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--upgrade (-u)"
+            + Environment.NewLine + "    upgrade all applications, or just one if specified with -a"
             + "";
         //
         // ====================================================================================================

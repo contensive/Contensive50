@@ -178,7 +178,7 @@ namespace Contensive.Processor.Controllers {
                                                         sf.height = GenericController.encodeInteger(sf.height * (640 / sf.width));
                                                         sf.width = 640;
                                                         sf.save(FilePath + FilenameNoExt + "-640x" + sf.height + "." + FilenameExt, core.wwwFiles);
-                                                        AltSizeList = AltSizeList + "\r\n640x" + sf.height;
+                                                        AltSizeList = AltSizeList + Environment.NewLine + "640x" + sf.height;
                                                     }
                                                     //
                                                     // Attempt to make 320x
@@ -188,7 +188,7 @@ namespace Contensive.Processor.Controllers {
                                                         sf.width = 320;
                                                         sf.save(FilePath + FilenameNoExt + "-320x" + sf.height + "." + FilenameExt, core.wwwFiles);
 
-                                                        AltSizeList = AltSizeList + "\r\n320x" + sf.height;
+                                                        AltSizeList = AltSizeList + Environment.NewLine + "320x" + sf.height;
                                                     }
                                                     //
                                                     // Attempt to make 160x
@@ -197,7 +197,7 @@ namespace Contensive.Processor.Controllers {
                                                         sf.height = GenericController.encodeInteger(sf.height * (160 / sf.width));
                                                         sf.width = 160;
                                                         sf.save(FilePath + FilenameNoExt + "-160x" + sf.height + "." + FilenameExt, core.wwwFiles);
-                                                        AltSizeList = AltSizeList + "\r\n160x" + sf.height;
+                                                        AltSizeList = AltSizeList + Environment.NewLine + "160x" + sf.height;
                                                     }
                                                     //
                                                     // Attempt to make 80x
@@ -206,7 +206,7 @@ namespace Contensive.Processor.Controllers {
                                                         sf.height = GenericController.encodeInteger(sf.height * (80 / sf.width));
                                                         sf.width = 80;
                                                         sf.save(FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt, core.wwwFiles);
-                                                        AltSizeList = AltSizeList + "\r\n80x" + sf.height;
+                                                        AltSizeList = AltSizeList + Environment.NewLine + "80x" + sf.height;
                                                     }
                                                     csData.set("AltSizeList", AltSizeList);
                                                 }
@@ -237,9 +237,9 @@ namespace Contensive.Processor.Controllers {
                             {"recordid",recordID.ToString()}
                         };
                         Option_String = ""
-                            + "\r\naction=contentdelete"
-                            + "\r\ncontentid=" + contentID
-                            + "\r\nrecordid=" + recordID + "";
+                            + Environment.NewLine + "action=contentdelete"
+                            + Environment.NewLine + "contentid=" + contentID
+                            + Environment.NewLine + "recordid=" + recordID + "";
                     } else {
                         instanceArguments = new Dictionary<string, string>() {
                             {"action","contentchange"},
@@ -247,9 +247,9 @@ namespace Contensive.Processor.Controllers {
                             {"recordid",recordID.ToString()}
                         };
                         Option_String = ""
-                            + "\r\naction=contentchange"
-                            + "\r\ncontentid=" + contentID
-                            + "\r\nrecordid=" + recordID + "";
+                            + Environment.NewLine + "action=contentchange"
+                            + Environment.NewLine + "contentid=" + contentID
+                            + Environment.NewLine + "recordid=" + recordID + "";
                     }
                     while (csData.ok()) {
                         var addon = AddonModel.create(core, csData.getInteger("Addonid"));

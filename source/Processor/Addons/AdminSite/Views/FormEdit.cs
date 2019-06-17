@@ -1113,7 +1113,7 @@ namespace Contensive.Addons.AdminSite {
                         string AjaxQS = RequestNameAjaxFunction + "=" + ajaxGetFieldEditorPreferenceForm + "&fieldid=" + field.id + "&currentEditorAddonId=" + editorAddonID + "&fieldTypeDefaultEditorAddonId=" + fieldTypeDefaultEditorAddonId;
                         string fancyBoxLinkId = "fbl" + adminData.fancyBoxPtr;
                         string fancyBoxContentId = "fbc" + adminData.fancyBoxPtr;
-                        adminData.fancyBoxHeadJS = adminData.fancyBoxHeadJS + "\r\njQuery('#" + fancyBoxLinkId + "').fancybox({"
+                        adminData.fancyBoxHeadJS = adminData.fancyBoxHeadJS + Environment.NewLine + "jQuery('#" + fancyBoxLinkId + "').fancybox({"
                             + "'titleShow':false,"
                             + "'transitionIn':'elastic',"
                             + "'transitionOut':'elastic',"
@@ -1368,11 +1368,11 @@ namespace Contensive.Addons.AdminSite {
                 core.html.addScriptCode_onLoad("docLoaded=true;", "Form loader");
                 result = HtmlController.formMultipart_start(core, core.doc.refreshQueryString, "", "ccForm", "adminEditForm");
                 result = GenericController.vbReplace(result, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\" autocomplete=\"off\">");
-                result += "\r\n<!-- block --><div class=\"d-none\"><input type=password name=\"password_block\" value=\"\"><input type=text name=\"username_block\" value=\"\"></div><!-- end block -->";
-                result += "\r\n<input TYPE=\"hidden\" NAME=\"" + rnAdminSourceForm + "\" VALUE=\"" + AdminFormID.ToString() + "\">";
-                result += "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + adminData.TitleExtension + "\">";
-                result += "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminDepth + "\" VALUE=\"" + adminData.ignore_legacyMenuDepth + "\">";
-                result += "\r\n<input TYPE=\"hidden\" NAME=\"FormEmptyFieldList\" ID=\"FormEmptyFieldList\" VALUE=\",\">";
+                result += Environment.NewLine + "<!-- block --><div class=\"d-none\"><input type=password name=\"password_block\" value=\"\"><input type=text name=\"username_block\" value=\"\"></div><!-- end block -->";
+                result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + rnAdminSourceForm + "\" VALUE=\"" + AdminFormID.ToString() + "\">";
+                result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + adminData.TitleExtension + "\">";
+                result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminDepth + "\" VALUE=\"" + adminData.ignore_legacyMenuDepth + "\">";
+                result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"FormEmptyFieldList\" ID=\"FormEmptyFieldList\" VALUE=\",\">";
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

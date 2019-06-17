@@ -158,58 +158,58 @@ namespace Contensive.Addons.AdminSite {
                                 // Ajax Filter Open
                                 //
                                 IndexFilterHead = ""
-                                    + "\r\n<div class=\"ccHeaderCon\">"
-                                    + "\r\n<div id=\"IndexFilterHeCursorTypeEnum.ADOPENed\" class=\"opened\">"
+                                    + Environment.NewLine + "<div class=\"ccHeaderCon\">"
+                                    + Environment.NewLine + "<div id=\"IndexFilterHeCursorTypeEnum.ADOPENed\" class=\"opened\">"
                                     + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
                                     + "\r<td valign=Middle class=\"left\">Filters</td>"
                                     + "\r<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\">" + iconClose_White + "</i></a></td>"
                                     + "\r</tr></table>"
-                                    + "\r\n</div>"
-                                    + "\r\n<div id=\"IndexFilterHeadClosed\" class=\"closed\" style=\"display:none;\">"
+                                    + Environment.NewLine + "</div>"
+                                    + Environment.NewLine + "<div id=\"IndexFilterHeadClosed\" class=\"closed\" style=\"display:none;\">"
                                     + "\r<a href=\"#\" onClick=\"OpenIndexFilter();return false\">" + iconOpen_White + "</i></a>"
-                                    + "\r\n</div>"
-                                    + "\r\n</div>"
+                                    + Environment.NewLine + "</div>"
+                                    + Environment.NewLine + "</div>"
                                     + "";
                                 IndexFilterContent = ""
-                                    + "\r\n<div class=\"ccContentCon\">"
-                                    + "\r\n<div id=\"IndexFilterContentOpened\" class=\"opened\">" + getForm_IndexFilterContent(core, adminData) + "<img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
-                                    + "\r\n<div id=\"IndexFilterContentClosed\" class=\"closed\" style=\"display:none;\">" + adminIndexFilterClosedLabel + "</div>"
-                                    + "\r\n</div>";
+                                    + Environment.NewLine + "<div class=\"ccContentCon\">"
+                                    + Environment.NewLine + "<div id=\"IndexFilterContentOpened\" class=\"opened\">" + getForm_IndexFilterContent(core, adminData) + "<img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
+                                    + Environment.NewLine + "<div id=\"IndexFilterContentClosed\" class=\"closed\" style=\"display:none;\">" + adminIndexFilterClosedLabel + "</div>"
+                                    + Environment.NewLine + "</div>";
                                 IndexFilterJS = ""
-                                    + "\r\n<script Language=\"JavaScript\" type=\"text/javascript\">"
-                                    + "\r\nfunction CloseIndexFilter() {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','none');SetDisplay('IndexFilterContentOpened','none');SetDisplay('IndexFilterHeadClosed','block');SetDisplay('IndexFilterContentClosed','block');cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxCloseIndexFilter + "','','')}"
-                                    + "\r\nfunction OpenIndexFilter() {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','block');SetDisplay('IndexFilterContentOpened','block');SetDisplay('IndexFilterHeadClosed','none');SetDisplay('IndexFilterContentClosed','none');cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxOpenIndexFilter + "','','')}"
-                                    + "\r\n</script>";
+                                    + Environment.NewLine + "<script Language=\"JavaScript\" type=\"text/javascript\">"
+                                    + Environment.NewLine + "function CloseIndexFilter() {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','none');SetDisplay('IndexFilterContentOpened','none');SetDisplay('IndexFilterHeadClosed','block');SetDisplay('IndexFilterContentClosed','block');cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxCloseIndexFilter + "','','')}"
+                                    + Environment.NewLine + "function OpenIndexFilter() {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','block');SetDisplay('IndexFilterContentOpened','block');SetDisplay('IndexFilterHeadClosed','none');SetDisplay('IndexFilterContentClosed','none');cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxOpenIndexFilter + "','','')}"
+                                    + Environment.NewLine + "</script>";
                             } else {
                                 //
                                 // Ajax Filter Closed
                                 //
                                 IndexFilterHead = ""
-                                    + "\r\n<div class=\"ccHeaderCon\">"
-                                    + "\r\n<div id=\"IndexFilterHeCursorTypeEnum.ADOPENed\" class=\"opened\" style=\"display:none;\">"
+                                    + Environment.NewLine + "<div class=\"ccHeaderCon\">"
+                                    + Environment.NewLine + "<div id=\"IndexFilterHeCursorTypeEnum.ADOPENed\" class=\"opened\" style=\"display:none;\">"
                                     + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
                                     + "\r<td valign=Middle class=\"left\">Filter</td>"
                                     + "\r<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\">" + iconClose_White + "</i></a></td>"
                                     + "\r</tr></table>"
-                                    + "\r\n</div>"
-                                    + "\r\n<div id=\"IndexFilterHeadClosed\" class=\"closed\">"
+                                    + Environment.NewLine + "</div>"
+                                    + Environment.NewLine + "<div id=\"IndexFilterHeadClosed\" class=\"closed\">"
                                     + "\r<a href=\"#\" onClick=\"OpenIndexFilter();return false\">" + iconOpen_White + "</i></a>"
-                                    + "\r\n</div>"
-                                    + "\r\n</div>"
+                                    + Environment.NewLine + "</div>"
+                                    + Environment.NewLine + "</div>"
                                     + "";
                                 IndexFilterContent = ""
-                                    + "\r\n<div class=\"ccContentCon\">"
-                                    + "\r\n<div id=\"IndexFilterContentOpened\" class=\"opened\" style=\"display:none;\"><div style=\"text-align:center;\"><img src=\"/ContensiveBase/images/ajax-loader-small.gif\" width=16 height=16></div></div>"
-                                    + "\r\n<div id=\"IndexFilterContentClosed\" class=\"closed\">" + adminIndexFilterClosedLabel + "</div>"
-                                    + "\r\n<div id=\"IndexFilterContentMinWidth\" style=\"display:none;\"><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
-                                    + "\r\n</div>";
+                                    + Environment.NewLine + "<div class=\"ccContentCon\">"
+                                    + Environment.NewLine + "<div id=\"IndexFilterContentOpened\" class=\"opened\" style=\"display:none;\"><div style=\"text-align:center;\"><img src=\"/ContensiveBase/images/ajax-loader-small.gif\" width=16 height=16></div></div>"
+                                    + Environment.NewLine + "<div id=\"IndexFilterContentClosed\" class=\"closed\">" + adminIndexFilterClosedLabel + "</div>"
+                                    + Environment.NewLine + "<div id=\"IndexFilterContentMinWidth\" style=\"display:none;\"><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
+                                    + Environment.NewLine + "</div>";
                                 string AjaxQS = GenericController.modifyQueryString(core.doc.refreshQueryString, RequestNameAjaxFunction, AjaxOpenIndexFilterGetContent);
                                 IndexFilterJS = ""
-                                    + "\r\n<script Language=\"JavaScript\" type=\"text/javascript\">"
-                                    + "\r\nvar IndexFilterPop=false;"
-                                    + "\r\nfunction CloseIndexFilter() {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','none');SetDisplay('IndexFilterHeadClosed','block');SetDisplay('IndexFilterContentOpened','none');SetDisplay('IndexFilterContentMinWidth','none');SetDisplay('IndexFilterContentClosed','block');cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxCloseIndexFilter + "','','')}"
-                                    + "\r\nfunction OpenIndexFilter() {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','block');SetDisplay('IndexFilterHeadClosed','none');SetDisplay('IndexFilterContentOpened','block');SetDisplay('IndexFilterContentMinWidth','block');SetDisplay('IndexFilterContentClosed','none');if(!IndexFilterPop){cj.ajax.qs('" + AjaxQS + "','','IndexFilterContentOpened');IndexFilterPop=true;}else{cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxOpenIndexFilter + "','','');}}"
-                                    + "\r\n</script>";
+                                    + Environment.NewLine + "<script Language=\"JavaScript\" type=\"text/javascript\">"
+                                    + Environment.NewLine + "var IndexFilterPop=false;"
+                                    + Environment.NewLine + "function CloseIndexFilter() {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','none');SetDisplay('IndexFilterHeadClosed','block');SetDisplay('IndexFilterContentOpened','none');SetDisplay('IndexFilterContentMinWidth','none');SetDisplay('IndexFilterContentClosed','block');cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxCloseIndexFilter + "','','')}"
+                                    + Environment.NewLine + "function OpenIndexFilter() {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','block');SetDisplay('IndexFilterHeadClosed','none');SetDisplay('IndexFilterContentOpened','block');SetDisplay('IndexFilterContentMinWidth','block');SetDisplay('IndexFilterContentClosed','none');if(!IndexFilterPop){cj.ajax.qs('" + AjaxQS + "','','IndexFilterContentOpened');IndexFilterPop=true;}else{cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxOpenIndexFilter + "','','');}}"
+                                    + Environment.NewLine + "</script>";
                             }
                             //
                             // Calculate total width
@@ -320,7 +320,7 @@ namespace Contensive.Addons.AdminSite {
                                         } else {
                                             RowColor = "class=\"ccAdminListRowOdd\"";
                                         }
-                                        DataTableRows.Append( "\r\n<tr>");
+                                        DataTableRows.Append( Environment.NewLine + "<tr>");
                                         //
                                         // --- Edit button column
                                         DataTableRows.Append( "<td align=center " + RowColor + ">");
@@ -348,7 +348,7 @@ namespace Contensive.Addons.AdminSite {
                                             string columnNameLc = column.Name.ToLowerInvariant();
                                             if (FieldUsedInColumns.ContainsKey(columnNameLc)) {
                                                 if (FieldUsedInColumns[columnNameLc]) {
-                                                    DataTableRows.Append( ("\r\n<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal));
+                                                    DataTableRows.Append( (Environment.NewLine + "<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal));
                                                     DataTableRows.Append( getForm_Index_GetCell(core, adminData, column.Name, csData, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail"));
                                                     DataTableRows.Append( ("&nbsp;</span></td>"));
                                                 }
@@ -419,7 +419,7 @@ namespace Contensive.Addons.AdminSite {
                                         FindWordValue = "false";
                                     }
                                 }
-                                DataTable_FindRow += "\r\n<td valign=\"middle\" align=\"center\" class=\"ccPanel3DReverse\" style=\"padding:8px;\">"
+                                DataTable_FindRow += Environment.NewLine + "<td valign=\"middle\" align=\"center\" class=\"ccPanel3DReverse\" style=\"padding:8px;\">"
                                     + "<input type=hidden name=\"FindName" + ColumnPointer + "\" value=\"" + FieldName + "\">"
                                     + "<input class=\"form-control findInput\"  onkeypress=\"KeyCheck(event);\"  type=text id=\"F" + ColumnPointer + "\" name=\"FindValue" + ColumnPointer + "\" value=\"" + FindWordValue + "\" style=\"width:98%\">"
                                     + "</td>";

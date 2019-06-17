@@ -179,7 +179,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             iContentName = encodeXmlAttributeFieldValue(appName, rowTableMeta, "Name");
                             ContentID = GenericController.encodeInteger(rowTableMeta["ID"]);
-                            sb.Append("\r\n\t<CDef");
+                            sb.Append(Environment.NewLine + "\t<CDef");
                             sb.Append(" Name=\"" + iContentName + "\"");
                             if ((!encodeBoolean(rowTableMeta["isBaseContent"])) || IncludeBaseFields) {
                                 sb.Append(" Active=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "Active") + "\"");
@@ -271,7 +271,7 @@ namespace Contensive.Processor.Controllers {
                                     break;
                                 } else if ((FieldContentID == ContentID) && (fieldId != LastFieldID)) {
                                     if (IncludeBaseFields || (",id,dateadded,createdby,modifiedby,ContentControlID,CreateKey,ModifiedDate,ccguid,".IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase) == -1)) {
-                                        sb.Append("\r\n\t\t<Field");
+                                        sb.Append(Environment.NewLine + "\t\t<Field");
                                         string fieldType = Models.Domain.ContentFieldMetadataModel.getFieldTypeNameFromFieldTypeId(core, (CPContentBaseClass.fileTypeIdEnum)encodeInteger(fieldMeta[f_Type, CFieldPtr]));
                                         sb.Append(" Name=\"" + xmlValueText(FieldName) + "\"");
                                         sb.Append(" active=\"" + xmlValueBoolean(fieldMeta[f_Active, CFieldPtr]) + "\"");
@@ -339,11 +339,11 @@ namespace Contensive.Processor.Controllers {
                                             HelpDefault = xmlValueText(fieldMeta[f_helpdefault, CFieldPtr]);
                                         }
                                         if (!string.IsNullOrEmpty(HelpDefault)) {
-                                            sb.Append("\r\n\t\t\t<HelpDefault>" + HelpDefault + "</HelpDefault>");
+                                            sb.Append(Environment.NewLine + "\t\t\t<HelpDefault>" + HelpDefault + "</HelpDefault>");
                                             HelpCnt = HelpCnt + 1;
                                         }
                                         if (HelpCnt > 0) {
-                                            sb.Append("\r\n\t\t");
+                                            sb.Append(Environment.NewLine + "\t\t");
                                         }
                                         sb.Append("</Field>");
                                     }
@@ -353,7 +353,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             if (FieldCnt > 0) {
-                                sb.Append("\r\n\t");
+                                sb.Append(Environment.NewLine + "\t");
                             }
                             sb.Append("</CDef>");
                         }
@@ -366,7 +366,7 @@ namespace Contensive.Processor.Controllers {
                             sb.Append(getAdminMenus(core));
                         }
                     }
-                    tempGetXMLContentDefinition3 = "<" + CollectionFileRootNode + " name=\"Application\" guid=\"" + ApplicationCollectionGuid + "\">" + sb.ToString() + "\r\n</" + CollectionFileRootNode + ">";
+                    tempGetXMLContentDefinition3 = "<" + CollectionFileRootNode + " name=\"Application\" guid=\"" + ApplicationCollectionGuid + "\">" + sb.ToString() + Environment.NewLine + "</" + CollectionFileRootNode + ">";
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -396,7 +396,7 @@ namespace Contensive.Processor.Controllers {
                         string IndexList = core.db.getSQLIndexList(TableName);
                         //
                         if (!string.IsNullOrEmpty(IndexList)) {
-                            string[] ListRows = GenericController.stringSplit(IndexList, "\r\n");
+                            string[] ListRows = GenericController.stringSplit(IndexList, Environment.NewLine);
                             string IndexName = "";
                             int tempVar = ListRows.GetUpperBound(0) + 1;
                             string IndexFields = "";
@@ -569,7 +569,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         private static string encodeXMLattribute(string Source) {
             string tempEncodeXMLattribute = HtmlController.encodeHtml(Source);
-            tempEncodeXMLattribute = GenericController.vbReplace(tempEncodeXMLattribute, "\r\n", " ");
+            tempEncodeXMLattribute = GenericController.vbReplace(tempEncodeXMLattribute, Environment.NewLine, " ");
             tempEncodeXMLattribute = GenericController.vbReplace(tempEncodeXMLattribute, "\r", "");
             return GenericController.vbReplace(tempEncodeXMLattribute, "\n", "");
         }

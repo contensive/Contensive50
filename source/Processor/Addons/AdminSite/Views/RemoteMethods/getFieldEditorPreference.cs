@@ -59,7 +59,7 @@ namespace Contensive.Addons.AdminSite {
                     foreach (DataRow rsDr in dt.Rows) {
                         int addonId = GenericController.encodeInteger(rsDr["addonid"]);
                         if ((addonId != 0) && (addonId != addonDefaultEditorId)) {
-                            result += "\r\n\t<div class=\"radioCon\">" + core.html.inputRadio(radioGroupName, GenericController.encodeText(addonId), currentEditorAddonId.ToString()) + "&nbsp;Use " + GenericController.encodeText(rsDr["addonName"]) + "</div>";
+                            result += Environment.NewLine + "\t<div class=\"radioCon\">" + core.html.inputRadio(radioGroupName, GenericController.encodeText(addonId), currentEditorAddonId.ToString()) + "&nbsp;Use " + GenericController.encodeText(rsDr["addonName"]) + "</div>";
                         }
 
                     }
@@ -76,12 +76,12 @@ namespace Contensive.Addons.AdminSite {
                                         + "";
 
                 result = ""
-                                        + "\r\n\t<h1>Editor Preference</h1>"
-                                        + "\r\n\t<p>Select the editor you will use for this field. Select default if you want to use the current system default.</p>"
-                                        + "\r\n\t<div class=\"radioCon\">" + core.html.inputRadio("setEditorPreference" + fieldId, "0", "0") + "&nbsp;Use Default Editor" + addonDefaultEditorName + "</div>"
-                                        + "\r\n\t" + result + "\r\n\t<div class=\"buttonCon\">"
-                                        + "\r\n\t<button type=\"button\" onclick=\"" + OnClick + "\">Select</button>"
-                                        + "\r\n\t</div>"
+                                        + Environment.NewLine + "\t<h1>Editor Preference</h1>"
+                                        + Environment.NewLine + "\t<p>Select the editor you will use for this field. Select default if you want to use the current system default.</p>"
+                                        + Environment.NewLine + "\t<div class=\"radioCon\">" + core.html.inputRadio("setEditorPreference" + fieldId, "0", "0") + "&nbsp;Use Default Editor" + addonDefaultEditorName + "</div>"
+                                        + Environment.NewLine + "\t" + result + Environment.NewLine + "\t<div class=\"buttonCon\">"
+                                        + Environment.NewLine + "\t<button type=\"button\" onclick=\"" + OnClick + "\">Select</button>"
+                                        + Environment.NewLine + "\t</div>"
                                         + "";
 
 

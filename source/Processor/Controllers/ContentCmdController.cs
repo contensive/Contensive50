@@ -351,7 +351,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 //htmlDoc = new Controllers.htmlController(core);
                 cmdSrc = cmdSrc.Trim(' ');
-                string whiteChrs = "\r\n\t ";
+                string whiteChrs = Environment.NewLine + "\t ";
                 bool trimming;
                 do {
                     trimming = false;

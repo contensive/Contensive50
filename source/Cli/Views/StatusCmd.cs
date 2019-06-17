@@ -12,10 +12,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string  helpText = ""
-            + "\r\n"
-            + "\r\n--status (-s)"
-            + "\r\n    display configuration status"
+        internal static string  helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--status (-s)"
+            + Environment.NewLine + "    display configuration status"
             + "";
         //
         // ====================================================================================================

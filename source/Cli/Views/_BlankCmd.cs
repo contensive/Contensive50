@@ -13,10 +13,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string  helpText = ""
-            + "\r\n"
-            + "\r\n--taskscheduler run|on|off"
-            + "\r\n    Use 'run' to execute the taskscheduler in the console (temporary). Use 'on' or 'off' to manage the taskscheduler service."
+        internal static string  helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--taskscheduler run|on|off"
+            + Environment.NewLine + "    Use 'run' to execute the taskscheduler in the console (temporary). Use 'on' or 'off' to manage the taskscheduler service."
             + "";
         //
         // ====================================================================================================
@@ -40,9 +40,9 @@ namespace Contensive.CLI {
                 default:
                     //
                     // -- invalid argument
-                    Console.Write("\r\nInvalid argument [" + arg + "].");
+                    Console.Write(Environment.NewLine + "Invalid argument [" + arg + "].");
                     Console.Write(helpText);
-                    Console.Write("\r\nRun cc --help for a full list of commands.");
+                    Console.Write(Environment.NewLine + "Run cc --help for a full list of commands.");
                     return;
             }
         }

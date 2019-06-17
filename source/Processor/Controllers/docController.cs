@@ -469,20 +469,20 @@ namespace Contensive.Processor.Controllers {
                         if (csData.insert("Form Pages")) {
                             csData.set("name", "Registration Form");
                             string Copy = ""
-                                + "\r\n<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" width=\"100%\">"
-                                + "\r\n{{REPEATSTART}}<tr><td align=right style=\"height:22px;\">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}"
-                                + "\r\n<tr><td align=right><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=135 height=1></td><td width=\"100%\">&nbsp;</td></tr>"
-                                + "\r\n<tr><td colspan=2>&nbsp;<br>" + core.html.getPanelButtons(ButtonRegister, "Button") + "</td></tr>"
-                                + "\r\n</table>";
+                                + Environment.NewLine + "<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" width=\"100%\">"
+                                + Environment.NewLine + "{{REPEATSTART}}<tr><td align=right style=\"height:22px;\">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}"
+                                + Environment.NewLine + "<tr><td align=right><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=135 height=1></td><td width=\"100%\">&nbsp;</td></tr>"
+                                + Environment.NewLine + "<tr><td colspan=2>&nbsp;<br>" + core.html.getPanelButtons(ButtonRegister, "Button") + "</td></tr>"
+                                + Environment.NewLine + "</table>";
                             csData.set("Body", Copy);
                             Copy = ""
                                 + "1"
-                                + "\r\nRegistered\r\ntrue"
-                                + "\r\n1,First Name,true,FirstName"
-                                + "\r\n1,Last Name,true,LastName"
-                                + "\r\n1,Email Address,true,Email"
-                                + "\r\n1,Phone,true,Phone"
-                                + "\r\n2,Please keep me informed of news and events,false,Subscribers"
+                                + Environment.NewLine + "Registered\r\ntrue"
+                                + Environment.NewLine + "1,First Name,true,FirstName"
+                                + Environment.NewLine + "1,Last Name,true,LastName"
+                                + Environment.NewLine + "1,Email Address,true,Email"
+                                + Environment.NewLine + "1,Phone,true,Phone"
+                                + Environment.NewLine + "2,Please keep me informed of news and events,false,Subscribers"
                                 + "";
                             csData.set("Instructions", Copy);
                         }
@@ -552,7 +552,7 @@ namespace Contensive.Processor.Controllers {
                         core.html.addTitle(HtmlController.encodeHtml(csData.getText("Name")), "page content");
                         core.html.addMetaDescription(HtmlController.encodeHtml(csData.getText("MetaDescription")), "page content");
                         core.html.addHeadTag(csData.getText("OtherHeadTags"), "page content");
-                        keywordList = csData.getText("MetaKeywordList").Replace("\r\n", ",");
+                        keywordList = csData.getText("MetaKeywordList").Replace(Environment.NewLine, ",");
                     }
                     csData.close();
                 }

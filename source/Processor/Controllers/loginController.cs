@@ -358,10 +358,10 @@ namespace Contensive.Processor.Controllers {
                                         //hint = "180"
                                         Message = "This email was sent in reply to a request at " + core.webServer.requestDomain + " for the username and password associated with this email address. ";
                                         Message = Message + "If this request was made by you, please return to the login screen and use the following:\r\n";
-                                        Message = Message + "\r\n";
+                                        Message = Message + Environment.NewLine;
                                     } else {
                                         //hint = "190"
-                                        Message = Message + "\r\n";
+                                        Message = Message + Environment.NewLine;
                                         Message = Message + "Additional user accounts with the same email address: \r\n";
                                     }
                                     //
@@ -394,7 +394,7 @@ namespace Contensive.Processor.Controllers {
                                             }
                                         }
                                         //hint = "260"
-                                        Message = Message + " username: " + Username + "\r\n";
+                                        Message = Message + " username: " + Username + Environment.NewLine;
                                     }
                                     //hint = "270"
                                     if (usernameOK) {
@@ -420,7 +420,7 @@ namespace Contensive.Processor.Controllers {
                                             updateUser = true;
                                         }
                                         //hint = "340"
-                                        Message = Message + " password: " + Password + "\r\n";
+                                        Message = Message + " password: " + Password + Environment.NewLine;
                                         result = true;
                                         if (updateUser) {
                                             //hint = "350"

@@ -10,6 +10,8 @@ using Contensive.Processor.Models.Domain;
 using System.Web;
 using Contensive.Processor.Exceptions;
 using System.Linq;
+using System.Reflection;
+using System.IO;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -266,8 +268,8 @@ namespace Contensive.Processor.Controllers {
             //        //
             //        // no textarea
             //        //
-            //        string replaceText = "\r\n" + new string(Convert.ToChar("\t"), (depth + 1));
-            //        temphtmlIndent = vbReplace(Source, "\r\n\t", replaceText);
+            //        string replaceText = Environment.NewLine + new string(Convert.ToChar("\t"), (depth + 1));
+            //        temphtmlIndent = vbReplace(Source, Environment.NewLine + "\t", replaceText);
             //    } else {
             //        //
             //        // text area found, isolate it and indent before and after
@@ -526,7 +528,7 @@ namespace Contensive.Processor.Controllers {
         public static string EncodeAddonConstructorArgument(string Arg) {
             string a = Arg;
             a = vbReplace(a, "\\", "\\\\");
-            a = vbReplace(a, "\r\n", "\\n");
+            a = vbReplace(a, Environment.NewLine, "\\n");
             a = vbReplace(a, "\t", "\\t");
             a = vbReplace(a, "&", "\\&");
             a = vbReplace(a, "=", "\\=");
@@ -567,7 +569,7 @@ namespace Contensive.Processor.Controllers {
             a = vbReplace(a, "\\=", "=");
             a = vbReplace(a, "\\&", "&");
             a = vbReplace(a, "\\t", "\t");
-            a = vbReplace(a, "\\n", "\r\n");
+            a = vbReplace(a, "\\n", Environment.NewLine);
             a = vbReplace(a, "\\\\", "\\");
             return a;
         }
@@ -809,10 +811,10 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(delimiter)) {
                     //
                     // If not explicit
-                    if (vbInstr(1, keyValueString, "\r\n") != 0) {
+                    if (vbInstr(1, keyValueString, Environment.NewLine) != 0) {
                         //
                         // crlf can only be here if it is the delimiter
-                        delimiter = "\r\n";
+                        delimiter = Environment.NewLine;
                     } else {
                         //
                         // either only one option, or it is the legacy '&' delimit
@@ -1394,7 +1396,7 @@ namespace Contensive.Processor.Controllers {
             //tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\\", "\\\\");
             //tempEncodeJavascript = vbReplace(tempEncodeJavascript, "'", "\\'");
             ////EncodeJavascript = vbReplace(EncodeJavascript, "'", "'+""'""+'")
-            //tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\r\n", "\\n");
+            //tempEncodeJavascript = vbReplace(tempEncodeJavascript, Environment.NewLine, "\\n");
             //tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\r", "\\n");
             //return vbReplace(tempEncodeJavascript, "\n", "\\n");
             ////
@@ -1581,7 +1583,7 @@ namespace Contensive.Processor.Controllers {
         public static string encodeNvaArgument(string Arg) {
             string a = Arg;
             if (!string.IsNullOrEmpty(a)) {
-                a = vbReplace(a, "\r\n", "#0013#");
+                a = vbReplace(a, Environment.NewLine, "#0013#");
                 a = vbReplace(a, "\n", "#0013#");
                 a = vbReplace(a, "\r", "#0013#");
                 a = vbReplace(a, "&", "#0038#");
@@ -1615,7 +1617,7 @@ namespace Contensive.Processor.Controllers {
             a = vbReplace(a, "#0044#", ",");
             a = vbReplace(a, "#0061#", "=");
             a = vbReplace(a, "#0038#", "&");
-            a = vbReplace(a, "#0013#", "\r\n");
+            a = vbReplace(a, "#0013#", Environment.NewLine);
             return a;
         }
         //
@@ -1647,11 +1649,11 @@ namespace Contensive.Processor.Controllers {
                 //
                 // If not explicit
                 //
-                if (vbInstr(1, ArgumentString, "\r\n") != 0) {
+                if (vbInstr(1, ArgumentString, Environment.NewLine) != 0) {
                     //
                     // crlf can only be here if it is the delimiter
                     //
-                    Delimiter = "\r\n";
+                    Delimiter = Environment.NewLine;
                 } else {
                     //
                     // either only one option, or it is the legacy '&' delimit
@@ -2046,7 +2048,7 @@ namespace Contensive.Processor.Controllers {
             string a = "";
             if (!string.IsNullOrEmpty(Arg)) {
                 a = Arg;
-                a = GenericController.vbReplace(a, "\r\n", "#0013#");
+                a = GenericController.vbReplace(a, Environment.NewLine, "#0013#");
                 a = GenericController.vbReplace(a, "\n", "#0013#");
                 a = GenericController.vbReplace(a, "\r", "#0013#");
                 a = GenericController.vbReplace(a, "&", "#0038#");
@@ -2287,7 +2289,7 @@ namespace Contensive.Processor.Controllers {
                 int Pos = 0;
                 //
                 if (!string.IsNullOrEmpty(SrcOptionList)) {
-                    SrcOptions = GenericController.stringSplit(SrcOptionList.Replace("\r\n", "\r").Replace("\n", "\r"), "\r");
+                    SrcOptions = GenericController.stringSplit(SrcOptionList.Replace(Environment.NewLine, "\r").Replace("\n", "\r"), "\r");
                     for (var Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
                         key = SrcOptions[Ptr].Replace("\t", "");
                         if (!string.IsNullOrEmpty(key)) {
@@ -2466,6 +2468,27 @@ namespace Contensive.Processor.Controllers {
 
             DateTime testDate;
             return DateTime.TryParse(expression.ToString(), out testDate);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return string yyyymmdd string
+        /// </summary>
+        /// <param name="rightNow"></param>
+        /// <returns></returns>
+        public static string getDateNumberString(DateTime rightNow) {
+            return rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0');
+
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return string yyyymmdd string
+        /// </summary>
+        /// <param name="rightNow"></param>
+        /// <returns></returns>
+        public static string getDateTimeNumberString(DateTime rightNow) {
+            return getDateNumberString(rightNow) + rightNow.Hour.ToString().PadLeft(2, '0') + rightNow.Minute.ToString().PadLeft(2, '0') + rightNow.Second.ToString().PadLeft(2, '0');
         }
     }
 }

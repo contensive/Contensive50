@@ -12,10 +12,10 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal const string  helpText = ""
-            + "\r\n"
-            + "\r\n--housekeep (-h)"
-            + "\r\n    housekeep all appications, or just one if specifid with -a"
+        internal static string  helpText = ""
+            + Environment.NewLine
+            + Environment.NewLine + "--housekeep (-h)"
+            + Environment.NewLine + "    housekeep all appications, or just one if specifid with -a"
             + "";
         //
         // ====================================================================================================

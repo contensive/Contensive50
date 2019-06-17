@@ -219,7 +219,7 @@ namespace Contensive.Processor.Controllers {
                                 return (new Addons.Primitives.ProcessSiteExplorerMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageStatus:
                                 //
-                                return (new Addons.Primitives.ProcessStatusMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Diagnostics.StatusClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageRedirect:
                                 //
                                 return (new Addons.Primitives.ProcessRedirectMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();

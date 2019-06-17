@@ -207,7 +207,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- add addon record arguments to doc properties
                             if (!string.IsNullOrWhiteSpace(addon.argumentList)) {
-                                foreach (var addon_argument in addon.argumentList.Replace("\r\n", "\r").Replace("\n", "\r").Split(Convert.ToChar("\r"))) {
+                                foreach (var addon_argument in addon.argumentList.Replace(Environment.NewLine, "\r").Replace("\n", "\r").Split(Convert.ToChar("\r"))) {
                                     if (!string.IsNullOrEmpty(addon_argument)) {
                                         string[] nvp = addon_argument.Split('=');
                                         if (!string.IsNullOrEmpty(nvp[0])) {
@@ -622,13 +622,13 @@ namespace Contensive.Processor.Controllers {
                                 hint = "24";
                                 core.doc.setMetaContent(0, 0);
                                 result = ""
-                                    + core.siteProperties.docTypeDeclaration + "\r\n<html>"
-                                    + "\r\n<head>"
+                                    + core.siteProperties.docTypeDeclaration + Environment.NewLine + "<html>"
+                                    + Environment.NewLine + "<head>"
                                     + core.html.getHtmlHead()
-                                    + "\r\n</head>"
-                                    + "\r\n" + TemplateDefaultBodyTag
-                                    + "\r\n</body>"
-                                    + "\r\n</html>";
+                                    + Environment.NewLine + "</head>"
+                                    + Environment.NewLine + TemplateDefaultBodyTag
+                                    + Environment.NewLine + "</body>"
+                                    + Environment.NewLine + "</html>";
                             } else if (addon.asAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
                                 //
                                 // -- as ajax content, AsAjax addon, during the Ajax callback, need to create an onload event that runs everything appended to onload within this content
@@ -1683,7 +1683,7 @@ namespace Contensive.Processor.Controllers {
                     core.assemblyList_NonAddonsFound.Add(assemblyPathname);
                     string detailedErrorMessage = "A load exception occured for addon [" + addon.name + "], DLL [" + assemblyPathname + "]. The error was [" + ex.ToString() + "] Any internal exception follow:";
                     foreach (Exception exLoader in ex.LoaderExceptions) {
-                        detailedErrorMessage += "\r\n--LoaderExceptions: " + exLoader.Message;
+                        detailedErrorMessage += Environment.NewLine + "--LoaderExceptions: " + exLoader.Message;
                     }
                     throw new GenericException(detailedErrorMessage);
                 } catch (Exception ex) {
@@ -1839,7 +1839,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             CopyContent = CopyContent + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
                                 + "";
-                            OptionSplit = GenericController.stringSplit(Option_String, "\r\n");
+                            OptionSplit = GenericController.stringSplit(Option_String, Environment.NewLine);
                             for (Ptr = 0; Ptr <= OptionSplit.GetUpperBound(0); Ptr++) {
                                 //
                                 // Process each option row
@@ -1917,7 +1917,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (GenericController.vbLCase(OptionValue) == LCaseOptionDefault) {
                                                         FormInput = FormInput + "<option value=\"" + OptionValue + "\" selected>" + OptionCaption + "</option>";
                                                     } else {
-                                                        OptionCaption = GenericController.vbReplace(OptionCaption, "\r\n", " ");
+                                                        OptionCaption = GenericController.vbReplace(OptionCaption, Environment.NewLine, " ");
                                                         FormInput = FormInput + "<option value=\"" + OptionValue + "\">" + OptionCaption + "</option>";
                                                     }
                                                     break;
@@ -2247,7 +2247,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Initially Build Constructor from AddonOptions
                     //
-                    ConstructorNameValues = GenericController.stringSplit(addonArgumentListFromRecord, "\r\n");
+                    ConstructorNameValues = GenericController.stringSplit(addonArgumentListFromRecord, Environment.NewLine);
                     ConstructorCnt = ConstructorNameValues.GetUpperBound(0) + 1;
                     ConstructorNames = new string[ConstructorCnt + 1];
                     ConstructorSelectors = new string[ConstructorCnt + 1];
@@ -2327,7 +2327,7 @@ namespace Contensive.Processor.Controllers {
                     ConstructorSelector = ConstructorSelectors[ConstructorPtr];
                     addonInstanceProperties.Add(ConstructorName, ConstructorValue);
                     if (IncludeSettingsBubbleOptions) {
-                        addonArgumentListPassToBubbleEditor = addonArgumentListPassToBubbleEditor + "\r\n" + core.html.getAddonSelector(ConstructorName, ConstructorValue, ConstructorSelector);
+                        addonArgumentListPassToBubbleEditor = addonArgumentListPassToBubbleEditor + Environment.NewLine + core.html.getAddonSelector(ConstructorName, ConstructorValue, ConstructorSelector);
                     }
                 }
                 addonInstanceProperties.Add("InstanceID", InstanceID);
@@ -2460,14 +2460,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="IsInline"></param>
         /// <returns></returns>
         public static string getDefaultAddonOptions(CoreController core, string ArgumentList, string AddonGuid, bool IsInline) {
-            ArgumentList = GenericController.vbReplace(ArgumentList, "\r\n", "\r");
+            ArgumentList = GenericController.vbReplace(ArgumentList, Environment.NewLine, "\r");
             ArgumentList = GenericController.vbReplace(ArgumentList, "\n", "\r");
-            ArgumentList = GenericController.vbReplace(ArgumentList, "\r", "\r\n");
+            ArgumentList = GenericController.vbReplace(ArgumentList, "\r", Environment.NewLine);
             if (ArgumentList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) == -1) {
                 //
                 // Add in default constructors, like wrapper
                 if (!string.IsNullOrEmpty(ArgumentList)) {
-                    ArgumentList += "\r\n";
+                    ArgumentList += Environment.NewLine;
                 }
                 if (GenericController.vbLCase(AddonGuid) == GenericController.vbLCase(addonGuidContentBox)) {
                     ArgumentList += AddonOptionConstructor_BlockNoAjax;
@@ -2495,7 +2495,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // split on equal
                         //
-                        NameValue = GenericController.vbReplace(NameValue, "\\=", "\r\n");
+                        NameValue = GenericController.vbReplace(NameValue, "\\=", Environment.NewLine);
                         int Pos = GenericController.vbInstr(1, NameValue, "=");
                         if (Pos == 0) {
                             OptionName = NameValue;
@@ -2503,19 +2503,19 @@ namespace Contensive.Processor.Controllers {
                             OptionName = NameValue.Left(Pos - 1);
                             OptionValue = NameValue.Substring(Pos);
                         }
-                        OptionName = GenericController.vbReplace(OptionName, "\r\n", "\\=");
-                        OptionValue = GenericController.vbReplace(OptionValue, "\r\n", "\\=");
+                        OptionName = GenericController.vbReplace(OptionName, Environment.NewLine, "\\=");
+                        OptionValue = GenericController.vbReplace(OptionValue, Environment.NewLine, "\\=");
                         //
                         // split optionvalue on [
                         //
-                        OptionValue = GenericController.vbReplace(OptionValue, "\\[", "\r\n");
+                        OptionValue = GenericController.vbReplace(OptionValue, "\\[", Environment.NewLine);
                         Pos = GenericController.vbInstr(1, OptionValue, "[");
                         if (Pos != 0) {
                             OptionSelector = OptionValue.Substring(Pos - 1);
                             OptionValue = OptionValue.Left(Pos - 1);
                         }
-                        OptionValue = GenericController.vbReplace(OptionValue, "\r\n", "\\[");
-                        OptionSelector = GenericController.vbReplace(OptionSelector, "\r\n", "\\[");
+                        OptionValue = GenericController.vbReplace(OptionValue, Environment.NewLine, "\\[");
+                        OptionSelector = GenericController.vbReplace(OptionSelector, Environment.NewLine, "\\[");
                         //
                         // Decode AddonConstructor format
                         OptionName = GenericController.DecodeAddonConstructorArgument(OptionName);

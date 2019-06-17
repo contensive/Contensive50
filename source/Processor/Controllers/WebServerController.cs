@@ -146,7 +146,7 @@ namespace Contensive.Processor.Controllers {
                 runProcess(core, Cmd, arg, true);
                 Copy = core.privateFiles.readFileText(LogFilename);
                 core.privateFiles.deleteFile(LogFilename);
-                Copy = GenericController.vbReplace(Copy, "\r\n", "\\n");
+                Copy = GenericController.vbReplace(Copy, Environment.NewLine, "\\n");
                 Copy = GenericController.vbReplace(Copy, "\r", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
@@ -172,7 +172,7 @@ namespace Contensive.Processor.Controllers {
                 runProcess(core, Cmd, "", true);
                 Copy = core.privateFiles.readFileText(LogFilename);
                 core.privateFiles.deleteFile(LogFilename);
-                Copy = GenericController.vbReplace(Copy, "\r\n", "\\n");
+                Copy = GenericController.vbReplace(Copy, Environment.NewLine, "\\n");
                 Copy = GenericController.vbReplace(Copy, "\r", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
@@ -198,7 +198,7 @@ namespace Contensive.Processor.Controllers {
                 runProcess(core, Cmd, "", true);
                 Copy = core.privateFiles.readFileText(LogFilename);
                 core.privateFiles.deleteFile(LogFilename);
-                Copy = GenericController.vbReplace(Copy, "\r\n", "\\n");
+                Copy = GenericController.vbReplace(Copy, Environment.NewLine, "\\n");
                 Copy = GenericController.vbReplace(Copy, "\r", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
@@ -641,34 +641,34 @@ namespace Contensive.Processor.Controllers {
                             //
                             // Pass Cookie to non-asp parent crlf delimited list of name,value,expires,domain,path,secure
                             if (bufferCookies != "") {
-                                bufferCookies = bufferCookies + "\r\n";
+                                bufferCookies = bufferCookies + Environment.NewLine;
                             }
                             bufferCookies = bufferCookies + cookieName;
-                            bufferCookies = bufferCookies + "\r\n" + iCookieValue;
+                            bufferCookies = bufferCookies + Environment.NewLine + iCookieValue;
                             //
                             s = "";
                             if (!isMinDate(DateExpires)) {
                                 s = DateExpires.ToString();
                             }
-                            bufferCookies = bufferCookies + "\r\n" + s;
+                            bufferCookies = bufferCookies + Environment.NewLine + s;
                             //
                             s = "";
                             if (!string.IsNullOrEmpty(domain)) {
                                 s = domain;
                             }
-                            bufferCookies = bufferCookies + "\r\n" + s;
+                            bufferCookies = bufferCookies + Environment.NewLine + s;
                             //
                             s = "/";
                             if (!string.IsNullOrEmpty(Path)) {
                                 s = Path;
                             }
-                            bufferCookies = bufferCookies + "\r\n" + s;
+                            bufferCookies = bufferCookies + Environment.NewLine + s;
                             //
                             s = "false";
                             if (Secure) {
                                 s = "true";
                             }
-                            bufferCookies = bufferCookies + "\r\n" + s;
+                            bufferCookies = bufferCookies + Environment.NewLine + s;
                         }
                     }
                 }
@@ -715,9 +715,9 @@ namespace Contensive.Processor.Controllers {
                         iisContext.Response.AddHeader(HeaderName, HeaderValue);
                     }
                     if (bufferResponseHeader != "") {
-                        bufferResponseHeader = bufferResponseHeader + "\r\n";
+                        bufferResponseHeader = bufferResponseHeader + Environment.NewLine;
                     }
-                    bufferResponseHeader = bufferResponseHeader + GenericController.vbReplace(HeaderName, "\r\n", "") + "\r\n" + GenericController.vbReplace(GenericController.encodeText(HeaderValue), "\r\n", "");
+                    bufferResponseHeader = bufferResponseHeader + GenericController.vbReplace(HeaderName, Environment.NewLine, "") + Environment.NewLine + GenericController.vbReplace(GenericController.encodeText(HeaderValue), Environment.NewLine, "");
                 }
             } catch (Exception ex) {
                 LogController.logError( core,ex);

@@ -911,7 +911,7 @@ namespace Contensive.Processor.Models.Domain {
                                     string StyleLine = SiteStyleSplit[SiteStylePtr];
                                     int PosNameLineEnd = StyleLine.LastIndexOf("{") + 1;
                                     if (PosNameLineEnd > 0) {
-                                        int PosNameLineStart = StyleLine.LastIndexOf("\r\n", PosNameLineEnd - 1) + 1;
+                                        int PosNameLineStart = StyleLine.LastIndexOf(Environment.NewLine, PosNameLineEnd - 1) + 1;
                                         if (PosNameLineStart > 0) {
                                             //
                                             // Check this site style for a match with the NewStyleName
@@ -924,7 +924,7 @@ namespace Contensive.Processor.Models.Domain {
                                                     //
                                                     // Found - Update style
                                                     //
-                                                    SiteStyleSplit[SiteStylePtr] = "\r\n" + tempVar4.Name + " {" + NewStyleValue;
+                                                    SiteStyleSplit[SiteStylePtr] = Environment.NewLine + tempVar4.Name + " {" + NewStyleValue;
                                                 }
                                                 break;
                                             }
@@ -936,16 +936,16 @@ namespace Contensive.Processor.Models.Domain {
                             // Add or update the stylesheet
                             //
                             if (!Found) {
-                                StyleSheetAdd = StyleSheetAdd + "\r\n" + NewStyleName + " {" + NewStyleValue + "}";
+                                StyleSheetAdd = StyleSheetAdd + Environment.NewLine + NewStyleName + " {" + NewStyleValue + "}";
                             }
                         }
                     }
                     SiteStyles = string.Join("}", SiteStyleSplit);
                     if (!string.IsNullOrEmpty(StyleSheetAdd)) {
                         SiteStyles = SiteStyles
-                            + "\r\n\r\n/*"
-                            + "\r\nStyles added " + DateTime.Now + "\r\n*/"
-                            + "\r\n" + StyleSheetAdd;
+                            + Environment.NewLine + "\r\n/*"
+                            + Environment.NewLine + "Styles added " + DateTime.Now + Environment.NewLine + "*/"
+                            + Environment.NewLine + StyleSheetAdd;
                     }
                     core.wwwFiles.saveFile("templates/styles.css", SiteStyles);
                     //

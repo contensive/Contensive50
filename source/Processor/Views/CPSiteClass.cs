@@ -172,7 +172,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void LogAlarm(string cause) {
-            LogController.logFatal(cp.core, "logAlarm: " + cause);
+            LogController.logAlarm(cp.core, cause);
         }
         //
         //====================================================================================================

@@ -110,10 +110,9 @@
     <Compile Include="Addons\AdminNavigator\Views\getNodeClass.cs" />
     <Compile Include="Addons\AdminSite\Constants.cs" />
     <Compile Include="Addons\Authentication\GetLoginButtonFormClass.cs" />
-    <Compile Include="Addons\Diagnostics\configClass.cs" />
-    <Compile Include="Addons\Diagnostics\serverStatusClass.cs" />
-    <Compile Include="Addons\Diagnostics\siteCheckClass.cs" />
-    <Compile Include="Addons\Diagnostics\GetStatus.cs" />
+    <Compile Include="Addons\Diagnostics\ServerDiagnosticClass.cs" />
+    <Compile Include="Addons\OnInstallBase51.cs" />
+    <Compile Include="Addons\Diagnostics\StatusClass.cs" />
     <Compile Include="Addons\Personalization\Password.cs" />
     <Compile Include="Addons\Personalization\Username.cs" />
     <Compile Include="Addons\Personalization\Company.cs" />
@@ -197,7 +196,6 @@
     <Compile Include="Addons\Authentication\processSendPasswordMethod.cs" />
     <Compile Include="Addons\SiteExplorer\processSiteExplorerMethod.cs" />
     <Compile Include="Addons\Editors\processSiteStyleEditor.cs" />
-    <Compile Include="Addons\Diagnostics\processStatusMethod.cs" />
     <Compile Include="Addons\RobotsTxt\robotsTxt.cs" />
     <Compile Include="Addons\Email\processEmailClass.cs" />
     <Compile Include="Addons\Housekeeping\houseKeepClass.cs" />

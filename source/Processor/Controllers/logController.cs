@@ -55,7 +55,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getMessageLine(string appName, string message) {
             string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("000");
-            return "app [" + appName + "], thread [" + threadName + "], " + message.Replace("\r\n", " ").Replace("\n", " ").Replace("\r", " ");
+            return "app [" + appName + "], thread [" + threadName + "], " + message.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " ");
         }
         //
         public static string getMessageLine(CoreController core, string message) {
@@ -110,7 +110,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logTrace(CoreController core, string message)  => log(core, message, LogLevel.Trace);
+        public static void logTrace(CoreController core, string message) => log(core, message, LogLevel.Trace);
         //
         //=============================================================================
         /// <summary>
@@ -185,7 +185,7 @@ namespace Contensive.Processor.Controllers {
                 core.doc.errorList.Add(messageLine);
                 return;
             }
-            if (core.doc.errorList.Count == 10) { core.doc.errorList.Add("Exception limit exceeded");}
+            if (core.doc.errorList.Count == 10) { core.doc.errorList.Add("Exception limit exceeded"); }
         }
         //
         //====================================================================================================
@@ -336,6 +336,16 @@ namespace Contensive.Processor.Controllers {
                 }
             }
             //
+        }
+        /// <summary>
+        /// Appends a log file in the /alarms folder in program files. The diagnostic monitor should signal a fail.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="cause"></param>
+        public static void logAlarm(CoreController core, string cause) {
+            LogController.logFatal(core, "logAlarm: " + cause);
+            core.programDataFiles.appendFile("Alarms/", "LogAlarm called, cause [" + cause + "]");
+
         }
     }
 }

@@ -183,8 +183,8 @@ namespace Contensive.Processor.Controllers {
             DataTable returnData = new DataTable();
             try {
                 if (!dbEnabled) { return new DataTable(); }
-                if (core.serverConfig == null) { LogController.logError(core, new GenericException("Cannot execute Sql in dbController without an application")); }
-                if (core.appConfig == null) { LogController.logError(core, new GenericException("Cannot execute Sql in dbController without an application")); }
+                if (core.serverConfig == null) { throw new GenericException("Cannot execute Sql in dbController, servercong is null"); }
+                if (core.appConfig == null) { throw new GenericException("Cannot execute Sql in dbController, appconfig is null"); }
                 //
                 // REFACTOR
                 // consider writing cs intrface to sql dataReader object -- one row at a time, vaster.

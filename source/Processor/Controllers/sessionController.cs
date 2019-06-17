@@ -373,25 +373,25 @@ namespace Contensive.Processor.Controllers {
                                 botFileContent = core.privateFiles.readFileText(Filename);
                                 if (string.IsNullOrEmpty(botFileContent)) {
                                     botFileContent = ""
-                                        + "\r\n//"
-                                        + "\r\n// Default Bot Name list"
-                                        + "\r\n// This file is maintained by the server. On the first hit of a visit,"
-                                        + "\r\n// the default member name is overridden with this name if there is a match"
-                                        + "\r\n// in either the user agent or the ipaddress."
-                                        + "\r\n// format:  name -tab- browser-user-agent-substring -tab- ip-address-substring -tab- type "
-                                        + "\r\n// This text is cached by the server for 1 hour, so changes take"
-                                        + "\r\n// effect when the cache expires. It is updated daily from the"
-                                        + "\r\n// support site feed. Manual changes may be over written."
-                                        + "\r\n// type - r=robot (default), b=bad robot, u=user"
-                                        + "\r\n//"
-                                        + "\r\nContensive Monitor\tContensive Monitor\t\tr"
-                                        + "\r\nGoogle-Bot\tgooglebot\t\tr"
-                                        + "\r\nMSN-Bot\tmsnbot\t\tr"
-                                        + "\r\nYahoo-Bot\tslurp\t\tr"
-                                        + "\r\nSearchMe-Bot\tsearchme.com\t\tr"
-                                        + "\r\nTwiceler-Bot\twww.cuil.com\t\tr"
-                                        + "\r\nUnknown Bot\trobot\t\tr"
-                                        + "\r\nUnknown Bot\tcrawl\t\tr"
+                                        + Environment.NewLine + "//"
+                                        + Environment.NewLine + "// Default Bot Name list"
+                                        + Environment.NewLine + "// This file is maintained by the server. On the first hit of a visit,"
+                                        + Environment.NewLine + "// the default member name is overridden with this name if there is a match"
+                                        + Environment.NewLine + "// in either the user agent or the ipaddress."
+                                        + Environment.NewLine + "// format:  name -tab- browser-user-agent-substring -tab- ip-address-substring -tab- type "
+                                        + Environment.NewLine + "// This text is cached by the server for 1 hour, so changes take"
+                                        + Environment.NewLine + "// effect when the cache expires. It is updated daily from the"
+                                        + Environment.NewLine + "// support site feed. Manual changes may be over written."
+                                        + Environment.NewLine + "// type - r=robot (default), b=bad robot, u=user"
+                                        + Environment.NewLine + "//"
+                                        + Environment.NewLine + "Contensive Monitor\tContensive Monitor\t\tr"
+                                        + Environment.NewLine + "Google-Bot\tgooglebot\t\tr"
+                                        + Environment.NewLine + "MSN-Bot\tmsnbot\t\tr"
+                                        + Environment.NewLine + "Yahoo-Bot\tslurp\t\tr"
+                                        + Environment.NewLine + "SearchMe-Bot\tsearchme.com\t\tr"
+                                        + Environment.NewLine + "Twiceler-Bot\twww.cuil.com\t\tr"
+                                        + Environment.NewLine + "Unknown Bot\trobot\t\tr"
+                                        + Environment.NewLine + "Unknown Bot\tcrawl\t\tr"
                                         + "";
                                     core.privateFiles.saveFile(Filename, botFileContent);
                                 }
@@ -399,7 +399,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             if (!string.IsNullOrEmpty(botFileContent)) {
-                                botFileContent = GenericController.vbReplace(botFileContent, "\r\n", "\n");
+                                botFileContent = GenericController.vbReplace(botFileContent, Environment.NewLine, "\n");
                                 List<string> botList = new List<string>();
                                 botList.AddRange(botFileContent.Split(Convert.ToChar("\n")));
                                 bool visitNameFound = false;

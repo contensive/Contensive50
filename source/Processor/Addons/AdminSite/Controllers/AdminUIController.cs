@@ -234,7 +234,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
             //    if (string.IsNullOrEmpty(rightSideMessage)) {
             //        rightSideMessage = core.doc.profileStartTime.ToString("G");
             //    }
-            //    if (isInStr(1, leftSideMessage + rightSideMessage, "\r\n")) {
+            //    if (isInStr(1, leftSideMessage + rightSideMessage, Environment.NewLine)) {
             //        s = ""
             //            + "\r<td width=\"50%\" valign=Middle class=\"cchLeft\">"
             //            + nop(leftSideMessage) + "\r</td>"
@@ -501,7 +501,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 Style = "ccAdminListRowEven";
             }
             //
-            tempGetReport_Cell = "\r\n<td valign=\"middle\" align=\"" + iAlign + "\" class=\"" + Style + "\"";
+            tempGetReport_Cell = Environment.NewLine + "<td valign=\"middle\" align=\"" + iAlign + "\" class=\"" + Style + "\"";
             if (Columns > 1) {
                 tempGetReport_Cell = tempGetReport_Cell + " colspan=\"" + Columns + "\"";
             }
@@ -563,7 +563,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     //} else {
                     //}
                 }
-                result = "\r\n<td style=\"" + Style + "\" class=\"" + ClassStyle + "\">" + Copy + "</td>";
+                result = Environment.NewLine + "<td style=\"" + Style + "\" class=\"" + ClassStyle + "\">" + Copy + "</td>";
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
@@ -684,7 +684,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 //
                 // ----- Header
                 //
-                Content.Add("\r\n<tr>");
+                Content.Add(Environment.NewLine + "<tr>");
                 Content.Add(getReport_CellHeader(core, 0, "&nbsp", "50px", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
                 for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
                     ColumnWidth = ColWidth[ColumnPtr];
@@ -714,24 +714,24 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     //    Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, SortingStateEnum.SortableNotSet))
                     //End If
                 }
-                Content.Add("\r\n</tr>");
+                Content.Add(Environment.NewLine + "</tr>");
                 //
                 // ----- Data
                 //
                 if (RowCount == 0) {
-                    Content.Add("\r\n<tr>");
+                    Content.Add(Environment.NewLine + "<tr>");
                     Content.Add(getReport_Cell(core, (RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
                     Content.Add(getReport_Cell(core, "-- End --", "left", ColumnCount, 0));
-                    Content.Add("\r\n</tr>");
+                    Content.Add(Environment.NewLine + "</tr>");
                 } else {
                     RowBAse = (ReportPageSize * (ReportPageNumber - 1)) + 1;
                     for (RowPointer = 0; RowPointer < RowCount; RowPointer++) {
-                        Content.Add("\r\n<tr>");
+                        Content.Add(Environment.NewLine + "<tr>");
                         Content.Add(getReport_Cell(core, (RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
                         for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
                             Content.Add(getReport_Cell(core, Cells[RowPointer, ColumnPtr], ColAlign[ColumnPtr], 1, RowPointer));
                         }
-                        Content.Add("\r\n</tr>");
+                        Content.Add(Environment.NewLine + "</tr>");
                     }
                 }
                 //

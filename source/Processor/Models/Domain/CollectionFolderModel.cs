@@ -126,18 +126,18 @@ namespace Contensive.Processor.Models.Domain {
                                                 LastChangeDate = "";
                                             }
                                         }
-                                        returnXml += "\r\n\t<Collection>";
-                                        returnXml += "\r\n\t\t<name>" + Collectionname + "</name>";
-                                        returnXml += "\r\n\t\t<guid>" + CollectionGuid + "</guid>";
-                                        returnXml += "\r\n\t\t<lastchangedate>" + LastChangeDate + "</lastchangedate>";
-                                        returnXml += "\r\n\t\t<path>" + FolderName + "</path>";
-                                        returnXml += "\r\n\t</Collection>";
+                                        returnXml += Environment.NewLine + "\t<Collection>";
+                                        returnXml += Environment.NewLine + "\t\t<name>" + Collectionname + "</name>";
+                                        returnXml += Environment.NewLine + "\t\t<guid>" + CollectionGuid + "</guid>";
+                                        returnXml += Environment.NewLine + "\t\t<lastchangedate>" + LastChangeDate + "</lastchangedate>";
+                                        returnXml += Environment.NewLine + "\t\t<path>" + FolderName + "</path>";
+                                        returnXml += Environment.NewLine + "\t</Collection>";
                                     }
                                 }
                             }
                         }
                     }
-                    returnXml = "<CollectionList>" + returnXml + "\r\n</CollectionList>";
+                    returnXml = "<CollectionList>" + returnXml + Environment.NewLine + "</CollectionList>";
                     core.privateFiles.saveFile(collectionFilePathFilename, returnXml);
                     //
                     LogController.logInfo(core, "Collection Folder XML is blank, rebuild finished and saved");

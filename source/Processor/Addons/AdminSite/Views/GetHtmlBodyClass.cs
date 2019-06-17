@@ -2817,17 +2817,17 @@ namespace Contensive.Addons.AdminSite {
             foreach (var kvp in IndexConfig.findWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
                 if ((!string.IsNullOrEmpty(findWord.Name)) && (findWord.MatchOption != FindWordMatchEnum.MatchIgnore)) {
-                    SubList = SubList + "\r\n" + findWord.Name + "\t" + findWord.Value + "\t" + (int)findWord.MatchOption;
+                    SubList = SubList + Environment.NewLine + findWord.Name + "\t" + findWord.Value + "\t" + (int)findWord.MatchOption;
                 }
             }
             string FilterText = "";
             if (!string.IsNullOrEmpty(SubList)) {
-                FilterText += "\r\nFindWordList" + SubList + "\r\n";
+                FilterText += Environment.NewLine + "FindWordList" + SubList + Environment.NewLine;
             }
             //
             // --CDef List
             if (IndexConfig.subCDefID > 0) {
-                FilterText += "\r\nCDefList\r\n" + IndexConfig.subCDefID + "\r\n";
+                FilterText += Environment.NewLine + "CDefList\r\n" + IndexConfig.subCDefID + Environment.NewLine;
             }
             //
             // -- Group List
@@ -2837,46 +2837,46 @@ namespace Contensive.Addons.AdminSite {
                 int Ptr = 0;
                 for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
                     if (!string.IsNullOrEmpty(IndexConfig.groupList[Ptr])) {
-                        SubList = SubList + "\r\n" + IndexConfig.groupList[Ptr];
+                        SubList = SubList + Environment.NewLine + IndexConfig.groupList[Ptr];
                     }
                 }
             }
             if (!string.IsNullOrEmpty(SubList)) {
-                FilterText += "\r\nGroupList" + SubList + "\r\n";
+                FilterText += Environment.NewLine + "GroupList" + SubList + Environment.NewLine;
             }
             //
             // PageNumber and Records Per Page
-            FilterText += "\r\n"
-                + "\r\npagenumber"
-                + "\r\n" + IndexConfig.pageNumber;
-            FilterText += "\r\n"
-                + "\r\nrecordsperpage"
-                + "\r\n" + IndexConfig.recordsPerPage;
+            FilterText += Environment.NewLine
+                + Environment.NewLine + "pagenumber"
+                + Environment.NewLine + IndexConfig.pageNumber;
+            FilterText += Environment.NewLine
+                + Environment.NewLine + "recordsperpage"
+                + Environment.NewLine + IndexConfig.recordsPerPage;
             //
             // misc filters
             if (IndexConfig.activeOnly) {
-                FilterText += "\r\n"
-                    + "\r\nIndexFilterActiveOnly";
+                FilterText += Environment.NewLine
+                    + Environment.NewLine + "IndexFilterActiveOnly";
             }
             if (IndexConfig.lastEditedByMe) {
-                FilterText += "\r\n"
-                    + "\r\nIndexFilterLastEditedByMe";
+                FilterText += Environment.NewLine
+                    + Environment.NewLine + "IndexFilterLastEditedByMe";
             }
             if (IndexConfig.lastEditedToday) {
-                FilterText += "\r\n"
-                    + "\r\nIndexFilterLastEditedToday";
+                FilterText += Environment.NewLine
+                    + Environment.NewLine + "IndexFilterLastEditedToday";
             }
             if (IndexConfig.lastEditedPast7Days) {
-                FilterText += "\r\n"
-                    + "\r\nIndexFilterLastEditedPast7Days";
+                FilterText += Environment.NewLine
+                    + Environment.NewLine + "IndexFilterLastEditedPast7Days";
             }
             if (IndexConfig.lastEditedPast30Days) {
-                FilterText += "\r\n"
-                    + "\r\nIndexFilterLastEditedPast30Days";
+                FilterText += Environment.NewLine
+                    + Environment.NewLine + "IndexFilterLastEditedPast30Days";
             }
             if (IndexConfig.open) {
-                FilterText += "\r\n"
-                    + "\r\nIndexFilterOpen";
+                FilterText += Environment.NewLine
+                    + Environment.NewLine + "IndexFilterOpen";
             }
             //
             cp.core.visitProperty.setProperty(AdminDataModel.IndexConfigPrefix + encodeText(IndexConfig.contentID), FilterText);
@@ -2887,12 +2887,12 @@ namespace Contensive.Addons.AdminSite {
             SubList = "";
             foreach (var column in IndexConfig.columns) {
                 if (!string.IsNullOrEmpty(column.Name)) {
-                    SubList = SubList + "\r\n" + column.Name + "\t" + column.Width;
+                    SubList = SubList + Environment.NewLine + column.Name + "\t" + column.Width;
                 }
             }
             FilterText = "";
             if (!string.IsNullOrEmpty(SubList)) {
-                FilterText += "\r\nColumns" + SubList + "\r\n";
+                FilterText += Environment.NewLine + "Columns" + SubList + Environment.NewLine;
             }
             //
             // Sorts
@@ -2901,11 +2901,11 @@ namespace Contensive.Addons.AdminSite {
             foreach (var kvp in IndexConfig.sorts) {
                 IndexConfigClass.IndexConfigSortClass sort = kvp.Value;
                 if (!string.IsNullOrEmpty(sort.fieldName)) {
-                    SubList = SubList + "\r\n" + sort.fieldName + "\t" + sort.direction;
+                    SubList = SubList + Environment.NewLine + sort.fieldName + "\t" + sort.direction;
                 }
             }
             if (!string.IsNullOrEmpty(SubList)) {
-                FilterText += "\r\nSorts" + SubList + "\r\n";
+                FilterText += Environment.NewLine + "Sorts" + SubList + Environment.NewLine;
             }
             cp.core.userProperty.setProperty(AdminDataModel.IndexConfigPrefix + encodeText(IndexConfig.contentID), FilterText);
             //

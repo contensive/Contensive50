@@ -647,7 +647,7 @@ namespace Contensive.Processor.Controllers {
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCountries", "Verify Countries");
                 //
                 string list = core.wwwFiles.readFileText("cclib\\config\\DefaultCountryList.txt");
-                string[] rows = GenericController.stringSplit(list, "\r\n");
+                string[] rows = GenericController.stringSplit(list, Environment.NewLine);
                 foreach (var row in rows) {
                     if (!string.IsNullOrEmpty(row)) {
                         string[] attrs = row.Split(';');

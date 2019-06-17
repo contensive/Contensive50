@@ -21,7 +21,7 @@ namespace Contensive.Processor.Controllers {
             var result = new System.Text.StringBuilder();
             if (FileInfo.Count > 0) {
                 foreach (CPFileSystemBaseClass.FileDetail fi in FileInfo) {
-                    result.Append("\r\n" + fi.Name + "\t" + fi.Attributes + "\t" + fi.DateCreated + "\t" + fi.DateLastAccessed + "\t" + fi.DateLastModified + "\t" + fi.Size + "\t" + fi.Extension);
+                    result.Append(Environment.NewLine + fi.Name + "\t" + fi.Attributes + "\t" + fi.DateCreated + "\t" + fi.DateLastAccessed + "\t" + fi.DateLastModified + "\t" + fi.Size + "\t" + fi.Extension);
                 }
             }
             return result.ToString();
@@ -37,7 +37,7 @@ namespace Contensive.Processor.Controllers {
             var result = new System.Text.StringBuilder();
             if (DirectoryInfo.Count > 0) {
                 foreach (CPFileSystemBaseClass.FolderDetail di in DirectoryInfo) {
-                    result.Append("\r\n" + di.Name + "\t" + (int)di.Attributes + "\t" + di.DateCreated + "\t" + di.DateLastAccessed + "\t" + di.DateLastModified + "\t0\t");
+                    result.Append(Environment.NewLine + di.Name + "\t" + (int)di.Attributes + "\t" + di.DateCreated + "\t" + di.DateLastAccessed + "\t" + di.DateLastModified + "\t0\t");
                 }
             }
             return result.ToString();

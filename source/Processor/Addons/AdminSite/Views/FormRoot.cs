@@ -87,21 +87,21 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Nothing Displayed, show default root page
                     //
-                    returnHtml = returnHtml + "\r\n<div style=\"padding:20px;height:450px\">"
-                    + "\r\n<div><a href=http://www.Contensive.com target=_blank><img style=\"border:1px solid #000;\" src=\"/ContensiveBase/images/ContensiveAdminLogo.GIF\" border=0 ></A></div>"
-                    + "\r\n<div><strong>Contensive/" + core.codeVersion() + "</strong></div>"
-                    + "\r\n<div style=\"clear:both;height:18px;margin-top:10px\"><div style=\"float:left;width:200px;\">Domain Name</div><div style=\"float:left;\">" + core.webServer.requestDomain + "</div></div>"
-                    + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Login Member Name</div><div style=\"float:left;\">" + core.session.user.name + "</div></div>"
-                    + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Quick Reports</div><div style=\"float:left;\"><a Href=\"?" + rnAdminForm + "=" + AdminFormQuickStats + "\">Real-Time Activity</A></div></div>"
-                    + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\"><a Href=\"?" + RequestNameDashboardReset + "=" + core.session.visit.id + "\">Run Dashboard</A></div></div>"
-                    + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\"><a Href=\"?addonguid=" + addonGuidAddonManager + "\">Add-on Manager</A></div></div>";
+                    returnHtml = returnHtml + Environment.NewLine + "<div style=\"padding:20px;height:450px\">"
+                    + Environment.NewLine + "<div><a href=http://www.Contensive.com target=_blank><img style=\"border:1px solid #000;\" src=\"/ContensiveBase/images/ContensiveAdminLogo.GIF\" border=0 ></A></div>"
+                    + Environment.NewLine + "<div><strong>Contensive/" + core.codeVersion() + "</strong></div>"
+                    + Environment.NewLine + "<div style=\"clear:both;height:18px;margin-top:10px\"><div style=\"float:left;width:200px;\">Domain Name</div><div style=\"float:left;\">" + core.webServer.requestDomain + "</div></div>"
+                    + Environment.NewLine + "<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Login Member Name</div><div style=\"float:left;\">" + core.session.user.name + "</div></div>"
+                    + Environment.NewLine + "<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Quick Reports</div><div style=\"float:left;\"><a Href=\"?" + rnAdminForm + "=" + AdminFormQuickStats + "\">Real-Time Activity</A></div></div>"
+                    + Environment.NewLine + "<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\"><a Href=\"?" + RequestNameDashboardReset + "=" + core.session.visit.id + "\">Run Dashboard</A></div></div>"
+                    + Environment.NewLine + "<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\"><a Href=\"?addonguid=" + addonGuidAddonManager + "\">Add-on Manager</A></div></div>";
                     //
                     if (!core.doc.userErrorList.Count.Equals(0)) {
                         returnHtml = returnHtml + "<div style=\"clear:both;margin-top:20px;\">&nbsp;</div>"
                         + "<div style=\"clear:both;margin-top:20px;\">" + Processor.Controllers.ErrorController.getUserError(core) + "</div>";
                     }
                     //
-                    returnHtml = returnHtml + "\r\n</div>"
+                    returnHtml = returnHtml + Environment.NewLine + "</div>"
                     + "";
                 }
             } catch (Exception ex) {
