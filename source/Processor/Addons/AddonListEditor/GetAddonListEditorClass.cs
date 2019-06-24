@@ -25,7 +25,7 @@ namespace Contensive.Addons.AddonListEditor {
                     }
                 }
                 if (string.IsNullOrWhiteSpace(recordGuid)) { return "<!-- recordid not valid -->"; };
-                CP.Doc.AddHeadJavascript("var parentContentGuid='" + recordGuid + "';var parentRecordGuid='" + content.ccguid + "';");
+                CP.Doc.AddHeadJavascript("var parentContentGuid='" + content.ccguid + "';var parentRecordGuid='" + recordGuid+ "';");
                 return string.Empty;
             }
             // 

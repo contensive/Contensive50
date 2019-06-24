@@ -106,6 +106,30 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// transverse the addonlist and delete the instance specified. return true if found, false if not found
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="addonList"></param>
+        /// <param name="instanceGuid"></param>
+        /// <param name="errorMessage"></param>
+        /// <returns></returns>
+        public static bool deleteInstance(CPBaseClass cp, List<AddonListItemModel> addonList, string instanceGuid) {
+            foreach (var addon in addonList) {
+                if (addon.columns != null) {
+                    foreach (var column in addon.columns) {
+                        if (deleteInstance(cp, column.addonList, instanceGuid)) { return true; }
+                    }
+                }
+                if (addon.instanceGuid == instanceGuid) {
+                    addonList.Remove(addon);
+                    return true;
+                }
+            }
+            return false;
+        }
+        //
+        //====================================================================================================
         #region  IDisposable Support 
         //
         // this class must implement System.IDisposable

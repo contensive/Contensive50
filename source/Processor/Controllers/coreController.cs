@@ -38,6 +38,12 @@ namespace Contensive.Processor.Controllers {
         public SessionController session;
         //
         //===================================================================================================
+        /// <summary>
+        /// if true, the session model (user, viewing, visit, visitor, properties) will be deleted on dispose)
+        /// </summary>
+        public bool deleteSessionOnExit = false;
+        //
+        //===================================================================================================
         // todo - this should be a pointer into the serverConfig
         /// <summary>
         /// The configuration for this app, a copy of the data in the serverconfig file
@@ -530,6 +536,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp) {
             cp_forAddonExecutionOnly = cp;
+            deleteSessionOnExit = true;
             LogController.logRaw("CoreController constructor-0, enter", LogController.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, ContentMetadataModel>();
@@ -553,6 +560,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName) : base() {
             this.cp_forAddonExecutionOnly = cp;
+            deleteSessionOnExit = true;
             LogController.logRaw("CoreController constructor-1, enter", LogController.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
@@ -606,6 +614,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig) : base() {
             cp_forAddonExecutionOnly = cp;
+            deleteSessionOnExit = true;
             LogController.logRaw("CoreController constructor-2, enter", LogController.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
@@ -631,6 +640,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
+            deleteSessionOnExit = false;
             LogController.logRaw("CoreController constructor-3, enter", LogController.LogLevel.Trace);
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -775,8 +785,33 @@ namespace Contensive.Processor.Controllers {
                     if (serverConfig != null) {
                         if (appConfig != null) {
                             if (appConfig.appStatus == AppConfigModel.AppStatusEnum.ok) {
+                                if (deleteSessionOnExit) {
+                                    if ((session != null)) {
+                                        if ((session.user != null) && (session.user.id > 0)) {
+                                            //
+                                            // -- delete user
+                                            userProperty.deleteAll(session.user.id);
+                                            DbBaseModel.delete<PersonModel>(this, session.user.id);
+                                        }
+                                        if ((session.visit != null) && (session.visit.id > 0)) {
+                                            //
+                                            // -- delete visit
+                                            visitProperty.deleteAll(session.user.id);
+                                            DbBaseModel.delete<VisitModel>(this, session.visit.id);
+                                            //
+                                            // -- delete viewing
+                                            DbBaseModel.deleteSelection<ViewingModel>(this, "(visitId=" + session.visit.id + ")");
+                                        }
+                                        if ((session.visitor != null) && (session.visitor.id > 0)) {
+                                            //
+                                            // -- delete visitor
+                                            visitorProperty.deleteAll(session.user.id);
+                                            DbBaseModel.delete<VisitorModel>(this, session.visit.id);
+                                        }
+                                    }
+                                }
                                 //if ((appConfig.appMode == appConfigModel.appModeEnum.normal) && (appConfig.appStatus == appConfigModel.appStatusEnum.OK))
-                                if (siteProperties.allowVisitTracking) {
+                                if (!deleteSessionOnExit && siteProperties.allowVisitTracking) {
                                     //
                                     // If visit tracking, save the viewing record
                                     //

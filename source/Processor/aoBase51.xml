@@ -2897,6 +2897,10 @@
     <DotNetClass>Contensive.Addons.AddonListEditor.GetAddonPanelClass</DotNetClass>
     <RemoteMethod>Yes</RemoteMethod>
   </Addon>
+  <Addon name="DeleteAddonListInstance" guid="{15614548-2749-45C1-AAFE-17018F5F0D1B}" type="Add-on">
+    <DotNetClass>Contensive.Addons.AddonListEditor.DeleteAddonListInstanceClass</DotNetClass>
+    <RemoteMethod>Yes</RemoteMethod>
+  </Addon>
   <Addon name="Status" guid="{6444B5C9-36DD-43FF-978C-26650EB2333F}" type="Add-on">
     <DotNetClass>Contensive.Addons.Diagnostics.StatusClass</DotNetClass>
     <RemoteMethod>Yes</RemoteMethod>

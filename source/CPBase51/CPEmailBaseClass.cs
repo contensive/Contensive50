@@ -116,6 +116,10 @@ namespace Contensive.BaseClasses {
         public abstract void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately);
         public abstract void sendUser(int toUserId, string fromAddress, string subject, string body);
         //
+        public abstract bool validateEmail(string toAddress);
+        //
+        public abstract bool validateUserEmail(int toUserId);
+        //
         //====================================================================================================
         // deprecated
         //

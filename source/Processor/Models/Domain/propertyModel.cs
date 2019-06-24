@@ -25,9 +25,9 @@ namespace Contensive.Processor.Models.Domain {
         private CoreController core;
         //
         public enum PropertyTypeEnum {
-            user=0,
-            visit=1,
-            visitor=2
+            user = 0,
+            visit = 1,
+            visitor = 2
         }
         /// <summary>
         /// The propertyType for instance of PropertyModel 
@@ -159,8 +159,8 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     core.db.executeQuery("update ccProperties set FieldValue=" + DbController.encodeSQLText(propertyValue) + ",ModifiedDate=" + SQLNow + " where id=" + RecordID);
                 }
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
         }
         //
@@ -172,7 +172,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public DateTime getDate(string propertyName) => encodeDate(getText(propertyName, encodeText(DateTime.MinValue), propertyKeyId)); 
+        public DateTime getDate(string propertyName) => encodeDate(getText(propertyName, encodeText(DateTime.MinValue), propertyKeyId));
         //
         //====================================================================================================
         /// <summary>
@@ -182,7 +182,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public DateTime getDate(string propertyName, DateTime defaultValue) => encodeDate(getText(propertyName, encodeText(defaultValue), propertyKeyId)); 
+        public DateTime getDate(string propertyName, DateTime defaultValue) => encodeDate(getText(propertyName, encodeText(defaultValue), propertyKeyId));
         //
         //====================================================================================================
         /// <summary>
@@ -192,7 +192,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public double getNumber(string propertyName) => encodeNumber(getText(propertyName, encodeText(0), propertyKeyId)); 
+        public double getNumber(string propertyName) => encodeNumber(getText(propertyName, encodeText(0), propertyKeyId));
         //
         //====================================================================================================
         /// <summary>
@@ -232,7 +232,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public int getInteger(string propertyName)  => encodeInteger(getText(propertyName, encodeText(0), propertyKeyId));
+        public int getInteger(string propertyName) => encodeInteger(getText(propertyName, encodeText(0), propertyKeyId));
         //
         //====================================================================================================
         /// <summary>
@@ -262,7 +262,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public string getText(string propertyName, string defaultValue) => getText(propertyName, defaultValue, propertyKeyId );
+        public string getText(string propertyName, string defaultValue) => getText(propertyName, defaultValue, propertyKeyId);
         //
         //====================================================================================================
         /// <summary>
@@ -293,13 +293,22 @@ namespace Contensive.Processor.Models.Domain {
                     setProperty(propertyName, defaultValue, keyId);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnString;
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// delete all properties for this user or visitor or visit
+        /// </summary>
+        /// <param name="keyId"></param>
+        public void deleteAll(int keyId) {
+            core.db.executeNonQuery("Delete from ccProperties where (TypeID=" + (int)propertyType + ")and(KeyID=" + keyId + ")");
+        }
         //
+        //====================================================================================================
         //
         private void loadFromDb(int keyId) {
             try {
@@ -322,8 +331,8 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
                 propertyCacheLoaded = true;
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
         }
     }

@@ -26,13 +26,13 @@ namespace Contensive.Addons.Diagnostics {
                 // -- tmp, check for 10% free on C-drive and D-drive
                 if (Directory.Exists(@"c:\")) {
                     DriveInfo driveTest = new DriveInfo("c");
-                    double freeSpace = 100.0 * (Convert.ToDouble(driveTest.AvailableFreeSpace) / Convert.ToDouble(driveTest.TotalSize));
+                    double freeSpace = Math.Round(100.0 * (Convert.ToDouble(driveTest.AvailableFreeSpace) / Convert.ToDouble(driveTest.TotalSize)), 2);
                     if (freeSpace < 10) { return "ERROR, Drive-C does not have 10% free"; };
                     result.AppendLine("ok, drive-c free space [" + freeSpace + "%], [" + (driveTest.AvailableFreeSpace / (1024 * 1024)) + " MB]");
                 }
                 if (Directory.Exists(@"d:\")) {
                     DriveInfo driveTest = new DriveInfo("d");
-                    double freeSpace = 100.0 * (Convert.ToDouble(driveTest.AvailableFreeSpace) / Convert.ToDouble(driveTest.TotalSize));
+                    double freeSpace = Math.Round( 100.0 * (Convert.ToDouble(driveTest.AvailableFreeSpace) / Convert.ToDouble(driveTest.TotalSize)), 2);
                     if (freeSpace < 10) { return "ERROR, Drive-C does not have 10% free"; };
                     result.AppendLine("ok, drive-d free space [" + freeSpace + "%], [" + (driveTest.AvailableFreeSpace / (1024 * 1024)) + " MB]");
                 }
@@ -65,25 +65,26 @@ namespace Contensive.Addons.Diagnostics {
                 if (AddonModel.createList(core, "(ProcessNextRun<" + DbController.encodeSQLDate(DateTime.Now.AddHours(-1)) + ")").Count > 0) {
                     return "ERROR, there are process addons unexecuted for over 1 hour. TaskScheduler may not be enabled, or no server is running the Contensive Task Service.";
                 }
-                //
-                // -- test for taskrunner stuck
                 if (TaskModel.createList(core, "(dateCompleted is null)and(dateStarted<" + DbController.encodeSQLDate(DateTime.Now.AddHours(-1)) + ")").Count > 0) {
                     return "ERROR, there are tasks that have been executing for over 1 hour. The Task Runner Server may have stopped.";
                 }
+                result.AppendLine("ok, taskscheduler running.");
                 //
                 // -- test for taskrunner not running
-                if (TaskModel.createList(core, "(dateCompleted is null)and(dateStarted is null)").Count > 100 ) {
+                if (TaskModel.createList(core, "(dateCompleted is null)and(dateStarted is null)").Count > 100) {
                     return "ERROR, there are over 100 task waiting to be execute. The Task Runner Server may have stopped.";
                 }
+                result.AppendLine("ok, taskrunner running.");
                 //
                 // -- verify the email process is running.
                 if (cp.Site.GetDate("EmailServiceLastCheck") < DateTime.Now.AddHours(-1)) {
                     return "ERROR, Email process has not executed for over 1 hour.";
                 }
+                result.AppendLine("ok, email process running.");
                 //
                 // -- last -- if alarm folder is not empty, fail diagnostic. Last so others can add an alarm entry
                 foreach (var alarmFile in core.programDataFiles.getFileList("Alarms/")) {
-                    return "ERROR, Alarm folder is not empty, [" + core.programDataFiles.readFileText(alarmFile.Name) + "].";
+                    return "ERROR, Alarm folder is not empty, [" + core.programDataFiles.readFileText("Alarms/" + alarmFile.Name) + "].";
                 }
                 return "ok, all server diagnostics passed" + Environment.NewLine + result.ToString();
             } catch (Exception ex) {

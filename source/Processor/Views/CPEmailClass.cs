@@ -321,6 +321,14 @@ namespace Contensive.Processor {
             GC.SuppressFinalize(this);
         }
 
+        public override bool validateEmail(string toAddress) {
+            throw new NotImplementedException();
+        }
+
+        public override bool validateUserEmail(int toUserId) {
+            throw new NotImplementedException();
+        }
+
         ~CPEmailClass() {
             Dispose(false);
         }

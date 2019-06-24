@@ -121,7 +121,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="code"></param>
         public override void AddHeadJavascript(string code) {
-            cp.core.html.addScriptCode(code, "");
+            cp.core.html.addScriptCode(code, "",true);
         }
         //
         //====================================================================================================
