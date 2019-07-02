@@ -9,7 +9,7 @@ namespace Tests {
         //
         // code version for this build. This is saved in a site property and checked in the housekeeping event - checkDataVersion
         //
-        public const string testAppName = "app20190506v51e";
+        public const string testAppName = "app20190702v51";
 
     }
 }

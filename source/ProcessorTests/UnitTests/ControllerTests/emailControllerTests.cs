@@ -57,7 +57,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // assert
                 Assert.AreEqual(1, cp.core.mockEmailList.Count);
                 MockEmailClass sentEmail = cp.core.mockEmailList.First();
-                Assert.AreEqual("", sentEmail.AttachmentFilename);
+                Assert.IsTrue(string.IsNullOrEmpty(sentEmail.AttachmentFilename));
                 Assert.AreEqual("to@kma.net", sentEmail.email.toAddress);
                 Assert.AreEqual("from@kma.net", sentEmail.email.fromAddress);
                 Assert.AreEqual("bounce@kma.net", sentEmail.email.BounceAddress);
@@ -87,7 +87,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // assert
                 Assert.AreEqual(1, cp.core.mockEmailList.Count);
                 MockEmailClass sentEmail = cp.core.mockEmailList.First();
-                Assert.AreEqual("", sentEmail.AttachmentFilename);
+                Assert.IsTrue(string.IsNullOrEmpty(sentEmail.AttachmentFilename));
                 Assert.AreEqual( toPerson.email, sentEmail.email.toAddress);
                 Assert.AreEqual("from@kma.net", sentEmail.email.fromAddress);
                 Assert.AreEqual("bounce@kma.net", sentEmail.email.BounceAddress);

@@ -1319,6 +1319,7 @@ namespace Contensive.Processor.Models.Domain {
                 ContentModel.invalidateTableCache(core);
                 ContentFieldModel.invalidateTableCache(core);
                 core.clearMetaData();
+                core.cache.invalidateAll();
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

@@ -5,7 +5,7 @@ namespace Contensive.Processor.Models.Domain {
     [System.Serializable]
     public class MockEmailClass {
         public EmailController.EmailClass email;
-        public string AttachmentFilename;
+        public string AttachmentFilename = string.Empty;
     }
 
 }
