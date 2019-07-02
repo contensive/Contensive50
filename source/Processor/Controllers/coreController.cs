@@ -787,12 +787,14 @@ namespace Contensive.Processor.Controllers {
                             if (appConfig.appStatus == AppConfigModel.AppStatusEnum.ok) {
                                 if (deleteSessionOnExit) {
                                     if ((session != null)) {
-                                        if ((session.user != null) && (session.user.id > 0)) {
-                                            //
-                                            // -- delete user
-                                            userProperty.deleteAll(session.user.id);
-                                            DbBaseModel.delete<PersonModel>(this, session.user.id);
-                                        }
+                                        //
+                                        // -- no, sending test email deletes the confirmation users!!
+                                        //if ((session.user != null) && (session.user.id > 0)) {
+                                        //    //
+                                        //    // -- delete user
+                                        //    userProperty.deleteAll(session.user.id);
+                                        //    DbBaseModel.delete<PersonModel>(this, session.user.id);
+                                        //}
                                         if ((session.visit != null) && (session.visit.id > 0)) {
                                             //
                                             // -- delete visit

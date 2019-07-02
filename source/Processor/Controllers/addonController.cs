@@ -477,34 +477,6 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 result += contentParts;
                                 //
-                                // -- Scripting code
-                                hint = "14";
-                                if (addon == null) { LogController.logError(core, new GenericException("AddonController.execute, addon became null at hint-14"), ""); }
-                                if (addon.scriptingCode == null) { LogController.logError(core, new GenericException("AddonController.execute, addon.scriptCode is null at hint-14"), ""); }
-                                if (addon.scriptingCode != "") {
-                                    hint = "14.1";
-                                    try {
-                                        hint = "14.2";
-                                        if (addon.scriptingLanguageID == (int)ScriptLanguages.Javascript) {
-                                            hint = "14.3";
-                                            result += execute_Script_JScript(ref addon);
-                                        } else {
-                                            hint = "14.4";
-                                            result += execute_Script_VBScript(ref addon);
-                                        }
-                                    } catch (Exception ex) {
-                                        hint = "14.5";
-                                        string addonDescription = getAddonDescription(core, addon);
-                                        throw new GenericException("There was an error executing the script component of Add-on [" + addonDescription + "]." + ((ex.InnerException != null) ? " Inner Exception [" + ex.InnerException.Message + "]" : ""));
-                                    }
-                                }
-                                //
-                                // -- DotNet
-                                hint = "15";
-                                if (addon.dotNetClass != "") {
-                                    result += execute_dotNetClass(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core, addon.collectionID));
-                                }
-                                //
                                 // -- RemoteAssetLink
                                 hint = "16";
                                 if (addon.remoteAssetLink != "") {
@@ -612,6 +584,36 @@ namespace Contensive.Processor.Controllers {
                                         result = "\r<div id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\">" + nop(result) + "\r</div>";
                                     }
                                 }
+                                //
+                                // -- add scripting and dotnet code last, so if the execution adds javascript to the head, the code in the fields is first.
+                                // -- Scripting code
+                                hint = "14";
+                                if (addon == null) { LogController.logError(core, new GenericException("AddonController.execute, addon became null at hint-14"), ""); }
+                                if (addon.scriptingCode == null) { LogController.logError(core, new GenericException("AddonController.execute, addon.scriptCode is null at hint-14"), ""); }
+                                if (addon.scriptingCode != "") {
+                                    hint = "14.1";
+                                    try {
+                                        hint = "14.2";
+                                        if (addon.scriptingLanguageID == (int)ScriptLanguages.Javascript) {
+                                            hint = "14.3";
+                                            result += execute_Script_JScript(ref addon);
+                                        } else {
+                                            hint = "14.4";
+                                            result += execute_Script_VBScript(ref addon);
+                                        }
+                                    } catch (Exception ex) {
+                                        hint = "14.5";
+                                        string addonDescription = getAddonDescription(core, addon);
+                                        throw new GenericException("There was an error executing the script component of Add-on [" + addonDescription + "]." + ((ex.InnerException != null) ? " Inner Exception [" + ex.InnerException.Message + "]" : ""));
+                                    }
+                                }
+                                //
+                                // -- DotNet
+                                hint = "15";
+                                if (addon.dotNetClass != "") {
+                                    result += execute_dotNetClass(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core, addon.collectionID));
+                                }
+
                             }
                             //
                             //   Add Wrappers to content

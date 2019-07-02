@@ -236,7 +236,7 @@ namespace Contensive.Processor.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;form class=&quot;form-inline&quot; method=&quot;post&quot; action=&quot;?method=logout&quot;&gt;
-        ///&lt;button class=&quot;btn btn-warning btn-sm ml-2&quot; type=&quot;submit&quot;&gt;Logout&lt;/button&gt;
+        ///{{personName}}&amp;nbsp;&lt;button class=&quot;btn btn-warning btn-sm ml-2&quot; type=&quot;submit&quot;&gt;Logout&lt;/button&gt;
         ///&lt;/form&gt;.
         /// </summary>
         public static string LogoutButtonFormHtml {
