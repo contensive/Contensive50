@@ -129,6 +129,33 @@ namespace Contensive.Processor.Controllers {
             return false;
         }
         //
+        // ==========================================================================================
+        /// <summary>
+        /// clean up the addonlist delivered from the UI (remove renderedhtml, update addonName, etc)
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="addonList"></param>
+        /// <returns></returns>
+        public static void normalizeAddonList(CPBaseClass cp, List<AddonListItemModel> addonList) {
+            try {
+                foreach (var addon in addonList) {
+                    addon.renderedHtml = string.Empty;
+                    addon.renderedAssets = new AddonAssetsModel();
+                    var addonRecord = Contensive.Processor.Models.Db.AddonModel.create(((CPClass)cp).core, addon.designBlockTypeGuid);
+                    if (addonRecord != null) {
+                        addon.designBlockTypeName = addonRecord.name;
+                    }
+                    if (addon.columns != null) {
+                        foreach (var column in addon.columns) {
+                            normalizeAddonList(cp, column.addonList);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                cp.Site.ErrorReport(ex);
+            }
+        }
+        //
         //====================================================================================================
         #region  IDisposable Support 
         //

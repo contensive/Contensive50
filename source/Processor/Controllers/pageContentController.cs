@@ -1065,9 +1065,9 @@ namespace Contensive.Processor.Controllers {
                     if (core.siteProperties.getBoolean("Allow AddonList Editor For Quick Editor")) {
                         core.docProperties.setProperty("contentid", ContentMetadataModel.getContentId(core, PageContentModel.contentName));
                         core.docProperties.setProperty("recordid", core.doc.pageController.page.id);
-                        core.addon.execute("{92B75A6A-E84B-4551-BBF3-849E91D084BC}", new CPUtilsBaseClass.addonExecuteContext() {
+                        resultContent.Append( core.addon.execute("{92B75A6A-E84B-4551-BBF3-849E91D084BC}", new CPUtilsBaseClass.addonExecuteContext() {
                              addonType = CPUtilsBaseClass.addonContext.ContextSimple
-                        });
+                        }));
                     } else {
                     }
                 } else {

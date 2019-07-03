@@ -18,6 +18,9 @@ namespace Contensive.Addons.AddonListEditor {
                 CoreController core = ((CPClass)cp).core;
                 //
                 SetAddonList_RequestClass request = DeserializeObject<SetAddonList_RequestClass>(cp.Request.Body);
+                //
+                cp.Utils.AppendLog("SetAddonListClass, request.body [" + cp.Request.Body + "]");
+                //
                 //if (request == null) {
                 //    request = new SetAddonList_RequestClass();
                 //    //
@@ -108,6 +111,9 @@ namespace Contensive.Addons.AddonListEditor {
                     });
                 }
                 //
+                // -- normalize the list to clean up what might be confusing data
+                AddonListController.normalizeAddonList(cp, request.addonList);
+                //
                 // -- validate addonList from UI and set back into a string
                 AddonListItemModel addonListItem = null;
                 switch (metadata.name.ToLower()) {
@@ -118,6 +124,9 @@ namespace Contensive.Addons.AddonListEditor {
                                 errorList = new List<string> { "The parent record in [Page Content] could not be determined from the guid [" + request.parentRecordGuid + "]" }
                             });
                         }
+                        //
+                        cp.Utils.AppendLog("SetAddonListClass, render addonList and update page [" + page.id + "," + page.name + "]");
+                        //
                         addonListItem = renderNewAddonInList(cp, request.addonList);
                         page.addonList = SerializeObject(request.addonList);
                         page.save(core);
@@ -202,28 +211,40 @@ namespace Contensive.Addons.AddonListEditor {
         /// <param name="addonList"></param>
         /// <returns></returns>
         public static AddonListItemModel renderNewAddonInList(CPBaseClass cp, List<AddonListItemModel> addonList) {
-            AddonListItemModel renderedAddonItem = null;
-            foreach (var addon in addonList) {
-                if (string.IsNullOrWhiteSpace(addon.instanceGuid)) {
-                    //
-                    // -- found the missing instance, create guid, save list, execute the addon and return
-                    renderedAddonItem = new AddonListItemModel {
-                        instanceGuid = Guid.NewGuid().ToString(),
-                        designBlockTypeGuid = addon.designBlockTypeGuid,
-                        designBlockTypeName = addon.designBlockTypeName,
-                        columns = addon.columns,
-                    };
-                    AddonListController.renderEdit(cp, renderedAddonItem);
-                    return renderedAddonItem;
-                }
-                if (addon.columns != null) {
-                    foreach (var column in addon.columns) {
-                        renderedAddonItem = renderNewAddonInList(cp, column.addonList);
-                        if (renderedAddonItem != null) { return renderedAddonItem; }
+            try {
+                //
+                cp.Utils.AppendLog("SetAddonListClass.renderNewAddonInList enter");
+                //
+                AddonListItemModel renderedAddonItem = null;
+                foreach (var addon in addonList) {
+                    if (string.IsNullOrWhiteSpace(addon.instanceGuid)) {
+                        //
+                        // -- found the missing instance, create guid, save list, execute the addon and return
+                        //
+                        cp.Utils.AppendLog("SetAddonListClass.renderNewAddonInList found addon in list with the missing instance [typename:" + addon.designBlockTypeName + ",typeGuid:" + addon.designBlockTypeGuid + "]");
+                        //
+                        addon.instanceGuid = Guid.NewGuid().ToString();
+                        renderedAddonItem = new AddonListItemModel {
+                            instanceGuid = addon.instanceGuid,
+                            designBlockTypeGuid = addon.designBlockTypeGuid,
+                            designBlockTypeName = addon.designBlockTypeName,
+                            columns = addon.columns,
+                        };
+                        AddonListController.renderEdit(cp, renderedAddonItem);
+                        return renderedAddonItem;
+                    }
+                    if (addon.columns != null) {
+                        foreach (var column in addon.columns) {
+                            renderedAddonItem = renderNewAddonInList(cp, column.addonList);
+                            if (renderedAddonItem != null) { return renderedAddonItem; }
+                        }
                     }
                 }
+                return renderedAddonItem;
+            } catch (Exception ex) {
+                cp.Site.ErrorReport(ex);
+                throw;
             }
-            return renderedAddonItem;
         }
     }
 }

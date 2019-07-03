@@ -2882,8 +2882,21 @@
   </Addon>
   <Addon name="AddonListEditor" guid="{92B75A6A-E84B-4551-BBF3-849E91D084BC}" type="Add-on">
     <DotNetClass>Contensive.Addons.AddonListEditor.GetAddonListEditorClass</DotNetClass>
-    <Content>Yes</Content>
-    <Template>Yes</Template>
+    <CopyText><![CDATA[<app-root></app-root>]]></CopyText>
+    <Content>No</Content>
+    <Template>No</Template>
+    <BlockEditTools>Yes</BlockEditTools>
+    <jsheadscriptsrc></jsheadscriptsrc>
+    <styleslinkhref>/addonListEditor/styles.css</styleslinkhref>
+    <OtherHeadTags>
+      <![CDATA[<! -- addonListEditor -->
+<script type="text/javascript" src="/addonListEditor/runtime.js"></script>
+<script type="text/javascript" src="/addonListEditor/polyfills.js"></script>
+<script type="text/javascript" src="/addonListEditor/scripts.js"></script>
+<script type="text/javascript" src="/addonListEditor/main.js"></script>
+<! -- /addonListEditor -->
+]]>
+    </OtherHeadTags>
   </Addon>
   <Addon name="GetAddonList" guid="{CE950C26-A1BB-4827-80A4-A665BBEAF936}" type="Add-on">
     <DotNetClass>Contensive.Addons.AddonListEditor.GetAddonListClass</DotNetClass>
