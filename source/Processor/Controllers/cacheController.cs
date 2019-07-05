@@ -489,6 +489,8 @@ namespace Contensive.Processor.Controllers {
         // <remarks></remarks>
         public void invalidate(string key, int recursionLimit = 5) {
             try {
+                Controllers.LogController.logTrace(core, "invalidate, key [" + key + "], recursionLimit [" + recursionLimit + "]");
+                //
                 if ((recursionLimit > 0) && (!string.IsNullOrWhiteSpace(key.Trim()))) {
                     key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                     // if key is a ptr, we need to invalidate the real key
@@ -546,7 +548,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="key">The cache key to be converted</param>
         /// <returns></returns>
         private string createServerKey(string key) {
-            string result = core.appConfig.name + "-" + core.codeVersion() + "-" + key;
+            string result = core.appConfig.name + "-" + key;
             result = Regex.Replace(result, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return result;
         }

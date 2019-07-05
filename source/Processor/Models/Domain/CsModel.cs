@@ -1249,6 +1249,13 @@ namespace Contensive.Processor {
         /// <param name="blockClearCache"></param>
         public void save(bool asyncSave, bool blockClearCache) {
             try {
+                Controllers.LogController.logTrace(core, "save, enter");
+                if ( contentMeta == null ) {
+                    Controllers.LogController.logTrace(core, "save, contentMeta NULL, sqlSource [" + sqlSource + "]");
+                } else {
+                    Controllers.LogController.logTrace(core, "save, enter, contentMeta.name [" + contentMeta.name + "], contentMeta.tableName [" + contentMeta.tableName + "], contentMeta.dataSourceName [" + contentMeta.dataSourceName + "], asyncSave [" + asyncSave + "], blockClearCache [" + blockClearCache + "]");
+                }
+                //
                 if (!ok()) { return; }
                 if (this.writeCache.Count == 0) { return; }
                 if (!(this.createdByQuery)) { throw new ArgumentException("The dataset cannot be updated because it was created with a query and not a content table."); }
@@ -1430,6 +1437,9 @@ namespace Contensive.Processor {
                             }
                         }
                     }
+                    //
+                    Controllers.LogController.logTrace(core, "save, FieldFoundCount [" + FieldFoundCount + "], sqlUpdate [" + sqlUpdate + "]");
+                    //
                     if (FieldFoundCount > 0) {
                         //
                         // ----- update live table (non-workflowauthoring and non-authorable fields)
@@ -1451,6 +1461,9 @@ namespace Contensive.Processor {
                     }
                     this.lastUsed = DateTime.Now;
                 }
+                //
+                Controllers.LogController.logTrace(core, "save, exit");
+                //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
