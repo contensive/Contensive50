@@ -37,7 +37,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// Can be used to write to the record. True if opened with a content definition.
         /// </summary>
-        private bool createdByQuery;
+        private bool createdWithMetaData;
         /// <summary>
         /// Can be read. True if created with open() or openSql(), false if created with openForUpdate()
         /// </summary>
@@ -228,7 +228,7 @@ namespace Contensive.Processor {
         public void deleteRecord() {
             try {
                 if (!ok()) { throw new ArgumentException("Cannot delete because data set is empty or at End-Of-file"); }
-                if (!createdByQuery) { throw new ArgumentException("Cannot delete because data set was created with a query."); }
+                if (!createdWithMetaData) { throw new ArgumentException("Cannot delete because data set was created with a query."); }
                 if (contentMeta == null) { throw new ArgumentException("Cannot delete because meta data is not valid."); }
                 if (string.IsNullOrEmpty(contentMeta.name)) { throw new ArgumentException("Cannot delete because meta data name is blank."); }
                 //
@@ -462,7 +462,7 @@ namespace Contensive.Processor {
             //resultEOF = true;
             sqlSelectFieldList = "";
             sqlSource = "";
-            createdByQuery = false;
+            createdWithMetaData = false;
             writeCache = null;
         }
         //
@@ -542,7 +542,7 @@ namespace Contensive.Processor {
                             throw new GenericException("Cannot read from a dataset because the data is not valid.");
                         } else {
                             if (!this.dt.Columns.Contains(fieldNameTrim.ToLowerInvariant())) {
-                                if (this.createdByQuery) {
+                                if (this.createdWithMetaData) {
                                     var dtFieldList = new List<string>();
                                     foreach (DataColumn column in this.dt.Columns) dtFieldList.Add(column.ColumnName);
                                     throw new GenericException("Field [" + fieldNameTrim + "] was not found in [" + this.contentName + "] with selected fields [" + String.Join(",", dtFieldList.ToArray()) + "]");
@@ -609,7 +609,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public CPContentBaseClass.fileTypeIdEnum getFieldTypeId(string fieldName) {
             try {
-                if (ok() && this.createdByQuery && !string.IsNullOrEmpty(this.contentMeta.name)) { return this.contentMeta.fields[fieldName.ToLowerInvariant()].fieldTypeId; }
+                if (ok() && this.createdWithMetaData && !string.IsNullOrEmpty(this.contentMeta.name)) { return this.contentMeta.fields[fieldName.ToLowerInvariant()].fieldTypeId; }
                 return 0;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -627,7 +627,7 @@ namespace Contensive.Processor {
         public string getFieldCaption(string fieldName) {
             string returnResult = "";
             try {
-                if (ok() && (this.createdByQuery) && (!string.IsNullOrEmpty(this.contentMeta.name))) {
+                if (ok() && (this.createdWithMetaData) && (!string.IsNullOrEmpty(this.contentMeta.name))) {
                     returnResult = this.contentMeta.fields[fieldName.ToLowerInvariant()].caption;
                     if (string.IsNullOrEmpty(returnResult)) {
                         returnResult = fieldName;
@@ -740,7 +740,7 @@ namespace Contensive.Processor {
                         //
                         // ----- Get tablename
                         //
-                        if (this.createdByQuery) {
+                        if (this.createdWithMetaData) {
                             //
                             // Get tablename from Content Definition
                             //
@@ -767,7 +767,7 @@ namespace Contensive.Processor {
                                 } else {
                                     fieldTypeId =  CPContentBaseClass.fileTypeIdEnum.File;
                                 }
-                            } else if (this.createdByQuery) {
+                            } else if (this.createdWithMetaData) {
                                 //
                                 // -- get from metadata
                                 fieldTypeId = this.contentMeta.fields[fieldName.ToLowerInvariant()].fieldTypeId;
@@ -808,7 +808,7 @@ namespace Contensive.Processor {
             try {
                 if (!ok()) { throw new ArgumentException("dataset is not valid"); }
                 if (string.IsNullOrEmpty(fieldName)) { throw new ArgumentException("fieldName cannot be blank"); }
-                if (!this.createdByQuery) { throw new GenericException("Cannot set fields for a dataset based on a query."); }
+                if (!this.createdWithMetaData) { throw new GenericException("Cannot set fields for a dataset based on a query."); }
                 if (this.contentMeta == null) { throw new GenericException("Cannot set fields for a dataset based on a query."); }
                 if (this.contentMeta.fields == null) { throw new GenericException("The dataset contains no fields."); }
                 if (!this.contentMeta.fields.ContainsKey(fieldName.ToLowerInvariant())) { throw new GenericException("The dataset does not contain the field specified [" + fieldName.ToLowerInvariant() + "]."); }
@@ -835,7 +835,7 @@ namespace Contensive.Processor {
                 if (!ok()) { throw new ArgumentException("dataset is not valid"); }
                 if (string.IsNullOrEmpty(fieldName)) { throw new ArgumentException("field Name cannot be blank"); }
                 if (string.IsNullOrEmpty(contentName)) { throw new ArgumentException("content Name cannot be blank"); }
-                if (!createdByQuery) { throw new GenericException("Cannot save a data set created by a query."); }
+                if (!createdWithMetaData) { throw new GenericException("Cannot save a data set created by a query."); }
                 string OldFilename = getText(fieldName);
                 string Filename = getFieldFilename(fieldName, "", contentName,  CPContentBaseClass.fileTypeIdEnum.FileText);
                 if (OldFilename != Filename) {
@@ -869,7 +869,7 @@ namespace Contensive.Processor {
             try {
                 //
                 // -- opened with openForUpdate. can be written but not read
-                if (this.createdByQuery & !this.readable) { return this.isOpen; }
+                if (this.createdWithMetaData & !this.readable) { return this.isOpen; }
                 //
                 // -- normal open
                 return this.isOpen & (this.readCacheRowPtr >= 0) && (this.readCacheRowPtr < this.readCacheRowCnt);
@@ -911,7 +911,7 @@ namespace Contensive.Processor {
             try {
                 if (!ok()) { throw new ArgumentException("Cannot read field because the dataset is not valid or end-of-file."); }
                 if (string.IsNullOrEmpty(fieldName.Trim())) { throw new ArgumentException("Cannot read field because the fieldname cannot be blank."); }
-                if (!this.createdByQuery) { return getRawData(fieldName); }
+                if (!this.createdWithMetaData) { return getRawData(fieldName); }
                 if (!this.contentMeta.fields.ContainsKey(fieldName.ToLowerInvariant())) { return getRawData(fieldName); }
                 var field = this.contentMeta.fields[fieldName.ToLowerInvariant()];
                 //
@@ -1045,7 +1045,7 @@ namespace Contensive.Processor {
             try {
                 if (!ok()) { throw new ArgumentException("dataset is not valid or End-Of-file."); }
                 if (string.IsNullOrEmpty(fieldName.Trim())) { throw new ArgumentException("fieldName cannnot be blank"); }
-                if (!this.createdByQuery) { throw new GenericException("Cannot update a contentset created from a sql query."); }
+                if (!this.createdWithMetaData) { throw new GenericException("Cannot update a contentset created from a sql query."); }
                 if (this.contentMeta == null) { throw new GenericException("Cannot update a contentset created with meta data."); }
                 if (string.IsNullOrEmpty(this.contentMeta.name)) { throw new GenericException("Cannot update a contentset created with invalid meta data."); }
                 string FieldNameLc = fieldName.Trim(' ').ToLowerInvariant();
@@ -1258,7 +1258,7 @@ namespace Contensive.Processor {
                 //
                 if (!ok()) { return; }
                 if (this.writeCache.Count == 0) { return; }
-                if (!(this.createdByQuery)) { throw new ArgumentException("The dataset cannot be updated because it was created with a query and not a content table."); }
+                if (!(this.createdWithMetaData)) { throw new ArgumentException("The dataset cannot be updated because it was created with a query and not a content table."); }
                 if (this.contentMeta == null) { throw new ArgumentException("The dataset cannot be updated because it was not created from a valid content table."); }
                 //
                 // -- create the Db controller instance
@@ -1927,7 +1927,7 @@ namespace Contensive.Processor {
                     //
                     // -- correct the status
                     this.readable = true;
-                    this.createdByQuery = true;
+                    this.createdWithMetaData = true;
                     this.contentName = contentName;
                     this.dataSourceName = contentMetaData.dataSourceName;
                     this.contentMeta = contentMetaData;
@@ -1977,7 +1977,7 @@ namespace Contensive.Processor {
                 init();
                 //this.newRecord = false;
                 this.readable = true;
-                this.createdByQuery = false;
+                this.createdWithMetaData = false;
                 this.contentName = "";
                 this.pageNumber = pageNumber;
                 this.pageSize = (pageSize);
