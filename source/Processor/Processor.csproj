@@ -111,6 +111,7 @@
     <Compile Include="Addons\AdminNavigator\Views\getNodeClass.cs" />
     <Compile Include="Addons\AdminSite\Constants.cs" />
     <Compile Include="Addons\Authentication\GetLoginButtonFormClass.cs" />
+    <Compile Include="Addons\Authentication\Authenticate.cs" />
     <Compile Include="Addons\Diagnostics\ServerDiagnosticClass.cs" />
     <Compile Include="Addons\Email\ValidateEmail.cs" />
     <Compile Include="Addons\OnInstallBase51.cs" />

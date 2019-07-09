@@ -93,8 +93,6 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestQueryString { get; set; } = "";
 
-        public bool requestSpaceAsUnderscore { get; set; } = false; // when true, is it assumed that dots in request variable names will convert
-        public bool requestDotAsUnderscore { get; set; } = false; // (php converts spaces and dots to underscores)
         public string requestUrlSource { get; set; } = "";
         public string linkForwardSource { get; set; } = ""; // main_ServerPathPage -- set during init
         public string linkForwardError { get; set; } = ""; // always 404

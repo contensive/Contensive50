@@ -2793,7 +2793,7 @@
     <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
   </Addon>
   <Addon name="Authenticate" guid="{C560E9CB-24F3-4746-8C08-C960554D4F0F}" type="Add-on">
-    <DotNetClass><![CDATA[Contensive.Addons.Primitives.ProcessLoginDefaultClass]]></DotNetClass>
+    <DotNetClass><![CDATA[Contensive.Addons.Primitives.AuthenticateClass]]></DotNetClass>
     <RemoteMethod>Yes</RemoteMethod>
   </Addon>
   <Addon name="Housekeep" guid="{7208D069-8FE3-4BD1-AB76-B25C40C89A45}" type="Add-on">

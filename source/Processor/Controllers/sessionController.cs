@@ -749,7 +749,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public int getUserIdForCredentials(string username, string password) {
+        public int getUserIdForUsernameCredentials(string username, string password) {
             int returnUserId = 0;
             try {
                 //
@@ -927,7 +927,7 @@ namespace Contensive.Processor.Controllers {
         public bool authenticate(string username, string password, bool AllowAutoLogin = false) {
             bool result = false;
             try {
-                int userId = getUserIdForCredentials(username, password);
+                int userId = getUserIdForUsernameCredentials(username, password);
                 if (userId != 0) {
                     result = authenticateById(userId, this);
                     if (result) {
@@ -1156,7 +1156,7 @@ namespace Contensive.Processor.Controllers {
         //   Checks the username and password
         //
         public bool isLoginOK(string Username, string Password, string ErrorMessage = "", int ErrorCode = 0) {
-            bool result = (getUserIdForCredentials(Username, Password) != 0);
+            bool result = (getUserIdForUsernameCredentials(Username, Password) != 0);
             if (!result) {
                 ErrorMessage = ErrorController.getUserError(core);
             }

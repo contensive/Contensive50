@@ -48,7 +48,7 @@ namespace Contensive.Processor {
         /// <param name="password"></param>
         /// <returns></returns>
         public override int GetIdByLogin(string username, string password) {
-            return cp.core.session.getUserIdForCredentials(username, password);
+            return cp.core.session.getUserIdForUsernameCredentials(username, password);
         }
         //
         //====================================================================================================

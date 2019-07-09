@@ -220,7 +220,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 if ((core.session.visit.loginAttempts < core.siteProperties.maxVisitLoginAttempts) && core.session.visit.cookieSupport) {
-                    int LocalMemberID = core.session.getUserIdForCredentials(
+                    int LocalMemberID = core.session.getUserIdForUsernameCredentials(
                         core.docProperties.getText("username"), 
                         core.docProperties.getText("password")
                     );
