@@ -1351,7 +1351,7 @@ namespace Contensive.Processor.Controllers {
                 string key = htmlTagName.ToLowerInvariant();
                 if (core.docProperties.containsKey(key)) {
                     var docProperty = core.docProperties.getProperty(key);
-                    if ((docProperty.IsFile) && (docProperty.Name.ToLowerInvariant() == key)) {
+                    if ((docProperty.propertyType == DocPropertyController.DocPropertyTypesEnum.file) && (docProperty.Name.ToLowerInvariant() == key)) {
                         string dosPathFilename = FileController.normalizeDosPath(path);
                         returnFilename = encodeDosFilename(docProperty.Value);
                         dosPathFilename += returnFilename;

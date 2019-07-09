@@ -11,6 +11,15 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class DocPropertyController {
         //
+        public enum DocPropertyTypesEnum {
+            serverVariable = 1,
+            header = 2,
+            form = 3,
+            file = 4,
+            queryString = 5,
+            userDefined = 6
+        }
+        //
         private CoreController core;
         //
         private Dictionary<string, DocPropertiesClass> docPropertiesDict = new Dictionary<string, DocPropertiesClass>();
@@ -21,45 +30,60 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
+        public void setProperty(string key, int value, DocPropertyTypesEnum propertyType) {
+            setProperty(key, value.ToString(), propertyType);
+        }
+        //
         public void setProperty(string key, int value) {
-            setProperty(key, value.ToString());
+            setProperty(key, value.ToString(), DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
+        //
+        public void setProperty(string key, double value, DocPropertyTypesEnum propertyType) {
+            setProperty(key, value.ToString(), propertyType);
+        }
         //
         public void setProperty(string key, double value) {
-            setProperty(key, value.ToString());
+            setProperty(key, value.ToString(), DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
+        //
+        public void setProperty(string key, DateTime value, DocPropertyTypesEnum propertyType) {
+            setProperty(key, value.ToString(), propertyType);
+        }
         //
         public void setProperty(string key, DateTime value) {
-            setProperty(key, value.ToString());
+            setProperty(key, value.ToString(), DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
         //
+        public void setProperty(string key, bool value, DocPropertyTypesEnum propertyType) {
+            setProperty(key, value.ToString(), propertyType);
+        }
+        //
         public void setProperty(string key, bool value) {
-            setProperty(key, value.ToString());
+            setProperty(key, value.ToString(), DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
         //
         public void setProperty(string key, string value) {
-            setProperty(key, value, false);
+            setProperty(key, value, DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
         //
-        public void setProperty(string key, string value, bool isForm) {
+        public void setProperty(string key, string value, DocPropertyTypesEnum propertyType) {
             try {
                 DocPropertiesClass prop = new DocPropertiesClass {
                     NameValue = key,
                     FileSize = 0,
                     fileType = "",
-                    IsFile = false,
-                    IsForm = isForm,
-                    Name = key
+                    Name = key,
+                    propertyType = propertyType
                 };
                 prop.NameValue = key + "=" + value;
                 prop.Value = value;
@@ -188,12 +212,6 @@ namespace Contensive.Processor.Controllers {
             try {
                 if (!string.IsNullOrEmpty(sourceKey)) {
                     returnResult = sourceKey.ToLowerInvariant();
-                    if (core.webServer.requestSpaceAsUnderscore) {
-                        returnResult = GenericController.vbReplace(returnResult, " ", "_");
-                    }
-                    if (core.webServer.requestDotAsUnderscore) {
-                        returnResult = GenericController.vbReplace(returnResult, ".", "_");
-                    }
                 }
             } catch (Exception ex) {
                 LogController.logError( core,ex);
@@ -211,37 +229,26 @@ namespace Contensive.Processor.Controllers {
         /// <param name="QS"></param>
         public void addQueryString(string QS) {
             try {
-                //
-                string[] ampSplit = null;
-                int ampSplitCount = 0;
-                string[] ValuePair = null;
-                string key = null;
-                int Ptr = 0;
-                //
-                ampSplit = QS.Split('&');
-                ampSplitCount = ampSplit.GetUpperBound(0) + 1;
-                for (Ptr = 0; Ptr < ampSplitCount; Ptr++) {
+                string[] ampSplit = QS.Split('&');
+                for (int Ptr = 0; Ptr < ampSplit.GetUpperBound(0) + 1; Ptr++) {
                     string nameValuePair = ampSplit[Ptr];
-                    DocPropertiesClass docProperty = new DocPropertiesClass();
                     if (!string.IsNullOrEmpty(nameValuePair)) {
                         if (GenericController.vbInstr(1, nameValuePair, "=") != 0) {
-                            ValuePair = nameValuePair.Split('=');
-                            key = decodeResponseVariable(encodeText(ValuePair[0]));
+                            string[] ValuePair = nameValuePair.Split('=');
+                            string key = decodeResponseVariable(encodeText(ValuePair[0]));
                             if (!string.IsNullOrEmpty(key)) {
-                                docProperty.Name = key;
-                                if (ValuePair.GetUpperBound(0) > 0) {
-                                    docProperty.Value = decodeResponseVariable(encodeText(ValuePair[1]));
-                                }
-                                docProperty.IsForm = false;
-                                docProperty.IsFile = false;
-                                //core.webServer.readStreamJSForm = core.webServer.readStreamJSForm Or (UCase(.Name) = genericController.vbUCase(RequestNameJSForm))
+                                DocPropertiesClass docProperty = new DocPropertiesClass {
+                                    Name = key,
+                                    propertyType = DocPropertyTypesEnum.queryString,
+                                    Value = (ValuePair.GetUpperBound(0) > 0) ? decodeResponseVariable(encodeText(ValuePair[1])) : ""
+                                };
                                 core.docProperties.setProperty(key, docProperty);
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core,ex);
                 throw;
             }
         }

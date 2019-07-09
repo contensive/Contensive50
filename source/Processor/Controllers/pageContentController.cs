@@ -322,15 +322,15 @@ namespace Contensive.Processor.Controllers {
                                 if (linkAliasList.Count > 0) {
                                     LinkAliasModel linkAlias = linkAliasList.First();
                                     string LinkQueryString = rnPageId + "=" + linkAlias.pageID + "&" + linkAlias.queryStringSuffix;
-                                    core.docProperties.setProperty(rnPageId, linkAlias.pageID.ToString(), false);
+                                    core.docProperties.setProperty(rnPageId, linkAlias.pageID.ToString(), DocPropertyController.DocPropertyTypesEnum.userDefined);
                                     string[] nameValuePairs = linkAlias.queryStringSuffix.Split('&');
                                     //Dim nameValuePairs As String() = Split(core.cache_linkAlias(linkAliasCache_queryStringSuffix, Ptr), "&")
                                     foreach (string nameValuePair in nameValuePairs) {
                                         string[] nameValueThing = nameValuePair.Split('=');
                                         if (nameValueThing.GetUpperBound(0) == 0) {
-                                            core.docProperties.setProperty(nameValueThing[0], "", false);
+                                            core.docProperties.setProperty(nameValueThing[0], "", DocPropertyController.DocPropertyTypesEnum.userDefined);
                                         } else {
-                                            core.docProperties.setProperty(nameValueThing[0], nameValueThing[1], false);
+                                            core.docProperties.setProperty(nameValueThing[0], nameValueThing[1], DocPropertyController.DocPropertyTypesEnum.userDefined);
                                         }
                                     }
                                 }
@@ -1544,19 +1544,20 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Add the Referrer to the Admin Msg
                     if (core.webServer.requestReferer != "") {
-                        int Pos = GenericController.vbInstr(1, core.webServer.requestReferrer, "AdminWarningPageID=", 1);
+                        String referer = core.webServer.requestReferrer;
+                        int Pos = GenericController.vbInstr(1, referer, "AdminWarningPageID=", 1);
                         if (Pos != 0) {
-                            core.webServer.requestReferrer = core.webServer.requestReferrer.Left(Pos - 2);
+                            referer = referer.Left(Pos - 2);
                         }
-                        Pos = GenericController.vbInstr(1, core.webServer.requestReferrer, "AdminWarningMsg=", 1);
+                        Pos = GenericController.vbInstr(1, referer, "AdminWarningMsg=", 1);
                         if (Pos != 0) {
-                            core.webServer.requestReferrer = core.webServer.requestReferrer.Left(Pos - 2);
+                            referer = referer.Left(Pos - 2);
                         }
-                        Pos = GenericController.vbInstr(1, core.webServer.requestReferrer, "blockcontenttracking=", 1);
+                        Pos = GenericController.vbInstr(1, referer, "blockcontenttracking=", 1);
                         if (Pos != 0) {
-                            core.webServer.requestReferrer = core.webServer.requestReferrer.Left(Pos - 2);
+                            referer = referer.Left(Pos - 2);
                         }
-                        adminMessage = adminMessage + " The referring page was " + core.webServer.requestReferrer + ".";
+                        adminMessage = adminMessage + " The referring page was " + referer + ".";
                     }
                     //
                     adminMessage = adminMessage + "</p>";

@@ -327,20 +327,6 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         /// <summary>
-        /// expose object that can be used to configure the web environment if IIS is not used.
-        /// </summary>
-        public CPContextClass context {
-            get {
-                if (_contextObj == null) {
-                    _contextObj = new CPContextClass(this);
-                }
-                return _contextObj;
-            }
-        }
-        private CPContextClass _contextObj;
-        //
-        //=========================================================================================================
-        /// <summary>
         /// Properties and methods helpful in access the database
         /// </summary>
         public override CPDbBaseClass Db {
@@ -648,9 +634,6 @@ namespace Contensive.Processor {
                     }
                     if (_contentObj != null) {
                         _contentObj.Dispose();
-                    }
-                    if (_contextObj != null) {
-                        _contextObj.Dispose();
                     }
                     if (_dbObj != null) {
                         _dbObj.Dispose();

@@ -825,8 +825,8 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     //
-                                    // -- convert requestFormDict to a name=value string for Db storage
-                                    string requestFormSerialized = GenericController.convertNameValueDictToREquestString(webServer.requestFormDict);
+                                    // -- convert requestForm to a name=value string for Db storage
+                                    string requestFormSerialized = GenericController.convertNameValueDictToREquestString(webServer.requestForm);
                                     string pagetitle = "";
                                     if (!doc.htmlMetaContent_TitleList.Count.Equals(0)) {
                                         pagetitle = doc.htmlMetaContent_TitleList[0].content;

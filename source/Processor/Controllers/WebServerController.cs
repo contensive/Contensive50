@@ -39,30 +39,60 @@ namespace Contensive.Processor.Controllers {
         //
         public System.Web.HttpContext iisContext;
         //
-        // -- Buffer request
-        public string requestLanguage { get; set; } = ""; // set externally from HTTP_Accept_LANGUAGE
-        public string requestHttpAccept { get; set; } = "";
-        public string requestHttpAcceptCharset { get; set; } = "";
-        public string requestHttpProfile { get; set; } = "";
-        public string requestxWapProfile { get; set; } = "";
-        public string requestHTTPVia { get; set; } = ""; // informs the server of proxies used during the request
-        public string requestHTTPFrom { get; set; } = ""; // contains the email address of the requestor
+        // -- Buffer request data
         /// <summary>
         /// The path and page of the current request, without the leading slash which comes from the appRootPath
         /// </summary>
-        public string requestPathPage { get; set; } = "";
-        public string requestReferrer { get; set; } = "";
+        public string requestPathPage {
+            get {
+                return (core.webServer.serverEnvironment.ContainsKey("SCRIPT_NAME")) ? core.webServer.serverEnvironment["SCRIPT_NAME"] : "";
+            }
+        }
+        /// <summary>
+        /// The refering URL
+        /// </summary>
+        public string requestReferrer {
+            get {
+                return (core.webServer.serverEnvironment.ContainsKey("HTTP_REFERER")) ? core.webServer.serverEnvironment["HTTP_REFERER"] : "";
+            }
+        }
         /// <summary>
         /// The domain part of the current request URL
         /// </summary>
-        public string requestDomain { get; set; } = "";
-        public bool requestSecure { get; set; } = false; // Set in InitASPEnvironment, true if https
-        public string requestRemoteIP { get; set; } = "";
-        public string requestBrowser { get; set; } = ""; // The browser for this visit
-        public string requestQueryString { get; set; } = ""; // The QueryString of the current URI
-        public bool requestFormUseBinaryHeader { get; set; } = false; // When set true with RequestNameBinaryRead=true, InitEnvironment reads the form in with a binary read
-        public byte[] requestFormBinaryHeader { get; set; } // For asp pages, this is the full multipart header
-        public Dictionary<string, string> requestFormDict { get; set; } = new Dictionary<string, string>();
+        public string requestDomain {
+            get {
+                return (core.webServer.serverEnvironment.ContainsKey("SERVER_NAME")) ? core.webServer.serverEnvironment["SERVER_NAME"] : "";
+            }
+        }
+        /// <summary>
+        /// true if the current request is secure
+        /// </summary>
+        public bool requestSecure {
+            get {
+                return (core.webServer.serverEnvironment.ContainsKey("SERVER_PORT_SECURE")) ? encodeBoolean(core.webServer.serverEnvironment["SERVER_PORT_SECURE"]) : false;
+            }
+        }
+        /// <summary>
+        /// Legacy property - user's IP
+        /// </summary>
+        public string requestRemoteIP {
+            get {
+                return (core.webServer.serverEnvironment.ContainsKey("REMOTE_ADDR")) ? core.webServer.serverEnvironment["REMOTE_ADDR"] : "";
+            }
+        }
+        /// <summary>
+        /// Legacy property - the browser
+        /// </summary>
+        public string requestBrowser {
+            get {
+                return (core.webServer.serverEnvironment.ContainsKey("HTTP_USER_AGENT")) ? core.webServer.serverEnvironment["HTTP_USER_AGENT"] : "";
+            }
+        }
+        /// <summary>
+        /// The QueryString of the current URI
+        /// </summary>
+        public string requestQueryString { get; set; } = "";
+
         public bool requestSpaceAsUnderscore { get; set; } = false; // when true, is it assumed that dots in request variable names will convert
         public bool requestDotAsUnderscore { get; set; } = false; // (php converts spaces and dots to underscores)
         public string requestUrlSource { get; set; } = "";
@@ -118,6 +148,14 @@ namespace Contensive.Processor.Controllers {
         /// The content type of the request
         /// </summary>
         public string requestContentType;
+        //
+        public Dictionary<string, string> requestHeaders { get; set; } = new Dictionary<string, string>();
+        //
+        public Dictionary<string, string> requestForm { get; set; } = new Dictionary<string, string>();
+        //
+        public Dictionary<string, string> requestQuery { get; set; } = new Dictionary<string, string>();
+        //
+        public Dictionary<string, string> serverEnvironment { get; set; } = new Dictionary<string, string>();
         //
         //
         //====================================================================================================
@@ -253,71 +291,88 @@ namespace Contensive.Processor.Controllers {
                 requestContentType = httpContext.Request.ContentType;
                 //
                 //
-                // -- basic request environment
-                requestDomain = iisContext.Request.ServerVariables["SERVER_NAME"];
-                requestPathPage = encodeText(iisContext.Request.ServerVariables["SCRIPT_NAME"]);
-                requestReferrer = encodeText(iisContext.Request.ServerVariables["HTTP_REFERER"]);
-                requestSecure = encodeBoolean(iisContext.Request.ServerVariables["SERVER_PORT_SECURE"]);
-                requestRemoteIP = encodeText(iisContext.Request.ServerVariables["REMOTE_ADDR"]);
-                requestBrowser = encodeText(iisContext.Request.ServerVariables["HTTP_USER_AGENT"]);
-                requestLanguage = encodeText(iisContext.Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"]);
-                requestHttpAccept = encodeText(iisContext.Request.ServerVariables["HTTP_ACCEPT"]);
-                requestHttpAcceptCharset = encodeText(iisContext.Request.ServerVariables["HTTP_ACCEPT_CHARSET"]);
-                requestHttpProfile = encodeText(iisContext.Request.ServerVariables["HTTP_PROFILE"]);
+                // todo consider dprecating custom and use docProperties
+                // custom server variables
                 //
-                // -- http QueryString
-                if (iisContext.Request.QueryString.Count > 0) {
-                    requestQueryString = "";
-                    foreach (string key in iisContext.Request.QueryString) {
-                        string keyValue = iisContext.Request.QueryString[key];
-                        core.docProperties.setProperty(key, keyValue);
-                        requestQueryString = GenericController.modifyQueryString(requestQueryString, key, keyValue);
+                // -- server variables
+                {
+                    System.Collections.Specialized.NameValueCollection nameValues = iisContext.Request.ServerVariables;
+                    for (int i = 0; i < nameValues.Count; i++) {
+                        string key = nameValues.GetKey(i);
+                        if (serverEnvironment.ContainsKey(key)) { serverEnvironment.Remove(key); }
+                        serverEnvironment.Add(nameValues.GetKey(i), nameValues.Get(i));
+                        core.docProperties.setProperty(nameValues.GetKey(i), nameValues.Get(i), DocPropertyController.DocPropertyTypesEnum.serverVariable);
                     }
                 }
                 //
-                // -- form
-                requestFormDict.Clear();
-                foreach (string key in iisContext.Request.Form.Keys) {
-                    string keyValue = iisContext.Request.Form[key];
-                    core.docProperties.setProperty(key, keyValue, true);
-                    if (requestFormDict.ContainsKey(keyValue)) {
-                        requestFormDict.Remove(keyValue);
+                // -- headers
+                {
+                    System.Collections.Specialized.NameValueCollection nameValues = iisContext.Request.Headers;
+                    for (int i = 0; i < nameValues.Count; i++) {
+                        string key = nameValues.GetKey(i);
+                        if (requestHeaders.ContainsKey(key)) { requestForm.Remove(key); }
+                        requestHeaders.Add(key, nameValues.Get(i));
+                        core.docProperties.setProperty(key, nameValues.Get(i), DocPropertyController.DocPropertyTypesEnum.header);
                     }
-                    requestFormDict.Add(key, keyValue);
                 }
                 //
-                // -- handle files
-                int filePtr = 0;
-                string instanceId = GenericController.getGUIDNaked();
-                string[] formNames = iisContext.Request.Files.AllKeys;
-                foreach (string formName in formNames) {
-                    System.Web.HttpPostedFile file = iisContext.Request.Files[formName];
-                    if (file != null) {
-                        if ((file.ContentLength > 0) && (!string.IsNullOrEmpty(file.FileName))) {
-                            DocPropertiesClass prop = new DocPropertiesClass {
-                                Name = formName,
-                                Value = file.FileName,
-                                NameValue = encodeRequestVariable(formName) + "=" + encodeRequestVariable(file.FileName),
-                                IsFile = true,
-                                IsForm = true,
-                                tempfilename = instanceId + "-" + filePtr.ToString() + ".bin"
-                        };
-                            core.tempFiles.verifyPath(core.tempFiles.localAbsRootPath);
-                            file.SaveAs(core.tempFiles.joinPath(core.tempFiles.localAbsRootPath, prop.tempfilename));
-                            core.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename);
-                            prop.FileSize = encodeInteger(file.ContentLength);
-                            core.docProperties.setProperty(formName, prop);
-                            filePtr += 1;
+                // -- queryString
+                {
+                    if (iisContext.Request.QueryString.Count > 0) {
+                        requestQueryString = "";
+                        foreach (string key in iisContext.Request.QueryString) {
+                            string keyValue = iisContext.Request.QueryString[key];
+                            if ( requestQuery.ContainsKey(key)) { requestQuery.Remove(key); }
+                            requestQuery.Add(key, keyValue);
+                            core.docProperties.setProperty(key, keyValue, DocPropertyController.DocPropertyTypesEnum.queryString);
+                            requestQueryString = GenericController.modifyQueryString(requestQueryString, key, keyValue);
                         }
                     }
                 }
                 //
-                // load request cookies
+                // -- form
+                {
+                    foreach (string key in iisContext.Request.Form.Keys) {
+                        string keyValue = iisContext.Request.Form[key];
+                        if ( requestForm.ContainsKey(key)) { requestForm.Remove(key); }
+                        requestForm.Add(key, keyValue);
+                        core.docProperties.setProperty(key, keyValue, DocPropertyController.DocPropertyTypesEnum.form);
+                    }
+                }
                 //
-                foreach (string key in iisContext.Request.Cookies) {
-                    string keyValue = iisContext.Request.Cookies[key].Value;
-                    keyValue = decodeResponseVariable(keyValue);
-                    addRequestCookie(key, keyValue);
+                // -- files
+                {
+                    int filePtr = 0;
+                    string instanceId = GenericController.getGUIDNaked();
+                    foreach (string formName in iisContext.Request.Files.AllKeys) {
+                        System.Web.HttpPostedFile file = iisContext.Request.Files[formName];
+                        if (file != null) {
+                            if ((file.ContentLength > 0) && (!string.IsNullOrEmpty(file.FileName))) {
+                                DocPropertiesClass prop = new DocPropertiesClass {
+                                    Name = formName,
+                                    Value = file.FileName,
+                                    NameValue = encodeRequestVariable(formName) + "=" + encodeRequestVariable(file.FileName),
+                                    tempfilename = instanceId + "-" + filePtr.ToString() + ".bin",
+                                    propertyType = DocPropertyController.DocPropertyTypesEnum.file
+                                };
+                                core.tempFiles.verifyPath(core.tempFiles.localAbsRootPath);
+                                file.SaveAs(core.tempFiles.joinPath(core.tempFiles.localAbsRootPath, prop.tempfilename));
+                                core.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename);
+                                prop.FileSize = encodeInteger(file.ContentLength);
+                                core.docProperties.setProperty(formName, prop);
+                                filePtr += 1;
+                            }
+                        }
+                    }
+                }
+                //
+                // -- cookies
+                {
+                    foreach (string key in iisContext.Request.Cookies) {
+                        string keyValue = iisContext.Request.Cookies[key].Value;
+                        keyValue = decodeResponseVariable(keyValue);
+                        addRequestCookie(key, keyValue);
+                    }
                 }
                 //
                 //--------------------------------------------------------------------------
@@ -353,12 +408,6 @@ namespace Contensive.Processor.Controllers {
                     requestUrlSource = requestUrlSource + requestDomain + requestPathPage;
                     if (requestQueryString != "") {
                         requestUrlSource = requestUrlSource + "?" + requestQueryString;
-                    }
-                    if (requestQueryString != "") {
-                        //
-                        // Add query string to stream
-                        //
-                        core.docProperties.addQueryString(requestQueryString);
                     }
                     //
                     // Other Server variables
@@ -777,7 +826,7 @@ namespace Contensive.Processor.Controllers {
                         // the same as the destination of the link forward, this throws an error and does not forward. the only case where main_ServerLinksource is different
                         // then main_ServerLink is the linkfforward/linkalias case.
                         //
-                    } else if ((requestFormDict.Count == 0) && (requestUrlSource == FullLink)) {
+                    } else if ((requestForm.Count == 0) && (requestUrlSource == FullLink)) {
                         //
                         // Loop redirect error, throw trap and block redirect to prevent loop
                         //
@@ -1137,7 +1186,7 @@ namespace Contensive.Processor.Controllers {
         //
         public static string getBrowserAcceptLanguage(CoreController core) {
             try {
-                string AcceptLanguageString = GenericController.encodeText(core.webServer.requestLanguage) + ",";
+                string AcceptLanguageString = (core.webServer.serverEnvironment.ContainsKey("HTTP_ACCEPT_LANGUAGE")) ? core.webServer.serverEnvironment["HTTP_ACCEPT_LANGUAGE"] : "";
                 int CommaPosition = GenericController.vbInstr(1, AcceptLanguageString, ",");
                 while (CommaPosition != 0) {
                     string AcceptLanguage = (AcceptLanguageString.Left( CommaPosition - 1)).Trim(' ');

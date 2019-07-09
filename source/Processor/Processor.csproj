@@ -306,7 +306,6 @@
     <Compile Include="Views\CPCacheClass.cs" />
     <Compile Include="Views\CPClass.cs" />
     <Compile Include="Views\CPContentClass.cs" />
-    <Compile Include="Views\CPContextClass.cs" />
     <Compile Include="Views\CPCSClass.cs" />
     <Compile Include="Views\CPDbClass.cs" />
     <Compile Include="Views\CPDocClass.cs" />

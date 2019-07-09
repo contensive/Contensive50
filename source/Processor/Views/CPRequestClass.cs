@@ -67,7 +67,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         public override string Form {
             get {
-                return Controllers.GenericController.convertNameValueDictToREquestString(cp.core.webServer.requestFormDict);
+                return Controllers.GenericController.convertNameValueDictToREquestString(cp.core.webServer.requestForm);
             }
         }
         //
@@ -113,28 +113,28 @@ namespace Contensive.Processor {
         //====================================================================================================
         public override string HTTPAccept {
             get {
-                return cp.core.webServer.requestHttpAccept;
+                return (cp.core.webServer.serverEnvironment.ContainsKey("HTTP_ACCEPT")) ? cp.core.webServer.serverEnvironment["HTTP_ACCEPT"] : ""; 
             }
         }
         //
         //====================================================================================================
         public override string HTTPAcceptCharset {
             get {
-                return cp.core.webServer.requestHttpAcceptCharset;
+                return (cp.core.webServer.serverEnvironment.ContainsKey("HTTP_ACCEPT_CHARSET")) ? cp.core.webServer.serverEnvironment["HTTP_ACCEPT_CHARSET"] : "";
             }
         }
         //
         //====================================================================================================
         public override string HTTPProfile {
             get {
-                return cp.core.webServer.requestHttpProfile;
+                return (cp.core.webServer.serverEnvironment.ContainsKey("HTTP_PROFILE")) ? cp.core.webServer.serverEnvironment["HTTP_PROFILE"] : "";
             }
         }
         //
         //====================================================================================================
         public override string HTTPXWapProfile {
             get {
-                return cp.core.webServer.requestxWapProfile;
+                return (cp.core.webServer.serverEnvironment.ContainsKey("HTTP_X_WAP_PROFILE")) ? cp.core.webServer.serverEnvironment["HTTP_X_WAP_PROFILE"] : "";
             }
         }
         //

@@ -182,7 +182,7 @@ namespace Contensive.Processor.Controllers {
                     + returnResult + HtmlController.inputHidden("Type", FormTypeSendPassword) + "";
                     foreach (string key in core.docProperties.getKeyList()) {
                         var tempVar = core.docProperties.getProperty(key);
-                        if (tempVar.IsForm) {
+                        if (tempVar.propertyType == DocPropertyController.DocPropertyTypesEnum.form) {
                             switch (GenericController.vbUCase(tempVar.Name)) {
                                 case "S":
                                 case "MA":
