@@ -170,6 +170,12 @@ namespace Contensive.Processor {
         //
         //=======================================================================================================
         //
+        public override T GetObject<T>(string key) {
+            return cp.core.visitProperty.getObject<T>(key);
+        }
+        //
+        //=======================================================================================================
+        //
         public override int StartDateValue {
             get {
                 return cp.core.session.visit.startDateValue;

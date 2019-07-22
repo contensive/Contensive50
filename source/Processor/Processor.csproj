@@ -110,6 +110,8 @@
     <Compile Include="Addons\AdminNavigator\Views\getFullClass.cs" />
     <Compile Include="Addons\AdminNavigator\Views\getNodeClass.cs" />
     <Compile Include="Addons\AdminSite\Constants.cs" />
+    <Compile Include="Addons\AdminSite\Models\FieldTypeEditorAddonModel.cs" />
+    <Compile Include="Addons\AdminSite\Models\FieldEditorAddonModel.cs" />
     <Compile Include="Addons\Authentication\GetLoginButtonFormClass.cs" />
     <Compile Include="Addons\Authentication\Authenticate.cs" />
     <Compile Include="Addons\Diagnostics\ServerDiagnosticClass.cs" />
@@ -385,6 +387,7 @@
     <Content Include="Resources\DefaultTemplateHtml.txt" />
     <Content Include="Resources\LogoutButtonFormHtml.txt" />
     <Content Include="Resources\LoginButtonFormHtml.txt" />
+    <Content Include="Resources\sqlTriggerManyManyRule.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Addons\AdminNavigator\Controllers\" />

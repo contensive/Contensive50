@@ -73,6 +73,15 @@ namespace Contensive.Processor {
         //
         //=======================================================================================================
         /// <summary>
+        /// return the visitor property from its key.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public override T GetObject<T>(string key) => cp.core.visitorProperty.getObject<T>(key);
+        //
+        //=======================================================================================================
+        /// <summary>
         /// return the visitor property from its key. If missing, set and return the defaultValue.
         /// </summary>
         /// <param name="key"></param>
@@ -264,6 +273,7 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         ~CPVisitorClass() {
             Dispose(false);
         }

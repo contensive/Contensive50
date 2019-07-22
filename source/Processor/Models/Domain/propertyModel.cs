@@ -113,6 +113,16 @@ namespace Contensive.Processor.Models.Domain {
         /// set property
         /// </summary>
         /// <param name="propertyName"></param>
+        /// <param name="PropertyValue"></param>
+        public void setProperty(string propertyName, object PropertyValue) {
+            setProperty(propertyName, Newtonsoft.Json.JsonConvert.SerializeObject(PropertyValue), propertyKeyId);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set property
+        /// </summary>
+        /// <param name="propertyName"></param>
         /// <param name="propertyValue"></param>
         /// <param name="keyId">keyId is like vistiId, vistorId, userId</param>
         public void setProperty(string propertyName, string propertyValue, int keyId) {
@@ -260,9 +270,19 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
         /// <returns></returns>
         public string getText(string propertyName, string defaultValue) => getText(propertyName, defaultValue, propertyKeyId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// get an object property
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="defaultObject"></param>
+        /// <returns></returns>
+        public T getObject<T>(string propertyName) {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(getText(propertyName, string.Empty, propertyKeyId));
+        }
         //
         //====================================================================================================
         /// <summary>

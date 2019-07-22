@@ -146,6 +146,9 @@ namespace Contensive.Processor.Controllers {
                     verifyLibraryFileTypes(core);
                     verifyGroups(core);
                     //
+                    // -- verify many to many triggers for all many-to-many fields
+                    verifyManyManyDeleteTriggers(core);
+                    //
                     LogController.logInfo(core, logPrefix + ", verify Site Properties");
                     if (repair) {
                         //
@@ -781,6 +784,12 @@ namespace Contensive.Processor.Controllers {
                 LogController.logError(core, ex);
                 throw;
             }
+        }
+        //
+        //====================================================================================================
+        //
+        private static void verifyManyManyDeleteTriggers( CoreController core ) {
+            LogController.logWarn(core, "verifyManyManyDeleteTriggers not implemented");
         }
         //
         //====================================================================================================

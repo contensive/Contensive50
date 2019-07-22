@@ -158,50 +158,61 @@ namespace Contensive.Addons.AdminSite {
                 //   if nothing in field types, Contensive handles it internally
                 //
                 Stream.Add("\r<input type=\"hidden\" name=\"fieldEditorPreference\" id=\"fieldEditorPreference\" value=\"\">");
-                var fieldTypeDefaultEditors = EditorController.getFieldTypeDefaultEditorAddonIdDictionary(core);
                 //
                 // load user's editor preferences to fieldEditorPreferences() - this is the editor this user has picked when there are >1
                 //   fieldId:addonId,fieldId:addonId,etc
                 //   with custom FancyBox form in edit window with button "set editor preference"
                 //   this button causes a 'refresh' action, reloads fields with stream without save
                 //
-                string fieldEditorPreferencesList = core.userProperty.getText("editorPreferencesForContent:" + adminData.adminContent.id, "");
-                //
-                // add the addon editors assigned to each field
-                // !!!!! this should be added to metaData load
-                //
-                string SQL = "select"
-                    + " f.id,f.editorAddonID"
-                    + " from ccfields f"
-                    + " where"
-                    + " f.ContentID=" + adminData.adminContent.id + " and f.editorAddonId is not null";
-                DataTable dt = core.db.executeQuery(SQL);
+                //string fieldEditorListKey = "editorPreferencesForContentV2:" + adminData.adminContent.id;
+                //List<FieldEditorAddonModel> fieldEditorList = core.userProperty.getObject<List<FieldEditorAddonModel>>(fieldEditorListKey);
 
-                string[,] Cells = core.db.convertDataTabletoArray(dt);
-                for (int Ptr = 0; Ptr < Cells.GetLength(1); Ptr++) {
-                    int fieldId = GenericController.encodeInteger(Cells[0, Ptr]);
-                    if (fieldId > 0) {
-                        fieldEditorPreferencesList = fieldEditorPreferencesList + "," + fieldId + ":" + Cells[1, Ptr];
-                    }
-                }
-                //
-                // load fieldEditorOptions - these are all the editors available for each field
-                //
-                Dictionary<string, int> fieldEditorOptions = new Dictionary<string, int>();
-                int fieldEditorOptionCnt = 0;
-                SQL = "select r.contentFieldTypeId,a.Id"
-                    + " from ccAddonContentFieldTypeRules r"
-                    + " left join ccaggregatefunctions a on a.id=r.addonid"
-                    + " where (r.active<>0)and(a.active<>0)and(a.id is not null) order by r.contentFieldTypeID";
-                dt = core.db.executeQuery(SQL);
-                Cells = core.db.convertDataTabletoArray(dt);
-                fieldEditorOptionCnt = Cells.GetUpperBound(1) + 1;
-                for (int Ptr = 0; Ptr < fieldEditorOptionCnt; Ptr++) {
-                    int fieldId = GenericController.encodeInteger(Cells[0, Ptr]);
-                    if ((fieldId > 0) && (!fieldEditorOptions.ContainsKey(fieldId.ToString()))) {
-                        fieldEditorOptions.Add(fieldId.ToString(), GenericController.encodeInteger(Cells[1, Ptr]));
-                    }
-                }
+
+                //if (fieldEditorList == null) {
+                //    fieldEditorList = new List<FieldEditorAddonModel>();
+                //    //
+                //    // -- check for legacy fieldeditor preference comma-string
+                //    string fieldEditorCommaList = core.userProperty.getText("editorPreferencesForContent:" + adminData.adminContent.id, "");
+                //    if (!string.IsNullOrEmpty(fieldEditorCommaList)) {
+                //        foreach (var fieldPair in fieldEditorCommaList.Split(',')) {
+                //            var fieldEditor = fieldPair.Split(':');
+                //            fieldEditorList.Add(new FieldEditorAddonModel() {
+                //                fieldId = encodeInteger(fieldEditor[0]),
+                //                editorAddonId = encodeInteger(fieldEditor[1])
+                //            });
+                //        }
+                //    }
+                //    core.userProperty.setProperty(fieldEditorListKey, fieldEditorList);
+                //}
+                ////
+                //// todo - this should be added to metaData load
+                //// add the addon editors assigned to each field
+                //string SQL = "select f.id,f.editorAddonID from ccfields f where f.ContentID=" + adminData.adminContent.id + " and f.editorAddonId is not null";
+                //using (DataTable dt = core.db.executeQuery(SQL)) {
+                //    foreach (DataRow row in dt.Rows) {
+                //        fieldEditorList.Add(new FieldEditorAddonModel() {
+                //            fieldId =  encodeInteger(row[0]),
+                //            editorAddonId = encodeInteger(row[1])
+                //        });
+                //    };
+                //}
+                ////
+                //// load fieldEditorOptions - these are all the editors available for each field
+                ////
+                //Dictionary<string, int> fieldEditorOptions = new Dictionary<string, int>();
+                //SQL = "select r.contentFieldTypeId,a.Id"
+                //    + " from ccAddonContentFieldTypeRules r"
+                //    + " left join ccaggregatefunctions a on a.id=r.addonid"
+                //    + " where (r.active<>0)and(a.active<>0)and(a.id is not null) order by r.contentFieldTypeID";
+                //using (DataTable dt = core.db.executeQuery(SQL)) {
+                //    foreach (DataRow row in dt.Rows) {
+                //        int fieldId = encodeInteger(row[0]);
+                //        if ((fieldId > 0) && (!fieldEditorOptions.ContainsKey(fieldId.ToString()))) {
+                //            fieldEditorOptions.Add(fieldId.ToString(), encodeInteger(row[1]));
+                //        }
+
+                //    }
+                //}
                 //
                 // ----- determine contentType for editor
                 //
@@ -248,7 +259,7 @@ namespace Contensive.Addons.AdminSite {
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
-                        Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                        Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Groups", GroupRuleEditor.get(core, adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
@@ -299,7 +310,7 @@ namespace Contensive.Addons.AdminSite {
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
-                        Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                        Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
@@ -328,7 +339,7 @@ namespace Contensive.Addons.AdminSite {
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
-                        Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly || EmailSubmitted, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                        Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly || EmailSubmitted, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
@@ -356,7 +367,7 @@ namespace Contensive.Addons.AdminSite {
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
-                        Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly || EmailSubmitted || EmailSent, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                        Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly || EmailSubmitted || EmailSent, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
@@ -384,7 +395,7 @@ namespace Contensive.Addons.AdminSite {
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
-                        Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                        Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) {
                             Stream.Add(adminMenu.getTabs(core));
@@ -413,7 +424,7 @@ namespace Contensive.Addons.AdminSite {
                     });
                     Stream.Add(EditSectionButtonBar);
                     Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
-                    Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, IsLandingPage || IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                    Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, IsLandingPage || IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                     Stream.Add(addTab(core, adminMenu, "Link Aliases", LinkAliasEditor.GetForm_Edit_LinkAliases(core, adminData, adminData.editRecord.userReadOnly), adminData.allowAdminTabs));
                     Stream.Add(addTab(core, adminMenu, "Content Watch", ContentTrackingEditor.get(core, adminData), adminData.allowAdminTabs));
                     Stream.Add(addTab(core, adminMenu, "Control Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
@@ -443,7 +454,7 @@ namespace Contensive.Addons.AdminSite {
                     });
                     Stream.Add(EditSectionButtonBar);
                     Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
-                    Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                    Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                     Stream.Add(addTab(core, adminMenu, "Content Watch", ContentTrackingEditor.get(core, adminData), adminData.allowAdminTabs));
                     Stream.Add(addTab(core, adminMenu, "Control Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                     if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
@@ -486,15 +497,14 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="HelpCustomCache"></param>
         /// <param name="AllowHelpMsgCustom"></param>
         /// <param name="helpIdIndex"></param>
-        /// <param name="fieldTypeDefaultEditors"></param>
-        /// <param name="fieldEditorPreferenceList"></param>
+        /// <param name="fieldEditorList"></param>
         /// <param name="styleList"></param>
         /// <param name="styleOptionList"></param>
         /// <param name="emailIdForStyles"></param>
         /// <param name="IsTemplateTable"></param>
         /// <param name="editorAddonListJSON"></param>
         /// <returns></returns>
-        public static string getTab(CoreController core, AdminDataModel adminData, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, CPHtml5BaseClass.EditorContentType EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, Dictionary<int, int> fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        public static string getTab(CoreController core, AdminDataModel adminData, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, CPHtml5BaseClass.EditorContentType EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 //
@@ -602,25 +612,15 @@ namespace Contensive.Addons.AdminSite {
                         }
                         string EditorString = "";
                         bool editorReadOnly = (record_readOnly || field.readOnly || (editRecord.id != 0 & field.notEditable) || (fieldForceReadOnly));
-                        //
-                        // Determine the editor: Contensive editor, field type default, or add-on preference
-                        int editorAddonID = 0;
-                        int fieldIdPos = GenericController.vbInstr(1, "," + fieldEditorPreferenceList, "," + field.id.ToString() + ":");
-                        while ((editorAddonID == 0) && (fieldIdPos > 0)) {
-                            fieldIdPos = fieldIdPos + 1 + field.id.ToString().Length;
-                            int Pos = GenericController.vbInstr(fieldIdPos, fieldEditorPreferenceList + ",", ",");
-                            if (Pos > 0) {
-                                editorAddonID = GenericController.encodeInteger(fieldEditorPreferenceList.Substring(fieldIdPos - 1, Pos - fieldIdPos));
-                            }
-                            fieldIdPos = GenericController.vbInstr(fieldIdPos + 1, "," + fieldEditorPreferenceList, "," + field.id.ToString() + ":");
-                        }
+                        AddonModel editorAddon = null;
                         int fieldTypeDefaultEditorAddonId = 0;
-                        if ((editorAddonID == 0) && (fieldTypeDefaultEditors.ContainsKey((int)fieldTypeId))) {
-                            fieldTypeDefaultEditorAddonId = fieldTypeDefaultEditors[(int)fieldTypeId];
-                            editorAddonID = fieldTypeDefaultEditorAddonId;
+                        var fieldEditor = adminData.fieldTypeEditors.Find(x => (x.fieldTypeId == (int)field.fieldTypeId));
+                        if (fieldEditor!=null) {
+                            fieldTypeDefaultEditorAddonId = (int)fieldEditor.editorAddonId;
+                            editorAddon = AddonModel.create(core, fieldTypeDefaultEditorAddonId);
                         }
                         bool useEditorAddon = false;
-                        if (editorAddonID != 0) {
+                        if (editorAddon != null ) {
                             //
                             //--------------------------------------------------------------------------------------------
                             // ----- Custom Editor
@@ -641,9 +641,9 @@ namespace Contensive.Addons.AdminSite {
                                 core.docProperties.setProperty("editorStyles", styleList);
                                 core.docProperties.setProperty("editorStyleOptions", styleOptionList);
                             }
-                            EditorString = core.addon.execute(editorAddonID, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                            EditorString = core.addon.execute(editorAddon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextEditor,
-                                errorContextMessage = "field editor id:" + editorAddonID
+                                errorContextMessage = "field editor id:" + editorAddon.id
                             });
                             useEditorAddon = !string.IsNullOrEmpty(EditorString);
                             if (useEditorAddon) {
@@ -654,7 +654,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // -- editor failed, determine if it is missing (or inactive). If missing, remove it from the members preferences
                                 using (var csData = new CsModel(core)) {
-                                    if (!csData.openSql("select id from ccaggregatefunctions where id=" + editorAddonID)) {
+                                    if (!csData.openSql("select id from ccaggregatefunctions where id=" + editorAddon.id)) {
                                         //
                                         // -- missing, not just inactive
                                         EditorString = "";
@@ -1072,7 +1072,7 @@ namespace Contensive.Addons.AdminSite {
                                             FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
                                             EditorString = HtmlController.inputTextarea(core, field.nameLc, HtmlController.encodeHtml(fieldValue_text), FieldRows, -1, fieldHtmlId, false, false, "text");
                                         }
-                                       break;
+                                        break;
                                 }
                             }
                         }
@@ -1110,7 +1110,8 @@ namespace Contensive.Addons.AdminSite {
                         string HelpClosedContentID = "helpClosedContentId" + field.id;
                         //
                         // editor preferences form - a fancybox popup that interfaces with a hardcoded ajax function in init() to set a member property
-                        string AjaxQS = RequestNameAjaxFunction + "=" + ajaxGetFieldEditorPreferenceForm + "&fieldid=" + field.id + "&currentEditorAddonId=" + editorAddonID + "&fieldTypeDefaultEditorAddonId=" + fieldTypeDefaultEditorAddonId;
+                        int editorAddonId = (editorAddon == null) ? 0 : editorAddon.id;
+                        string AjaxQS = RequestNameAjaxFunction + "=" + ajaxGetFieldEditorPreferenceForm + "&fieldid=" + field.id + "&currentEditorAddonId=" + editorAddonId + "&fieldTypeDefaultEditorAddonId=" + fieldTypeDefaultEditorAddonId;
                         string fancyBoxLinkId = "fbl" + adminData.fancyBoxPtr;
                         string fancyBoxContentId = "fbc" + adminData.fancyBoxPtr;
                         adminData.fancyBoxHeadJS = adminData.fancyBoxHeadJS + Environment.NewLine + "jQuery('#" + fancyBoxLinkId + "').fancybox({"
@@ -1193,8 +1194,8 @@ namespace Contensive.Addons.AdminSite {
                                     + "<!-- close icon --><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedID + "');\"><img src=\"/ContensiveBase/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right\" title=\"close\"></a>"
                                     + HelpMsg + "</div>"
                                 + "";
-                           HelpMsgOpenedEdit = ""
-                                + "";
+                            HelpMsgOpenedEdit = ""
+                                 + "";
                             if (IsLongHelp) {
                                 //
                                 // Long help
@@ -1263,15 +1264,15 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="EditorContext"></param>
         /// <param name="allowAjaxTabs"></param>
         /// <param name="TemplateIDForStyles"></param>
-        /// <param name="fieldTypeDefaultEditors"></param>
-        /// <param name="fieldEditorPreferenceList"></param>
+        
+        /// <param name="fieldEditorList"></param>
         /// <param name="styleList"></param>
         /// <param name="styleOptionList"></param>
         /// <param name="emailIdForStyles"></param>
         /// <param name="IsTemplateTable"></param>
         /// <param name="editorAddonListJSON"></param>
         /// <returns></returns>
-        public static string getTabs(CoreController core, AdminDataModel adminData, TabController adminMenu, bool readOnlyField, bool IsLandingPage, bool IsRootPage, CPHtml5BaseClass.EditorContentType EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, Dictionary<int, int> fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        public static string getTabs(CoreController core, AdminDataModel adminData, TabController adminMenu, bool readOnlyField, bool IsLandingPage, bool IsRootPage, CPHtml5BaseClass.EditorContentType EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 // todo
@@ -1322,7 +1323,7 @@ namespace Contensive.Addons.AdminSite {
                         string editTabCaption = field.editTabName;
                         if (string.IsNullOrEmpty(editTabCaption)) { editTabCaption = "Details"; }
                         string NewFormFieldList = "";
-                        string tabContent = getTab(core, adminData, adminData.editRecord.id, adminData.adminContent.id, readOnlyField, IsLandingPage, IsRootPage, field.editTabName, EditorContext, ref NewFormFieldList, TemplateIDForStyles, HelpCnt, HelpIDCache, helpDefaultCache, HelpCustomCache, AllowHelpMsgCustom, helpIdIndex, fieldTypeDefaultEditors, fieldEditorPreferenceList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON);
+                        string tabContent = getTab(core, adminData, adminData.editRecord.id, adminData.adminContent.id, readOnlyField, IsLandingPage, IsRootPage, field.editTabName, EditorContext, ref NewFormFieldList, TemplateIDForStyles, HelpCnt, HelpIDCache, helpDefaultCache, HelpCustomCache, AllowHelpMsgCustom, helpIdIndex,  styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON);
                         if (!string.IsNullOrEmpty(tabContent)) {
                             returnHtml += addTab(core, adminMenu, editTabCaption, tabContent, adminData.allowAdminTabs);
                         }
@@ -1378,7 +1379,10 @@ namespace Contensive.Addons.AdminSite {
             }
             return result;
         }
+        //
         //====================================================================================================
+        //
+
 
     }
 }

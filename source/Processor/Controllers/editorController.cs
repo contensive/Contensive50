@@ -1,9 +1,11 @@
 ﻿
+using Contensive.Addons.AdminSite;
 using Contensive.BaseClasses;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using static Contensive.Processor.Constants;
+using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -118,34 +120,39 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static Dictionary<int, int> getFieldTypeDefaultEditorAddonIdDictionary(CoreController core) {
-            var result = new Dictionary<int, int>();
+        public static List<FieldTypeEditorAddonModel> getFieldEditorAddonList(CoreController core) {
+            var result = new List<FieldTypeEditorAddonModel>();
             try {
                 //
-                // load default editors into editors() - these are the editors used when there is no editorPreference
-                //   editors(fieldtypeid) = addonid
-                string SQL = ""
-                    + " select"
-                    + " t.id as contentfieldtypeid"
-                    + " ,t.editorAddonId"
-                    + " from ccFieldTypes t"
-                    + " left join ccaggregatefunctions a on a.id=t.editorAddonId"
-                    + " where (t.active<>0)and(a.active<>0) order by t.id";
-                DataTable RS = core.db.executeQuery(SQL);
-                foreach (DataRow dr in RS.Rows) {
-                    int fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
-                    if ( !result.ContainsKey(fieldTypeID)) {
-                        result.Add(fieldTypeID, GenericController.encodeInteger(dr["editorAddonId"]));
+                // --use the last addon installed that is set to each field
+                {
+                    core.db.executeNonQuery("delete  from ccAddonContentFieldTypeRules from ccAddonContentFieldTypeRules r left join ccAggregateFunctions a on a.id=r.addonid where a.id is null");
+                    string sql = "select contentfieldtypeid, max(addonId) as editorAddonId from ccAddonContentFieldTypeRules group by contentfieldtypeid";
+                    DataTable dt = core.db.executeQuery(sql);
+                    foreach (DataRow row in dt.Rows) {
+                        result.Add(new FieldTypeEditorAddonModel() {
+                            fieldTypeId = encodeInteger(row["contentfieldtypeid"]),
+                            editorAddonId = encodeInteger(row["editorAddonId"])
+                        });
                     }
                 }
                 //
-                // -- set any editors not specifically requested in fieldtype
-                SQL = "select contentfieldtypeid, max(addonId) as editorAddonId from ccAddonContentFieldTypeRules group by contentfieldtypeid";
-                RS = core.db.executeQuery(SQL);
-                foreach (DataRow dr in RS.Rows) {
-                    int fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
-                    if (!result.ContainsKey(fieldTypeID)) {
-                        result.Add(fieldTypeID, GenericController.encodeInteger(dr["editorAddonId"]));
+                // -- for field types without custom addons, use the addon selected for the field type
+                {
+                    string sql = ""
+                        + " select"
+                        + " t.id as contentfieldtypeid"
+                        + " ,t.editorAddonId"
+                        + " from ccFieldTypes t"
+                        + " left join ccaggregatefunctions a on a.id=t.editorAddonId"
+                        + " where (t.active<>0)and(a.active<>0) order by t.id";
+                    DataTable dt = core.db.executeQuery(sql);
+                    foreach (DataRow dr in dt.Rows) {
+                        int fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
+                        result.Add(new FieldTypeEditorAddonModel() {
+                            fieldTypeId = fieldTypeID,
+                            editorAddonId = GenericController.encodeInteger(dr["editorAddonId"])
+                        });
                     }
                 }
                 return result;
@@ -154,6 +161,64 @@ namespace Contensive.Processor.Controllers {
                 return null;
             }
         }
+        //
+        //====================================================================================================
+        //
+        //public static List<FieldEditorAddonModel> getFieldEditorAddonList(CoreController core, int contentId) {
+        //    try {
+        //        string fieldEditorListKey = "editorPreferencesForContentV2:" + contentId;
+        //        List<FieldEditorAddonModel> fieldEditorList = core.userProperty.getObject<List<FieldEditorAddonModel>>(fieldEditorListKey);
+        //        if (fieldEditorList == null) {
+        //            fieldEditorList = new List<FieldEditorAddonModel>();
+        //            //
+        //            // -- check for legacy fieldeditor preference comma-string
+        //            string fieldEditorCommaList = core.userProperty.getText("editorPreferencesForContent:" + contentId, "");
+        //            if (!string.IsNullOrEmpty(fieldEditorCommaList)) {
+        //                foreach (var fieldPair in fieldEditorCommaList.Split(',')) {
+        //                    var fieldEditor = fieldPair.Split(':');
+        //                    fieldEditorList.Add(new FieldEditorAddonModel() {
+        //                        fieldId = encodeInteger(fieldEditor[0]),
+        //                        editorAddonId = encodeInteger(fieldEditor[1])
+        //                    });
+        //                }
+        //            }
+        //            core.userProperty.setProperty(fieldEditorListKey, fieldEditorList);
+        //        }
+        //        //
+        //        // todo - this should be added to metaData load
+        //        // add the addon editors assigned to each field
+        //        string SQL = "select f.id,f.editorAddonID from ccfields f where f.ContentID=" + contentId + " and f.editorAddonId is not null";
+        //        using (DataTable dt = core.db.executeQuery(SQL)) {
+        //            foreach (DataRow row in dt.Rows) {
+        //                fieldEditorList.Add(new FieldEditorAddonModel() {
+        //                    fieldId = encodeInteger(row[0]),
+        //                    editorAddonId = encodeInteger(row[1])
+        //                });
+        //            };
+        //        }
+        //        //
+        //        // load fieldEditorOptions - these are all the editors available for each field
+        //        //
+        //        Dictionary<string, int> fieldEditorOptions = new Dictionary<string, int>();
+        //        SQL = "select r.contentFieldTypeId,a.Id"
+        //            + " from ccAddonContentFieldTypeRules r"
+        //            + " left join ccaggregatefunctions a on a.id=r.addonid"
+        //            + " where (r.active<>0)and(a.active<>0)and(a.id is not null) order by r.contentFieldTypeID";
+        //        using (DataTable dt = core.db.executeQuery(SQL)) {
+        //            foreach (DataRow row in dt.Rows) {
+        //                int fieldId = encodeInteger(row[0]);
+        //                if ((fieldId > 0) && (!fieldEditorOptions.ContainsKey(fieldId.ToString()))) {
+        //                    fieldEditorOptions.Add(fieldId.ToString(), encodeInteger(row[1]));
+        //                }
+
+        //            }
+        //        }
+        //        return fieldEditorList;
+        //    } catch (Exception ex) {
+        //        LogController.logError(core, ex);
+        //        throw;
+        //    }
+        //}
         //
         //====================================================================================================
         #region  IDisposable Support 

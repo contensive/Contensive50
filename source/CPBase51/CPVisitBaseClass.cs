@@ -57,6 +57,14 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Return the user property for the specified key.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public abstract T GetObject<T>(string key);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Get the visit property that matches the key. If not found set and return the default value.
         /// </summary>
         /// <param name="key"></param>

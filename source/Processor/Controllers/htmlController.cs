@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
                     result.Add("<div class=\"ccTestPointMessageCon\">" + core.doc.testPointMessage + "</div>");
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return string.Join("\r", result);
@@ -144,12 +144,12 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- Selection is too big
                         ErrorController.addUserError(core, "The drop down list for " + ContentName + " called " + MenuName + " is too long to display. The site administrator has been notified and the problem will be resolved shortly. To fix this issue temporarily, go to the admin tab of the Preferences page and set the Select Field Limit larger than " + RowCnt + ".");
-                        LogController.logError( core,new Exception("Error creating select list from content [" + ContentName + "] called [" + MenuName + "]. Selection of [" + RowCnt + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property SelectFieldLimit."));
+                        LogController.logError(core, new Exception("Error creating select list from content [" + ContentName + "] called [" + MenuName + "]. Selection of [" + RowCnt + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property SelectFieldLimit."));
                         result += inputHidden(MenuNameFPO, CurrentValue);
                         if (CurrentValue == 0) {
                             result = inputText(core, MenuName, "0");
                         } else {
-                            using ( var csData = new CsModel( core )) {
+                            using (var csData = new CsModel(core)) {
                                 if (csData.openRecord(ContentName, CurrentValue)) {
                                     result = csData.getText("name") + "&nbsp;";
                                 }
@@ -223,7 +223,7 @@ namespace Contensive.Processor.Controllers {
                             DropDownFieldCount = DropDownFieldCount + 1;
                         }
                         if (DropDownFieldCount == 0) {
-                            LogController.logError( core,new Exception("No drop down field names found for content [" + ContentName + "]."));
+                            LogController.logError(core, new Exception("No drop down field names found for content [" + ContentName + "]."));
                         } else {
                             int[] DropDownFieldPointer = new int[DropDownFieldCount];
                             string SelectFields = "ID";
@@ -355,7 +355,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 result = SelectRaw;
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -406,7 +406,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Selection is too big
                         //
-                        LogController.logError( core,new Exception("While building a group members list for group [" + GroupController.getGroupName(core, GroupID) + "], too many rows were selected. [" + RowMax + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property app.SiteProperty_SelectFieldLimit."));
+                        LogController.logError(core, new Exception("While building a group members list for group [" + GroupController.getGroupName(core, GroupID) + "], too many rows were selected. [" + RowMax + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property app.SiteProperty_SelectFieldLimit."));
                         result += inputHidden(MenuNameFPO, currentValue);
                         if (currentValue != 0) {
                             using (var csData = new CsModel(core)) {
@@ -422,7 +422,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         string DropDownFieldList = "name";
                         var peopleMetaData = ContentMetadataModel.createByUniqueName(core, "people");
-                        if ( peopleMetaData != null ) DropDownFieldList = peopleMetaData.dropDownFieldList;
+                        if (peopleMetaData != null) DropDownFieldList = peopleMetaData.dropDownFieldList;
                         int DropDownFieldCount = 0;
                         string CharAllowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
                         string DropDownPreField = "";
@@ -483,7 +483,7 @@ namespace Contensive.Processor.Controllers {
                             DropDownFieldCount = DropDownFieldCount + 1;
                         }
                         if (DropDownFieldCount == 0) {
-                            LogController.logError( core,new Exception("No drop down field names found for content [" + GroupID + "]."));
+                            LogController.logError(core, new Exception("No drop down field names found for content [" + GroupID + "]."));
                         } else {
                             int[] DropDownFieldPointer = new int[DropDownFieldCount];
                             string SelectFields = "P.ID";
@@ -594,7 +594,7 @@ namespace Contensive.Processor.Controllers {
                 SelectRaw = GenericController.vbReplace(SelectRaw, NoneCaptionFPO, noneCaption);
                 result = SelectRaw;
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -700,7 +700,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -735,12 +735,12 @@ namespace Contensive.Processor.Controllers {
                         IconFilename = GenericController.getCdnFileLink(core, IconFilename);
                     }
                     // original  "<img alt=\"Login\" src=\"" + IconFilename + "\" border=\"0\" >"
-                    result += HtmlController.img( IconFilename, "Login" );
+                    result += HtmlController.img(IconFilename, "Login");
                     result += "</A>";
                     result += "</td></tr></table>";
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -772,7 +772,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.outputBufferEnabled = BufferOn;
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -798,7 +798,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="actionQueryString"></param>
         /// <returns></returns>
-        public static string formMultipart_start( CoreController core, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "") {
+        public static string formMultipart_start(CoreController core, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "") {
             string result = "<form action=\"?" + ((actionQueryString == "") ? core.doc.refreshQueryString : actionQueryString) + "\" ENCTYPE=\"MULTIPART/FORM-DATA\" method=\"post\" style=\"display: inline;\"";
             if (!string.IsNullOrWhiteSpace(htmlName)) result += " name=\"" + htmlName + "\"";
             if (!string.IsNullOrWhiteSpace(htmlClass)) result += " class=\"" + htmlClass + "\"";
@@ -816,7 +816,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="htmlMethod"></param>
         /// <returns></returns>
-        public static string form( CoreController core,  string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post" ) {
+        public static string form(CoreController core, string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post") {
             if (string.IsNullOrEmpty(actionQueryString)) actionQueryString = core.doc.refreshQueryString;
             string action = core.webServer.serverFormActionURL + (string.IsNullOrEmpty(actionQueryString) ? "" : "?" + actionQueryString);
             string result = "<form name=\"" + htmlName + "\" action=\"" + action + "\" method=\"" + htmlMethod + "\" style=\"display: inline;\"";
@@ -829,10 +829,10 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string inputText( CoreController core, string htmlName, string defaultValue = "", int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false, string placeholder = "" ) {
+        public static string inputText(CoreController core, string htmlName, string defaultValue = "", int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false, string placeholder = "") {
             string result = "";
             try {
-                if ((heightRows>1) & !passwordField) {
+                if ((heightRows > 1) & !passwordField) {
                     result = inputTextarea(core, htmlName, defaultValue, heightRows, widthCharacters, htmlId, true, readOnly, htmlClass, disabled, maxLength);
                 } else {
                     defaultValue = HtmlController.encodeHtml(defaultValue);
@@ -854,7 +854,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.formInputTextCnt += 1;
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -872,7 +872,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="disabled"></param>
         /// <param name="htmlClass"></param>
         /// <returns></returns>
-        public static string inputTextarea( CoreController core, string htmlName, string defaultValue = "", int heightRows = 4, int widthCharacters = -1, string htmlId = "", bool ignore = false, bool readOnly = false, string htmlClass = "", bool disabled = false, int maxLength = 0) {
+        public static string inputTextarea(CoreController core, string htmlName, string defaultValue = "", int heightRows = 4, int widthCharacters = -1, string htmlId = "", bool ignore = false, bool readOnly = false, string htmlClass = "", bool disabled = false, int maxLength = 0) {
             string result = "";
             try {
                 defaultValue = HtmlController.encodeHtml(defaultValue);
@@ -882,12 +882,12 @@ namespace Contensive.Processor.Controllers {
                 attrList += (!readOnly) ? "" : " readonly";
                 attrList += (!disabled) ? "" : " disabled";
                 attrList += (maxLength <= 0) ? "" : " maxlength=" + maxLength.ToString();
-                attrList += (widthCharacters==-1) ? "" : " cols=" + widthCharacters.ToString();
+                attrList += (widthCharacters == -1) ? "" : " cols=" + widthCharacters.ToString();
                 attrList += " rows=" + heightRows.ToString();
                 result = "<textarea" + attrList + ">" + defaultValue + "</textarea>";
                 core.doc.formInputTextCnt += 1;
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -938,7 +938,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="required"></param>
         /// <param name="disabled"></param>
         /// <returns></returns>
-        public static string inputDate( CoreController core, string htmlName, DateTime? htmlValue, string Width = "", string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
+        public static string inputDate(CoreController core, string htmlName, DateTime? htmlValue, string Width = "", string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
             string result = "";
             try {
                 // {0:s} 
@@ -946,7 +946,7 @@ namespace Contensive.Processor.Controllers {
                 core.doc.formInputTextCnt += 1;
                 core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
                 string attrList = " type=date name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
-                if ((htmlValue!=null) && (htmlValue > DateTime.MinValue)) attrList += " value=\"" + encodeDate( htmlValue ).ToString("yyyy-MM-dd") + "\"";              
+                if ((htmlValue != null) && (htmlValue > DateTime.MinValue)) attrList += " value=\"" + encodeDate(htmlValue).ToString("yyyy-MM-dd") + "\"";
                 attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
                 attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
                 attrList += (!readOnly) ? "" : " readonly";
@@ -954,7 +954,7 @@ namespace Contensive.Processor.Controllers {
                 attrList += (!required) ? "" : " required";
                 return "<input" + attrList + ">";
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1008,7 +1008,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string checkbox(string htmlName, bool selected = false, string htmlId = "", bool disabled = false, string htmlClass = "", bool readOnly = false, string htmlValue="1", string label = "") {
+        public static string checkbox(string htmlName, bool selected = false, string htmlId = "", bool disabled = false, string htmlClass = "", bool readOnly = false, string htmlValue = "1", string label = "") {
             string result = "<input type=\"checkbox\" name=\"" + htmlName + "\" value=\"" + htmlValue + "\"";
             if (readOnly && !selected) {
                 result += " disabled";
@@ -1018,14 +1018,14 @@ namespace Contensive.Processor.Controllers {
                 result += " checked";
             }
             if (!string.IsNullOrWhiteSpace(htmlId)) {
-                result +=  " id=\"" + htmlId + "\"";
+                result += " id=\"" + htmlId + "\"";
             }
             if (!string.IsNullOrWhiteSpace(htmlClass)) {
-                result +=  " class=\"" + htmlClass + "\"";
+                result += " class=\"" + htmlClass + "\"";
             }
             result += ">";
             if (!string.IsNullOrWhiteSpace(label)) {
-                result = div( "<label>" + result + "&nbsp;" + label + "</label>", "checkbox");
+                result = div("<label>" + result + "&nbsp;" + label + "</label>", "checkbox");
             }
             return result;
         }
@@ -1231,7 +1231,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnResult;
@@ -1297,7 +1297,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        public string getWysiwygAddonList( BaseClasses.CPHtml5BaseClass.EditorContentType contentType) {
+        public string getWysiwygAddonList(BaseClasses.CPHtml5BaseClass.EditorContentType contentType) {
             string result = "";
             try {
                 if (core.doc.wysiwygAddonList.ContainsKey(contentType)) {
@@ -1490,7 +1490,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.wysiwygAddonList.Add(contentType, result);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1721,7 +1721,7 @@ namespace Contensive.Processor.Controllers {
                     result += "[" + list + "]" + SrcSelectorSuffix;
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1731,9 +1731,13 @@ namespace Contensive.Processor.Controllers {
         public string getFormInputHTML(string htmlName, string DefaultValue = "", string styleHeight = "", string styleWidth = "", bool readOnlyfield = false, bool allowActiveContent = false, string addonListJSON = "", string styleList = "", string styleOptionList = "", bool allowResourceLibrary = false) {
             string returnHtml = "";
             try {
-                var FieldTypeDefaultEditorAddonIds = EditorController.getFieldTypeDefaultEditorAddonIdDictionary(core);
-                int FieldTypeDefaultEditorAddonId = GenericController.encodeInteger(FieldTypeDefaultEditorAddonIds[(int)CPContentBaseClass.fileTypeIdEnum.HTML]);
-                if (FieldTypeDefaultEditorAddonId == 0) {
+                var fieldEditorAddonList = EditorController.getFieldEditorAddonList(core);
+                Addons.AdminSite.FieldTypeEditorAddonModel fieldEditor = fieldEditorAddonList.Find(x => x.fieldTypeId == (int)CPContentBaseClass.fileTypeIdEnum.HTML);
+                int FieldEditorAddonId = 0;
+                if (fieldEditor != null) {
+                    FieldEditorAddonId = fieldEditor.editorAddonId;
+                }
+                if (FieldEditorAddonId == 0) {
                     //
                     //    use default wysiwyg
                     returnHtml = inputTextarea(core, htmlName, DefaultValue);
@@ -1754,14 +1758,15 @@ namespace Contensive.Processor.Controllers {
                         { "editorStyles", styleList },
                         { "editorStyleOptions", styleOptionList }
                     };
-                    returnHtml = core.addon.execute(AddonModel.create(core, FieldTypeDefaultEditorAddonId), new CPUtilsBaseClass.addonExecuteContext() {
+                    var addon = AddonModel.create(core, FieldEditorAddonId);
+                    returnHtml = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
                         addonType = CPUtilsBaseClass.addonContext.ContextEditor,
                         argumentKeyValuePairs = arguments,
-                        errorContextMessage = "calling editor addon for text field type, addon [" + FieldTypeDefaultEditorAddonId  + "]"
+                        errorContextMessage = "calling editor addon for text field type, addon [" + FieldEditorAddonId + "]"
                     });
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnHtml;
@@ -1821,7 +1826,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -1999,7 +2004,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Public Site call, must have contentname and recordid
                 //
-                LogController.logError( core,new Exception("invalid content [" + ContentName + "], RecordID [" + RecordID + "]"));
+                LogController.logError(core, new Exception("invalid content [" + ContentName + "], RecordID [" + RecordID + "]"));
             } else {
                 //
                 // ----- Normal Content Edit - find instance in the content
@@ -2158,7 +2163,7 @@ namespace Contensive.Processor.Controllers {
                 // Clear Caches
                 //
                 if (!string.IsNullOrEmpty(ContentName)) {
-                    string contentTablename = MetadataController.getContentTablename(core, ContentName);                    
+                    string contentTablename = MetadataController.getContentTablename(core, ContentName);
                     core.cache.invalidateTableObjects(contentTablename);
                 }
             }
@@ -2258,7 +2263,7 @@ namespace Contensive.Processor.Controllers {
                 CaptionFieldName = GenericController.encodeEmpty(CaptionFieldName, "name");
                 if (string.IsNullOrEmpty(PrimaryContentName) || string.IsNullOrEmpty(SecondaryContentName) || string.IsNullOrEmpty(RulesContentName) || string.IsNullOrEmpty(RulesPrimaryFieldname) || string.IsNullOrEmpty(RulesSecondaryFieldName)) {
                     returnHtml = "[Checklist not configured]";
-                    LogController.logError( core,new Exception("Creating checklist, all required fields were not supplied, Caption=[" + CaptionFieldName + "], PrimaryContentName=[" + PrimaryContentName + "], SecondaryContentName=[" + SecondaryContentName + "], RulesContentName=[" + RulesContentName + "], RulesPrimaryFieldName=[" + RulesPrimaryFieldname + "], RulesSecondaryFieldName=[" + RulesSecondaryFieldName + "]"));
+                    LogController.logError(core, new Exception("Creating checklist, all required fields were not supplied, Caption=[" + CaptionFieldName + "], PrimaryContentName=[" + PrimaryContentName + "], SecondaryContentName=[" + SecondaryContentName + "], RulesContentName=[" + RulesContentName + "], RulesPrimaryFieldName=[" + RulesPrimaryFieldname + "], RulesSecondaryFieldName=[" + RulesSecondaryFieldName + "]"));
                 } else {
                     //
                     // ----- Gather all the SecondaryContent that associates to the PrimaryContent
@@ -2451,7 +2456,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.checkListCnt = core.doc.checkListCnt + 1;
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnHtml;
@@ -2520,7 +2525,7 @@ namespace Contensive.Processor.Controllers {
         public string getPanelTop(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "", string HeightMin = "") {
             string MyWidth = encodeEmpty(Width, "100%");
             string MyPadding = encodeEmpty(Padding, "5");
-            string ContentPanelWidth = (MyWidth.IsNumeric()) ? (int.Parse(MyWidth) - 2).ToString() :  "100%";
+            string ContentPanelWidth = (MyWidth.IsNumeric()) ? (int.Parse(MyWidth) - 2).ToString() : "100%";
             return ""
                 + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + MyWidth + "\">"
                 + cr2 + "<tr>"
@@ -2713,7 +2718,7 @@ namespace Contensive.Processor.Controllers {
                         Copy = ""
                             + "\r<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
                             + GenericController.nop(Copy) + "\r</table>";
-                        ToolsPanel.Add(getPanelInput(Copy,"100%"));
+                        ToolsPanel.Add(getPanelInput(Copy, "100%"));
                         result += getPanel(HtmlController.form(core, ToolsPanel.Text), "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         result += getPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         LinkPanel = null;
@@ -2755,7 +2760,7 @@ namespace Contensive.Processor.Controllers {
                     result = "\r<div class=\"ccCon\">" + GenericController.nop(result) + "\r</div>";
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2802,7 +2807,7 @@ namespace Contensive.Processor.Controllers {
                     + Environment.NewLine + "</html>"
                     + "";
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2918,7 +2923,7 @@ namespace Contensive.Processor.Controllers {
                     headList.Add(Environment.NewLine + asset.content);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return string.Join("\r", headList);
         }
@@ -2936,7 +2941,7 @@ namespace Contensive.Processor.Controllers {
                     });
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -2967,13 +2972,13 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
         //=========================================================================================================
         //
-        public void addScriptLinkSrc( string scriptLinkSrc, string addedByMessage, bool forceHead = false, int sourceAddonId = 0) {
+        public void addScriptLinkSrc(string scriptLinkSrc, string addedByMessage, bool forceHead = false, int sourceAddonId = 0) {
             try {
                 if (!string.IsNullOrWhiteSpace(scriptLinkSrc)) {
                     HtmlAssetClass asset = null;
@@ -2998,14 +3003,14 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
         public void addScriptLinkSrc(string scriptLinkSrc, string addedByMessage) => addScriptLinkSrc(scriptLinkSrc, addedByMessage, false, 0);
         //
         public void addScriptLinkSrc(string scriptLinkSrc, string addedByMessage, bool forceHead) => addScriptLinkSrc(scriptLinkSrc, addedByMessage, forceHead, 0);
-       //
+        //
         //=========================================================================================================
         //
         public void addTitle(string pageTitle, string addedByMessage) {
@@ -3017,7 +3022,7 @@ namespace Contensive.Processor.Controllers {
                     });
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -3034,7 +3039,7 @@ namespace Contensive.Processor.Controllers {
                     });
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -3054,7 +3059,7 @@ namespace Contensive.Processor.Controllers {
                     });
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -3071,7 +3076,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -3088,7 +3093,7 @@ namespace Contensive.Processor.Controllers {
                     });
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -3133,7 +3138,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnCopy;
@@ -3168,7 +3173,7 @@ namespace Contensive.Processor.Controllers {
                 argumentKeyValuePairs = arguments,
                 errorContextMessage = "calling resource library addon [" + addonGuidResourceLibrary + "] from internal method"
             });
-       }
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -3188,7 +3193,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Test if RuleCopy is supported
                 var ruleContentMetadata = ContentMetadataModel.createByUniqueName(core, rulesContentName);
-                if ( ruleContentMetadata==null) {
+                if (ruleContentMetadata == null) {
                     LogController.logWarn(core, "processCheckList called and ruleContentName not found [" + rulesContentName + "]");
                     return;
                 }
@@ -3210,7 +3215,7 @@ namespace Contensive.Processor.Controllers {
                 string rulesTablename = MetadataController.getContentTablename(core, rulesContentName);
                 string SQL = "select " + rulesSecondaryFieldName + ",id from " + rulesTablename + " where (" + rulesPrimaryFieldname + "=" + primaryRecordID + ")and(active<>0) order by " + rulesSecondaryFieldName;
                 DataTable currentRules = core.db.executeQuery(SQL);
-                int currentRulesCnt = currentRules.Rows.Count; 
+                int currentRulesCnt = currentRules.Rows.Count;
                 for (int GroupPtr = 0; GroupPtr < GroupCnt; GroupPtr++) {
                     //
                     // ----- Read Response
@@ -3603,7 +3608,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public static string style( string innerStyleSheet ) {
+        public static string style(string innerStyleSheet) {
             var tag = new StringBuilder("<style type=\"text/css\">");
             tag.Append(innerStyleSheet).Append("</style>");
             return tag.ToString();

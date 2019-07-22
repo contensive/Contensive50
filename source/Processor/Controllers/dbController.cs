@@ -657,6 +657,23 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
+        /// Create a trigger that deletes a man-to-many rule if a foreign-key is not valid. Should be called on both foreign keys of 
+        /// </summary>
+        /// <param name="ruleTableName"></param>
+        /// <param name="ruleField"></param>
+        /// <param name="joinTable"></param>
+        /// <param name="joinField"></param>
+        public void createTriggerManyManyRule(string ruleTableName, string ruleField, string joinTable, string joinField) {
+            string sql = Properties.Resources.sqlTriggerManyManyRule;
+            sql = sql.Replace("ruleTableName", ruleTableName);
+            sql = sql.Replace("ruleField", ruleField);
+            sql = sql.Replace("joinTable", joinTable);
+            sql = sql.Replace("joinField", joinField);
+            executeNonQueryAsync(sql);
+        }
+        //
+        //========================================================================
+        /// <summary>
         /// Get FieldDescritor from FieldType
         /// </summary>
         /// <param name="DataSourceName"></param>

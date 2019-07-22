@@ -17,23 +17,36 @@ namespace Contensive.Addons.AdminSite {
     /// object that contains the context for the admin site, like recordsPerPage, etc. Should eventually include the loadContext and be its own document
     /// </summary>
     public class AdminDataModel {
+        //
+        //====================================================================================================
+        //
+        public CoreController core;
+        //
+        //====================================================================================================
         /// <summary>
         /// the content metadata being edited
         /// </summary>
         public ContentMetadataModel adminContent { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// the record being edited
         /// </summary>
         public EditRecordClass editRecord { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// Value returned from a submit button, process into action/form
         /// </summary>
         public string requestButton { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// the next form requested (the get)
         /// </summary>
         public int AdminForm { get; set; }
-
+        //
+        //====================================================================================================
         /// <summary>
         /// Group Rules
         /// </summary>
@@ -42,94 +55,140 @@ namespace Contensive.Addons.AdminSite {
             public bool AllowAdd;
             public bool AllowDelete;
         }
+        //
+        //====================================================================================================
         /// <summary>
         /// Used within Admin site to create fancyBox popups
         /// </summary>
         public bool includeFancyBox { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int fancyBoxPtr { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public string fancyBoxHeadJS { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int requestedContentId { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int requestedRecordId { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// true if there was an error loading the edit record - use to block the edit form
         /// </summary>
         public bool BlockEditForm { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// The action to be performed before the next form
         /// </summary>
         public int Admin_Action { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// The form that submitted that the button to process
         /// </summary>
         public int AdminSourceForm { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// for passing where clause values from page to page
         /// </summary>
         public string[,] WherePair = new string[3, 11];
+        //
+        //====================================================================================================
         /// <summary>
         /// the current number of WherePairCount in use
         /// </summary>
         public int WherePairCount { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int RecordTop { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int RecordsPerPage { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// The number of windows open (below this one)
         /// </summary>
         public int ignore_legacyMenuDepth { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// String that adds on to the end of the title
         /// </summary>
         public string TitleExtension { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// true uses tab system
         /// </summary>
         public bool allowAdminTabs { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// this is a hidden on the edit form. The popup editor preferences sets this hidden and submits
         /// </summary>
         public string fieldEditorPreference { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// flag set that shows the rest are valid
         /// </summary>
         public bool ContentWatchLoaded { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int ContentWatchRecordID { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public string ContentWatchLink { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int ContentWatchClicks { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public string ContentWatchLinkLabel { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public DateTime ContentWatchExpires { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// list of all ContentWatchLists for this Content, read from response, then later saved to Rules
         /// </summary>
@@ -142,58 +201,86 @@ namespace Contensive.Addons.AdminSite {
             }
         }
         private int[] _ContentWatchListID;
+        //
+        //====================================================================================================
         /// <summary>
         /// size of ContentWatchListID() array
         /// </summary>
         public int ContentWatchListIDSize { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// number of valid entries in ContentWatchListID()
         /// </summary>
         public int ContentWatchListIDCount { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// Count of Buttons in use
         /// </summary>
         public int ButtonObjectCount { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public string[,] ImagePreloads = new string[3, 101];
+        //
+        //====================================================================================================
         /// <summary>
         /// Collected string of Javascript functions to print at end
         /// </summary>
         public string JavaScriptString { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// the HTML needed to complete the Admin Form after contents
         /// </summary>
         public string adminFooter { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public bool UserAllowContentEdit { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// used to generate labels for form input
         /// </summary>
         public int FormInputCount { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int EditSectionPanelCount { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public static readonly string OpenLiveWindowTable = "<div ID=\"LiveWindowTable\">";
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public static readonly string CloseLiveWindowTable = "</div>";
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public static readonly string AdminFormErrorOpen = "<table border=\"0\" cellpadding=\"20\" cellspacing=\"0\" width=\"100%\"><tr><td align=\"left\">";
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public static readonly string AdminFormErrorClose = "</td></tr></table>";
+        //
+        //====================================================================================================
         /// <summary>
         /// these were defined different in csv
         /// </summary>
@@ -203,10 +290,14 @@ namespace Contensive.Addons.AdminSite {
             NodeTypeAddon = 2,
             NodeTypeContent = 3
         }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public static readonly string IndexConfigPrefix = "IndexConfig:";
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
@@ -220,7 +311,7 @@ namespace Contensive.Addons.AdminSite {
         }
         private bool? AllowAdminFieldCheck_Local = null;
         //
-        //========================================================================
+        //====================================================================================================
         /// <summary>
         /// Read in Whats New values if present, Field values must be loaded
         /// </summary>
@@ -422,6 +513,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="core"></param>
         public AdminDataModel(CoreController core) {
             try {
+                this.core = core;
                 //
                 // Tab Control
                 allowAdminTabs = GenericController.encodeBoolean(core.userProperty.getText("AllowAdminTabs", "1"));
@@ -1606,6 +1698,30 @@ namespace Contensive.Addons.AdminSite {
                 LogController.logError(core, ex);
             }
         }
+        //
+        //====================================================================================================
+        //
+        public List<FieldTypeEditorAddonModel> fieldTypeEditors {
+            get {
+                if (_fieldTypeDefaultEditors == null) {
+                    _fieldTypeDefaultEditors = EditorController.getFieldEditorAddonList(core);
+                }
+                return _fieldTypeDefaultEditors;
+            }
+        }
+        private List<FieldTypeEditorAddonModel> _fieldTypeDefaultEditors = null;
+        ////
+        ////====================================================================================================
+        ////
+        //public List<FieldTypeEditorAddonModel> fieldEditors {
+        //    get {
+        //        if (_fieldEditors == null) {
+        //            _fieldEditors = EditorController.getFieldEditorAddonList(core);
+        //        }
+        //        return _fieldEditors;
+        //    }
+        //}
+        //private List<FieldTypeEditorAddonModel> _fieldEditors = null;
         //
     }
 }

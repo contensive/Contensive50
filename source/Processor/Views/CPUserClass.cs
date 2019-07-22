@@ -359,6 +359,12 @@ namespace Contensive.Processor {
         public override string GetText(string key) => cp.core.userProperty.getText(key);
         public override string GetText(string key, string defaultValue) => cp.core.userProperty.getText(key, defaultValue);
         //
+        //=======================================================================================================
+        //
+        public override T GetObject<T>(string key) {
+            return cp.core.userProperty.getObject<T>(key);
+        }
+        //
         //====================================================================================================
         // todo  obsolete
         //

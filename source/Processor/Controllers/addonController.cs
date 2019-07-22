@@ -81,25 +81,6 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// execute addon by is id
-        /// </summary>
-        /// <param name="addonId"></param>
-        /// <param name="executeContext"></param>
-        /// <returns></returns>
-        public string execute(int addonId, CPUtilsBaseClass.addonExecuteContext executeContext) {
-            var addon = AddonModel.create(core, addonId);
-            if (addon == null) {
-                //
-                // -- addon not found
-                LogController.logError(core, new ArgumentException("AddonExecute called without valid id [" + addonId + "] from context [" + executeContext.errorContextMessage + "]."));
-                return "";
-            } else {
-                return execute(addon, executeContext);
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// execute addon
         /// </summary>
         /// <param name="addon"></param>

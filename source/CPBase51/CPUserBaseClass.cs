@@ -323,6 +323,14 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Return the user property for the specified key.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public abstract T GetObject<T>(string key);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Set a user property for this type
         /// </summary>
         /// <param name="key"></param>
