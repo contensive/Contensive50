@@ -864,7 +864,7 @@ namespace Contensive.Processor.Controllers {
                                     emailBody.Append("<h1>Page Hit Notification.</h1>");
                                     emailBody.Append("<p>This email was sent to you as a notification of the following viewing details.</p>");
                                     emailBody.Append(HtmlController.tableStart(4, 1, 1));
-                                    emailBody.Append("<tr><td align=\"right\" width=\"150\" Class=\"ccPanelHeader\">Description<br><img alt=\"image\" src=\"http://" + core.webServer.requestDomain + "/ContensiveBase/images/spacer.gif\" width=\"150\" height=\"1\"></td><td align=\"left\" width=\"100%\" Class=\"ccPanelHeader\">Value</td></tr>");
+                                    emailBody.Append("<tr><td align=\"right\" width=\"150\" Class=\"ccPanelHeader\">Description<br><img alt=\"image\" src=\"http://" + core.webServer.requestDomain + "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=\"150\" height=\"1\"></td><td align=\"left\" width=\"100%\" Class=\"ccPanelHeader\">Value</td></tr>");
                                     emailBody.Append(get2ColumnTableRow("Domain", core.webServer.requestDomain, true));
                                     emailBody.Append(get2ColumnTableRow("Link", core.webServer.requestUrl, false));
                                     emailBody.Append(get2ColumnTableRow("Page Name", PageName, true));
@@ -1058,9 +1058,6 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (core.session.isQuickEditing(PageContentModel.contentName)) {
                     //
-                    // -- quick editor for wysiwyg content
-                    resultContent.Append(QuickEditController.getQuickEditing(core));
-                    //
                     // -- drag-drop editor for addonList
                     if (core.siteProperties.getBoolean("Allow AddonList Editor For Quick Editor")) {
                         core.docProperties.setProperty("contentid", ContentMetadataModel.getContentId(core, PageContentModel.contentName));
@@ -1069,6 +1066,9 @@ namespace Contensive.Processor.Controllers {
                              addonType = CPUtilsBaseClass.addonContext.ContextSimple
                         }));
                     } else {
+                        //
+                        // -- quick editor for wysiwyg content
+                        resultContent.Append(QuickEditController.getQuickEditing(core));
                     }
                 } else {
                     //

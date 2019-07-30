@@ -2,15 +2,15 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Contensive.Processor</id>
-        <version>5.1.3</version>
+        <version>5.1.190729</version>
         <title>Contensive Processor</title>
         <authors>Contensive</authors>
         <owners>Contensive</owners>
         <licenseUrl>http://contensive.io/</licenseUrl>
-        <projectUrl>http://contensive.io/ecommerce</projectUrl>
+        <projectUrl>http://contensive.io/</projectUrl>
         <iconUrl>http://contensive.io/img/ContensiveLogo2-385x60.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>This package installs the library files required to manage an application.</description>
+        <description>This package installs the library files required to create an instance of cp within an application.</description>
         <releaseNotes></releaseNotes>
         <copyright>Copyright 2019</copyright>
         <tags>Contensive</tags>
@@ -22,12 +22,13 @@
 		  <dependency id="NLog" version="4.5.11" />
 		  <dependency id="NLog.Schema" version="4.5.11" />
 		  <dependency id="Amazon.ElastiCacheCluster" version="1.0.1.0" />
-		  <dependency id="EnyimMemcached" version="2.12.0" />
+		  <dependency id="EnyimMemcached" version="2.16.0" />
+		  <dependency id="EnyimMemcached-NLog" version="2.16.0" />
 		  <dependency id="Microsoft.NETCore.Platforms" version="2.0.1" />
 		  <dependency id="Microsoft.Web.Administration" version="7.0.0.0" />
 		  <dependency id="Microsoft.Win32.Primitives" version="4.3.0" />
 		  <dependency id="NETStandard.Library" version="2.0.1" />
-		  <dependency id="NUglify" version="1.5.8" />
+		  <dependency id="NUglify" version="1.5.12" />
 		</dependencies>
     </metadata>
     <files>

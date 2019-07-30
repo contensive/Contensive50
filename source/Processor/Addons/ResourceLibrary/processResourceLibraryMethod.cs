@@ -37,14 +37,14 @@ namespace Contensive.Addons.Primitives {
                     // Open a page compatible with a dialog
                     //
                     core.doc.addRefreshQueryString("EditorObjectName", EditorObjectName);
-                    core.html.addScriptLinkSrc("/ContensiveBase/ClientSide/dialogs.js", "Resource Library");
-                    //Call AddHeadScript("<script type=""text/javascript"" src=""/ContensiveBase/ClientSide/dialogs.js""></script>")
+                    core.html.addScriptLinkSrc("https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/ClientSide/dialogs.js", "Resource Library");
+                    //Call AddHeadScript("<script type=""text/javascript"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/ClientSide/dialogs.js""></script>")
                     core.doc.setMetaContent(0, 0);
                     core.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Resource Library");
                     string Copy = core.html.getResourceLibrary("", true, EditorObjectName, LinkObjectName, true);
                     string htmlBody = ""
                         + GenericController.nop(core.html.getPanelHeader("Contensive Resource Library")) + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>"
-                        + cr2 + "<div style=\"border-top:1px solid white;border-bottom:1px solid black;height:2px\"><img alt=\"spacer\" src=\"/ContensiveBase/images/spacer.gif\" width=1 height=1></div>"
+                        + cr2 + "<div style=\"border-top:1px solid white;border-bottom:1px solid black;height:2px\"><img alt=\"spacer\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=1 height=1></div>"
                         + GenericController.nop(Copy) + "\r</td></tr>"
                         + "\r<tr><td>"
                         + GenericController.nop(core.html.getHtmlBodyEnd(false, false)) + "\r</td></tr></table>"
@@ -57,7 +57,7 @@ namespace Contensive.Addons.Primitives {
                     //
                     // Open a page compatible with a dialog
                     core.doc.addRefreshQueryString("LinkObjectName", LinkObjectName);
-                    core.html.addScriptLinkSrc("/ContensiveBase/ClientSide/dialogs.js", "Resource Library");
+                    core.html.addScriptLinkSrc("https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/ClientSide/dialogs.js", "Resource Library");
                     core.doc.setMetaContent(0, 0);
                     core.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Resource Library");
                     string htmlBody = ""

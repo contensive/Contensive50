@@ -42,7 +42,7 @@ namespace Contensive.Addons.Primitives {
                                 logType = EmailLogTypeOpen
                             };
                         }
-                        core.webServer.redirect(NonEncodedLink: core.webServer.requestProtocol + core.webServer.requestDomain + "/ContensiveBase/images/spacer.gif", RedirectReason: "Group Email Open hit, redirecting to a dummy image", IsPageNotFound: false, allowDebugMessage: false);
+                        core.webServer.redirect(NonEncodedLink: core.webServer.requestProtocol + core.webServer.requestDomain + "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif", RedirectReason: "Group Email Open hit, redirecting to a dummy image", IsPageNotFound: false, allowDebugMessage: false);
                     }
                 }
             } catch (Exception ex) {

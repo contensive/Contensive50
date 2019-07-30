@@ -174,7 +174,7 @@ namespace Contensive.Addons.AdminSite {
                     ColWidth = new string[ColumnCnt + 1];
                     Cells = new string[PageSize + 1, ColumnCnt + 1];
                     //
-                    ColCaption[ColumnPtr] = "Select<br><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=10 height=1>";
+                    ColCaption[ColumnPtr] = "Select<br><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=10 height=1>";
                     ColAlign[ColumnPtr] = "center";
                     ColWidth[ColumnPtr] = "10";
                     ColumnPtr = ColumnPtr + 1;
@@ -184,17 +184,17 @@ namespace Contensive.Addons.AdminSite {
                     ColWidth[ColumnPtr] = "100%";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    ColCaption[ColumnPtr] = "Created By<br><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=100 height=1>";
+                    ColCaption[ColumnPtr] = "Created By<br><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=100 height=1>";
                     ColAlign[ColumnPtr] = "left";
                     ColWidth[ColumnPtr] = "100";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    ColCaption[ColumnPtr] = "Date Created<br><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=150 height=1>";
+                    ColCaption[ColumnPtr] = "Date Created<br><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=150 height=1>";
                     ColAlign[ColumnPtr] = "left";
                     ColWidth[ColumnPtr] = "150";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    //ColCaption(ColumnPtr) = "?<br><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=100 height=1>"
+                    //ColCaption(ColumnPtr) = "?<br><img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=100 height=1>"
                     //ColAlign(ColumnPtr) = "Left"
                     //ColWidth(ColumnPtr) = "100"
                     //ColumnPtr = ColumnPtr + 1
@@ -243,7 +243,7 @@ namespace Contensive.Addons.AdminSite {
                     Tab1.Add("<td>" + HtmlController.inputText(core, SQLFieldName, "", 8, 40) + "</td>");
                     Tab1.Add("</tr>");
                     //
-                    Tab1.Add("<tr><td width=\"120\"><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"120\" height=\"1\"></td><td width=\"100%\">&nbsp;</td></tr></table>");
+                    Tab1.Add("<tr><td width=\"120\"><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=\"120\" height=\"1\"></td><td width=\"100%\">&nbsp;</td></tr></table>");
                     //
                     // Build and add tabs
                     //

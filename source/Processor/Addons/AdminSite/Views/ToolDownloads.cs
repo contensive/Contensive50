@@ -163,7 +163,7 @@ namespace Contensive.Addons.AdminSite {
                     string[,] Cells = new string[PageSize + 1, ColumnCnt + 1];
                     int ColumnPtr = 0;
                     //
-                    ColCaption[ColumnPtr] = "Select<br><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=10 height=1>";
+                    ColCaption[ColumnPtr] = "Select<br><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=10 height=1>";
                     ColAlign[ColumnPtr] = "center";
                     ColWidth[ColumnPtr] = "10";
                     ColumnPtr = ColumnPtr + 1;
@@ -173,17 +173,17 @@ namespace Contensive.Addons.AdminSite {
                     ColWidth[ColumnPtr] = "100%";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    ColCaption[ColumnPtr] = "For<br><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=100 height=1>";
+                    ColCaption[ColumnPtr] = "For<br><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=100 height=1>";
                     ColAlign[ColumnPtr] = "left";
                     ColWidth[ColumnPtr] = "100";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    ColCaption[ColumnPtr] = "Requested<br><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=150 height=1>";
+                    ColCaption[ColumnPtr] = "Requested<br><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=150 height=1>";
                     ColAlign[ColumnPtr] = "left";
                     ColWidth[ColumnPtr] = "150";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    ColCaption[ColumnPtr] = "File<br><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=100 height=1>";
+                    ColCaption[ColumnPtr] = "File<br><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=100 height=1>";
                     ColAlign[ColumnPtr] = "Left";
                     ColWidth[ColumnPtr] = "100";
                     ColumnPtr = ColumnPtr + 1;
@@ -216,7 +216,7 @@ namespace Contensive.Addons.AdminSite {
                                 if (DateCompleted == DateTime.MinValue) {
                                     string RemoteKey = RemoteQueryController.main_GetRemoteQueryKey(core, "select DateCompleted,filename,resultMessage from cctasks where id=" + RecordID, "default", 1);
                                     Cell = "";
-                                    Cell = Cell + Environment.NewLine + "<div id=\"pending" + RowPointer + "\">Pending <img src=\"/ContensiveBase/images/ajax-loader-small.gif\" width=16 height=16></div>";
+                                    Cell = Cell + Environment.NewLine + "<div id=\"pending" + RowPointer + "\">Pending <img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ajax-loader-small.gif\" width=16 height=16></div>";
                                     //
                                     Cell = Cell + Environment.NewLine + "<script>";
                                     Cell = Cell + Environment.NewLine + "function statusHandler" + RowPointer + "(results) {";
@@ -280,7 +280,7 @@ namespace Contensive.Addons.AdminSite {
                     //        '
                     //        Call Tab1.Add("" _
                     //            & "<tr>" _
-                    //            & "<td width=""120""><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""120"" height=""1""></td>" _
+                    //            & "<td width=""120""><img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=""120"" height=""1""></td>" _
                     //            & "<td width=""100%"">&nbsp;</td>" _
                     //            & "</tr>" _
                     //            & "</table>")

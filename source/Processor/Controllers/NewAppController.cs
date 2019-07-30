@@ -431,7 +431,7 @@ namespace Contensive.Processor.Controllers {
         private static void verifyLibraryFileTypes(CoreController core) {
             try {
                 //
-                // Load basic records -- default images are handled in the REsource Library through the /ContensiveBase/config/DefaultValues.txt GetDefaultValue(key) mechanism
+                // Load basic records -- default images are handled in the REsource Library through the https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/config/DefaultValues.txt GetDefaultValue(key) mechanism
                 if (MetadataController.getRecordIdByUniqueName(core, "Library File Types", "Image") == 0) {
                     verifyRecord(core, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'");
                     verifyRecord(core, "Library File Types", "Image", "IsImage", "1");

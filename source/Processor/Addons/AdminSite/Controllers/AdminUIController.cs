@@ -480,8 +480,8 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 + "<table border=0 cellpadding=3 cellspacing=0 width=\"100%\">"
                     + innerHtml
                     + "<tr>"
-                        + "<td width=20%><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=1 ></td>"
-                        + "<td width=80%><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=1 ></td>"
+                        + "<td width=20%><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=\"100%\" height=1 ></td>"
+                        + "<td width=80%><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=\"100%\" height=1 ></td>"
                     + "</tr>"
                 + "</table>";
         }
@@ -542,13 +542,13 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     case SortingStateEnum.SortableSetza: {
                             string QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
                             QS = GenericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
-                            Copy = "<a href=\"?" + QS + "\" title=\"Sort A-Z\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"/ContensiveBase/images/arrowup.gif\" width=8 height=8 border=0></a>";
+                            Copy = "<a href=\"?" + QS + "\" title=\"Sort A-Z\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/arrowup.gif\" width=8 height=8 border=0></a>";
                             break;
                         }
                     case SortingStateEnum.SortableSetAZ: {
                             string QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetza).ToString(), true);
                             QS = GenericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
-                            Copy = "<a href=\"?" + QS + "\" title=\"Sort Z-A\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"/ContensiveBase/images/arrowdown.gif\" width=8 height=8 border=0></a>";
+                            Copy = "<a href=\"?" + QS + "\" title=\"Sort Z-A\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/arrowdown.gif\" width=8 height=8 border=0></a>";
                             break;
                         }
                 }

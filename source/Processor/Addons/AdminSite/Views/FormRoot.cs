@@ -88,7 +88,7 @@ namespace Contensive.Addons.AdminSite {
                     // Nothing Displayed, show default root page
                     //
                     returnHtml = returnHtml + Environment.NewLine + "<div style=\"padding:20px;height:450px\">"
-                    + Environment.NewLine + "<div><a href=http://www.Contensive.com target=_blank><img style=\"border:1px solid #000;\" src=\"/ContensiveBase/images/ContensiveAdminLogo.GIF\" border=0 ></A></div>"
+                    + Environment.NewLine + "<div><a href=http://www.Contensive.com target=_blank><img style=\"border:1px solid #000;\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ContensiveAdminLogo.GIF\" border=0 ></A></div>"
                     + Environment.NewLine + "<div><strong>Contensive/" + core.codeVersion() + "</strong></div>"
                     + Environment.NewLine + "<div style=\"clear:both;height:18px;margin-top:10px\"><div style=\"float:left;width:200px;\">Domain Name</div><div style=\"float:left;\">" + core.webServer.requestDomain + "</div></div>"
                     + Environment.NewLine + "<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Login Member Name</div><div style=\"float:left;\">" + core.session.user.name + "</div></div>"

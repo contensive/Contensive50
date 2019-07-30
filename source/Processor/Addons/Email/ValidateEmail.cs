@@ -54,7 +54,7 @@ namespace Contensive.Addons.Primitives {
                                     };
                                 }
                             }
-                            return core.webServer.redirect(core.webServer.requestProtocol + core.webServer.requestDomain + "/ContensiveBase/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.");
+                            return core.webServer.redirect(core.webServer.requestProtocol + core.webServer.requestDomain + "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.");
                         }
                     }
                 }

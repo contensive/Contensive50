@@ -155,7 +155,7 @@ namespace Contensive.Processor.Controllers {
         //
         public string loginIconFilename {
             get {
-                return textPropertyBase("LoginIconFilename", "/ContensiveBase/images/ccLibLogin.GIF", ref _LoginIconFilename);
+                return textPropertyBase("LoginIconFilename", "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ccLibLogin.GIF", ref _LoginIconFilename);
             }
         }
         private string _LoginIconFilename = null;

@@ -72,8 +72,8 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("</tr>");
                 //
                 Stream.Add("<tr>");
-                Stream.Add("<td width=\"150\"><IMG alt=\"\" src=\"/ContensiveBase/Images/spacer.gif\" width=\"150\" height=\"1\"></td>");
-                Stream.Add("<td width=\"99%\"><IMG alt=\"\" src=\"/ContensiveBase/Images/spacer.gif\" width=\"100%\" height=\"1\"></td>");
+                Stream.Add("<td width=\"150\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"150\" height=\"1\"></td>");
+                Stream.Add("<td width=\"99%\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"100%\" height=\"1\"></td>");
                 Stream.Add("</tr>");
                 Stream.Add("</TABLE>");
                 Stream.Add("</form>");

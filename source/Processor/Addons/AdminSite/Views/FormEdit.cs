@@ -970,15 +970,15 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         return_NewFieldList += "," + field.nameLc;
                                         EditorString = ""
-                                            + HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"/ContensiveBase/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
-                                            + "&nbsp;<a href=\"#\" onClick=\"OpenSiteExplorerWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"/ContensiveBase/images/PageLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a page\" title=\"Link to a page\"></a>";
+                                            + HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
+                                            + "&nbsp;<a href=\"#\" onClick=\"OpenSiteExplorerWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/PageLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a page\" title=\"Link to a page\"></a>";
                                         break;
                                     case CPContentBaseClass.fileTypeIdEnum.ResourceLink:
                                         //
                                         // ----- Resource Link (src value)
                                         //
                                         return_NewFieldList += "," + field.nameLc;
-                                        EditorString = HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"/ContensiveBase/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
+                                        EditorString = HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
                                         break;
                                     case CPContentBaseClass.fileTypeIdEnum.HTML:
                                     case CPContentBaseClass.fileTypeIdEnum.FileHTML:
@@ -1123,9 +1123,9 @@ namespace Contensive.Addons.AdminSite {
                             + "'onStart':function(){cj.ajax.qs('" + AjaxQS + "','','" + fancyBoxContentId + "')}"
                             + "});";
                         EditorHelp = EditorHelp + "\r<div style=\"float:right;\">"
-                            + cr2 + "<a id=\"" + fancyBoxLinkId + "\" href=\"#" + fancyBoxContentId + "\" title=\"select an alternate editor for this field.\" tabindex=\"-1\"><img src=\"/ContensiveBase/images/NavAltEditor.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"select an alternate editor for this field.\"></a>"
+                            + cr2 + "<a id=\"" + fancyBoxLinkId + "\" href=\"#" + fancyBoxContentId + "\" title=\"select an alternate editor for this field.\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAltEditor.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"select an alternate editor for this field.\"></a>"
                             + cr2 + "<div style=\"display:none;\">"
-                            + cr3 + "<div class=\"ccEditorPreferenceCon\" id=\"" + fancyBoxContentId + "\"><div style=\"margin:20px auto auto auto;\"><img src=\"/ContensiveBase/images/ajax-loader-big.gif\" width=\"32\" height=\"32\"></div></div>"
+                            + cr3 + "<div class=\"ccEditorPreferenceCon\" id=\"" + fancyBoxContentId + "\"><div style=\"margin:20px auto auto auto;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ajax-loader-big.gif\" width=\"32\" height=\"32\"></div></div>"
                             + cr2 + "</div>"
                             + "\r</div>"
                             + "";
@@ -1141,7 +1141,7 @@ namespace Contensive.Addons.AdminSite {
                                 HelpMsgDefault = "Admin: No default help is available for this field.";
                             }
                             HelpMsgOpenedRead = ""
-                                    + "<!-- close icon --><div class=\"\" style=\"float:right\"><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedID + "');\"><img src=\"/ContensiveBase/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"close\"></a></div>"
+                                    + "<!-- close icon --><div class=\"\" style=\"float:right\"><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedID + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"close\"></a></div>"
                                     + "<div class=\"header\">Default Help</div>"
                                     + "<div class=\"body\">" + HelpMsgDefault + "</div>"
                                     + "<div class=\"header\">Custom Help</div>"
@@ -1163,22 +1163,22 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // Long help, closed gets MoreHelpIcon (opens to HelpMsgOpenedRead) and HelpEditIcon (opens to readonly default copy plus editor with custom copy)
                                 HelpMsgClosed = ""
-                                        + "<!-- open read icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedReadID + "');\" tabindex=\"-1\"><img src=\"/ContensiveBase/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"more help\"></a></div>"
-                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedEditID + "');\" tabindex=\"-1\"><img src=\"/ContensiveBase/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
+                                        + "<!-- open read icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedReadID + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"more help\"></a></div>"
+                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedEditID + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
                                         + "<div id=\"" + HelpClosedContentID + "\">" + HelpMsgClosed + "</div>"
                                     + "";
                             } else if (!IsEmptyHelp) {
                                 //
                                 // short help, closed gets helpmsgclosed + HelpEditIcon (opens to readonly default copy plus editor with custom copy)
                                 HelpMsgClosed = ""
-                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedEditID + "');\" tabindex=\"-1\"><img src=\"/ContensiveBase/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
+                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedEditID + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
                                         + "<div id=\"" + HelpClosedContentID + "\">" + HelpMsgClosed + "</div>"
                                     + "";
                             } else {
                                 //
                                 // Empty help, closed gets helpmsgclosed + HelpEditIcon (opens to readonly default copy plus editor with custom copy)
                                 HelpMsgClosed = ""
-                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedEditID + "');\" tabindex=\"-1\"><img src=\"/ContensiveBase/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
+                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedEditID + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
                                         + "<div id=\"" + HelpClosedContentID + "\">" + HelpMsgClosed + "</div>"
                                     + "";
                             }
@@ -1191,7 +1191,7 @@ namespace Contensive.Addons.AdminSite {
                             // Non-admin view
                             HelpMsgOpenedRead = ""
                                     + "<div class=\"body\">"
-                                    + "<!-- close icon --><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedID + "');\"><img src=\"/ContensiveBase/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right\" title=\"close\"></a>"
+                                    + "<!-- close icon --><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedID + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right\" title=\"close\"></a>"
                                     + HelpMsg + "</div>"
                                 + "";
                             HelpMsgOpenedEdit = ""
@@ -1201,7 +1201,7 @@ namespace Contensive.Addons.AdminSite {
                                 // Long help
                                 HelpMsgClosed = ""
                                     + "<div class=\"body\">"
-                                    + "<!-- open read icon --><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedReadID + "');\"><img src=\"/ContensiveBase/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right;\" title=\"more help\"></a>"
+                                    + "<!-- open read icon --><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedReadID + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right;\" title=\"more help\"></a>"
                                     + HelpMsgClosed + "</div>"
                                     + "";
                             } else if (!IsEmptyHelp) {
