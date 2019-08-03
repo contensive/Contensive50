@@ -1,20 +1,10 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
 using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-//
-//using Microsoft.Web.Administration;
 using Contensive.Processor.Models.Domain;
 using Microsoft.Web.Administration;
 using Contensive.Processor.Exceptions;
@@ -35,19 +25,43 @@ namespace Contensive.Processor.Controllers {
         //
         private CoreController core;
         //
-        // if this instance is a webRole, retain pointer for callbacks
-        //
+        /// <summary>
+        /// if this instance is a webRole, retain pointer for callbacks
+        /// </summary>
         public System.Web.HttpContext iisContext;
         //
-        // -- Buffer request data
+        // todo - create request domain model with constructor for both web-driven and non-web-driven environments
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// request port
+        /// </summary>
+        public int requestPort {
+            get {
+                if (_requestPort == null) {
+                    _requestPort = iisContext.Request.Url.Port;
+                }
+                return (int)_requestPort;
+            }
+        }
+        private int? _requestPort = null;
+        //
+        // ====================================================================================================
         /// <summary>
         /// The path and page of the current request, without the leading slash which comes from the appRootPath
         /// </summary>
         public string requestPathPage {
             get {
-                return (core.webServer.serverEnvironment.ContainsKey("SCRIPT_NAME")) ? core.webServer.serverEnvironment["SCRIPT_NAME"] : "";
+                if (string.IsNullOrEmpty(_requestPathPage)) {
+                    _requestPathPage = (core.webServer.serverEnvironment.ContainsKey("SCRIPT_NAME")) ? core.webServer.serverEnvironment["SCRIPT_NAME"] : "";
+                }
+                return _requestPathPage ;
             }
         }
+        private string _requestPathPage = null;
+        //
+        // ====================================================================================================
+        // todo convert request variables on-demand pattern.
         /// <summary>
         /// The refering URL
         /// </summary>
@@ -56,6 +70,8 @@ namespace Contensive.Processor.Controllers {
                 return (core.webServer.serverEnvironment.ContainsKey("HTTP_REFERER")) ? core.webServer.serverEnvironment["HTTP_REFERER"] : "";
             }
         }
+        //
+        // ====================================================================================================
         /// <summary>
         /// The domain part of the current request URL
         /// </summary>
@@ -64,6 +80,8 @@ namespace Contensive.Processor.Controllers {
                 return (core.webServer.serverEnvironment.ContainsKey("SERVER_NAME")) ? core.webServer.serverEnvironment["SERVER_NAME"] : "";
             }
         }
+        //
+        // ====================================================================================================
         /// <summary>
         /// true if the current request is secure
         /// </summary>
@@ -72,6 +90,8 @@ namespace Contensive.Processor.Controllers {
                 return (core.webServer.serverEnvironment.ContainsKey("SERVER_PORT_SECURE")) ? encodeBoolean(core.webServer.serverEnvironment["SERVER_PORT_SECURE"]) : false;
             }
         }
+        //
+        // ====================================================================================================
         /// <summary>
         /// Legacy property - user's IP
         /// </summary>
@@ -80,6 +100,8 @@ namespace Contensive.Processor.Controllers {
                 return (core.webServer.serverEnvironment.ContainsKey("REMOTE_ADDR")) ? core.webServer.serverEnvironment["REMOTE_ADDR"] : "";
             }
         }
+        //
+        // ====================================================================================================
         /// <summary>
         /// Legacy property - the browser
         /// </summary>
@@ -88,49 +110,159 @@ namespace Contensive.Processor.Controllers {
                 return (core.webServer.serverEnvironment.ContainsKey("HTTP_USER_AGENT")) ? core.webServer.serverEnvironment["HTTP_USER_AGENT"] : "";
             }
         }
+        //
+        // ====================================================================================================
         /// <summary>
         /// The QueryString of the current URI
         /// </summary>
         public string requestQueryString { get; set; } = "";
-
-        public string requestUrlSource { get; set; } = "";
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// The url as it was requested. if the url is a route, this is the original route call and requestUrl is the path it is routed to.
+        /// </summary>
+        public string requestUrlSource {
+            get {
+                if (_requestUrlSource == null ) {
+                    _requestUrlSource = iisContext.Request.Url.AbsoluteUri;
+                    //_requestUrlSource = "http://";
+                    //if (requestSecure) {
+                    //    _requestUrlSource = "https://";
+                    //}
+                    //_requestUrlSource += requestDomain + requestPathPage;
+                    //if (requestQueryString != "") {
+                    //    _requestUrlSource += "?" + requestQueryString;
+                    //}
+                }
+                return _requestUrlSource;
+            }
+        }
+        private string _requestUrlSource = null;
+        //
+        // ====================================================================================================
+        //
         public string linkForwardSource { get; set; } = ""; // main_ServerPathPage -- set during init
+        //
+        // ====================================================================================================
+        //
         public string linkForwardError { get; set; } = ""; // always 404
+        //
+        // ====================================================================================================
+        //
         public bool pageExcludeFromAnalytics { get; set; } = false; // For this page - true for remote methods and ajax
+        //
+        // ====================================================================================================
+        //
         public int memberAction { get; set; } = 0; // action to be performed during init
+        //
+        // ====================================================================================================
+        //
         public string adminMessage { get; set; } = ""; // For more information message
+        //
+        // ====================================================================================================
+        //
         public string requestPageReferer { get; set; } = ""; // replaced by main_ServerReferrer
+        //
+        // ====================================================================================================
+        //
         public string requestReferer { get; set; } = "";
-        public string serverFormActionURL { get; set; } = ""; // The Action for all internal forms, if not set, default
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// The Action for all internal forms, if not set, default
+        /// </summary>
+        public string serverFormActionURL {
+            get {
+                if (string.IsNullOrEmpty(_serverFormActionURL)) {
+                    _serverFormActionURL = requestUrl;
+                }
+                return _serverFormActionURL;
+            }
+            set {
+                _serverFormActionURL = value;
+            }
+        }
+        private string _serverFormActionURL = null;
+        //
+        // ====================================================================================================
+        //
         public string requestContentWatchPrefix { get; set; } = ""; // The different between the URL and the main_ContentWatch Pathpage
+        //
+        // ====================================================================================================
         /// <summary>
         /// The protocol used in the current quest
         /// </summary>
-        public string requestProtocol { get; set; } = "";
+        public string requestProtocol {
+            get {
+                if (requestSecure) return "https://";
+                return "http://";
+            }
+        }
+        //
+        // ====================================================================================================
         /// <summary>
-        /// The requesting URL, from protocol to end of quesrystring
+        /// The executed script. If the url is a route, requestUrlSource is the route and requestUrl is the script page that was run
         /// </summary>
-        public string requestUrl { get; set; } = "";
+        public string requestUrl {
+            get {
+                if (string.IsNullOrEmpty(_requestUrl)) {
+                    _requestUrl = requestProtocol 
+                        + requestDomain 
+                        + ((requestPort==80)?"":":" + requestPort) 
+                        + requestPath 
+                        + requestPage 
+                        + ((string.IsNullOrWhiteSpace(requestQueryString)) ? "" : "?" + requestQueryString);
+                }
+                return _requestUrl;
+            }
+        }
+        private string _requestUrl = null;
+        //
+        // ====================================================================================================
         /// <summary>
         /// The path between the requestDomain and the requestPage. NOTE - breaking change: this used to follow appRootPath and never started with /
         /// </summary>
         public string requestPath { get; set; } = "";
+        //
+        // ====================================================================================================
         /// <summary>
         /// The page or script name, typicall index.html or default.aspx or myPage.aspx
         /// </summary>
         public string requestPage { get; set; } = "";
-        public string requestSecureURLRoot { get; set; } = ""; // The URL to the root of the secure area for this site
-                                                               //
-                                                               // -- response
-        public bool response_NoFollow { get; set; } = false; // when set, Meta no follow is added
-                                                             //
-                                                             // -- Buffer responses
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// The URL to the root of the secure area for this site
+        /// </summary>
+        public string requestSecureURLRoot { get; set; } = "";
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// when set, Meta no follow is added
+        /// </summary>
+        public bool response_NoFollow { get; set; } = false;
+        //
+        // ====================================================================================================
+        //
         public string bufferRedirect { get; set; } = "";
+        //
+        // ====================================================================================================
+        //
         public string bufferContentType { get; set; } = "";
+        //
+        // ====================================================================================================
+        //
         public string bufferCookies { get; set; } = "";
+        //
+        // ====================================================================================================
+        //
         public string bufferResponseHeader { get; set; } = "";
+        //
+        // ====================================================================================================
+        //
         public string bufferResponseStatus { get; set; } = "";
-        //------------------------------------------------------------------------
+        //
+        // ====================================================================================================
         //
         //   QueryString, Form and cookie Processing variables
         public class CookieClass {
@@ -138,25 +270,36 @@ namespace Contensive.Processor.Controllers {
             public string value;
         }
         public Dictionary<string, CookieClass> requestCookies;
+        //
+        // ====================================================================================================
         /// <summary>
         /// The body of the request
         /// </summary>
         public string requestBody;
+        //
+        // ====================================================================================================
         /// <summary>
         /// The content type of the request
         /// </summary>
         public string requestContentType;
         //
+        // ====================================================================================================
+        //
         public Dictionary<string, string> requestHeaders { get; set; } = new Dictionary<string, string>();
+        //
+        // ====================================================================================================
         //
         public Dictionary<string, string> requestForm { get; set; } = new Dictionary<string, string>();
         //
+        // ====================================================================================================
+        //
         public Dictionary<string, string> requestQuery { get; set; } = new Dictionary<string, string>();
+        //
+        // ====================================================================================================
         //
         public Dictionary<string, string> serverEnvironment { get; set; } = new Dictionary<string, string>();
         //
-        //
-        //====================================================================================================
+        // ====================================================================================================
         //
         public WebServerController(CoreController core) : base() {
             this.core = core;
@@ -274,7 +417,7 @@ namespace Contensive.Processor.Controllers {
         public bool initWebContext(System.Web.HttpContext httpContext) {
             try {
                 //
-                // -- setup IIS Response
+                // -- setup IIS default Response
                 iisContext = httpContext;
                 iisContext.Response.CacheControl = "no-cache";
                 iisContext.Response.Expires = -1;
@@ -397,26 +540,9 @@ namespace Contensive.Processor.Controllers {
                     linkForwardSource = "";
                     linkForwardError = "";
                     //
-                    // start with the best guess for the source url, then improve the guess based on what iis might have done
-                    //
-                    requestUrlSource = "http://";
-                    if (requestSecure) {
-                        requestUrlSource = "https://";
-                    }
-                    requestUrlSource = requestUrlSource + requestDomain + requestPathPage;
-                    if (requestQueryString != "") {
-                        requestUrlSource = requestUrlSource + "?" + requestQueryString;
-                    }
-                    //
                     // Other Server variables
                     requestReferer = requestReferrer;
                     requestPageReferer = requestReferrer;
-                    //
-                    if (requestSecure) {
-                        requestProtocol = "https://";
-                    } else {
-                        requestProtocol = "http://";
-                    }
                     //
                     core.doc.blockExceptionReporting = false;
                     //
@@ -465,6 +591,7 @@ namespace Contensive.Processor.Controllers {
                             newDomain.pageNotFoundPageId = 0;
                             newDomain.forwardDomainId = 0;
                             newDomain.defaultRouteId = core.siteProperties.getInteger("");
+                            newDomain.save(core);
                             core.domainDictionary.Add(domain.ToLowerInvariant(), newDomain);
                             updateDomainCache = true;
                         }
@@ -510,6 +637,10 @@ namespace Contensive.Processor.Controllers {
                             defaultTemplateId = core.domain.defaultTemplateId,
                             pageNotFoundPageId = core.domain.pageNotFoundPageId
                         };
+                        //
+                        // todo - would prefer not save new template
+                        // -- fix, must save or template selection fails.
+                        domain.save(core);
                         core.domain.id = domain.id;
                     }
                     if (!core.domain.visited) {
@@ -554,6 +685,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     //
+                    // todo - CORS cannot be generated dynamically because info http method does not execute code
                     // -- add default CORS headers to approved domains
                     Uri originUri = httpContext.Request.UrlReferrer;
                     if ( originUri != null ) {
@@ -587,24 +719,10 @@ namespace Contensive.Processor.Controllers {
                     }
                     requestSecureURLRoot = "https://" + requestDomain + "/";
                     //
-                    // ----- Create Server Link property
-                    //
-                    requestUrl = requestProtocol + requestDomain + requestPath + requestPage;
-                    if (requestQueryString != "") {
-                        requestUrl = requestUrl + "?" + requestQueryString;
-                    }
-                    if (requestUrlSource == "") {
-                        requestUrlSource = requestUrl;
-                    }
-                    //
                     // ----- Style tag
                     adminMessage = "For more information, please contact the <a href=\"mailto:" + core.siteProperties.emailAdmin + "?subject=Re: " + requestDomain + "\">Site Administrator</A>.";
                     //
-                    requestUrl = requestProtocol + requestDomain + requestPath + requestPage;
-                    if (requestQueryString != "") {
-                        requestUrl = requestUrl + "?" + requestQueryString;
-                    }
-                    //
+                    // todo ???? this is always false
                     if (requestDomain.ToLowerInvariant() != GenericController.vbLCase(requestDomain)) {
                         string Copy = "Redirecting to domain [" + requestDomain + "] because this site is configured to run on the current domain [" + requestDomain + "]";
                         if (requestQueryString != "") {

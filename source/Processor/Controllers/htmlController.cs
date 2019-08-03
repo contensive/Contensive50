@@ -2875,15 +2875,15 @@ namespace Contensive.Processor.Controllers {
                     headList.Add(Environment.NewLine + "<meta name=\"robots\" content=\"nofollow\" >");
                     headList.Add(Environment.NewLine + "<meta name=\"mssmarttagspreventparsing\" content=\"true\" >");
                 }
-                //
-                // -- base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
-                if (!string.IsNullOrEmpty(core.webServer.serverFormActionURL)) {
-                    string BaseHref = core.webServer.serverFormActionURL;
-                    if (!string.IsNullOrEmpty(core.doc.refreshQueryString)) {
-                        BaseHref += "?" + core.doc.refreshQueryString;
-                    }
-                    headList.Add(Environment.NewLine + "<base href=\"" + BaseHref + "\" >");
-                }
+                ////
+                //// -- base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
+                //if (!string.IsNullOrEmpty(core.webServer.serverFormActionURL)) {
+                //    string BaseHref = core.webServer.serverFormActionURL;
+                //    if (!string.IsNullOrEmpty(core.doc.refreshQueryString)) {
+                //        BaseHref += "?" + core.doc.refreshQueryString;
+                //    }
+                //    headList.Add(Environment.NewLine + "<base href=\"" + BaseHref + "\" >");
+                //}
                 //
                 // -- css and js
                 // -- only select assets with .inHead, which includes those whose depencies are .inHead
