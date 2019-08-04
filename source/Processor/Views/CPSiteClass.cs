@@ -237,21 +237,21 @@ namespace Contensive.Processor {
             return cp.core.siteProperties.getNumber(propertyName, GenericController.encodeNumber(DefaultValue));
         }
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
         public override string PhysicalFilePath {
             get {
                 return cp.core.cdnFiles.localAbsRootPath;
             }
         }
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
         public override string PhysicalInstallPath {
             get {
                 return cp.core.privateFiles.localAbsRootPath;
             }
         }
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
         public override string PhysicalWWWPath {
             get {
                 return cp.core.wwwFiles.localAbsRootPath;

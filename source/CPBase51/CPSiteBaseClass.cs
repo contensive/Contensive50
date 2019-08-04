@@ -219,13 +219,13 @@ namespace Contensive.BaseClasses {
         [Obsolete("Deprecated", false)]
         public abstract bool MultiDomainMode { get; }
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
         public abstract string PhysicalFilePath { get; }
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
         public abstract string PhysicalInstallPath { get; }
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
         public abstract string PhysicalWWWPath { get; }
         //
         // 20151121 - not needed, removed to resolve compile issue with com compatibility
