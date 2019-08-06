@@ -423,6 +423,18 @@ namespace Contensive.Processor {
         }
         private CPHtml5Class _html5Obj;
         //
+        //====================================================================================================
+        public override CPLogBaseClass Log {
+            get {
+                if (_LogObj == null) {
+                    _LogObj = new CPLogClass(this);
+                }
+                return _LogObj;
+            }
+        }
+        private CPLogClass _LogObj;
+
+        //
         [Obsolete("Deprecated. To access addon details of the addon running, create a model with the cp.addon.id",true)]
         public override CPAddonBaseClass MyAddon {
             get {

@@ -18,32 +18,32 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public static class LogController {
         //
-        public enum LogLevel {
-            /// <summary>
-            /// Begin method X, end method X etc
-            /// </summary>
-            Trace = 0,
-            /// <summary>
-            /// Executed queries, user authenticated, session expired
-            /// </summary>
-            Debug = 1,
-            /// <summary>
-            /// Normal behavior like mail sent, user updated profile etc.
-            /// </summary>
-            Info = 2,
-            /// <summary>
-            /// Incorrect behavior but the application can continue
-            /// </summary>
-            Warn = 3,
-            /// <summary>
-            /// For example application crashes / exceptions.
-            /// </summary>
-            Error = 4,
-            /// <summary>
-            /// Highest level: important stuff down
-            /// </summary>
-            Fatal = 5
-        }
+        //public enum LogLevel {
+        //    /// <summary>
+        //    /// Begin method X, end method X etc
+        //    /// </summary>
+        //    Trace = 0,
+        //    /// <summary>
+        //    /// Executed queries, user authenticated, session expired
+        //    /// </summary>
+        //    Debug = 1,
+        //    /// <summary>
+        //    /// Normal behavior like mail sent, user updated profile etc.
+        //    /// </summary>
+        //    Info = 2,
+        //    /// <summary>
+        //    /// Incorrect behavior but the application can continue
+        //    /// </summary>
+        //    Warn = 3,
+        //    /// <summary>
+        //    /// For example application crashes / exceptions.
+        //    /// </summary>
+        //    Error = 4,
+        //    /// <summary>
+        //    /// Highest level: important stuff down
+        //    /// </summary>
+        //    Fatal = 5
+        //}
         //
         //=============================================================================
         /// <summary>
@@ -74,7 +74,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logDebug(CoreController core, string message) => log(core, message, LogLevel.Debug);
+        public static void logDebug(CoreController core, string message) => log(core, message, BaseClasses.CPLogBaseClass.LogLevel.Debug);
         //
         //=============================================================================
         /// <summary>
@@ -83,7 +83,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logError(CoreController core, string message) => log(core, message, LogLevel.Error);
+        public static void logError(CoreController core, string message) => log(core, message, BaseClasses.CPLogBaseClass.LogLevel.Error);
         //
         //=============================================================================
         /// <summary>
@@ -92,7 +92,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logFatal(CoreController core, string message) => log(core, message, LogLevel.Fatal);
+        public static void logFatal(CoreController core, string message) => log(core, message, BaseClasses.CPLogBaseClass.LogLevel.Fatal);
         //
         //=============================================================================
         /// <summary>
@@ -101,7 +101,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logInfo(CoreController core, string message) => log(core, message, LogLevel.Info);
+        public static void logInfo(CoreController core, string message) => log(core, message, BaseClasses.CPLogBaseClass.LogLevel.Info);
         //
         //=============================================================================
         /// <summary>
@@ -110,7 +110,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logTrace(CoreController core, string message) => log(core, message, LogLevel.Trace);
+        public static void logTrace(CoreController core, string message) => log(core, message, BaseClasses.CPLogBaseClass.LogLevel.Trace);
         //
         //=============================================================================
         /// <summary>
@@ -119,7 +119,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logWarn(CoreController core, string message) => log(core, message, LogLevel.Warn);
+        public static void logWarn(CoreController core, string message) => log(core, message, BaseClasses.CPLogBaseClass.LogLevel.Warn);
         //
         //=============================================================================
         /// <summary>
@@ -128,28 +128,28 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="messageLine"></param>
         /// <param name="level"></param>
-        public static void logRaw(string messageLine, LogLevel level) {
+        public static void logRaw(string messageLine, BaseClasses.CPLogBaseClass.LogLevel level) {
             try {
                 //
                 // -- decouple NLog types from internal enum
                 NLog.LogLevel nLogLevel = NLog.LogLevel.Info;
                 switch (level) {
-                    case LogLevel.Trace:
+                    case BaseClasses.CPLogBaseClass.LogLevel.Trace:
                         nLogLevel = NLog.LogLevel.Trace;
                         break;
-                    case LogLevel.Debug:
+                    case BaseClasses.CPLogBaseClass.LogLevel.Debug:
                         nLogLevel = NLog.LogLevel.Debug;
                         break;
-                    case LogLevel.Info:
+                    case BaseClasses.CPLogBaseClass.LogLevel.Info:
                         nLogLevel = NLog.LogLevel.Info;
                         break;
-                    case LogLevel.Warn:
+                    case BaseClasses.CPLogBaseClass.LogLevel.Warn:
                         nLogLevel = NLog.LogLevel.Warn;
                         break;
-                    case LogLevel.Error:
+                    case BaseClasses.CPLogBaseClass.LogLevel.Error:
                         nLogLevel = NLog.LogLevel.Error;
                         break;
-                    case LogLevel.Fatal:
+                    case BaseClasses.CPLogBaseClass.LogLevel.Fatal:
                         nLogLevel = NLog.LogLevel.Fatal;
                         break;
                 }
@@ -173,13 +173,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <param name="level"></param>
-        public static void log(CoreController core, string message, LogLevel level) {
+        public static void log(CoreController core, string message, BaseClasses.CPLogBaseClass.LogLevel level) {
             string messageLine = getMessageLine(core, message);
             logRaw(messageLine, level);
             //
             // add to doc exception list to display at top of webpage
             //
-            if (level < LogLevel.Warn) { return; }
+            if (level < BaseClasses.CPLogBaseClass.LogLevel.Warn) { return; }
             if (core.doc.errorList == null) { core.doc.errorList = new List<string>(); }
             if (core.doc.errorList.Count < 10) {
                 core.doc.errorList.Add(messageLine);
@@ -191,37 +191,37 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public static void logError(CoreController core, Exception ex, string cause) {
-            log(core, cause + ", exception [" + ex.ToString() + "]", LogLevel.Error);
+            log(core, cause + ", exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
         }
         //
         //====================================================================================================
         //
         public static void logError(CoreController core, Exception ex) {
-            log(core, "exception [" + ex.ToString() + "]", LogLevel.Error);
+            log(core, "exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
         }
         //
         //====================================================================================================
         //
         public static void logWarn(CoreController core, Exception ex, string cause) {
-            log(core, cause + ", exception [" + ex.ToString() + "]", LogLevel.Warn);
+            log(core, cause + ", exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Warn);
         }
         //
         //====================================================================================================
         //
         public static void logWarn(CoreController core, Exception ex) {
-            log(core, "exception [" + ex.ToString() + "]", LogLevel.Warn);
+            log(core, "exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Warn);
         }
         //
         //====================================================================================================
         //
         public static void logFatal(CoreController core, Exception ex, string cause) {
-            log(core, cause + ", exception [" + ex.ToString() + "]", LogLevel.Fatal);
+            log(core, cause + ", exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
         }
         //
         //====================================================================================================
         //
         public static void logFatal(CoreController core, Exception ex) {
-            log(core, "exception [" + ex.ToString() + "]", LogLevel.Fatal);
+            log(core, "exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
         }
         //
         //=====================================================================================================

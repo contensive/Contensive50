@@ -12,6 +12,24 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Contensive version
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract string Version { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The addon class handles access to an add-on's features. Use the Utils object to run an cpcore.addon. An instance of the Addon class is passed to the executing addon in the MyAddon object so it can access any features needed. See the CPAddonBaseClass for more details.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract CPAddonBaseClass Addon { get; }
+        //
+        //====================================================================================================
+        /// <summary>
         /// Construct new Block object. See CPBlockBaseClass for Block Details
         /// </summary>
         /// <returns></returns>
@@ -20,11 +38,45 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// The Cache objects handles caching. Use this class to save blocks of data you will use again. See CPCacheBaseClass for more details.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract CPCacheBaseClass Cache { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// read and write cdn files, like content uploads. Sites with static front-ends may put static files here.
+        /// </summary>
+        /// <returns></returns>
+        public abstract CPFileSystemBaseClass CdnFiles { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The Content class handles functions related to content meta such as determining the table used for a content definition, getting a recordid based on the name, or accessing the methods that control workflow publishing. See CPContentBaseClass for more details.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract CPContentBaseClass Content { get; }
+        //
+        //====================================================================================================
+        /// <summary>
         /// Construct new CS object. See CPCSBaseClass for CS object details 
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract CPCSBaseClass CSNew();
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The Db object handles direct access to the Database. The ContentSet functions in the CPCSBaseClass are prefered for general use. See the CPDBBaseClass for more details.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract CPDbBaseClass Db { get; }
         //
         //====================================================================================================
         /// <summary>
@@ -38,12 +90,31 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Contensive version
+        /// The Doc object handles features related to the document (page) being contructed in the current call. See CPDocBaseClass for more details.
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public abstract string Version { get; }
+        public abstract CPDocBaseClass Doc { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The Email object handles email functions. See CPEmailBaseClass for more information.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract CPEmailBaseClass Email { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Legacy file object. Use FileCdn, FileAppRoot, FilePrivate and tempFiles.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [Obsolete("Legacy file object. Use FileCdn, FileAppRoot, FilePrivate and tempFiles.")]
+        public abstract CPFileBaseClass File { get; }
         //
         //====================================================================================================
         /// <summary>
@@ -53,6 +124,40 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract CPGroupBaseClass Group { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The HTML class handles functions used to read and produce HTML elements. See CPHtmlBaseClass for more details.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract CPHtmlBaseClass Html { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The HTML class handles functions used to read and produce HTML elements. See CPHtmlBaseClass for more details.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract CPHtml5BaseClass Html5 { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The Log class manages server logs
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract CPLogBaseClass Log { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// read and write files not available to the Internet
+        /// </summary>
+        /// <returns></returns>
+        public abstract CPFileSystemBaseClass PrivateFiles { get; }
         //
         //====================================================================================================
         /// <summary>
@@ -71,6 +176,31 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract CPResponseBaseClass Response { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The Site Class handles features related to the current site. See CPSiteBaseClass for more details.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract CPSiteBaseClass Site { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// read and write files in a temporary location.
+        /// </summary>
+        /// <returns></returns>
+        public abstract CPFileSystemBaseClass TempFiles { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The User Class handles details related to the user and its related people record. See CPUserBaseClass for more details.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract CPUserBaseClass User { get; }
         //
         //====================================================================================================
         /// <summary>
@@ -101,129 +231,12 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// The User Class handles details related to the user and its related people record. See CPUserBaseClass for more details.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract CPUserBaseClass User { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// The HTML class handles functions used to read and produce HTML elements. See CPHtmlBaseClass for more details.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract CPHtmlBaseClass Html { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// The HTML class handles functions used to read and produce HTML elements. See CPHtmlBaseClass for more details.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract CPHtml5BaseClass Html5 { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// The Cache objects handles caching. Use this class to save blocks of data you will use again. See CPCacheBaseClass for more details.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract CPCacheBaseClass Cache { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// The Db object handles direct access to the Database. The ContentSet functions in the CPCSBaseClass are prefered for general use. See the CPDBBaseClass for more details.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract CPDbBaseClass Db { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// The Email object handles email functions. See CPEmailBaseClass for more information.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract CPEmailBaseClass Email { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// The Content class handles functions related to content meta such as determining the table used for a content definition, getting a recordid based on the name, or accessing the methods that control workflow publishing. See CPContentBaseClass for more details.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract CPContentBaseClass Content { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// The addon class handles access to an add-on's features. Use the Utils object to run an cpcore.addon. An instance of the Addon class is passed to the executing addon in the MyAddon object so it can access any features needed. See the CPAddonBaseClass for more details.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract CPAddonBaseClass Addon { get; }
-        //
-        //====================================================================================================
-        /// <summary>
         /// The Utils class handles basic utilities and other features not classified. See CPUtilsBaseClass for more details.
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract CPUtilsBaseClass Utils { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// The Doc object handles features related to the document (page) being contructed in the current call. See CPDocBaseClass for more details.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract CPDocBaseClass Doc { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// The Site Class handles features related to the current site. See CPSiteBaseClass for more details.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract CPSiteBaseClass Site { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// The MyAddon object is an instance of the Addon class created before an add-ons execute method is called. See CPAddonBaseClass for more details.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        [Obsolete("Legacy object. To determine addon properties of the current addon, use CP.Addon.id to create a model.", false)]
-        public abstract CPAddonBaseClass MyAddon { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Legacy file object. Use FileCdn, FileAppRoot, FilePrivate and tempFiles.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        [Obsolete("Legacy file object. Use FileCdn, FileAppRoot, FilePrivate and tempFiles.")]
-        public abstract CPFileBaseClass File { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// read and write cdn files, like content uploads. Sites with static front-ends may put static files here.
-        /// </summary>
-        /// <returns></returns>
-        public abstract CPFileSystemBaseClass CdnFiles { get; }
         //
         //====================================================================================================
         /// <summary>
@@ -234,17 +247,13 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// read and write files not available to the Internet
+        /// The MyAddon object is an instance of the Addon class created before an add-ons execute method is called. See CPAddonBaseClass for more details.
         /// </summary>
+        /// <value></value>
         /// <returns></returns>
-        public abstract CPFileSystemBaseClass PrivateFiles { get; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// read and write files in a temporary location.
-        /// </summary>
-        /// <returns></returns>
-        public abstract CPFileSystemBaseClass TempFiles { get; }
+        /// <remarks></remarks>
+        [Obsolete("Legacy object. To determine addon properties of the current addon, use CP.Addon.id to create a model.", false)]
+        public abstract CPAddonBaseClass MyAddon { get; }
         //
     }
 }

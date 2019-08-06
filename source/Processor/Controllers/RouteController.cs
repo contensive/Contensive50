@@ -33,7 +33,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             var sw = new Stopwatch();
             sw.Start();
-            LogController.logRaw("CoreController executeRoute, enter", LogController.LogLevel.Trace);
+            LogController.logRaw("CoreController executeRoute, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             try {
                 if (core.appConfig != null) {
                     //
@@ -356,7 +356,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.logError(core, ex);
             } finally {
                 // if (core.doc.routeDictionaryChanges) { DefaultSite.configurationClass.loadRouteMap(cp))}
-                LogController.logRaw("CoreController executeRoute, exit", LogController.LogLevel.Trace);
+                LogController.logRaw("CoreController executeRoute, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             }
             return result;
         }

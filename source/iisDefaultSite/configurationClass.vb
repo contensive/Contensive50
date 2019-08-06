@@ -9,6 +9,7 @@ Imports Contensive.Processor.Controllers.GenericController
 Imports System.Web.Routing
 Imports System.IO
 Imports Contensive.Processor.Models.Domain
+Imports Contensive
 
 Public Class ConfigurationClass
     '
@@ -63,13 +64,13 @@ Public Class ConfigurationClass
             appConfig.privateKey = ConfigurationManager.AppSettings("ContensivePrivateKey")
             serverConfig.apps.Add(appConfig.name.ToLowerInvariant(), appConfig)
         Catch ex As Exception
-            Logger.appendProgramDataLog(ex.ToString)
+            'Logger.appendProgramDataLog(ex.ToString)
         End Try
         Return serverConfig
     End Function
     '
     Public Shared Sub loadRouteMap(cp As CPClass)
-        LogController.logRaw("configurationClass, loadRouteMap, [" + cp.Site.Name + "]", LogController.LogLevel.Trace)
+        LogController.logRaw("configurationClass, loadRouteMap, [" + cp.Site.Name + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
         '
         ' test if route map needs to be loaded (routeMap.dateCreated <> application[routeMapDateCreated])
         If (Not cp.routeMap.dateCreated.Equals(HttpContext.Current.Application("RouteMapDateCreated"))) Then
@@ -78,7 +79,7 @@ Public Class ConfigurationClass
             For Each newRouteKeyValuePair In cp.routeMap.routeDictionary
                 Try
                     '
-                    LogController.logRaw("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRouteKeyValuePair.Value.virtualRoute + "], [" + newRouteKeyValuePair.Value.physicalRoute + "]", LogController.LogLevel.Trace)
+                    LogController.logRaw("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRouteKeyValuePair.Value.virtualRoute + "], [" + newRouteKeyValuePair.Value.physicalRoute + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
                     '
                     RouteTable.Routes.Remove(RouteTable.Routes(newRouteKeyValuePair.Key))
                     RouteTable.Routes.MapPageRoute(newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.physicalRoute)

@@ -5,6 +5,7 @@ Option Strict On
 Imports System.Web.SessionState
 Imports System.Web.Routing
 Imports Contensive.Processor.Controllers
+Imports Contensive
 
 Public Class Global_asax
     Inherits System.Web.HttpApplication
@@ -20,12 +21,12 @@ Public Class Global_asax
     Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
         Try
             Application("asdf") = ""
-            LogController.logRaw("Global.asax, Application_Start [" & ConfigurationClass.getAppName() & "]", LogController.LogLevel.Trace)
+            LogController.logRaw("Global.asax, Application_Start [" & ConfigurationClass.getAppName() & "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
             Using cp As New Contensive.Processor.CPClass(ConfigurationClass.getAppName())
                 DefaultSite.ConfigurationClass.loadRouteMap(cp)
             End Using
         Catch ex As Exception
-            LogController.logRaw("Global.asax, Application_Start exception [" & ConfigurationClass.getAppName() & "]" & getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.Processor.Controllers.LogController.LogLevel.Fatal)
+            LogController.logRaw("Global.asax, Application_Start exception [" & ConfigurationClass.getAppName() & "]" & getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.BaseClasses.CPLogBaseClass.LogLevel.Fatal)
         End Try
     End Sub
     '
@@ -36,7 +37,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Session_Start(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logRaw("Global.asax, Session_Start [" + e.ToString() + "]", LogController.LogLevel.Trace)
+        LogController.logRaw("Global.asax, Session_Start [" + e.ToString() + "]", Contensive.BaseClasses.CPLogBaseClass.LogLevel.Trace)
     End Sub
     '
     '====================================================================================================
@@ -46,7 +47,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_BeginRequest(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logRaw("Global.asax, Application_BeginRequest [" + e.ToString() + "]", LogController.LogLevel.Trace)
+        LogController.logRaw("Global.asax, Application_BeginRequest [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
     End Sub
     '
     '====================================================================================================
@@ -56,7 +57,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_AuthenticateRequest(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logRaw("Global.asax, Application_AuthenticateRequest [" + e.ToString() + "]", LogController.LogLevel.Trace)
+        LogController.logRaw("Global.asax, Application_AuthenticateRequest [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
     End Sub
     '
     '====================================================================================================
@@ -66,7 +67,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_Error(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logRaw("Global.asax, Application_Error, Server.GetLastError().InnerException [" + Server.GetLastError().InnerException.ToString() + "]", LogController.LogLevel.Error)
+        LogController.logRaw("Global.asax, Application_Error, Server.GetLastError().InnerException [" + Server.GetLastError().InnerException.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error)
     End Sub
     '
     '====================================================================================================
@@ -76,7 +77,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Session_End(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logRaw("Global.asax, Session_End [" + e.ToString() + "]", LogController.LogLevel.Trace)
+        LogController.logRaw("Global.asax, Session_End [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
     End Sub
     '
     '====================================================================================================
@@ -86,7 +87,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_End(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logRaw("Global.asax, Application_End [" + e.ToString() + "]", LogController.LogLevel.Trace)
+        LogController.logRaw("Global.asax, Application_End [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
     End Sub
     '
     '====================================================================================================

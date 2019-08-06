@@ -106,7 +106,7 @@ namespace Contensive.Processor.Controllers {
                 if (processTimerInProcess) {
                     //
                     // -- trace log without core
-                    LogController.logRaw("taskRunner.processTimerTick, skip -- processTimerInProcess true",LogController.LogLevel.Trace);
+                    LogController.logRaw("taskRunner.processTimerTick, skip -- processTimerInProcess true",BaseClasses.CPLogBaseClass.LogLevel.Trace);
                 } else {
                     processTimerInProcess = true;
                     //
@@ -126,7 +126,7 @@ namespace Contensive.Processor.Controllers {
                 long workingSetMemory = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
                 long virtualMemory = System.Diagnostics.Process.GetCurrentProcess().VirtualMemorySize64;
                 long privateMemory = System.Diagnostics.Process.GetCurrentProcess().PrivateMemorySize64;
-                LogController.logRaw("TaskRunner exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", LogController.LogLevel.Info);
+                LogController.logRaw("TaskRunner exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
                     LogController.logError(cp.core,ex);
@@ -218,7 +218,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- trace log without core
-                LogController.logRaw("taskRunner.runTasks, exit (" + swProcess.ElapsedMilliseconds + "ms)", LogController.LogLevel.Trace);
+                LogController.logRaw("taskRunner.runTasks, exit (" + swProcess.ElapsedMilliseconds + "ms)", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             } catch (Exception ex) {
                 LogController.logError(serverCore, ex);
             }
@@ -237,7 +237,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (var task in TaskModel.createList(cp.core, "(cmdRunner=" + DbController.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
                         //
                         // -- trace log without core
-                        LogController.logRaw("taskRunner.runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", LogController.LogLevel.Info);
+                        LogController.logRaw("taskRunner.runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
                         //
                         DateTime dateStarted = DateTime.Now;
                         var cmdDetail = DeserializeObject<TaskModel.CmdDetailClass>(task.cmdDetail);
@@ -276,11 +276,11 @@ namespace Contensive.Processor.Controllers {
                         TaskModel.delete(cp.core, task.id);
                         //
                         // -- info log the task running - so info state will log for memory leaks
-                        LogController.logRaw("TaskRunner exit, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", LogController.LogLevel.Info);
+                        LogController.logRaw("TaskRunner exit, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
                     }
                 }
             } catch (Exception ex) {
-                LogController.logRaw("TaskRunner exception, ex [" + ex.ToString()  + "]", LogController.LogLevel.Error);
+                LogController.logRaw("TaskRunner exception, ex [" + ex.ToString()  + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
                 Console.WriteLine("Error: [" + ex.ToString() + "]");
             }
         }

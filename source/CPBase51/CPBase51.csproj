@@ -54,6 +54,7 @@
     <Compile Include="CPCacheBaseClass.cs" />
     <Compile Include="CPContentBaseClass.cs" />
     <Compile Include="CPCSBaseClass.cs" />
+    <Compile Include="CPLogBaseClass.cs" />
     <Compile Include="CPDbBaseClass.cs" />
     <Compile Include="CPDocBaseClass.cs" />
     <Compile Include="CPEmailBaseClass.cs" />

@@ -178,15 +178,15 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void ErrorReport(string message) {
-            LogController.log(cp.core, message , LogController.LogLevel.Error);
+            LogController.log(cp.core, message , BaseClasses.CPLogBaseClass.LogLevel.Error);
         }
         //
         public override void ErrorReport(System.Exception ex, string message) {
-            LogController.log(cp.core, message + ", exception [" + ex.ToString() + "]", LogController.LogLevel.Error);
+            LogController.log(cp.core, message + ", exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
         }
         //
         public override void ErrorReport(System.Exception ex) {
-            LogController.log(cp.core, "exception [" + ex.ToString() + "]", LogController.LogLevel.Error);
+            LogController.log(cp.core, "exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
         }
         //
         //====================================================================================================
