@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Contensive.Processor</id>
-        <version>5.1.190802</version>
+        <version>5.1.190806</version>
         <title>Contensive Processor</title>
         <authors>Contensive</authors>
         <owners>Contensive</owners>
@@ -11,7 +11,7 @@
         <iconUrl>http://contensive.io/img/ContensiveLogo2-385x60.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>This package installs the library files required to create an instance of cp within an application.</description>
-        <releaseNotes></releaseNotes>
+        <releaseNotes>Added Nustache dependency. Added cp.Log object to api</releaseNotes>
         <copyright>Copyright 2019</copyright>
         <tags>Contensive</tags>
         <dependencies>
@@ -28,6 +28,8 @@
 		  <dependency id="Microsoft.Win32.Primitives" version="4.3.0" />
 		  <dependency id="NETStandard.Library" version="2.0.1" />
 		  <dependency id="NUglify" version="1.5.12" />
+		  <dependency id="Nustache" version="1.16.0.10" />
+		  <dependency id="ClearScript.V8" version="5.5.2" />
 		</dependencies>
     </metadata>
     <files>
