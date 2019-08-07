@@ -851,6 +851,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Cdn\upload.cmd" />
+    <None Include="Contensive.Processor.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

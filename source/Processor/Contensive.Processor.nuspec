@@ -6,7 +6,7 @@
         <title>Contensive Processor</title>
         <authors>Contensive</authors>
         <owners>Contensive</owners>
-        <licenseUrl>http://contensive.io/</licenseUrl>
+        <license type="expression">MIT</license>
         <projectUrl>http://contensive.io/</projectUrl>
         <iconUrl>http://contensive.io/img/ContensiveLogo2-385x60.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -35,5 +35,6 @@
     <files>
         <file src="bin\Debug\Processor.dll" target="lib\net461\Processor.dll" />
         <file src="bin\Debug\CPBase.dll" target="lib\net461\CPBase.dll" />
+      
     </files>
 </package>
