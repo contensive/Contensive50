@@ -131,6 +131,12 @@
     <Reference Include="Amazon.ElastiCacheCluster, Version=1.0.1.0, Culture=neutral, PublicKeyToken=445456c82d5a0fce, processorArchitecture=MSIL">
       <HintPath>..\packages\Amazon.ElastiCacheCluster.1.0.1.0\lib\net35\Amazon.ElastiCacheCluster.dll</HintPath>
     </Reference>
+    <Reference Include="AWS.Logger.Core, Version=1.4.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWS.Logger.Core.1.4.0\lib\net45\AWS.Logger.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.CloudWatchLogs, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.CloudWatchLogs.3.3.100.39\lib\net45\AWSSDK.CloudWatchLogs.dll</HintPath>
+    </Reference>
     <Reference Include="AWSSDK.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
       <HintPath>..\packages\AWSSDK.Core.3.3.103.20\lib\net45\AWSSDK.Core.dll</HintPath>
     </Reference>
@@ -152,6 +158,9 @@
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.6.6\lib\net45\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog.AWS.Logger, Version=1.4.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWS.Logger.NLog.1.4.0\lib\net45\NLog.AWS.Logger.dll</HintPath>
     </Reference>
     <Reference Include="NUglify, Version=1.5.13.0, Culture=neutral, PublicKeyToken=15bc7810aec21b5e, processorArchitecture=MSIL">
       <HintPath>..\packages\NUglify.1.5.13\lib\net40\NUglify.dll</HintPath>
@@ -192,6 +201,7 @@
     <Compile Include="Views\FixTableFolderCaseCmd.cs" />
     <Compile Include="Views\ExecuteAddonCmd.cs" />
     <Compile Include="Views\DeleteProtectionCmd.cs" />
+    <Compile Include="Views\InstallFileCmd.cs" />
     <Compile Include="Views\StatusCmd.cs" />
     <Compile Include="Views\HousekeepCmd.cs" />
     <Compile Include="Views\FlushCacheCmd.cs" />
@@ -204,7 +214,7 @@
     <Compile Include="Views\VersionCmd.cs" />
     <Compile Include="Views\RunTaskCmd.cs" />
     <Compile Include="Views\_BlankCmd.cs" />
-    <Compile Include="Views\InstallCollectionCmd.cs" />
+    <Compile Include="Views\InstallCmd.cs" />
     <Compile Include="Views\FileDownloadCmd.cs" />
     <Compile Include="Views\DeleteAppCmd.cs" />
     <Compile Include="Views\GenericController.cs" />
@@ -285,6 +295,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Analyzer Include="..\packages\AWSSDK.CloudWatchLogs.3.3.100.39\analyzers\dotnet\cs\AWSSDK.CloudWatchLogs.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.S3.3.3.104.8\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

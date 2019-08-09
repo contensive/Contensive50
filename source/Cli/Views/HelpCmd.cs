@@ -25,7 +25,8 @@ namespace Contensive.CLI {
             Console.Write(FixTableFolderCaseCmd.helpText);
             Console.Write(FlushCacheCmd.helpText);
             Console.Write(HousekeepCmd.helpText);
-            Console.Write(InstallCollectionCmd.helpText);
+            Console.Write(InstallCmd.helpText);
+            Console.Write(InstallFileCmd.helpText);
             //Console.Write(LoggingCmd.helpText);
             Console.Write(RepairCmd.helpText);
             Console.Write(RunTaskCmd.helpText);

@@ -66,7 +66,12 @@ namespace Contensive.CLI {
                             case "--install":
                                 //
                                 // -- install collection to one or all applications
-                                InstallCollectionCmd.execute(cpServer, appName, getNextCmdArg(args, ref argPtr));
+                                InstallCmd.execute(cpServer, appName, getNextCmdArg(args, ref argPtr));
+                                break;
+                            case "--installfile":
+                                //
+                                // -- install collection to one or all applications
+                                InstallFileCmd.execute(cpServer, appName, AppDomain.CurrentDomain.BaseDirectory + getNextCmdArg(args, ref argPtr));
                                 break;
                             case "-h":
                             case "--housekeep":
