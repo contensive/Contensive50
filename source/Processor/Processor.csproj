@@ -140,6 +140,7 @@
     <Compile Include="Addons\Email\Download.cs" />
     <Compile Include="Controllers\CollectionFolderController.cs" />
     <Compile Include="Controllers\CollectionLibraryController.cs" />
+    <Compile Include="Controllers\CollectionExportController.cs" />
     <Compile Include="Controllers\PermissionController.cs" />
     <Compile Include="Controllers\EmailAmazonSESController.cs" />
     <Compile Include="Controllers\UpgradeController.cs" />
@@ -272,7 +273,7 @@
     <Compile Include="Controllers\TaskRunnerController.cs" />
     <Compile Include="Controllers\TaskSchedulerController.cs" />
     <Compile Include="Controllers\WorkflowController.cs" />
-    <Compile Include="Controllers\ApplicationCDefMiniCollection.cs" />
+    <Compile Include="Controllers\CollectionExportCDefController.cs" />
     <Compile Include="Controllers\XmlController.cs" />
     <Compile Include="Controllers\QuickEditController.cs" />
     <Compile Include="Controllers\MetadataController.cs" />

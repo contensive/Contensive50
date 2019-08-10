@@ -1501,7 +1501,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (!isNewBuild) {
                     //
                     // if this is not an empty database, get the application collection, else return empty
-                    string applicationMetaDataMiniCollectionXml = ApplicationMetaDataMiniCollection.get(core, true);
+                    string applicationMetaDataMiniCollectionXml = CollectionExportCDefController.get(core, true);
                     result = MetadataMiniCollectionModel.loadXML(core, applicationMetaDataMiniCollectionXml, false, false, isNewBuild, new MetadataMiniCollectionModel(), logPrefix);
                 }
             } catch (Exception ex) {

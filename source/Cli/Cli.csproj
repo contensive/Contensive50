@@ -201,7 +201,8 @@
     <Compile Include="Views\FixTableFolderCaseCmd.cs" />
     <Compile Include="Views\ExecuteAddonCmd.cs" />
     <Compile Include="Views\DeleteProtectionCmd.cs" />
-    <Compile Include="Views\InstallFileCmd.cs" />
+    <Compile Include="Views\ExportCollectionCmd.cs" />
+    <Compile Include="Views\InstallCollectionFileCmd.cs" />
     <Compile Include="Views\StatusCmd.cs" />
     <Compile Include="Views\HousekeepCmd.cs" />
     <Compile Include="Views\FlushCacheCmd.cs" />
@@ -214,7 +215,7 @@
     <Compile Include="Views\VersionCmd.cs" />
     <Compile Include="Views\RunTaskCmd.cs" />
     <Compile Include="Views\_BlankCmd.cs" />
-    <Compile Include="Views\InstallCmd.cs" />
+    <Compile Include="Views\InstallCollectionCmd.cs" />
     <Compile Include="Views\FileDownloadCmd.cs" />
     <Compile Include="Views\DeleteAppCmd.cs" />
     <Compile Include="Views\GenericController.cs" />

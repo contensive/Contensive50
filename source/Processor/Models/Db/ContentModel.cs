@@ -150,5 +150,16 @@ namespace Contensive.Processor.Models.Db {
         public static string getTableInvalidationKey(CoreController core) {
             return getTableCacheKey<ContentModel>(core);
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Create a list of content records that are assocated to a collection, alphabetically by content name
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="collectionId"></param>
+        /// <returns></returns>
+        public static List<ContentModel> createListFromCollection( CoreController core, int collectionId) {
+            return createList(core, "id in (select distinct contentId from ccAddonCollectionCDefRules where collectionid=" + collectionId + ")", "name");
+        }
     }
 }
