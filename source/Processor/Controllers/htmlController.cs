@@ -3672,5 +3672,28 @@ namespace Contensive.Processor.Controllers {
         }
         //
         public static string indent(string sourceHtml) => indent(sourceHtml, 1);
+        //
+        //====================================================================================================
+        //
+        public static string inputNumber(CoreController core, string htmlName, Double? htmlValue, string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
+            string result = "";
+            try {
+                // {0:s}
+                // yyyy-MM-dd
+                core.doc.formInputTextCnt += 1;
+                core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
+                result = "<input type=\"number\"  name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
+                if ((htmlValue != null)) result += " value=\"" + htmlValue + "\"";
+                result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+                result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+                result += (!readOnly) ? "" : " readonly";
+                result += (!disabled) ? "" : " disabled";
+                result += (!required) ? "" : " required";
+                result += ">";
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+            }
+            return result;
+        }
     }
 }

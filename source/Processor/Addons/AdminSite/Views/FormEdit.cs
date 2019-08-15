@@ -773,8 +773,7 @@ namespace Contensive.Addons.AdminSite {
                                         return_NewFieldList += "," + field.nameLc;
                                         FieldValueNumber = GenericController.encodeNumber(fieldValueObject);
                                         EditorString += (HtmlController.inputHidden(field.nameLc, GenericController.encodeText(FieldValueNumber)));
-                                        EditorString += (HtmlController.inputText(core, field.nameLc, FieldValueNumber.ToString(), -1, -1, fieldHtmlId, false, editorReadOnly, "text form-control"));
-                                        EditorString += (string.Format("{0:C}", FieldValueNumber));
+                                        EditorString += (HtmlController.inputNumber(core, field.nameLc, FieldValueNumber, fieldHtmlId, "text form-control", editorReadOnly, false));
                                         EditorString += WhyReadOnlyMsg;
                                         //
                                         break;
@@ -785,8 +784,9 @@ namespace Contensive.Addons.AdminSite {
                                         // ----- number readonly
                                         //
                                         return_NewFieldList += "," + field.nameLc;
+                                        FieldValueNumber = GenericController.encodeNumber(fieldValueObject);
                                         EditorString += (HtmlController.inputHidden(field.nameLc, fieldValue_text));
-                                        EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, false, editorReadOnly, "number form-control"));
+                                        EditorString += (HtmlController.inputNumber(core, field.nameLc, FieldValueNumber, fieldHtmlId, "text form-control", editorReadOnly, false));
                                         EditorString += WhyReadOnlyMsg;
                                         //
                                         break;
@@ -954,13 +954,10 @@ namespace Contensive.Addons.AdminSite {
                                             EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, true, false, "password form-control"));
                                         } else {
                                             if (string.IsNullOrEmpty(fieldValue_text)) {
-                                                EditorString += (HtmlController.inputText(core, field.nameLc, "", -1, -1, fieldHtmlId, false, false, "text form-control"));
+                                                EditorString += (HtmlController.inputNumber(core, field.nameLc, null, fieldHtmlId, "text form-control", editorReadOnly, false));
+                                                //EditorString += (HtmlController.inputText(core, field.nameLc, "", -1, -1, fieldHtmlId, false, false, "text form-control"));
                                             } else {
-                                                if (encodeBoolean(fieldValue_text.IndexOf("\n") + 1) || (fieldValue_text.Length > 40)) {
-                                                    EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, false, false, "text form-control"));
-                                                } else {
-                                                    EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, -1, fieldHtmlId, false, false, "text form-control"));
-                                                }
+                                                EditorString += (HtmlController.inputNumber(core, field.nameLc, encodeNumber( fieldValue_text), fieldHtmlId, "text form-control", editorReadOnly, false));
                                             }
                                         }
                                         break;

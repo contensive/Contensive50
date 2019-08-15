@@ -252,6 +252,9 @@ namespace Contensive.Addons.AdminSite {
                         adminBody = GetCollectionHelp(cp, HelpCollectionID, "");
                     } else if (adminData.AdminForm != 0) {
                         //
+                        // -- formindex requires valkid content
+                        if ((adminData.adminContent.tableName == null) && ((adminData.AdminForm == AdminFormIndex) || (adminData.AdminForm == AdminFormIndex))) { adminData.AdminForm = AdminFormRoot; }
+                        //
                         // No content so far, try the forms
                         // todo - convert this to switch
                         if (adminData.AdminForm == AdminFormBuilderCollection) {

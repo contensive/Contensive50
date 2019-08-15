@@ -71,7 +71,7 @@ namespace Contensive.CLI {
                             case "--installfile":
                                 //
                                 // -- install collection to one or all applications
-                                InstallFileCmd.execute(cpServer, appName, AppDomain.CurrentDomain.BaseDirectory + getNextCmdArg(args, ref argPtr));
+                                InstallFileCmd.execute(cpServer, appName, System.IO.Directory.GetCurrentDirectory() + "\\" + getNextCmdArg(args, ref argPtr));
                                 break;
                             case "-h":
                             case "--housekeep":

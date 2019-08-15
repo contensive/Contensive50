@@ -149,7 +149,8 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex, "exception in serverConfigModel.getObject");
+                LogController.logFatal( core,ex, "exception in serverConfigModel.getObject");
+                throw;
             }
             return returnModel;
         }
