@@ -170,24 +170,8 @@ namespace Contensive.Processor.Controllers {
                             LogController.logInfo(core, "queueAdHocEmail, sent with warning [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
                         }
                     }
-                    string htmlBody = null;
-                    string textBody = null;
-                    if (!isHTML) {
-                        textBody = body;
-                        htmlBody = core.html.convertTextToHtml(body);
-                    } else {
-                        textBody = NUglify.Uglify.HtmlToText("<body>" + body + "</body>").Code.Trim();
-                        string rootUrl = "http://" + core.appConfig.domainList[0] + "/";
-                        htmlBody = GenericController.convertLinksToAbsolute(body, rootUrl);
-                        htmlBody = ""
-                            + "<html>"
-                            + "<head>"
-                            + "<Title>" + subject + "</Title>"
-                            + "<Base href=\"" + rootUrl + "\" >"
-                            + "</head>"
-                            + "<body class=\"ccBodyEmail\">" + htmlBody + "</body>"
-                            + "</html>";
-                    }
+                    string htmlBody = encodeEmailHtmlBody(core, isHTML, body, "", subject, null, "" );
+                    string textBody = encodeEmailTextBody(core, isHTML, body, null);
                     queueEmail(core, isImmediate, emailContextMessage, new EmailClass() {
                         attempts = 0,
                         BounceAddress = bounceAddress,
@@ -258,57 +242,24 @@ namespace Contensive.Processor.Controllers {
         /// <param name="queryStringForLinkAppend"></param>
         /// <param name="emailContextMessage">Brief description for the log entry (Conditional Email, etc)</param>
         /// <returns> returns ok if send is successful, otherwise returns the principle issue as a user error</returns>
-        public static bool queuePersonEmail(CoreController core, PersonModel person, string fromAddress, string subject, string body, string bounceAddress, string replyToAddress, bool Immediate, bool isHTML, int emailIdOrZeroForLog, string template, bool EmailAllowLinkEID, ref string userErrorMessage, string queryStringForLinkAppend, string emailContextMessage) {
+        public static bool queuePersonEmail(CoreController core, PersonModel recipient, string fromAddress, string subject, string body, string bounceAddress, string replyToAddress, bool Immediate, bool isHTML, int emailIdOrZeroForLog, string template, bool EmailAllowLinkEID, ref string userErrorMessage, string queryStringForLinkAppend, string emailContextMessage) {
             bool result = false;
             try {
-                if (person == null) {
-                    userErrorMessage = "The email was not sent because the recipient could not be found by thier id [" + person.id.ToString() + "]";
-                } else if (!verifyEmailAddress(core, person.email)) {
+                if (recipient == null) {
+                    userErrorMessage = "The email was not sent because the recipient could not be found by thier id [" + recipient.id.ToString() + "]";
+                } else if (!verifyEmailAddress(core, recipient.email)) {
                     //
                     userErrorMessage = "Email not sent because the to-address is not valid.";
                 } else if (!verifyEmailAddress(core, fromAddress)) {
                     //
                     userErrorMessage = "Email not sent because the from-address is not valid.";
-                } else if (0 != GenericController.vbInstr(1, getBlockList(core), Environment.NewLine + person.email + Environment.NewLine, 1)) {
+                } else if (0 != GenericController.vbInstr(1, getBlockList(core), Environment.NewLine + recipient.email + Environment.NewLine, 1)) {
                     //
                     userErrorMessage = "Email not sent because the to-address is blocked by this application. See the Blocked Email Report.";
                 } else {
-                    subject = ActiveContentController.renderHtmlForEmail(core, subject, person.id, queryStringForLinkAppend);
-                    body = ActiveContentController.renderHtmlForEmail(core, body, person.id, queryStringForLinkAppend);
-                    body = GenericController.vbReplace(body, "#member_id#", person.id.ToString());
-                    body = GenericController.vbReplace(body, "#member_email#", person.email);
-                    string htmlBody;
-                    string textBody;
-                    if (!isHTML) {
-                        textBody = body;
-                        htmlBody = core.html.convertTextToHtml(body);
-                    } else {
-                        textBody = NUglify.Uglify.HtmlToText("<body>" + body + "</body>").Code.Trim();
-                        htmlBody = body;
-                        if (!string.IsNullOrWhiteSpace(template)) {
-                            //
-                            // -- encode template
-                            // hotfix - templates no longer have wysiwyg editors, so content may not be saved correctly - preprocess to convert wysiwyg content
-                            template = ActiveContentController.processWysiwygResponseForSave(core, template);
-                            template = ActiveContentController.renderHtmlForEmail(core, template, person.id, queryStringForLinkAppend);
-                            if (template.IndexOf(fpoContentBox) != -1) {
-                                htmlBody = GenericController.vbReplace(template, fpoContentBox, htmlBody);
-                            } else {
-                                htmlBody = template + htmlBody;
-                            }
-                        }
-                        // -- hotfix - move template merge before link conversion to update template links also
-                        string rootUrl = "http://" + core.appConfig.domainList[0] + "/";
-                        htmlBody = GenericController.convertLinksToAbsolute(htmlBody, rootUrl);
-                        htmlBody = ""
-                            + "<html>"
-                            + "<head>"
-                            + "<Title>" + subject + "</Title>"
-                            + "<Base href=\"" + rootUrl + "\" >"
-                            + "</head>"
-                            + "<body class=\"ccBodyEmail\">" + htmlBody + "</body>"
-                            + "</html>";
-                    }
+
+                    string htmlBody = encodeEmailHtmlBody(core, isHTML, body, template, subject, recipient, queryStringForLinkAppend);
+                    string textBody = encodeEmailTextBody(core, isHTML, body, recipient);
                     var email = new EmailClass() {
                         attempts = 0,
                         BounceAddress = bounceAddress,
@@ -318,8 +269,8 @@ namespace Contensive.Processor.Controllers {
                         replyToAddress = replyToAddress,
                         subject = subject,
                         textBody = textBody,
-                        toAddress = person.email,
-                        toMemberId = person.id
+                        toAddress = recipient.email,
+                        toMemberId = recipient.id
                     };
                     if (verifyEmail(core, email, ref userErrorMessage)) {
                         queueEmail(core, Immediate, emailContextMessage, email);
@@ -976,6 +927,105 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
+        }
+        //
+        //====================================================================================================        
+        /// <summary>
+        /// create a simple text version of the email
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="isHTML"></param>
+        /// <param name="body"></param>
+        /// <returns></returns>
+        public static string encodeEmailTextBody(CoreController core, bool isHTML, string body, PersonModel recipient) {
+            int recipientId = ( recipient == null ) ? 0 : recipient.id;
+            //
+            // -- body
+            if (!string.IsNullOrWhiteSpace(body)) {
+                body = ActiveContentController.renderHtmlForEmail(core, body, recipientId, "");
+            }
+            //
+            if (!isHTML) {
+                return body;
+            } else if (body.ToLower().IndexOf("<html") >= 0) {
+                //
+                // -- isHtml, if the body includes an html tag, this is the entire body, just send it
+                return NUglify.Uglify.HtmlToText("<body>" + body + "</body>").Code.Trim();
+            } else {
+                //
+                // -- isHtml but no body tag, add an html wrapper
+                return NUglify.Uglify.HtmlToText("<body>" + body + "</body>").Code.Trim();
+            }
+        }
+        //
+        //====================================================================================================        
+        /// <summary>
+        /// create the final html document to be sent in the email body
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="isHTML"></param>
+        /// <param name="body"></param>
+        /// <param name="template"></param>
+        /// <param name="subject"></param>
+        /// <param name="recipient"></param>
+        /// <param name="queryStringForLinkAppend"></param>
+        /// <returns></returns>
+        public static string encodeEmailHtmlBody(CoreController core, bool isHTML, string body, string template, string subject, PersonModel recipient, string queryStringForLinkAppend) {
+            int recipientId = (recipient == null) ? 0 : recipient.id;
+            string recipientEmail = (recipient == null) ? "" : recipient.email;
+            //
+            // -- hotfix - move template merge before link conversion to update template links also
+            string rootUrl = "http://" + core.appConfig.domainList[0] + "/";
+            //
+            // -- subject
+            if (!string.IsNullOrWhiteSpace(subject)) {
+                subject = ActiveContentController.renderHtmlForEmail(core, subject, recipientId, queryStringForLinkAppend);
+                subject = GenericController.convertLinksToAbsolute(subject, rootUrl);
+                subject = NUglify.Uglify.HtmlToText("<body>" + subject + "</body>").Code;
+                if ( subject == null ) { subject = string.Empty; }
+                subject = subject.Trim();
+            }
+            //
+            // -- body
+            if (!string.IsNullOrWhiteSpace(body)) {
+                body = ActiveContentController.renderHtmlForEmail(core, body, recipientId, queryStringForLinkAppend);
+                body = GenericController.convertLinksToAbsolute(body, rootUrl);
+                body = GenericController.vbReplace(body, "#member_id#", recipientId.ToString());
+                body = GenericController.vbReplace(body, "#member_email#", recipientEmail);
+            }
+            //
+            // -- encode and merge template
+            if(!string.IsNullOrWhiteSpace(template)) {
+                //
+                // hotfix - templates no longer have wysiwyg editors, so content may not be saved correctly - preprocess to convert wysiwyg content
+                template = ActiveContentController.processWysiwygResponseForSave(core, template);
+                //
+                template = ActiveContentController.renderHtmlForEmail(core, template, recipientId, queryStringForLinkAppend);
+                if (template.IndexOf(fpoContentBox) != -1) {
+                    body = GenericController.vbReplace(template, fpoContentBox, body);
+                } else {
+                    body = template + body;
+                }
+            }
+            if (!isHTML) {
+                //
+                // -- non html email, return a text version of the finished document
+                return core.html.convertTextToHtml(body);
+            }
+            if (body.ToLower().IndexOf("<html") >= 0) {
+                //
+                // -- isHtml and the document includes an html tag -- return as-is
+                return body;
+            }
+            //
+            // -- html without an html tag. wrap it
+            return "<html>"
+                + "<head>"
+                + "<Title>" + subject + "</Title>"
+                + "<Base href=\"" + rootUrl + "\" >"
+                + "</head>"
+                + "<body class=\"ccBodyEmail\">" + body + "</body>"
+                + "</html>";
         }
         //
         //====================================================================================================        

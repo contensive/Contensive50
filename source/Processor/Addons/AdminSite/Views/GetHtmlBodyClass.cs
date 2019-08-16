@@ -96,7 +96,7 @@ namespace Contensive.Addons.AdminSite {
                     adminData.ContentWatchLoaded = false;
                     //
                     if (string.Compare(cp.core.siteProperties.dataBuildVersion, cp.Version) < 0) {
-                        LogController.logWarn(cp.core, new GenericException("Application code version (" + cp.Version + ") is newer than Db version (" + cp.core.siteProperties.dataBuildVersion + "). Upgrade site code."));
+                        LogController.logWarn(cp.core, new GenericException("Application code (v" + cp.Version + ") is newer than database (v" + cp.core.siteProperties.dataBuildVersion + "). Upgrade the database with the command line 'cc.exe -a " + cp.core.appConfig.name + " -u'."));
                     }
                     //
                     //// Get Requests, initialize adminContext.content and editRecord objects 

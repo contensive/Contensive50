@@ -39,7 +39,7 @@ namespace Contensive.Processor.Controllers {
         public int requestPort {
             get {
                 if (_requestPort == null) {
-                    _requestPort = iisContext.Request.Url.Port;
+                    _requestPort = ((iisContext != null) && (iisContext.Request != null) && (iisContext.Request.Url != null)) ? iisContext.Request.Url.Port : 0;
                 }
                 return (int)_requestPort;
             }
@@ -416,6 +416,12 @@ namespace Contensive.Processor.Controllers {
         //
         public bool initWebContext(System.Web.HttpContext httpContext) {
             try {
+                //
+                // -- argument validation
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Response == null)) {
+                    Controllers.LogController.logWarn(core, new GenericException("Attempt to initialize webContext but iisContext or one of its objects is null."));
+                    return false;
+                }
                 //
                 // -- setup IIS default Response
                 iisContext = httpContext;

@@ -81,6 +81,8 @@ namespace Contensive.CLI {
                 CollectionInstallController.installCollectionFromPrivateFile(cpApp.core, contextLog, privatePathFilename, ref return_ErrorMessage, ref collectionGuidsInstalled, false, false, ref nonCriticalErrorList, logPrefix, ref collectionsInstalled);
                 if (!string.IsNullOrEmpty(returnErrorMessage)) {
                     Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
+                } else {
+                    Console.WriteLine("Command line collection installation completed with no errors.");
                 }
                 cpApp.PrivateFiles.DeleteFile(privatePhysicalPathFilename);
                 cpApp.Cache.InvalidateAll();

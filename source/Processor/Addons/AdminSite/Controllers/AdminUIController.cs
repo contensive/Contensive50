@@ -876,7 +876,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
             bool alt = true;
             if (alt) {
                 if (editRecord.id == 0) {
-                    result += HtmlController.div("New record", "col-sm-12");
+                    result += HtmlController.div(HtmlController.strong(editRecord.contentControlId_Name) + ":&nbsp;New record", "col-sm-12");
                 } else {
                     result += HtmlController.div(HtmlController.strong(editRecord.contentControlId_Name + ":&nbsp;#") + headerInfo.recordId + ", " + editRecord.nameLc, "col-sm-4");
                     result += HtmlController.div(HtmlController.strong("Created:&nbsp;") + getEditForm_TitleBarDetails_EditorString(editRecord.dateAdded, editRecord.createdBy, "unknown"), "col-sm-4");

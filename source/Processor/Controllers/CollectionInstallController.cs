@@ -1061,6 +1061,7 @@ namespace Contensive.Processor.Controllers {
                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
                         }
                     }
+                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", Collection(s) installed successfully.");
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

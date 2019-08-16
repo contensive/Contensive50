@@ -315,122 +315,131 @@ namespace Contensive.Addons.Email {
         /// <param name="emailStyles"></param>
         /// <returns>OK if successful, else returns user error.</returns>
         private string queueEmailRecord(CoreController core, string emailContextMessage, int sendToPersonId, int emailID, DateTime DateBlockExpires, int emailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
+            PersonModel recipient = PersonModel.create(core, sendToPersonId);
+
             string returnStatus = "";
-            try {
-                string EmailBodyEncoded = EmailBody;
-                string EmailSubjectEncoded = EmailSubject;
-                using (var CSLog = new CsModel(core)) {
-                    CSLog.insert("Email Log");
-                    if (CSLog.ok()) {
-                        CSLog.set("Name", "Queued: " + emailContextMessage);
-                        CSLog.set("EmailDropID", emailDropID);
-                        CSLog.set("EmailID", emailID);
-                        CSLog.set("MemberID", sendToPersonId);
-                        CSLog.set("LogType", EmailLogTypeDrop);
-                        CSLog.set("DateBlockExpires", DateBlockExpires);
-                        CSLog.set("SendStatus", "Send attempted but not completed");
-                        CSLog.set("fromaddress", FromAddress);
-                        CSLog.set("Subject", EmailSubject);
-                        CSLog.save();
-                        //
-                        // Get the Template
-                        string protocolHostLink = "http://" + core.appConfig.domainList[0];
-                        //
-                        // Get the Member
-                        using (var CSPeople = new CsModel(core)) {
-                            CSPeople.openRecord("People", sendToPersonId, "Email,Name");
-                            if (CSPeople.ok()) {
-                                string emailToAddress = CSPeople.getText("Email");
-                                string emailToName = CSPeople.getText("Name");
-                                string defaultPage = core.siteProperties.serverPageDefault;
-                                string urlProtocolDomainSlash = protocolHostLink + "/";
-                                string openTriggerCode = "";
-                                if (emailDropID != 0) {
-                                    switch (core.siteProperties.getInteger("GroupEmailOpenTriggerMethod", 0)) {
-                                        case 1:
-                                            openTriggerCode = "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailOpenCssFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=#member_id#\">";
-                                            break;
-                                        default:
-                                            openTriggerCode = "<img src=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailOpenFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=#member_id#\">";
-                                            break;
-                                    }
-                                }
-                                //
-                                string emailWorkingStyles = emailStyles;
-                                emailWorkingStyles = GenericController.vbReplace(emailWorkingStyles, StyleSheetStart, StyleSheetStart + "<!-- ", 1, 99, 1);
-                                emailWorkingStyles = GenericController.vbReplace(emailWorkingStyles, StyleSheetEnd, " // -->" + StyleSheetEnd, 1, 99, 1);
-                                //
-                                // Create the clickflag to be added to all anchors
-                                string ClickFlagQuery = rnEmailClickFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=" + sendToPersonId;
-                                //
-                                // -- encode body and subject
-                                EmailBodyEncoded = ActiveContentController.renderHtmlForEmail(core, EmailBodyEncoded, sendToPersonId, ClickFlagQuery);
-                                EmailSubjectEncoded = ActiveContentController.renderHtmlForEmail(core, EmailSubjectEncoded, sendToPersonId, ClickFlagQuery);
-                                //
-                                // Encode/Merge Template
-                                if (string.IsNullOrEmpty(EmailTemplate)) {
-                                    //
-                                    // create 20px padding template
-                                    EmailBodyEncoded = "<div style=\"padding:10px;\">" + EmailBodyEncoded + "</div>";
-                                } else {
-                                    //
-                                    // use provided template
-                                    // hotfix - templates no longer have wysiwyg editors, so content may not be saved correctly - preprocess to convert wysiwyg content
-                                    EmailTemplate = ActiveContentController.processWysiwygResponseForSave(core, EmailTemplate);
-                                    string EmailTemplateEncoded = ActiveContentController.renderHtmlForEmail(core, EmailTemplate, sendToPersonId, ClickFlagQuery);
-                                    if (GenericController.vbInstr(1, EmailTemplateEncoded, fpoContentBox) != 0) {
-                                        EmailBodyEncoded = GenericController.vbReplace(EmailTemplateEncoded, fpoContentBox, EmailBodyEncoded);
-                                    } else {
-                                        EmailBodyEncoded = EmailTemplateEncoded + "<div style=\"padding:10px;\">" + EmailBodyEncoded + "</div>";
-                                    }
-                                }
-                                //
-                                // Spam Footer under template
-                                // remove the marker for any other place in the email then add it as needed
-                                EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, rnEmailBlockRecipientEmail, "", 1, 99, 1);
-                                if (AllowSpamFooter) {
-                                    //
-                                    // non-authorable, default true - leave it as an option in case there is an important exception
-                                    EmailBodyEncoded = EmailBodyEncoded + "<div style=\"padding:10px;\">" + getLinkedText("<a href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailBlockRecipientEmail + "=#member_email#&" + rnEmailBlockRequestDropID + "=" + emailDropID + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
-                                }
-                                //
-                                // open trigger under footer (so it does not shake as the image comes in)
-                                EmailBodyEncoded = EmailBodyEncoded + openTriggerCode;
-                                EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, "#member_id#", sendToPersonId);
-                                EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, "#member_email#", emailToAddress);
-                                //
-                                // Now convert URLS to absolute
-                                EmailBodyEncoded = convertLinksToAbsolute(EmailBodyEncoded, urlProtocolDomainSlash);
-                                EmailBodyEncoded = ""
-                                    + "<HTML>"
-                                    + "<Head>"
-                                    + "<Title>" + EmailSubjectEncoded + "</Title>"
-                                    + "<Base href=\"" + urlProtocolDomainSlash + "\">"
-                                    + "</Head>"
-                                    + "<BODY class=ccBodyEmail>"
-                                    + "<Base href=\"" + urlProtocolDomainSlash + "\">"
-                                    + emailWorkingStyles + EmailBodyEncoded + "</BODY>"
-                                    + "</HTML>";
-                                string EmailStatus = null;
-                                //
-                                // Send
-                                EmailController.queueAdHocEmail(core, emailContextMessage, sendToPersonId, emailToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, "", true, true, emailID, ref EmailStatus);
-                                if (string.IsNullOrEmpty(EmailStatus)) {
-                                    EmailStatus = "ok";
-                                }
-                                returnStatus = returnStatus + "Added to queue, email for " + emailToName + " at " + emailToAddress;
-                                //
-                                // ----- Log the send
-                                CSLog.set("SendStatus", EmailStatus);
-                                CSLog.set("toaddress", emailToAddress);
-                                CSLog.save();
-                            }
-                        }
-                    }
-                }
-            } catch (Exception) {
-                throw (new GenericException("Unexpected exception"));
+            if (EmailController.queuePersonEmail(core, recipient, FromAddress, EmailSubject, EmailBody, BounceAddress, ReplyToAddress, false, true, emailID, EmailTemplate, EmailAllowLinkEID, ref returnStatus, "", emailContextMessage)) {
+                returnStatus = "Added to queue, email for " + recipient.name + " at " + recipient.email;
             }
+
+
+
+
+            //try {
+            //    string EmailBodyEncoded = EmailBody;
+            //    string EmailSubjectEncoded = EmailSubject;
+            //    using (var CSLog = new CsModel(core)) {
+            //        CSLog.insert("Email Log");
+            //        if (CSLog.ok()) {
+            //            CSLog.set("Name", "Queued: " + emailContextMessage);
+            //            CSLog.set("EmailDropID", emailDropID);
+            //            CSLog.set("EmailID", emailID);
+            //            CSLog.set("MemberID", sendToPersonId);
+            //            CSLog.set("LogType", EmailLogTypeDrop);
+            //            CSLog.set("DateBlockExpires", DateBlockExpires);
+            //            CSLog.set("SendStatus", "Send attempted but not completed");
+            //            CSLog.set("fromaddress", FromAddress);
+            //            CSLog.set("Subject", EmailSubject);
+            //            CSLog.save();
+            //            //
+            //            // Get the Template
+            //            string protocolHostLink = "http://" + core.appConfig.domainList[0];
+            //            //
+            //            // Get the Member
+            //            using (var CSPeople = new CsModel(core)) {
+            //                CSPeople.openRecord("People", sendToPersonId, "Email,Name");
+            //                if (CSPeople.ok()) {
+            //                    string emailToAddress = CSPeople.getText("Email");
+            //                    string emailToName = CSPeople.getText("Name");
+            //                    string defaultPage = core.siteProperties.serverPageDefault;
+            //                    string urlProtocolDomainSlash = protocolHostLink + "/";
+            //                    string openTriggerCode = "";
+            //                    if (emailDropID != 0) {
+            //                        switch (core.siteProperties.getInteger("GroupEmailOpenTriggerMethod", 0)) {
+            //                            case 1:
+            //                                openTriggerCode = "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailOpenCssFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=#member_id#\">";
+            //                                break;
+            //                            default:
+            //                                openTriggerCode = "<img src=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailOpenFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=#member_id#\">";
+            //                                break;
+            //                        }
+            //                    }
+            //                    //
+            //                    string emailWorkingStyles = emailStyles;
+            //                    emailWorkingStyles = GenericController.vbReplace(emailWorkingStyles, StyleSheetStart, StyleSheetStart + "<!-- ", 1, 99, 1);
+            //                    emailWorkingStyles = GenericController.vbReplace(emailWorkingStyles, StyleSheetEnd, " // -->" + StyleSheetEnd, 1, 99, 1);
+            //                    //
+            //                    // Create the clickflag to be added to all anchors
+            //                    string ClickFlagQuery = rnEmailClickFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=" + sendToPersonId;
+            //                    //
+            //                    // -- encode body and subject
+            //                    EmailBodyEncoded = ActiveContentController.renderHtmlForEmail(core, EmailBodyEncoded, sendToPersonId, ClickFlagQuery);
+            //                    EmailSubjectEncoded = ActiveContentController.renderHtmlForEmail(core, EmailSubjectEncoded, sendToPersonId, ClickFlagQuery);
+            //                    //
+            //                    // Encode/Merge Template
+            //                    if (string.IsNullOrEmpty(EmailTemplate)) {
+            //                        //
+            //                        // create 20px padding template
+            //                        EmailBodyEncoded = "<div style=\"padding:10px;\">" + EmailBodyEncoded + "</div>";
+            //                    } else {
+            //                        //
+            //                        // use provided template
+            //                        // hotfix - templates no longer have wysiwyg editors, so content may not be saved correctly - preprocess to convert wysiwyg content
+            //                        EmailTemplate = ActiveContentController.processWysiwygResponseForSave(core, EmailTemplate);
+            //                        string EmailTemplateEncoded = ActiveContentController.renderHtmlForEmail(core, EmailTemplate, sendToPersonId, ClickFlagQuery);
+            //                        if (GenericController.vbInstr(1, EmailTemplateEncoded, fpoContentBox) != 0) {
+            //                            EmailBodyEncoded = GenericController.vbReplace(EmailTemplateEncoded, fpoContentBox, EmailBodyEncoded);
+            //                        } else {
+            //                            EmailBodyEncoded = EmailTemplateEncoded + "<div style=\"padding:10px;\">" + EmailBodyEncoded + "</div>";
+            //                        }
+            //                    }
+            //                    //
+            //                    // Spam Footer under template
+            //                    // remove the marker for any other place in the email then add it as needed
+            //                    EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, rnEmailBlockRecipientEmail, "", 1, 99, 1);
+            //                    if (AllowSpamFooter) {
+            //                        //
+            //                        // non-authorable, default true - leave it as an option in case there is an important exception
+            //                        EmailBodyEncoded = EmailBodyEncoded + "<div style=\"padding:10px;\">" + getLinkedText("<a href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailBlockRecipientEmail + "=#member_email#&" + rnEmailBlockRequestDropID + "=" + emailDropID + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+            //                    }
+            //                    //
+            //                    // open trigger under footer (so it does not shake as the image comes in)
+            //                    EmailBodyEncoded = EmailBodyEncoded + openTriggerCode;
+            //                    EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, "#member_id#", sendToPersonId);
+            //                    EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, "#member_email#", emailToAddress);
+            //                    //
+            //                    // Now convert URLS to absolute
+            //                    EmailBodyEncoded = convertLinksToAbsolute(EmailBodyEncoded, urlProtocolDomainSlash);
+            //                    //EmailBodyEncoded = ""
+            //                    //    + "<HTML>"
+            //                    //    + "<Head>"
+            //                    //    + "<Title>" + EmailSubjectEncoded + "</Title>"
+            //                    //    + "<Base href=\"" + urlProtocolDomainSlash + "\">"
+            //                    //    + "</Head>"
+            //                    //    + "<BODY class=ccBodyEmail>"
+            //                    //    + "<Base href=\"" + urlProtocolDomainSlash + "\">"
+            //                    //    + emailWorkingStyles + EmailBodyEncoded + "</BODY>"
+            //                    //    + "</HTML>";
+            //                    string EmailStatus = null;
+            //                    //
+            //                    // Send
+            //                    EmailController.queueAdHocEmail(core, emailContextMessage, sendToPersonId, emailToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, "", true, true, emailID, ref EmailStatus);
+            //                    if (string.IsNullOrEmpty(EmailStatus)) {
+            //                        EmailStatus = "ok";
+            //                    }
+            //                    returnStatus = returnStatus + "Added to queue, email for " + emailToName + " at " + emailToAddress;
+            //                    //
+            //                    // ----- Log the send
+            //                    CSLog.set("SendStatus", EmailStatus);
+            //                    CSLog.set("toaddress", emailToAddress);
+            //                    CSLog.save();
+            //                }
+            //            }
+            //        }
+            //    }
+            //} catch (Exception) {
+            //    throw (new GenericException("Unexpected exception"));
+            //}
 
             return returnStatus;
         }
