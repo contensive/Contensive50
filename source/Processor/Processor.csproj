@@ -853,6 +853,8 @@
     <Content Include="Resources\defaultLogin_html.txt" />
     <Content Include="Resources\defaultLogin_autoLogin_html.txt" />
     <Content Include="Resources\DefaultTemplateHtml.txt" />
+    <Content Include="Resources\Icons\AdminHeaderIconSettings.txt" />
+    <Content Include="Resources\Icons\IdeaAdminHeaderIconAddonManager.txt" />
     <Content Include="Resources\LogoutButtonFormHtml.txt" />
     <Content Include="Resources\LoginButtonFormHtml.txt" />
     <Content Include="Resources\sqlTriggerManyManyRule.txt" />

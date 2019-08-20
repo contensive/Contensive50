@@ -1,5 +1,7 @@
 ﻿
+using Contensive.Processor.Controllers;
 using System;
+using System.Diagnostics;
 
 namespace Contensive.Processor {
     //
@@ -83,7 +85,12 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void Redirect(string link) {
-            cp.core.webServer.redirect(link, "", false, false);
+            //
+            // -- determine the message by getting the call stack
+
+            // Get call stack
+            string callStack = "CP.Redirect call from " + GenericController.getCallStack();
+            cp.core.webServer.redirect(link, callStack, false, false);
         }
         //
         //====================================================================================================

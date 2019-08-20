@@ -903,7 +903,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="RedirectReason"></param>
         /// <param name="IsPageNotFound"></param>
         /// <param name="allowDebugMessage">If true, when visit property debugging is enabled, the routine returns </param>
-        public string redirect(string NonEncodedLink, string RedirectReason = "No explaination provided", bool IsPageNotFound = false, bool allowDebugMessage = true) {
+        public string redirect(string NonEncodedLink, string RedirectReason, bool IsPageNotFound = false, bool allowDebugMessage = true) {
             string result = HtmlController.div( "Redirecting to [" + NonEncodedLink + "], reason [" + RedirectReason + "]", "ccWarningBox" );
             try {
                 const string rnRedirectCycleFlag = "cycleFlag";
@@ -1296,7 +1296,7 @@ namespace Contensive.Processor.Controllers {
                         if (csData.isFieldSupported("Clicks")) {
                             csData.set("Clicks", (csData.getNumber("Clicks")) + 1);
                         }
-                        core.webServer.redirect(LinkPrefix + NonEncodedLink, "no reason given.", false, false);
+                        core.webServer.redirect(LinkPrefix + NonEncodedLink, "Redirect by Record, content [" + contentName + "], recordId [" + recordId + "], field [" + fieldName + "], called from " + GenericController.getCallStack(), false, false);
                         result = true;
                     }
                 }

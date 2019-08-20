@@ -170,7 +170,7 @@ namespace Contensive.Addons.Tools {
                     //
                     // Cancel to the admin site
                     //
-                    return core.webServer.redirect(core.siteProperties.getText("AdminURL", "/admin/"));
+                    return core.webServer.redirect( core.appConfig.adminRoute, "Tools-List, cancel button");
                 }
                 //
                 // ----- Check permissions
@@ -207,7 +207,7 @@ namespace Contensive.Addons.Tools {
                     if (Button == ButtonCancel) {
                         //
                         // -- Cancel
-                        return core.webServer.redirect(core.siteProperties.getText("AdminURL", "/admin/"));
+                        return core.webServer.redirect(core.appConfig.adminRoute, "Tools-List, cancel button");
                     } else {
                         //
                         // -- Print out the page
@@ -722,7 +722,7 @@ namespace Contensive.Addons.Tools {
                     if (Button == ButtonSaveandInvalidateCache) {
                         core.cache.invalidateAll();
                         core.clearMetaData();
-                        return core.webServer.redirect("?af=" + AdminFormToolConfigureListing + "&ContentID=" + ContentID);
+                        return core.webServer.redirect("?af=" + AdminFormToolConfigureListing + "&ContentID=" + ContentID, "Tools-ConfigureListing, Save and Invalidate Cache, Go to back ConfigureListing tools");
                     }
                     //
                     //--------------------------------------------------------------------------------
@@ -2762,7 +2762,7 @@ namespace Contensive.Addons.Tools {
                     //
                     //
                     LogController.logDebug(core, "Restarting IIS");
-                    core.webServer.redirect("https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Popup/WaitForIISReset.htm");
+                    core.webServer.redirect("https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Popup/WaitForIISReset.htm", "Redirect to iis reset");
                     Thread.Sleep(2000);
                     var cmdDetail = new TaskModel.CmdDetailClass {
                         addonId = 0,

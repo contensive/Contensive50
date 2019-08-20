@@ -91,7 +91,12 @@ namespace Contensive.Processor.Controllers {
                     } catch (Exception) {
                         throw;
                     } finally {
+                        //
+                        // -- remove temp folder
                         core.privateFiles.deleteFolder(installPrivatePath);
+                        //
+                        // -- invalidate cache
+                        core.cache.invalidateAll();
                     }
                 }
             } catch (Exception ex) {
@@ -958,6 +963,9 @@ namespace Contensive.Processor.Controllers {
                                             }
                                         }
                                     }
+                                    //
+                                    // -- invalidate cache
+                                    core.cache.invalidateAll();
                                 }
                             }
                         }
@@ -1013,6 +1021,9 @@ namespace Contensive.Processor.Controllers {
                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
                             break;
                         }
+                        //
+                        // -- invalidate cache
+                        core.cache.invalidateAll();
                     }
                 }
             } catch (Exception ex) {
@@ -1063,6 +1074,9 @@ namespace Contensive.Processor.Controllers {
                     }
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", Collection(s) installed successfully.");
                 }
+                //
+                // -- invalidate cache
+                core.cache.invalidateAll();
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 returnSuccess = false;

@@ -206,6 +206,9 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     }
+                    //
+                    // -- invalidate cache
+                    core.cache.invalidateAll();
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -254,7 +257,11 @@ namespace Contensive.Processor.Controllers {
                         CollectionInstallController.installCollectionsFromPrivateFolder(core, contextLog, privateFilesDownloadPath, ref return_ErrorMessage, ref collectionsInstalledList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
                     }
                     //
+                    // -- delete the temporary install folder
                     core.privateFiles.deleteFolder(privateFilesDownloadPath);
+                    //
+                    // -- invalidate cache
+                    core.cache.invalidateAll();
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

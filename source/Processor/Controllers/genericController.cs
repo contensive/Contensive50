@@ -210,6 +210,23 @@ namespace Contensive.Processor.Controllers {
         //
         //=============================================================================
         /// <summary>
+        /// add the values from the addQuery to the primaryQuery
+        /// </summary>
+        /// <param name="primaryQuery"></param>
+        /// <param name="addQuery"></param>
+        /// <returns></returns>
+        public static string joinQueryString(string primaryQuery, string addQuery) {
+            if (string.IsNullOrWhiteSpace(addQuery)) return primaryQuery;
+            foreach (string queryPair in addQuery.Split('&')) {
+                string[] queryVar = queryPair.Split('=');
+                if (queryVar.Length < 2) continue;
+                primaryQuery = modifyQueryString(primaryQuery, queryVar[0], queryVar[1]);
+            }
+            return primaryQuery;
+        }
+        //
+        //=============================================================================
+        /// <summary>
         /// Create the part of the sql where clause that is modified by the user, WorkingQuery is the original querystring to change, QueryName is the name part of the name pair to change, If the QueryName is not found in the string
         /// </summary>
         /// <param name="workingQuery"></param>
@@ -217,9 +234,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="queryValue"></param>
         /// <param name="addIfMissing"></param>
         /// <returns></returns>
-        //
-        //=============================================================================
-        //
         public static string modifyQueryString(string workingQuery, string queryName, string queryValue, bool addIfMissing = true) {
             string result = "";
             //
@@ -251,60 +265,6 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string nop(string Source, int depth = 1) {
             return Source;
-            //string temphtmlIndent = null;
-            //int posStart = 0;
-            //int posEnd = 0;
-            //string pre = null;
-            //string post = null;
-            //string target = null;
-            ////
-            //posStart = vbInstr(1, Source, "<![CDATA[", 1);
-            //if (posStart == 0) {
-            //    //
-            //    // no cdata
-            //    //
-            //    posStart = vbInstr(1, Source, "<textarea", 1);
-            //    if (posStart == 0) {
-            //        //
-            //        // no textarea
-            //        //
-            //        string replaceText = Environment.NewLine + new string(Convert.ToChar("\t"), (depth + 1));
-            //        temphtmlIndent = vbReplace(Source, Environment.NewLine + "\t", replaceText);
-            //    } else {
-            //        //
-            //        // text area found, isolate it and indent before and after
-            //        //
-            //        posEnd = vbInstr(posStart, Source, "</textarea>", 1);
-            //        pre = Source.Left( posStart - 1);
-            //        if (posEnd == 0) {
-            //            target = Source.Substring(posStart - 1);
-            //            post = "";
-            //        } else {
-            //            target = Source.Substring(posStart - 1, posEnd - posStart + ((string)("</textarea>")).Length);
-            //            post = Source.Substring((posEnd + ((string)("</textarea>")).Length) - 1);
-            //        }
-            //        temphtmlIndent = nop(pre) + target + nop(post);
-            //    }
-            //} else {
-            //    //
-            //    // cdata found, isolate it and indent before and after
-            //    //
-            //    posEnd = vbInstr(posStart, Source, "]]>", 1);
-            //    pre = Source.Left( posStart - 1);
-            //    if (posEnd == 0) {
-            //        target = Source.Substring(posStart - 1);
-            //        post = "";
-            //    } else {
-            //        target = Source.Substring(posStart - 1, posEnd - posStart + ((string)("]]>")).Length);
-            //        post = Source.Substring(posEnd + 2);
-            //    }
-            //    temphtmlIndent = nop(pre) + target + nop(post);
-            //}
-            ////    kmaIndent = Source
-            ////    If vbInstr(1, kmaIndent, "<textarea", vbTextCompare) = 0 Then
-            ////        kmaIndent = vbReplace(Source, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
-            ////    End If
-            //return temphtmlIndent;
         }
         //
         //========================================================================================================
@@ -329,108 +289,6 @@ namespace Contensive.Processor.Controllers {
         public static string GetRFC1123PatternDateFormat(DateTime DateValue) {
             //
             return DateValue.ToString("R");
-            //string tempGetGMTFromDate = null;
-            //int WorkLong = 0;
-            ////
-            //tempGetGMTFromDate = "";
-            //if (GenericController.IsDate(DateValue)) {
-            //    switch ((int)DateValue.DayOfWeek) {
-            //        case 0:
-            //            tempGetGMTFromDate = "Sun, ";
-            //            break;
-            //        case 1:
-            //            tempGetGMTFromDate = "Mon, ";
-            //            break;
-            //        case 2:
-            //            tempGetGMTFromDate = "Tue, ";
-            //            break;
-            //        case 3:
-            //            tempGetGMTFromDate = "Wed, ";
-            //            break;
-            //        case 4:
-            //            tempGetGMTFromDate = "Thu, ";
-            //            break;
-            //        case 5:
-            //            tempGetGMTFromDate = "Fri, ";
-            //            break;
-            //        case 6:
-            //            tempGetGMTFromDate = "Sat, ";
-            //            break;
-            //    }
-            //    //
-            //    WorkLong = DateValue.Day;
-            //    if (WorkLong < 10) {
-            //        tempGetGMTFromDate = tempGetGMTFromDate + "0" + WorkLong.ToString() + " ";
-            //    } else {
-            //        tempGetGMTFromDate = tempGetGMTFromDate + WorkLong.ToString() + " ";
-            //    }
-            //    //
-            //    switch (DateValue.Month) {
-            //        case 1:
-            //            tempGetGMTFromDate = tempGetGMTFromDate + "Jan ";
-            //            break;
-            //        case 2:
-            //            tempGetGMTFromDate = tempGetGMTFromDate + "Feb ";
-            //            break;
-            //        case 3:
-            //            tempGetGMTFromDate = tempGetGMTFromDate + "Mar ";
-            //            break;
-            //        case 4:
-            //            tempGetGMTFromDate = tempGetGMTFromDate + "Apr ";
-            //            break;
-            //        case 5:
-            //            tempGetGMTFromDate = tempGetGMTFromDate + "May ";
-            //            break;
-            //        case 6:
-            //            tempGetGMTFromDate = tempGetGMTFromDate + "Jun ";
-            //            break;
-            //        case 7:
-            //            tempGetGMTFromDate = tempGetGMTFromDate + "Jul ";
-            //            break;
-            //        case 8:
-            //            tempGetGMTFromDate = tempGetGMTFromDate + "Aug ";
-            //            break;
-            //        case 9:
-            //            tempGetGMTFromDate = tempGetGMTFromDate + "Sep ";
-            //            break;
-            //        case 10:
-            //            tempGetGMTFromDate = tempGetGMTFromDate + "Oct ";
-            //            break;
-            //        case 11:
-            //            tempGetGMTFromDate = tempGetGMTFromDate + "Nov ";
-            //            break;
-            //        case 12:
-            //            tempGetGMTFromDate = tempGetGMTFromDate + "Dec ";
-            //            break;
-            //    }
-            //    //
-            //    tempGetGMTFromDate = tempGetGMTFromDate + encodeText(DateValue.Year) + " ";
-            //    //
-            //    WorkLong = DateValue.Hour;
-            //    if (WorkLong < 10) {
-            //        tempGetGMTFromDate = tempGetGMTFromDate + "0" + WorkLong.ToString() + ":";
-            //    } else {
-            //        tempGetGMTFromDate = tempGetGMTFromDate + WorkLong.ToString() + ":";
-            //    }
-            //    //
-            //    WorkLong = DateValue.Minute;
-            //    if (WorkLong < 10) {
-            //        tempGetGMTFromDate = tempGetGMTFromDate + "0" + WorkLong.ToString() + ":";
-            //    } else {
-            //        tempGetGMTFromDate = tempGetGMTFromDate + WorkLong.ToString() + ":";
-            //    }
-            //    //
-            //    WorkLong = DateValue.Second;
-            //    if (WorkLong < 10) {
-            //        tempGetGMTFromDate = tempGetGMTFromDate + "0" + WorkLong.ToString();
-            //    } else {
-            //        tempGetGMTFromDate = tempGetGMTFromDate + WorkLong.ToString();
-            //    }
-            //    //
-            //    tempGetGMTFromDate = tempGetGMTFromDate + " GMT";
-            //}
-            //
-            //return tempGetGMTFromDate;
         }
         //
         //========================================================================================================
@@ -2489,6 +2347,20 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getDateTimeNumberString(DateTime rightNow) {
             return getDateNumberString(rightNow) + rightNow.Hour.ToString().PadLeft(2, '0') + rightNow.Minute.ToString().PadLeft(2, '0') + rightNow.Second.ToString().PadLeft(2, '0');
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a string with class.method() > class.method() > etc.
+        /// </summary>
+        /// <returns></returns>
+        public static string getCallStack() {
+            string callStack = "";
+            StackTrace stackTrace = new StackTrace();
+            foreach (var stackFrame in stackTrace.GetFrames()) {
+                callStack += " > " + stackFrame.GetMethod().GetType().Name + "." + stackFrame.GetMethod().Name + "()";
+            }
+            return callStack;
         }
     }
 }

@@ -217,7 +217,7 @@ namespace Contensive.Addons.Tools {
                             //
                             // ----- Exit back to menu
                             //
-                            return core.webServer.redirect(core.webServer.requestProtocol + core.webServer.requestDomain + core.webServer.requestPath + core.webServer.requestPage + "?af=" + AdminFormTools);
+                            return core.webServer.redirect(core.appConfig.adminRoute, "Tool-ConfigureContentEdit, ok or cancel button, go to root.");
                         }
                     }
                 }

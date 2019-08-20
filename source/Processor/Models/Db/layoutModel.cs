@@ -27,7 +27,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         // -- instance properties (must be properties not fields)
-        public FieldTypeHTMLFile layout { get; set; }
+        public DbBaseModel.FieldTypeTextFile layout { get; set; }
         public string stylesFilename { get; set; }
     }
 }

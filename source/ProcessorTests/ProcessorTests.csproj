@@ -104,30 +104,30 @@
   </Choose>
   <ItemGroup>
     <Compile Include="constants.cs" />
-    <Compile Include="UnitTests\ControllerTests\adminUIControllerTests.cs" />
-    <Compile Include="UnitTests\ControllerTests\addonControllerTests.cs" />
-    <Compile Include="UnitTests\ControllerTests\activeContentControllerTests.cs" />
-    <Compile Include="UnitTests\ControllerTests\dbControllerTests.cs" />
-    <Compile Include="UnitTests\ControllerTests\fileControllerTests.cs" />
-    <Compile Include="UnitTests\ControllerTests\securityControllerTests.cs" />
-    <Compile Include="UnitTests\ControllerTests\csTests.cs" />
-    <Compile Include="UnitTests\extensionMethodsUnitTests.cs" />
+    <Compile Include="Admin\adminUIControllerTests.cs" />
+    <Compile Include="Addon\addonControllerTests.cs" />
+    <Compile Include="ActiveContent\activeContentControllerTests.cs" />
+    <Compile Include="Db\dbControllerTests.cs" />
+    <Compile Include="File\fileControllerTests.cs" />
+    <Compile Include="Security\securityControllerTests.cs" />
+    <Compile Include="Cs\csTests.cs" />
+    <Compile Include="extensionMethodsUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UnitTests\ControllerTests\cacheControllerTests.cs" />
-    <Compile Include="UnitTests\ControllerTests\contentCmdControllerTests.cs" />
-    <Compile Include="UnitTests\ControllerTests\emailControllerTests.cs" />
-    <Compile Include="UnitTests\ControllerTests\genericControllerUnitTests.cs" />
-    <Compile Include="UnitTests\ControllerTests\iisControllerUnitTests.cs" />
-    <Compile Include="UnitTests\ControllerTests\_blank.cs" />
-    <Compile Include="UnitTests\ModelTests\routeDictionaryModelTests.cs" />
-    <Compile Include="UnitTests\ViewTests\cpBlockTests.cs" />
-    <Compile Include="UnitTests\ViewTests\cpCacheTests.cs" />
-    <Compile Include="UnitTests\ViewTests\cpContentTests.cs" />
-    <Compile Include="UnitTests\ViewTests\cpCSTests.cs" />
-    <Compile Include="UnitTests\ViewTests\cpSecurityTests.cs" />
-    <Compile Include="UnitTests\ViewTests\cpUserTests.cs" />
-    <Compile Include="UnitTests\ViewTests\cpTests.cs" />
-    <Compile Include="UnitTests\ViewTests\NumericHelper.cs" />
+    <Compile Include="Cache\cacheControllerTests.cs" />
+    <Compile Include="ContentCmd\contentCmdControllerTests.cs" />
+    <Compile Include="Email\emailControllerTests.cs" />
+    <Compile Include="Generic\genericControllerUnitTests.cs" />
+    <Compile Include="IIS\iisControllerUnitTests.cs" />
+    <Compile Include="_blank.cs" />
+    <Compile Include="Routing\routeDictionaryModelTests.cs" />
+    <Compile Include="Cp\cpBlockTests.cs" />
+    <Compile Include="Cp\cpCacheTests.cs" />
+    <Compile Include="Cp\cpContentTests.cs" />
+    <Compile Include="Cp\cpCSTests.cs" />
+    <Compile Include="Cp\cpSecurityTests.cs" />
+    <Compile Include="Cp\cpUserTests.cs" />
+    <Compile Include="Cp\cpTests.cs" />
+    <Compile Include="Cp\NumericHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CPBase51\CPBase51.csproj">
@@ -140,10 +140,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Views\" />
+    <Folder Include="Block\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -818,7 +818,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string form(CoreController core, string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post") {
             if (string.IsNullOrEmpty(actionQueryString)) actionQueryString = core.doc.refreshQueryString;
-            string action = core.webServer.serverFormActionURL + (string.IsNullOrEmpty(actionQueryString) ? "" : "?" + actionQueryString);
+            string action = joinQueryString( core.webServer.serverFormActionURL, actionQueryString);
             string result = "<form name=\"" + htmlName + "\" action=\"" + action + "\" method=\"" + htmlMethod + "\" style=\"display: inline;\"";
             result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
             result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
