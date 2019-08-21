@@ -155,7 +155,7 @@ namespace Contensive.Addons.AdminSite {
                                         addonName = ExportCSVAddon.name,
                                         args = docProperties
                                     };
-                                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false);
+                                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false, ExportName );
                                 }
                                 //
                                 Content = ""
