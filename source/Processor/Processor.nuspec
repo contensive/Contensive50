@@ -11,7 +11,7 @@
         <iconUrl>http://contensive.io/img/ContensiveLogo2-385x60.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>This package installs the library files required to create an instance of cp within an application.</description>
-        <releaseNotes>minor bugfix</releaseNotes>
+        <releaseNotes></releaseNotes>
         <copyright>Copyright 2019</copyright>
         <tags>Contensive</tags>
     </metadata>
