@@ -22,9 +22,6 @@ using Contensive.BaseClasses;
 //
 namespace Contensive.Addons.Tools {
     public class LegacyToolsClass {
-        //========================================================================
-        // This file and its contents are copyright by Kidwell McGowan Associates.
-        //========================================================================
         //
         // ----- global scope variables
         //

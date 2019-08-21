@@ -4,9 +4,6 @@
       <assemblies>
         <remove assembly="ClearScriptV8-64" />
         <remove assembly="ClearScriptV8-32" />
-        <remove assembly="v8-base-ia32.dll" />
-        <remove assembly="v8-base-x64.dll" />
-        <remove assembly="v8-x64.dll" />
       </assemblies>
     </compilation>
   </system.web>

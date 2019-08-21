@@ -52,22 +52,37 @@
     <Reference Include="Amazon.ElastiCacheCluster, Version=1.0.1.0, Culture=neutral, PublicKeyToken=445456c82d5a0fce, processorArchitecture=MSIL">
       <HintPath>..\packages\Amazon.ElastiCacheCluster.1.0.1.0\lib\net35\Amazon.ElastiCacheCluster.dll</HintPath>
     </Reference>
+    <Reference Include="AWS.Logger.Core, Version=1.4.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWS.Logger.Core.1.4.0\lib\net45\AWS.Logger.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.CloudWatchLogs, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.CloudWatchLogs.3.3.101.13\lib\net45\AWSSDK.CloudWatchLogs.dll</HintPath>
+    </Reference>
     <Reference Include="AWSSDK.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
       <HintPath>..\packages\AWSSDK.Core.3.3.103.29\lib\net45\AWSSDK.Core.dll</HintPath>
     </Reference>
     <Reference Include="AWSSDK.S3, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
       <HintPath>..\packages\AWSSDK.S3.3.3.104.17\lib\net45\AWSSDK.S3.dll</HintPath>
     </Reference>
-    <Reference Include="ClearScript, Version=5.5.2.0, Culture=neutral, PublicKeyToken=935d0c957da47c73, processorArchitecture=MSIL">
-      <HintPath>..\packages\ClearScript.V8.5.5.2\lib\net45\ClearScript.dll</HintPath>
+    <Reference Include="AWSSDK.SimpleEmail, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.SimpleEmail.3.3.101.35\lib\net45\AWSSDK.SimpleEmail.dll</HintPath>
+    </Reference>
+    <Reference Include="ClearScript, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ClearScript.5.6.0\lib\net45\ClearScript.dll</HintPath>
     </Reference>
     <Reference Include="ClearScriptV8-32, Version=5.5.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\clearScript\ClearScriptV8-32.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\Contensive.CPBaseClass.5.1.190820.2\lib\net461\CPBase.dll</HintPath>
+    </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
       <HintPath>..\packages\EnyimMemcached.2.16.0\lib\net35\Enyim.Caching.dll</HintPath>
+    </Reference>
+    <Reference Include="Enyim.Caching.NLogAdapter, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
+      <HintPath>..\packages\EnyimMemcached-NLog.2.16.0\lib\net35\Enyim.Caching.NLogAdapter.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=1.2.0.246, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.1.2.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -79,8 +94,17 @@
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.6.6\lib\net45\NLog.dll</HintPath>
     </Reference>
+    <Reference Include="NLog.AWS.Logger, Version=1.4.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWS.Logger.NLog.1.4.0\lib\net45\NLog.AWS.Logger.dll</HintPath>
+    </Reference>
     <Reference Include="NUglify, Version=1.5.13.0, Culture=neutral, PublicKeyToken=15bc7810aec21b5e, processorArchitecture=MSIL">
       <HintPath>..\packages\NUglify.1.5.13\lib\net40\NUglify.dll</HintPath>
+    </Reference>
+    <Reference Include="Nustache.Core, Version=1.16.0.10, Culture=neutral, PublicKeyToken=efd6f3d8f76ecd9f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nustache.1.16.0.10\lib\net20\Nustache.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="processor, Version=5.1.7172.15235, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Contensive.Processor.5.1.190821\lib\net472\processor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -131,7 +155,9 @@
     <Import Include="System.Web.UI.HtmlControls" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ClearScriptV8-32.dll" />
+    <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow.html" />
+    <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow2.html" />
+    <Content Include="aoBase51.xml" />
     <Content Include="default.aspx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -147,10 +173,20 @@
     <Content Include="helloworld.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Licenses\clearscript-license.txt" />
-    <Content Include="Licenses\v8-license.txt" />
-    <Content Include="v8-base-ia32.dll" />
-    <Content Include="v8-ia32.dll" />
+    <Content Include="Models\dataModelFields.txt" />
+    <Content Include="Resources\adminNavBarHtml.txt" />
+    <Content Include="Resources\adminTemplateHtml.txt" />
+    <Content Include="Resources\defaultForgetPassword_html.txt" />
+    <Content Include="Resources\defaultLogin_autoLogin_html.txt" />
+    <Content Include="Resources\defaultLogin_email_autoLogin_html.txt" />
+    <Content Include="Resources\defaultLogin_email_html.txt" />
+    <Content Include="Resources\defaultLogin_html.txt" />
+    <Content Include="Resources\DefaultTemplateHtml.txt" />
+    <Content Include="Resources\Icons\AdminHeaderIconSettings.txt" />
+    <Content Include="Resources\Icons\IdeaAdminHeaderIconAddonManager.txt" />
+    <Content Include="Resources\LoginButtonFormHtml.txt" />
+    <Content Include="Resources\LogoutButtonFormHtml.txt" />
+    <Content Include="Resources\sqlTriggerManyManyRule.txt" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -239,16 +275,6 @@
     <None Include="Web.StagingDefaultApp.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CPBase51\CPBase51.csproj">
-      <Project>{29b26629-df94-4e7c-9f83-7e76cb4f342e}</Project>
-      <Name>CPBase51</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Processor\Processor.csproj">
-      <Project>{46657d07-74bc-4ddc-8fdd-9078eb1a1cd2}</Project>
-      <Name>Processor</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
@@ -346,11 +372,15 @@
   </ProjectExtensions>
   <PropertyGroup>
     <PostBuildEvent>
-if not exist "$(TargetDir)" md "$(TargetDir)"
-xcopy /s /y "$(SolutionDir)packages\ClearScript.V8.5.5.2\tools\native\x86\*.*" "$(TargetDir)"
-if not exist "$(TargetDir)" md "$(TargetDir)"
-xcopy /s /y "$(SolutionDir)packages\ClearScript.V8.5.5.2\tools\native\amd64\*.*" "$(TargetDir)"</PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\Microsoft.ClearScript.5.6.0\build\Microsoft.ClearScript.targets" Condition="Exists('..\packages\Microsoft.ClearScript.5.6.0\build\Microsoft.ClearScript.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.ClearScript.5.6.0\build\Microsoft.ClearScript.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ClearScript.5.6.0\build\Microsoft.ClearScript.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
