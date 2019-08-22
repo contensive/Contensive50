@@ -870,7 +870,7 @@ namespace Contensive.Addons.SafeAddonManager {
                     if (!string.IsNullOrEmpty(status)) {
                         Description = Description + "<div style=\"Margin-left:50px\">" + status + "</div>";
                     }
-                    addonManager = AdminUIController.getBody(core,Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
+                    addonManager = AdminUIController.getToolBody(core,Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
                     core.html.addTitle("Add-on Manager");
                 }
             } catch (Exception ex) {

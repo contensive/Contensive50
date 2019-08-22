@@ -20,7 +20,7 @@ namespace Contensive.Addons.AdminSite {
             try {
                 //
                 bool AllowContentAccess = false;
-                string ButtonList = "";
+                string ButtonCommaList = "";
                 string ExportName = null;
                 //adminUIController Adminui = new adminUIController(core);
                 string Description = null;
@@ -65,7 +65,7 @@ namespace Contensive.Addons.AdminSite {
                         Content = ""
                             + "<p>You must be a content manager of " + adminData.adminContent.name + " to use this tool. Hit Cancel to return to main admin page.</p>"
                             + HtmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
-                        ButtonList = ButtonCancelAll;
+                        ButtonCommaList = ButtonCancelAll;
                     } else {
                         IsRecordLimitSet = false;
                         if (string.IsNullOrEmpty(Button)) {
@@ -78,7 +78,7 @@ namespace Contensive.Addons.AdminSite {
                             RecordLimitText = "";
                         } else {
                             ExportName = core.docProperties.getText("ExportName");
-                            ExportType = core.docProperties.getInteger("ExportType");
+                            ExportType = 1; //core.docProperties.getInteger("ExportType");
                             RecordLimitText = core.docProperties.getText("RecordLimit");
                             if (!string.IsNullOrEmpty(RecordLimitText)) {
                                 IsRecordLimitSet = true;
@@ -137,7 +137,7 @@ namespace Contensive.Addons.AdminSite {
                                 Content = ""
                                     + "<p>This selection has no records.. Hit Cancel to return to the " + adminData.adminContent.name + " list page.</p>"
                                     + HtmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
-                                ButtonList = ButtonCancel;
+                                ButtonCommaList = ButtonCancel;
                             } else if (Button == ButtonRequestDownload) {
                                 //
                                 // Request the download
@@ -155,64 +155,76 @@ namespace Contensive.Addons.AdminSite {
                                         addonName = ExportCSVAddon.name,
                                         args = docProperties
                                     };
-                                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false, ExportName );
+                                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false, ExportName);
                                 }
                                 //
                                 Content = ""
                                     + "<p>Your export has been requested and will be available shortly in the <a href=\"?" + rnAdminForm + "=" + AdminFormDownloads + "\">Download Manager</a>. Hit Cancel to return to the " + adminData.adminContent.name + " list page.</p>"
                                     + HtmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                                 //
-                                ButtonList = ButtonCancel;
+                                ButtonCommaList = ButtonCancel;
                             } else {
                                 //
                                 // no button or refresh button, Ask are you sure
                                 //
-                                Content = Content + "\r<tr>"
-                                    + cr2 + "<td class=\"exportTblCaption\">Export Name</td>"
-                                    + cr2 + "<td class=\"exportTblInput\">" + HtmlController.inputText(core, "ExportName", ExportName) + "</td>"
-                                    + "\r</tr>";
-                                Content = Content + "\r<tr>"
-                                    + cr2 + "<td class=\"exportTblCaption\">Export Format</td>"
-                                    + cr2 + "<td class=\"exportTblInput\">" + HtmlController.selectFromList(core, "ExportType", ExportType, new String[] { "Comma Delimited,XML" }, "", "") + "</td>"
-                                    + "\r</tr>";
-                                Content = Content + "\r<tr>"
-                                    + cr2 + "<td class=\"exportTblCaption\">Records Found</td>"
-                                    + cr2 + "<td class=\"exportTblInput\">" + HtmlController.inputText(core, "RecordCnt", recordCnt.ToString(), -1, -1, "", false, true) + "</td>"
-                                    + "\r</tr>";
-                                Content = Content + "\r<tr>"
-                                    + cr2 + "<td class=\"exportTblCaption\">Record Limit</td>"
-                                    + cr2 + "<td class=\"exportTblInput\">" + HtmlController.inputText(core, "RecordLimit", RecordLimitText) + "</td>"
-                                    + "\r</tr>";
+                                Content += HtmlController.div(
+                                    HtmlController.label("Export Name", "export-name")
+                                    + HtmlController.inputText(core, "ExportName", ExportName, "form-control", "export-name")
+                                    , "form-group");
+                                Content += HtmlController.div(
+                                    HtmlController.label("Records Found", "records-found")
+                                    + HtmlController.inputText(core, "RecordCnt", recordCnt.ToString(), "form-control", "records-found",true)
+                                    , "form-group");
+                                Content += HtmlController.div(
+                                    HtmlController.label("Record Limit", "record-limit")
+                                    + HtmlController.inputText(core, "RecordLimit", RecordLimitText, "form-control", "record-limit")
+                                    , "form-group");
                                 if (core.session.isAuthenticatedDeveloper()) {
-                                    Content = Content + "\r<tr>"
-                                        + cr2 + "<td class=\"exportTblCaption\">Results SQL</td>"
-                                        + cr2 + "<td class=\"exportTblInput\"><div style=\"border:1px dashed #ccc;background-color:#fff;padding:10px;\">" + SQL + "</div></td>"
-                                        + "\r</tr>"
-                                        + "";
+                                    Content += HtmlController.div(
+                                         HtmlController.label("Results SQL", "export-query")
+                                         + HtmlController.inputTextarea(core, "sql", SQL, 4,-1,"export-query",false,false, "form-control")
+                                         , "form-group");
                                 }
+
+
+
+                                //Content = Content + "\r<tr>"
+                                //    + cr2 + "<td class=\"exportTblCaption\">Records Found</td>"
+                                //    + cr2 + "<td class=\"exportTblInput\">" + HtmlController.inputText_Legacy(core, "RecordCnt", recordCnt.ToString(), -1, -1, "", false, true) + "</td>"
+                                //    + "\r</tr>";
+                                //Content = Content + "\r<tr>"
+                                //    + cr2 + "<td class=\"exportTblCaption\">Record Limit</td>"
+                                //    + cr2 + "<td class=\"exportTblInput\">" + HtmlController.inputText_Legacy(core, "RecordLimit", RecordLimitText) + "</td>"
+                                //    + "\r</tr>";
+                                //if (core.session.isAuthenticatedDeveloper()) {
+                                //    Content = Content + "\r<tr>"
+                                //        + cr2 + "<td class=\"exportTblCaption\">Results SQL</td>"
+                                //        + cr2 + "<td class=\"exportTblInput\"><div style=\"border:1px dashed #ccc;background-color:#fff;padding:10px;\">" + SQL + "</div></td>"
+                                //        + "\r</tr>"
+                                //        + "";
+                                //}
+                                //
+                                //Content = ""
+                                //    + "\r<table>"
+                                //    + GenericController.nop(Content) + "\r</table>"
+                                //    + "";
                                 //
                                 Content = ""
-                                    + "\r<table>"
-                                    + GenericController.nop(Content) + "\r</table>"
-                                    + "";
-                                //
-                                Content = ""
-                                    + "\r<style>"
-                                    + cr2 + ".exportTblCaption {width:100px;}"
-                                    + cr2 + ".exportTblInput {}"
-                                    + "\r</style>"
+                                    //+ "\r<style>"
+                                    //+ cr2 + ".exportTblCaption {width:100px;}"
+                                    //+ cr2 + ".exportTblInput {}"
+                                    //+ "\r</style>"
                                     + Content + HtmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
-                                ButtonList = ButtonCancel + "," + ButtonRequestDownload;
+                                ButtonCommaList = ButtonCancel + "," + ButtonRequestDownload;
                                 if (core.session.isAuthenticatedDeveloper()) {
-                                    ButtonList = ButtonList + "," + ButtonRefresh;
+                                    ButtonCommaList = ButtonCommaList + "," + ButtonRefresh;
                                 }
                             }
                         }
                     }
                     //
                     Description = "<p>This tool creates an export of the current admin list page results. If you would like to download the current results, select a format and press OK. Your search results will be submitted for export. Your download will be ready shortly in the download manager. To exit without requesting an output, hit Cancel.</p>";
-                    result = ""
-                        + AdminUIController.getBody(core, adminData.adminContent.name + " Export", ButtonList, "", false, false, Description, "", 10, Content);
+                    result = AdminUIController.getToolBody(core, adminData.adminContent.name + " Export", ButtonCommaList, "", false, false, Description, "", 10, Content);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

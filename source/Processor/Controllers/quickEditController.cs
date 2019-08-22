@@ -58,29 +58,29 @@ namespace Contensive.Processor.Controllers {
                 //
                 // SubPanel: Authoring Status
                 //
-                string ButtonList = "";
-                ButtonList = ButtonList + "," + ButtonCancel;
+                string leftButtonCommaList = "";
+                leftButtonCommaList = leftButtonCommaList + "," + ButtonCancel;
                 if (userContentPermissions.allowSave) {
-                    ButtonList = ButtonList + "," + ButtonSave + "," + ButtonOK;
+                    leftButtonCommaList = leftButtonCommaList + "," + ButtonSave + "," + ButtonOK;
                 }
                 if (userContentPermissions.allowDelete && (core.doc.pageController.pageToRootList.Count == 1)) {
                     //
                     // -- allow delete and not root page
-                    ButtonList = ButtonList + "," + ButtonDelete;
+                    leftButtonCommaList = leftButtonCommaList + "," + ButtonDelete;
                 }
                 if (userContentPermissions.allowAdd) {
-                    ButtonList = ButtonList + "," + ButtonAddChildPage;
+                    leftButtonCommaList = leftButtonCommaList + "," + ButtonAddChildPage;
                 }
                 int page_ParentID = 0;
                 if ((page_ParentID != 0) && userContentPermissions.allowAdd) {
-                    ButtonList = ButtonList + "," + ButtonAddSiblingPage;
+                    leftButtonCommaList = leftButtonCommaList + "," + ButtonAddSiblingPage;
                 }
                 if (AllowMarkReviewed) {
-                    ButtonList = ButtonList + "," + ButtonMarkReviewed;
+                    leftButtonCommaList = leftButtonCommaList + "," + ButtonMarkReviewed;
                 }
-                if (!string.IsNullOrEmpty(ButtonList)) {
-                    ButtonList = ButtonList.Substring(1);
-                    ButtonList = core.html.getPanelButtons(ButtonList, "Button");
+                if (!string.IsNullOrEmpty(leftButtonCommaList)) {
+                    leftButtonCommaList = leftButtonCommaList.Substring(1);
+                    leftButtonCommaList = core.html.getPanelButtons(leftButtonCommaList);
                 }
                 //If OptionsPanelAuthoringStatus <> "" Then
                 //    result = result & "" _
@@ -107,7 +107,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 result += "\r<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:10px;\">Name</td>"
-                    + cr2 + "<td class=\"qeRow qeRight\">" + HtmlController.inputText(core, "name", core.doc.pageController.page.name, 1, 0, "", false, !userContentPermissions.allowSave) + "</td>"
+                    + cr2 + "<td class=\"qeRow qeRight\">" + HtmlController.inputText_Legacy(core, "name", core.doc.pageController.page.name, 1, 0, "", false, !userContentPermissions.allowSave) + "</td>"
                     + "\r</tr>"
                     + "";
                 string PageList = null;
@@ -160,7 +160,7 @@ namespace Contensive.Processor.Controllers {
                     + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                     + GenericController.nop(result) + "\r</table>";
                 result = ""
-                    + ButtonList + result + ButtonList;
+                    + leftButtonCommaList + result + leftButtonCommaList;
                 result = core.html.getPanel(result);
                 //
                 // Form Wrapper

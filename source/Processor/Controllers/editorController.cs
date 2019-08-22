@@ -105,7 +105,7 @@ namespace Contensive.Processor.Controllers {
                             EditorPanel = EditorPanel + GenericController.encodeText(FormElements);
                             EditorPanel = EditorPanel + core.html.getFormInputHTML("ContentCopy", Copy, "3", "45", false, true);
                             //EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
-                            ButtonPanel = core.html.getPanelButtons(ButtonCancel + "," + ButtonSave, "button");
+                            ButtonPanel = core.html.getPanelButtons(ButtonCancel + "," + ButtonSave);
                             EditorPanel = EditorPanel + ButtonPanel;
                         }
                         csData.close();

@@ -1079,7 +1079,7 @@ namespace Contensive.Processor.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + HtmlController.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = HtmlController.inputText(core, FieldName, FieldValue);
+                                                                            Copy = HtmlController.inputText_Legacy(core, FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     default:
@@ -1216,7 +1216,7 @@ namespace Contensive.Processor.Controllers {
                                                                 if (dt.Rows.Count > 0) {
                                                                     object[,] something = { { } };
                                                                     if (dt.Rows.Count == 1 && dt.Columns.Count == 1) {
-                                                                        Copy = HtmlController.inputText(core, "result", GenericController.encodeText(something[0, 0]), 0, 0, "", false, true);
+                                                                        Copy = HtmlController.inputText_Legacy(core, "result", GenericController.encodeText(something[0, 0]), 0, 0, "", false, true);
                                                                     } else {
                                                                         foreach (DataRow dr in dt.Rows) {
                                                                             //
@@ -1305,7 +1305,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 //
-                result = AdminUIController.getBody(core, Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
+                result = AdminUIController.getToolBody(core, Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1936,7 +1936,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             OptionDefault = GenericController.decodeNvaArgument(OptionDefault);
                                             FormInput = ""
-                                                + HtmlController.inputText(core, OptionName, OptionDefault, 1, 20) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + OptionName + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
+                                                + HtmlController.inputText_Legacy(core, OptionName, OptionDefault, 1, 20) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + OptionName + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
                                             //EditorString = core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
                                             break;
                                         case "checkbox":
@@ -1962,7 +1962,7 @@ namespace Contensive.Processor.Controllers {
                                     //
 
                                     OptionSelector = GenericController.decodeNvaArgument(OptionSelector);
-                                    FormInput = HtmlController.inputText(core, OptionName, OptionSelector, 1, 20);
+                                    FormInput = HtmlController.inputText_Legacy(core, OptionName, OptionSelector, 1, 20);
                                 }
                                 CopyContent = CopyContent + "<tr>"
                                     + "<td class=\"bbLeft\">" + OptionName + "</td>"

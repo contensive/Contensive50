@@ -235,12 +235,12 @@ namespace Contensive.Addons.AdminSite {
                     //
                     Tab1.Add("<tr>");
                     Tab1.Add("<td align=right>Name</td>");
-                    Tab1.Add("<td>" + HtmlController.inputText(core, "Name", "", 1, 40) + "</td>");
+                    Tab1.Add("<td>" + HtmlController.inputText_Legacy(core, "Name", "", 1, 40) + "</td>");
                     Tab1.Add("</tr>");
                     //
                     Tab1.Add("<tr>");
                     Tab1.Add("<td align=right>SQL Query</td>");
-                    Tab1.Add("<td>" + HtmlController.inputText(core, SQLFieldName, "", 8, 40) + "</td>");
+                    Tab1.Add("<td>" + HtmlController.inputText_Legacy(core, SQLFieldName, "", 8, 40) + "</td>");
                     Tab1.Add("</tr>");
                     //
                     Tab1.Add("<tr><td width=\"120\"><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=\"120\" height=\"1\"></td><td width=\"100%\">&nbsp;</td></tr></table>");
@@ -253,7 +253,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                 }
                 //
-                tempGetForm_CustomReports = AdminUIController.getBody(core, Caption, ButtonListLeft, ButtonListRight, true, true, Description, ContentSummary, ContentPadding, Content);
+                tempGetForm_CustomReports = AdminUIController.getToolBody(core, Caption, ButtonListLeft, ButtonListRight, true, true, Description, ContentSummary, ContentPadding, Content);
                 //
                 core.html.addTitle("Custom Reports");
             } catch (Exception ex) {

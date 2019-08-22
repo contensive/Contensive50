@@ -20,10 +20,18 @@ md "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%"
 
 rem build solution 
 "C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" contensive.sln /p:DeployOnBuild=true /p:PublishProfile=defaultSite
+if errorlevel 1 (
+   echo Failure Reason Given is %errorlevel%
+   exit /b %errorlevel%
+)
 xcopy "..\WebDeploymentPackage\*.zip" "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%"
 
 rem build the CLI Setup installation
 "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\devenv.exe" contensive.sln /build Debug /project CliSetup\setup3.vdproj 
+rem if errorlevel 1 (
+rem    echo Failure Reason Given is %errorlevel%
+rem    exit /b %errorlevel%
+rem )
 xcopy ".\CliSetup\Debug\*.msi" "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%"
 
 rem build CPBaseClass Nuget
@@ -32,7 +40,12 @@ IF EXIST "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" (
 	del "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" /Q
 )
 "nuget.exe" pack "Contensive.CPBaseClass.nuspec" -version 5.1.%deploymentNumber%
+if errorlevel 1 (
+   echo Failure Reason Given is %errorlevel%
+   exit /b %errorlevel%
+)
 xcopy "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Documents\nugetLocalPackages" /Y
+xcopy "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%"
 cd ..
 
 rem build CPBaseClass Nuget
@@ -41,7 +54,12 @@ IF EXIST "Contensive.Processor.5.1.%deploymentNumber%.nupkg" (
 	del "Contensive.Processor.5.1.%deploymentNumber%.nupkg" /Q
 )
 "nuget.exe" pack "processor.csproj" -version 5.1.%deploymentNumber%
+if errorlevel 1 (
+   echo Failure Reason Given is %errorlevel%
+   exit /b %errorlevel%
+)
 xcopy "Contensive.Processor.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Documents\nugetLocalPackages" /Y
+xcopy "Contensive.Processor.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%"
 cd ..
 
 rem upgrade nuget for ContensiveMvc

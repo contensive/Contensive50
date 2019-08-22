@@ -97,7 +97,7 @@ namespace Contensive.Addons.AdminSite {
                                     idHidden = HtmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID),
                                     checkboxInput = HtmlController.checkbox("MemberRules." + GroupCount, GroupActive),
                                     groupCaption = GroupCaption,
-                                    expiresInput = HtmlController.inputText(core, "MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20, "", false, false, "text form-control", -1, false, "expires"),
+                                    expiresInput = HtmlController.inputText_Legacy(core, "MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20, "", false, false, "text form-control", -1, false, "expires"),
                                     relatedButtonList = relatedButtonList,
                                 };
                                 groupRuleEditor.rowList.Add(row);

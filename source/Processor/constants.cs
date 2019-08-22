@@ -1134,6 +1134,7 @@ namespace Contensive.Processor {
         internal const string PageNotAvailable_Msg = "This page is not currently available. <br>"
                             + "Please use your back button to return to the previous page. <br>";
         internal const string NewPage_Msg = "";
+        internal const string toolExceptionMessage = "<p>There was an unexpected exception.</p>";
         //
         internal const string main_BakeHeadDelimiter = "#####MultilineFlag#####";
         internal const int navStruc_Descriptor = 1; // Descriptors:0 = RootPage, 1 = Parent Page, 2 = Current Page, 3 = Child Page

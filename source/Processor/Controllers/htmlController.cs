@@ -147,7 +147,7 @@ namespace Contensive.Processor.Controllers {
                         LogController.logError(core, new Exception("Error creating select list from content [" + ContentName + "] called [" + MenuName + "]. Selection of [" + RowCnt + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property SelectFieldLimit."));
                         result += inputHidden(MenuNameFPO, CurrentValue);
                         if (CurrentValue == 0) {
-                            result = inputText(core, MenuName, "0");
+                            result = inputText_Legacy(core, MenuName, "0");
                         } else {
                             using (var csData = new CsModel(core)) {
                                 if (csData.openRecord(ContentName, CurrentValue)) {
@@ -818,7 +818,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string form(CoreController core, string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post") {
             if (string.IsNullOrEmpty(actionQueryString)) actionQueryString = core.doc.refreshQueryString;
-            string action = joinQueryString( core.webServer.serverFormActionURL, actionQueryString);
+            string action = joinQueryString(core.webServer.serverFormActionURL, actionQueryString);
             string result = "<form name=\"" + htmlName + "\" action=\"" + action + "\" method=\"" + htmlMethod + "\" style=\"display: inline;\"";
             result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
             result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
@@ -829,7 +829,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string inputText(CoreController core, string htmlName, string defaultValue = "", int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false, string placeholder = "") {
+        public static string inputText_Legacy(CoreController core, string htmlName, string defaultValue = "", int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false, string placeholder = "") {
             string result = "";
             try {
                 if ((heightRows > 1) & !passwordField) {
@@ -853,6 +853,28 @@ namespace Contensive.Processor.Controllers {
                     }
                     core.doc.formInputTextCnt += 1;
                 }
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+            }
+            return result;
+        }
+        //
+        //====================================================================================================
+        //
+        public static string inputText(CoreController core, string htmlName, string defaultValue = "", string htmlClass = "", string htmlId = "", bool readOnly = false, int maxLength = -1, bool disabled = false, string placeholder = "") {
+            string result = "";
+            try {
+                defaultValue = HtmlController.encodeHtml(defaultValue);
+                // todo replace concat with stringbuilder
+                string attrList = " name=\"" + htmlName + "\"";
+                attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+                attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+                attrList += (!readOnly) ? "" : " readonly";
+                attrList += (!disabled) ? "" : " disabled";
+                attrList += (maxLength <= 0) ? "" : " maxlength=" + maxLength.ToString();
+                attrList += (string.IsNullOrEmpty(placeholder)) ? "" : " placeholder=\"" + placeholder + "\"";
+                result = "<input TYPE=\"Text\" value=\"" + defaultValue + "\"" + attrList + ">";
+                core.doc.formInputTextCnt += 1;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
@@ -1084,7 +1106,7 @@ namespace Contensive.Processor.Controllers {
                         // Handle Password Fields
                         //
                         FieldValueText = GenericController.encodeText(FieldValueVariant);
-                        returnResult = inputText(core, fieldName, FieldValueText, Height, Width, "", true);
+                        returnResult = inputText_Legacy(core, fieldName, FieldValueText, Height, Width, "", true);
                     } else {
                         string FieldLookupContentName = null;
                         int FieldValueInteger = 0;
@@ -1127,7 +1149,7 @@ namespace Contensive.Processor.Controllers {
                                     returnResult = FieldValueText;
                                 } else {
                                     //Height = encodeEmptyInteger(Height, 4)
-                                    returnResult = inputText(core, fieldName, FieldValueText, Height, Width);
+                                    returnResult = inputText_Legacy(core, fieldName, FieldValueText, Height, Width);
                                 }
                                 //
                                 // text public files, read from core.cdnFiles and use text editor
@@ -1143,7 +1165,7 @@ namespace Contensive.Processor.Controllers {
                                 if (FieldReadOnly) {
                                     returnResult = FieldValueText;
                                 } else {
-                                    returnResult = inputText(core, fieldName, FieldValueText, Height, Width);
+                                    returnResult = inputText_Legacy(core, fieldName, FieldValueText, Height, Width);
                                 }
                                 break;
                             case CPContentBaseClass.fileTypeIdEnum.Boolean:
@@ -1163,7 +1185,7 @@ namespace Contensive.Processor.Controllers {
                                 if (FieldReadOnly) {
                                     returnResult = GenericController.encodeText(FieldValueVariant);
                                 } else {
-                                    returnResult = inputText(core, fieldName, GenericController.encodeText(FieldValueVariant), Height, Width);
+                                    returnResult = inputText_Legacy(core, fieldName, GenericController.encodeText(FieldValueVariant), Height, Width);
                                 }
                                 break;
                             case CPContentBaseClass.fileTypeIdEnum.File:
@@ -1208,7 +1230,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // Just call it text
                                     //
-                                    returnResult = inputText(core, fieldName, FieldValueInteger.ToString(), Height, Width);
+                                    returnResult = inputText_Legacy(core, fieldName, FieldValueInteger.ToString(), Height, Width);
                                 }
                                 break;
                             case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
@@ -1223,7 +1245,7 @@ namespace Contensive.Processor.Controllers {
                                     if (FieldHTMLContent) {
                                         returnResult = getFormInputHTML(fieldName, FieldValueText, Height.ToString(), Width.ToString(), FieldReadOnly, false);
                                     } else {
-                                        returnResult = inputText(core, fieldName, FieldValueText, Height, Width);
+                                        returnResult = inputText_Legacy(core, fieldName, FieldValueText, Height, Width);
                                     }
                                 }
                                 break;
@@ -1240,7 +1262,7 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public static string inputSubmit(string htmlValue, string htmlName = "button", string htmlId = "", string onClick = "", bool disabled = false, string htmlClass = "") {
-            string attrList = "<input type=submit name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
+            string attrList = "<input type=submit";
             attrList += (string.IsNullOrEmpty(htmlName)) ? "" : " name=\"" + htmlName + "\"";
             attrList += (string.IsNullOrEmpty(htmlValue)) ? "" : " value=\"" + htmlValue + "\"";
             attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
@@ -1253,7 +1275,7 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public static string inputHidden(string htmlName, string htmlValue, string htmlClass, string htmlId) {
-            string attrList = "<input type=hidden name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
+            string attrList = "<input type=hidden";
             attrList += (string.IsNullOrEmpty(htmlName)) ? "" : " name=\"" + htmlName + "\"";
             attrList += (string.IsNullOrEmpty(htmlValue)) ? "" : " value=\"" + htmlValue + "\"";
             attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
@@ -2549,9 +2571,13 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public string getPanelButtons(string ButtonValueList, string ButtonName, string PanelWidth = "", string PanelHeightMin = "") {
-            return AdminUIController.getButtonBar(core, AdminUIController.getButtonsFromList(core, ButtonValueList, true, true, ButtonName), "");
+        public string getPanelButtons(string leftButtonCommaList, string rightButtonCommaList) {
+            string leftButtonHtml = (string.IsNullOrWhiteSpace(leftButtonCommaList)) ? "" : AdminUIController.getButtonHtmlFromCommaList(core, leftButtonCommaList, true, true, RequestNameButton);
+            string rightButtonHtml = (string.IsNullOrWhiteSpace(rightButtonCommaList)) ? "" : AdminUIController.getButtonHtmlFromCommaList(core, rightButtonCommaList, false, false, RequestNameButton);
+            return AdminUIController.getButtonBar(core, leftButtonHtml, rightButtonHtml);
         }
+        //
+        public string getPanelButtons(string leftButtonCommaList) => getPanelButtons(leftButtonCommaList, "");
         //
         //====================================================================================================
         //
@@ -2672,7 +2698,7 @@ namespace Contensive.Processor.Controllers {
                         TagID = "Username";
                         LoginPanel = LoginPanel + ""
                             + "\r<div class=\"ccAdminSmall\">"
-                            + cr2 + "<LABEL for=\"" + TagID + "\">" + HtmlController.inputText(core, TagID, "", 1, 30, TagID, false) + "&nbsp;" + Caption + "</LABEL>"
+                            + cr2 + "<LABEL for=\"" + TagID + "\">" + HtmlController.inputText_Legacy(core, TagID, "", 1, 30, TagID, false) + "&nbsp;" + Caption + "</LABEL>"
                             + "\r</div>";
                         //
                         // Username
@@ -2685,7 +2711,7 @@ namespace Contensive.Processor.Controllers {
                         TagID = "Password";
                         LoginPanel = LoginPanel + ""
                             + "\r<div class=\"ccAdminSmall\">"
-                            + cr2 + "<LABEL for=\"" + TagID + "\">" + HtmlController.inputText(core, TagID, "", 1, 30, TagID, true) + "&nbsp;" + Caption + "</LABEL>"
+                            + cr2 + "<LABEL for=\"" + TagID + "\">" + HtmlController.inputText_Legacy(core, TagID, "", 1, 30, TagID, true) + "&nbsp;" + Caption + "</LABEL>"
                             + "\r</div>";
                         //
                         // Autologin checkbox
@@ -2702,7 +2728,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Buttons
                         //
-                        LoginPanel = LoginPanel + AdminUIController.getButtonBar(core, AdminUIController.getButtonsFromList(core, ButtonLogin + "," + ButtonLogout, true, true, "mb"), "");
+                        LoginPanel = LoginPanel + AdminUIController.getButtonBar(core, AdminUIController.getButtonHtmlFromCommaList(core, ButtonLogin + "," + ButtonLogout, true, true, "mb"), "");
                         //
                         // ----- assemble tools panel
                         //
@@ -3370,7 +3396,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string h2(string innerHtml) => genericBlockTag("h2", "", "", "", "");
+        public static string h2(string innerHtml) => genericBlockTag("h2", innerHtml, "", "", "");
         //
         public static string h2(string innerHtml, string htmlClass) => genericBlockTag("h2", innerHtml, htmlClass, "", "");
         //

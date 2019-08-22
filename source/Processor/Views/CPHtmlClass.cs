@@ -209,11 +209,11 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string InputText(string htmlName, string htmlValue, int maxLength, string htmlClass, string htmlId) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, htmlId, false, false, htmlClass, maxLength);
-        public override string InputText(string htmlName, string htmlValue, int maxLength, string htmlClass) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", false, false, htmlClass, maxLength);
-        public override string InputText(string htmlName, string htmlValue, int maxLength) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", false, false, "", maxLength);
-        public override string InputText(string htmlName, string htmlValue) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", false, false, "", 255);
-        public override string InputText(string htmlName) => HtmlController.inputText(cp.core, htmlName, "", -1, 20, "", false, false, "", 255);
+        public override string InputText(string htmlName, string htmlValue, int maxLength, string htmlClass, string htmlId) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, htmlId, false, false, htmlClass, maxLength);
+        public override string InputText(string htmlName, string htmlValue, int maxLength, string htmlClass) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", false, false, htmlClass, maxLength);
+        public override string InputText(string htmlName, string htmlValue, int maxLength) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", false, false, "", maxLength);
+        public override string InputText(string htmlName, string htmlValue) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", false, false, "", 255);
+        public override string InputText(string htmlName) => HtmlController.inputText_Legacy(cp.core, htmlName, "", -1, 20, "", false, false, "", 255);
         //
         // ====================================================================================================
         //

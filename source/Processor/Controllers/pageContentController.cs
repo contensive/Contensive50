@@ -2169,7 +2169,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         Copy = "";
                         Panel = Panel + "<td align=\"right\" width=\"100\" valign=\"top\"><p>Feedback</p></td>";
-                        Panel = Panel + "<td>" + HtmlController.inputText(core, "NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
+                        Panel = Panel + "<td>" + HtmlController.inputText_Legacy(core, "NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
                         //Panel = Panel & "<td><textarea ID=""TextArea"" rows=""4"" cols=""40"" name=""NoteCopy"">" & Copy & "</textarea></td>"
                         Panel = Panel + "</tr><tr>";
                         //

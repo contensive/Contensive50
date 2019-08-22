@@ -391,7 +391,7 @@ namespace Contensive.Addons.Tools {
                             } else if (FieldLocked) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.nameLc + "&nbsp;</SPAN><input type=hidden name=dtfaName." + RecordCount + " value=\"" + fieldsort.field.nameLc + "\">");
                             } else {
-                                streamRow.Add(HtmlController.inputText(core, "dtfaName." + RecordCount, fieldsort.field.nameLc, 1, 10));
+                                streamRow.Add(HtmlController.inputText_Legacy(core, "dtfaName." + RecordCount, fieldsort.field.nameLc, 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -401,7 +401,7 @@ namespace Contensive.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.caption + "</SPAN>");
                             } else {
-                                streamRow.Add(HtmlController.inputText(core, "dtfaCaption." + RecordCount, fieldsort.field.caption, 1, 10));
+                                streamRow.Add(HtmlController.inputText_Legacy(core, "dtfaCaption." + RecordCount, fieldsort.field.caption, 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -411,7 +411,7 @@ namespace Contensive.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.editTabName + "</SPAN>");
                             } else {
-                                streamRow.Add(HtmlController.inputText(core, "dtfaEditTab." + RecordCount, fieldsort.field.editTabName, 1, 10));
+                                streamRow.Add(HtmlController.inputText_Legacy(core, "dtfaEditTab." + RecordCount, fieldsort.field.editTabName, 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -421,7 +421,7 @@ namespace Contensive.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + GenericController.encodeText(fieldsort.field.defaultValue) + "</SPAN>");
                             } else {
-                                streamRow.Add(HtmlController.inputText(core, "dtfaDefaultValue." + RecordCount, GenericController.encodeText(fieldsort.field.defaultValue), 1, 10));
+                                streamRow.Add(HtmlController.inputText_Legacy(core, "dtfaDefaultValue." + RecordCount, GenericController.encodeText(fieldsort.field.defaultValue), 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -454,7 +454,7 @@ namespace Contensive.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.editSortPriority + "</SPAN>");
                             } else {
-                                streamRow.Add(HtmlController.inputText(core, "dtfaEditSortPriority." + RecordCount, fieldsort.field.editSortPriority.ToString(), 1, 10));
+                                streamRow.Add(HtmlController.inputText_Legacy(core, "dtfaEditSortPriority." + RecordCount, fieldsort.field.editSortPriority.ToString(), 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -535,11 +535,11 @@ namespace Contensive.Addons.Tools {
                 Stream.Add(HtmlController.inputHidden("ReloadCDef", ReloadCDef));
                 //
                 // -- assemble form
-                result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
+                return AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return toolExceptionMessage;
             }
-            return result;
         }
         //
         //

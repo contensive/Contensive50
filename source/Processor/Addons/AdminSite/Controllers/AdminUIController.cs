@@ -163,15 +163,17 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="Title"></param>
         /// <param name="Description"></param>
         /// <returns></returns>
-        public static string getTitleBar(CoreController core, string Description) {
+        public static string getTitleBar(CoreController core, string Title, string Description) {
             string result = string.Empty;
             try {
-                if (!core.doc.userErrorList.Count.Equals(0)) { Description += HtmlController.div(ErrorController.getUserError(core)); }
-                if (!string.IsNullOrEmpty(Description)) { result += HtmlController.div(Description); }
+                result = getToolFormTitle(Title, Description);
+                if (!core.doc.userErrorList.Count.Equals(0)) { result += HtmlController.div(ErrorController.getUserError(core)); }
+                return HtmlController.div(result);
+                //return HtmlController.div(result, "ccAdminTitleBar");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return "";
             }
-            return HtmlController.div(result, "ccAdminTitleBar");
         }
         //
         //====================================================================================================
@@ -223,7 +225,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="rightSideMessage"></param>
         /// <returns></returns>
         public static string getHeader(CoreController core, string leftSideMessage, string rightSideMessage = "", string rightSideNavHtml = "") {
-            string result =  Processor.Properties.Resources.adminNavBarHtml;
+            string result = Processor.Properties.Resources.adminNavBarHtml;
             result = result.Replace("{navBrand}", core.appConfig.name);
             result = result.Replace("{leftSideMessage}", leftSideMessage);
             result = result.Replace("{rightSideMessage}", rightSideMessage);
@@ -261,7 +263,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         }
         //
         //====================================================================================================
-        public static string getButtonsFromList(CoreController core, List<ButtonMetadata> ButtonList, bool AllowDelete, bool AllowAdd) {
+        public static string getButtonHtmlFromList(CoreController core, List<ButtonMetadata> ButtonList, bool AllowDelete, bool AllowAdd) {
             string s = "";
             try {
                 foreach (ButtonMetadata button in ButtonList) {
@@ -284,24 +286,24 @@ namespace Contensive.Addons.AdminSite.Controllers {
         }
         //
         //====================================================================================================
-        public static string getButtonsFromList(CoreController core, string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
-            return getButtonsFromList(core, buttonStringToButtonList(ButtonList), AllowDelete, AllowAdd);
+        public static string getButtonHtmlFromCommaList(CoreController core, string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
+            return getButtonHtmlFromList(core, buttonStringToButtonList(ButtonList), AllowDelete, AllowAdd);
         }
         //
         //====================================================================================================
         /// <summary>
         /// Return a bootstrap button bar
         /// </summary>
-        /// <param name="LeftButtons"></param>
-        /// <param name="RightButtons"></param>
+        /// <param name="leftButtonHtml"></param>
+        /// <param name="rightButtonHtml"></param>
         /// <returns></returns>
-        public static string getButtonBar(CoreController core, string LeftButtons, string RightButtons) {
-            if (string.IsNullOrWhiteSpace(LeftButtons + RightButtons)) {
+        public static string getButtonBar(CoreController core, string leftButtonHtml, string rightButtonHtml) {
+            if (string.IsNullOrWhiteSpace(leftButtonHtml + rightButtonHtml)) {
                 return "";
-            } else if (string.IsNullOrWhiteSpace(RightButtons)) {
-                return "<div class=\"border bg-white p-2\">" + LeftButtons + "</div>";
+            } else if (string.IsNullOrWhiteSpace(rightButtonHtml)) {
+                return "<div class=\"border bg-white p-2\">" + leftButtonHtml + "</div>";
             } else {
-                return "<div class=\"border bg-white p-2\">" + LeftButtons + "<div class=\"float-right\">" + RightButtons + "</div></div>";
+                return "<div class=\"border bg-white p-2\">" + leftButtonHtml + "<div class=\"float-right\">" + rightButtonHtml + "</div></div>";
             }
         }
         //
@@ -408,40 +410,42 @@ namespace Contensive.Addons.AdminSite.Controllers {
         }
         //
         //====================================================================================================
-        public static string getBody(CoreController core, string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
-            string result = "";
+        public static string getToolBody(CoreController core, string Caption, string ButtonCommaListLeft, string ButtonCommaListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
+            string body = "";
             try {
-                string ButtonBar = null;
-                string LeftButtons = "";
-                string RightButtons = "";
                 string CellContentSummary = "";
                 //
                 // Build ButtonBar
                 //
-                if (!string.IsNullOrEmpty(ButtonListLeft.Trim(' '))) {
-                    LeftButtons = getButtonsFromList(core, ButtonListLeft, AllowDelete, AllowAdd, "Button");
+                string LeftHtmlButtonList = "";
+                if (!string.IsNullOrEmpty(ButtonCommaListLeft.Trim(' '))) {
+                    LeftHtmlButtonList = getButtonHtmlFromCommaList(core, ButtonCommaListLeft, AllowDelete, AllowAdd, "Button");
                 }
-                if (!string.IsNullOrEmpty(ButtonListRight.Trim(' '))) {
-                    RightButtons = getButtonsFromList(core, ButtonListRight, AllowDelete, AllowAdd, "Button");
+                string RightHtmlButtonList = "";
+                if (!string.IsNullOrEmpty(ButtonCommaListRight.Trim(' '))) {
+                    RightHtmlButtonList = getButtonHtmlFromCommaList(core, ButtonCommaListRight, AllowDelete, AllowAdd, "Button");
                 }
-                ButtonBar = getButtonBar(core, LeftButtons, RightButtons);
+                //string ButtonBar = getButtonBar(core, LeftHtmlButtonList, RightHtmlButtonList);
                 if (!string.IsNullOrEmpty(ContentSummary)) {
                     CellContentSummary = ""
                         + "\r<div class=\"ccPanelBackground\" style=\"padding:10px;\">"
                         + core.html.getPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
                         + "\r</div>";
                 }
-                result += ""
-                    + ButtonBar
-                    + getTitleBar(core, Description)
+                body += ""
+                    + getTitleBar(core, Caption, Description)
                     + CellContentSummary
                     + "<div style=\"padding:" + ContentPadding + "px;\">" + Content + "\r</div>"
-                    + ButtonBar;
-                result = HtmlController.formMultipart(core, result, core.doc.refreshQueryString, "", "ccForm");
+                    + "";
+                //
+                // -- assemble form
+                body = getToolForm(core, body, ButtonCommaListLeft, ButtonCommaListRight);
+                return body;
+                //return HtmlController.formMultipart(core, body, core.doc.refreshQueryString, "", "ccForm");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return toolExceptionMessage;
             }
-            return result;
         }
         //
         //====================================================================================================
@@ -996,7 +1000,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
             if ((fieldValue.IndexOf("\n") == -1) && (fieldValue.Length < 80)) {
                 //
                 // text field shorter then 40 characters without a CR
-                return HtmlController.inputText(core, fieldName, fieldValue, 1, -1, htmlId, false, readOnly, "text form-control", 255);
+                return HtmlController.inputText_Legacy(core, fieldName, fieldValue, 1, -1, htmlId, false, readOnly, "text form-control", 255);
             }
             return getDefaultEditor_TextArea(core, fieldName, fieldValue, readOnly, htmlId);
         }
@@ -1048,7 +1052,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="htmlId"></param>
         /// <returns></returns>
         public static string getDefaultEditor_Password(CoreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
-            return HtmlController.inputText(core, fieldName, fieldValue, -1, -1, htmlId, true, readOnly, "password form-control", 255);
+            return HtmlController.inputText_Legacy(core, fieldName, fieldValue, -1, -1, htmlId, true, readOnly, "password form-control", 255);
         }
         //
         // ====================================================================================================
@@ -1395,19 +1399,24 @@ namespace Contensive.Addons.AdminSite.Controllers {
         //====================================================================================================
         //
         public static string getToolFormTitle(string Title, string Description) {
-            return HtmlController.h2(Title) + HtmlController.p(Description);
+            return "" 
+                + ((string.IsNullOrWhiteSpace(Title)) ? "" : HtmlController.h2(Title)) 
+                + ((string.IsNullOrWhiteSpace(Description)) ? "" : HtmlController.div(Description));
         }
         //
         //====================================================================================================
         //
-        public static string getToolForm(CoreController core, string innerHtml, string buttonList) {
-            string buttonHtml = (string.IsNullOrWhiteSpace(buttonList)) ? "" : core.html.getPanelButtons(buttonList, "Button");
+        public static string getToolForm(CoreController core, string innerHtml, string leftButtonCommaList, string rightButtonCommaList) {
+            string buttonBar = core.html.getPanelButtons(leftButtonCommaList, rightButtonCommaList);
             string result = ""
-                + buttonHtml
+                + buttonBar
                 + HtmlController.div(innerHtml, "p-4 bg-light")
-                + buttonHtml;
-            return HtmlController.form(core, result);
+                + buttonBar;
+            return HtmlController.formMultipart(core, result);
         }
+        //
+        public static string getToolForm(CoreController core, string innerHtml, string leftButtonCommaList)
+            => getToolForm(core, innerHtml, leftButtonCommaList, "");
         //
         //====================================================================================================
         //

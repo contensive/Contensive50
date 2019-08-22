@@ -122,11 +122,11 @@ namespace Contensive.Addons.AdminSite {
                 //
                 Title = adminData.adminContent.name;
                 Title = Title + " Advanced Search";
-                Title = "<strong>" + Title + "</strong>";
-                Title = SpanClassAdminNormal + Title + "</span>";
+                //Title = "<strong>" + Title + "</strong>";
+                //Title = SpanClassAdminNormal + Title + "</span>";
                 //Title = Title & core.main_GetHelpLink(46, "Using the Advanced Search Page", BubbleCopy_AdminIndexPage)
                 string TitleDescription = "<div>Enter criteria for each field to identify and select your results. The results of a search will have to have all of the criteria you enter.</div>";
-                TitleBar = AdminUIController.getTitleBar(core, TitleDescription);
+                TitleBar = AdminUIController.getTitleBar(core, Title, TitleDescription);
                 //
                 // ----- List out all fields
                 //
@@ -287,7 +287,7 @@ namespace Contensive.Addons.AdminSite {
                             + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "n" + FieldPtr) + "=</div>"
                             + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchGreaterThan).ToString(), FieldMatchOption.ToString(), "") + "&gt;</div>"
                             + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchLessThan).ToString(), FieldMatchOption.ToString(), "") + "&lt;</div>"
-                            + "<div style=\"display:block;float:left;width:300px;\">" + HtmlController.inputText(core, "fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "",false,false, "ccAdvSearchText").Replace(">", " onFocus=\"var e=getElementById('n" + FieldPtr + "');e.checked=1;\">") + "</div>"
+                            + "<div style=\"display:block;float:left;width:300px;\">" + HtmlController.inputText_Legacy(core, "fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "",false,false, "ccAdvSearchText").Replace(">", " onFocus=\"var e=getElementById('n" + FieldPtr + "');e.checked=1;\">") + "</div>"
                             + "</div>"
                             + "</td>"
                             + "</tr>";
@@ -343,7 +343,7 @@ namespace Contensive.Addons.AdminSite {
                             + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
                             + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
                             + "<div style=\"display:block;float:left;width:150px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "t" + FieldPtr) + "includes</div>"
-                            + "<div style=\"display:block;float:left;width:300px;\">" + HtmlController.inputText(core, "fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", false, false, "ccAdvSearchText").Replace(">", " onFocus=\"var e=getElementById('t" + FieldPtr + "');e.checked=1;\">") + "</div>"
+                            + "<div style=\"display:block;float:left;width:300px;\">" + HtmlController.inputText_Legacy(core, "fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", false, false, "ccAdvSearchText").Replace(">", " onFocus=\"var e=getElementById('t" + FieldPtr + "');e.checked=1;\">") + "</div>"
                             + "</div>"
                             + "</td>"
                             + "</tr>";
@@ -361,7 +361,7 @@ namespace Contensive.Addons.AdminSite {
                             + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
                             + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
                             + "<div style=\"display:block;float:left;width:150px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "t" + FieldPtr) + "includes</div>"
-                            + "<div style=\"display:block;float:left;width:300px;\">" + HtmlController.inputText( core, "fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "",false, false, "ccAdvSearchText").Replace(">", " onFocus=\"var e=getElementById('t" + FieldPtr + "'); e.checked= 1;\">") + "</div>"
+                            + "<div style=\"display:block;float:left;width:300px;\">" + HtmlController.inputText_Legacy( core, "fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "",false, false, "ccAdvSearchText").Replace(">", " onFocus=\"var e=getElementById('t" + FieldPtr + "'); e.checked= 1;\">") + "</div>"
                             + "</div>"
                             + "</td>"
                             + "</tr>";

@@ -258,7 +258,7 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
+                        Stream.Add(AdminUIController.getTitleBar(core, "", titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Groups", GroupRuleEditor.get(core, adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
@@ -309,7 +309,7 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
+                        Stream.Add(AdminUIController.getTitleBar(core, "", titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
@@ -338,7 +338,7 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
+                        Stream.Add(AdminUIController.getTitleBar(core, "", titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly || EmailSubmitted, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
@@ -366,7 +366,7 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
+                        Stream.Add(AdminUIController.getTitleBar(core, "", titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly || EmailSubmitted || EmailSent, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
@@ -394,7 +394,7 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
+                        Stream.Add(AdminUIController.getTitleBar(core, "", titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) {
@@ -423,7 +423,7 @@ namespace Contensive.Addons.AdminSite {
                         isPageContent = false
                     });
                     Stream.Add(EditSectionButtonBar);
-                    Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
+                    Stream.Add(AdminUIController.getTitleBar(core, "", titleBarDetails));
                     Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, IsLandingPage || IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                     Stream.Add(addTab(core, adminMenu, "Link Aliases", LinkAliasEditor.GetForm_Edit_LinkAliases(core, adminData, adminData.editRecord.userReadOnly), adminData.allowAdminTabs));
                     Stream.Add(addTab(core, adminMenu, "Content Watch", ContentTrackingEditor.get(core, adminData), adminData.allowAdminTabs));
@@ -453,7 +453,7 @@ namespace Contensive.Addons.AdminSite {
                         isPageContent = pageContentMetadata.isParentOf(core, adminData.adminContent.id)
                     });
                     Stream.Add(EditSectionButtonBar);
-                    Stream.Add(AdminUIController.getTitleBar(core, titleBarDetails));
+                    Stream.Add(AdminUIController.getTitleBar(core, "", titleBarDetails));
                     Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.userReadOnly, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                     Stream.Add(addTab(core, adminMenu, "Content Watch", ContentTrackingEditor.get(core, adminData), adminData.allowAdminTabs));
                     Stream.Add(addTab(core, adminMenu, "Control Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
@@ -844,14 +844,14 @@ namespace Contensive.Addons.AdminSite {
                                         if (field.password) {
                                             //
                                             // Password forces simple text box
-                                            EditorString += HtmlController.inputText(core, field.nameLc, "*****", 0, 0, fieldHtmlId, true, true, "password form-control");
+                                            EditorString += HtmlController.inputText_Legacy(core, field.nameLc, "*****", 0, 0, fieldHtmlId, true, true, "password form-control");
                                         } else if (!field.htmlContent) {
                                             //
                                             // not HTML capable, textarea with resizing
                                             if ((fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Text) && (fieldValue_text.IndexOf("\n") == -1) && (fieldValue_text.Length < 40)) {
                                                 //
                                                 // text field shorter then 40 characters without a CR
-                                                EditorString += HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 0, fieldHtmlId, false, true, "text form-control");
+                                                EditorString += HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 0, fieldHtmlId, false, true, "text form-control");
                                             } else {
                                                 //
                                                 // longer text data, or text that contains a CR
@@ -951,7 +951,7 @@ namespace Contensive.Addons.AdminSite {
                                         // ----- Others that simply print
                                         return_NewFieldList += "," + field.nameLc;
                                         if (field.password) {
-                                            EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, true, false, "password form-control"));
+                                            EditorString += (HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, true, false, "password form-control"));
                                         } else {
                                             if (string.IsNullOrEmpty(fieldValue_text)) {
                                                 EditorString += (HtmlController.inputNumber(core, field.nameLc, null, fieldHtmlId, "text form-control", editorReadOnly, false));
@@ -967,7 +967,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         return_NewFieldList += "," + field.nameLc;
                                         EditorString = ""
-                                            + HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
+                                            + HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
                                             + "&nbsp;<a href=\"#\" onClick=\"OpenSiteExplorerWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/PageLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a page\" title=\"Link to a page\"></a>";
                                         break;
                                     case CPContentBaseClass.fileTypeIdEnum.ResourceLink:
@@ -975,7 +975,7 @@ namespace Contensive.Addons.AdminSite {
                                         // ----- Resource Link (src value)
                                         //
                                         return_NewFieldList += "," + field.nameLc;
-                                        EditorString = HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
+                                        EditorString = HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
                                         break;
                                     case CPContentBaseClass.fileTypeIdEnum.HTML:
                                     case CPContentBaseClass.fileTypeIdEnum.FileHTML:
@@ -1033,7 +1033,7 @@ namespace Contensive.Addons.AdminSite {
                                         if (field.password) {
                                             //
                                             // Password forces simple text box
-                                            EditorString = HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, true, false, "password form-control");
+                                            EditorString = HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, true, false, "password form-control");
                                         } else if (!field.htmlContent) {
                                             //
                                             // not HTML capable, textarea with resizing
@@ -1042,7 +1042,7 @@ namespace Contensive.Addons.AdminSite {
                                                 //
                                                 // text field shorter then 40 characters without a CR
                                                 //
-                                                EditorString = HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, -1, fieldHtmlId, false, false, "text form-control");
+                                                EditorString = HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, -1, fieldHtmlId, false, false, "text form-control");
                                             } else {
                                                 //
                                                 // longer text data, or text that contains a CR

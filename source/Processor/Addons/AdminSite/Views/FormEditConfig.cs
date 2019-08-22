@@ -36,7 +36,7 @@ namespace Contensive.Addons.AdminSite {
                         ButtonList = ButtonCancel;
                         Content.Add(AdminUIController.getFormBodyAdminOnly());
                         core.html.addTitle("Style Editor");
-                        result = AdminUIController.getBody(core, "Site Styles", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                        result = AdminUIController.getToolBody(core, "Site Styles", ButtonList, "", true, true, Description, "", 0, Content.Text);
                     } else {
                         string AdminList = "";
                         string CMList = "";
@@ -132,7 +132,7 @@ namespace Contensive.Addons.AdminSite {
                             }
                             Copy = ""
                                 + Environment.NewLine + "<div><b>body background style color</b> (default='white')</div>"
-                                + Environment.NewLine + "<div>" + HtmlController.inputText(core, "editorbackgroundcolor", core.siteProperties.getText("Editor Background Color", "white")) + "</div>"
+                                + Environment.NewLine + "<div>" + HtmlController.inputText_Legacy(core, "editorbackgroundcolor", core.siteProperties.getText("Editor Background Color", "white")) + "</div>"
                                 + Environment.NewLine + "<div>&nbsp;</div>"
                                 + Environment.NewLine + "<div><b>Toolbar features available</b></div>"
                                 + Environment.NewLine + "<table border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"500px\" align=left>" + GenericController.nop(Copy) + Environment.NewLine + kmaEndTable;
@@ -141,7 +141,7 @@ namespace Contensive.Addons.AdminSite {
                             ButtonList = ButtonCancel + "," + ButtonRefresh + "," + ButtonSave + "," + ButtonOK;
                             Content.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormEditorConfig));
                             core.html.addTitle("Editor Settings");
-                            result = AdminUIController.getBody(core, "Editor Configuration", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                            result = AdminUIController.getToolBody(core, "Editor Configuration", ButtonList, "", true, true, Description, "", 0, Content.Text);
                         }
                     }
                 }

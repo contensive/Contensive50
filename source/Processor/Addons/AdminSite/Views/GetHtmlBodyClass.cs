@@ -2466,12 +2466,12 @@ namespace Contensive.Addons.AdminSite {
                         FieldValue = FieldValue + "</select>";
                         tableBody += AdminUIController.getEditRowLegacy(cp.core, FieldValue, "Parent Content Name", "", false, false, "");
                         //
-                        FieldValue = HtmlController.inputText(cp.core, "ChildContentName", ChildContentName, 1, 40);
+                        FieldValue = HtmlController.inputText_Legacy(cp.core, "ChildContentName", ChildContentName, 1, 40);
                         tableBody += AdminUIController.getEditRowLegacy(cp.core, FieldValue, "New Child Content Name", "", false, false, "");
                         //
                         FieldValue = ""
                             + cp.core.html.inputRadio("NewGroup", false.ToString(), NewGroup.ToString()) + cp.core.html.selectFromContent("GroupID", GroupID, "Groups", "", "", "", ref IsEmptyList) + "(Select a current group)"
-                            + "<br>" + cp.core.html.inputRadio("NewGroup", true.ToString(), NewGroup.ToString()) + HtmlController.inputText(cp.core, "NewGroupName", NewGroupName) + "(Create a new group)";
+                            + "<br>" + cp.core.html.inputRadio("NewGroup", true.ToString(), NewGroup.ToString()) + HtmlController.inputText_Legacy(cp.core, "NewGroupName", NewGroupName) + "(Create a new group)";
                         tableBody += AdminUIController.getEditRowLegacy(cp.core, FieldValue, "Content Manager Group", "", false, false, "");
                         //
                         Content.Add(AdminUIController.editTable(tableBody));
@@ -2484,7 +2484,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 Caption = "Create Content Definition";
                 Description = "<div>This tool is used to create content definitions that help segregate your content into authorable segments.</div>" + Description;
-                result = AdminUIController.getBody(cp.core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
+                result = AdminUIController.getToolBody(cp.core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
             }
@@ -2647,11 +2647,11 @@ namespace Contensive.Addons.AdminSite {
                     tableBody += (HtmlController.tableRowStart() + "<td colspan=\"3\" class=\"ccPanel3D ccAdminEditSubHeader\"><b>Options</b>" + tableCellEnd + kmaEndTableRow);
                     //
                     Caption = "Archive Age";
-                    Copy = HtmlController.inputText(cp.core, "ArchiveRecordAgeDays", ArchiveRecordAgeDays.ToString(), -1, 20) + "&nbsp;Number of days to keep visit records. 0 disables housekeeping.";
+                    Copy = HtmlController.inputText_Legacy(cp.core, "ArchiveRecordAgeDays", ArchiveRecordAgeDays.ToString(), -1, 20) + "&nbsp;Number of days to keep visit records. 0 disables housekeeping.";
                     tableBody += (AdminUIController.getEditRowLegacy(cp.core, Copy, Caption));
                     //
                     Caption = "Housekeeping Time";
-                    Copy = HtmlController.inputText(cp.core, "ArchiveTimeOfDay", ArchiveTimeOfDay, -1, 20) + "&nbsp;The time of day when record deleting should start.";
+                    Copy = HtmlController.inputText_Legacy(cp.core, "ArchiveTimeOfDay", ArchiveTimeOfDay, -1, 20) + "&nbsp;The time of day when record deleting should start.";
                     tableBody += (AdminUIController.getEditRowLegacy(cp.core, Copy, Caption));
                     //
                     Caption = "Purge Content Files";
@@ -2665,7 +2665,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 Caption = "Data Housekeeping Control";
                 Description = "This tool is used to control the database record housekeeping process. This process deletes visit history records, so care should be taken before making any changes.";
-                tempGetForm_HouseKeepingControl = AdminUIController.getBody(cp.core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
+                tempGetForm_HouseKeepingControl = AdminUIController.getToolBody(cp.core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
                 //
                 cp.core.html.addTitle(Caption);
             } catch (Exception ex) {
@@ -2801,7 +2801,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 Description = "Use this tool to modify the site security settings";
-                tempGetForm_BuildCollection = AdminUIController.getBody(cp.core, "Security Settings", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                tempGetForm_BuildCollection = AdminUIController.getToolBody(cp.core, "Security Settings", ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);

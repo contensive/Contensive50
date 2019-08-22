@@ -113,7 +113,7 @@ namespace Contensive.Addons.Tools {
                 }
                 //
                 Description = "Use this tool to enter multiple Meta Keywords";
-                tempGetForm_MetaKeywordTool = AdminUIController.getBody(core, "Meta Keyword Entry Tool", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                tempGetForm_MetaKeywordTool = AdminUIController.getToolBody(core, "Meta Keyword Entry Tool", ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
                 //
                 ///Dim th as integer: Exit Function

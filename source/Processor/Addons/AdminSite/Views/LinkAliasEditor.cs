@@ -45,7 +45,7 @@ namespace Contensive.Addons.AdminSite {
                     if (readOnlyField) {
                         f.Add(linkAlias);
                     } else {
-                        f.Add(HtmlController.inputText(core, "LinkAlias", linkAlias));
+                        f.Add(HtmlController.inputText_Legacy(core, "LinkAlias", linkAlias));
                     }
                     f.Add("</span></td></tr>");
                     //

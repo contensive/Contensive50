@@ -64,7 +64,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 Description = "Hit Apply or OK to clear all current content caches";
-                returnHtml = AdminUIController.getBody(core, "Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                returnHtml = AdminUIController.getToolBody(core, "Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
                 LogController.logError(core, ex);

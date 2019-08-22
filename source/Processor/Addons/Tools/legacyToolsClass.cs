@@ -177,7 +177,7 @@ namespace Contensive.Addons.Tools {
                     // You must be admin to use this feature
                     //
                     tempGetForm = AdminUIController.getFormBodyAdminOnly();
-                    tempGetForm = AdminUIController.getBody(core,"Admin Tools", ButtonCancelAll, "", false, false, "<div>Administration Tools</div>", "", 0, tempGetForm);
+                    tempGetForm = AdminUIController.getToolBody(core,"Admin Tools", ButtonCancelAll, "", false, false, "<div>Administration Tools</div>", "", 0, tempGetForm);
                 } else {
                     ToolsAction = core.docProperties.getInteger("dta");
                     Button = core.docProperties.getText("Button");
@@ -457,13 +457,13 @@ namespace Contensive.Addons.Tools {
                 Stream.Add(core.html.selectFromContent("DataSourceID", datasource.id, "Data Sources", "", "Default"));
                 Stream.Add("<br><br>");
                 Stream.Add("Content Name<br>");
-                Stream.Add(HtmlController.inputText( core,"ContentName", ContentName, 1, 40));
+                Stream.Add(HtmlController.inputText_Legacy( core,"ContentName", ContentName, 1, 40));
                 Stream.Add("<br><br>");
                 Stream.Add("Table Name<br>");
-                Stream.Add(HtmlController.inputText( core,"TableName", TableName, 1, 40));
+                Stream.Add(HtmlController.inputText_Legacy( core,"TableName", TableName, 1, 40));
                 Stream.Add("<br><br>");
                 Stream.Add("</SPAN>");
-                result = AdminUIController.getBody(core,Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
+                result = AdminUIController.getToolBody(core,Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
@@ -1094,7 +1094,7 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Child Content Name<br>");
-                Stream.Add(HtmlController.inputText( core,"ChildContentName", ChildContentName, 1, 40));
+                Stream.Add(HtmlController.inputText_Legacy( core,"ChildContentName", ChildContentName, 1, 40));
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Add Admin Menu Entry under Parent's Menu Entry<br>");
@@ -1749,7 +1749,7 @@ namespace Contensive.Addons.Tools {
                 //
                 Stream.Add("<br>");
                 Stream.Add("Table Name<br>");
-                Stream.Add(HtmlController.inputText( core,"Tablename", TableName));
+                Stream.Add(HtmlController.inputText_Legacy( core,"Tablename", TableName));
                 //
                 Stream.Add("<br><br>");
                 Stream.Add("Data Source<br>");
@@ -2593,7 +2593,7 @@ namespace Contensive.Addons.Tools {
                 });
                 string Description = "Manage files and folders within the virtual content file area.";
                 string ButtonList = ButtonApply + "," + ButtonCancel;
-                result = AdminUIController.getBody(core,"Content File Manager", ButtonList, "", false, false, Description, "", 0, Content);
+                result = AdminUIController.getToolBody(core,"Content File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
@@ -2617,7 +2617,7 @@ namespace Contensive.Addons.Tools {
                 });
                 string Description = "Manage files and folders within the Website's file area.";
                 string ButtonList = ButtonApply + "," + ButtonCancel;
-                result = AdminUIController.getBody(core,"Website File Manager", ButtonList, "", false, false, Description, "", 0, Content);
+                result = AdminUIController.getToolBody(core,"Website File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
@@ -2794,7 +2794,7 @@ namespace Contensive.Addons.Tools {
                 // Process the form
                 Button = core.docProperties.getText("button");
                 //
-                s.Add(HtmlController.inputText( core,"GUID", GenericController.getGUID(), 1, 80));
+                s.Add(HtmlController.inputText_Legacy( core,"GUID", GenericController.getGUID(), 1, 80));
                 //
                 // Display form
                 result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonCreateGUID);

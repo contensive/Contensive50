@@ -240,17 +240,17 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string InputPassword(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, htmlId, true, false, htmlClass, maxLength);
-        public override string InputPassword(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", true, false, htmlClass, maxLength);
-        public override string InputPassword(string htmlName, int maxLength, string htmlValue) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", true, false, "", maxLength);
-        public override string InputPassword(string htmlName, int maxLength) => HtmlController.inputText(cp.core, htmlName, "", -1, 20, "", true, false, "", maxLength);
+        public override string InputPassword(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, htmlId, true, false, htmlClass, maxLength);
+        public override string InputPassword(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", true, false, htmlClass, maxLength);
+        public override string InputPassword(string htmlName, int maxLength, string htmlValue) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", true, false, "", maxLength);
+        public override string InputPassword(string htmlName, int maxLength) => HtmlController.inputText_Legacy(cp.core, htmlName, "", -1, 20, "", true, false, "", maxLength);
         //
         // ====================================================================================================
         //
-        public override string InputText(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, htmlId, false, false, htmlClass, maxLength);
-        public override string InputText(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", false, false, htmlClass, maxLength);
-        public override string InputText(string htmlName, int maxLength, string htmlValue) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", false, false, "", maxLength);
-        public override string InputText(string htmlName, int maxLength) => HtmlController.inputText(cp.core, htmlName, "", -1, 20, "", false, false, "", maxLength);
+        public override string InputText(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, htmlId, false, false, htmlClass, maxLength);
+        public override string InputText(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", false, false, htmlClass, maxLength);
+        public override string InputText(string htmlName, int maxLength, string htmlValue) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", false, false, "", maxLength);
+        public override string InputText(string htmlName, int maxLength) => HtmlController.inputText_Legacy(cp.core, htmlName, "", -1, 20, "", false, false, "", maxLength);
         //
         // ====================================================================================================
         //

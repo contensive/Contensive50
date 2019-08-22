@@ -27,7 +27,7 @@ namespace Contensive.Addons.AdminSite {
                 // --- Start a form to make a refresh button
                 //
                 //Stream.Add(htmlController.form_start(core));
-                Stream.Add(core.html.getPanelButtons(ButtonCancel + "," + ButtonRefresh, "" + RequestNameButton + ""));
+                Stream.Add(core.html.getPanelButtons(ButtonCancel + "," + ButtonRefresh));
                 Stream.Add("<input TYPE=\"hidden\" NAME=\"asf\" VALUE=\"" + AdminFormQuickStats + "\">");
                 Stream.Add(core.html.getPanel(" "));
                 //
