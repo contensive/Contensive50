@@ -481,7 +481,7 @@ namespace Contensive.Addons.Tools {
                 const string RequestNameAddField = "addfield";
                 const string RequestNameAddFieldID = "addfieldID";
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                Stream.Add(AdminUIController.getToolFormTitle("Configure Admin Listing", "Configure the Administration Content Listing Page."));
+                Stream.Add(AdminUIController.getHeaderTitleDescription("Configure Admin Listing", "Configure the Administration Content Listing Page."));
                 //
                 //   Load Request
                 ToolsAction = core.docProperties.getInteger("dta");
@@ -1039,7 +1039,7 @@ namespace Contensive.Addons.Tools {
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList = ButtonCancel + "," + ButtonRun;
                 //
-                Stream.Add(AdminUIController.getToolFormTitle("Create a Child Content from a Content Definition", "This tool creates a Content Definition based on another Content Definition."));
+                Stream.Add(AdminUIController.getHeaderTitleDescription("Create a Child Content from a Content Definition", "This tool creates a Content Definition based on another Content Definition."));
                 //
                 //   print out the submit form
                 if (core.docProperties.getText("Button") != "") {
@@ -1124,7 +1124,7 @@ namespace Contensive.Addons.Tools {
                 //
                 ButtonList = ButtonCancel + ",Clear Content Watch Links";
                 Stream.Add(SpanClassAdminNormal);
-                Stream.Add(AdminUIController.getToolFormTitle("Clear ContentWatch Links", "This tools nulls the Links field of all Content Watch records. After running this tool, run the diagnostic spider to repopulate the links."));
+                Stream.Add(AdminUIController.getHeaderTitleDescription("Clear ContentWatch Links", "This tools nulls the Links field of all Content Watch records. After running this tool, run the diagnostic spider to repopulate the links."));
                 //
                 if (core.docProperties.getText("Button") != "") {
                     //
@@ -1161,7 +1161,7 @@ namespace Contensive.Addons.Tools {
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
-                Stream.Add(AdminUIController.getToolFormTitle("Synchronize Tables to Content Definitions", "This tools goes through all Content Definitions and creates any necessary Tables and Table Fields to support the Definition."));
+                Stream.Add(AdminUIController.getHeaderTitleDescription("Synchronize Tables to Content Definitions", "This tools goes through all Content Definitions and creates any necessary Tables and Table Fields to support the Definition."));
                 //
                 if (core.docProperties.getText("Button") != "") {
                     //
@@ -1304,7 +1304,7 @@ namespace Contensive.Addons.Tools {
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
-                Stream.Add(AdminUIController.getToolFormTitle("Benchmark", "Run a series of data operations and compare the results to previous known values."));
+                Stream.Add(AdminUIController.getHeaderTitleDescription("Benchmark", "Run a series of data operations and compare the results to previous known values."));
                 //
                 if (core.docProperties.getText("Button") != "") {
                     //
@@ -1537,7 +1537,7 @@ namespace Contensive.Addons.Tools {
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
-                Stream.Add(AdminUIController.getToolFormTitle("Query Database Schema", "This tool examines the database schema for all tables available."));
+                Stream.Add(AdminUIController.getHeaderTitleDescription("Query Database Schema", "This tool examines the database schema for all tables available."));
                 //
                 StatusOK = true;
                 if ((core.docProperties.getText("button")) != ButtonRun) {
@@ -1792,7 +1792,7 @@ namespace Contensive.Addons.Tools {
                 string ButtonList;
                 //
                 ButtonList = ButtonCancel + "," + ButtonSelect;
-                result = AdminUIController.getToolFormTitle("Modify Database Indexes", "This tool adds and removes database indexes.");
+                result = AdminUIController.getHeaderTitleDescription("Modify Database Indexes", "This tool adds and removes database indexes.");
                 //
                 // Process Input
                 //
@@ -1949,7 +1949,7 @@ namespace Contensive.Addons.Tools {
                 string ButtonList;
                 //
                 ButtonList = ButtonCancel;
-                result = AdminUIController.getToolFormTitle("Get Content Database Schema", "This tool displays all tables and fields required for the current Content Defintions.");
+                result = AdminUIController.getHeaderTitleDescription("Get Content Database Schema", "This tool displays all tables and fields required for the current Content Defintions.");
                 //
                 TableColSpan = 3;
                 result += HtmlController.tableStart(2, 0, 0);
@@ -2019,7 +2019,7 @@ namespace Contensive.Addons.Tools {
             string tempGetForm_LogFiles = null;
             try {
                 string ButtonList = ButtonCancel;
-                tempGetForm_LogFiles = AdminUIController.getToolFormTitle("Log File View", "This tool displays the Contensive Log Files.");
+                tempGetForm_LogFiles = AdminUIController.getHeaderTitleDescription("Log File View", "This tool displays the Contensive Log Files.");
                 tempGetForm_LogFiles = tempGetForm_LogFiles + "<P></P>";
                 //
                 string QueryOld = ".asp?";
@@ -2215,7 +2215,7 @@ namespace Contensive.Addons.Tools {
                 string ButtonList;
                 //
                 ButtonList = ButtonCancel + "," + ButtonSaveandInvalidateCache;
-                Stream.Add(AdminUIController.getToolFormTitle("Load Content Definitions", "This tool reloads the content definitions. This is necessary when changes are made to the ccContent or ccFields tables outside Contensive. The site will be blocked during the load."));
+                Stream.Add(AdminUIController.getHeaderTitleDescription("Load Content Definitions", "This tool reloads the content definitions. This is necessary when changes are made to the ccContent or ccFields tables outside Contensive. The site will be blocked during the load."));
                 //
                 if ((core.docProperties.getText("button")) != ButtonSaveandInvalidateCache) {
                     //
@@ -2271,7 +2271,7 @@ namespace Contensive.Addons.Tools {
                 AllowImageImport = core.docProperties.getBoolean("AllowImageImport");
                 AllowStyleImport = core.docProperties.getBoolean("AllowStyleImport");
                 //
-                Stream.Add(AdminUIController.getToolFormTitle("Load Templates", "This tool creates template records from the HTML files in the root folder of the site."));
+                Stream.Add(AdminUIController.getHeaderTitleDescription("Load Templates", "This tool creates template records from the HTML files in the root folder of the site."));
                 //
                 if ((core.docProperties.getText("button")) != ButtonImportTemplates) {
                     //
@@ -2650,7 +2650,7 @@ namespace Contensive.Addons.Tools {
                 int FindRows = 0;
                 string lcName = null;
                 //
-                Stream.Add(AdminUIController.getToolFormTitle("Find and Replace", "This tool runs a find and replace operation on content throughout the site."));
+                Stream.Add(AdminUIController.getHeaderTitleDescription("Find and Replace", "This tool runs a find and replace operation on content throughout the site."));
                 //
                 // Process the form
                 //
@@ -2748,7 +2748,7 @@ namespace Contensive.Addons.Tools {
                 string Button = null;
                 StringBuilderLegacyController s = new StringBuilderLegacyController();
                 //
-                s.Add(AdminUIController.getToolFormTitle("IIS Reset", "Reset the webserver."));
+                s.Add(AdminUIController.getHeaderTitleDescription("IIS Reset", "Reset the webserver."));
                 //
                 // Process the form
                 //
@@ -2789,7 +2789,7 @@ namespace Contensive.Addons.Tools {
                 string Button = null;
                 StringBuilderLegacyController s;
                 s = new StringBuilderLegacyController();
-                s.Add(AdminUIController.getToolFormTitle("Create GUID", "Use this tool to create a GUID. This is useful when creating new Addons."));
+                s.Add(AdminUIController.getHeaderTitleDescription("Create GUID", "Use this tool to create a GUID. This is useful when creating new Addons."));
                 //
                 // Process the form
                 Button = core.docProperties.getText("button");

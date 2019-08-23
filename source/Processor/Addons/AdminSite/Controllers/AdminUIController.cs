@@ -157,18 +157,18 @@ namespace Contensive.Addons.AdminSite.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Title Bar
+        /// The title and description section at the top of a tool
         /// </summary>
         /// <param name="core"></param>
         /// <param name="Title"></param>
         /// <param name="Description"></param>
         /// <returns></returns>
-        public static string getTitleBar(CoreController core, string Title, string Description) {
-            string result = string.Empty;
+        public static string getSectionHeader(CoreController core, string Title, string Description) {
             try {
-                result = getToolFormTitle(Title, Description);
+                string result = getHeaderTitleDescription(Title, Description);
                 if (!core.doc.userErrorList.Count.Equals(0)) { result += HtmlController.div(ErrorController.getUserError(core)); }
-                return HtmlController.div(result);
+                result = HtmlController.div(result, "p-2");
+                return HtmlController.section(result);
                 //return HtmlController.div(result, "ccAdminTitleBar");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -178,15 +178,15 @@ namespace Contensive.Addons.AdminSite.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Get the Normal Edit Button Bar String, used on Normal Edit and others
+        /// The button bar section at the top and bottom of the edit page
         /// </summary>
-        public static string getButtonBarForEdit(CoreController core, EditButtonBarInfoClass info) {
-            //
-            LogController.logTrace(core, "getButtonBarForEdit, enter, info.allowActivate [" + info.allowActivate + "]");
-            //
-            string buttonsLeft = "";
-            string buttonsRight = "";
+        public static string getSectionButtonBarForEdit(CoreController core, EditButtonBarInfoClass info) {
             try {
+                //
+                LogController.logTrace(core, "getSectionButtonBarForEdit, enter");
+                //
+                string buttonsLeft = "";
+                string buttonsRight = "";
                 if (info.allowCancel) buttonsLeft += getButtonPrimary(ButtonCancel, "return processSubmit(this);");
                 if (info.allowRefresh) buttonsLeft += getButtonPrimary(ButtonRefresh);
                 if (info.allowSave) {
@@ -207,13 +207,14 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     JSOnClick = "if(!DeleteCheckWithChildren())return false;";
                 }
                 buttonsRight += getButtonDanger(ButtonDelete, JSOnClick, !info.allowDelete);
+                //
+                LogController.logTrace(core, "getButtonBarForEdit, exit");
+                //
+                return getSectionButtonBar(core, buttonsLeft, buttonsRight);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return toolExceptionMessage;
             }
-            //
-            LogController.logTrace(core, "getButtonBarForEdit, exit");
-            //
-            return getButtonBar(core, buttonsLeft, buttonsRight);
         }
         //
         //====================================================================================================
@@ -292,18 +293,19 @@ namespace Contensive.Addons.AdminSite.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Return a bootstrap button bar
+        /// The button bar section at the top and bottom of a tool
         /// </summary>
         /// <param name="leftButtonHtml"></param>
         /// <param name="rightButtonHtml"></param>
         /// <returns></returns>
-        public static string getButtonBar(CoreController core, string leftButtonHtml, string rightButtonHtml) {
+        public static string getSectionButtonBar(CoreController core, string leftButtonHtml, string rightButtonHtml) {
             if (string.IsNullOrWhiteSpace(leftButtonHtml + rightButtonHtml)) {
                 return "";
             } else if (string.IsNullOrWhiteSpace(rightButtonHtml)) {
-                return "<div class=\"border bg-white p-2\">" + leftButtonHtml + "</div>";
+                return HtmlController.section( HtmlController.div(leftButtonHtml, "border bg-white p-2"));
             } else {
-                return "<div class=\"border bg-white p-2\">" + leftButtonHtml + "<div class=\"float-right\">" + rightButtonHtml + "</div></div>";
+                //return "<div class=\"border bg-white p-2\">" + leftButtonHtml + "<div class=\"float-right\">" + rightButtonHtml + "</div></div>";
+                return HtmlController.section(HtmlController.div(leftButtonHtml + HtmlController.div(rightButtonHtml, "float-right"), "border bg-white p-2"));
             }
         }
         //
@@ -348,7 +350,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
             } else {
                 RightButtons += AdminUIController.getButtonDanger(ButtonDelete, "", true);
             }
-            result = getButtonBar(core, LeftButtons, RightButtons);
+            result = getSectionButtonBar(core, LeftButtons, RightButtons);
             return result;
             //return adminUIController.getForm_index_pageNavigation(core, LeftButtons, RightButtons, pageNumber, recordsPerPage, PageCount, recordCnt, contentName);
         }
@@ -410,7 +412,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         }
         //
         //====================================================================================================
-        public static string getToolBody(CoreController core, string Caption, string ButtonCommaListLeft, string ButtonCommaListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
+        public static string getToolBody(CoreController core, string title, string ButtonCommaListLeft, string ButtonCommaListRight, bool AllowAdd, bool AllowDelete, string description, string ContentSummary, int ContentPadding, string Content) {
             string body = "";
             try {
                 string CellContentSummary = "";
@@ -433,7 +435,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         + "\r</div>";
                 }
                 body += ""
-                    + getTitleBar(core, Caption, Description)
+                    + getSectionHeader(core, title, description)
                     + CellContentSummary
                     + "<div style=\"padding:" + ContentPadding + "px;\">" + Content + "\r</div>"
                     + "";
@@ -1398,7 +1400,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         //
         //====================================================================================================
         //
-        public static string getToolFormTitle(string Title, string Description) {
+        public static string getHeaderTitleDescription(string Title, string Description) {
             return "" 
                 + ((string.IsNullOrWhiteSpace(Title)) ? "" : HtmlController.h2(Title)) 
                 + ((string.IsNullOrWhiteSpace(Description)) ? "" : HtmlController.div(Description));

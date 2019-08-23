@@ -103,8 +103,8 @@
     <Reference Include="Nustache.Core, Version=1.16.0.10, Culture=neutral, PublicKeyToken=efd6f3d8f76ecd9f, processorArchitecture=MSIL">
       <HintPath>..\packages\Nustache.1.16.0.10\lib\net20\Nustache.Core.dll</HintPath>
     </Reference>
-    <Reference Include="processor, Version=5.1.7173.1142, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Contensive.Processor.5.1.190822.2\lib\net472\processor.dll</HintPath>
+    <Reference Include="processor, Version=5.1.7174.22005, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Contensive.Processor.5.1.190823.1\lib\net472\processor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />

@@ -116,7 +116,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 LeftButtons += AdminUIController.getButtonPrimary(ButtonSearch);
                 //LeftButtons &= core.main_GetFormButton(ButtonSearch, , , "return processSubmit(this)")
-                ButtonBar = AdminUIController.getButtonBar(core, LeftButtons, "");
+                ButtonBar = AdminUIController.getSectionButtonBar(core, LeftButtons, "");
                 //
                 // ----- TitleBar
                 //
@@ -126,7 +126,7 @@ namespace Contensive.Addons.AdminSite {
                 //Title = SpanClassAdminNormal + Title + "</span>";
                 //Title = Title & core.main_GetHelpLink(46, "Using the Advanced Search Page", BubbleCopy_AdminIndexPage)
                 string TitleDescription = "<div>Enter criteria for each field to identify and select your results. The results of a search will have to have all of the criteria you enter.</div>";
-                TitleBar = AdminUIController.getTitleBar(core, Title, TitleDescription);
+                TitleBar = AdminUIController.getSectionHeader(core, Title, TitleDescription);
                 //
                 // ----- List out all fields
                 //

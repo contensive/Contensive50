@@ -34,7 +34,7 @@ namespace Contensive.Addons.Tools {
             CoreController core = cp.core;
             try {
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                Stream.Add(AdminUIController.getToolFormTitle("Run Manual Query", "This tool runs an SQL statement on a selected datasource. If there is a result set, the set is printed in a table."));
+                Stream.Add(AdminUIController.getHeaderTitleDescription("Run Manual Query", "This tool runs an SQL statement on a selected datasource. If there is a result set, the set is printed in a table."));
                 //
                 // Get the members SQL Queue
                 //

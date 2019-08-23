@@ -457,7 +457,7 @@ namespace Contensive.Addons.AdminSite {
                             // Assemble LiveWindowTable
                             //
                             Stream.Add(ButtonBar);
-                            Stream.Add(AdminUIController.getTitleBar(core, "", titleRow));
+                            Stream.Add(AdminUIController.getSectionHeader(core, "", titleRow));
                             Stream.Add(formContent);
                             Stream.Add(ButtonBar);
                             //Stream.Add(core.html.getPanel("<img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=\"1\", height=\"10\" >"));

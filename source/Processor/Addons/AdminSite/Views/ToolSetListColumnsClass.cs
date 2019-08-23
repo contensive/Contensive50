@@ -49,7 +49,7 @@ namespace Contensive.Addons.AdminSite {
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string Title = "Set Columns: " + adminContent.name;
                 string Description = "Use the icons to add, remove and modify your personal column prefernces for this content (" + adminContent.name + "). Hit OK when complete. Hit Reset to restore your column preferences for this content to the site's default column preferences.";
-                Stream.Add(AdminUIController.getToolFormTitle(Title, Description));
+                Stream.Add(AdminUIController.getHeaderTitleDescription(Title, Description));
                 //
                 //--------------------------------------------------------------------------------
                 // Process actions

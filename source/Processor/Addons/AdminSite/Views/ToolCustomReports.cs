@@ -16,7 +16,6 @@ namespace Contensive.Addons.AdminSite {
         //========================================================================
         //
         public static string getForm_CustomReports(CoreController core) {
-            string tempGetForm_CustomReports = null;
             try {
                 //
                 string Button = null;
@@ -43,10 +42,10 @@ namespace Contensive.Addons.AdminSite {
                 string Format = null;
                 string Filename = null;
                 string Name = null;
-                string Caption = null;
+                string title = null;
                 string Description = null;
-                string ButtonListLeft = null;
-                string ButtonListRight = null;
+                string ButtonCommaListLeft = null;
+                string ButtonCommaListRight = null;
                 int ContentPadding = 0;
                 string ContentSummary = "";
                 StringBuilderLegacyController Tab0 = new StringBuilderLegacyController();
@@ -61,12 +60,12 @@ namespace Contensive.Addons.AdminSite {
                 ContentID = core.docProperties.getInteger("ContentID");
                 Format = core.docProperties.getText("Format");
                 //
-                Caption = "Custom Report Manager";
+                title = "Custom Report Manager";
                 Description = "Custom Reports are a way for you to create a snapshot of data to view or download. To request a report, select the Custom Reports tab, check the report(s) you want, and click the [Request Download] Button. When your report is ready, it will be available in the <a href=\"?" + rnAdminForm + "=30\">Download Manager</a>. To create a new custom report, select the Request New Report tab, enter a name and SQL statement, and click the Apply button.";
                 ContentPadding = 0;
-                ButtonListLeft = ButtonCancel + "," + ButtonDelete + "," + ButtonRequestDownload;
+                ButtonCommaListLeft = ButtonCancel + "," + ButtonDelete + "," + ButtonRequestDownload;
                 //ButtonListLeft = ButtonCancel & "," & ButtonDelete & "," & ButtonRequestDownload & "," & ButtonApply
-                ButtonListRight = "";
+                ButtonCommaListRight = "";
                 SQLFieldName = "SQLQuery";
                 //
                 if (!core.session.isAuthenticatedAdmin()) {
@@ -253,14 +252,13 @@ namespace Contensive.Addons.AdminSite {
                     //
                 }
                 //
-                tempGetForm_CustomReports = AdminUIController.getToolBody(core, Caption, ButtonListLeft, ButtonListRight, true, true, Description, ContentSummary, ContentPadding, Content);
-                //
                 core.html.addTitle("Custom Reports");
+                //
+                return AdminUIController.getToolBody(core, title, ButtonCommaListLeft, ButtonCommaListRight, true, true, Description, ContentSummary, ContentPadding, Content);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return toolExceptionMessage;
             }
-            return tempGetForm_CustomReports;
         }
-        //
     }
 }

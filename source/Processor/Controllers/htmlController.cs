@@ -2574,7 +2574,7 @@ namespace Contensive.Processor.Controllers {
         public string getPanelButtons(string leftButtonCommaList, string rightButtonCommaList) {
             string leftButtonHtml = (string.IsNullOrWhiteSpace(leftButtonCommaList)) ? "" : AdminUIController.getButtonHtmlFromCommaList(core, leftButtonCommaList, true, true, RequestNameButton);
             string rightButtonHtml = (string.IsNullOrWhiteSpace(rightButtonCommaList)) ? "" : AdminUIController.getButtonHtmlFromCommaList(core, rightButtonCommaList, false, false, RequestNameButton);
-            return AdminUIController.getButtonBar(core, leftButtonHtml, rightButtonHtml);
+            return AdminUIController.getSectionButtonBar(core, leftButtonHtml, rightButtonHtml);
         }
         //
         public string getPanelButtons(string leftButtonCommaList) => getPanelButtons(leftButtonCommaList, "");
@@ -2728,7 +2728,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Buttons
                         //
-                        LoginPanel = LoginPanel + AdminUIController.getButtonBar(core, AdminUIController.getButtonHtmlFromCommaList(core, ButtonLogin + "," + ButtonLogout, true, true, "mb"), "");
+                        LoginPanel = LoginPanel + AdminUIController.getSectionButtonBar(core, AdminUIController.getButtonHtmlFromCommaList(core, ButtonLogin + "," + ButtonLogout, true, true, "mb"), "");
                         //
                         // ----- assemble tools panel
                         //
@@ -3372,6 +3372,14 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
+        public static string section(string innerHtml) => genericBlockTag("section", innerHtml);
+        //
+        public static string section(string innerHtml, string htmlClass) => genericBlockTag("section", innerHtml, htmlClass);
+        //
+        public static string section(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("section", innerHtml, htmlClass, htmlId);
+        //
+        //====================================================================================================
+        //
         public static string div(string innerHtml) => genericBlockTag("div", innerHtml);
         //
         public static string div(string innerHtml, string htmlClass) => genericBlockTag("div", innerHtml, htmlClass);
@@ -3708,7 +3716,7 @@ namespace Contensive.Processor.Controllers {
                 // yyyy-MM-dd
                 core.doc.formInputTextCnt += 1;
                 core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
-                result = "<input type=\"number\"  name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
+                result = "<input type=\"text\"  name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
                 if ((htmlValue != null)) result += " value=\"" + htmlValue + "\"";
                 result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
                 result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
