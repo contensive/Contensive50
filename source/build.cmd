@@ -124,7 +124,6 @@ rem )
 rem ==============================================================
 rem
 rem update aspx site nuget packages 
-pause
 rem
 cd iisdefaultsite
 nuget update iisdefaultsite.vbproj -noninteractive
@@ -133,7 +132,6 @@ cd ..
 rem ==============================================================
 rem
 rem build aspx and publish 
-pause
 rem
 "%msbuildLocation%msbuild.exe" contensiveAspx.sln /p:DeployOnBuild=true /p:PublishProfile=defaultSite
 if errorlevel 1 (
@@ -145,7 +143,6 @@ xcopy "..\WebDeploymentPackage\*.zip" "C:\Users\jay\Desktop\deployments\v51\Inst
 rem ==============================================================
 rem
 rem upgrade nuget for ContensiveMvc
-pause
 rem
 
 

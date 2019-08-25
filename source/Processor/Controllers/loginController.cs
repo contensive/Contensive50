@@ -24,7 +24,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// A complete html page with the login form in the middle
+        /// A complete html page with the login form in the middle. If it processes successfully it returns and empty response. (legacy, sorry)
         /// </summary>
         /// <param name="forceDefaultLogin"></param>
         /// <returns></returns>
@@ -36,21 +36,12 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     result = getLoginForm(core);
                 }
-                //result = htmlController.div(result, "ccCon bg-light");
-                result = ""
-                    + "<div class=\"ccCon bg-light pt-2 pb-4\" style=\"width:400px;margin:100px auto 0 auto;border:1px solid #bbb;border-radius:5px;\">"
-                    + result
-                    + "</div>";
-                //result = ""
-                //    + "\r<div class=\"ccCon bg-light\" style=\"width:400px;margin:100px auto 0 auto;\">"
-                //    + nop(core.html.getPanelHeader("Login"))
-                //    + nop(result)
-                //    + "</div>";
+                if (string.IsNullOrWhiteSpace(result)) return result;
+                return "<div class=\"ccCon bg-light pt-2 pb-4\" style=\"width:400px;margin:100px auto 0 auto;border:1px solid #bbb;border-radius:5px;\">" + result + "</div>";
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
-            return result;
         }
         //
         // ====================================================================================================
@@ -110,10 +101,10 @@ namespace Contensive.Processor.Controllers {
                         result += getSendPasswordForm(core);
                     }
                     //
-                    result = HtmlController.div(result, "ccLoginFormCon"); 
+                    result = HtmlController.div(result, "ccLoginFormCon");
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -158,7 +149,7 @@ namespace Contensive.Processor.Controllers {
                     returnHtml = getLoginForm_Default(core);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnHtml;
@@ -200,10 +191,10 @@ namespace Contensive.Processor.Controllers {
                     QueryString = core.doc.refreshQueryString;
                     QueryString = GenericController.modifyQueryString(QueryString, "S", "");
                     QueryString = GenericController.modifyQueryString(QueryString, "ccIPage", "");
-                    returnResult = HtmlController.form( core,returnResult,QueryString);
+                    returnResult = HtmlController.form(core, returnResult, QueryString);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnResult;
@@ -221,11 +212,11 @@ namespace Contensive.Processor.Controllers {
                 //
                 if ((core.session.visit.loginAttempts < core.siteProperties.maxVisitLoginAttempts) && core.session.visit.cookieSupport) {
                     int LocalMemberID = core.session.getUserIdForUsernameCredentials(
-                        core.docProperties.getText("username"), 
+                        core.docProperties.getText("username"),
                         core.docProperties.getText("password")
                     );
                     if (LocalMemberID == 0) {
-                        if((core.session.isAuthenticated) ||(core.session.isRecognized())) { core.session.logout(); }
+                        if ((core.session.isAuthenticated) || (core.session.isRecognized())) { core.session.logout(); }
                         core.session.visit.loginAttempts = core.session.visit.loginAttempts + 1;
                         core.session.visit.save(core);
                     } else {
@@ -239,7 +230,7 @@ namespace Contensive.Processor.Controllers {
                 }
 
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnResult;
@@ -253,7 +244,7 @@ namespace Contensive.Processor.Controllers {
                 string returnUserMessage = "";
                 sendPassword(core, core.docProperties.getText("email"), ref returnUserMessage);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -312,7 +303,7 @@ namespace Contensive.Processor.Controllers {
                         using (var csData = new CsModel(core)) {
                             sqlCriteria = "(email=" + DbController.encodeSQLText(workingEmail) + ")";
                             sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
-                            csData.open("People", sqlCriteria, "ID",true,core.session.user.id,"username,password", 1);
+                            csData.open("People", sqlCriteria, "ID", true, core.session.user.id, "username,password", 1);
                             if (!csData.ok()) {
                                 //
                                 // valid login account for this email not found
@@ -330,7 +321,7 @@ namespace Contensive.Processor.Controllers {
                                         //hint = "150"
                                         csData.set("developer", "1");
                                         csData.set("admin", "1");
-                                        if ( csData.getDate( "dateExpires") > DateTime.MinValue ) { csData.set("dateExpires", DateTime.Now.AddDays(7).Date.ToString());  }
+                                        if (csData.getDate("dateExpires") > DateTime.MinValue) { csData.set("dateExpires", DateTime.Now.AddDays(7).Date.ToString()); }
                                     } else {
                                         //
                                         // inject support record
@@ -437,10 +428,10 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (result) {
                     string sendStatus = "";
-                    EmailController.queueAdHocEmail(core,"Password Email", core.session.user.id, workingEmail, FromAddress, subject, Message, "", "", "", true, false, 0, ref sendStatus);
+                    EmailController.queueAdHocEmail(core, "Password Email", core.session.user.id, workingEmail, FromAddress, subject, Message, "", "", "", true, false, 0, ref sendStatus);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -457,15 +448,15 @@ namespace Contensive.Processor.Controllers {
                 string Email = null;
                 int errorCode = 0;
                 //
-                string loginForm_Username = ""; 
-                string loginForm_Password = ""; 
+                string loginForm_Username = "";
+                string loginForm_Password = "";
                 loginForm_Username = core.docProperties.getText("username");
                 loginForm_Password = core.docProperties.getText("password");
                 //
                 if (!GenericController.encodeBoolean(core.siteProperties.getBoolean("AllowMemberJoin", false))) {
                     ErrorController.addUserError(core, "This site does not accept public main_MemberShip.");
                 } else {
-                    if (!core.session.isNewCredentialOK( loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
+                    if (!core.session.isNewCredentialOK(loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
                         ErrorController.addUserError(core, ErrorMessage);
                     } else {
                         if (!(!core.doc.userErrorList.Count.Equals(0))) {
@@ -498,7 +489,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 PersonModel.invalidateRecordCache(core, core.session.user.id);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }

@@ -207,9 +207,27 @@ namespace Contensive.Processor.Controllers {
                                 return (new Addons.Primitives.ProcessResourceLibraryMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageLoginDefault:
                                 //
+                                if (core.session.isAuthenticated) {
+                                    //
+                                    // -- if authenticated, redirect to the route without the method
+                                    string routeWithoutQuery = modifyLinkQuery(core.webServer.requestUrlSource, "method", "", false);
+                                    core.webServer.redirect(routeWithoutQuery, "Redirect to route without 'method' because login was successful.");
+                                    return string.Empty;
+                                }
+                                //
+                                // -- process the login method, or return the login form
                                 return (new Addons.Primitives.ProcessLoginDefaultMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageLogin:
                                 //
+                                if (core.session.isAuthenticated) {
+                                    //
+                                    // -- if authenticated, redirect to the route without the method
+                                    string routeWithoutQuery = modifyLinkQuery(core.webServer.requestUrlSource, "method", "", false);
+                                    core.webServer.redirect(routeWithoutQuery, "Redirect to route without 'method' because login was successful.");
+                                    return string.Empty;
+                                }
+                                //
+                                // -- process the login method, or return the login form
                                 return (new Addons.Primitives.ProcessLoginMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageLogoutLogin:
                                 //

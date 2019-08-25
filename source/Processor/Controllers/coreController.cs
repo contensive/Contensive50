@@ -131,8 +131,10 @@ namespace Contensive.Processor.Controllers {
             "\\nuglify.dll",
             "\\nustache.core.dll",
             "\\v8-base-ia32.dll",
+            "\\v8-libcpp-ia32.dll",
             "\\v8-ia32.dll",
             "\\v8-base-x64.dll",
+            "\\v8-libcpp-x64.dll",
             "\\v8-x64.dll"
         };
         //
