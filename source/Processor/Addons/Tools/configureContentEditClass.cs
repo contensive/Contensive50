@@ -30,7 +30,6 @@ namespace Contensive.Addons.Tools {
         //=============================================================================
         //
         public static string configureContentEdit(CPClass cp) {
-            string result = "";
             CoreController core = cp.core;
             try {
                 KeyPtrController Index = new KeyPtrController();

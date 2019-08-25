@@ -22,7 +22,8 @@ namespace Contensive.Processor {
         /// Constructor
         /// </summary>
         /// <param name="cp"></param>
-        public CPLogClass(CPClass cp) => this.cp = cp;
+        public CPLogClass(CPClass cp) 
+            => this.cp = cp;
         //
         // ====================================================================================================
         /// <summary>

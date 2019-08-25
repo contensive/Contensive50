@@ -49,6 +49,15 @@ namespace Contensive.CLI {
                     while (true) {
                         string cmd = getNextCmd(args, ref argPtr);
                         switch (cmd.ToLowerInvariant()) {
+                            case "--pause":
+                            case "-p":
+                                //
+                                // -- pause for input (use for debuggin)
+                                {
+                                    String prompt = "\nPaused. Hit enter to continue.";
+                                    GenericController.promptForReply(prompt, "");
+                                }
+                                break;
                             case "-a":
                                 //
                                 // set application name
@@ -136,7 +145,7 @@ namespace Contensive.CLI {
                             case "--deleteprotection":
                                 //
                                 // turn off delete protection
-                                DeleteProtectionCmd.execute(cpServer, appName, getNextCmdArg( args, ref argPtr));
+                                DeleteProtectionCmd.execute(cpServer, appName, getNextCmdArg(args, ref argPtr));
                                 break;
                             case "--delete":
                                 //

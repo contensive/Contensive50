@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>Contensive.Processor</id>
+		<version>5.1.190821.8</version>
+        <title>Contensive Processor</title>
+        <authors>Contensive</authors>
+        <owners>Contensive</owners>
+        <license type="expression">MIT</license>
+        <projectUrl>http://contensive.io/</projectUrl>
+        <iconUrl>http://contensive.io/img/ContensiveLogo2-385x60.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>This package installs the library files required to create an instance of cp within an application.</description>
+        <releaseNotes></releaseNotes>
+        <copyright>Copyright 2019</copyright>
+        <tags>Contensive</tags>
+    </metadata>
+    <files>
+        <file src="bin\Debug\Processor.dll" target="lib\net461\Processor.dll" />
+        <file src="bin\Debug\CPBase.dll" target="lib\net461\CPBase.dll" />      
+        <file src="resources\web.config.transform" target="content" />      
+    </files>
+</package>

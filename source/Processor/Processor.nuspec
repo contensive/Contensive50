@@ -14,10 +14,24 @@
         <releaseNotes></releaseNotes>
         <copyright>Copyright 2019</copyright>
         <tags>Contensive</tags>
-    </metadata>
+		<dependencies>
+			<dependency id="Amazon.ElastiCacheCluster" version="1.0.1" />
+			<dependency id="AWS.Logger.NLog" version="1.4.0" />
+			<dependency id="AWSSDK.CloudWatchLogs" version="3.3.101.15" />
+			<dependency id="AWSSDK.S3" version="3.3.104.19" />
+			<dependency id="AWSSDK.SimpleEmail" version="3.3.101.37" />
+			<dependency id="Contensive.CPBaseClass" version="5.1.190825.13" />
+			<dependency id="EnyimMemcached" version="2.16.0" />
+			<dependency id="EnyimMemcached-NLog" version="2.16.0" />
+			<dependency id="Microsoft.ClearScript" version="5.6.0" />
+			<dependency id="Newtonsoft.Json" version="12.0.2" />
+			<dependency id="NLog" version="4.6.6" />
+			<dependency id="NUglify" version="1.5.13" />
+			<dependency id="Nustache" version="1.16.0.10" />
+			<dependency id="SharpZipLib" version="1.2.0" />
+		</dependencies>    </metadata>
     <files>
         <file src="bin\Debug\Processor.dll" target="lib\net461\Processor.dll" />
-        <file src="bin\Debug\CPBase.dll" target="lib\net461\CPBase.dll" />      
         <file src="resources\web.config.transform" target="content" />      
     </files>
 </package>

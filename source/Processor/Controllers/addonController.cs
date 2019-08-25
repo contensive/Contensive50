@@ -1604,7 +1604,8 @@ namespace Contensive.Processor.Controllers {
                         //
                         try {
                             var typeMap = testAssembly.GetTypes().ToDictionary(t => t.FullName, t => t, StringComparer.OrdinalIgnoreCase);
-                            if (typeMap.TryGetValue(addon.dotNetClass, out Type addonType)) {
+                            Type addonType;
+                            if (typeMap.TryGetValue(addon.dotNetClass, out addonType)) {
                                 if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
                                     //
                                     // -- assembly is public, not abstract, based on a base type

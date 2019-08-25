@@ -25,7 +25,6 @@ namespace Contensive.Addons.AdminSite {
                 //adminUIController Adminui = new adminUIController(core);
                 string Description = null;
                 string Content = "";
-                int ExportType = 0;
                 string Button = null;
                 int RecordLimit = 0;
                 int recordCnt = 0;
@@ -73,12 +72,10 @@ namespace Contensive.Addons.AdminSite {
                             // Set Defaults
                             //
                             ExportName = "";
-                            ExportType = 1;
                             RecordLimit = 0;
                             RecordLimitText = "";
                         } else {
                             ExportName = core.docProperties.getText("ExportName");
-                            ExportType = 1; //core.docProperties.getInteger("ExportType");
                             RecordLimitText = core.docProperties.getText("RecordLimit");
                             if (!string.IsNullOrEmpty(RecordLimitText)) {
                                 IsRecordLimitSet = true;

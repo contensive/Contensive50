@@ -640,18 +640,19 @@ namespace Contensive.Processor.Models.Db {
                         // -- set primary cache to the object created
                         // -- set secondary caches to the primary cache
                         // -- add all cachenames to the injected cachenamelist
-                        if (modelInstance is DbBaseModel baseInstance) {
+                        if (modelInstance is DbBaseModel) {
+                            //DbBaseModel baseInstance;
                             string datasourceName = derivedDataSourceName(instanceType);
                             string tableName = derivedTableName(instanceType);
-                            string cacheKey = CacheController.createCacheKey_forDbRecord(baseInstance.id, tableName, datasourceName);
+                            string cacheKey = CacheController.createCacheKey_forDbRecord(modelInstance.id, tableName, datasourceName);
                             callersCacheKeyList.Add(cacheKey);
                             core.cache.storeObject(cacheKey, modelInstance);
                             //
-                            string cachePtr = CacheController.createCachePtr_forDbRecord_guid(baseInstance.ccguid, tableName, datasourceName);
+                            string cachePtr = CacheController.createCachePtr_forDbRecord_guid(modelInstance.ccguid, tableName, datasourceName);
                             core.cache.storePtr(cachePtr, cacheKey);
                             //
                             if (derivedNameFieldIsUnique(instanceType)) {
-                                cachePtr = CacheController.createCachePtr_forDbRecord_uniqueName(baseInstance.name, tableName, datasourceName);
+                                cachePtr = CacheController.createCachePtr_forDbRecord_uniqueName(modelInstance.name, tableName, datasourceName);
                                 core.cache.storePtr(cachePtr, cacheKey);
                             }
                         }

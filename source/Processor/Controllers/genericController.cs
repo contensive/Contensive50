@@ -1297,9 +1297,12 @@ namespace Contensive.Processor.Controllers {
         public static int encodeInteger(object expression) {
             if (expression == null) { return 0; }
             string trialString = expression.ToString();
-            if (Int32.TryParse(trialString, out int trialInt)) { return trialInt; }
-            if (Double.TryParse(trialString, out double trialDbl)) { return (int)trialDbl; }
-            if (Boolean.TryParse(trialString, out bool trialBool)) { return (trialBool) ? 1 : 0; }
+            int trialInt;
+            if (int.TryParse(trialString, out trialInt)) { return trialInt; }
+            double trialDbl;
+            if (double.TryParse(trialString, out trialDbl)) { return (int)trialDbl; }
+            bool trialBool;
+            if (bool.TryParse(trialString, out trialBool)) { return (trialBool) ? 1 : 0; }
             return 0;
         }
         //
@@ -1313,8 +1316,10 @@ namespace Contensive.Processor.Controllers {
         public static double encodeNumber(object expression) {
             if (expression == null) { return 0; }
             string trialString = expression.ToString();
-            if (Double.TryParse(trialString, out double trialDbl)) { return trialDbl; }
-            if (Boolean.TryParse(trialString, out bool trialBool)) { return (trialBool) ? 1 : 0; }
+            double trialDbl;
+            if (double.TryParse(trialString, out trialDbl)) { return trialDbl; }
+            bool trialBool;
+            if (bool.TryParse(trialString, out trialBool)) { return (trialBool) ? 1 : 0; }
             return 0;
         }
         //
