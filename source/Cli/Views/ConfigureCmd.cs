@@ -54,7 +54,7 @@ namespace Contensive.CLI {
                     //
                     // -- local or multiserver mode
                     {
-                        Console.WriteLine("\n\nLocal or Remote File System");
+                        Console.WriteLine("\n\nLocal or Remote File System Mode.");
                         Console.WriteLine("Local File System stores content files on the webserver. Remote File System store content in an Amazon AWS S3 bucket, using the webserver to cache files for read and write.");
                         String prompt = "Local File System (y/n)?";
                         String defaultValue =  (cp.core.serverConfig.isLocalFileSystem) ? "y" : "n";
@@ -63,40 +63,16 @@ namespace Contensive.CLI {
                     //
                     // -- local file location
                     {
-                        Console.WriteLine("\n\nConfigure Local File System");
+                        Console.WriteLine("\n\nConfigure Local File System. This local system is required for both local and remote file system modes.");
                         if (string.IsNullOrEmpty(cp.core.serverConfig.localDataDriveLetter)) cp.core.serverConfig.localDataDriveLetter = "d";
                         if (!(new System.IO.DriveInfo(cp.core.serverConfig.localDataDriveLetter).IsReady)) cp.core.serverConfig.localDataDriveLetter = "c";
                         cp.core.serverConfig.localDataDriveLetter = GenericController.promptForReply("Enter the Drive letter for data storage (c/d/etc)", cp.core.serverConfig.localDataDriveLetter);
                     }
                     //
-                    // -- aws s3 bucket configure for non-local
-                    if (!cp.core.serverConfig.isLocalFileSystem) {
+                    // -- aws credentials
+                    {
                         //
-                        Console.WriteLine("\n\nConfigure Remote File System");
-                        string regionList = "";
-                        foreach (var region in RegionEndpoint.EnumerableAllRegions) {
-                            regionList += "," + region.SystemName;
-                        }
-                        regionList = regionList.Substring(1);
-                        do {
-                            string selectedRegion = GenericController.promptForReply("Enter the AWS bucket region (" + regionList + ")", cp.core.serverConfig.awsBucketRegionName).ToLowerInvariant();
-                            cp.core.serverConfig.awsBucketRegionName = "";
-                            foreach (var region in RegionEndpoint.EnumerableAllRegions) {
-                                if (selectedRegion == region.SystemName.ToLowerInvariant()) {
-                                    cp.core.serverConfig.awsBucketRegionName = region.SystemName;
-                                    break;
-                                }
-                            }
-                        } while (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsBucketRegionName));
-                        //
-                        do {
-                            cp.core.serverConfig.awsBucketName = GenericController.promptForReply("Enter the name of the AWS bucket for remote storage", cp.core.serverConfig.awsBucketName);
-                        } while (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsBucketName));
-                        ////
-                        //do {
-                        //    cp.core.serverConfig.cdnFilesRemoteEndpoint = cliController.promptForReply("Enter the AWS bucket endpoint", cp.core.serverConfig.cdnFilesRemoteEndpoint);
-                        //} while (string.IsNullOrWhiteSpace(cp.core.serverConfig.cdnFilesRemoteEndpoint));
-                        //
+                        Console.WriteLine("\n\nConfigure the AWS credentials for this server. Use AWS IAM to create a user with programmatic credentials. This user will require policies for each of the services used by this server, such as S3 bucket access for remote files and logging for cloudwatch.");
                         do {
                             cp.core.serverConfig.awsAccessKey = GenericController.promptForReply("Enter the AWS Access Key", cp.core.serverConfig.awsAccessKey);
                         } while (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsAccessKey));
@@ -104,6 +80,38 @@ namespace Contensive.CLI {
                         do {
                             cp.core.serverConfig.awsSecretAccessKey = GenericController.promptForReply("Enter the AWS Access Secret", cp.core.serverConfig.awsSecretAccessKey);
                         } while (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsSecretAccessKey));
+                    }
+                    //
+                    // -- aws region
+                    {
+                        //
+                        Console.WriteLine("\n\nConfigure the AWS region for this server. The region is used for remote files and cloudwatch logging.");
+                        string regionList = "";
+                        foreach (var region in RegionEndpoint.EnumerableAllRegions) {
+                            regionList += "," + region.SystemName;
+                        }
+                        regionList = regionList.Substring(1);
+                        do {
+                            string selectedRegion = GenericController.promptForReply("Enter the AWS region (" + regionList + ")", cp.core.serverConfig.awsRegionName).ToLowerInvariant();
+                            cp.core.serverConfig.awsRegionName = "";
+                            foreach (var region in RegionEndpoint.EnumerableAllRegions) {
+                                if (selectedRegion == region.SystemName.ToLowerInvariant()) {
+                                    cp.core.serverConfig.awsRegionName = region.SystemName;
+                                    break;
+                                }
+                            }
+                        } while (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsRegionName));
+                    }
+                    //
+                    // -- aws s3 bucket configure for non-local
+                    {
+                        if (!cp.core.serverConfig.isLocalFileSystem) {
+                            //
+                            Console.WriteLine("\n\nConfigure the AWS S3 bucket used for the remote file storage.");
+                            do {
+                                cp.core.serverConfig.awsBucketName = GenericController.promptForReply("Enter the name of the AWS bucket for remote storage", cp.core.serverConfig.awsBucketName);
+                            } while (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsBucketName));
+                        }
                     }
                     //
                     // -- Sql Server Driver

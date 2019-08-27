@@ -39,7 +39,7 @@ Public Class ConfigurationClass
             serverConfig.allowTaskRunnerService = False
             serverConfig.allowTaskSchedulerService = False
             serverConfig.awsBucketName = ConfigurationManager.AppSettings("ContensiveAwsBucketName")
-            serverConfig.awsBucketRegionName = ConfigurationManager.AppSettings("ContensiveAwsBucketRegionName")
+            serverConfig.awsRegionName = ConfigurationManager.AppSettings("ContensiveAwsRegionName")
             serverConfig.awsAccessKey = ConfigurationManager.AppSettings("ContensiveAwsAccessKey")
             serverConfig.awsSecretAccessKey = ConfigurationManager.AppSettings("ContensiveAwsSecretAccessKey")
             serverConfig.defaultDataSourceAddress = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceAddress")

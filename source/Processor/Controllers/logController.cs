@@ -7,6 +7,7 @@ using NLog.Config;
 using NLog.Targets;
 using System.Diagnostics;
 using System.Collections.Generic;
+using NLog.AWS.Logger;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -44,6 +45,31 @@ namespace Contensive.Processor.Controllers {
         //    /// </summary>
         //    Fatal = 5
         //}
+        //
+        //=============================================================================
+        /// <summary>
+        /// configure target "aws" for AWS CloudWatch
+        /// </summary>
+        /// <param name="core"></param>
+        public static void awsConfigure(CoreController core) {
+            if (!string.IsNullOrWhiteSpace(core.serverConfig.awsCloudWatchLogGroup)) {
+                var awsTarget = new AWSTarget() {
+                    Layout = "${longdate}|${level:uppercase=true}|${callsite}|${message}",
+                    LogGroup = core.serverConfig.awsCloudWatchLogGroup,
+                    Region = core.serverConfig.awsRegionName,
+                    Credentials = new Amazon.Runtime.BasicAWSCredentials(core.serverConfig.awsAccessKey, core.serverConfig.awsSecretAccessKey),
+                    LogStreamNamePrefix = "abc",
+                    LogStreamNameSuffix = "123",
+                    MaxQueuedMessages = 5000
+                     
+                     
+                };
+                var config = new LoggingConfiguration();
+                config.AddTarget("aws", awsTarget);
+                config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, awsTarget));
+                LogManager.Configuration = config;
+            }
+        }
         //
         //=============================================================================
         /// <summary>
@@ -174,6 +200,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="message"></param>
         /// <param name="level"></param>
         public static void log(CoreController core, string message, BaseClasses.CPLogBaseClass.LogLevel level) {
+            awsConfigure(core);
             string messageLine = getMessageLine(core, message);
             logRaw(messageLine, level);
             //

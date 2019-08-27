@@ -42,7 +42,7 @@ namespace Contensive.CLI {
                 Console.WriteLine("File System:");
                 Console.WriteLine("    isLocal: " + cpServer.core.serverConfig.isLocalFileSystem.ToString());
                 //Console.WriteLine("    cdnFilesRemoteEndpoint: " + cp.core.serverConfig.cdnFilesRemoteEndpoint);
-                Console.WriteLine("    awsBucketRegionName: " + cpServer.core.serverConfig.awsBucketRegionName);
+                Console.WriteLine("    awsBucketRegionName: " + cpServer.core.serverConfig.awsRegionName);
                 Console.WriteLine("    awsBucketName: " + cpServer.core.serverConfig.awsBucketName);
                 Console.WriteLine("    awsAccessKey: " + cpServer.core.serverConfig.awsAccessKey);
                 Console.WriteLine("    awsSecretAccessKey: " + cpServer.core.serverConfig.awsSecretAccessKey);

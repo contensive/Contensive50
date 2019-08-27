@@ -53,13 +53,20 @@ namespace Contensive.Processor.Models.Domain {
         public string defaultDataSourceUsername { get; set; }
         public string defaultDataSourcePassword { get; set; }
         //
+        // -- aws programmatic user for all services
+        public string awsAccessKey { get; set; }
+        public string awsSecretAccessKey { get; set; }
+        //
+        // -- aws region for this server (default us-east-1)
+        public string awsRegionName { get; set; }
+        //
         // -- endpoint for cluster files (not sure how it works, maybe this will be an object taht includes permissions, for now an fpo)
         public bool isLocalFileSystem { get; set; }
         public string localDataDriveLetter { get; set; }
-        public string awsAccessKey { get; set; }
-        public string awsSecretAccessKey { get; set; }
-        public string awsBucketRegionName { get; set; }
         public string awsBucketName { get; set; }
+        //
+        // -- if provided, NLog data will be sent to this CloudWatch LogGroup 
+        public string awsCloudWatchLogGroup { get; set; }
         //
         // -- configuration of async command listener on render machines (not sure if used still)
         //public int serverListenerPort { get; set; }
@@ -86,18 +93,21 @@ namespace Contensive.Processor.Models.Domain {
             enableLocalMemoryCache = true;
             enableLocalFileCache = false;
             enableRemoteCache = false;
-            awsElastiCacheConfigurationEndpoint = "";
             defaultDataSourceAddress = "";
             defaultDataSourceUsername = "";
             defaultDataSourcePassword = "";
             isLocalFileSystem = true;
             localDataDriveLetter = "D";
-            //serverListenerPort = Port_ContentServerControlDefault;
             maxConcurrentTasksPerServer = 5;
-            //username = "";
-            //password = "";
             productionEnvironment = true;
-            //enableLogging = false;
+            allowTaskRunnerService = false;
+            allowTaskSchedulerService = false;
+            awsAccessKey = "";
+            awsSecretAccessKey = "";
+            awsRegionName = "us-east-1";
+            awsBucketName = "";
+            awsElastiCacheConfigurationEndpoint = "";
+            awsCloudWatchLogGroup = "";
             apps = new CaseInsensitiveDictionary<string, AppConfigModel>();
         }
         //
@@ -118,8 +128,6 @@ namespace Contensive.Processor.Models.Domain {
                     // for now it fails, maybe later let it autobuild a local cluster
                     //
                     returnModel = new ServerConfigModel();
-                    returnModel.allowTaskRunnerService = false;
-                    returnModel.allowTaskSchedulerService = false;
                     core.programDataFiles.saveFile("config.json", SerializeObject(returnModel));
                 } else {
                     returnModel = DeserializeObject<ServerConfigModel>(JSONTemp);

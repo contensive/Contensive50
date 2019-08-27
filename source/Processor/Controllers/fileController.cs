@@ -52,7 +52,7 @@ namespace Contensive.Processor.Controllers {
         internal AmazonS3Client s3Client {
             get {
                 if (_s3Client == null) {
-                    Amazon.RegionEndpoint awsRegionEndpoint = RegionEndpoint.GetBySystemName(core.serverConfig.awsBucketRegionName);
+                    Amazon.RegionEndpoint awsRegionEndpoint = RegionEndpoint.GetBySystemName(core.serverConfig.awsRegionName);
                     _s3Client = new AmazonS3Client(core.serverConfig.awsAccessKey, core.serverConfig.awsSecretAccessKey, awsRegionEndpoint);
                 };
                 return _s3Client;

@@ -194,11 +194,16 @@ namespace Contensive.Processor.Controllers {
                     string HardCodedPage = core.docProperties.getText(RequestNameHardCodedPage);
                     if (!string.IsNullOrEmpty(HardCodedPage)) {
                         switch (GenericController.vbLCase(HardCodedPage)) {
-                            case HardCodedPageLogout:
-                                //
-                                // -- logout intercept -- after logout continue
-                                (new Addons.Primitives.ProcessLogoutMethodClass()).Execute(core.cp_forAddonExecutionOnly);
-                                break;
+                            case HardCodedPageLogout: {
+                                    //
+                                    // -- logout intercept
+                                    (new Addons.Primitives.ProcessLogoutMethodClass()).Execute(core.cp_forAddonExecutionOnly);
+                                    //
+                                    // -- redirect to the route without the method
+                                    string routeWithoutQuery = modifyLinkQuery(core.webServer.requestUrlSource, "method", "", false);
+                                    core.webServer.redirect(routeWithoutQuery, "Redirect to route without 'method' because login was successful.");
+                                    return string.Empty;
+                                }
                             case HardCodedPageSendPassword:
                                 //
                                 return (new Addons.Primitives.ProcessSendPasswordMethodClass()).Execute(core.cp_forAddonExecutionOnly).ToString();
