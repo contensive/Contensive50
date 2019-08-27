@@ -1,10 +1,13 @@
 rem 
-rem run >build [deploymentNumber like 190824.5]
+rem Must be run from the projects 'source' folder - everything is relative
+rem run >build [deploymentNumber]
+rem deploymentNumber is YYMMDD.build-number, like 190824.5
 rem
 
 rem @echo off
 rem Setup deployment folder
 set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\
+set deploymentFolderRoot=C:\Users\jay\Desktop\deployments\v51\Install\
 set deploymentNumber=%1
 set year=%date:~12,4%
 set month=%date:~4,2%
@@ -20,11 +23,26 @@ IF [%deploymentNumber%] == [] (
 rem
 rem if deployment folder exists, delete it and make directory
 rem
-IF EXIST "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%" (
-	del "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%\*.*" /Q
-	rd "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%"
+IF EXIST "%deploymentFolderRoot%%deploymentNumber%" (
+	del "%deploymentFolderRoot%%deploymentNumber%\*.*" /Q
+	rd "%deploymentFolderRoot%%deploymentNumber%"
 )
-md "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%"
+md "%deploymentFolderRoot%%deploymentNumber%"
+
+rem ==============================================================
+rem
+rem clean build folders
+rem
+rd /S /Q "cli\bin"
+rd /S /Q "cli\obj"
+
+rd /S /Q "clisetup\debug"
+rd /S /Q "clisetup\Debug-DevApp"
+rd /S /Q "clisetup\Debug-StagingDefaultApp"
+rd /S /Q "clisetup\DevDefaultApp"
+rd /S /Q "clisetup\Release"
+rd /S /Q "clisetup\StagingDefaultApp"
+
 
 rem ==============================================================
 rem
@@ -50,7 +68,7 @@ if errorlevel 1 (
    exit /b %errorlevel%
 )
 xcopy "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Documents\nugetLocalPackages" /Y
-xcopy "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%" /Y
+xcopy "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" "%deploymentFolderRoot%%deploymentNumber%" /Y
 cd ..
 
 rem ==============================================================
@@ -83,7 +101,7 @@ if errorlevel 1 (
    exit /b %errorlevel%
 )
 xcopy "Contensive.Processor.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Documents\nugetLocalPackages" /Y
-xcopy "Contensive.Processor.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%" /Y
+xcopy "Contensive.Processor.5.1.%deploymentNumber%.nupkg" "%deploymentFolderRoot%%deploymentNumber%" /Y
 cd ..
 
 rem ==============================================================
@@ -110,12 +128,13 @@ rem ==============================================================
 rem
 rem build cli setup
 rem
-"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\devenv.exe" contensiveCli.sln /build Debug /project CliSetup\setup3.vdproj 
+"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\devenv.exe" /build Debug contensiveCli.sln /project "CliSetup\setup3.vdproj" /projectconfig Debug 
+
 rem if errorlevel 1 (
 rem    echo Failure Reason Given is %errorlevel%
 rem    exit /b %errorlevel%
 rem )
-xcopy ".\CliSetup\Debug\*.msi" "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%" /Y
+xcopy ".\CliSetup\Debug\*.msi" "%deploymentFolderRoot%%deploymentNumber%" /Y
 rem if errorlevel 1 (
 rem    echo Failure Reason Given is %errorlevel%
 rem    exit /b %errorlevel%
@@ -138,7 +157,7 @@ if errorlevel 1 (
    echo Failure Reason Given is %errorlevel%
    exit /b %errorlevel%
 )
-xcopy "..\WebDeploymentPackage\*.zip" "C:\Users\jay\Desktop\deployments\v51\Install\%deploymentNumber%" /Y
+xcopy "..\WebDeploymentPackage\*.zip" "%deploymentFolderRoot%%deploymentNumber%" /Y
 
 rem ==============================================================
 rem
