@@ -50,7 +50,8 @@ rem build cpbaseclass
 rem
 "%msbuildLocation%msbuild.exe" contensiveCPBase.sln
 if errorlevel 1 (
-   echo Failure Reason Given is %errorlevel%
+   echo failure building CPBase.dll
+   pause
    exit /b %errorlevel%
 )
 
@@ -64,7 +65,8 @@ IF EXIST "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" (
 )
 "nuget.exe" pack "Contensive.CPBaseClass.nuspec" -version 5.1.%deploymentNumber%
 if errorlevel 1 (
-   echo Failure Reason Given is %errorlevel%
+   echo failure in nuget CPBase
+   pause
    exit /b %errorlevel%
 )
 xcopy "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Documents\nugetLocalPackages" /Y
@@ -83,9 +85,14 @@ cd ..
 
 rem ==============================================================
 rem
-rem build the Processor 
+rem build Processor 
 rem
 "%msbuildLocation%msbuild.exe" contensive.sln
+if errorlevel 1 (
+   echo failure building processor.dll
+   pause
+   exit /b %errorlevel%
+)
 
 rem ==============================================================
 rem
@@ -97,7 +104,8 @@ IF EXIST "Contensive.Processor.5.1.%deploymentNumber%.nupkg" (
 )
 "nuget.exe" pack "processor.nuspec" -version 5.1.%deploymentNumber%
 if errorlevel 1 (
-   echo Failure Reason Given is %errorlevel%
+   echo failure building processor.dll
+   pause
    exit /b %errorlevel%
 )
 xcopy "Contensive.Processor.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Documents\nugetLocalPackages" /Y
@@ -120,25 +128,10 @@ rem build cli and task server
 rem
 "%msbuildLocation%msbuild.exe" contensiveCli.sln
 if errorlevel 1 (
-   echo Failure Reason Given is %errorlevel%
+   echo failure building processor.dll
+   pause
    exit /b %errorlevel%
 )
-
-rem ==============================================================
-rem
-rem build cli setup
-rem
-"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\devenv.exe" /build Debug contensiveCli.sln /project "CliSetup\setup3.vdproj" /projectconfig Debug 
-
-rem if errorlevel 1 (
-rem    echo Failure Reason Given is %errorlevel%
-rem    exit /b %errorlevel%
-rem )
-xcopy ".\CliSetup\Debug\*.msi" "%deploymentFolderRoot%%deploymentNumber%" /Y
-rem if errorlevel 1 (
-rem    echo Failure Reason Given is %errorlevel%
-rem    exit /b %errorlevel%
-rem )
 
 rem ==============================================================
 rem
@@ -154,10 +147,24 @@ rem build aspx and publish
 rem
 "%msbuildLocation%msbuild.exe" contensiveAspx.sln /p:DeployOnBuild=true /p:PublishProfile=defaultSite
 if errorlevel 1 (
-   echo Failure Reason Given is %errorlevel%
+   echo failure building contensiveAspx
+   pause
    exit /b %errorlevel%
 )
 xcopy "..\WebDeploymentPackage\*.zip" "%deploymentFolderRoot%%deploymentNumber%" /Y
+
+rem ==============================================================
+rem
+rem build cli setup
+rem
+del CliSetup.out.txt /Q
+"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\devenv.exe" /Rebuild Debug contensiveCli.sln /project "CliSetup\setup3.vdproj" /projectconfig Debug /out CliSetup.out.txt
+if errorlevel 1 (
+   echo failure building CLIsetup
+   pause
+   exit /b %errorlevel%
+)
+xcopy ".\CliSetup\Debug\*.msi" "%deploymentFolderRoot%%deploymentNumber%" /Y
 
 rem ==============================================================
 rem

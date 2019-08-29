@@ -983,79 +983,64 @@ namespace Contensive.Processor.Controllers {
 		}
 		//
 		//====================================================================================================
-		internal void GetLocalCollectionArgs(CPBaseClass cp, string CollectionGuid, ref string Return_CollectionPath, ref DateTime Return_LastChagnedate) {
+        /// <summary>
+        /// load the addon\collections.xml file
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="CollectionGuid"></param>
+        /// <param name="return_CollectionPath"></param>
+        /// <param name="return_LastChangedate"></param>
+		internal void GetLocalCollectionArgs(CPBaseClass cp, string CollectionGuid, ref string return_CollectionPath, ref DateTime return_LastChangedate) {
 			try {
 				const string CollectionListRootNode = "collectionlist";
-				//
-				string LocalPath = string.Empty;
-				string LocalGuid = "";
+				return_CollectionPath = "";
+				return_LastChangedate = DateTime.MinValue;
 				System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
-//INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-//				System.Xml.XmlNode CollectionNode = null;
-//INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-//				System.Xml.XmlNode LocalListNode = null;
-				//bool CollectionFound = false;
-				string CollectionPath = "";
-				DateTime LastChangeDate = default(DateTime);
-				bool MatchFound = false;
-				string LocalName = null;
-				//
-				MatchFound = false;
-				Return_CollectionPath = "";
-				Return_LastChagnedate = DateTime.MinValue;
 				Doc.LoadXml(cp.PrivateFiles.Read("addons\\Collections.xml"));
-				if (true) {
-					if (Doc.DocumentElement.Name.ToLower() != CollectionListRootNode.ToLower()) {
-						//Call AppendClassLogFile("Server", "", "GetLocalCollectionArgs, Hint=[" & Hint & "], The Collections.xml file has an invalid root node, [" & Doc.documentElement.name & "] was received and [" & CollectionListRootNode & "] was expected.")
-					} else {
-						if (Doc.DocumentElement.Name.ToLower() != "collectionlist") {
-							//Call AppendClassLogFile("Server", "", "GetLocalCollectionArgs, basename was not collectionlist, [" & .name & "].")
-						} else {
-							//CollectionFound = false;
-							//hint = hint & ",checking nodes [" & .childNodes.length & "]"
-							foreach (System.Xml.XmlNode LocalListNode in Doc.DocumentElement.ChildNodes) {
-								LocalName = "no name found";
-								LocalPath = "";
-								switch (LocalListNode.Name.ToLower()) {
-									case "collection":
-										LocalGuid = "";
-										foreach (System.Xml.XmlNode CollectionNode in LocalListNode.ChildNodes) {
-											switch (CollectionNode.Name.ToLower()) {
-												case "name":
-													//
-													LocalName = CollectionNode.InnerText.ToLower();
-													break;
-												case "guid":
-													//
-													LocalGuid = CollectionNode.InnerText.ToLower();
-													break;
-												case "path":
-													//
-													CollectionPath = CollectionNode.InnerText.ToLower();
-													break;
-												case "lastchangedate":
-													LastChangeDate = cp.Utils.EncodeDate(CollectionNode.InnerText);
-													break;
-											}
-										}
-										break;
-								}
-								//hint = hint & ",checking node [" & LocalName & "]"
-								if (CollectionGuid.ToLower() == LocalGuid) {
-									Return_CollectionPath = CollectionPath;
-									Return_LastChagnedate = LastChangeDate;
-									//Call AppendClassLogFile("Server", "GetCollectionConfigArg", "GetLocalCollectionArgs, match found, CollectionName=" & LocalName & ", CollectionPath=" & CollectionPath & ", LastChangeDate=" & LastChangeDate)
-									MatchFound = true;
-									break;
-								}
-							}
-						}
-					}
-				}
-				if (!MatchFound) {
-					//Call AppendClassLogFile("Server", "GetCollectionConfigArg", "GetLocalCollectionArgs, no local collection match found, Hint=[" & Hint & "]")
-				}
-			} catch (Exception ex) {
+                if (Doc.DocumentElement.Name.ToLower() != CollectionListRootNode.ToLower()) {
+                } else {
+                    if (Doc.DocumentElement.Name.ToLower() != "collectionlist") {
+                    } else {
+                        foreach (System.Xml.XmlNode LocalListNode in Doc.DocumentElement.ChildNodes) {
+                            string LocalName = "no name found";
+                            string LocalPath = string.Empty;
+                            LocalPath = "";
+                            string LocalGuid = "";
+                            string CollectionPath = "";
+                            DateTime LastChangeDate = default(DateTime);
+                            switch (LocalListNode.Name.ToLower()) {
+                                case "collection":
+                                    LocalGuid = "";
+                                    foreach (System.Xml.XmlNode CollectionNode in LocalListNode.ChildNodes) {
+                                        switch (CollectionNode.Name.ToLower()) {
+                                            case "name":
+                                                //
+                                                LocalName = CollectionNode.InnerText.ToLower();
+                                                break;
+                                            case "guid":
+                                                //
+                                                LocalGuid = CollectionNode.InnerText.ToLower();
+                                                break;
+                                            case "path":
+                                                //
+                                                CollectionPath = CollectionNode.InnerText.ToLower();
+                                                break;
+                                            case "lastchangedate":
+                                                LastChangeDate = cp.Utils.EncodeDate(CollectionNode.InnerText);
+                                                break;
+                                        }
+                                    }
+                                    break;
+                            }
+                            if (CollectionGuid.ToLower() == LocalGuid) {
+                                return_CollectionPath = CollectionPath;
+                                return_LastChangedate = LastChangeDate;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ex) {
 				cp.Site.ErrorReport(ex, "GetLocalCollectionArgs");
 			}
 		}
