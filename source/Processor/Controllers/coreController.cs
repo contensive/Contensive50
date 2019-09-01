@@ -9,6 +9,7 @@ using static Contensive.Processor.Constants;
 using static Contensive.Processor.Controllers.GenericController;
 using System.Diagnostics;
 using Contensive.Processor.Exceptions;
+using System.Security.Policy;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -146,7 +147,11 @@ namespace Contensive.Processor.Controllers {
         public Dictionary<string, AssemblyFileDetails> assemblyList_AddonsFound {
             get {
                 if (_assemblyFileDict != null) { return _assemblyFileDict; }
-                _assemblyFileDict = cache.getObject<Dictionary<string, AssemblyFileDetails>>(AssemblyFileDictCacheName);
+                //
+                // -- if remote-mode collections.xml file is updated, invalidate cache
+                if (!privateFiles.localFileStale(addon.getPrivateFilesAddonPath() + "Collections.xml")){
+                    _assemblyFileDict = cache.getObject<Dictionary<string, AssemblyFileDetails>>(AssemblyFileDictCacheName);
+                }
                 if (_assemblyFileDict == null) {
                     _assemblyFileDict = new Dictionary<string, AssemblyFileDetails>();
                 }
@@ -752,6 +757,22 @@ namespace Contensive.Processor.Controllers {
             _contentNameIdDictionary = null;
         }
         //
+        //====================================================================================================
+        //
+        public AppDomain addonAppDomain {
+            get {
+                if (_addonAppDomain==null) {
+
+                    AppDomainSetup domaininfo = new AppDomainSetup();
+                    domaininfo.ApplicationBase = System.Environment.CurrentDirectory;
+                    Evidence adevidence = AppDomain.CurrentDomain.Evidence;
+                    _addonAppDomain = AppDomain.CreateDomain("MyDomain", adevidence, domaininfo);
+                }
+                return _addonAppDomain;
+            }
+        }
+        private AppDomain _addonAppDomain = null;
+        //
 
         #region  IDisposable Support 
         //
@@ -939,6 +960,10 @@ namespace Contensive.Processor.Controllers {
                     if (_db != null) {
                         _db.Dispose();
                         _db = null;
+                    }
+                    //
+                    if(_addonAppDomain != null ) {
+                        AppDomain.Unload(_addonAppDomain);
                     }
                 }
                 //

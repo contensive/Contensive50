@@ -1457,26 +1457,28 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// return true if in remote file mode and the local file needs to be updated from the remote file
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <returns></returns>
         public bool localFileStale(string pathFilename) {
             if (isLocal) return false;
-            if (fileExists_local(pathFilename)) return false;
             //
-            string localDosPathFilename = convertToDosSlash(pathFilename);
+            // -- true if the local file does not exist
+            if (!fileExists_local(pathFilename)) return true;
             //
-            // -- verify remote file
-            string remoteUnixPathFilenameLowercase = convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
-            verifyPath_remote(getPath(pathFilename));
+            // -- true if the local file details cannot be read
+            string dosPathFilename = normalizeDosPathFilename(pathFilename);
+            FileDetail localFile = getFileDetails_local(dosPathFilename);
+            if (localFile == null) return true;
             //
-            // -- Setup request for putting an object in S3.
-            PutObjectRequest request = new PutObjectRequest();
-            request.BucketName = core.serverConfig.awsBucketName;
-            request.Key = remoteUnixPathFilenameLowercase;
-            request.FilePath = joinPath(localAbsRootPath, localDosPathFilename);
+            // -- false if the remote file does not exist
+            FileDetail remoteFile = getFileDetails_remote(dosPathFilename);
+            if (remoteFile == null) return false;
             //
-            // -- Make service call and get back the response.
-            LogController.logInfo(core, "copyFileLocalToRemote(from [" + request.FilePath + "], to bucket [" + request.BucketName + "], to file [" + request.Key + "])");
-            PutObjectResponse response = s3Client.PutObject(request);
-            result = true;
+            // -- false if remote and local files are the same size and modification date, or the remote is older, dont copy
+            return ((remoteFile.Size != localFile.Size) || (remoteFile.DateLastModified > localFile.DateLastModified));
         }
         //
         //====================================================================================================
@@ -1489,29 +1491,28 @@ namespace Contensive.Processor.Controllers {
         public bool copyFileLocalToRemote(string pathFilename) {
             bool result = false;
             try {
+                //
+                // -- if local mode, done
+                if (isLocal) return false;
+                //
+                // -- if local file does not exist, done
                 pathFilename = normalizeDosPathFilename(pathFilename);
-                if (isLocal) {
-                    // not exception, if this method is called and the object is local, this should not be an error, but it should not execute all the code
-                } else {
-                    if (fileExists_local(pathFilename)) {
-                        string localDosPathFilename = convertToDosSlash(pathFilename);
-                        //
-                        // -- no, cannot change the case here
-                        string remoteUnixPathFilenameLowercase = convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
-                        verifyPath_remote(getPath(pathFilename));
-                        //
-                        // -- Setup request for putting an object in S3.
-                        PutObjectRequest request = new PutObjectRequest();
-                        request.BucketName = core.serverConfig.awsBucketName;
-                        request.Key = remoteUnixPathFilenameLowercase;
-                        request.FilePath = joinPath(localAbsRootPath, localDosPathFilename);
-                        //
-                        // -- Make service call and get back the response.
-                        LogController.logInfo(core, "copyFileLocalToRemote(from [" + request.FilePath + "], to bucket [" + request.BucketName + "], to file [" + request.Key + "])");
-                        PutObjectResponse response = s3Client.PutObject(request);
-                        result = true;
-                    }
-                }
+                if (!fileExists_local(pathFilename)) return false;
+                //
+                // -- verify the remote path
+                verifyPath_remote(getPath(pathFilename));
+                //
+                // -- Setup request for putting an object in S3.
+                PutObjectRequest request = new PutObjectRequest {
+                    BucketName = core.serverConfig.awsBucketName,
+                    Key = convertToUnixSlash(joinPath(remotePathPrefix, pathFilename)),
+                    FilePath = joinPath(localAbsRootPath, convertToDosSlash(pathFilename))
+                };
+                //
+                // -- Make service call and get back the response.
+                LogController.logInfo(core, "copyFileLocalToRemote(from [" + request.FilePath + "], to bucket [" + request.BucketName + "], to file [" + request.Key + "])");
+                PutObjectResponse response = s3Client.PutObject(request);
+                result = true;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
@@ -1526,50 +1527,50 @@ namespace Contensive.Processor.Controllers {
         public bool copyFileRemoteToLocal(string dosPathFilename) {
             bool result = false;
             try {
-                if (!isLocal) {
-                    dosPathFilename = normalizeDosPathFilename(dosPathFilename);
+                if (isLocal) return false;
+                dosPathFilename = normalizeDosPathFilename(dosPathFilename);
+                //
+                // -- check if local mirror has an up-to-date copy of the file
+                if (!localFileStale(dosPathFilename)) return true;
+                //FileDetail localFile = getFileDetails_local(dosPathFilename);
+                //if (localFile != null) {
+                //    FileDetail remoteFile = getFileDetails_remote(dosPathFilename);
+                //    if (remoteFile != null) {
+                //        if ((remoteFile.Size == localFile.Size) && (remoteFile.DateLastModified <= localFile.DateLastModified)) {
+                //            //
+                //            // -- remote and local files are the same size and modification date, or the remote is older, dont copy
+                //            return true;
+                //        }
+                //    }
+                //}
+                //
+                // note: local call is not exception, can be used regardless of isLocal
+                verifyPath_remote(getPath(dosPathFilename));
+                string remoteUnixAbsPathFilename = convertToUnixSlash(joinPath(remotePathPrefix, dosPathFilename));
+                string localDosPathFilename = convertToDosSlash(dosPathFilename);
+                //
+                // -- delete local file (for both cases, remote exists and remote does not)
+                deleteFile_local(localDosPathFilename);
+                if (fileExists_remote(dosPathFilename)) {
                     //
-                    // -- check if local mirror has an up-to-date copy of the file
-                    FileDetail localFile = getFileDetails_local(dosPathFilename);
-                    if (localFile != null) {
-                        FileDetail remoteFile = getFileDetails_remote(dosPathFilename);
-                        if (remoteFile != null) {
-                            if ((remoteFile.Size == localFile.Size) && (remoteFile.DateLastModified <= localFile.DateLastModified)) {
-                                //
-                                // -- remote and local files are the same size and modification date, or the remote is older, dont copy
-                                return true;
-                            }
+                    // -- remote file exists, verify local folder (or AWS returns error)
+                    verifyPath_local(getPath(dosPathFilename));
+                    //
+                    // -- remote file exists, copy remote to local
+                    GetObjectRequest request = new GetObjectRequest {
+                        BucketName = core.serverConfig.awsBucketName,
+                        Key = remoteUnixAbsPathFilename
+                    };
+                    using (GetObjectResponse response = s3Client.GetObject(request)) {
+                        try {
+                            response.WriteResponseStreamToFile(joinPath(localAbsRootPath, localDosPathFilename));
+                        } catch (System.IO.IOException) {
+                            // -- pause 1 second and retry
+                            System.Threading.Thread.Sleep(1000);
+                            response.WriteResponseStreamToFile(joinPath(localAbsRootPath, localDosPathFilename));
                         }
                     }
-                    //
-                    // note: local call is not exception, can be used regardless of isLocal
-                    verifyPath_remote(getPath(dosPathFilename));
-                    string remoteUnixAbsPathFilename = convertToUnixSlash(joinPath(remotePathPrefix, dosPathFilename));
-                    string localDosPathFilename = convertToDosSlash(dosPathFilename);
-                    //
-                    // -- delete local file (for both cases, remote exists and remote does not)
-                    deleteFile_local(localDosPathFilename);
-                    if (fileExists_remote(dosPathFilename)) {
-                        //
-                        // -- remote file exists, verify local folder (or AWS returns error)
-                        verifyPath_local(getPath(dosPathFilename));
-                        //
-                        // -- remote file exists, copy remote to local
-                        GetObjectRequest request = new GetObjectRequest {
-                            BucketName = core.serverConfig.awsBucketName,
-                            Key = remoteUnixAbsPathFilename
-                        };
-                        using (GetObjectResponse response = s3Client.GetObject(request)) {
-                            try {
-                                response.WriteResponseStreamToFile(joinPath(localAbsRootPath, localDosPathFilename));
-                            } catch (System.IO.IOException) {
-                                // -- pause 1 second and retry
-                                System.Threading.Thread.Sleep(1000);
-                                response.WriteResponseStreamToFile(joinPath(localAbsRootPath, localDosPathFilename));
-                            }
-                        }
-                        result = true;
-                    }
+                    result = true;
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

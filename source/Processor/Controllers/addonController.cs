@@ -585,7 +585,7 @@ namespace Contensive.Processor.Controllers {
                                     } catch (Exception ex) {
                                         hint = "14.5";
                                         string addonDescription = getAddonDescription(core, addon);
-                                        throw new GenericException("There was an error executing the script component of Add-on [" + addonDescription + "]. The exception was [" + ex.ToString() + "]." +  ((ex.InnerException != null) ? " There was an inner exception [" + ex.InnerException.Message + "]" : ""));
+                                        throw new GenericException("There was an error executing the script component of Add-on [" + addonDescription + "]. The exception was [" + ex.ToString() + "]." + ((ex.InnerException != null) ? " There was an inner exception [" + ex.InnerException.Message + "]" : ""));
                                     }
                                 }
                                 //
@@ -1490,14 +1490,15 @@ namespace Contensive.Processor.Controllers {
                 if (core.assemblyList_AddonsFound.ContainsKey(assemblyFileDictKey)) {
                     return execute_dotNetClass_assembly(addon, core.assemblyList_AddonsFound[assemblyFileDictKey].pathFilename);
                 }
-                //
-                // -- development bypass folder (addonAssemblyBypass)
-                // -- purpose is to provide a path that can be hardcoded in visual studio after-build event to make development easier
                 bool AddonFound = false;
-                string commonAssemblyPath = core.programDataFiles.localAbsRootPath + "AddonAssemblyBypass\\";
-                if (!Directory.Exists(commonAssemblyPath)) { Directory.CreateDirectory(commonAssemblyPath); }
-                result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, commonAssemblyPath, true, ref AddonFound);
-                if (AddonFound) { return result; }
+                ////
+                //// -- development bypass folder (addonAssemblyBypass)
+                //// -- purpose is to provide a path that can be hardcoded in visual studio after-build event to make development easier
+                //string commonAssemblyPath = core.programDataFiles.localAbsRootPath + "AddonAssemblyBypass\\";
+                //if (!Directory.Exists(commonAssemblyPath)) { Directory.CreateDirectory(commonAssemblyPath); }
+                //result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, commonAssemblyPath, true, ref AddonFound);
+                //if (AddonFound) { return result; }
+                //warningMessage += warningMessage + ", not found in developer path [" + commonAssemblyPath + "]";
                 //
                 // -- application path (background from program files, forground from appRoot)
                 // -- purpose is to allow add-ons to be included in the website's (wwwRoot) assembly. So a website's custom addons are within the wwwRoot build, not separate
@@ -1512,14 +1513,14 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- try addon folder
                 var collectionFolderConfig = CollectionFolderModel.getCollectionFolderConfig(core, addonCollection.ccguid);
-                if (collectionFolderConfig == null) { throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection"); };
-                if (string.IsNullOrEmpty(collectionFolderConfig.path)) { throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the path for collection [" + addonCollection.name + "] was not valid in the \\private\\addons\\Collections.xml file. Try re-installing the collection"); };
+                if (collectionFolderConfig == null) { throw new GenericException(warningMessage + ", not found in application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection"); };
+                if (string.IsNullOrEmpty(collectionFolderConfig.path)) { throw new GenericException(warningMessage + ", not found in application path [" + appPath + "]. The collection path was not checked because the path for collection [" + addonCollection.name + "] was not valid in the \\private\\addons\\Collections.xml file. Try re-installing the collection"); };
                 string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), collectionFolderConfig.path);
                 if (!core.privateFiles.pathExists_local(AddonPath)) { core.privateFiles.copyPathRemoteToLocal(AddonPath); }
                 string appAddonPath = core.privateFiles.joinPath(core.privateFiles.localAbsRootPath, AddonPath);
                 result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appAddonPath, false, ref AddonFound);
                 if (!AddonFound) {
-                    throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "] or collection path [" + appAddonPath + "].");
+                    throw new GenericException(warningMessage + ", not found in application path [" + appPath + "] or collection path [" + appAddonPath + "].");
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1578,22 +1579,38 @@ namespace Contensive.Processor.Controllers {
         /// Execute an addon assembly
         /// </summary>
         /// <param name="addon"></param>
-        /// <param name="assemblyPathname"></param>
+        /// <param name="assemblyPhysicalPrivatePathname"></param>
         /// <param name="fileIsValidAddonAssembly">The file was a valid assembly, just not the right onw</param>
         /// <param name="addonFound">If found, the search for the assembly can be abandoned</param>
         /// <returns></returns>
-        private string execute_dotNetClass_assembly(AddonModel addon, string assemblyPathname, ref bool fileIsValidAddonAssembly, ref bool addonFound) {
+        private string execute_dotNetClass_assembly(AddonModel addon, string assemblyPhysicalPrivatePathname, ref bool fileIsValidAddonAssembly, ref bool addonFound) {
             string result = "";
             try {
                 Assembly testAssembly = null;
                 fileIsValidAddonAssembly = true;
                 try {
                     //
+                    // -- "once an assembly is loaded into an appdomain, it's there for the life of the appdomain."
                     // todo consider using refectiononlyload first, then if it is right, do the loadfrom - so Dependencies are not loaded.
-                    testAssembly = System.Reflection.Assembly.LoadFrom(assemblyPathname);
+                    // -- .LoadFile cannot work because although it loads the right assembly, it does not track dependencies
+                    // -- .LoadFrom uses the appDomain to load the assembly, so if another instance of this assembly is loaded it is used.
+                    // ---- (no, multiple front-end would not reload) maybe unloading the appdomain during install, and taskRunning MUST run addons in new processes so it's appDomain reloads each run
+                    // ---- (no, multiple front-end would not iisreset) maybe iisreset, (taskRunner must run addons in new process)
+                    // ---- need flag to cause reload (appdomain or iisreset) in each server instance
+                    // ------ if cache enable, use ???
+                    // -- ?? when an addon is loaded, we can unload the old assembly (do not know method, but articles say you can)
+                    // -- ?? try -- instead of loadfrom, try var assembly = Assembly.Load( File.ReadAllBytes(FilePathHere));
+                    if (false) {
+                        byte[] buffer = File.ReadAllBytes(assemblyPhysicalPrivatePathname);
+                        testAssembly = core.addonAppDomain.Load(buffer);
+                    } else if (false) {
+                        testAssembly = Assembly.Load(File.ReadAllBytes(assemblyPhysicalPrivatePathname));
+                    } else {
+                        testAssembly = Assembly.LoadFrom(assemblyPhysicalPrivatePathname);
+                    }
                 } catch (Exception ex) {
-                    LogController.logInfo(core, "Assembly.LoadFrom failure, adding DLL [" + assemblyPathname + "] to assemblySkipList, ex [" + ex.Message + "]");
-                    core.assemblyList_NonAddonsFound.Add(assemblyPathname);
+                    LogController.logInfo(core, "Assembly.LoadFrom failure, adding DLL [" + assemblyPhysicalPrivatePathname + "] to assemblySkipList, ex [" + ex.Message + "]");
+                    core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
                     fileIsValidAddonAssembly = false;
                     return string.Empty;
                 }
@@ -1642,7 +1659,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // Error in the addon
                                 //
-                                string detailedErrorMessage = "There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + assemblyPathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + Ex.ToString() + "]";
+                                string detailedErrorMessage = "There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + assemblyPhysicalPrivatePathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + Ex.ToString() + "]";
                                 LogController.logError(core, Ex, detailedErrorMessage);
                                 //Throw new GenericException(detailedErrorMessage)
                             }
@@ -1650,22 +1667,22 @@ namespace Contensive.Processor.Controllers {
                             //
                             // exceptin thrown out of application bin folder when xunit library included -- ignore
                             //
-                            LogController.logDebug(core, "Assembly ReflectionTypeLoadException, [" + assemblyPathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
-                            core.assemblyList_NonAddonsFound.Add(assemblyPathname);
+                            LogController.logDebug(core, "Assembly ReflectionTypeLoadException, [" + assemblyPhysicalPrivatePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
+                            core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
                         } catch (Exception ex) {
                             //
                             // problem loading types
                             //
-                            LogController.logDebug(core, "Assembly exception, [" + assemblyPathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
-                            core.assemblyList_NonAddonsFound.Add(assemblyPathname);
-                            string detailedErrorMessage = "While locating assembly for addon [" + addon.name + "], there was an error loading types for assembly [" + assemblyPathname + "]. This assembly was skipped and should be removed from the folder.";
+                            LogController.logDebug(core, "Assembly exception, [" + assemblyPhysicalPrivatePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
+                            core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
+                            string detailedErrorMessage = "While locating assembly for addon [" + addon.name + "], there was an error loading types for assembly [" + assemblyPhysicalPrivatePathname + "]. This assembly was skipped and should be removed from the folder.";
                             throw new GenericException(detailedErrorMessage);
                         }
                     }
                 } catch (System.Reflection.ReflectionTypeLoadException ex) {
-                    LogController.logDebug(core, "Assembly ReflectionTypeLoadException-2, [" + assemblyPathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
-                    core.assemblyList_NonAddonsFound.Add(assemblyPathname);
-                    string detailedErrorMessage = "A load exception occured for addon [" + addon.name + "], DLL [" + assemblyPathname + "]. The error was [" + ex.ToString() + "] Any internal exception follow:";
+                    LogController.logDebug(core, "Assembly ReflectionTypeLoadException-2, [" + assemblyPhysicalPrivatePathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
+                    core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
+                    string detailedErrorMessage = "A load exception occured for addon [" + addon.name + "], DLL [" + assemblyPhysicalPrivatePathname + "]. The error was [" + ex.ToString() + "] Any internal exception follow:";
                     foreach (Exception exLoader in ex.LoaderExceptions) {
                         detailedErrorMessage += Environment.NewLine + "--LoaderExceptions: " + exLoader.Message;
                     }
@@ -1674,9 +1691,9 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ignore these errors
                     //
-                    LogController.logDebug(core, "Assembly Exception-2, [" + assemblyPathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
-                    core.assemblyList_NonAddonsFound.Add(assemblyPathname);
-                    string detailedErrorMessage = "A non-load exception occured while loading the addon [" + addon.name + "], DLL [" + assemblyPathname + "]. The error was [" + ex.ToString() + "].";
+                    LogController.logDebug(core, "Assembly Exception-2, [" + assemblyPhysicalPrivatePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
+                    core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
+                    string detailedErrorMessage = "A non-load exception occured while loading the addon [" + addon.name + "], DLL [" + assemblyPhysicalPrivatePathname + "]. The error was [" + ex.ToString() + "].";
                     LogController.logError(core, new GenericException(detailedErrorMessage));
                 }
             } catch (Exception ex) {
@@ -2636,21 +2653,21 @@ namespace Contensive.Processor.Controllers {
             }
             return returnString;
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// If an addon assembly references a system assembly that is not in the gac (system.io.compression.filesystem), it does not look in the folder I did the loadfrom.
-        /// Problem is knowing where to look. No argument to pass a path...
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public static Assembly myAssemblyResolve(object sender, ResolveEventArgs args) {
-            string sample_folderPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string assemblyPath = Path.Combine(sample_folderPath, (new AssemblyName(args.Name)).Name + ".dll");
-            if (!File.Exists(assemblyPath)) { return null; }
-            return Assembly.LoadFrom(assemblyPath);
-        }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// If an addon assembly references a system assembly that is not in the gac (system.io.compression.filesystem), it does not look in the folder I did the loadfrom.
+        ///// Problem is knowing where to look. No argument to pass a path...
+        ///// </summary>
+        ///// <param name="sender"></param>
+        ///// <param name="args"></param>
+        ///// <returns></returns>
+        //public static Assembly myAssemblyResolve(object sender, ResolveEventArgs args) {
+        //    string sample_folderPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        //    string assemblyPath = Path.Combine(sample_folderPath, (new AssemblyName(args.Name)).Name + ".dll");
+        //    if (!File.Exists(assemblyPath)) { return null; }
+        //    return Assembly.LoadFrom(assemblyPath);
+        //}
         //
         //========================================================================================================
         /// <summary>

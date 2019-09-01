@@ -74,20 +74,22 @@ Public Class ConfigurationClass
         '
         ' test if route map needs to be loaded (routeMap.dateCreated <> application[routeMapDateCreated])
         If (Not cp.routeMap.dateCreated.Equals(HttpContext.Current.Application("RouteMapDateCreated"))) Then
-            ' 20180307, added clear to resolve error 
-            RouteTable.Routes.Clear()
-            For Each newRouteKeyValuePair In cp.routeMap.routeDictionary
-                Try
-                    '
-                    LogController.logRaw("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRouteKeyValuePair.Value.virtualRoute + "], [" + newRouteKeyValuePair.Value.physicalRoute + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
-                    '
-                    RouteTable.Routes.Remove(RouteTable.Routes(newRouteKeyValuePair.Key))
-                    RouteTable.Routes.MapPageRoute(newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.physicalRoute)
-                Catch ex As Exception
-                    cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & newRouteKeyValuePair.Key & "]")
-                End Try
-            Next
             HttpContext.Current.Application("routeMapDateCreated") = cp.routeMap.dateCreated
+            SyncLock RouteTable.Routes
+                ' 20180307, added clear to resolve error 
+                RouteTable.Routes.Clear()
+                For Each newRouteKeyValuePair In cp.routeMap.routeDictionary
+                    Try
+                        '
+                        LogController.logRaw("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRouteKeyValuePair.Value.virtualRoute + "], [" + newRouteKeyValuePair.Value.physicalRoute + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+                        '
+                        RouteTable.Routes.Remove(RouteTable.Routes(newRouteKeyValuePair.Key))
+                        RouteTable.Routes.MapPageRoute(newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.physicalRoute)
+                    Catch ex As Exception
+                        cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & newRouteKeyValuePair.Key & "]")
+                    End Try
+                Next
+            End SyncLock
         End If
     End Sub
 End Class

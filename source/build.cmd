@@ -4,6 +4,9 @@ rem run >build [deploymentNumber]
 rem deploymentNumber is YYMMDD.build-number, like 190824.5
 rem
 
+c:
+cd \Users\jay\Documents\Git\Contensive50\source
+
 rem @echo off
 rem Setup deployment folder
 set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\
@@ -18,15 +21,19 @@ rem if deployment number not entered, set it to date.1
 rem
 IF [%deploymentNumber%] == [] (
 	echo No deployment folder provided on the command line, use current date
-	set deploymentNumber=%year%%month%%day%.1
+	set deploymentTimeStamp=%year%%month%%day%
 )
 rem
 rem if deployment folder exists, delete it and make directory
 rem
-IF EXIST "%deploymentFolderRoot%%deploymentNumber%" (
-	del "%deploymentFolderRoot%%deploymentNumber%\*.*" /Q
-	rd "%deploymentFolderRoot%%deploymentNumber%"
-)
+
+set suffix=1
+:tryagain
+set deploymentNumber=%deploymentTimeStamp%.%suffix%
+if not exist "%deploymentFolderRoot%%deploymentNumber%" goto :makefolder
+set /a suffix=%suffix%+1
+goto tryagain
+:makefolder
 md "%deploymentFolderRoot%%deploymentNumber%"
 
 rem ==============================================================
@@ -43,6 +50,7 @@ rd /S /Q "clisetup\DevDefaultApp"
 rd /S /Q "clisetup\Release"
 rd /S /Q "clisetup\StagingDefaultApp"
 
+del /Q "..\WebDeploymentPackage\*.*"
 
 rem ==============================================================
 rem
