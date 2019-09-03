@@ -64,7 +64,7 @@ namespace Contensive.Processor.Controllers {
                 };
                 var config = new LoggingConfiguration();
                 config.AddTarget("aws", awsTarget);
-                config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, awsTarget));
+                config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, awsTarget));
                 LogManager.Configuration = config;
             }
         }

@@ -189,7 +189,7 @@ namespace Contensive.CLI {
                             //
                             // -- enableEnyimNLog
                             {
-                                Console.WriteLine("\n\nEnable Remote Cache Service.");
+                                Console.WriteLine("\n\nEnable Remote Cache Debug Logging.");
                                 Console.WriteLine("Enables remote cache logging (Enyim Logging). This is helpful as a diagnostic but is a serious performance hit.");
                                 string prompt = "Enable Logging (y/n)?";
                                 String defaultLoggingValue = (cp.core.serverConfig.enableEnyimNLog) ? "y" : "n";
