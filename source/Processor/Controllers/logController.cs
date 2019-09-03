@@ -52,21 +52,21 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         public static void awsConfigure(CoreController core) {
-            if (!string.IsNullOrWhiteSpace(core.serverConfig.awsCloudWatchLogGroup)) {
-                var awsTarget = new AWSTarget() {
-                    Layout = "${longdate}|${level:uppercase=true}|${callsite}|${message}",
-                    LogGroup = core.serverConfig.awsCloudWatchLogGroup,
-                    Region = core.serverConfig.awsRegionName,
-                    Credentials = new Amazon.Runtime.BasicAWSCredentials(core.serverConfig.awsAccessKey, core.serverConfig.awsSecretAccessKey),
-                    LogStreamNamePrefix = core.appConfig.name,
-                    LogStreamNameSuffix = "NLog",
-                    MaxQueuedMessages = 5000
-                };
-                var config = new LoggingConfiguration();
-                config.AddTarget("aws", awsTarget);
-                config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, awsTarget));
-                LogManager.Configuration = config;
-            }
+            if (core.serverConfig == null) return;
+            if (string.IsNullOrWhiteSpace(core.serverConfig.awsCloudWatchLogGroup)) return;
+            var awsTarget = new AWSTarget() {
+                Layout = "${longdate}|${level:uppercase=true}|${callsite}|${message}",
+                LogGroup = core.serverConfig.awsCloudWatchLogGroup,
+                Region = core.serverConfig.awsRegionName,
+                Credentials = new Amazon.Runtime.BasicAWSCredentials(core.serverConfig.awsAccessKey, core.serverConfig.awsSecretAccessKey),
+                LogStreamNamePrefix = core.appConfig.name,
+                LogStreamNameSuffix = "NLog",
+                MaxQueuedMessages = 5000
+            };
+            var config = new LoggingConfiguration();
+            config.AddTarget("aws", awsTarget);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, awsTarget));
+            LogManager.Configuration = config;
         }
         //
         //=============================================================================
@@ -196,7 +196,8 @@ namespace Contensive.Processor.Controllers {
         public static void log(CoreController core, string message, BaseClasses.CPLogBaseClass.LogLevel level) {
             try {
                 string messageLine = getMessageLine(core, message);
-                core.nlogLogger.Log(typeof(LogController), new LogEventInfo(getNLogLogLevel(level), core.nlogLogger.Name, messageLine));
+                Logger loggerInstance = core.nlogLogger;
+                loggerInstance.Log(typeof(LogController), new LogEventInfo(getNLogLogLevel(level), loggerInstance.Name, messageLine));
                 //
                 // -- add to doc exception list to display at top of webpage
                 if (level < BaseClasses.CPLogBaseClass.LogLevel.Warn) { return; }

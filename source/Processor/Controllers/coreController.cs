@@ -765,6 +765,11 @@ namespace Contensive.Processor.Controllers {
         public Logger nlogLogger {
             get {
                 if (_nlogLogger == null) {
+                    //
+                    // -- if serverconfig not provided, return one-off logger
+                    if (serverConfig == null) return LogManager.GetCurrentClassLogger();
+                    //
+                    // -- serverConfig is valid, initialize one stream for the rest of the document
                     LogController.awsConfigure(this);
                     _nlogLogger = LogManager.GetCurrentClassLogger();
                 }

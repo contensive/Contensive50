@@ -326,7 +326,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             // -- set simple lazy cache
-                            string cacheName = "siteproperty" + propertyName.Trim().ToLowerInvariant();
+                            string cacheName = getNameValueDictKey( propertyName );
                             if (nameValueDict.ContainsKey(cacheName)) {
                                 nameValueDict.Remove(cacheName);
                             }
@@ -341,6 +341,16 @@ namespace Contensive.Processor.Controllers {
                 LogController.logError( core,ex);
                 throw;
             }
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// convert propertyname to dictionary key
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        internal string getNameValueDictKey( string propertyName ) {
+            return propertyName.Trim().ToLowerInvariant();
         }
         //
         //========================================================================
@@ -419,12 +429,12 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// get site property, return as text. If not found, set and return default value
         /// </summary>
-        /// <param name="PropertyName"></param>
+        /// <param name="propertyName"></param>
         /// <param name="DefaultValue"></param>
         /// <param name="memberId"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public string getText(string PropertyName, string DefaultValue) {
+        public string getText(string propertyName, string DefaultValue) {
             string returnString = "";
             try {
                 if (dbNotReady) {
@@ -432,7 +442,7 @@ namespace Contensive.Processor.Controllers {
                     // -- if not ready, return default 
                     returnString = DefaultValue;
                 } else {
-                    string cacheName = PropertyName.Trim().ToLowerInvariant();
+                    string cacheName = getNameValueDictKey(propertyName);
                     if (cacheName.Equals("adminurl")) {
                         returnString = "/" + core.appConfig.adminRoute;
                     } else {
@@ -451,7 +461,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- read property from cache, no, with preloaded local cache, this will never be used
                                 bool propertyFound = false;
-                                returnString = getTextFromDb(PropertyName, DefaultValue, ref propertyFound);
+                                returnString = getTextFromDb(propertyName, DefaultValue, ref propertyFound);
                                 if (propertyFound) {
                                     //
                                     // -- found in Db, save in lazy cache in case it is repeated
@@ -462,9 +472,6 @@ namespace Contensive.Processor.Controllers {
                                     returnString = DefaultValue;
                                     nameValueDict.Add(cacheName, returnString);
                                     setProperty(cacheName, DefaultValue);
-                                    //if (!string.IsNullOrEmpty(returnString)) {
-                                    //    setProperty(cacheName, DefaultValue);
-                                    //}
                                 }
                             }
                         }
@@ -559,20 +566,6 @@ namespace Contensive.Processor.Controllers {
         public string dataBuildVersion {
             get {
                 return textPropertyBase("BuildVersion", "", ref _buildVersion);
-                //Dim returnString = ""
-                //Try
-                //    If Not _dataBuildVersion_Loaded Then
-                //        _dataBuildVersion = getText("BuildVersion", "")
-                //        If _dataBuildVersion = "" Then
-                //            _dataBuildVersion = "0.0.000"
-                //        End If
-                //        _dataBuildVersion_Loaded = True
-                //    End If
-                //    returnString = _dataBuildVersion
-                //Catch ex As Exception
-                //    logController.handleException( core,ex); : Throw
-                //End Try
-                //Return returnString
             }
             set {
                 setProperty("BuildVersion", value);
@@ -606,20 +599,6 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     if (_nameValueDict == null) {
                         _nameValueDict = SitePropertyModel.getNameValueDict(core);
-                        //_nameValueDict = new Dictionary<string, string>();
-                        //CsController cs = new CsController(core);
-                        //if (cs.openSQL("select name,FieldValue from ccsetup where (active>0) order by id")) {
-                        //    do {
-                        //        string name = cs.getText("name").Trim().ToLowerInvariant();
-                        //        if (!string.IsNullOrEmpty(name)) {
-                        //            if (!_nameValueDict.ContainsKey(name)) {
-                        //                _nameValueDict.Add(name, cs.getText("FieldValue"));
-                        //            }
-                        //        }
-                        //        cs.goNext();
-                        //    } while (cs.ok());
-                        //}
-                        //cs.close();
                     }
                 }
                 return _nameValueDict;
