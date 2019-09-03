@@ -70,10 +70,17 @@ Public Class ConfigurationClass
     End Function
     '
     Public Shared Sub loadRouteMap(cp As CPClass)
-        LogController.logRaw("configurationClass, loadRouteMap, [" + cp.Site.Name + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
         '
-        ' test if route map needs to be loaded (routeMap.dateCreated <> application[routeMapDateCreated])
-        If (Not cp.routeMap.dateCreated.Equals(HttpContext.Current.Application("RouteMapDateCreated"))) Then
+        ' -- if application var does not equal routemap.datecreated rebuild
+        Dim routeMapDateInValid As Boolean = HttpContext.Current.Application("RouteMapDateCreated") Is Nothing
+        If (routeMapDateInValid OrElse (cp.routeMap.dateCreated <> CDate(HttpContext.Current.Application("RouteMapDateCreated")))) Then
+            '
+            If routeMapDateInValid Then
+                LogController.logLocalOnly("configurationClass, loadRouteMap, [" + cp.Site.Name + "], rebuild because HttpContext.Current.Application(RouteMapDateCreated) is not valid", BaseClasses.CPLogBaseClass.LogLevel.Info)
+            Else
+                LogController.logLocalOnly("configurationClass, loadRouteMap, [" + cp.Site.Name + "], rebuild because not equal, cp.routeMap.dateCreated [" + cp.routeMap.dateCreated.ToString() + "], HttpContext.Current.Application(RouteMapDateCreated) [" + HttpContext.Current.Application("RouteMapDateCreated").ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Info)
+            End If
+            '
             HttpContext.Current.Application("routeMapDateCreated") = cp.routeMap.dateCreated
             SyncLock RouteTable.Routes
                 ' 20180307, added clear to resolve error 
@@ -81,7 +88,7 @@ Public Class ConfigurationClass
                 For Each newRouteKeyValuePair In cp.routeMap.routeDictionary
                     Try
                         '
-                        LogController.logRaw("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRouteKeyValuePair.Value.virtualRoute + "], [" + newRouteKeyValuePair.Value.physicalRoute + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+                        LogController.logLocalOnly("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRouteKeyValuePair.Value.virtualRoute + "], [" + newRouteKeyValuePair.Value.physicalRoute + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
                         '
                         RouteTable.Routes.Remove(RouteTable.Routes(newRouteKeyValuePair.Key))
                         RouteTable.Routes.MapPageRoute(newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.physicalRoute)

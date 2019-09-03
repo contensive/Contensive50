@@ -246,12 +246,10 @@ namespace Contensive.Processor.Controllers {
                     // -- use remote cache
                     typeMessage = "remote";
                     try {
-                        LogController.logTrace(core, "cacheClient.Get, serverKey [" + serverKey + "]");
                         result = cacheClient.Get<CacheDocumentClass>(serverKey);
                     } catch (Exception ex) {
                         //
                         // --client does not throw its own errors, so try to differentiate by message
-                        LogController.logTrace(core, "***** cacheClient exception *****, [" + ex.ToString() + "]");
                         if (ex.Message.ToLowerInvariant().IndexOf("unable to load type") >= 0) {
                             //
                             // -- trying to deserialize an object and this code does not have a matching class, clear cache and return empty
@@ -289,18 +287,17 @@ namespace Contensive.Processor.Controllers {
                 }
                 string returnContentSegment = SerializeObject(result);
                 returnContentSegment = (returnContentSegment.Length > 50) ? returnContentSegment.Substring(0, 50) : returnContentSegment;
-                LogController.logTrace(core, "return content [" + returnContentSegment + "]");
                 //
                 // -- log result
                 if (result == null) {
                     LogController.logTrace(core, "miss, cacheType [" + typeMessage + "], key [" + key + "]");
                 } else {
                     if (result.content == null) {
-                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], age [" + result.saveDate.ToString() + "], content [null]");
+                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], saveDate [" + result.saveDate.ToString() + "], content [null]");
                     } else {
                         string content = result.content.ToString();
                         content = (content.Length > 50) ? (content.Left(50) + "...") : content;
-                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], age [" + result.saveDate.ToString() + "], content [" + content + "]");
+                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], saveDate [" + result.saveDate.ToString() + "], content [" + content + "]");
                     }
                 }
                 //
@@ -728,7 +725,6 @@ namespace Contensive.Processor.Controllers {
                     if (remoteCacheInitialized) {
                         //
                         // -- save remote cache
-                        LogController.logTrace(core, "cacheClient.Store, mode [Enyim.Caching.Memcached.StoreMode.Set], serverKey [" + serverKey + "], cacheDocument [" + cacheDocument + "], cacheDocument.invalidationDate [" + cacheDocument.invalidationDate + "]");
                         if( !cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, serverKey, cacheDocument, cacheDocument.invalidationDate)) {
                             //
                             // -- store failed

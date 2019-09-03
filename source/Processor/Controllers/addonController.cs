@@ -1601,10 +1601,10 @@ namespace Contensive.Processor.Controllers {
                     // -- ?? when an addon is loaded, we can unload the old assembly (do not know method, but articles say you can)
                     // -- ?? try -- instead of loadfrom, try var assembly = Assembly.Load( File.ReadAllBytes(FilePathHere));
                     if (false) {
-                        byte[] buffer = File.ReadAllBytes(assemblyPhysicalPrivatePathname);
-                        testAssembly = core.addonAppDomain.Load(buffer);
+                        //byte[] buffer = File.ReadAllBytes(assemblyPhysicalPrivatePathname);
+                        //testAssembly = core.addonAppDomain.Load(buffer);
                     } else if (false) {
-                        testAssembly = Assembly.Load(File.ReadAllBytes(assemblyPhysicalPrivatePathname));
+                        //testAssembly = Assembly.Load(File.ReadAllBytes(assemblyPhysicalPrivatePathname));
                     } else {
                         testAssembly = Assembly.LoadFrom(assemblyPhysicalPrivatePathname);
                     }

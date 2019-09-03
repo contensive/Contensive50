@@ -21,12 +21,12 @@ Public Class Global_asax
     Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
         Try
             Application("asdf") = ""
-            LogController.logRaw("Global.asax, Application_Start [" & ConfigurationClass.getAppName() & "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+            LogController.logLocalOnly("Global.asax, Application_Start [" & ConfigurationClass.getAppName() & "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
             Using cp As New Contensive.Processor.CPClass(ConfigurationClass.getAppName())
                 DefaultSite.ConfigurationClass.loadRouteMap(cp)
             End Using
         Catch ex As Exception
-            LogController.logRaw("Global.asax, Application_Start exception [" & ConfigurationClass.getAppName() & "]" & getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.BaseClasses.CPLogBaseClass.LogLevel.Fatal)
+            LogController.logLocalOnly("Global.asax, Application_Start exception [" & ConfigurationClass.getAppName() & "]" & getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.BaseClasses.CPLogBaseClass.LogLevel.Fatal)
         End Try
     End Sub
     '
@@ -37,7 +37,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Session_Start(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logRaw("Global.asax, Session_Start [" + e.ToString() + "]", Contensive.BaseClasses.CPLogBaseClass.LogLevel.Trace)
+        LogController.logLocalOnly("Global.asax, Session_Start [" + e.ToString() + "]", Contensive.BaseClasses.CPLogBaseClass.LogLevel.Trace)
     End Sub
     '
     '====================================================================================================
@@ -47,7 +47,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_BeginRequest(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logRaw("Global.asax, Application_BeginRequest [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+        LogController.logLocalOnly("Global.asax, Application_BeginRequest [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
     End Sub
     '
     '====================================================================================================
@@ -57,7 +57,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_AuthenticateRequest(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logRaw("Global.asax, Application_AuthenticateRequest [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+        LogController.logLocalOnly("Global.asax, Application_AuthenticateRequest [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
     End Sub
     '
     '====================================================================================================
@@ -67,7 +67,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_Error(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logRaw("Global.asax, Application_Error, Server.GetLastError().InnerException [" + Server.GetLastError().InnerException.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error)
+        LogController.logLocalOnly("Global.asax, Application_Error, Server.GetLastError().InnerException [" + Server.GetLastError().InnerException.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error)
     End Sub
     '
     '====================================================================================================
@@ -77,7 +77,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Session_End(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logRaw("Global.asax, Session_End [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+        LogController.logLocalOnly("Global.asax, Session_End [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
     End Sub
     '
     '====================================================================================================
@@ -87,7 +87,9 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_End(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logRaw("Global.asax, Application_End [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+        LogController.logLocalOnly("Global.asax, Application_End [" + e.ToString() + "," + getShutdownDetail() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+
+
     End Sub
     '
     '====================================================================================================
@@ -100,6 +102,45 @@ Public Class Global_asax
         builder.AppendFormat(", Appdomain: {0}", AppDomain.CurrentDomain.FriendlyName)
         builder.Append(IIf(System.Threading.Thread.CurrentThread.IsThreadPoolThread, ", Pool Thread", ", No Thread").ToString())
         Return builder.ToString()
+    End Function
+    '
+    Private Function getShutdownDetail() As String
+        Dim shutdownReason As System.Web.ApplicationShutdownReason = System.Web.Hosting.HostingEnvironment.ShutdownReason
+        Dim shutdownDetail As String = ""
+
+        Select Case shutdownReason
+            Case ApplicationShutdownReason.BinDirChangeOrDirectoryRename
+                shutdownDetail = "A change was made to the bin directory or the directory was renamed"
+            Case ApplicationShutdownReason.BrowsersDirChangeOrDirectoryRename
+                shutdownDetail = "A change was made to the App_browsers folder or the files contained in it"
+            Case ApplicationShutdownReason.ChangeInGlobalAsax
+                shutdownDetail = "A change was made in the global.asax file"
+            Case ApplicationShutdownReason.ChangeInSecurityPolicyFile
+                shutdownDetail = "A change was made in the code access security policy file"
+            Case ApplicationShutdownReason.CodeDirChangeOrDirectoryRename
+                shutdownDetail = "A change was made in the App_Code folder or the files contained in it"
+            Case ApplicationShutdownReason.ConfigurationChange
+                shutdownDetail = "A change was made to the application level configuration"
+            Case ApplicationShutdownReason.HostingEnvironment
+                shutdownDetail = "The hosting environment shut down the application"
+            Case ApplicationShutdownReason.HttpRuntimeClose
+                shutdownDetail = "A call to Close() was requested"
+            Case ApplicationShutdownReason.IdleTimeout
+                shutdownDetail = "The idle time limit was reached"
+            Case ApplicationShutdownReason.InitializationError
+                shutdownDetail = "An error in the initialization of the AppDomain"
+            Case ApplicationShutdownReason.MaxRecompilationsReached
+                shutdownDetail = "The maximum number of dynamic recompiles of a resource limit was reached"
+            Case ApplicationShutdownReason.PhysicalApplicationPathChanged
+                shutdownDetail = "A change was made to the physical path to the application"
+            Case ApplicationShutdownReason.ResourcesDirChangeOrDirectoryRename
+                shutdownDetail = "A change was made to the App_GlobalResources foldr or the files contained within it"
+            Case ApplicationShutdownReason.UnloadAppDomainCalled
+                shutdownDetail = "A call to UnloadAppDomain() was completed"
+            Case Else
+                shutdownDetail = "Unknown shutdown reason"
+        End Select
+        Return shutdownDetail
     End Function
 
 End Class

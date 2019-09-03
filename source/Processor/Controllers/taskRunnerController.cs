@@ -106,27 +106,27 @@ namespace Contensive.Processor.Controllers {
                 if (processTimerInProcess) {
                     //
                     // -- trace log without core
-                    LogController.logRaw("taskRunner.processTimerTick, skip -- processTimerInProcess true",BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                    //LogController.logRaw("taskRunner.processTimerTick, skip -- processTimerInProcess true",BaseClasses.CPLogBaseClass.LogLevel.Trace);
                 } else {
                     processTimerInProcess = true;
                     //
                     // run tasks in task
                     //
-                    using (CPClass cpCluster = new CPClass()) {
-                        if (!cpCluster.core.serverConfig.allowTaskRunnerService) {
-                            LogController.logTrace(cpCluster.core, "taskRunner.processTimerTick, skip -- allowTaskRunnerService false");
+                    using (CPClass cpServerGroup = new CPClass()) {
+                        if (!cpServerGroup.core.serverConfig.allowTaskRunnerService) {
+                            LogController.logTrace(cpServerGroup.core, "taskRunner.processTimerTick, skip -- allowTaskRunnerService false");
                         } else {
-                            runTasks(cpCluster.core);
+                            runTasks(cpServerGroup.core);
                         }
+                        //
+                        // -- log memory usage -- info
+                        long workingSetMemory = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
+                        long virtualMemory = System.Diagnostics.Process.GetCurrentProcess().VirtualMemorySize64;
+                        long privateMemory = System.Diagnostics.Process.GetCurrentProcess().PrivateMemorySize64;
+                        LogController.log(cpServerGroup.core, "TaskRunner exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
                     }
                     processTimerInProcess = false;
                 }
-                //
-                // -- log memory usage -- info
-                long workingSetMemory = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
-                long virtualMemory = System.Diagnostics.Process.GetCurrentProcess().VirtualMemorySize64;
-                long privateMemory = System.Diagnostics.Process.GetCurrentProcess().PrivateMemorySize64;
-                LogController.logRaw("TaskRunner exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
                     LogController.logError(cp.core,ex);
@@ -218,7 +218,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- trace log without core
-                LogController.logRaw("taskRunner.runTasks, exit (" + swProcess.ElapsedMilliseconds + "ms)", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                //LogController.logRaw("taskRunner.runTasks, exit (" + swProcess.ElapsedMilliseconds + "ms)", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             } catch (Exception ex) {
                 LogController.logError(serverCore, ex);
             }
@@ -234,53 +234,57 @@ namespace Contensive.Processor.Controllers {
         public static void executeRunnerTasks(string appName, string runnerGuid) {
             try {
                 using (var cp = new Contensive.Processor.CPClass(appName)) {
-                    foreach (var task in TaskModel.createList(cp.core, "(cmdRunner=" + DbController.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
-                        //
-                        // -- trace log without core
-                        LogController.logRaw("taskRunner.runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
-                        //
-                        DateTime dateStarted = DateTime.Now;
-                        var cmdDetail = DeserializeObject<TaskModel.CmdDetailClass>(task.cmdDetail);
-                        if (cmdDetail != null) {
-                            var addon = AddonModel.create(cp.core, cmdDetail.addonId);
-                            if ( addon != null ) {
-                                var context = new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
-                                    backgroundProcess = true,
-                                    addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
-                                    argumentKeyValuePairs = cmdDetail.args,
-                                    errorContextMessage = "running task, addon [" + cmdDetail.addonId + "]"
-                                };
-                                string result = cp.core.addon.execute(addon, context);
-                                if(!string.IsNullOrEmpty(result)) {
-                                    //
-                                    // -- save output
-                                    if (task.resultDownloadId > 0) {
-                                        var download = DbBaseModel.create<DownloadModel>(cp.core, task.resultDownloadId);
-                                        if (download != null) {
-                                            if (string.IsNullOrEmpty(download.name)) {
-                                                download.name = "Download";
+                    try {
+                        foreach (var task in TaskModel.createList(cp.core, "(cmdRunner=" + DbController.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
+                            //
+                            // -- trace log without core
+                            LogController.log(cp.core, "taskRunner.runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
+                            //
+                            DateTime dateStarted = DateTime.Now;
+                            var cmdDetail = DeserializeObject<TaskModel.CmdDetailClass>(task.cmdDetail);
+                            if (cmdDetail != null) {
+                                var addon = AddonModel.create(cp.core, cmdDetail.addonId);
+                                if (addon != null) {
+                                    var context = new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                                        backgroundProcess = true,
+                                        addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
+                                        argumentKeyValuePairs = cmdDetail.args,
+                                        errorContextMessage = "running task, addon [" + cmdDetail.addonId + "]"
+                                    };
+                                    string result = cp.core.addon.execute(addon, context);
+                                    if (!string.IsNullOrEmpty(result)) {
+                                        //
+                                        // -- save output
+                                        if (task.resultDownloadId > 0) {
+                                            var download = DbBaseModel.create<DownloadModel>(cp.core, task.resultDownloadId);
+                                            if (download != null) {
+                                                if (string.IsNullOrEmpty(download.name)) {
+                                                    download.name = "Download";
+                                                }
+                                                download.resultMessage = "Completed";
+                                                download.filename.content = result;
+                                                download.dateRequested = dateStarted;
+                                                download.dateCompleted = DateTime.Now;
+                                                download.save(cp.core);
                                             }
-                                            download.resultMessage = "Completed";
-                                            download.filename.content = result;
-                                            download.dateRequested = dateStarted;
-                                            download.dateCompleted = DateTime.Now;
-                                            download.save(cp.core);
                                         }
+                                        //task.filename.content = result;
                                     }
-                                    //task.filename.content = result;
                                 }
                             }
+                            task.dateCompleted = DateTime.Now;
+                            //task.save(cp.core);
+                            TaskModel.delete(cp.core, task.id);
+                            //
+                            // -- info log the task running - so info state will log for memory leaks
+                            LogController.log(cp.core, "TaskRunner exit, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
                         }
-                        task.dateCompleted = DateTime.Now;
-                        //task.save(cp.core);
-                        TaskModel.delete(cp.core, task.id);
-                        //
-                        // -- info log the task running - so info state will log for memory leaks
-                        LogController.logRaw("TaskRunner exit, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
+                    } catch (Exception exInner) {
+                        LogController.log(cp.core, "TaskRunner exception, ex [" + exInner.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
+                        throw;
                     }
                 }
             } catch (Exception ex) {
-                LogController.logRaw("TaskRunner exception, ex [" + ex.ToString()  + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
                 Console.WriteLine("Error: [" + ex.ToString() + "]");
             }
         }

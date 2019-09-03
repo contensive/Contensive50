@@ -105,14 +105,14 @@ namespace Contensive.Processor.Controllers {
                         if (cp.core.serverConfig.allowTaskSchedulerService) {
                             scheduleTasks(cp.core);
                         }
+                        //
+                        // -- log memory usage -- info
+                        long workingSetMemory = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
+                        long virtualMemory = System.Diagnostics.Process.GetCurrentProcess().VirtualMemorySize64;
+                        long privateMemory = System.Diagnostics.Process.GetCurrentProcess().PrivateMemorySize64;
+                        LogController.log(cp.core, "TaskScheduler exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
                     }
                 }
-                //
-                // -- log memory usage -- info
-                long workingSetMemory = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
-                long virtualMemory = System.Diagnostics.Process.GetCurrentProcess().VirtualMemorySize64;
-                long privateMemory = System.Diagnostics.Process.GetCurrentProcess().PrivateMemorySize64;
-                LogController.logRaw("TaskScheduler exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
                     LogController.logError(cp.core, ex);

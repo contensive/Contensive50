@@ -1249,15 +1249,14 @@ namespace Contensive.Processor {
         /// <param name="blockClearCache"></param>
         public void save(bool asyncSave, bool blockClearCache) {
             try {
-                Controllers.LogController.logTrace(core, "save, enter");
+                if (!ok()) { return; }
+                if (this.writeCache.Count == 0) { return; }
                 if ( contentMeta == null ) {
                     Controllers.LogController.logTrace(core, "save, contentMeta NULL, sqlSource [" + sqlSource + "]");
                 } else {
                     Controllers.LogController.logTrace(core, "save, enter, contentMeta.name [" + contentMeta.name + "], contentMeta.tableName [" + contentMeta.tableName + "], contentMeta.dataSourceName [" + contentMeta.dataSourceName + "], asyncSave [" + asyncSave + "], blockClearCache [" + blockClearCache + "]");
                 }
                 //
-                if (!ok()) { return; }
-                if (this.writeCache.Count == 0) { return; }
                 if (!(this.createdWithMetaData)) { throw new ArgumentException("The dataset cannot be updated because it was created with a query and not a content table."); }
                 if (this.contentMeta == null) { throw new ArgumentException("The dataset cannot be updated because it was not created from a valid content table."); }
                 //

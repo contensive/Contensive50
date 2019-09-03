@@ -58,11 +58,9 @@ namespace Contensive.Processor.Controllers {
                     LogGroup = core.serverConfig.awsCloudWatchLogGroup,
                     Region = core.serverConfig.awsRegionName,
                     Credentials = new Amazon.Runtime.BasicAWSCredentials(core.serverConfig.awsAccessKey, core.serverConfig.awsSecretAccessKey),
-                    LogStreamNamePrefix = "abc",
-                    LogStreamNameSuffix = "123",
+                    LogStreamNamePrefix = core.appConfig.name,
+                    LogStreamNameSuffix = "NLog",
                     MaxQueuedMessages = 5000
-                     
-                     
                 };
                 var config = new LoggingConfiguration();
                 config.AddTarget("aws", awsTarget);
@@ -149,46 +147,42 @@ namespace Contensive.Processor.Controllers {
         //
         //=============================================================================
         /// <summary>
+        /// Convert internal logLevels to NLog, decoupling log levels so we don't expose NLog classes
+        /// </summary>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        public static NLog.LogLevel getNLogLogLevel(BaseClasses.CPLogBaseClass.LogLevel level) {
+            //
+            // -- decouple NLog types from internal enum
+            switch (level) {
+                case BaseClasses.CPLogBaseClass.LogLevel.Trace:
+                    return NLog.LogLevel.Trace;
+                case BaseClasses.CPLogBaseClass.LogLevel.Debug:
+                    return NLog.LogLevel.Debug;
+                case BaseClasses.CPLogBaseClass.LogLevel.Warn:
+                    return NLog.LogLevel.Warn;
+                case BaseClasses.CPLogBaseClass.LogLevel.Error:
+                    return NLog.LogLevel.Error;
+                case BaseClasses.CPLogBaseClass.LogLevel.Fatal:
+                    return NLog.LogLevel.Fatal;
+                default:
+                    return NLog.LogLevel.Info;
+            }
+        }
+        //
+        //=============================================================================
+        /// <summary>
         /// log any level with NLOG without messageLine formatting. Only use in extreme cases where the application environment is not stable.
         /// </summary>
         /// <param name="core"></param>
         /// <param name="messageLine"></param>
         /// <param name="level"></param>
-        public static void logRaw(string messageLine, BaseClasses.CPLogBaseClass.LogLevel level) {
+        public static void logLocalOnly(string messageLine, BaseClasses.CPLogBaseClass.LogLevel level) {
             try {
-                //
-                // -- decouple NLog types from internal enum
-                NLog.LogLevel nLogLevel = NLog.LogLevel.Info;
-                switch (level) {
-                    case BaseClasses.CPLogBaseClass.LogLevel.Trace:
-                        nLogLevel = NLog.LogLevel.Trace;
-                        break;
-                    case BaseClasses.CPLogBaseClass.LogLevel.Debug:
-                        nLogLevel = NLog.LogLevel.Debug;
-                        break;
-                    case BaseClasses.CPLogBaseClass.LogLevel.Info:
-                        nLogLevel = NLog.LogLevel.Info;
-                        break;
-                    case BaseClasses.CPLogBaseClass.LogLevel.Warn:
-                        nLogLevel = NLog.LogLevel.Warn;
-                        break;
-                    case BaseClasses.CPLogBaseClass.LogLevel.Error:
-                        nLogLevel = NLog.LogLevel.Error;
-                        break;
-                    case BaseClasses.CPLogBaseClass.LogLevel.Fatal:
-                        nLogLevel = NLog.LogLevel.Fatal;
-                        break;
-                }
-                //
-                // -- log with even so we can pass in the type of our wrapper
-                Logger nlogLogger = LogManager.GetCurrentClassLogger();
-                nlogLogger.Log(typeof(LogController), new LogEventInfo(nLogLevel, nlogLogger.Name, messageLine));
-            } catch (Exception ex) {
-                string thing1 = ex.ToString();
-                string thing2 = thing1;
-                // -- ignore errors in error handling
-            } finally {
-                //
+                var nlogLogger = LogManager.GetCurrentClassLogger();
+                nlogLogger.Log(typeof(LogController), new LogEventInfo(getNLogLogLevel(level), nlogLogger.Name, messageLine));
+            } catch (Exception) {
+                // -- throw away errors in error-handling
             }
         }
         //
@@ -200,19 +194,21 @@ namespace Contensive.Processor.Controllers {
         /// <param name="message"></param>
         /// <param name="level"></param>
         public static void log(CoreController core, string message, BaseClasses.CPLogBaseClass.LogLevel level) {
-            awsConfigure(core);
-            string messageLine = getMessageLine(core, message);
-            logRaw(messageLine, level);
-            //
-            // add to doc exception list to display at top of webpage
-            //
-            if (level < BaseClasses.CPLogBaseClass.LogLevel.Warn) { return; }
-            if (core.doc.errorList == null) { core.doc.errorList = new List<string>(); }
-            if (core.doc.errorList.Count < 10) {
-                core.doc.errorList.Add(messageLine);
-                return;
+            try {
+                string messageLine = getMessageLine(core, message);
+                core.nlogLogger.Log(typeof(LogController), new LogEventInfo(getNLogLogLevel(level), core.nlogLogger.Name, messageLine));
+                //
+                // -- add to doc exception list to display at top of webpage
+                if (level < BaseClasses.CPLogBaseClass.LogLevel.Warn) { return; }
+                if (core.doc.errorList == null) { core.doc.errorList = new List<string>(); }
+                if (core.doc.errorList.Count < 10) {
+                    core.doc.errorList.Add(messageLine);
+                    return;
+                }
+                if (core.doc.errorList.Count == 10) { core.doc.errorList.Add("Exception limit exceeded"); }
+            } catch (Exception) {
+                // -- throw away errors in error-handling
             }
-            if (core.doc.errorList.Count == 10) { core.doc.errorList.Add("Exception limit exceeded"); }
         }
         //
         //====================================================================================================

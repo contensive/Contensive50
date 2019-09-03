@@ -31,30 +31,25 @@ namespace Contensive.CLI {
                     //
                     // -- serverGroup name
                     {
-                        String prompt = "\nEnter the server group name (alpha-numeric string). For stand-alone servers, this can be the name of the server. For scaling configurations, this is a name for the group of servers:";
+                        Console.WriteLine("\n\nServer Group Name");
+                        Console.WriteLine("Enter the server group name (alpha-numeric string). For stand-alone servers this can be a simple server name. For scaling configurations, this is a name for the group of servers.");
+                        String prompt = "Server Group";
                         String defaultValue = cp.core.serverConfig.name;
                         cp.core.serverConfig.name = GenericController.promptForReply(prompt, defaultValue);
                     }
                     //
                     // -- production server?
                     {
-                        Console.WriteLine("\n\nIs this instance a production server? Non-production server instances may disable or mock some services, like ecommerce billing or email notifications.");
+                        Console.WriteLine("\n\nProduction Server");
+                        Console.WriteLine("Is this instance a production server? Non-production server instances may disable or mock some services, like ecommerce billing or email notifications.");
                         String prompt = "Production Server (y/n)?";
                         String defaultValue = (cp.core.serverConfig.productionEnvironment) ? "y" : "n";
                         cp.core.serverConfig.productionEnvironment = Equals(GenericController.promptForReply(prompt, defaultValue).ToLowerInvariant(), "y");
                     }
-                    ////
-                    //// -- enable logging
-                    //{
-                    //    Console.WriteLine("\n\nWith logging disabled, the server log at c:\\ProgramData\\Contensive\\Logs only includes Error and Fatal level entries. With logging enabled, these logs are verbose and can be large.");
-                    //    string prompt = "Enable Logging (y/n)?";
-                    //    String defaultValue = (cp.core.serverConfig.enableLogging) ? "y" : "n";
-                    //    cp.core.serverConfig.enableLogging = Equals(GenericController.promptForReply(prompt, defaultValue).ToLowerInvariant(), "y");
-                    //}
                     //
                     // -- local or multiserver mode
                     {
-                        Console.WriteLine("\n\nLocal or Remote File System Mode.");
+                        Console.WriteLine("\n\nLocal File System Mode (vs Remote File System).");
                         Console.WriteLine("Local File System stores content files on the webserver. Remote File System store content in an Amazon AWS S3 bucket, using the webserver to cache files for read and write.");
                         String prompt = "Local File System (y/n)?";
                         String defaultValue =  (cp.core.serverConfig.isLocalFileSystem) ? "y" : "n";
@@ -63,16 +58,17 @@ namespace Contensive.CLI {
                     //
                     // -- local file location
                     {
-                        Console.WriteLine("\n\nConfigure Local File System. This local system is required for both local and remote file system modes.");
+                        Console.WriteLine("\n\nFile Storage Location.");
+                        Console.WriteLine("The local system is required for both local and remote file system modes.");
                         if (string.IsNullOrEmpty(cp.core.serverConfig.localDataDriveLetter)) cp.core.serverConfig.localDataDriveLetter = "d";
                         if (!(new System.IO.DriveInfo(cp.core.serverConfig.localDataDriveLetter).IsReady)) cp.core.serverConfig.localDataDriveLetter = "c";
-                        cp.core.serverConfig.localDataDriveLetter = GenericController.promptForReply("Enter the Drive letter for data storage (c/d/etc)", cp.core.serverConfig.localDataDriveLetter);
+                        cp.core.serverConfig.localDataDriveLetter = GenericController.promptForReply("Enter the Drive letter for data storage (c/d/etc)?", cp.core.serverConfig.localDataDriveLetter);
                     }
                     //
                     // -- aws credentials
                     {
-                        //
-                        Console.WriteLine("\n\nConfigure the AWS credentials for this server. Use AWS IAM to create a user with programmatic credentials. This user will require policies for each of the services used by this server, such as S3 bucket access for remote files and logging for cloudwatch.");
+                        Console.WriteLine("\n\nAWS Credentials.");
+                        Console.WriteLine("Configure the AWS credentials for this server. Use AWS IAM to create a user with programmatic credentials. This user will require policies for each of the services used by this server, such as S3 bucket access for remote files and logging for cloudwatch.");
                         do {
                             cp.core.serverConfig.awsAccessKey = GenericController.promptForReply("Enter the AWS Access Key", cp.core.serverConfig.awsAccessKey);
                         } while (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsAccessKey));
@@ -84,8 +80,8 @@ namespace Contensive.CLI {
                     //
                     // -- aws region
                     {
-                        //
-                        Console.WriteLine("\n\nConfigure the AWS region for this server. The region is used for remote files and cloudwatch logging.");
+                        Console.WriteLine("\n\nAWS Region.");
+                        Console.WriteLine("Configure the AWS region for this server. The region is used for remote files and cloudwatch logging.");
                         string regionList = "";
                         foreach (var region in RegionEndpoint.EnumerableAllRegions) {
                             regionList += "," + region.SystemName;
@@ -107,10 +103,27 @@ namespace Contensive.CLI {
                     {
                         if (!cp.core.serverConfig.isLocalFileSystem) {
                             //
-                            Console.WriteLine("\n\nConfigure the AWS S3 bucket used for the remote file storage.");
+                            Console.WriteLine("\n\nRemote Storage AWS S3 bucket.");
+                            Console.WriteLine("Configure the AWS S3 bucket used for the remote file storage.");
                             do {
-                                cp.core.serverConfig.awsBucketName = GenericController.promptForReply("Enter the name of the AWS bucket for remote storage", cp.core.serverConfig.awsBucketName);
+                                cp.core.serverConfig.awsBucketName = GenericController.promptForReply("AWS S3 bucket", cp.core.serverConfig.awsBucketName);
                             } while (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsBucketName));
+                        }
+                    }
+                    //
+                    // -- aws Cloudwatch Logging - send NLOG logs to CloudWatch if the LogGroup is set
+                    {
+                        Console.WriteLine("\n\nCloudwatch Logging.");
+                        Console.WriteLine("If enabled, logging will be sent to Amazon AWS Cloudwatch. You will be prompted for a LogGroup. The AWS Credentials must include a policy for Service: 'CloudWatch Logs', Actions: List-DescribeLogGroups, List-DescribeLogStreams, Write-CreateLogCroup, Write-CreateLogStream, Write-PutLogEvents.");
+                        String prompt = "Enable CloudWatch Logging (y/n)?";
+                        String defaultValue = (string.IsNullOrWhiteSpace( cp.core.serverConfig.awsCloudWatchLogGroup)) ? "n" : "y";
+                        string enableCW = GenericController.promptForReply(prompt, defaultValue);
+                        if (enableCW.ToLower()!="y") {
+                            cp.core.serverConfig.awsCloudWatchLogGroup = "";
+                        } else {
+                            prompt = "AWS CloudWatch LogGroup. Leave Blank to disable";
+                            defaultValue = (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsCloudWatchLogGroup)) ? cp.core.serverConfig.name : cp.core.serverConfig.awsCloudWatchLogGroup;
+                            cp.core.serverConfig.awsCloudWatchLogGroup = GenericController.promptForReply(prompt, defaultValue);
                         }
                     }
                     //
@@ -119,29 +132,21 @@ namespace Contensive.CLI {
                     //
                     // -- Sql Server end-point
                     {
-                        Console.Write("\n\nSql Server endpoint. Use (local) for Sql Server on this machine, or the AWS RDS endpoint (url:port):");
+                        Console.WriteLine("\n\nSql Server endpoint.");
+                        Console.WriteLine("Sql Server endpoint or endpoint:port. Use endpoint '(local)' for Sql Server on this machine:");
                         if (!String.IsNullOrEmpty(cp.core.serverConfig.defaultDataSourceAddress)) Console.Write("(" + cp.core.serverConfig.defaultDataSourceAddress + ")");
                         string reply = Console.ReadLine();
                         if (String.IsNullOrEmpty(reply)) reply = cp.core.serverConfig.defaultDataSourceAddress;
                         cp.core.serverConfig.defaultDataSourceAddress = reply;
                     }
                     //
-                    // -- Sql Server userId
+                    // -- Sql Server Credentials
                     {
-                        Console.Write("native sqlserver userId:");
-                        if (!String.IsNullOrEmpty(cp.core.serverConfig.defaultDataSourceUsername)) Console.Write("(" + cp.core.serverConfig.defaultDataSourceUsername + ")");
-                        String reply = Console.ReadLine();
-                        if (String.IsNullOrEmpty(reply)) reply = cp.core.serverConfig.defaultDataSourceUsername;
-                        cp.core.serverConfig.defaultDataSourceUsername = reply;
-                    }
-                    //
-                    // -- Sql Server password
-                    {
-                        Console.Write("native sqlserver password:");
-                        if (!String.IsNullOrEmpty(cp.core.serverConfig.defaultDataSourcePassword)) Console.Write("(" + cp.core.serverConfig.defaultDataSourcePassword + ")");
-                        String reply = Console.ReadLine();
-                        if (String.IsNullOrEmpty(reply)) reply = cp.core.serverConfig.defaultDataSourcePassword;
-                        cp.core.serverConfig.defaultDataSourcePassword = reply;
+                        Console.WriteLine("\n\nSql Server Credentials");
+                        string prompt = "Sql Server userId";
+                        cp.core.serverConfig.defaultDataSourceUsername = GenericController.promptForReply(prompt, cp.core.serverConfig.defaultDataSourceUsername);
+                        prompt = "Sql Server password";
+                        cp.core.serverConfig.defaultDataSourcePassword = GenericController.promptForReply(prompt, cp.core.serverConfig.defaultDataSourcePassword);
                     }
                     //
                     // -- cache server local or remote
@@ -149,10 +154,15 @@ namespace Contensive.CLI {
                         String reply;
                         string defaultCacheValue = (String.IsNullOrEmpty(cp.core.serverConfig.awsElastiCacheConfigurationEndpoint)) ? "l" : "m";
                         do {
-                            Console.WriteLine("\n\nThe server requires a caching service. You can choose either the systems local cache or an AWS Elasticache (memCacheD).");
-                            Console.WriteLine("Use (l)ocal cache or (m)emcached server?");
-                            Console.Write("(" + defaultCacheValue + ")");
-                            reply = Console.ReadLine().ToLowerInvariant();
+                            Console.WriteLine("\n\nCache Service.");
+                            Console.WriteLine("The server requires a caching service. You can choose either the systems local memory or an AWS Elasticache (memCacheD).");
+
+                            string prompt = "(l)ocal cache or (m)emcached server";
+                            reply = GenericController.promptForReply(prompt, defaultCacheValue);
+
+                            //Console.WriteLine("Use (l)ocal cache or (m)emcached server?");
+                            //Console.Write("(" + defaultCacheValue + ")");
+                            //reply = Console.ReadLine().ToLowerInvariant();
                             if (String.IsNullOrEmpty(reply)) reply = defaultCacheValue;
                         } while ((reply != "l") && (reply != "m"));
                         if ((reply == "l")) {
@@ -169,6 +179,7 @@ namespace Contensive.CLI {
                             cp.core.serverConfig.enableLocalMemoryCache = false;
                             cp.core.serverConfig.enableRemoteCache = true;
                             do {
+                                Console.WriteLine("\n\nRemote Cache Service.");
                                 Console.WriteLine("Enter the ElasticCache Configuration Endpoint (server:port):");
                                 if (!String.IsNullOrEmpty(cp.core.serverConfig.awsElastiCacheConfigurationEndpoint)) Console.Write("(" + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint + ")");
                                 reply = Console.ReadLine();
@@ -178,7 +189,8 @@ namespace Contensive.CLI {
                             //
                             // -- enableEnyimNLog
                             {
-                                Console.WriteLine("\nEnable Remote cache drive logging (Enyim Logging). This is helpful as a diagnostic but is a seriou performance hit.");
+                                Console.WriteLine("\n\nEnable Remote Cache Service.");
+                                Console.WriteLine("Enables remote cache logging (Enyim Logging). This is helpful as a diagnostic but is a serious performance hit.");
                                 string prompt = "Enable Logging (y/n)?";
                                 String defaultLoggingValue = (cp.core.serverConfig.enableEnyimNLog) ? "y" : "n";
                                 cp.core.serverConfig.enableEnyimNLog = Equals(GenericController.promptForReply(prompt, defaultLoggingValue).ToLowerInvariant(), "y");
@@ -189,7 +201,6 @@ namespace Contensive.CLI {
                     // -- tasks and logging
                     cp.core.serverConfig.allowTaskRunnerService = true;
                     cp.core.serverConfig.allowTaskSchedulerService = true;
-                    //cp.core.serverConfig.enableLogging = true;
                     //
                     // -- save the configuration
                     cp.core.serverConfig.save(cp.core);

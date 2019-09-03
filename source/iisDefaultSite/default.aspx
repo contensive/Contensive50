@@ -3,7 +3,7 @@
 <script runat="server">
 
     Sub Page_Load()
-        Contensive.Processor.Controllers.LogController.logRaw("Page_Load", Contensive.BaseClasses.CPLogBaseClass.LogLevel.Trace)
+        Contensive.Processor.Controllers.LogController.logLocalOnly("Page_Load", Contensive.BaseClasses.CPLogBaseClass.LogLevel.Trace)
         Try
             If (ConfigurationManager.AppSettings("ContensiveUseWebConfig").ToLower = "true") Then
                 '

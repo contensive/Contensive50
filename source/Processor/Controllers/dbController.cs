@@ -217,7 +217,12 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 dbVerified = true;
-                saveTransactionLog(sql, sw.ElapsedMilliseconds, "query", recordsReturned);
+                string logMsg = "duration [" + sw.ElapsedMilliseconds + "ms], recordsAffected [" + recordsReturned + "], sql [" + sql.Replace("\r", "").Replace("\n", "") + "]";
+                if (sw.ElapsedMilliseconds > sqlSlowThreshholdMsec) {
+                    LogController.logWarn(core, "Slow Query " + logMsg);
+                } else {
+                    LogController.logDebug(core, logMsg);
+                }
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "], recordsReturned [" + recordsReturned + "]", ex));
                 throw;
@@ -256,7 +261,12 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 dbVerified = true;
-                saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query", recordsAffected);
+                string logMsg = "duration [" + sw.ElapsedMilliseconds + "ms], recordsAffected [" + recordsAffected + "], sql [" + sql.Replace("\r", "").Replace("\n", "") + "]";
+                if (sw.ElapsedMilliseconds > sqlSlowThreshholdMsec) {
+                    LogController.logWarn(core, "Slow Query " + logMsg);
+                } else {
+                    LogController.logDebug(core, logMsg);
+                }
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], recordsAffected [" + recordsAffected + "]", ex));
                 throw;
@@ -283,7 +293,12 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 dbVerified = true;
-                saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query-async", -1);
+                string logMsg = "duration [" + sw.ElapsedMilliseconds + "ms], recordsAffected [n/a], sql [" + sql.Replace("\r", "").Replace("\n", "") + "]";
+                if (sw.ElapsedMilliseconds > sqlSlowThreshholdMsec) {
+                    LogController.logWarn(core, "Slow Query " + logMsg);
+                } else {
+                    LogController.logDebug(core, logMsg);
+                }
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "]", ex));
                 throw;
@@ -431,20 +446,6 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
             return returnDataTable;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// update the transaction log
-        /// </summary>
-        /// <param name="LogEntry"></param>
-        private void saveTransactionLog(string sql, long elapsedMilliseconds, string sqlMethodType, int recordsAffected) {
-            string logMsg = "type [" + sqlMethodType + "], duration [" + elapsedMilliseconds + "ms], recordsAffected [" + recordsAffected + "], sql [" + sql.Replace("\r", "").Replace("\n", "") + "]";
-            if (elapsedMilliseconds > sqlSlowThreshholdMsec) {
-                LogController.logWarn(core, "Slow Query " + logMsg);
-            } else {
-                LogController.logDebug(core, logMsg);
-            }
         }
         //
         //========================================================================

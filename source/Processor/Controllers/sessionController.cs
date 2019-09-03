@@ -187,7 +187,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- Visit Tracking
                     //
-                    LogController.logTrace(core, "visittracking");
+                    //LogController.logTrace(core, "visittracking");
                     var visitToken = new SecurityController.TokenData();
                     if (!string.IsNullOrEmpty(visitCookie)) {
                         //
@@ -203,21 +203,21 @@ namespace Contensive.Processor.Controllers {
                     if (visitToken.id != 0) {
                         //
                         // -- Visit is good, setup visit, then secondary visitor/user if possible
-                        LogController.logTrace(core, "valid cookieVisit [" + visitToken.id + "]");
                         resultSessionContext.visit = VisitModel.create(core, visitToken.id);
                         if (resultSessionContext.visit == null) {
                             //
                             // -- visit record is missing, create a new visit
-                            LogController.logTrace(core, "visit record is missing, create a new visit");
+                            LogController.logTrace(core, "cookie visit record is missing, create a new visit");
                             resultSessionContext.visit = VisitModel.addEmpty(core);
                         } else if (resultSessionContext.visit.lastVisitTime.AddHours(1) < core.doc.profileStartTime) {
                             //
                             // -- visit has expired, create new visit
-                            LogController.logTrace(core, "visit has expired, create new visit, lastVisitTime [" + resultSessionContext.visit.lastVisitTime + "], profileStartTime [" + core.doc.profileStartTime + "]");
+                            LogController.logTrace(core, "cookie visit has expired, create new visit, lastVisitTime [" + resultSessionContext.visit.lastVisitTime + "], profileStartTime [" + core.doc.profileStartTime + "]");
                             resultSessionContext.visit = VisitModel.addEmpty(core);
                         } else {
                             //
                             // -- visit object is valid, share its data with other objects
+                            LogController.logTrace(core, "valid cookie visit [" + visitToken.id + "]");
                             resultSessionContext.visit.timeToLastHit = 0;
                             if (resultSessionContext.visit.startTime > DateTime.MinValue) {
                                 resultSessionContext.visit.timeToLastHit = encodeInteger((core.doc.profileStartTime - resultSessionContext.visit.startTime).TotalSeconds);
@@ -540,7 +540,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- count the page hit
-                    LogController.logTrace(core, "attempt visit count update");
+                    //LogController.logTrace(core, "attempt visit count update");
                     resultSessionContext.visit.excludeFromAnalytics |= resultSessionContext.visit.bot || resultSessionContext.user.excludeFromAnalytics || resultSessionContext.user.admin || resultSessionContext.user.developer;
                     if (!core.webServer.pageExcludeFromAnalytics) {
                         resultSessionContext.visit.pageVisits += 1;
@@ -548,7 +548,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- Save anything that changed
-                    LogController.logTrace(core, "save visit,visitor,user if updated");
+                    //LogController.logTrace(core, "save visit,visitor,user if updated");
                     if (visit_changes) {
                         resultSessionContext.visit.save(core, true);
                     }
@@ -564,7 +564,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 if (AllowOnNewVisitEvent) {
-                    LogController.logTrace(core, "execute onNewVisitEvent");
+                    LogController.logTrace(core, "execute NewVisit Event");
                     foreach (var addon in core.addonCache.getOnNewVisitAddonList()) {
                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                             addonType = CPUtilsBaseClass.addonContext.ContextOnNewVisit,
