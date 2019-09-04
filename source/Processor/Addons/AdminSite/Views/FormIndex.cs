@@ -68,7 +68,7 @@ namespace Contensive.Addons.AdminSite {
                                 Copy = FormIndexExport.get( core, adminData);
                                 break;
                             case AdminFormIndex_SubFormSetColumns:
-                                Copy = ToolSetListColumnsClass.GetForm_Index_SetColumns(cp, core, adminData);
+                                Copy = FormIndexSetColumnsClass.get(cp, core, adminData);
                                 break;
                             case AdminFormIndex_SubFormAdvancedSearch:
                                 Copy = FormIndexAdvancedSearchClass.get(cp, core, adminData);

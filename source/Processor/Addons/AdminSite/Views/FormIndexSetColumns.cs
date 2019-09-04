@@ -11,13 +11,13 @@ using Contensive.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 
 namespace Contensive.Addons.AdminSite {
-    public class ToolSetListColumnsClass {
+    public class FormIndexSetColumnsClass {
         //
         //=============================================================================
         //   Print the Configure Index Form
         //=============================================================================
         //
-        public static string GetForm_Index_SetColumns(CPClass cp, CoreController core, AdminDataModel adminData) {
+        public static string get(CPClass cp, CoreController core, AdminDataModel adminData) {
             string result = "";
             try {
                 // todo refactor out
@@ -25,14 +25,15 @@ namespace Contensive.Addons.AdminSite {
                 string Button = core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonOK) {
                     //
-                    //   Process OK
+                    // -- Process OK, remove subform from querystring and return empty
+                    cp.Doc.AddRefreshQueryString(RequestNameAdminSubForm, "");
                     return result;
                 }
                 //
                 //   Load Request
                 if (Button == ButtonReset) {
                     //
-                    //   Process reset
+                    // -- Process reset
                     core.userProperty.setProperty(AdminDataModel.IndexConfigPrefix + adminContent.id.ToString(), "");
                 }
                 IndexConfigClass IndexConfig = IndexConfigClass.get(core, adminData);

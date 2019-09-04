@@ -65,7 +65,7 @@
       <HintPath>..\packages\Microsoft.ClearScript.5.6.0\lib\net45\ClearScript.dll</HintPath>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.1.190903.3\lib\net461\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.1.190904.1\lib\net461\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -176,7 +176,7 @@
     <Compile Include="Addons\AdminSite\Models\IndexConfigClass.cs" />
     <Compile Include="Addons\AdminSite\Views\GroupRuleEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\FormIndex.cs" />
-    <Compile Include="Addons\AdminSite\Views\ToolSetListColumnsClass.cs" />
+    <Compile Include="Addons\AdminSite\Views\FormIndexSetColumns.cs" />
     <Compile Include="Addons\ExportSql\ExportCsvClass.cs" />
     <Compile Include="Addons\PageManager\getChildPageList.cs" />
     <Compile Include="Addons\Tools\MetakeywordToolClass.cs" />

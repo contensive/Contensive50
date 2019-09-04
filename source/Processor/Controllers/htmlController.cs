@@ -818,7 +818,11 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string form(CoreController core, string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post") {
             if (string.IsNullOrEmpty(actionQueryString)) actionQueryString = core.doc.refreshQueryString;
-            string action = joinQueryString(core.webServer.serverFormActionURL, actionQueryString);
+            //
+            // todo - remove comments if this is correct
+            // -- I dont think serverActionForm is correct. Form action, if not provided should be refreshQueryString
+            //string action = joinQueryString(core.webServer.serverFormActionURL, actionQueryString);
+            string action = "?" + actionQueryString;
             string result = "<form name=\"" + htmlName + "\" action=\"" + action + "\" method=\"" + htmlMethod + "\" style=\"display: inline;\"";
             result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
             result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
