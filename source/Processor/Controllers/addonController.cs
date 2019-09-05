@@ -1481,8 +1481,8 @@ namespace Contensive.Processor.Controllers {
             try {
                 LogController.logTrace(core, "execute_assembly dotNetClass [" + addon.dotNetClass + "], enter");
                 //
+                // -- purpose is to have a repository where addons can be stored for web and non-web apps, and allow permissions to be installed with online upload
                 string warningMessage = "The addon [" + addon.name + "] dotnet code could not be executed because no assembly was found with namespace [" + addon.dotNetClass + "].";
-                // -- purpose is to have a repository where addons can be stored for now web and non-web apps, and allow permissions to be installed with online upload
                 if ((addonCollection == null) || (string.IsNullOrEmpty(addonCollection.ccguid))) { throw new GenericException(warningMessage + " The addon dotnet assembly could not be run because no collection is set, or the collection guid is empty."); }
                 //
                 // -- has addon been found before
@@ -1490,20 +1490,9 @@ namespace Contensive.Processor.Controllers {
                 if (core.assemblyList_AddonsFound.ContainsKey(assemblyFileDictKey)) {
                     return execute_dotNetClass_assembly(addon, core.assemblyList_AddonsFound[assemblyFileDictKey].pathFilename);
                 }
-                bool AddonFound = false;
-                ////
-                //// -- development bypass folder (addonAssemblyBypass)
-                //// -- purpose is to provide a path that can be hardcoded in visual studio after-build event to make development easier
-                //string commonAssemblyPath = core.programDataFiles.localAbsRootPath + "AddonAssemblyBypass\\";
-                //if (!Directory.Exists(commonAssemblyPath)) { Directory.CreateDirectory(commonAssemblyPath); }
-                //result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, commonAssemblyPath, true, ref AddonFound);
-                //if (AddonFound) { return result; }
-                //warningMessage += warningMessage + ", not found in developer path [" + commonAssemblyPath + "]";
                 //
-                // -- application path (background from program files, forground from appRoot)
-                // -- purpose is to allow add-ons to be included in the website's (wwwRoot) assembly. So a website's custom addons are within the wwwRoot build, not separate
-                // -- background - program files installation folder, foreground - appRootPath
-                //string appPath = (executeContext.backgroundProcess) ? core.programFiles.localAbsRootPath : core.privateFiles.joinPath(core.wwwFiles.localAbsRootPath, "bin\\");
+                // -- try to find addon in current executing path (built in addons)
+                bool AddonFound = false;
                 string codeBase = Assembly.GetExecutingAssembly().CodeBase;
                 UriBuilder uri = new UriBuilder(codeBase);
                 string path = Uri.UnescapeDataString(uri.Path);
@@ -1538,31 +1527,34 @@ namespace Contensive.Processor.Controllers {
         /// <param name="addon"></param>
         /// <param name="fullPath"></param>
         /// <param name="IsDevAssembliesFolder"></param>
-        /// <param name="AddonFound"></param>
+        /// <param name="addonFound"></param>
         /// <returns></returns>
-        private string execute_dotNetClass_byPath(AddonModel addon, string assemblyFileDictKey, string fullPath, bool IsDevAssembliesFolder, ref bool AddonFound) {
+        private string execute_dotNetClass_byPath(AddonModel addon, string assemblyFileDictKey, string fullPath, bool IsDevAssembliesFolder, ref bool addonFound) {
             try {
+                addonFound = false;
                 if (!Directory.Exists(fullPath)) { return string.Empty; }
                 foreach (var testPathFilename in Directory.GetFileSystemEntries(fullPath, "*.dll")) {
-                    if (!core.assemblyList_NonAddonsFound.Contains(testPathFilename)) {
-                        bool testFileIsValidAddonAssembly = true;
-                        if (!string.IsNullOrEmpty(core.assemblyList_NonAddonsInstalled.Find(x => testPathFilename.ToLower().Right(x.Length) == x))) {
-                            //
-                            // -- this assembly is a non-addon installed file, block full path
-                            core.assemblyList_NonAddonsFound.Add(testPathFilename);
-                            continue;
-                        };
-                        string returnValue = execute_dotNetClass_assembly(addon, testPathFilename, ref testFileIsValidAddonAssembly, ref AddonFound);
+                    //
+                    // -- tmp test skipping the non-addon list, depend on found-addon list instead
+                    //if (core.assemblyList_NonAddonsFound.Contains(testPathFilename)) { continue; }
+                    if (!string.IsNullOrEmpty(core.assemblyList_NonAddonsInstalled.Find(x => testPathFilename.ToLower().Right(x.Length) == x))) {
                         //
-                        // -- if found, add this assembly to the found-dictionary
-                        if (AddonFound && !core.assemblyList_AddonsFound.ContainsKey(assemblyFileDictKey)) {
+                        // -- this assembly is a non-addon installed file, block full path
+                        core.assemblyList_NonAddonsFound.Add(testPathFilename);
+                        continue;
+                    };
+                    string returnValue = execute_dotNetClass_assembly(addon, testPathFilename, ref addonFound);
+                    if (addonFound) {
+                        //
+                        // -- addon found, save addonsFound list and return the addon result
+                        if (!core.assemblyList_AddonsFound.ContainsKey(assemblyFileDictKey)) {
                             core.assemblyList_AddonsFound.Add(assemblyFileDictKey, new AssemblyFileDetails() {
                                 pathFilename = testPathFilename,
                                 path = ""
                             });
                             core.assemblyList_AddonsFound_save();
-                            return returnValue;
                         }
+                        return returnValue;
                     }
                 }
                 return string.Empty;
@@ -1583,118 +1575,75 @@ namespace Contensive.Processor.Controllers {
         /// <param name="fileIsValidAddonAssembly">The file was a valid assembly, just not the right onw</param>
         /// <param name="addonFound">If found, the search for the assembly can be abandoned</param>
         /// <returns></returns>
-        private string execute_dotNetClass_assembly(AddonModel addon, string assemblyPhysicalPrivatePathname, ref bool fileIsValidAddonAssembly, ref bool addonFound) {
+        private string execute_dotNetClass_assembly(AddonModel addon, string assemblyPhysicalPrivatePathname, ref bool addonFound) {
             string result = "";
             try {
                 Assembly testAssembly = null;
-                fileIsValidAddonAssembly = true;
+                addonFound = false;
                 try {
                     //
                     // -- "once an assembly is loaded into an appdomain, it's there for the life of the appdomain."
-                    // todo consider using refectiononlyload first, then if it is right, do the loadfrom - so Dependencies are not loaded.
-                    // -- .LoadFile cannot work because although it loads the right assembly, it does not track dependencies
-                    // -- .LoadFrom uses the appDomain to load the assembly, so if another instance of this assembly is loaded it is used.
-                    // ---- (no, multiple front-end would not reload) maybe unloading the appdomain during install, and taskRunning MUST run addons in new processes so it's appDomain reloads each run
-                    // ---- (no, multiple front-end would not iisreset) maybe iisreset, (taskRunner must run addons in new process)
-                    // ---- need flag to cause reload (appdomain or iisreset) in each server instance
-                    // ------ if cache enable, use ???
-                    // -- ?? when an addon is loaded, we can unload the old assembly (do not know method, but articles say you can)
-                    // -- ?? try -- instead of loadfrom, try var assembly = Assembly.Load( File.ReadAllBytes(FilePathHere));
-                    if (false) {
-                        //byte[] buffer = File.ReadAllBytes(assemblyPhysicalPrivatePathname);
-                        //testAssembly = core.addonAppDomain.Load(buffer);
-                    } else if (false) {
-                        //testAssembly = Assembly.Load(File.ReadAllBytes(assemblyPhysicalPrivatePathname));
-                    } else {
-                        testAssembly = Assembly.LoadFrom(assemblyPhysicalPrivatePathname);
-                    }
-                } catch (Exception ex) {
-                    LogController.logInfo(core, "Assembly.LoadFrom failure, adding DLL [" + assemblyPhysicalPrivatePathname + "] to assemblySkipList, ex [" + ex.Message + "]");
+                    testAssembly = Assembly.LoadFrom(assemblyPhysicalPrivatePathname);
+                } catch (System.BadImageFormatException) {
+                    //
+                    // -- file is not an assembly, return addonFound false
                     core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
-                    fileIsValidAddonAssembly = false;
+                    return string.Empty;
+                } catch (Exception ex) {
+                    //
+                    // -- file is not an assembly, return addonFound false
+                    LogController.logInfo(core, "Assembly.LoadFrom failure [" + assemblyPhysicalPrivatePathname + "], ex [" + ex.Message + "]");
                     return string.Empty;
                 }
-                try {
-                    if (fileIsValidAddonAssembly) {
+                //
+                // -- assembly loaded, it is a proper assembly. Test if it is the one we are looking for (match class + baseclass)
+                var typeMap = testAssembly.GetTypes().ToDictionary(t => t.FullName, t => t, StringComparer.OrdinalIgnoreCase);
+                if (typeMap.TryGetValue(addon.dotNetClass, out Type addonType)) {
+                    if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
                         //
-                        // problem loading types, use try to debug
-                        //
-                        try {
-                            var typeMap = testAssembly.GetTypes().ToDictionary(t => t.FullName, t => t, StringComparer.OrdinalIgnoreCase);
-                            Type addonType;
-                            if (typeMap.TryGetValue(addon.dotNetClass, out addonType)) {
-                                if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
-                                    //
-                                    // -- assembly is public, not abstract, based on a base type
-                                    if (addonType.BaseType.FullName != null) {
-                                        //
-                                        // -- assembly has a baseType fullname
-                                        addonFound = ((addonType.BaseType.FullName.ToLowerInvariant() == "addonbaseclass") || (addonType.BaseType.FullName.ToLowerInvariant() == "contensive.baseclasses.addonbaseclass"));
-                                    }
-                                }
-                            }
-                            if (!addonFound) { return string.Empty; }
+                        // -- assembly is public, not abstract, based on a base type
+                        if (addonType.BaseType.FullName != null) {
                             //
-                            // -- Create the object from the Assembly
-                            AddonBaseClass AddonObj = (AddonBaseClass)testAssembly.CreateInstance(addonType.FullName);
-                            try {
-                                //
-                                // -- Call Execute
-                                object AddonReturnObj = AddonObj.Execute(core.cp_forAddonExecutionOnly);
-                                if (AddonReturnObj != null) {
-                                    switch (AddonReturnObj.GetType().ToString()) {
-                                        case "System.String":
-                                            //
-                                            // -- return simple string
-                                            result = (string)AddonReturnObj;
-                                            break;
-                                        default:
-                                            //
-                                            // -- if the addon returned an object, json serialize
-                                            result = SerializeObject(AddonReturnObj);
-                                            break;
-                                    }
-                                }
-                            } catch (Exception Ex) {
-                                //
-                                // Error in the addon
-                                //
-                                string detailedErrorMessage = "There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + assemblyPhysicalPrivatePathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + Ex.ToString() + "]";
-                                LogController.logError(core, Ex, detailedErrorMessage);
-                                //Throw new GenericException(detailedErrorMessage)
-                            }
-                        } catch (ReflectionTypeLoadException ex) {
-                            //
-                            // exceptin thrown out of application bin folder when xunit library included -- ignore
-                            //
-                            LogController.logDebug(core, "Assembly ReflectionTypeLoadException, [" + assemblyPhysicalPrivatePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
-                            core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
-                        } catch (Exception ex) {
-                            //
-                            // problem loading types
-                            //
-                            LogController.logDebug(core, "Assembly exception, [" + assemblyPhysicalPrivatePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
-                            core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
-                            string detailedErrorMessage = "While locating assembly for addon [" + addon.name + "], there was an error loading types for assembly [" + assemblyPhysicalPrivatePathname + "]. This assembly was skipped and should be removed from the folder.";
-                            throw new GenericException(detailedErrorMessage);
+                            // -- assembly has a baseType fullname
+                            addonFound = ((addonType.BaseType.FullName.ToLowerInvariant() == "addonbaseclass") || (addonType.BaseType.FullName.ToLowerInvariant() == "contensive.baseclasses.addonbaseclass"));
                         }
                     }
-                } catch (System.Reflection.ReflectionTypeLoadException ex) {
-                    LogController.logDebug(core, "Assembly ReflectionTypeLoadException-2, [" + assemblyPhysicalPrivatePathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
+                }
+                //
+                // -- if not addon found, exit now
+                if (!addonFound) { return string.Empty; }
+                //
+                // -- addon found, execute it
+                AddonBaseClass AddonObj = null;
+                try {
+                    //
+                    // -- Create an object from the Assembly
+                    AddonObj = (AddonBaseClass)testAssembly.CreateInstance(addonType.FullName);
+                } catch (ReflectionTypeLoadException ex) {
+                    //
+                    // -- exception thrown out of application bin folder when xunit library included -- ignore
+                    LogController.logDebug(core, "Assembly ReflectionTypeLoadException, [" + assemblyPhysicalPrivatePathname + "], ex [" + ex.Message + "]");
                     core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
-                    string detailedErrorMessage = "A load exception occured for addon [" + addon.name + "], DLL [" + assemblyPhysicalPrivatePathname + "]. The error was [" + ex.ToString() + "] Any internal exception follow:";
-                    foreach (Exception exLoader in ex.LoaderExceptions) {
-                        detailedErrorMessage += Environment.NewLine + "--LoaderExceptions: " + exLoader.Message;
-                    }
-                    throw new GenericException(detailedErrorMessage);
                 } catch (Exception ex) {
                     //
-                    // ignore these errors
-                    //
-                    LogController.logDebug(core, "Assembly Exception-2, [" + assemblyPhysicalPrivatePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
+                    // -- problem loading types
+                    LogController.logDebug(core, "Assembly exception, [" + assemblyPhysicalPrivatePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
                     core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
-                    string detailedErrorMessage = "A non-load exception occured while loading the addon [" + addon.name + "], DLL [" + assemblyPhysicalPrivatePathname + "]. The error was [" + ex.ToString() + "].";
-                    LogController.logError(core, new GenericException(detailedErrorMessage));
+                    string detailedErrorMessage = "While locating assembly for addon [" + addon.name + "], there was an error loading types for assembly [" + assemblyPhysicalPrivatePathname + "]. This assembly was skipped and should be removed from the folder.";
+                    throw new GenericException(detailedErrorMessage);
+                }
+                try {
+                    //
+                    // -- Call Execute
+                    object AddonObjResult = AddonObj.Execute(core.cp_forAddonExecutionOnly);
+                    if (AddonObjResult == null) return string.Empty;
+                    if (AddonObjResult.GetType().ToString() == "System.String") { return (string)AddonObjResult; }
+                    return SerializeObject(AddonObjResult);
+                } catch (Exception ex) {
+                    //
+                    // -- error in the addon
+                    LogController.logError(core, ex, "There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + assemblyPhysicalPrivatePathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + ex.ToString() + "]");
+                    //Throw new GenericException(detailedErrorMessage)
                 }
             } catch (Exception ex) {
                 //
@@ -1704,6 +1653,8 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
+        //
+        //====================================================================================================================
         /// <summary>
         /// Execute an addon assembly
         /// </summary>
@@ -1712,12 +1663,15 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         private string execute_dotNetClass_assembly(AddonModel addon, string assemblyPathname) {
             bool mock1 = false;
-            bool mock2 = false;
-            return execute_dotNetClass_assembly(addon, assemblyPathname, ref mock1, ref mock2);
+            return execute_dotNetClass_assembly(addon, assemblyPathname, ref mock1);
         }
         //
         //====================================================================================================================
-        //
+        /// <summary>
+        /// execute an addon in the task service
+        /// </summary>
+        /// <param name="addon"></param>
+        /// <param name="arguments"></param>
         public void executeAsync(AddonModel addon, Dictionary<string, string> arguments) {
             try {
                 if (addon == null) {
@@ -1766,450 +1720,6 @@ namespace Contensive.Processor.Controllers {
             var addon = Models.Db.AddonModel.createByUniqueName(core, name);
             if (addon == null) { throw new ArgumentException("executeAsyncByName cannot find Addon for name [" + name + "]"); }
             executeAsync(addon, convertQSNVAArgumentstoDocPropertiesList(core, OptionString));
-        }
-        //
-        //===============================================================================================================================================
-        /// <summary>
-        /// popup menu used on pages
-        /// </summary>
-        /// <param name="AddonName"></param>
-        /// <param name="Option_String"></param>
-        /// <param name="ContentName"></param>
-        /// <param name="RecordID"></param>
-        /// <param name="FieldName"></param>
-        /// <param name="ACInstanceID"></param>
-        /// <param name="Context"></param>
-        /// <param name="return_DialogList"></param>
-        /// <returns></returns>
-        public string getInstanceBubble(string AddonName, string Option_String, string ContentName, int RecordID, string FieldName, string ACInstanceID, CPUtilsBaseClass.addonContext Context, ref string return_DialogList) {
-            string tempgetInstanceBubble = null;
-            try {
-                //
-                string OptionDefault = null;
-                string OptionSuffix = null;
-                int OptionCnt = 0;
-                string OptionValue_AddonEncoded = null;
-                string OptionValue = null;
-                string OptionCaption = null;
-                string LCaseOptionDefault = null;
-                string[] OptionValues = null;
-                string FormInput = null;
-                int OptionPtr = 0;
-                string QueryString = null;
-                string LocalCode = "";
-                string CopyHeader = "";
-                string CopyContent = "";
-                string BubbleJS = null;
-                string[] OptionSplit = null;
-                string OptionName = null;
-                string OptionSelector = null;
-                int Ptr = 0;
-                int Pos = 0;
-                //
-                if (core.session.isAuthenticated & ((ACInstanceID == "-2") || (ACInstanceID == "-1") || (ACInstanceID == "0") || (RecordID != 0))) {
-                    if (core.session.isEditing()) {
-                        CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
-                            + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
-                            + "<tr>"
-                            + "<td align=left class=\"bbLeft\">Options for this instance of " + AddonName + "</td>"
-                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\">" + iconClose_White + "</i></a></td>"
-                            + "</tr>"
-                            + "</table>"
-                            + "</div>";
-                        if (string.IsNullOrEmpty(Option_String)) {
-                            //
-                            // no option string - no settings to display
-                            //
-                            CopyContent = "This Add-on has no instance options.";
-                            CopyContent = "<div style=\"width:400px;background-color:transparent\" class=\"ccAdminSmall\">" + CopyContent + "</div>";
-                        } else if ((ACInstanceID == "0") || (ACInstanceID == "-1")) {
-                            //
-                            // This addon does not support bubble option setting
-                            //
-                            CopyContent = "This addon does not support instance options.";
-                            CopyContent = "<div style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + CopyContent + "</div>";
-                        } else if (string.IsNullOrEmpty(ACInstanceID)) {
-                            //
-                            // No instance ID - must be edited and saved
-                            //
-                            CopyContent = "You can not edit instance options for Add-ons on this page until the page is upgraded. To upgrade, edit and save the page.";
-                            CopyContent = "<div style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + CopyContent + "</div>";
-                        } else {
-                            //
-                            // ACInstanceID is -2 (Admin Root), or Rnd (from an instance on a page) Editable Form
-                            //
-                            CopyContent = CopyContent + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
-                                + "";
-                            OptionSplit = GenericController.stringSplit(Option_String, Environment.NewLine);
-                            for (Ptr = 0; Ptr <= OptionSplit.GetUpperBound(0); Ptr++) {
-                                //
-                                // Process each option row
-                                //
-                                OptionName = OptionSplit[Ptr];
-                                OptionSuffix = "";
-                                OptionDefault = "";
-                                LCaseOptionDefault = "";
-                                OptionSelector = "";
-                                Pos = GenericController.vbInstr(1, OptionName, "=");
-                                if (Pos != 0) {
-                                    if (Pos < OptionName.Length) {
-                                        OptionSelector = (OptionName.Substring(Pos)).Trim(' ');
-                                    }
-                                    OptionName = (OptionName.Left(Pos - 1)).Trim(' ');
-                                }
-                                OptionName = GenericController.decodeNvaArgument(OptionName);
-                                Pos = GenericController.vbInstr(1, OptionSelector, "[");
-                                if (Pos != 0) {
-                                    //
-                                    // List of Options, might be select, radio, checkbox, resourcelink
-                                    //
-                                    OptionDefault = OptionSelector.Left(Pos - 1);
-                                    OptionDefault = GenericController.decodeNvaArgument(OptionDefault);
-                                    LCaseOptionDefault = GenericController.vbLCase(OptionDefault);
-                                    //LCaseOptionDefault = genericController.decodeNvaArgument(LCaseOptionDefault)
-
-                                    OptionSelector = OptionSelector.Substring(Pos);
-                                    Pos = GenericController.vbInstr(1, OptionSelector, "]");
-                                    if (Pos > 0) {
-                                        if (Pos < OptionSelector.Length) {
-                                            OptionSuffix = GenericController.vbLCase((OptionSelector.Substring(Pos)).Trim(' '));
-                                        }
-                                        OptionSelector = OptionSelector.Left(Pos - 1);
-                                    }
-                                    OptionValues = OptionSelector.Split('|');
-                                    FormInput = "";
-                                    OptionCnt = OptionValues.GetUpperBound(0) + 1;
-                                    for (OptionPtr = 0; OptionPtr < OptionCnt; OptionPtr++) {
-                                        OptionValue_AddonEncoded = OptionValues[OptionPtr].Trim(' ');
-                                        if (!string.IsNullOrEmpty(OptionValue_AddonEncoded)) {
-                                            Pos = GenericController.vbInstr(1, OptionValue_AddonEncoded, ":");
-                                            if (Pos == 0) {
-                                                OptionValue = GenericController.decodeNvaArgument(OptionValue_AddonEncoded);
-                                                OptionCaption = OptionValue;
-                                            } else {
-                                                OptionCaption = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.Left(Pos - 1));
-                                                OptionValue = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
-                                            }
-                                            switch (OptionSuffix) {
-                                                case "checkbox":
-                                                    //
-                                                    // Create checkbox FormInput
-                                                    //
-                                                    if (GenericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + GenericController.vbLCase(OptionValue) + ",") != 0) {
-                                                        FormInput = FormInput + "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + OptionName + OptionPtr + "\" value=\"" + OptionValue + "\" checked=\"checked\">" + OptionCaption + "</div>";
-                                                    } else {
-                                                        FormInput = FormInput + "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + OptionName + OptionPtr + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
-                                                    }
-                                                    break;
-                                                case "radio":
-                                                    //
-                                                    // Create Radio FormInput
-                                                    //
-                                                    if (GenericController.vbLCase(OptionValue) == LCaseOptionDefault) {
-                                                        FormInput = FormInput + "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + OptionName + "\" value=\"" + OptionValue + "\" checked=\"checked\" >" + OptionCaption + "</div>";
-                                                    } else {
-                                                        FormInput = FormInput + "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + OptionName + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
-                                                    }
-                                                    break;
-                                                default:
-                                                    //
-                                                    // Create select FormInput
-                                                    //
-                                                    if (GenericController.vbLCase(OptionValue) == LCaseOptionDefault) {
-                                                        FormInput = FormInput + "<option value=\"" + OptionValue + "\" selected>" + OptionCaption + "</option>";
-                                                    } else {
-                                                        OptionCaption = GenericController.vbReplace(OptionCaption, Environment.NewLine, " ");
-                                                        FormInput = FormInput + "<option value=\"" + OptionValue + "\">" + OptionCaption + "</option>";
-                                                    }
-                                                    break;
-                                            }
-                                        }
-                                    }
-                                    switch (OptionSuffix) {
-                                        //                            Case FieldTypeLink
-                                        //                                '
-                                        //                                ' ----- Link (href value
-                                        //                                '
-                                        //                                Return_NewFieldList = Return_NewFieldList & "," & FieldName
-                                        //                                FieldValueText = genericController.encodeText(FieldValueVariant)
-                                        //                                EditorString = "" _
-                                        //                                    & core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName) _
-                                        //                                    & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>" _
-                                        //                                    & "&nbsp;<a href=""#"" onClick=""OpenSiteExplorerWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/PageLink1616.gif"" width=16 height=16 border=0 alt=""Link to a page"" title=""Link to a page""></a>"
-                                        //                                s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
-                                        //                            Case FieldTypeResourceLink
-                                        //                                '
-                                        //                                ' ----- Resource Link (src value)
-                                        //                                '
-                                        //                                Return_NewFieldList = Return_NewFieldList & "," & FieldName
-                                        //                                FieldValueText = genericController.encodeText(FieldValueVariant)
-                                        //                                EditorString = "" _
-                                        //                                    & core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName) _
-                                        //                                    & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
-                                        //                                'EditorString = core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
-                                        //                                s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
-                                        case "resourcelink":
-                                            //
-                                            // Create text box linked to resource library
-                                            //
-                                            OptionDefault = GenericController.decodeNvaArgument(OptionDefault);
-                                            FormInput = ""
-                                                + HtmlController.inputText_Legacy(core, OptionName, OptionDefault, 1, 20) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + OptionName + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
-                                            //EditorString = core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
-                                            break;
-                                        case "checkbox":
-                                            //
-                                            //
-                                            CopyContent = CopyContent + "<input type=\"hidden\" name=\"" + OptionName + "CheckBoxCnt\" value=\"" + OptionCnt + "\" >";
-                                            break;
-                                        case "radio":
-                                            //
-                                            // Create Radio FormInput
-                                            //
-                                            break;
-                                        default:
-                                            //
-                                            // Create select FormInput
-                                            //
-                                            FormInput = "<select name=\"" + OptionName + "\">" + FormInput + "</select>";
-                                            break;
-                                    }
-                                } else {
-                                    //
-                                    // Create Text FormInput
-                                    //
-
-                                    OptionSelector = GenericController.decodeNvaArgument(OptionSelector);
-                                    FormInput = HtmlController.inputText_Legacy(core, OptionName, OptionSelector, 1, 20);
-                                }
-                                CopyContent = CopyContent + "<tr>"
-                                    + "<td class=\"bbLeft\">" + OptionName + "</td>"
-                                    + "<td class=\"bbRight\">" + FormInput + "</td>"
-                                    + "</tr>";
-                            }
-                            CopyContent = ""
-                                + CopyContent + "</table>"
-                                + HtmlController.inputHidden("Type", FormTypeAddonSettingsEditor) + HtmlController.inputHidden("ContentName", ContentName) + HtmlController.inputHidden("RecordID", RecordID) + HtmlController.inputHidden("FieldName", FieldName) + HtmlController.inputHidden("ACInstanceID", ACInstanceID);
-                        }
-                        //
-                        BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
-                        QueryString = core.doc.refreshQueryString;
-                        QueryString = GenericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
-                        //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
-                        return_DialogList = return_DialogList
-                            + "<div class=\"ccCon helpDialogCon\">"
-                            + HtmlController.formMultipart_start(core, core.doc.refreshQueryString, "", "ccForm")
-                            + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
-                            + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
-                            + "<tr><td class=\"ccButtonCon\">" + HtmlController.inputSubmit("Update", "HelpBubbleButton") + "</td></tr>"
-                            + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
-                            + "</table>"
-                            + "</form>"
-                            + "</div>";
-                        tempgetInstanceBubble = ""
-                            + "&nbsp;<a href=\"#\" tabindex=-1 target=\"_blank\"" + BubbleJS + ">"
-                            + getIconSprite("", 0, "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/toolsettings.png", 22, 22, "Edit options used just for this instance of the " + AddonName + " Add-on", "Edit options used just for this instance of the " + AddonName + " Add-on", "", true, "") + "</a>"
-                            + ""
-                            + "";
-                        core.doc.helpCodes.Add(new DocController.HelpStuff() {
-                            caption = AddonName,
-                            code = LocalCode
-                        });
-                        if (core.doc.helpDialogCnt == 0) {
-                            core.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs");
-                        }
-                        core.doc.helpDialogCnt = core.doc.helpDialogCnt + 1;
-                    }
-                }
-                //
-                return tempgetInstanceBubble;
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-            }
-            //ErrorTrap:
-            //throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetInstanceBubble")
-            return tempgetInstanceBubble;
-        }
-        //
-        //===============================================================================================================================================
-        /// <summary>
-        /// Get styles for help popup
-        /// </summary>
-        /// <param name="addonId"></param>
-        /// <param name="return_DialogList"></param>
-        /// <returns></returns>
-        public string getAddonStylesBubble(int addonId, ref string return_DialogList) {
-            string result = "";
-            try {
-                if (core.session.isAuthenticated && true) {
-                    if (core.session.isEditing()) {
-                        AddonModel addon = AddonModel.create(core, addonId);
-                        string CopyHeader = ""
-                            + "<div class=\"ccHeaderCon\">"
-                            + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
-                            + "<tr>"
-                            + "<td align=left class=\"bbLeft\">Stylesheet for " + addon.name + "</td>"
-                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\">" + iconClose_White + "</i></a></td>"
-                            + "</tr>"
-                            + "</table>"
-                            + "</div>";
-                        string CopyContent = ""
-                            + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
-                            + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccContentCon ccAdminSmall\">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</td></tr>"
-                            + "<tr><td style=\"padding-bottom:5px;\" class=\"ccContentCon ccAdminSmall\"><b>Custom Stylesheet</b>" + HtmlController.inputTextarea(core, "CustomStyles", addon.stylesFilename.content, 10) + "</td></tr>"
-                            + "</table>"
-                            + HtmlController.inputHidden("Type", FormTypeAddonStyleEditor) + HtmlController.inputHidden("AddonID", addonId) + "";
-                        string BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
-                        string QueryString = GenericController.modifyQueryString(core.doc.refreshQueryString, RequestNameHardCodedPage, "", false);
-                        string Dialog = ""
-                            + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
-                            + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
-                            + "<tr><td class=\"ccButtonCon\">" + HtmlController.inputSubmit("Update", "HelpBubbleButton") + "</td></tr>"
-                            + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
-                            + "</table>";
-                        Dialog = HtmlController.formMultipart(core, Dialog, core.doc.refreshQueryString, "", "ccForm");
-                        Dialog = HtmlController.div(Dialog, "ccCon helpDialogCon");
-                        return_DialogList = return_DialogList + Dialog;
-                        result = ""
-                            + "&nbsp;<a href=\"#\" tabindex=-1 target=\"_blank\"" + BubbleJS + ">"
-                            + getIconSprite("", 0, "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/toolstyles.png", 22, 22, "Edit " + addon.name + " Stylesheets", "Edit " + addon.name + " Stylesheets", "", true, "") + "</a>";
-                        string LocalCode = "";
-                        core.doc.helpCodes.Add(new DocController.HelpStuff {
-                            caption = addon.name,
-                            code = LocalCode
-                        });
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-            }
-            return result;
-        }
-        //
-        //===============================================================================================================================================
-        /// <summary>
-        /// help popup
-        /// </summary>
-        /// <param name="addonId"></param>
-        /// <param name="helpCopy"></param>
-        /// <param name="CollectionID"></param>
-        /// <param name="return_DialogList"></param>
-        /// <returns></returns>
-        public string getHelpBubble(int addonId, string helpCopy, int CollectionID, ref string return_DialogList) {
-            string result = "";
-            if (core.session.isAuthenticated) {
-                if (core.session.isEditing()) {
-                    int StyleSN = GenericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
-                    string InnerCopy = helpCopy;
-                    if (string.IsNullOrEmpty(InnerCopy)) { InnerCopy = "<p style=\"text-align:center\">No help is available for this add-on.</p>"; }
-                    string CollectionCopy = "";
-                    if (CollectionID != 0) {
-                        CollectionCopy = MetadataController.getRecordName(core, "Add-on Collections", CollectionID);
-                        if (!string.IsNullOrEmpty(CollectionCopy)) {
-                            CollectionCopy = "This add-on is a member of the " + CollectionCopy + " collection.";
-                        } else {
-                            CollectionID = 0;
-                        }
-                    }
-                    if (CollectionID == 0) {
-                        CollectionCopy = "This add-on is not a member of any collection.";
-                    }
-                    string CopyHeader = "";
-                    CopyHeader = CopyHeader
-                        + "<div class=\"ccHeaderCon\">"
-                        + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
-                        + "<tr>"
-                        + "<td align=left class=\"bbLeft\">Help Viewer</td>"
-                        + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\">" + iconClose_White + "</i></a></td>"
-                        + "</tr>"
-                        + "</table>"
-                        + "</div>";
-                    string CopyContent = ""
-                        + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
-                        + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\"><p>" + CollectionCopy + "</p></td></tr>"
-                        + "<tr><td style=\"width:400px;background-color:transparent;border:1px solid #fff;padding:10px;margin:5px;\">" + InnerCopy + "</td></tr>"
-                        + "</tr>"
-                        + "</table>";
-                    //
-                    string QueryString = core.doc.refreshQueryString;
-                    QueryString = GenericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
-                    //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
-                    return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
-                        + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
-                        + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
-                        + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
-                        + "</table>"
-                        + "</div>";
-                    string BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
-                    string LocalCode = "";
-                    string AddonName = "";
-                    core.doc.helpCodes.Add(new DocController.HelpStuff {
-                        code = LocalCode,
-                        caption = AddonName
-                    });
-                    //
-                    if (core.doc.helpDialogCnt == 0) {
-                        core.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs");
-                    }
-                    core.doc.helpDialogCnt = core.doc.helpDialogCnt + 1;
-                    result = ""
-                        + "&nbsp;<a href=\"#\" tabindex=-1 tarGet=\"_blank\"" + BubbleJS + " >"
-                        + getIconSprite("", 0, "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/toolhelp.png", 22, 22, "View help resources for this Add-on", "View help resources for this Add-on", "", true, "") + "</a>";
-                }
-            }
-            return result;
-        }
-        //
-        //===============================================================================================================================================
-        /// <summary>
-        /// help buble
-        /// </summary>
-        /// <param name="addonId"></param>
-        /// <param name="HTMLSourceID"></param>
-        /// <param name="return_DialogList"></param>
-        /// <returns></returns>
-        public string getHTMLViewerBubble(int addonId, string HTMLSourceID, ref string return_DialogList) {
-            string results = "";
-            try {
-                if ((core.session.isAuthenticated) && (core.session.isEditing())) {
-                    int StyleSN = GenericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
-                    string HTMLViewerBubbleID = "HelpBubble" + core.doc.helpCodes.Count;
-                    string CopyHeader = ""
-                        + "<div class=\"ccHeaderCon\">"
-                        + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
-                        + "<tr>"
-                        + "<td align=left class=\"bbLeft\">HTML viewer</td>"
-                        + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('" + HTMLViewerBubbleID + "');return false;\">" + iconClose_White + "</i></A></td>"
-                        + "</tr>"
-                        + "</table>"
-                        + "</div>";
-                    string CopyContent = ""
-                        + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
-                        + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">This is the HTML produced by this add-on. Carrage returns and tabs have been added or modified to enhance readability.</td></tr>"
-                        + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + HtmlController.inputTextarea(core, "DefaultStyles", "", 10, -1, HTMLViewerBubbleID + "_dst", false, false) + "</td></tr>"
-                        + "</tr>"
-                        + "</table>";
-                    string QueryString = core.doc.refreshQueryString;
-                    QueryString = GenericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
-                    return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
-                        + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"" + HTMLViewerBubbleID + "\" style=\"display:none;visibility:hidden;\">"
-                        + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
-                        + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
-                        + "</table>"
-                        + "</div>";
-                    string BubbleJS = " onClick=\"var d=document.getElementById('" + HTMLViewerBubbleID + "_dst');if(d){var s=document.getElementById('" + HTMLSourceID + "');if(s){d.value=s.innerHTML;HelpBubbleOn( '" + HTMLViewerBubbleID + "',this)}};return false;\" ";
-                    core.doc.helpCodes.Add(new DocController.HelpStuff { code = "", caption = "" });
-                    if (core.doc.helpDialogCnt == 0) { core.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs"); }
-                    core.doc.helpDialogCnt = core.doc.helpDialogCnt + 1;
-                    results = ""
-                        + "&nbsp;<a href=\"#\" tabindex=-1 target=\"_blank\"" + BubbleJS + " >"
-                        + getIconSprite("", 0, "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/toolhtml.png", 22, 22, "View the source HTML produced by this Add-on", "View the source HTML produced by this Add-on", "", true, "") + "</A>";
-                }
-                return results;
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                return "";
-            }
         }
         //
         //===================================================================================================
@@ -2653,21 +2163,6 @@ namespace Contensive.Processor.Controllers {
             }
             return returnString;
         }
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// If an addon assembly references a system assembly that is not in the gac (system.io.compression.filesystem), it does not look in the folder I did the loadfrom.
-        ///// Problem is knowing where to look. No argument to pass a path...
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="args"></param>
-        ///// <returns></returns>
-        //public static Assembly myAssemblyResolve(object sender, ResolveEventArgs args) {
-        //    string sample_folderPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-        //    string assemblyPath = Path.Combine(sample_folderPath, (new AssemblyName(args.Name)).Name + ".dll");
-        //    if (!File.Exists(assemblyPath)) { return null; }
-        //    return Assembly.LoadFrom(assemblyPath);
-        //}
         //
         //========================================================================================================
         /// <summary>

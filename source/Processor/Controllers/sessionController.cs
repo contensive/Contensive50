@@ -726,10 +726,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         public void logout() {
             try {
+                //
                 LogController.addSiteActivity(core, "logout", user.id, user.organizationID);
                 //
-                // new guest
                 user = PersonModel.addDefault(core, ContentMetadataModel.createByUniqueName(core, PersonModel.contentName));
+                if ( user == null ) {
+                    LogController.logError(core, "logout failed because new user could not be created");
+                    return;
+                }
                 visit.memberID = user.id;
                 visit.visitAuthenticated = false;
                 visit.save(core);
