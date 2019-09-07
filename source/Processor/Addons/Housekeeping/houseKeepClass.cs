@@ -1503,26 +1503,33 @@ namespace Contensive.Addons.Housekeeping {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// delete orphan user properties
+        /// </summary>
+        /// <param name="core"></param>
         public void housekeep_userProperties(CoreController core) {
-            string sqlInner = "select p.id from ccProperties p left join ccmembers m on m.id=p.KeyID where (p.TypeID=" + PropertyModelClass.PropertyTypeEnum.user + ") and (m.ID is null)";
-            string sql = "delete from ccProperties where id in (" + sqlInner + ")";
+            //string sqlInner = "select p.id from ccProperties p left join ccmembers m on m.id=p.KeyID where (p.TypeID=" + PropertyModelClass.PropertyTypeEnum.user + ") and (m.ID is null)";
+            string sql = "delete from ccProperties from ccProperties p left join ccmembers m on m.id=p.KeyID where (p.TypeID=" + PropertyModelClass.PropertyTypeEnum.user + ") and (m.ID is null)";
             core.db.executeNonQueryAsync(sql);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Delete stale visit properties (older than 24 hrs)
+        /// </summary>
+        /// <param name="core"></param>
         public void housekeep_visitProperties(CoreController core) {
-            string sqlInner = "select p.id from ccProperties p left join ccvisits m on m.id=p.KeyID where (p.TypeID=" + PropertyModelClass.PropertyTypeEnum.visit + ") and (m.ID is null)";
-            string sql = "delete from ccProperties where id in (" + sqlInner + ")";
+            string sql = "delete from ccProperties where (TypeID=" + PropertyModelClass.PropertyTypeEnum.visit + ")and(dateAdded<" + DbController.encodeSQLDate(DateTime.Now.AddDays(-1)) + ")";
             core.db.executeNonQueryAsync(sql);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// delete orphan visitor properties
+        /// </summary>
+        /// <param name="core"></param>
         public void housekeep_visitorProperties(CoreController core) {
-            string sqlInner = "select p.id from ccProperties p left join ccvisitors m on m.id=p.KeyID where (p.TypeID=" + PropertyModelClass.PropertyTypeEnum.visitor + ") and (m.ID is null)";
-            string sql = "delete from ccProperties where id in (" + sqlInner + ")";
+            string sql = "delete from ccProperties from ccProperties p left join ccvisitors m on m.id=p.KeyID where (p.TypeID=" + PropertyModelClass.PropertyTypeEnum.visitor + ") and (m.ID is null)";
             core.db.executeNonQueryAsync(sql);
         }
         //
