@@ -15,6 +15,17 @@ Public Class ConfigurationClass
     '
     '====================================================================================================
     ''' <summary>
+    ''' if true, the route map is not loaded or invalid and needs to be loaded
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function routeMapDateInvalid() As Boolean
+        If (HttpContext.Current.Application("RouteMapDateCreated") Is Nothing) Then Return True
+        Dim dateResult As Date
+        Return (Not Date.TryParse(HttpContext.Current.Application("RouteMapDateCreated").ToString(), dateResult))
+    End Function
+    '
+    '====================================================================================================
+    ''' <summary>
     ''' determine the Contensive application name from the webconfig or iis sitename
     ''' </summary>
     ''' <returns></returns>
@@ -72,7 +83,6 @@ Public Class ConfigurationClass
     Public Shared Sub loadRouteMap(cp As CPClass)
         '
         ' -- if application var does not equal routemap.datecreated rebuild
-        Dim routeMapDateInValid As Boolean = HttpContext.Current.Application("RouteMapDateCreated") Is Nothing
         If (routeMapDateInValid OrElse (cp.routeMap.dateCreated <> CDate(HttpContext.Current.Application("RouteMapDateCreated")))) Then
             '
             If routeMapDateInValid Then

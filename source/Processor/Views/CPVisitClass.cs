@@ -102,20 +102,78 @@ namespace Contensive.Processor {
             cp.core.visitProperty.setProperty(key, value);
         }
         //
+        //=======================================================================================================
+        //
+        public override void SetProperty(string key, string value, int TargetVisitId) {
+            if (TargetVisitId == 0) {
+                cp.core.visitProperty.setProperty(key, value);
+            } else {
+                cp.core.visitProperty.setProperty(key, value, TargetVisitId);
+            }
+        }
+        //
+        //=======================================================================================================
+        //
         public override void SetProperty(string key, int value) {
             cp.core.visitProperty.setProperty(key, value);
         }
+        //
+        //=======================================================================================================
+        //
+        public override void SetProperty(string key, int value, int TargetVisitId) {
+            if (TargetVisitId == 0) {
+                cp.core.visitProperty.setProperty(key, value);
+            } else {
+                cp.core.visitProperty.setProperty(key, value, TargetVisitId);
+            }
+        }
+        //
+        //=======================================================================================================
         //
         public override void SetProperty(string key, double value) {
             cp.core.visitProperty.setProperty(key, value);
         }
         //
+        //=======================================================================================================
+        //
+        public override void SetProperty(string key, double value, int TargetVisitId) {
+            if (TargetVisitId == 0) {
+                cp.core.visitProperty.setProperty(key, value);
+            } else {
+                cp.core.visitProperty.setProperty(key, value, TargetVisitId);
+            }
+        }
+        //
+        //=======================================================================================================
+        //
         public override void SetProperty(string key, bool value) {
             cp.core.visitProperty.setProperty(key, value);
         }
         //
+        //=======================================================================================================
+        //
+        public override void SetProperty(string key, bool value, int TargetVisitId) {
+            if (TargetVisitId == 0) {
+                cp.core.visitProperty.setProperty(key, value);
+            } else {
+                cp.core.visitProperty.setProperty(key, value, TargetVisitId);
+            }
+        }
+        //
+        //=======================================================================================================
+        //
         public override void SetProperty(string key, DateTime value) {
             cp.core.visitProperty.setProperty(key, value);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override void SetProperty(string key, DateTime value, int TargetVisitId) {
+            if (TargetVisitId == 0) {
+                cp.core.visitProperty.setProperty(key, value);
+            } else {
+                cp.core.visitProperty.setProperty(key, value, TargetVisitId);
+            }
         }
         //
         //=======================================================================================================
@@ -213,15 +271,6 @@ namespace Contensive.Processor {
         [Obsolete("Deprecated", false)]
         public override string GetProperty(string key) {
             return cp.core.visitProperty.getText(key);
-        }
-        //
-        [Obsolete("Deprecated", false)]
-        public override void SetProperty(string key, string value, int TargetVisitId) {
-            if (TargetVisitId == 0) {
-                cp.core.visitProperty.setProperty(key, value);
-            } else {
-                cp.core.visitProperty.setProperty(key, value, TargetVisitId);
-            }
         }
         //
         [Obsolete("Deprecated", false)]

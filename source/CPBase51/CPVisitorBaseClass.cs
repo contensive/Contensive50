@@ -107,11 +107,20 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Set the key value for this visitor
+        /// Set property value for this visitor
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
         public abstract void SetProperty(string key, string value);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set property value for a specific visitor
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="targetVisitorid"></param>
+        public abstract void SetProperty(string key, string value, int targetVisitorid);
         //
         //====================================================================================================
         /// <summary>
@@ -123,11 +132,29 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Set property value for a specific visitor
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="targetVisitorid"></param>
+        public abstract void SetProperty(string key, bool value, int targetVisitorid);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Set the key value for this visitor
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
         public abstract void SetProperty(string key, int value);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set property value for a specific visitor
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="targetVisitorid"></param>
+        public abstract void SetProperty(string key, int value, int targetVisitorid);
         //
         //====================================================================================================
         /// <summary>
@@ -139,11 +166,29 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Set property value for a specific visitor
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="targetVisitorid"></param>
+        public abstract void SetProperty(string key, double value, int targetVisitorid);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Set the key value for this visitor
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
         public abstract void SetProperty(string key, DateTime value);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set property value for a specific visitor
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="targetVisitorid"></param>
+        public abstract void SetProperty(string key, DateTime value, int targetVisitorid);
         //
         //====================================================================================================
         /// <summary>
@@ -174,9 +219,6 @@ namespace Contensive.BaseClasses {
         //
         [Obsolete("Use the Get that returns the appropriate defaultvalue type.")]
         public abstract double GetNumber(string key, string defaultValue);
-        //
-        [Obsolete("Cannot set the property of another visitor.")]
-        public abstract void SetProperty(string key, string value, int targetVisitorid);
     }
 }
 

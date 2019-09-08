@@ -324,15 +324,35 @@ namespace Contensive.Processor {
         //
         //=======================================================================================================
         //
-        public override void SetProperty(string key, string value) => cp.core.userProperty.setProperty(key, value);
+        public override void SetProperty(string key, string value) 
+            => cp.core.userProperty.setProperty(key, value);
         //
-        public override void SetProperty(string key, int value) => cp.core.userProperty.setProperty(key, value);
+        public override void SetProperty(string PropertyName, string Value, int TargetMemberId)
+            => cp.core.userProperty.setProperty(PropertyName, Value, TargetMemberId);
         //
-        public override void SetProperty(string key, double value) => cp.core.userProperty.setProperty(key, value);
+        public override void SetProperty(string key, int value) 
+            => cp.core.userProperty.setProperty(key, value);
         //
-        public override void SetProperty(string key, bool value) => cp.core.userProperty.setProperty(key, value);
+        public override void SetProperty(string PropertyName, int Value, int TargetMemberId)
+            => cp.core.userProperty.setProperty(PropertyName, Value, TargetMemberId);
         //
-        public override void SetProperty(string key, DateTime value) => cp.core.userProperty.setProperty(key, value);
+        public override void SetProperty(string key, double value) 
+            => cp.core.userProperty.setProperty(key, value);
+        //
+        public override void SetProperty(string PropertyName, double Value, int TargetMemberId)
+            => cp.core.userProperty.setProperty(PropertyName, Value, TargetMemberId);
+        //
+        public override void SetProperty(string key, bool value) 
+            => cp.core.userProperty.setProperty(key, value);
+        //
+        public override void SetProperty(string PropertyName, bool Value, int TargetMemberId)
+            => cp.core.userProperty.setProperty(PropertyName, Value, TargetMemberId);
+        //
+        public override void SetProperty(string key, DateTime value) 
+            => cp.core.userProperty.setProperty(key, value);
+        //
+        public override void SetProperty(string PropertyName, DateTime Value, int TargetMemberId)
+            => cp.core.userProperty.setProperty(PropertyName, Value, TargetMemberId);
         //
         //=======================================================================================================
         //
@@ -396,11 +416,6 @@ namespace Contensive.Processor {
         [Obsolete("Use LoginById(integer) instead", false)]
         public override bool LoginByID(string RecordID, bool SetAutoLogin = false) {
             return cp.core.session.authenticateById(encodeInteger(RecordID), cp.core.session);
-        }
-        //
-        [Obsolete("Deprecated.", false)]
-        public override void SetProperty(string PropertyName, string Value, int TargetMemberId) {
-            cp.core.userProperty.setProperty(PropertyName, Value, TargetMemberId);
         }
         //
         //=======================================================================================================

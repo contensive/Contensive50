@@ -131,16 +131,89 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Set a key value for the visit
+        /// Set a text value for the visit
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public abstract void SetProperty(string key, string value);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set a property value for the visit for a specific visit
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <param name="targetVisitId"></param>
-        public abstract void SetProperty(string key, string value);
+        public abstract void SetProperty(string key, string value, int targetVisitId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set a property value for the current visit
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public abstract void SetProperty(string key, int value);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set a property value for a specific visit
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="targetVisitId"></param>
+        public abstract void SetProperty(string key, int value, int targetVisitId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set a property value for the current visit
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public abstract void SetProperty(string key, double value);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set a property value for a specific visit
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="targetVisitId"></param>
+        public abstract void SetProperty(string key, double value, int targetVisitId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set a property value for the current visit
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public abstract void SetProperty(string key, DateTime value);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set a property value for a specific visit
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="targetVisitId"></param>
+        public abstract void SetProperty(string key, DateTime value, int targetVisitId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set a property value for the current visit
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public abstract void SetProperty(string key, bool value);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set a property value for a specific visit
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="targetVisitId"></param>
+        public abstract void SetProperty(string key, bool value, int targetVisitId);
+        //
         //
         //====================================================================================================
         /// <summary>
@@ -166,9 +239,6 @@ namespace Contensive.BaseClasses {
         //
         [Obsolete("Use Get of the correct type", false)]
         public abstract string GetProperty(string key);
-        //
-        [Obsolete("Deprecated. Set and get only the current visit", false)]
-        public abstract void SetProperty(string key, string value, int targetVisitId);
         //
         [Obsolete("Deprecated. Use the get with the correct default argumnet type", false)]
         public abstract bool GetBoolean(string key, string defaultValue);

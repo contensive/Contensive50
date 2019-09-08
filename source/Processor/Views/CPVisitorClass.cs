@@ -156,6 +156,16 @@ namespace Contensive.Processor {
         }
         //
         //=======================================================================================================
+        //
+        public override void SetProperty(string key, string value, int TargetVisitorid) {
+            if (TargetVisitorid == 0) {
+                cp.core.visitorProperty.setProperty(key, value);
+            } else {
+                cp.core.visitorProperty.setProperty(key, value, TargetVisitorid);
+            }
+        }
+        //
+        //=======================================================================================================
         /// <summary>
         /// set the key value 
         /// </summary>
@@ -163,6 +173,16 @@ namespace Contensive.Processor {
         /// <param name="value"></param>
         public override void SetProperty(string key, bool value) {
             cp.core.visitorProperty.setProperty(key, value);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override void SetProperty(string key, bool value, int TargetVisitorid) {
+            if (TargetVisitorid == 0) {
+                cp.core.visitorProperty.setProperty(key, value);
+            } else {
+                cp.core.visitorProperty.setProperty(key, value, TargetVisitorid);
+            }
         }
         //
         //=======================================================================================================
@@ -176,6 +196,16 @@ namespace Contensive.Processor {
         }
         //
         //=======================================================================================================
+        //
+        public override void SetProperty(string key, int value, int TargetVisitorid) {
+            if (TargetVisitorid == 0) {
+                cp.core.visitorProperty.setProperty(key, value);
+            } else {
+                cp.core.visitorProperty.setProperty(key, value, TargetVisitorid);
+            }
+        }
+        //
+        //=======================================================================================================
         /// <summary>
         /// set the key value 
         /// </summary>
@@ -186,6 +216,16 @@ namespace Contensive.Processor {
         }
         //
         //=======================================================================================================
+        //
+        public override void SetProperty(string key, double value, int TargetVisitorid) {
+            if (TargetVisitorid == 0) {
+                cp.core.visitorProperty.setProperty(key, value);
+            } else {
+                cp.core.visitorProperty.setProperty(key, value, TargetVisitorid);
+            }
+        }
+        //
+        //=======================================================================================================
         /// <summary>
         /// set the key value 
         /// </summary>
@@ -193,6 +233,16 @@ namespace Contensive.Processor {
         /// <param name="value"></param>
         public override void SetProperty(string key, DateTime value) {
             cp.core.visitorProperty.setProperty(key, value);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override void SetProperty(string key, DateTime value, int TargetVisitorid) {
+            if (TargetVisitorid == 0) {
+                cp.core.visitorProperty.setProperty(key, value);
+            } else {
+                cp.core.visitorProperty.setProperty(key, value, TargetVisitorid);
+            }
         }
         //
         //=======================================================================================================
@@ -239,16 +289,6 @@ namespace Contensive.Processor {
         [Obsolete("Use the get for the appropriate default type.", false)]
         public override bool GetBoolean(string key, string defaultValue) => cp.core.visitorProperty.getBoolean(key, encodeBoolean(defaultValue));
         //
-        [Obsolete("Cannot set the visitor property of another visitor.", false)]
-        public override void SetProperty(string PropertyName, string Value, int TargetVisitorid) {
-            if (TargetVisitorid == 0) {
-                cp.core.visitorProperty.setProperty(PropertyName, Value);
-            } else {
-                cp.core.visitorProperty.setProperty(PropertyName, Value, TargetVisitorid);
-            }
-        }
-
-
         #region  IDisposable Support 
         //
         // dispose

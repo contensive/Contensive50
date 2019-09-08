@@ -435,42 +435,45 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         /// <remarks></remarks>
         public string getText(string propertyName, string DefaultValue) {
-            string returnString = "";
+            string result = "";
             try {
                 if (dbNotReady) {
                     //
                     // -- if not ready, return default 
-                    returnString = DefaultValue;
+                    result = DefaultValue;
                 } else {
                     string cacheName = getNameValueDictKey(propertyName);
                     if (cacheName.Equals("adminurl")) {
-                        returnString = "/" + core.appConfig.adminRoute;
+                        result = "/" + core.appConfig.adminRoute;
                     } else {
                         if (string.IsNullOrEmpty(cacheName)) {
                             //
                             // -- bad property name 
-                            returnString = DefaultValue;
+                            result = DefaultValue;
                         } else {
                             //
                             // -- test simple lazy cache to keep from reading the same property mulitple times on one doc
                             if (nameValueDict.ContainsKey(cacheName)) {
                                 //
                                 // -- property in memory cache
-                                returnString = nameValueDict[cacheName];
+                                result = nameValueDict[cacheName];
                             } else {
                                 //
                                 // -- read property from cache, no, with preloaded local cache, this will never be used
                                 bool propertyFound = false;
-                                returnString = getTextFromDb(propertyName, DefaultValue, ref propertyFound);
+                                result = getTextFromDb(propertyName, DefaultValue, ref propertyFound);
                                 if (propertyFound) {
                                     //
                                     // -- found in Db, save in lazy cache in case it is repeated
-                                    nameValueDict.Add(cacheName, returnString);
+                                    if (nameValueDict.ContainsKey(cacheName)) {
+                                        nameValueDict.Remove(cacheName);
+                                    }
+                                    nameValueDict.Add(cacheName, result);
                                 } else {
                                     //
                                     // -- property not found in db, if default is not blank, write it and set cache
-                                    returnString = DefaultValue;
-                                    nameValueDict.Add(cacheName, returnString);
+                                    result = DefaultValue;
+                                    nameValueDict.Add(cacheName, result);
                                     setProperty(cacheName, DefaultValue);
                                 }
                             }
@@ -481,7 +484,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.logError( core,ex);
                 throw;
             }
-            return returnString;
+            return result;
         }
         //
         //========================================================================

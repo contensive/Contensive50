@@ -331,11 +331,20 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Set a user property for this type
+        /// Set a text user property
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
         public abstract void SetProperty(string key, string value);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set a text user property for a specific user
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="userId"></param>
+        public abstract void SetProperty(string key, string value, int userId);
         //
         //====================================================================================================
         /// <summary>
@@ -347,11 +356,29 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Set an integer user property for a specific user
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="userId"></param>
+        public abstract void SetProperty(string key, int value, int userId);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Set a user property for this type
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
         public abstract void SetProperty(string key, double value);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set a number (double) user property for a specific user
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="userId"></param>
+        public abstract void SetProperty(string key, double value, int userId);
         //
         //====================================================================================================
         /// <summary>
@@ -363,11 +390,29 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Set a boolean user property for a specific user
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="userId"></param>
+        public abstract void SetProperty(string key, bool value, int userId);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Set a user property for this type
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
         public abstract void SetProperty(string key, DateTime value);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Set a datetime user property for a specific user
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="userId"></param>
+        public abstract void SetProperty(string key, DateTime value, int userId);
         //
         //====================================================================================================
         //
@@ -408,9 +453,6 @@ namespace Contensive.BaseClasses {
         //
         [Obsolete("Use the Get method with the correct type.", false)]
         public abstract string GetProperty(string key);
-        //
-        [Obsolete("Do not expose other user's properties.", false)]
-        public abstract void SetProperty(string key, string value, int userId);
         //
         [Obsolete("Use isContentManager( Page Content ). This method returned true if the user isContentManager( Page Content )", false)]
         public abstract bool IsContentManager();

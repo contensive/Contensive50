@@ -82,7 +82,7 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="PropertyValue"></param>
-        public void setProperty(string propertyName, bool PropertyValue) => setProperty(propertyName, PropertyValue.ToString(), propertyKeyId);
+        public void setProperty(string propertyName, bool PropertyValue) => setProperty(propertyName, PropertyValue.ToString(CultureInfo.InvariantCulture), propertyKeyId);
         //
         //====================================================================================================
         /// <summary>
@@ -98,7 +98,7 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="PropertyValue"></param>
-        public void setProperty(string propertyName, int PropertyValue) => setProperty(propertyName, PropertyValue.ToString(), propertyKeyId);
+        public void setProperty(string propertyName, int PropertyValue) => setProperty(propertyName, PropertyValue.ToString(CultureInfo.InvariantCulture), propertyKeyId);
         //
         //====================================================================================================
         /// <summary>
@@ -173,6 +173,18 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.logError(core, ex);
             }
         }
+        //
+        public void setProperty(string propertyName, int propertyValue, int keyId)
+            => setProperty(propertyName, propertyValue.ToString(CultureInfo.InvariantCulture), keyId);
+        //
+        public void setProperty(string propertyName, double propertyValue, int keyId)
+            => setProperty(propertyName, propertyValue.ToString(CultureInfo.InvariantCulture), keyId);
+        //
+        public void setProperty(string propertyName, bool propertyValue, int keyId)
+            => setProperty(propertyName, propertyValue.ToString(CultureInfo.InvariantCulture), keyId);
+        //
+        public void setProperty(string propertyName, DateTime propertyValue, int keyId)
+            => setProperty(propertyName, propertyValue.ToString(CultureInfo.InvariantCulture), keyId);
         //
         //====================================================================================================
         /// <summary>
