@@ -3,9 +3,10 @@
 using System;
 using System.Collections.Generic;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
 //
@@ -56,11 +57,11 @@ namespace Contensive.Addons.AddonListEditor {
                 }
                 //
                 // -- create sample addonList
-                AddonModel addonHero = DbBaseModel.create<AddonModel>(core, guidDesignBlockHeroImage);
-                AddonModel addonContactUs = DbBaseModel.create<AddonModel>(core, guidDesignBlockContactUs);
-                AddonModel addonFourColumn = DbBaseModel.create<AddonModel>(core, guidDesignBlockFourColumn);
-                AddonModel addonTwoColumn = DbBaseModel.create<AddonModel>(core, guidDesignBlockTwoColumn);
-                AddonModel addonTile = DbBaseModel.create<AddonModel>(core, guidDesignBlockTile);
+                AddonModel addonHero = DbBaseModel.create<AddonModel>(cp, guidDesignBlockHeroImage);
+                AddonModel addonContactUs = DbBaseModel.create<AddonModel>(cp, guidDesignBlockContactUs);
+                AddonModel addonFourColumn = DbBaseModel.create<AddonModel>(cp, guidDesignBlockFourColumn);
+                AddonModel addonTwoColumn = DbBaseModel.create<AddonModel>(cp, guidDesignBlockTwoColumn);
+                AddonModel addonTile = DbBaseModel.create<AddonModel>(cp, guidDesignBlockTile);
                 request.addonList = new List<AddonListItemModel>() {
                     new AddonListItemModel() {
                         designBlockTypeGuid = addonHero.ccguid,
@@ -190,24 +191,24 @@ namespace Contensive.Addons.AddonListEditor {
                 // -- validate addonList from UI and set back into a string
                 switch (metadata.name.ToLower()) {
                     case "page content":
-                        var page = Contensive.Processor.Models.Db.PageContentModel.create(core, request.parentRecordGuid);
+                        var page = DbBaseModel.create<PageContentModel>(core.cpParent, request.parentRecordGuid);
                         if (page == null) {
                             return SerializeObject(new SetAddonList_ResponseClass() {
                                 errorList = new List<string> { "The parent record in [Page Content] could not be determined from the guid [" + request.parentRecordGuid + "]" }
                             });
                         }
                         page.addonList = SerializeObject(request.addonList);
-                        page.save(core);
+                        page.save(core.cpParent);
                         break;
                     case "page templates":
-                        var template = Contensive.Processor.Models.Db.PageTemplateModel.create(core, request.parentRecordGuid);
+                        var template = DbBaseModel.create<PageTemplateModel>(core.cpParent, request.parentRecordGuid);
                         if (template == null) {
                             return SerializeObject(new SetAddonList_ResponseClass() {
                                 errorList = new List<string> { "The parent record in [Page Templates] could not be determined from the guid [" + request.parentRecordGuid + "]" }
                             });
                         }
                         template.addonList = SerializeObject(request.addonList);
-                        template.save(core);
+                        template.save(core.cpParent);
                         break;
                     default:
                         return SerializeObject(new SetAddonList_ResponseClass() {

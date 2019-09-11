@@ -6,6 +6,7 @@ using static Tests.testConstants;
 using System.Linq;
 using Contensive.Processor;
 using Contensive.Processor.Models.Domain;
+using Contensive.Models.Db;
 
 namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     [TestClass]
@@ -73,12 +74,12 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 cp.core.mockEmail = true;
                 // arrange
                 string body = GenericController.GetRandomInteger(cp.core).ToString();
-                var toPerson = Processor.Models.Db.PersonModel.addDefault(cp.core, Processor.Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, Processor.Models.Db.PersonModel.contentName));
+                var toPerson = DbBaseModel.addDefault<PersonModel>(cp, Processor.Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, PersonModel.contentName));
                 Assert.IsNotNull(toPerson);
                 toPerson.email = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
                 toPerson.firstName = GenericController.GetRandomInteger(cp.core).ToString();
                 toPerson.lastName = GenericController.GetRandomInteger(cp.core).ToString();
-                toPerson.save(cp.core);
+                toPerson.save(cp);
                 string sendStatus = "";
                 // act
                 Assert.IsTrue( EmailController.queuePersonEmail(cp.core, "Function Test", toPerson, "from@kma.net", "subject", body, "bounce@kma.net", "replyTo@kma.net", true, true, 0, "", true, ref sendStatus));

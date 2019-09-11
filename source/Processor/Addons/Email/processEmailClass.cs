@@ -1,13 +1,14 @@
 ﻿
 using System;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.BaseClasses;
 using Contensive.Processor.Exceptions;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.Email {
     public class ProcessEmailClass : AddonBaseClass {
@@ -315,7 +316,7 @@ namespace Contensive.Addons.Email {
         /// <param name="emailStyles"></param>
         /// <returns>OK if successful, else returns user error.</returns>
         private string queueEmailRecord(CoreController core, string emailContextMessage, int sendToPersonId, int emailID, DateTime DateBlockExpires, int emailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
-            PersonModel recipient = PersonModel.create(core, sendToPersonId);
+            PersonModel recipient = DbBaseModel.create<PersonModel>(core.cpParent, sendToPersonId);
 
             string returnStatus = "";
             if (EmailController.queuePersonEmail(core, recipient, FromAddress, EmailSubject, EmailBody, BounceAddress, ReplyToAddress, false, true, emailID, EmailTemplate, EmailAllowLinkEID, ref returnStatus, "", emailContextMessage)) {
@@ -447,7 +448,7 @@ namespace Contensive.Addons.Email {
         //====================================================================================================
         //
         private string getEmailTemplate(CoreController core, int EmailTemplateID) {
-            var emailTemplate = Processor.Models.Db.EmailTemplateModel.create(core, EmailTemplateID);
+            var emailTemplate = DbBaseModel.create<EmailTemplateModel>(core.cpParent, EmailTemplateID);
             if (emailTemplate != null) {
                 return emailTemplate.bodyHTML;
             }
@@ -484,7 +485,7 @@ namespace Contensive.Addons.Email {
         /// <param name="EmailStatusList"></param>
         private void queueConfirmationEmail(CoreController core, int ConfirmationMemberID, int EmailDropID, string EmailTemplate, bool EmailAllowLinkEID, string PrimaryLink, string EmailSubject, string emailBody, string emailStyles, string EmailFrom, string EmailStatusList, string emailContextMessage) {
             try {
-                PersonModel person = PersonModel.create(core, ConfirmationMemberID);
+                PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, ConfirmationMemberID);
                 if (person != null) {
                     string ConfirmBody = ""
                         + "The follow email has been sent."

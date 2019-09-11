@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
@@ -11,6 +11,7 @@ using Contensive.Addons.AdminSite.Controllers;
 using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.BaseClasses;
 using System.Text;
+using Contensive.Models.Db;
 
 namespace Contensive.Addons.AdminSite {
     public class FormIndex {
@@ -51,7 +52,7 @@ namespace Contensive.Addons.AdminSite {
                     Stream.Add(AdminErrorController.get( core, "Access to this content [" + adminData.adminContent.name + "] requires developer permissions. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
                 } else {
                     List<string> tmp = new List<string> { };
-                    DataSourceModel datasource = DataSourceModel.create(core, adminData.adminContent.dataSourceId, ref tmp);
+                    DataSourceModel datasource = DataSourceModel.create<DataSourceModel>(core.cpParent, adminData.adminContent.dataSourceId, ref tmp);
                     //
                     // get access rights
                     //bool allowCMEdit = false;
@@ -1587,7 +1588,7 @@ namespace Contensive.Addons.AdminSite {
                 // Sub Content Definitions
                 //
                 SubFilterList = "";
-                var contentList = ContentModel.createList(core, "(contenttableid in (select id from cctables where name=" + DbController.encodeSQLText(adminData.adminContent.tableName) + "))");
+                var contentList = ContentModel.createList<ContentModel>(core.cpParent, "(contenttableid in (select id from cctables where name=" + DbController.encodeSQLText(adminData.adminContent.tableName) + "))");
                 string Caption = null;
                 if (contentList.Count > 1) {
                     foreach (var subContent in contentList) {

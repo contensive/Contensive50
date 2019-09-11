@@ -5,6 +5,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 using System.Text;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -315,7 +316,7 @@ namespace Contensive.Processor.Controllers {
                                     recordId = GenericController.encodeInteger(fieldMeta[f_MemberSelectGroupId, CFieldPtr]);
                                     RecordName = "";
                                     if (recordId > 0) {
-                                        RecordName = Models.Db.DbBaseModel.getRecordName<Models.Db.GroupModel>(core, recordId);
+                                        RecordName = DbBaseModel.getRecordName<GroupModel>(core.cpParent, recordId);
                                     }
                                     sb.Append(" MemberSelectGroup=\"" + xmlValueText(fieldMeta[f_MemberSelectGroupId, CFieldPtr]) + "\"");
 
@@ -512,7 +513,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 string appName = core.appConfig.name;
-                int MenuContentID = MetadataController.getRecordIdByUniqueName(core, "Content", Processor.Models.Db.NavigatorEntryModel.contentName);
+                int MenuContentID = MetadataController.getRecordIdByUniqueName(core, "Content", NavigatorEntryModel.contentName);
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 using (DataTable dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')")) {
                     if (dt.Rows.Count > 0) {
@@ -563,7 +564,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string appName = core.appConfig.name;
-                int MenuContentID = MetadataController.getRecordIdByUniqueName(core, "Content", Processor.Models.Db.NavigatorEntryModel.contentName);
+                int MenuContentID = MetadataController.getRecordIdByUniqueName(core, "Content", NavigatorEntryModel.contentName);
                 using (DataTable dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')")) {
                     if (DbController.isDataTableOk(dt)) {
                         foreach (DataRow dr in dt.Rows) {

@@ -9,6 +9,8 @@ using Contensive.Processor.Exceptions;
 using System.Text;
 using Contensive.BaseClasses;
 using System.Linq;
+using Contensive.Models.Db;
+using Contensive.Models;
 //
 namespace Contensive.Processor.Models.Db {
     //

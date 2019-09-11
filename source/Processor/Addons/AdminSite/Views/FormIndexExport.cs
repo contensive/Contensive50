@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Models.Db;
 
 namespace Contensive.Addons.AdminSite {
     public class FormIndexExport {
@@ -41,7 +42,7 @@ namespace Contensive.Addons.AdminSite {
                 bool IsRecordLimitSet = false;
                 string RecordLimitText = null;
                 var cacheNameList = new List<string>();
-                DataSourceModel datasource = DataSourceModel.create(core, adminData.adminContent.dataSourceId, ref cacheNameList);
+                DataSourceModel datasource = DataSourceModel.create<DataSourceModel>(core.cpParent, adminData.adminContent.dataSourceId, ref cacheNameList);
                 //
                 // ----- Process Input
                 //
@@ -139,7 +140,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // Request the download
                                 //
-                                var ExportCSVAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportCSV);
+                                var ExportCSVAddon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidExportCSV);
                                 if (ExportCSVAddon == null) {
                                     LogController.logError(core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
                                 } else {

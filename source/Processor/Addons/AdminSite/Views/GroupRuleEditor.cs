@@ -2,13 +2,14 @@
 using System;
 using System.Collections.Generic;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
 using Nustache.Core;
 using Contensive.Processor.Properties;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Models.Db;
 
 namespace Contensive.Addons.AdminSite {
     public class GroupRuleEditor {
@@ -35,7 +36,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     int membershipCount = 0;
                     if (adminData.editRecord.id != 0) {
-                        var memberRuleList = MemberRuleModel.createList(core, "memberid=" + adminData.editRecord.id);
+                        var memberRuleList = DbBaseModel.createList<MemberRuleModel>(core.cpParent, "memberid=" + adminData.editRecord.id);
                         int membershipSize = 0;
                         foreach ( var memberRule in memberRuleList) {
                             if (membershipCount >= membershipSize) {

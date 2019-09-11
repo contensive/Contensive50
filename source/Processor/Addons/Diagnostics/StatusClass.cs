@@ -9,11 +9,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Text;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.Diagnostics {
     //
@@ -41,7 +42,7 @@ namespace Contensive.Addons.Diagnostics {
                 if (cp.User.IsAdmin) {
                     resultList.Append("ok, ." + Environment.NewLine + resultList.ToString());
                 }
-                foreach (var addon in DbBaseModel.createList<AddonModel>(core, "(diagnostic>0)")) {
+                foreach (var addon in DbBaseModel.createList<AddonModel>(core.cpParent, "(diagnostic>0)")) {
                     string testResult = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
                     if (string.IsNullOrWhiteSpace(testResult)) { return "ERROR, diagnostic [" + addon.name + "] failed, it returned an empty result." + pauseHint; }
                     if (testResult.Length < 2) { return "ERROR, diagnostic [" + addon.name + "] failed, it returned an invalid result." + pauseHint; }

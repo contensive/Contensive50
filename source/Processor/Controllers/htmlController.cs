@@ -6,11 +6,13 @@ using System.Text;
 using System.Data;
 using System.Collections.Generic;
 using Contensive.BaseClasses;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Models;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -1441,7 +1443,7 @@ namespace Contensive.Processor.Controllers {
                             Criteria = Criteria + "and(template<>0)";
                         }
                     }
-                    string AddonContentName = Models.Db.AddonModel.contentName;
+                    string AddonContentName = AddonModel.contentName;
                     string SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccguid";
                     using (var csData = new CsModel(core)) {
                         if (csData.open(AddonContentName, Criteria, "Name,ID", false, 0, SelectList)) {
@@ -1784,7 +1786,7 @@ namespace Contensive.Processor.Controllers {
                         { "editorStyles", styleList },
                         { "editorStyleOptions", styleOptionList }
                     };
-                    var addon = AddonModel.create(core, FieldEditorAddonId);
+                    var addon = DbBaseModel.create<AddonModel>(core.cpParent, FieldEditorAddonId);
                     returnHtml = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
                         addonType = CPUtilsBaseClass.addonContext.ContextEditor,
                         argumentKeyValuePairs = arguments,
@@ -1897,7 +1899,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- Page Content Child List Add-on
                 //
                 if (RecordID != 0) {
-                    AddonModel addon = AddonModel.create(core, addonGuidChildList);
+                    AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidChildList);
                     if (addon != null) {
                         FoundAddon = true;
                         AddonOptionConstructor = addon.argumentList;
@@ -3198,7 +3200,7 @@ namespace Contensive.Processor.Controllers {
                 { "SelectLinkObjectName", SelectLinkObjectName },
                 { "AllowGroupAdd", AllowGroupAdd.ToString() }
             };
-            return core.addon.execute(AddonModel.create(core, addonGuidResourceLibrary), new CPUtilsBaseClass.addonExecuteContext() {
+            return core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidResourceLibrary), new CPUtilsBaseClass.addonExecuteContext() {
                 addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
                 argumentKeyValuePairs = arguments,
                 errorContextMessage = "calling resource library addon [" + addonGuidResourceLibrary + "] from internal method"

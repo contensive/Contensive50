@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
@@ -11,6 +11,7 @@ using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.AdminSite {
     /// <summary>
@@ -811,7 +812,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                     //
                     // ----- Set the local global copy of Edit Record Locks
-                    var table = TableModel.createByContentName(core, adminContent.name);
+                    var table = TableModel.createByContentName(core.cpParent, adminContent.name);
                     WorkflowController.recordWorkflowStatusClass authoringStatus = WorkflowController.getWorkflowStatus(core, adminContent.name, editRecord.id);
                     editRecord.EditLock = WorkflowController.getEditLock(core, table.id, editRecord.id);
                     editRecord.SubmitLock = authoringStatus.isWorkflowSubmitted;
@@ -1187,7 +1188,7 @@ namespace Contensive.Addons.AdminSite {
                                         if (createdByPersonId == 0) {
                                             editRecord.createdBy = new PersonModel() { name = "system" };
                                         } else {
-                                            editRecord.createdBy = PersonModel.create(core, createdByPersonId);
+                                            editRecord.createdBy = DbBaseModel.create<PersonModel>(core.cpParent, createdByPersonId);
                                             if (editRecord.createdBy == null) {
                                                 editRecord.createdBy = new PersonModel() { name = "deleted #" + createdByPersonId.ToString() };
                                             }
@@ -1198,7 +1199,7 @@ namespace Contensive.Addons.AdminSite {
                                         if (modifiedByPersonId == 0) {
                                             editRecord.modifiedBy = new PersonModel() { name = "system" };
                                         } else {
-                                            editRecord.modifiedBy = PersonModel.create(core, modifiedByPersonId);
+                                            editRecord.modifiedBy = DbBaseModel.create<PersonModel>(core.cpParent, modifiedByPersonId);
                                             if (editRecord.modifiedBy == null) {
                                                 editRecord.modifiedBy = new PersonModel() { name = "deleted #" + modifiedByPersonId.ToString() };
                                             }
@@ -1289,7 +1290,7 @@ namespace Contensive.Addons.AdminSite {
                     // fixup the string so it can be reduced by each field found, leaving and empty string if all correct
                     //
                     var tmpList = new List<string>();
-                    //DataSourceModel datasource = DataSourceModel.create(core, adminContent.dataSourceId, ref tmpList);
+                    //DataSourceModel datasource = DataSourceModel.create(core.cpInternal, adminContent.dataSourceId, ref tmpList);
                     //DataSourceName = core.db.getDataSourceNameByID(adminContext.content.dataSourceId)
                     foreach (var keyValuePair in adminContent.fields) {
                         ContentFieldMetadataModel field = keyValuePair.Value;

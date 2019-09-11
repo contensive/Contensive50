@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Contensive.BaseClasses;
-using Contensive.Processor.Models.Db;
+using Contensive.Models.Db;
 using ICSharpCode.SharpZipLib.GZip;
 using static Contensive.BaseClasses.CPContentBaseClass;
 using static Contensive.Processor.Constants;
@@ -40,7 +40,7 @@ namespace Contensive.Processor.Controllers {
 					if (CS.FieldOK("onInstallAddonId")) {
 						int onInstallAddonId = CS.GetInteger("onInstallAddonId");
 						if (onInstallAddonId > 0) {
-							AddonModel addon = AddonModel.create(cp.core, onInstallAddonId);
+							AddonModel addon = DbBaseModel.create<AddonModel>(cp, onInstallAddonId);
 							onInstallAddonGuid = addon.ccguid;
 						}
 					}

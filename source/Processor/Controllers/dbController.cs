@@ -4,12 +4,14 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
+using Contensive.Models;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -722,8 +724,8 @@ namespace Contensive.Processor.Controllers {
                     case CPContentBaseClass.fileTypeIdEnum.HTML:
                         //
                         // ----- Longtext, depends on datasource
-                        //
-                        returnType = "Text Null";
+                        returnType = "varchar(max) Null";
+                        //returnType = "Text Null";
                         //Select Case DataSourceConnectionObjs(Pointer).Type
                         //    Case DataSourceTypeODBCSQLServer
                         //        csv_returnType = "Text Null"
@@ -1464,7 +1466,7 @@ namespace Contensive.Processor.Controllers {
         public DataTable executeRemoteQuery(string remoteQueryKey) {
             DataTable result = null;
             try {
-                var remoteQuery = Models.Db.RemoteQueryModel.create(core, remoteQueryKey);
+                var remoteQuery = RemoteQueryModel.create(core.cpParent, remoteQueryKey);
                 if (remoteQuery == null) {
                     throw new GenericException("remoteQuery was not found with key [" + remoteQueryKey + "]");
                 } else {
@@ -1580,73 +1582,77 @@ namespace Contensive.Processor.Controllers {
         #endregion
     }
     //
-    // ====================================================================================================
-    /// <summary>
-    /// Model to create name=value lists
-    /// </summary>
-    public class SqlFieldListClass {
-        /// <summary>
-        /// store
-        /// </summary>
-        private List<NameValueModel> _sqlList = new List<NameValueModel>();
-        /// <summary>
-        /// add a name=value pair to the list. values MUST be punctuated correctly for their type in sql (quoted text, etc)
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        public void add(string name, string value) {
-            _sqlList.Add(new NameValueModel() {
-                name = name,
-                value = value
-            });
-        }
-        /// <summary>
-        /// get name=value list
-        /// </summary>
-        /// <returns></returns>
-        public string getNameValueList() {
-            string returnPairs = "";
-            string delim = "";
-            foreach (var nameValue in _sqlList) {
-                returnPairs += delim + nameValue.name + "=" + nameValue.value;
-                delim = ",";
-            }
-            return returnPairs;
-        }
-        /// <summary>
-        /// get list of names
-        /// </summary>
-        /// <returns></returns>
-        public string getNameList() {
-            string returnPairs = "";
-            string delim = "";
-            foreach (var nameValue in _sqlList) {
-                returnPairs += delim + nameValue.name;
-                delim = ",";
-            }
-            return returnPairs;
-        }
-        /// <summary>
-        /// get list of values
-        /// </summary>
-        /// <returns></returns>
-        public string getValueList() {
-            string returnPairs = "";
-            string delim = "";
-            foreach (var nameValue in _sqlList) {
-                returnPairs += delim + nameValue.value;
-                delim = ",";
-            }
-            return returnPairs;
-        }
-        /// <summary>
-        /// get count of name=value pairs
-        /// </summary>
-        public int count {
-            get {
-                return _sqlList.Count;
-            }
-        }
+    // moved to Contensive.Models in .CPBase
+    //
 
-    }
+    ////
+    //// ====================================================================================================
+    ///// <summary>
+    ///// Model to create name=value lists
+    ///// </summary>
+    //public class SqlFieldListClass {
+    //    /// <summary>
+    //    /// store
+    //    /// </summary>
+    //    private List<NameValueModel> _sqlList = new List<NameValueModel>();
+    //    /// <summary>
+    //    /// add a name=value pair to the list. values MUST be punctuated correctly for their type in sql (quoted text, etc)
+    //    /// </summary>
+    //    /// <param name="name"></param>
+    //    /// <param name="value"></param>
+    //    public void add(string name, string value) {
+    //        _sqlList.Add(new NameValueModel() {
+    //            name = name,
+    //            value = value
+    //        });
+    //    }
+    //    /// <summary>
+    //    /// get name=value list
+    //    /// </summary>
+    //    /// <returns></returns>
+    //    public string getNameValueList() {
+    //        string returnPairs = "";
+    //        string delim = "";
+    //        foreach (var nameValue in _sqlList) {
+    //            returnPairs += delim + nameValue.name + "=" + nameValue.value;
+    //            delim = ",";
+    //        }
+    //        return returnPairs;
+    //    }
+    //    /// <summary>
+    //    /// get list of names
+    //    /// </summary>
+    //    /// <returns></returns>
+    //    public string getNameList() {
+    //        string returnPairs = "";
+    //        string delim = "";
+    //        foreach (var nameValue in _sqlList) {
+    //            returnPairs += delim + nameValue.name;
+    //            delim = ",";
+    //        }
+    //        return returnPairs;
+    //    }
+    //    /// <summary>
+    //    /// get list of values
+    //    /// </summary>
+    //    /// <returns></returns>
+    //    public string getValueList() {
+    //        string returnPairs = "";
+    //        string delim = "";
+    //        foreach (var nameValue in _sqlList) {
+    //            returnPairs += delim + nameValue.value;
+    //            delim = ",";
+    //        }
+    //        return returnPairs;
+    //    }
+    //    /// <summary>
+    //    /// get count of name=value pairs
+    //    /// </summary>
+    //    public int count {
+    //        get {
+    //            return _sqlList.Count;
+    //        }
+    //    }
+
+    //}
 }

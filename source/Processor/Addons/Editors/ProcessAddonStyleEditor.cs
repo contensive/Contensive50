@@ -9,10 +9,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.Primitives {
     public class ProcessAddonStyleEditorClass : Contensive.BaseClasses.AddonBaseClass {
@@ -32,14 +33,14 @@ namespace Contensive.Addons.Primitives {
                 if (core.session.isAuthenticated & core.session.isAuthenticatedAdmin()) {
                     int addonId = core.docProperties.getInteger("AddonID");
                     if (addonId > 0) {
-                       AddonModel styleAddon =AddonModel.create(core, addonId);
+                       AddonModel styleAddon =DbBaseModel.create<AddonModel>(core.cpParent, addonId);
                         if (styleAddon.stylesFilename.content != core.docProperties.getText("CustomStyles")) {
                             styleAddon.stylesFilename.content = core.docProperties.getText("CustomStyles");
-                            styleAddon.save(core);
+                            styleAddon.save(core.cpParent);
                             //
                             // Clear Caches
                             //
-                            AddonModel.invalidateRecordCache(core, addonId);
+                            DbBaseModel.invalidateCacheOfRecord<AddonModel>(core.cpParent, addonId);
                         }
                     }
                 }

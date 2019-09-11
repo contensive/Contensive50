@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
@@ -118,7 +119,7 @@ namespace Contensive.Addons.AddonListEditor {
                 AddonListItemModel addonListItem = null;
                 switch (metadata.name.ToLower()) {
                     case "page content":
-                        var page = Contensive.Processor.Models.Db.PageContentModel.create(core, request.parentRecordGuid);
+                        var page = DbBaseModel.create<PageContentModel>(core.cpParent, request.parentRecordGuid);
                         if (page == null) {
                             return SerializeObject(new SetAddonList_ResponseClass() {
                                 errorList = new List<string> { "The parent record in [Page Content] could not be determined from the guid [" + request.parentRecordGuid + "]" }
@@ -129,10 +130,10 @@ namespace Contensive.Addons.AddonListEditor {
                         //
                         addonListItem = renderNewAddonInList(cp, request.addonList);
                         page.addonList = SerializeObject(request.addonList);
-                        page.save(core);
+                        page.save(cp);
                         break;
                     case "page templates":
-                        var template = Contensive.Processor.Models.Db.PageTemplateModel.create(core, request.parentRecordGuid);
+                        var template = DbBaseModel.create<PageTemplateModel>(cp, request.parentRecordGuid);
                         if (template == null) {
                             return SerializeObject(new SetAddonList_ResponseClass() {
                                 errorList = new List<string> { "The parent record in [Page Templates] could not be determined from the guid [" + request.parentRecordGuid + "]" }
@@ -140,10 +141,10 @@ namespace Contensive.Addons.AddonListEditor {
                         }
                         addonListItem = renderNewAddonInList(cp, request.addonList);
                         template.addonList = SerializeObject(request.addonList);
-                        template.save(core);
+                        template.save(cp);
                         break;
                     case "email":
-                        var email = Contensive.Processor.Models.Db.EmailModel.create(core, request.parentRecordGuid);
+                        var email = EmailModel.create<EmailModel>(cp, request.parentRecordGuid);
                         if (email == null) {
                             return SerializeObject(new SetAddonList_ResponseClass() {
                                 errorList = new List<string> { "The parent record in [Email] could not be determined from the guid [" + request.parentRecordGuid + "]" }
@@ -151,7 +152,7 @@ namespace Contensive.Addons.AddonListEditor {
                         }
                         addonListItem = renderNewAddonInList(cp, request.addonList);
                         email.addonList = SerializeObject(request.addonList);
-                        email.save(core);
+                        email.save(cp);
                         break;
                     default:
                         return SerializeObject(new SetAddonList_ResponseClass() {

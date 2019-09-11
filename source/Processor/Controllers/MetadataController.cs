@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
@@ -9,6 +9,7 @@ using System.Data;
 using System.Linq;
 using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -326,7 +327,7 @@ namespace Contensive.Processor.Controllers {
         public static int getContentTableID(CoreController core, string contentName) {
             var meta = ContentMetadataModel.createByUniqueName(core, contentName);
             if (meta == null) { return 0; }
-            var table = TableModel.createByUniqueName(core, meta.tableName);
+            var table = DbBaseModel.createByUniqueName<TableModel>(core.cpParent, meta.tableName);
             if (table != null) { return table.id; }
             return 0;
         }

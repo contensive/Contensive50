@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+using Contensive.Models.Db;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Exceptions;
 //
@@ -114,7 +114,7 @@ namespace Contensive.Processor.Models.Domain {
                     //}
                     //
                     // -- link forwards
-                    foreach (var linkForward in LinkForwardModel.createList(core, "name Is Not null")) {
+                    foreach (var linkForward in DbBaseModel.createList<LinkForwardModel>(core.cpParent, "name Is Not null")) {
                         string route = GenericController.normalizeRoute(linkForward.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.routeDictionary.ContainsKey(route)) {
@@ -131,7 +131,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     //
                     // -- link aliases
-                    foreach (var linkAlias in LinkAliasModel.createList(core, "name Is Not null")) {
+                    foreach (var linkAlias in DbBaseModel.createList<LinkAliasModel>(core.cpParent, "name Is Not null")) {
                         string route = GenericController.normalizeRoute(linkAlias.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.routeDictionary.ContainsKey(route)) {

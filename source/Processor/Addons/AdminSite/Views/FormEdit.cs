@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
@@ -12,6 +12,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Processor;
+using Contensive.Models.Db;
 
 namespace Contensive.Addons.AdminSite {
     public static class FormEdit {
@@ -87,9 +88,9 @@ namespace Contensive.Addons.AdminSite {
                 Stream.Add(getForm_EditFormStart(core, adminData, AdminFormEdit));
                 bool IsLandingPageParent = false;
                 int TemplateIDForStyles = 0;
-                bool IsTemplateTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.PageTemplateModel.contentTableNameLowerCase);
-                bool IsPageContentTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.PageContentModel.contentTableNameLowerCase);
-                bool IsEmailTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.EmailModel.contentTableNameLowerCase);
+                bool IsTemplateTable = (adminData.adminContent.tableName.ToLowerInvariant() == PageTemplateModel.contentTableNameLowerCase);
+                bool IsPageContentTable = (adminData.adminContent.tableName.ToLowerInvariant() == PageContentModel.contentTableNameLowerCase);
+                bool IsEmailTable = (adminData.adminContent.tableName.ToLowerInvariant() == EmailModel.contentTableNameLowerCase);
                 int emailIdForStyles = IsEmailTable ? adminData.editRecord.id : 0;
                 bool IsLandingPage = false;
                 bool IsRootPage = false;
@@ -617,7 +618,7 @@ namespace Contensive.Addons.AdminSite {
                         var fieldEditor = adminData.fieldTypeEditors.Find(x => (x.fieldTypeId == (int)field.fieldTypeId));
                         if (fieldEditor!=null) {
                             fieldTypeDefaultEditorAddonId = (int)fieldEditor.editorAddonId;
-                            editorAddon = AddonModel.create(core, fieldTypeDefaultEditorAddonId);
+                            editorAddon = DbBaseModel.create<AddonModel>(core.cpParent, fieldTypeDefaultEditorAddonId);
                         }
                         bool useEditorAddon = false;
                         if (editorAddon != null ) {

@@ -1,5 +1,6 @@
 ﻿
 using System;
+using Contensive.Models.Db;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
@@ -20,7 +21,7 @@ namespace Contensive.Addons.AdminSite {
                 using (CoreController core = ((CPClass)cp).core) {
                     using (var csData = new CsModel(core)) {
                         string AddonGuid = core.docProperties.getText("guid");
-                        csData.open(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(AddonGuid));
+                        csData.open(AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(AddonGuid));
                         if (csData.ok()) {
                             string addonArgumentList = csData.getText("argumentlist");
                             bool addonIsInline = csData.getBoolean("IsInline");

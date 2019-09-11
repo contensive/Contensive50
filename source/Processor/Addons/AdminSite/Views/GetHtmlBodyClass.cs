@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
@@ -12,6 +12,7 @@ using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 
 namespace Contensive.Addons.AdminSite {
     public class GetHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
@@ -112,7 +113,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Normalize values to be needed
                     if (adminData.editRecord.id != 0) {
-                        var table = TableModel.createByUniqueName(cp.core, adminData.adminContent.tableName);
+                        var table = DbBaseModel.createByUniqueName<TableModel>(cp, adminData.adminContent.tableName);
                         if (table != null) {
                             WorkflowController.clearEditLock(cp.core, table.id, adminData.editRecord.id);
                         }
@@ -271,7 +272,7 @@ namespace Contensive.Addons.AdminSite {
                         } else if (adminData.AdminForm == AdminFormClearCache) {
                             adminBody = ToolClearCache.GetForm_ClearCache(cp.core);
                         } else if (adminData.AdminForm == AdminFormSpiderControl) {
-                            adminBody = cp.core.addon.execute(AddonModel.createByUniqueName(cp.core, "Content Spider Control"), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                            adminBody = cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, "Content Spider Control"), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorContextMessage = "get Content Spider Control for Admin"
                             });
@@ -331,15 +332,15 @@ namespace Contensive.Addons.AdminSite {
                             if (addonId != 0) {
                                 executeContextErrorCaption = " addon id:" + addonId + " for Admin";
                                 cp.core.doc.addRefreshQueryString("addonid", addonId.ToString());
-                                addon = AddonModel.create(cp.core, addonId);
+                                addon = DbBaseModel.create<AddonModel>(cp, addonId);
                             } else if (!string.IsNullOrEmpty(AddonGuid)) {
                                 executeContextErrorCaption = "addon guid:" + AddonGuid + " for Admin";
                                 cp.core.doc.addRefreshQueryString("addonguid", AddonGuid);
-                                addon = AddonModel.create(cp.core, AddonGuid);
+                                addon = DbBaseModel.create<AddonModel>(cp, AddonGuid);
                             } else if (!string.IsNullOrEmpty(AddonName)) {
                                 executeContextErrorCaption = "addon name:" + AddonName + " for Admin";
                                 cp.core.doc.addRefreshQueryString("addonname", AddonName);
-                                addon = AddonModel.createByUniqueName(cp.core, AddonName);
+                                addon = DbBaseModel.createByUniqueName<AddonModel>(cp, AddonName);
                             }
                             if (addon != null) {
                                 addonId = addon.id;
@@ -371,7 +372,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // include fancybox if it was needed
                     if (adminData.includeFancyBox) {
-                        cp.core.addon.executeDependency(AddonModel.create(cp.core, addonGuidjQueryFancyBox), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                        cp.core.addon.executeDependency(DbBaseModel.create<AddonModel>(cp, addonGuidjQueryFancyBox), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                             addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                             errorContextMessage = "adding fancybox dependency in Admin"
                         });
@@ -419,7 +420,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpAddonID.ToString() + ",") == 0) {
                     using (var csData = new CsModel(cp.core)) {
-                        csData.openRecord(Processor.Models.Db.AddonModel.contentName, HelpAddonID);
+                        csData.openRecord(AddonModel.contentName, HelpAddonID);
                         if (csData.ok()) {
                             FoundAddon = true;
                             AddonName = csData.getText("Name");
@@ -514,7 +515,7 @@ namespace Contensive.Addons.AdminSite {
                     // Add-ons
                     //
                     using (var csData = new CsModel(cp.core)) {
-                        csData.open(Processor.Models.Db.AddonModel.contentName, "CollectionID=" + HelpCollectionID, "name");
+                        csData.open(AddonModel.contentName, "CollectionID=" + HelpCollectionID, "name");
                         while (csData.ok()) {
                             IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(cp, csData.getInteger("ID"), "") + "</div>";
                             csData.goNext();
@@ -645,7 +646,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // Mark the record reviewed without making any changes
                                     //
-                                    Processor.Models.Db.PageContentModel.markReviewed(cp.core, adminData.editRecord.id);
+                                    PageContentModel.markReviewed(cp, adminData.editRecord.id);
                                     break;
                                 case Constants.AdminActionDelete:
                                     if (adminData.editRecord.userReadOnly) {
@@ -973,7 +974,7 @@ namespace Contensive.Addons.AdminSite {
                     cp.core.db.executeQuery(SQL);
                 }
                 if (RecordChanged) {
-                    GroupRuleModel.invalidateTableCache(cp.core);
+                    GroupRuleModel.invalidateCacheOfTable<GroupRuleModel>(cp);
                 }
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
@@ -1109,7 +1110,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
                 if (RecordChanged) {
-                    GroupRuleModel.invalidateTableCache(cp.core);
+                    GroupRuleModel.invalidateCacheOfTable<GroupRuleModel>(cp);
                 }
                 return;
                 //
@@ -1550,7 +1551,7 @@ namespace Contensive.Addons.AdminSite {
                                             case "ccmembers":
                                                 //
                                                 if (ActivityLogOrganizationID < 0) {
-                                                    PersonModel person = PersonModel.create(cp.core, editRecord.id);
+                                                    PersonModel person = DbBaseModel.create<PersonModel>(cp, editRecord.id);
                                                     if (person != null) {
                                                         ActivityLogOrganizationID = person.organizationID;
                                                     }
@@ -1575,16 +1576,16 @@ namespace Contensive.Addons.AdminSite {
                                     tableName = MetadataController.getContentTablename(cp.core, editRecord.contentControlId_Name).ToLowerInvariant();
                                 }
                                 if (tableName == LinkAliasModel.contentTableNameLowerCase) {
-                                    LinkAliasModel.invalidateRecordCache(cp.core, editRecord.id);
+                                    LinkAliasModel.invalidateCacheOfRecord<LinkAliasModel>(cp, editRecord.id);
                                 } else if (tableName == AddonModel.contentTableNameLowerCase) {
-                                    AddonModel.invalidateRecordCache(cp.core, editRecord.id);
+                                    AddonModel.invalidateCacheOfRecord<AddonModel>(cp, editRecord.id);
                                 } else {
-                                    LinkAliasModel.invalidateRecordCache(cp.core, editRecord.id);
+                                    LinkAliasModel.invalidateCacheOfRecord<LinkAliasModel>(cp, editRecord.id);
                                 }
                             }
                             //
                             // ----- clear/set authoring controls
-                            var contentTable = TableModel.createByUniqueName(cp.core, adminData.adminContent.tableName);
+                            var contentTable = DbBaseModel.createByUniqueName<TableModel>(cp, adminData.adminContent.tableName);
                             if (contentTable != null) WorkflowController.clearEditLock(cp.core, contentTable.id, editRecord.id);
                             //
                             // ----- if admin content is changed, reload the adminContext.content data in case this is a save, and not an OK
@@ -1630,7 +1631,7 @@ namespace Contensive.Addons.AdminSite {
                 adminData.adminFooter = "";
                 //
                 // -- Admin Navigator
-                string AdminNavFull = cp.core.addon.execute(AddonModel.create(cp.core, AdminNavigatorGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                string AdminNavFull = cp.core.addon.execute(DbBaseModel.create<AddonModel>(cp, AdminNavigatorGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                     errorContextMessage = "executing Admin Navigator in Admin"
                 });
@@ -2385,10 +2386,10 @@ namespace Contensive.Addons.AdminSite {
                                 // Add Navigator entries
                                 //
                                 //                    cmc = cp.core.main_cs_getv()
-                                //                    MenuContentName = Processor.Models.Db.NavigatorEntryModel.contentName
+                                //                    MenuContentName = NavigatorEntryModel.contentName
                                 //                    SupportAddonID = cp.core.csv_IsContentFieldSupported(MenuContentName, "AddonID")
                                 //                    SupportGuid = cp.core.csv_IsContentFieldSupported(MenuContentName, "ccGuid")
-                                //                    CS = cp.core.app.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
+                                //                    CS = cp.core.app.csOpen(NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
                                 //                    Do While cp.core.app.csv_IsCSOK(CS)
                                 //                        ParentID = cp.core.app.csv_cs_getText(CS, "ID")
                                 //                        ParentName = cp.core.app.csv_cs_getText(CS, "name")
@@ -2420,7 +2421,7 @@ namespace Contensive.Addons.AdminSite {
                                 //                            End If
                                 //                        End If
                                 //                        Call cp.core.app.csv_CloseCS(CSEntry)
-                                //                        'Call cp.core.csv_VerifyNavigatorEntry2(ccGuid, menuNameSpace, MenuName, ChildContenName, "", "", AdminOnly, DeveloperOnly, False, True, Processor.Models.Db.NavigatorEntryModel.contentName, "")
+                                //                        'Call cp.core.csv_VerifyNavigatorEntry2(ccGuid, menuNameSpace, MenuName, ChildContenName, "", "", AdminOnly, DeveloperOnly, False, True, NavigatorEntryModel.contentName, "")
                                 //                        'Call cp.core.main_CreateAdminMenu(MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
                                 //                        Description = Description _
                                 //                            & "<div>Creating navigator entry for [" & ChildContentName & "] under entry [" & ParentName & "].</div>"
@@ -2431,7 +2432,7 @@ namespace Contensive.Addons.AdminSite {
                                 // Add Legacy Navigator Entries
                                 //
                                 // -- deprecated
-                                //CS = csData.cs_open(Processor.Models.Db.NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
+                                //CS = csData.cs_open(NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
                                 //Do While csData.cs_ok(CS)
                                 //    MenuName = csData.cs_get(CS, "name")
                                 //    AdminOnly = csData.cs_getBoolean(CS, "AdminOnly")

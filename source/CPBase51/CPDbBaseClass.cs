@@ -1,4 +1,5 @@
 ﻿
+using Contensive.Models;
 using System;
 using System.Data;
 
@@ -11,11 +12,67 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// creates a pathFilename for a field that stores text content, like css, js, etc.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
+        public abstract string CreateFieldPathFilename(string tableName, string fieldName, int recordId, CPContentBaseClass.fileTypeIdEnum fieldType);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// creates a pathFilename for a field that stores the path of an uploaded file
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
+        public abstract string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename, CPContentBaseClass.fileTypeIdEnum fieldType);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Add a record to a table in the default datasource and return its Id
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
+        public abstract int Add(string tableName, int createdByUserId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// update records in a table. Criteria is an sql compatible where-clause, the sqlList is a list of fields and values to update
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
+        public abstract void Update(string tableName, string criteria, SqlFieldListClass sqlList);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// update records in a table. Criteria is an sql compatible where-clause, the sqlList is a list of fields and values to update. If Async is true, the query is queued for later
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
+        public abstract void Update(string tableName, string criteria, SqlFieldListClass sqlList, bool Async);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Delete the record specified by tablename and recordId
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="recordId"></param>
         public abstract void Delete(string tableName, int recordId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Delete the record specified by tablename and guid
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
+        public abstract void Delete(string tableName, string guid);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Delete the record specified by tablename and guid
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
+        public abstract void DeleteRows(string tableName, string sqlCriteria);
         //
         //====================================================================================================
         /// <summary>

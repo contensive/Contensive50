@@ -161,8 +161,16 @@ namespace Contensive.Processor {
             cp.core.cache.invalidate(tagList);
         }
         //
+        //====================================================================================================
+        //
         public override void InvalidateContentRecord(string contentName, int recordId) {
-            cp.core.cache.invalidateDbRecord(recordId, MetadataController.getContentTablename( cp.core,  contentName));
+            cp.core.cache.invalidateDbRecord(recordId, MetadataController.getContentTablename(cp.core, contentName));
+        }
+        //
+        //====================================================================================================
+        //
+        public override void InvalidateTableRecord(string tableName, int recordId) {
+            cp.core.cache.invalidateDbRecord(recordId, tableName);
         }
         //
         //====================================================================================================
@@ -258,6 +266,14 @@ namespace Contensive.Processor {
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public override void InvalidateTable(string tableName) {
+            throw new NotImplementedException();
+        }
+
+        public override void StorePtr(string keyPtr, string key) {
+            throw new NotImplementedException();
         }
 
         ~CPCacheClass() {

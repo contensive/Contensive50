@@ -2,12 +2,12 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Microsoft.Web.Administration;
 using Contensive.Processor.Exceptions;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -17,11 +17,11 @@ namespace Contensive.Processor.Controllers {
     public class WebServerController {
         //
         // enum this, not consts --  https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-        internal const string httpResponseStatus200_Success = "200 OK";
-        internal const string httpResponseStatus401_Unauthorized = "401 Unauthorized";
-        internal const string httpResponseStatus403_Forbidden = "403 Forbidden";
-        internal const string httpResponseStatus404_NotFound = "404 Not Found";
-        internal const string httpResponseStatus500_ServerError = "500 Internal Server Error";
+        public const string httpResponseStatus200_Success = "200 OK";
+        public const string httpResponseStatus401_Unauthorized = "401 Unauthorized";
+        public const string httpResponseStatus403_Forbidden = "403 Forbidden";
+        public const string httpResponseStatus404_NotFound = "404 Not Found";
+        public const string httpResponseStatus500_ServerError = "500 Internal Server Error";
         //
         private CoreController core;
         //
@@ -55,7 +55,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(_requestPathPage)) {
                     _requestPathPage = (core.webServer.serverEnvironment.ContainsKey("SCRIPT_NAME")) ? core.webServer.serverEnvironment["SCRIPT_NAME"] : "";
                 }
-                return _requestPathPage ;
+                return _requestPathPage;
             }
         }
         private string _requestPathPage = null;
@@ -123,7 +123,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestUrlSource {
             get {
-                if (_requestUrlSource == null ) {
+                if (_requestUrlSource == null) {
                     _requestUrlSource = iisContext.Request.Url.AbsoluteUri;
                     //_requestUrlSource = "http://";
                     //if (requestSecure) {
@@ -206,11 +206,11 @@ namespace Contensive.Processor.Controllers {
         public string requestUrl {
             get {
                 if (string.IsNullOrEmpty(_requestUrl)) {
-                    _requestUrl = requestProtocol 
-                        + requestDomain 
-                        + ((requestPort==80)?"":":" + requestPort) 
-                        + requestPath 
-                        + requestPage 
+                    _requestUrl = requestProtocol
+                        + requestDomain
+                        + ((requestPort == 80) ? "" : ":" + requestPort)
+                        + requestPath
+                        + requestPage
                         + ((string.IsNullOrWhiteSpace(requestQueryString)) ? "" : "?" + requestQueryString);
                 }
                 return _requestUrl;
@@ -329,7 +329,7 @@ namespace Contensive.Processor.Controllers {
                 Copy = GenericController.vbReplace(Copy, "\r", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -355,7 +355,7 @@ namespace Contensive.Processor.Controllers {
                 Copy = GenericController.vbReplace(Copy, "\r", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -381,7 +381,7 @@ namespace Contensive.Processor.Controllers {
                 Copy = GenericController.vbReplace(Copy, "\r", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -404,7 +404,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -469,7 +469,7 @@ namespace Contensive.Processor.Controllers {
                         requestQueryString = "";
                         foreach (string key in iisContext.Request.QueryString) {
                             string keyValue = iisContext.Request.QueryString[key];
-                            if ( requestQuery.ContainsKey(key)) { requestQuery.Remove(key); }
+                            if (requestQuery.ContainsKey(key)) { requestQuery.Remove(key); }
                             requestQuery.Add(key, keyValue);
                             core.docProperties.setProperty(key, keyValue, DocPropertyController.DocPropertyTypesEnum.queryString);
                             requestQueryString = GenericController.modifyQueryString(requestQueryString, key, keyValue);
@@ -481,7 +481,7 @@ namespace Contensive.Processor.Controllers {
                 {
                     foreach (string key in iisContext.Request.Form.Keys) {
                         string keyValue = iisContext.Request.Form[key];
-                        if ( requestForm.ContainsKey(key)) { requestForm.Remove(key); }
+                        if (requestForm.ContainsKey(key)) { requestForm.Remove(key); }
                         requestForm.Add(key, keyValue);
                         core.docProperties.setProperty(key, keyValue, DocPropertyController.DocPropertyTypesEnum.form);
                     }
@@ -573,12 +573,12 @@ namespace Contensive.Processor.Controllers {
                     core.domain.typeId = 1;
                     core.domain.visited = false;
                     core.domain.id = 0;
-                    core.domain.forwardUrl = ""; 
+                    core.domain.forwardUrl = "";
                     core.domainDictionary = core.cache.getObject<Dictionary<string, DomainModel>>("domainContentList");
                     if (core.domainDictionary == null) {
                         //
                         //  no cache found, build domainContentList from database
-                        core.domainDictionary = DomainModel.createDictionary(core, "(active<>0)and(name is not null)");
+                        core.domainDictionary = DomainModel.createDictionary(core.cpParent, "(active<>0)and(name is not null)");
                         updateDomainCache = true;
                     }
                     //
@@ -586,7 +586,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (string domain in core.appConfig.domainList) {
                         if (!core.domainDictionary.ContainsKey(domain.ToLowerInvariant())) {
                             LogController.logTrace(core, "adding domain record because configList domain not found [" + domain.ToLowerInvariant() + "]");
-                            var newDomain = DomainModel.addEmpty(core);
+                            var newDomain = DomainModel.addEmpty<DomainModel>(core.cpParent);
                             newDomain.name = domain;
                             newDomain.rootPageId = 0;
                             newDomain.noFollow = false;
@@ -597,7 +597,7 @@ namespace Contensive.Processor.Controllers {
                             newDomain.pageNotFoundPageId = 0;
                             newDomain.forwardDomainId = 0;
                             newDomain.defaultRouteId = core.siteProperties.getInteger("");
-                            newDomain.save(core);
+                            newDomain.save(core.cpParent);
                             core.domainDictionary.Add(domain.ToLowerInvariant(), newDomain);
                             updateDomainCache = true;
                         }
@@ -606,7 +606,7 @@ namespace Contensive.Processor.Controllers {
                     // -- verify request domain
                     if (!core.domainDictionary.ContainsKey(requestDomain.ToLowerInvariant())) {
                         LogController.logTrace(core, "adding domain record because requestDomain [" + requestDomain.ToLowerInvariant() + "] not found");
-                        var newDomain = DomainModel.addEmpty( core );
+                        var newDomain = DomainModel.addEmpty<DomainModel>(core.cpParent);
                         newDomain.name = requestDomain;
                         newDomain.rootPageId = 0;
                         newDomain.noFollow = false;
@@ -616,7 +616,7 @@ namespace Contensive.Processor.Controllers {
                         newDomain.defaultTemplateId = 0;
                         newDomain.pageNotFoundPageId = 0;
                         newDomain.forwardDomainId = 0;
-                        newDomain.save(core);
+                        newDomain.save(core.cpParent);
                         core.domainDictionary.Add(requestDomain.ToLowerInvariant(), newDomain);
                         updateDomainCache = true;
                     }
@@ -624,7 +624,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // if there was a change, update the cache
                         //
-                        core.cache.storeObject("domainContentList", core.domainDictionary, new List<string> { DomainModel.getTableInvalidationKey(core) });
+                        core.cache.storeObject("domainContentList", core.domainDictionary, new List<string> { DbBaseModel.createDependencyKeyInvalidateOnChange<DomainModel>(core.cpParent) });
                     }
                     //
                     // domain found
@@ -646,7 +646,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // todo - would prefer not save new template
                         // -- fix, must save or template selection fails.
-                        domain.save(core);
+                        domain.save(core.cpParent);
                         core.domain.id = domain.id;
                     }
                     if (!core.domain.visited) {
@@ -680,11 +680,11 @@ namespace Contensive.Processor.Controllers {
                         //
                         // forward to a replacement domain
                         //
-                        string forwardDomain = MetadataController.getRecordName( core,"domains", core.domain.forwardDomainId);
+                        string forwardDomain = MetadataController.getRecordName(core, "domains", core.domain.forwardDomainId);
                         if (!string.IsNullOrEmpty(forwardDomain)) {
-                            int pos = requestUrlSource.ToLowerInvariant().IndexOf( requestDomain.ToLowerInvariant() );
+                            int pos = requestUrlSource.ToLowerInvariant().IndexOf(requestDomain.ToLowerInvariant());
                             if (pos > 0) {
-                                core.domain.forwardUrl = requestUrlSource.ToString().Left( pos) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length));
+                                core.domain.forwardUrl = requestUrlSource.ToString().Left(pos) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length));
                                 redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this replacement domain", false, false);
                                 return core.doc.continueProcessing;
                             }
@@ -694,9 +694,9 @@ namespace Contensive.Processor.Controllers {
                     // todo - CORS cannot be generated dynamically because info http method does not execute code
                     // -- add default CORS headers to approved domains
                     Uri originUri = httpContext.Request.UrlReferrer;
-                    if ( originUri != null ) {
-                        if( core.domainDictionary.ContainsKey(originUri.Host.ToLowerInvariant())) {
-                            if ( core.domainDictionary[originUri.Host.ToLowerInvariant()].allowCORS ) {
+                    if (originUri != null) {
+                        if (core.domainDictionary.ContainsKey(originUri.Host.ToLowerInvariant())) {
+                            if (core.domainDictionary[originUri.Host.ToLowerInvariant()].allowCORS) {
                                 httpContext.Response.AddHeader("Access-Control-Allow-Credentials", "true");
                                 httpContext.Response.AddHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
                                 httpContext.Response.AddHeader("Access-Control-Headers", "Content-Type,soapaction,X-Requested-With");
@@ -709,7 +709,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     requestContentWatchPrefix = requestProtocol + requestDomain + "/";
-                    requestContentWatchPrefix = requestContentWatchPrefix.Left( requestContentWatchPrefix.Length - 1);
+                    requestContentWatchPrefix = requestContentWatchPrefix.Left(requestContentWatchPrefix.Length - 1);
                     //
                     requestPath = "/";
                     if (string.IsNullOrWhiteSpace(requestPathPage)) {
@@ -717,10 +717,10 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         requestPage = requestPathPage;
                         int slashPtr = requestPathPage.LastIndexOf("/");
-                        if (slashPtr >=0) {
+                        if (slashPtr >= 0) {
                             requestPage = "";
-                            requestPath = requestPathPage.Left(slashPtr+1);
-                            if(requestPathPage.Length>1) requestPage = requestPathPage.Substring(slashPtr+1);
+                            requestPath = requestPathPage.Left(slashPtr + 1);
+                            if (requestPathPage.Length > 1) requestPage = requestPathPage.Substring(slashPtr + 1);
                         }
                     }
                     requestSecureURLRoot = "https://" + requestDomain + "/";
@@ -748,7 +748,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- done at last
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return core.doc.continueProcessing;
@@ -844,7 +844,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -891,8 +891,8 @@ namespace Contensive.Processor.Controllers {
                     bufferResponseHeader = bufferResponseHeader + GenericController.vbReplace(HeaderName, Environment.NewLine, "") + Environment.NewLine + GenericController.vbReplace(GenericController.encodeText(HeaderValue), Environment.NewLine, "");
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
-            }  
+                LogController.logError(core, ex);
+            }
         }
         //
         //===========================================================================================
@@ -904,7 +904,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="IsPageNotFound"></param>
         /// <param name="allowDebugMessage">If true, when visit property debugging is enabled, the routine returns </param>
         public string redirect(string NonEncodedLink, string RedirectReason, bool IsPageNotFound = false, bool allowDebugMessage = true) {
-            string result = HtmlController.div( "Redirecting to [" + NonEncodedLink + "], reason [" + RedirectReason + "]", "ccWarningBox" );
+            string result = HtmlController.div("Redirecting to [" + NonEncodedLink + "], reason [" + RedirectReason + "]", "ccWarningBox");
             try {
                 const string rnRedirectCycleFlag = "cycleFlag";
                 string EncodedLink = null;
@@ -916,13 +916,13 @@ namespace Contensive.Processor.Controllers {
                     redirectCycles = core.docProperties.getInteger(rnRedirectCycleFlag);
                     //
                     // convert link to a long link on this domain
-                    if (NonEncodedLink.Left( 4).ToLowerInvariant() == "http") {
+                    if (NonEncodedLink.Left(4).ToLowerInvariant() == "http") {
                         FullLink = NonEncodedLink;
                     } else {
-                        if (NonEncodedLink.Left( 1).ToLowerInvariant() == "/") {
+                        if (NonEncodedLink.Left(1).ToLowerInvariant() == "/") {
                             //
                             // -- root relative - url starts with path, let it go
-                        } else if (NonEncodedLink.Left( 1).ToLowerInvariant() == "?") {
+                        } else if (NonEncodedLink.Left(1).ToLowerInvariant() == "?") {
                             //
                             // -- starts with qs, fix issue where iis consideres this on the physical page, not the link-alias vitrual route
                             NonEncodedLink = requestPathPage + NonEncodedLink;
@@ -941,7 +941,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Link is not valid
                         //
-                        LogController.logError( core,new GenericException("Redirect was called with a blank Link. Redirect Reason [" + RedirectReason + "]"));
+                        LogController.logError(core, new GenericException("Redirect was called with a blank Link. Redirect Reason [" + RedirectReason + "]"));
                         return string.Empty;
                         //
                         // changed to main_ServerLinksource because if a redirect is caused by a link forward, and the host page for the iis 404 is
@@ -952,7 +952,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Loop redirect error, throw trap and block redirect to prevent loop
                         //
-                        LogController.logError( core,new GenericException("Redirect was called to the same URL, main_ServerLink is [" + requestUrl + "], main_ServerLinkSource is [" + requestUrlSource + "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" + RedirectReason + "]"));
+                        LogController.logError(core, new GenericException("Redirect was called to the same URL, main_ServerLink is [" + requestUrl + "], main_ServerLinkSource is [" + requestUrlSource + "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" + RedirectReason + "]"));
                         return string.Empty;
                     } else if (IsPageNotFound) {
                         //
@@ -975,7 +975,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Go ahead and redirect
                         //
-                        LogController.logInfo(core, "Redirect called, from [" + requestUrl + "], to [" + NonEncodedLink + "], reason [" + RedirectReason + "]" );
+                        LogController.logInfo(core, "Redirect called, from [" + requestUrl + "], to [" + NonEncodedLink + "], reason [" + RedirectReason + "]");
                         if (allowDebugMessage && core.doc.visitPropertyAllowDebugging) {
                             //
                             // -- Verbose - do not redirect, just print the link
@@ -1000,7 +1000,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.continueProcessing = false;
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1035,7 +1035,7 @@ namespace Contensive.Processor.Controllers {
                 verifyAppPool(core, appName);
                 verifyWebsite(core, appName, DomainName, rootPublicFilesPath, appName);
             } catch (Exception ex) {
-                LogController.logError( core,ex, "verifySite");
+                LogController.logError(core, ex, "verifySite");
             }
         }
         //
@@ -1068,7 +1068,7 @@ namespace Contensive.Processor.Controllers {
                     serverManager.CommitChanges();
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex, "verifyAppPool");
+                LogController.logError(core, ex, "verifyAppPool");
             }
         }
         //
@@ -1126,7 +1126,7 @@ namespace Contensive.Processor.Controllers {
                     iisManager.CommitChanges();
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex, "verifyWebsite");
+                LogController.logError(core, ex, "verifyWebsite");
             }
         }
         //
@@ -1160,7 +1160,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex, "verifyWebsite_Binding");
+                LogController.logError(core, ex, "verifyWebsite_Binding");
             }
         }
         //
@@ -1169,7 +1169,7 @@ namespace Contensive.Processor.Controllers {
         private static void verifyWebsite_VirtualDirectory(CoreController core, Site site, string appName, string virtualFolder, string physicalPath) {
             try {
                 bool found = false;
-                foreach ( Application iisApp in site.Applications) {
+                foreach (Application iisApp in site.Applications) {
                     if (iisApp.ApplicationPoolName.ToLowerInvariant() == appName.ToLowerInvariant()) {
                         foreach (VirtualDirectory virtualDirectory in iisApp.VirtualDirectories) {
                             if (virtualDirectory.Path == virtualFolder) {
@@ -1203,7 +1203,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex, "verifyWebsite_VirtualDirectory");
+                LogController.logError(core, ex, "verifyWebsite_VirtualDirectory");
             }
         }
         //========================================================================
@@ -1311,22 +1311,22 @@ namespace Contensive.Processor.Controllers {
                 string AcceptLanguageString = (core.webServer.serverEnvironment.ContainsKey("HTTP_ACCEPT_LANGUAGE")) ? core.webServer.serverEnvironment["HTTP_ACCEPT_LANGUAGE"] : "";
                 int CommaPosition = GenericController.vbInstr(1, AcceptLanguageString, ",");
                 while (CommaPosition != 0) {
-                    string AcceptLanguage = (AcceptLanguageString.Left( CommaPosition - 1)).Trim(' ');
+                    string AcceptLanguage = (AcceptLanguageString.Left(CommaPosition - 1)).Trim(' ');
                     AcceptLanguageString = AcceptLanguageString.Substring(CommaPosition);
                     if (AcceptLanguage.Length > 0) {
                         int DashPosition = GenericController.vbInstr(1, AcceptLanguage, "-");
                         if (DashPosition > 1) {
-                            AcceptLanguage = AcceptLanguage.Left( DashPosition - 1);
+                            AcceptLanguage = AcceptLanguage.Left(DashPosition - 1);
                         }
                         DashPosition = GenericController.vbInstr(1, AcceptLanguage, ";");
                         if (DashPosition > 1) {
-                            return AcceptLanguage.Left( DashPosition - 1);
+                            return AcceptLanguage.Left(DashPosition - 1);
                         }
                     }
                     CommaPosition = GenericController.vbInstr(1, AcceptLanguageString, ",");
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return "";
         }

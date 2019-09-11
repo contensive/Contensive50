@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using static Tests.testConstants;
 using Contensive.BaseClasses;
 using Contensive.Processor;
+using Contensive.Models.Db;
 
 namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     //
@@ -69,8 +70,8 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                     }
                 }
                 // assert
-                var person_test1 = Processor.Models.Db.PersonModel.create(cp.core, testId_test1);
-                var person_test2 = Processor.Models.Db.PersonModel.create(cp.core, testId_test2);
+                var person_test1 = DbBaseModel.create<PersonModel>(cp, testId_test1);
+                var person_test2 = DbBaseModel.create<PersonModel>(cp, testId_test2);
                 //
                 Assert.AreEqual("a", person_test1.username);
                 Assert.AreEqual("b", person_test1.password);
@@ -137,7 +138,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 using (CPCSBaseClass cs = cp.CSNew()) {
                     string impossibleName = cp.Utils.CreateGuid();
                     // act
-                    cs.Open(Processor.Models.Db.PersonModel.contentName, "(name=" + cp.Db.EncodeSQLText(impossibleName) + ")");
+                    cs.Open(PersonModel.contentName, "(name=" + cp.Db.EncodeSQLText(impossibleName) + ")");
                     resultNoData = cs.GetRowCount();
                     cs.Close();
                 }

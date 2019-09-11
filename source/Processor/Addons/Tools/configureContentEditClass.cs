@@ -5,11 +5,12 @@ using Contensive.Processor;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.Tools {
     //
@@ -130,7 +131,7 @@ namespace Contensive.Addons.Tools {
                                                         //
                                                         // Field Type changed, must be done manually
                                                         //
-                                                        ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + DbBaseModel.getRecordName<ContentFieldTypeModel>(core, (int)cdefFieldKvp.Value.fieldTypeId) + "] to [" + DbBaseModel.getRecordName<ContentFieldTypeModel>(core, (int)formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
+                                                        ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + DbBaseModel.getRecordName<ContentFieldTypeModel>(core.cpParent, (int)cdefFieldKvp.Value.fieldTypeId) + "] to [" + DbBaseModel.getRecordName<ContentFieldTypeModel>(core.cpParent, (int)formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
                                                         int DataSourceTypeID = core.db.getDataSourceType();
                                                         switch (DataSourceTypeID) {
                                                             case DataSourceTypeODBCMySQL:
@@ -438,7 +439,7 @@ namespace Contensive.Addons.Tools {
                                     }
                                 }
                             } else if (FieldLocked) {
-                                streamRow.Add(DbBaseModel.getRecordName<ContentFieldTypeModel>(core, (int)fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, (int)fieldsort.field.fieldTypeId));
+                                streamRow.Add(DbBaseModel.getRecordName<ContentFieldTypeModel>(core.cpParent, (int)fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, (int)fieldsort.field.fieldTypeId));
                             } else {
                                 string TypeSelect = TypeSelectTemplate;
                                 TypeSelect = GenericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);

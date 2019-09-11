@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+using Contensive.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
 using static Newtonsoft.Json.JsonConvert;

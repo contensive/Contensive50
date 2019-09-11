@@ -9,11 +9,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Models.Domain {
     //
@@ -1525,7 +1526,7 @@ namespace Contensive.Processor.Models.Domain {
                     if (contentMetadata.dataChanged) {
                         //
                         // -- update definition (use SingleRecord as an update flag)
-                        var datasource = DataSourceModel.createByUniqueName(core, contentMetadata.dataSourceName);
+                        var datasource = DbBaseModel.createByUniqueName<DataSourceModel>(core.cpParent, contentMetadata.dataSourceName);
                         ContentMetadataModel.verifyContent_returnId(core, contentMetadata);
                     }
                     //
@@ -1541,16 +1542,15 @@ namespace Contensive.Processor.Models.Domain {
                         if (fieldMetadata.helpChanged) {
                             //int FieldHelpID = 0;
                             ContentFieldHelpModel fieldHelp = null;
-                            var fieldHelpList = ContentFieldHelpModel.createList(core, "fieldid=" + fieldMetadata.id);
+                            var fieldHelpList = DbBaseModel.createList<ContentFieldHelpModel>(core.cpParent, "fieldid=" + fieldMetadata.id);
                             if (fieldHelpList.Count == 0) {
                                 //
                                 // -- no current field help record, if adding help, create record
                                 if ((!string.IsNullOrWhiteSpace(fieldMetadata.helpDefault)) || (!string.IsNullOrWhiteSpace(fieldMetadata.helpCustom))) {
-                                    fieldHelp = ContentFieldHelpModel.addEmpty(core);
+                                    fieldHelp = DbBaseModel.addEmpty<ContentFieldHelpModel>(core.cpParent);
                                     fieldHelp.helpDefault = fieldMetadata.helpDefault;
                                     fieldHelp.helpCustom = fieldMetadata.helpCustom;
-                                    fieldHelp.save(core);
-
+                                    fieldHelp.save(core.cpParent);
                                 }
                             } else {
                                 //
@@ -1559,7 +1559,7 @@ namespace Contensive.Processor.Models.Domain {
                                 if ((!fieldHelp.helpCustom.Equals(fieldMetadata.helpCustom)) || !fieldHelp.helpDefault.Equals(fieldMetadata.helpDefault)) {
                                     fieldHelp.helpDefault = fieldMetadata.helpDefault;
                                     fieldHelp.helpCustom = fieldMetadata.helpCustom;
-                                    fieldHelp.save(core);
+                                    fieldHelp.save(core.cpParent);
                                 }
                             }
                         }

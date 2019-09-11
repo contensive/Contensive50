@@ -9,10 +9,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.PageManager {
     public class getChildPageList : Contensive.BaseClasses.AddonBaseClass {
@@ -27,7 +28,7 @@ namespace Contensive.Addons.PageManager {
             string result = "";
             try {
                 CoreController core = ((CPClass)cp).core;
-                result = PageContentController.getChildPageList(core, cp.Doc.GetText("List Name"), Processor.Models.Db.PageContentModel.contentName, core.doc.pageController.page.id, true);
+                result = PageContentController.getChildPageList(core, cp.Doc.GetText("List Name"), PageContentModel.contentName, core.doc.pageController.page.id, true);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

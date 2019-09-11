@@ -9,12 +9,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using static Newtonsoft.Json.JsonConvert;
 using Contensive.Processor.Models.Domain;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     public class TaskSchedulerController : IDisposable {
@@ -146,7 +147,7 @@ namespace Contensive.Processor.Controllers {
                                     + "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))"
                                     + "  or(ProcessNextRun<" + DbController.encodeSQLDate(RightNow) + ")"
                                     + " )";
-                                var addonList = AddonModel.createList(cpApp.core, sqlAddonsCriteria);
+                                var addonList = DbBaseModel.createList<AddonModel>(cpApp, sqlAddonsCriteria);
                                 foreach (var addon in addonList) {
                                     DateTime nextRun = DateTime.MinValue;
                                     if (addon.processInterval > 0) {
@@ -173,7 +174,7 @@ namespace Contensive.Processor.Controllers {
                                         // -- Interval is OK but NextRun is 0, just set next run
                                         addon.processNextRun = nextRun;
                                     }
-                                    addon.save(cpApp.core);
+                                    addon.save(cpApp);
                                 }
                             } catch (Exception ex) {
                                 LogController.logTrace(cpApp.core, "scheduleTasks, exception [" + ex.ToString() + "]");
@@ -215,7 +216,7 @@ namespace Contensive.Processor.Controllers {
         //                            + "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))"
         //                            + "  or(ProcessNextRun<" + SQLNow + ")"
         //                            + " )";
-        //                        int CS = coreApp.db.csOpen(Models.Db.AddonModel.contentName, sqlAddonsCriteria);
+        //                        int CS = coreApp.db.csOpen(AddonModel.contentName, sqlAddonsCriteria);
         //                        while (coreApp.db.csOk()) {
         //                            int addonProcessInterval = coreApp.db.csGetInteger("ProcessInterval");
         //                            string addonName = coreApp.db.csGetText("name");
@@ -281,7 +282,8 @@ namespace Contensive.Processor.Controllers {
                 //
                 int downloadId = 0;
                 if (!string.IsNullOrEmpty(downloadName)) {
-                    var download = DbBaseModel.addDefault<DownloadModel>(core, ContentMetadataModel.createByUniqueName(core, DownloadModel.contentName));
+                    Dictionary<string, string> defaultValues = ContentMetadataModel.getDefaultValueDict(core, DownloadModel.contentName);
+                    var download = DbBaseModel.addDefault<DownloadModel>(core.cpParent, defaultValues);
                     download.name = downloadName;
                     download.dateRequested = DateTime.Now;
                     download.requestedBy = core.session.user.id;
@@ -292,7 +294,7 @@ namespace Contensive.Processor.Controllers {
                         download.filename.content = " ";
                     }
                     downloadId = download.id;
-                    download.save(core);
+                    download.save(core.cpParent);
                 }
                 string cmdDetailJson = SerializeObject(cmdDetail);
                 if (blockDuplicates) {
@@ -306,11 +308,11 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- add it to the queue and shell out to the command
                 if (resultTaskAdded) {
-                    var task = TaskModel.addEmpty<TaskModel>(core);
+                    var task = TaskModel.addEmpty<TaskModel>(core.cpParent);
                     task.name = "addon [#" + cmdDetail.addonId + "," + cmdDetail.addonName + "]";
                     task.cmdDetail = cmdDetailJson;
                     task.resultDownloadId = downloadId;
-                    task.save(core);
+                    task.save(core.cpParent);
                     LogController.logTrace(core, "addTaskToQueue, cmdDetailJson [" + cmdDetailJson + "]");
                 }
             } catch (Exception ex) {

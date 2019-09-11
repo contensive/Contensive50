@@ -2,10 +2,11 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -222,7 +223,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         internal Dictionary<int, int> addonRecursionDepth { get; set; } = new Dictionary<int, int>();
         //
-        public Stack<Models.Db.AddonModel> addonModelStack = new Stack<AddonModel>();
+        public Stack<AddonModel> addonModelStack = new Stack<AddonModel>();
         //
         // -- todo
         public int addonInstanceCnt { get; set; } = 0;
@@ -407,7 +408,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- Current method - all pages are in the Template, Section, Page structure
                         if (templateId != 0) {
-                            PageTemplateModel template = PageTemplateModel.create(core, templateId);
+                            PageTemplateModel template = DbBaseModel.create<PageTemplateModel>(core.cpParent, templateId);
                             if (template != null) {
                                 resultLink = ""; // template.Link
                             }

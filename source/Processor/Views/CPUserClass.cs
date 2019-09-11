@@ -1,9 +1,10 @@
 ﻿
 using System;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using Contensive.Processor.Models.Domain;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor {
     public class CPUserClass : BaseClasses.CPUserBaseClass, IDisposable {
@@ -59,9 +60,9 @@ namespace Contensive.Processor {
         public override int Id {
             get {
                 if (cp.core.session.user.id==0) {
-                    var user = PersonModel.addDefault(cp.core, ContentMetadataModel.createByUniqueName( cp.core, PersonModel.contentName));
+                    var user = DbBaseModel.addDefault<PersonModel>(cp, ContentMetadataModel.createByUniqueName( cp.core, PersonModel.contentName));
                     user.createdByVisit = true;
-                    user.save(cp.core);
+                    user.save(cp);
                     SessionController.recognizeById(cp.core, user.id, ref cp.core.session);
                 }
                 return cp.core.session.user.id;
@@ -259,7 +260,7 @@ namespace Contensive.Processor {
             bool result = cp.core.session.authenticateById(userId, cp.core.session);
             if (result) {
                 cp.core.session.user.autoLogin = setAutoLogin;
-                cp.core.session.user.save(cp.core);
+                cp.core.session.user.save(cp);
             }
             return result;
         }

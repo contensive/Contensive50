@@ -1,8 +1,9 @@
 ﻿
 using System;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using System.Collections.Generic;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor {
     public class CPEmailClass : BaseClasses.CPEmailBaseClass, IDisposable {
@@ -223,7 +224,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
-            PersonModel person = PersonModel.create(cp.core, toUserId);
+            PersonModel person = DbBaseModel.create<PersonModel>(cp, toUserId);
             if ( person == null ) {
                 userErrorMessage = "An email could not be sent because the user could not be located.";
                 return;

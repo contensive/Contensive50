@@ -46,26 +46,26 @@
       <HintPath>..\packages\AWS.Logger.Core.1.4.0\lib\net45\AWS.Logger.Core.dll</HintPath>
     </Reference>
     <Reference Include="AWSSDK.CloudWatchLogs, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
-      <HintPath>..\packages\AWSSDK.CloudWatchLogs.3.3.101.19\lib\net45\AWSSDK.CloudWatchLogs.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.CloudWatchLogs.3.3.101.20\lib\net45\AWSSDK.CloudWatchLogs.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AWSSDK.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
-      <HintPath>..\packages\AWSSDK.Core.3.3.103.35\lib\net45\AWSSDK.Core.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.Core.3.3.103.36\lib\net45\AWSSDK.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AWSSDK.S3, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
-      <HintPath>..\packages\AWSSDK.S3.3.3.104.23\lib\net45\AWSSDK.S3.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.S3.3.3.104.24\lib\net45\AWSSDK.S3.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AWSSDK.SimpleEmail, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
-      <HintPath>..\packages\AWSSDK.SimpleEmail.3.3.101.41\lib\net45\AWSSDK.SimpleEmail.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.SimpleEmail.3.3.101.43\lib\net45\AWSSDK.SimpleEmail.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ClearScript, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ClearScript.5.6.0\lib\net45\ClearScript.dll</HintPath>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.1.190908.1\lib\net461\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.1.190911.12\lib\net461\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -238,12 +238,6 @@
     <Compile Include="Controllers\CacheController.cs" />
     <Compile Include="Controllers\KeyPtrIndexController.cs" />
     <Compile Include="Controllers\ContentCmdController.cs" />
-    <Compile Include="Models\Db\ContentFieldTypeModel.cs" />
-    <Compile Include="Models\Db\DbGenericModel.cs" />
-    <Compile Include="Models\Db\MenuModel.cs" />
-    <Compile Include="Models\Db\MenuPageRuleModel.cs" />
-    <Compile Include="Models\Db\DbBaseFieldsModel.cs" />
-    <Compile Include="Models\Db\ViewingModel.cs" />
     <Compile Include="Models\Domain\AddonPanelListItemModel.cs" />
     <Compile Include="Models\Domain\CsModel.cs" />
     <Compile Include="Controllers\DbController.cs" />
@@ -286,28 +280,8 @@
     <Compile Include="Controllers\_BlankController.cs" />
     <Compile Include="Extensions\extensionMethodsClass.cs" />
     <Compile Include="Extensions\webClientExtensionClass.cs" />
-    <Compile Include="Models\Db\Datasource.cs" />
-    <Compile Include="Models\Db\SitePropertyModel.cs" />
-    <Compile Include="Models\Db\StateModel.cs" />
-    <Compile Include="Models\Db\DownloadModel.cs" />
-    <Compile Include="Models\Db\RemoteQueryModel.cs" />
-    <Compile Include="Models\Db\AuthoringControlModel.cs" />
     <Compile Include="Models\Domain\AppConfigModel.cs" />
-    <Compile Include="Models\Db\EmailQueueModel.cs" />
-    <Compile Include="Models\Db\ConditionalEmailModel.cs" />
-    <Compile Include="Models\Db\GroupEmailModel.cs" />
-    <Compile Include="Models\Db\SystemEmailModel.cs" />
-    <Compile Include="Models\Db\EmailTemplateModel.cs" />
-    <Compile Include="Models\Db\VisitModel.cs" />
-    <Compile Include="Models\Db\PageTemplateModel.cs" />
-    <Compile Include="Models\Db\VisitorModel.cs" />
     <Compile Include="Controllers\CoreController.cs" />
-    <Compile Include="Models\Db\OrganizationModel.cs" />
-    <Compile Include="Models\Db\GroupModel.cs" />
-    <Compile Include="Models\Db\GroupRuleModel.cs" />
-    <Compile Include="Models\Db\MemberRuleModel.cs" />
-    <Compile Include="Models\Db\EmailModel.cs" />
-    <Compile Include="Models\Db\TaskModel.cs" />
     <Compile Include="Models\Domain\NameValueModel.cs" />
     <Compile Include="Models\Domain\AddonCacheModel.cs" />
     <Compile Include="Models\Domain\AddonListItemModel.cs" />
@@ -323,6 +297,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Views\CPJSONClass.cs" />
     <Compile Include="Views\CPLogClass.cs" />
     <Compile Include="Views\CPAddonClass.cs" />
     <Compile Include="Views\CPBlockClass.cs" />
@@ -357,34 +332,7 @@
     <Compile Include="Models\Domain\StylesheetContextModel.cs" />
     <Compile Include="Models\Domain\UploadFileModel.cs" />
     <Compile Include="Models\Domain\_BlankModel.cs" />
-    <Compile Include="Models\Db\AddonCollectionModel.cs" />
-    <Compile Include="Models\Db\AddonContentFieldTypeRulesModel.cs" />
-    <Compile Include="Models\Db\AddonIncludeRuleModel.cs" />
-    <Compile Include="Models\Db\AddonModel.cs" />
-    <Compile Include="Models\Db\AddonPageRuleModel.cs" />
-    <Compile Include="Models\Db\AddonTemplateRuleModel.cs" />
-    <Compile Include="Models\Db\DbBaseModel.cs" />
-    <Compile Include="Models\Db\ContentFieldHelpModel.cs" />
-    <Compile Include="Models\Db\ContentFieldModel.cs" />
-    <Compile Include="Models\Db\ContentModel.cs" />
-    <Compile Include="Models\Db\DomainModel.cs" />
-    <Compile Include="Models\Db\EmailDropModel.cs" />
-    <Compile Include="Models\Db\EmailLogModel.cs" />
-    <Compile Include="Models\Db\LanguageModel.cs" />
-    <Compile Include="Models\Db\LibraryFileLogModel.cs" />
-    <Compile Include="Models\Db\LibraryFilesModel.cs" />
-    <Compile Include="Models\Db\LinkAliasModel.cs" />
-    <Compile Include="Models\Db\LinkForwardModel.cs" />
-    <Compile Include="Models\Db\NavigatorEntryModel.cs" />
-    <Compile Include="Models\Db\PageContentModel.cs" />
-    <Compile Include="Models\Db\PersonModel.cs" />
     <Compile Include="Models\Domain\ServerConfigModel.cs" />
-    <Compile Include="Models\Db\SortMethodModel.cs" />
-    <Compile Include="Models\Db\TableModel.cs" />
-    <Compile Include="Models\Db\TemplateDomainRuleModel.cs" />
-    <Compile Include="Models\Db\CopyContentModel.cs" />
-    <Compile Include="Models\Db\LayoutModel.cs" />
-    <Compile Include="Models\Db\_BlankModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -411,6 +359,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Addons\AdminNavigator\Controllers\" />
+    <Folder Include="Models\Db\" />
     <Folder Include="Models\View\" />
   </ItemGroup>
   <ItemGroup>

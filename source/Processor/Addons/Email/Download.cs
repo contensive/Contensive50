@@ -9,10 +9,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.Primitives {
     public class DownloadClass : Contensive.BaseClasses.AddonBaseClass {
@@ -29,13 +30,13 @@ namespace Contensive.Addons.Primitives {
                 CoreController core = ((CPClass)cp).core;
                 //
                 // -- Active Download hook
-                LibraryFilesModel file = LibraryFilesModel.create(core, core.docProperties.getText(RequestNameDownloadFileGuid));
+                LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, core.docProperties.getText(RequestNameDownloadFileGuid));
                 //if (file == null) {
                 //    //
                 //    // -- compatibility mode, downloadid, this exposes all library files because it exposes the sequential id number
                 //    int downloadId = core.docProperties.getInteger(RequestNameDownloadFileId);
                 //    if ((downloadId > 0) && (core.siteProperties.getBoolean("Allow library file download by id", false))) {
-                //        file = LibraryFilesModel.create(core, downloadId);
+                //        file = LibraryFilesModel.create(core.cpInternal, downloadId);
                 //    }
                 //}
                 if (file != null) {
@@ -43,18 +44,18 @@ namespace Contensive.Addons.Primitives {
                     // -- lookup record and set clicks
                     if (file != null) {
                         file.clicks += 1;
-                        file.save(core);
+                        file.save(core.cpParent);
                         if (file.filename != "") {
                             //
                             // -- create log entry
-                            LibraryFileLogModel log = LibraryFileLogModel.addEmpty(core);
+                            LibraryFileLogModel log = LibraryFileLogModel.addEmpty<LibraryFileLogModel>(core.cpParent);
                             if (log != null) {
                                 log.name = DateTime.Now.ToString() + " user [#" + core.session.user.name + ", " + core.session.user.name + "]";
                                 log.fileID = file.id;
                                 log.visitID = core.session.visit.id;
                                 log.memberID = core.session.user.id;
                                 log.FromUrl = core.webServer.requestPageReferer;
-                                log.save(core);
+                                log.save(core.cpParent);
                             }
                             //
                             // -- and go

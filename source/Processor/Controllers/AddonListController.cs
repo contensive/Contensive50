@@ -141,7 +141,7 @@ namespace Contensive.Processor.Controllers {
                 foreach (var addon in addonList) {
                     addon.renderedHtml = string.Empty;
                     addon.renderedAssets = new AddonAssetsModel();
-                    var addonRecord = Contensive.Processor.Models.Db.AddonModel.create(((CPClass)cp).core, addon.designBlockTypeGuid);
+                    var addonRecord = Contensive.DbBaseModel.create<AddonModel>(((CPClass)cp).core, addon.designBlockTypeGuid);
                     if (addonRecord != null) {
                         addon.designBlockTypeName = addonRecord.name;
                     }

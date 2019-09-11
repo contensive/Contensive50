@@ -3,7 +3,7 @@ using System;
 using System.Reflection;
 using System.Xml;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
@@ -14,6 +14,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -52,7 +53,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="context"></param>
         /// <returns></returns>
         /// 
-        public string executeDependency(Models.Db.AddonModel addon, CPUtilsBaseClass.addonExecuteContext context) {
+        public string executeDependency(AddonModel addon, CPUtilsBaseClass.addonExecuteContext context) {
             bool saveContextIsIncludeAddon = context.isIncludeAddon;
             context.isIncludeAddon = true;
             string result = execute(addon, context);
@@ -68,7 +69,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="executeContext"></param>
         /// <returns></returns>
         public string execute(string addonGuid, CPUtilsBaseClass.addonExecuteContext executeContext) {
-            var addon = AddonModel.create(core, addonGuid);
+            var addon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuid);
             if (addon == null) {
                 //
                 // -- addon not found
@@ -86,7 +87,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="addon"></param>
         /// <param name="executeContext"></param>
         /// <returns></returns>
-        public string execute(Models.Db.AddonModel addon, CPUtilsBaseClass.addonExecuteContext executeContext) {
+        public string execute(AddonModel addon, CPUtilsBaseClass.addonExecuteContext executeContext) {
             string result = "";
             string hint = "00";
             //
@@ -157,7 +158,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             //List<int> addonIncludeRuleList = core.doc.getAddonIncludeRuleList(addon.id);
                             //foreach ( int includedAddonID in addonIncludeRuleList) {
-                            //    AddonModel dependentAddon = AddonModel.create(core, includedAddonID);
+                            //    AddonModel dependentAddon = DbBaseModel.create<AddonModel>(core.cpInternal, includedAddonID);
                             //    if (dependentAddon == null) {
                             //        LogController.handleError(core, new GenericException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
                             //    } else {
@@ -165,12 +166,12 @@ namespace Contensive.Processor.Controllers {
                             //        result += executeDependency(dependentAddon, executeContext);
                             //    }
                             //}
-                            //List<Models.Db.AddonIncludeRuleModel> addonIncludeRules = AddonIncludeRuleModel.createList(core, "(addonid=" + addon.id + ")");
+                            //List<AddonIncludeRuleModel> addonIncludeRules = AddonIncludeRuleModel.createList(core, "(addonid=" + addon.id + ")");
                             //if (addonIncludeRules.Count > 0) {
                             //    string addonContextMessage = executeContext.errorContextMessage;
-                            //    foreach (Models.Db.AddonIncludeRuleModel addonRule in addonIncludeRules) {
+                            //    foreach (AddonIncludeRuleModel addonRule in addonIncludeRules) {
                             //        if (addonRule.includedAddonID > 0) {
-                            //            AddonModel dependentAddon = AddonModel.create(core, addonRule.includedAddonID);
+                            //            AddonModel dependentAddon = DbBaseModel.create<AddonModel>(core.cpInternal, addonRule.includedAddonID);
                             //            if (dependentAddon == null) {
                             //                LogController.handleError(core, new GenericException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
                             //            } else {
@@ -592,7 +593,7 @@ namespace Contensive.Processor.Controllers {
                                 // -- DotNet
                                 hint = "15";
                                 if (addon.dotNetClass != "") {
-                                    result += execute_dotNetClass(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core, addon.collectionID));
+                                    result += execute_dotNetClass(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, addon.collectionID));
                                 }
 
                             }
@@ -644,7 +645,7 @@ namespace Contensive.Processor.Controllers {
                                         //if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                                         //    string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
                                         //    string AddonEditIcon = getIconSprite("", 0, "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
-                                        //    AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + Models.Domain.ContentMetadataModel.getContentId(core, Models.Db.AddonModel.contentName) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
+                                        //    AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + Models.Domain.ContentMetadataModel.getContentId(core, AddonModel.contentName) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
                                         //    string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
                                         //    string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
                                         //    string SiteStylesEditIcon = ""; // ?????
@@ -1004,7 +1005,7 @@ namespace Contensive.Processor.Controllers {
                                                                     { "FieldName", FieldName },
                                                                     { "FieldValue", core.siteProperties.getText(FieldName, FieldDefaultValue) }
                                                                 };
-                                                                AddonModel addon = AddonModel.createByUniqueName(core, FieldAddon);
+                                                                AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, FieldAddon);
                                                                 Copy = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
                                                                     addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
                                                                     argumentKeyValuePairs = arguments,
@@ -1365,7 +1366,7 @@ namespace Contensive.Processor.Controllers {
                     throw;
                 }
                 try {
-                    engine.AddHostObject("cp", core.cp_forAddonExecutionOnly);
+                    engine.AddHostObject("cp", core.cpParent);
                 } catch (Exception) {
                     throw;
                 }
@@ -1442,7 +1443,7 @@ namespace Contensive.Processor.Controllers {
                     throw;
                 }
                 try {
-                    engine.AddHostObject("cp", core.cp_forAddonExecutionOnly);
+                    engine.AddHostObject("cp", core.cpParent);
                 } catch (Exception) {
                     throw;
                 }
@@ -1476,7 +1477,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="addon"></param>
         /// <param name="addonCollection"></param>
         /// <returns></returns>
-        private string execute_dotNetClass(CPUtilsBaseClass.addonExecuteContext executeContext, Models.Db.AddonModel addon, AddonCollectionModel addonCollection) {
+        private string execute_dotNetClass(CPUtilsBaseClass.addonExecuteContext executeContext, AddonModel addon, AddonCollectionModel addonCollection) {
             string result = "";
             try {
                 LogController.logTrace(core, "execute_assembly dotNetClass [" + addon.dotNetClass + "], enter");
@@ -1635,7 +1636,7 @@ namespace Contensive.Processor.Controllers {
                 try {
                     //
                     // -- Call Execute
-                    object AddonObjResult = AddonObj.Execute(core.cp_forAddonExecutionOnly);
+                    object AddonObjResult = AddonObj.Execute(core.cpParent);
                     if (AddonObjResult == null) return string.Empty;
                     if (AddonObjResult.GetType().ToString() == "System.String") { return (string)AddonObjResult; }
                     return SerializeObject(AddonObjResult);
@@ -1708,7 +1709,7 @@ namespace Contensive.Processor.Controllers {
         //
         public void executeAsync(string guid, string OptionString = "") {
             if (string.IsNullOrEmpty(guid)) { throw new ArgumentException("executeAsync called with invalid guid [" + guid + "]"); }
-            var addon = Models.Db.AddonModel.create(core, guid);
+            var addon = DbBaseModel.create<AddonModel>(core.cpParent, guid);
             if (addon == null) { throw new ArgumentException("ExecuteAsync cannot find Addon for guid [" + guid + "]"); }
             executeAsync(addon, convertQSNVAArgumentstoDocPropertiesList(core, OptionString));
         }
@@ -1717,7 +1718,7 @@ namespace Contensive.Processor.Controllers {
         //
         public void executeAsyncByName(string name, string OptionString = "") {
             if (string.IsNullOrEmpty(name)) { throw new ArgumentException("executeAsyncByName called with invalid name [" + name + "]"); }
-            var addon = Models.Db.AddonModel.createByUniqueName(core, name);
+            var addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, name);
             if (addon == null) { throw new ArgumentException("executeAsyncByName cannot find Addon for name [" + name + "]"); }
             executeAsync(addon, convertQSNVAArgumentstoDocPropertiesList(core, OptionString));
         }
@@ -2057,7 +2058,7 @@ namespace Contensive.Processor.Controllers {
             string addonDescription = "[invalid addon]";
             if (addon != null) {
                 string collectionName = "invalid collection or collection not set";
-                AddonCollectionModel collection = AddonCollectionModel.create(core, addon.collectionID);
+                AddonCollectionModel collection = AddonCollectionModel.create(core.cpParent, addon.collectionID);
                 if (collection != null) {
                     collectionName = collection.name;
                 }
@@ -2076,7 +2077,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 bool AddonStatusOK = true;
                 try {
-                    AddonModel addon = AddonModel.create(core, addonGuidAddonManager);
+                    AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidAddonManager);
                     if (addon != null) {
                         result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
                             addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
@@ -2147,7 +2148,7 @@ namespace Contensive.Processor.Controllers {
                         while (cs.ok()) {
                             int addonid = cs.getInteger("addonid");
                             if (addonid != 0) {
-                                var addon = AddonModel.create(core, addonid);
+                                var addon = DbBaseModel.create<AddonModel>(core.cpParent, addonid);
                                 returnString += core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                                     addonType = CPUtilsBaseClass.addonContext.ContextSimple,
                                     errorContextMessage = "calling handler addon id [" + addonid + "] for event [" + eventNameIdOrGuid + "]"

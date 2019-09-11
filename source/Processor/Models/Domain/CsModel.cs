@@ -9,6 +9,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
 using static Contensive.Processor.Constants;
 using static Contensive.Processor.Controllers.GenericController;
+using Contensive.Models;
 //
 namespace Contensive.Processor {
     //
@@ -286,7 +287,7 @@ namespace Contensive.Processor {
                 if (meta.id <= 0) { throw new GenericException("Cannot insert new record because Content meta data is not valid."); }
                 //
                 // create default record in Live table
-                SqlFieldListClass sqlList = new SqlFieldListClass();
+                var sqlList = new SqlFieldListClass();
                 foreach (KeyValuePair<string, Models.Domain.ContentFieldMetadataModel> keyValuePair in meta.fields) {
                     ContentFieldMetadataModel field = keyValuePair.Value;
                     if ((!string.IsNullOrEmpty(field.nameLc)) && (!string.IsNullOrEmpty(field.defaultValue))) {

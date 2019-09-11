@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
@@ -9,6 +9,8 @@ using Contensive.Processor.Models.Domain;
 using System.Text;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor;
+using Contensive.Models;
+using Contensive.Models.Db;
 
 namespace Contensive.Addons.AdminSite.Controllers {
     //
@@ -960,7 +962,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     if ((headerInfo.recordLockExpiresDate == null) || (headerInfo.recordLockExpiresDate < DateTime.Now)) {
                         //
                         // Add Edit Locking to right panel
-                        PersonModel personLock = PersonModel.create(core, headerInfo.recordLockById);
+                        PersonModel personLock = DbBaseModel.create<PersonModel>(core.cpParent, headerInfo.recordLockById);
                         if (personLock != null) {
                             result += "<br><b>Record is locked by " + personLock.name + " until " + headerInfo.recordLockExpiresDate + "</b>";
                         }
@@ -1197,10 +1199,10 @@ namespace Contensive.Addons.AdminSite.Controllers {
         public static string getDefaultEditor_memberSelect(CoreController core, string htmlName, int selectedRecordId, int groupId, string groupName, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
             string EditorString = "";
             if ((groupId > 0) & (string.IsNullOrWhiteSpace(groupName))) {
-                var group = GroupModel.create(core, groupId);
+                var group = GroupModel.create(core.cpParent, groupId);
                 if (group != null) {
                     groupName = "Group " + group.id.ToString();
-                    group.save(core);
+                    group.save(core.cpParent);
                 }
             }
             if (readOnly) {
@@ -1210,7 +1212,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 if (selectedRecordId == 0) {
                     EditorString += "None";
                 } else {
-                    var selectedUser = PersonModel.create(core, selectedRecordId);
+                    var selectedUser = DbBaseModel.create<PersonModel>(core.cpParent, selectedRecordId);
                     if (selectedUser == null) {
                         EditorString += getDefaultEditor_text(core, htmlName + "-readonly-fpo", "(deleted)", readOnly, htmlId);
                     } else {
@@ -1224,7 +1226,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 // -- editable
                 EditorString += core.html.selectUserFromGroup(htmlName, selectedRecordId, groupId, "", (fieldRequired) ? "" : "None", htmlId, "select form-control");
                 if (selectedRecordId != 0) {
-                    var selectedUser = PersonModel.create(core, selectedRecordId);
+                    var selectedUser = DbBaseModel.create<PersonModel>(core.cpParent, selectedRecordId);
                     if (selectedUser == null) {
                         EditorString += "Deleted";
                     } else {
@@ -1695,7 +1697,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 //
                 // -- convert older QS format to command delimited format
                 presetNameValueList = presetNameValueList.Replace("&", ",");
-                var content = ContentModel.createByUniqueName(core, contentName);
+                var content = DbBaseModel.createByUniqueName<ContentModel>(core.cpParent, contentName);
                 result.AddRange(getRecordAddLink_GetChildContentLinks(core, content, presetNameValueList, new List<int>()));
                 //
                 // -- Add in the paste entry, if needed
@@ -1708,7 +1710,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 if (ClipBoardArray.GetUpperBound(0) == 0) { return result; }
                 int ClipboardContentID = GenericController.encodeInteger(ClipBoardArray[0]);
                 int ClipChildRecordID = GenericController.encodeInteger(ClipBoardArray[1]);
-                if (content.isParentOf<ContentModel>(core, ClipboardContentID)) {
+                if (content.isParentOf<ContentModel>(core.cpParent, ClipboardContentID)) {
                     int ParentID = 0;
                     if (GenericController.vbInstr(1, presetNameValueList, "PARENTID=", 1) != 0) {
                         //
@@ -1720,7 +1722,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         BufferString = BufferString.Replace(",", "&");
                         ParentID = encodeInteger(GenericController.main_GetNameValue_Internal(core, BufferString, "Parentid"));
                     }
-                    if ((ParentID != 0) && (!DbBaseModel.isChildOf<PageContentModel>(core, ParentID, 0, new List<int>()))) {
+                    if ((ParentID != 0) && (!DbBaseModel.isChildOf<PageContentModel>(core.cpParent, ParentID, 0, new List<int>()))) {
                         //
                         // Can not paste as child of itself
                         string PasteLink = core.webServer.requestPage + "?" + core.doc.refreshQueryString;
@@ -1842,7 +1844,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         //core.menuFlyout.menu_AddEntry(MenuName + ":" + content.name, ParentMenuName, "", "", Link, ButtonCaption, "", "", true);
                         //
                         // Create child submenu if Child Entries found
-                        var childList = Processor.Models.Db.ContentModel.createList(core, "ParentID=" + content.id);
+                        var childList = ContentModel.createList(core, "ParentID=" + content.id);
                         if (childList.Count > 0) {
                             //
                             // Add the child menu

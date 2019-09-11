@@ -9,13 +9,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.SafeAddonManager {
     public class AddonManagerClass {
@@ -184,7 +185,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //
                                         // Delete any addons from this collection
                                         //
-                                        MetadataController.deleteContentRecords(core, Processor.Models.Db.AddonModel.contentName, "collectionid=" + TargetCollectionID);
+                                        MetadataController.deleteContentRecords(core, AddonModel.contentName, "collectionid=" + TargetCollectionID);
 
                                         //                            '
                                         //                            ' Load all collections into local collection storage
@@ -297,7 +298,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //                                '
                                         //                                ' delete all addons associated to this collection
                                         //                                '
-                                        //                                Call core.app.DeleteContentRecords(Models.Db.AddonModel.contentName, "collectionid=" & TargetCollectionID)
+                                        //                                Call core.app.DeleteContentRecords(AddonModel.contentName, "collectionid=" & TargetCollectionID)
                                         //                            Else
                                         //                                ' deprecated the addoncollectionrules for collectionid in addon
                                         //                                If (TargetCollectionPtr >= 0) And (CollectionCnt <> 0) Then
@@ -335,7 +336,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //                                            Else
                                         //                                                Criteria = "(name=" & encodeSQLText(TargetAddonName) & ")"
                                         //                                            End If
-                                        //                                            Call core.app.DeleteContentRecords(Models.Db.AddonModel.contentName, Criteria)
+                                        //                                            Call core.app.DeleteContentRecords(AddonModel.contentName, Criteria)
                                         //                                        End If
                                         //                                    Next
                                         //                                End If
@@ -362,7 +363,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //                                        '
                                         //                                        ' OK to delete the target addon
                                         //                                        '
-                                        //                                        Call core.app.DeleteContentRecords(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" & encodeSQLText(TargetName) & ")")
+                                        //                                        Call core.app.DeleteContentRecords(NavigatorEntryModel.contentName, "(name=" & encodeSQLText(TargetName) & ")")
                                         //                                    End If
                                         //                                Next
                                         //                                '
@@ -396,7 +397,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //                                        '
                                         //                                        ' OK to delete the target addon
                                         //                                        '
-                                        //                                        ParentID = GetParentIDFromNameSpace(Processor.Models.Db.NavigatorEntryModel.contentName, TargetNameSpace)
+                                        //                                        ParentID = GetParentIDFromNameSpace(NavigatorEntryModel.contentName, TargetNameSpace)
                                         //                                        ReDim Preserve Deletes(DeleteCnt)
                                         //                                        Deletes(DeleteCnt).name = TargetName
                                         //                                        Deletes(DeleteCnt).ParentID = ParentID
@@ -418,7 +419,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         if (TargetCollectionID > 0) {
                                             AddonNavigatorID = 0;
                                             using (var csData = new CsModel(core)) {
-                                                csData.open(Processor.Models.Db.NavigatorEntryModel.contentName, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
+                                                csData.open(NavigatorEntryModel.contentName, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
                                                 if (csData.ok()) {
                                                     AddonNavigatorID = csData.getInteger("ID");
                                                 }
@@ -433,7 +434,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                             //
                                             // Delete Navigator Entries set as installed by the collection (this may be all that is needed)
                                             //
-                                            MetadataController.deleteContentRecords(core, Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + TargetCollectionID);
+                                            MetadataController.deleteContentRecords(core, NavigatorEntryModel.contentName, "installedbycollectionid=" + TargetCollectionID);
                                         }
                                     }
                                 }
@@ -447,7 +448,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             if (Cnt > 0) {
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                     if (core.docProperties.getBoolean("ao" + Ptr)) {
-                                        MetadataController.deleteContentRecord(core, Processor.Models.Db.AddonModel.contentName, core.docProperties.getInteger("aoID" + Ptr));
+                                        MetadataController.deleteContentRecord(core, AddonModel.contentName, core.docProperties.getInteger("aoID" + Ptr));
                                     }
                                 }
                             }
@@ -887,9 +888,9 @@ namespace Contensive.Addons.SafeAddonManager {
                 int EntryID = 0;
                 using (var csData = new CsModel(core)) {
                     if (EntryParentID == 0) {
-                        csData.open(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and((parentID is null)or(parentid=0))");
+                        csData.open(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and((parentID is null)or(parentid=0))");
                     } else {
-                        csData.open(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and(parentID=" + DbController.encodeSQLNumber(EntryParentID) + ")");
+                        csData.open(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and(parentID=" + DbController.encodeSQLNumber(EntryParentID) + ")");
                     }
                     if (csData.ok()) {
                         EntryID = csData.getInteger("ID");
@@ -899,7 +900,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 //
                 if (EntryID != 0) {
                     using (var csData = new CsModel(core)) {
-                        csData.open(Processor.Models.Db.NavigatorEntryModel.contentName, "(parentID=" + DbController.encodeSQLNumber(EntryID) + ")");
+                        csData.open(NavigatorEntryModel.contentName, "(parentID=" + DbController.encodeSQLNumber(EntryID) + ")");
                         while (csData.ok()) {
                             GetForm_SafeModeAddonManager_DeleteNavigatorBranch(csData.getText("name"), EntryID);
                             csData.goNext();

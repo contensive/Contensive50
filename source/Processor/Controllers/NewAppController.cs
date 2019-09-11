@@ -2,7 +2,7 @@
 using System;
 using System.Xml;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Data;
@@ -10,6 +10,8 @@ using System.Linq;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
+using Contensive.Models;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -71,10 +73,10 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- verify root developer
                     LogController.logInfo(core, logPrefix + ", verify developer user");
-                    var root = PersonModel.create(core, defaultRootUserGuid);
+                    var root = DbBaseModel.create<PersonModel>(core.cpParent, defaultRootUserGuid);
                     if (root == null) {
                         LogController.logInfo(core, logPrefix + ", root user guid not found, test for root username");
-                        var rootList = PersonModel.createList(core, "(username='root')");
+                        var rootList = DbBaseModel.createList<PersonModel>(core.cpParent, "(username='root')");
                         if (rootList.Count > 0) {
                             LogController.logInfo(core, logPrefix + ", root username found");
                             root = rootList.First();
@@ -82,7 +84,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     if (root == null) {
                         LogController.logInfo(core, logPrefix + ", root user not found, adding root/contensive");
-                        root = PersonModel.addEmpty(core);
+                        root = DbBaseModel.addEmpty<PersonModel>(core.cpParent);
                         root.name = defaultRootUserName;
                         root.firstName = defaultRootUserName;
                         root.username = defaultRootUserUsername;
@@ -90,7 +92,7 @@ namespace Contensive.Processor.Controllers {
                         root.developer = true;
                         root.contentControlID = ContentMetadataModel.getContentId(core, "people");
                         try {
-                            root.save(core);
+                            root.save(core.cpParent);
                         } catch (Exception) {
                             LogController.logInfo(core, logPrefix + ", error prevented root user update");
                         }
@@ -98,16 +100,16 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- verify site managers group
                     LogController.logInfo(core, logPrefix + ", verify site managers groups");
-                    var group = GroupModel.create(core, defaultSiteManagerGuid);
+                    var group = DbBaseModel.create<GroupModel>(core.cpParent, defaultSiteManagerGuid);
                     if (group == null) {
                         LogController.logInfo(core, logPrefix + ", verify site manager group");
-                        group = GroupModel.addEmpty(core);
+                        group = DbBaseModel.addEmpty<GroupModel>(core.cpParent);
                         group.name = defaultSiteManagerName;
                         group.caption = defaultSiteManagerName;
                         group.allowBulkEmail = true;
                         group.ccguid = defaultSiteManagerGuid;
                         try {
-                            group.save(core);
+                            group.save(core.cpParent);
                         } catch (Exception) {
                             LogController.logInfo(core, logPrefix + ", error creating site managers group");
                         }
@@ -115,12 +117,12 @@ namespace Contensive.Processor.Controllers {
                     if ((root != null) && (group != null)) {
                         //
                         // -- verify root is in site managers
-                        var memberRuleList = MemberRuleModel.createList(core, "(groupid=" + group.id.ToString() + ")and(MemberID=" + root.id.ToString() + ")");
+                        var memberRuleList = DbBaseModel.createList<MemberRuleModel>(core.cpParent, "(groupid=" + group.id.ToString() + ")and(MemberID=" + root.id.ToString() + ")");
                         if (memberRuleList.Count() == 0) {
-                            var memberRule = MemberRuleModel.addEmpty(core);
+                            var memberRule = DbBaseModel.addEmpty<MemberRuleModel>(core.cpParent);
                             memberRule.groupId = group.id;
                             memberRule.MemberID = root.id;
-                            memberRule.save(core);
+                            memberRule.save(core.cpParent);
                         }
                     }
                     if (isNewBuild) {
@@ -195,9 +197,9 @@ namespace Contensive.Processor.Controllers {
                     core.siteProperties.getText("TextSearchStartTag", "<!-- TextSearchStart -->");
                     core.siteProperties.getText("TrapEmail", "");
                     core.siteProperties.getText("TrapErrors", "0");
-                    AddonModel defaultRouteAddon = AddonModel.create(core, core.siteProperties.defaultRouteId);
+                    AddonModel defaultRouteAddon = DbBaseModel.create<AddonModel>(core.cpParent, core.siteProperties.defaultRouteId);
                     if (defaultRouteAddon == null) {
-                        defaultRouteAddon = AddonModel.create(core, addonGuidPageManager);
+                        defaultRouteAddon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidPageManager);
                         if (defaultRouteAddon != null) {
                             core.siteProperties.defaultRouteId = defaultRouteAddon.id;
                         }
@@ -323,12 +325,9 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // verify Db field schema for fields handled internally (fix datatime2(0) problem -- need at least 3 digits for precision)
-                var tableList = Models.Db.TableModel.createList(core, "", "dataSourceId");
-                //var dataSource = DataSourceModel.addEmpty(core);
+                var tableList = DbBaseModel.createList<TableModel>(core.cpParent, "", "dataSourceId");
                 foreach (TableModel table in tableList) {
                     hint = "1";
-                    //if (table.dataSourceID != dataSource.id) { dataSource = DataSourceModel.create(core, table.dataSourceID); }
-                    //if ((dataSource == null)) { dataSource = DataSourceModel.addEmpty(core); }
                     var tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, table.name, "default");
                     hint = "2";
                     if (tableSchema != null) {
@@ -519,13 +518,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="CountryID"></param>
         private static void verifyState(CoreController core, string Name, string Abbreviation, double SaleTax, int CountryID) {
             try {
-                var state = Models.Db.StateModel.createByUniqueName(core, Name);
-                if (state == null) state = StateModel.addEmpty(core);
+                var state = DbBaseModel.createByUniqueName<StateModel>(core.cpParent, Name);
+                if (state == null) state = DbBaseModel.addEmpty<StateModel>(core.cpParent);
                 state.abbreviation = Abbreviation;
                 state.name = Name;
                 state.salesTax = SaleTax;
                 state.countryID = CountryID;
-                state.save(core, true);
+                state.save(core.cpParent, true);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -819,15 +818,15 @@ namespace Contensive.Processor.Controllers {
                     if (!string.IsNullOrWhiteSpace(menu.AddonGuid)) {
                         returnEntry = 0;
                     }
-                    AddonModel addon = ((!string.IsNullOrWhiteSpace(menu.AddonGuid)) ? AddonModel.create(core, menu.AddonGuid) : null);
-                    addon = addon ?? ((!string.IsNullOrWhiteSpace(menu.AddonName)) ? AddonModel.createByUniqueName(core, menu.AddonName) : null);
+                    AddonModel addon = ((!string.IsNullOrWhiteSpace(menu.AddonGuid)) ? DbBaseModel.create<AddonModel>(core.cpParent, menu.AddonGuid) : null);
+                    addon = addon ?? ((!string.IsNullOrWhiteSpace(menu.AddonName)) ? DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, menu.AddonName) : null);
                     int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menu.menuNameSpace);
                     int contentId = ContentMetadataModel.getContentId(core, menu.ContentName);
                     string listCriteria = "(name=" + DbController.encodeSQLText(menu.name) + ")and(Parentid=" + parentId + ")";
-                    List<Models.Db.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(core, listCriteria, "id");
+                    List<NavigatorEntryModel> entryList = DbBaseModel.createList<NavigatorEntryModel>(core.cpParent, listCriteria, "id");
                     NavigatorEntryModel entry = null;
                     if (entryList.Count == 0) {
-                        entry = NavigatorEntryModel.addEmpty(core);
+                        entry = DbBaseModel.addEmpty<NavigatorEntryModel>(core.cpParent);
                         entry.name = menu.name.Trim();
                         entry.ParentID = parentId;
                     } else {
@@ -849,7 +848,7 @@ namespace Contensive.Processor.Controllers {
                     entry.NavIconTitle = menu.NavIconTitle;
                     entry.NavIconType = GetListIndex(menu.NavIconType, NavIconTypeList);
                     entry.InstalledByCollectionID = InstalledByCollectionID;
-                    entry.save(core);
+                    entry.save(core.cpParent);
                     returnEntry = entry.id;
                 }
             } catch (Exception ex) {
@@ -926,7 +925,7 @@ namespace Contensive.Processor.Controllers {
                     // update sort method
                     int recordId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                     core.db.updateTableRecord("ccSortMethods", "ID=" + recordId.ToString(), sqlList, true);
-                    SortMethodModel.invalidateRecordCache(core, recordId);
+                    SortMethodModel.invalidateCacheOfRecord<SortMethodModel>(core.cpParent, recordId);
                 } else {
                     //
                     // Create the new sort method
@@ -1055,48 +1054,47 @@ namespace Contensive.Processor.Controllers {
             //if (core.appConfig.domainList.Count > 0) {
             //    primaryDomain = core.appConfig.domainList[0];
             //}
-            var domain = DomainModel.createByUniqueName(core, primaryDomain);
-            if (DomainModel.createByUniqueName(core, primaryDomain) == null) {
-                var domainMetadata = ContentMetadataModel.createByUniqueName(core, "domains");
-                domain = DomainModel.addDefault(core, domainMetadata);
+            var domain = DbBaseModel.createByUniqueName<DomainModel>(core.cpParent, primaryDomain);
+            if (DbBaseModel.createByUniqueName<DomainModel>(core.cpParent, primaryDomain) == null) {
+                domain = DomainModel.addDefault<DomainModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, "domains"));
                 domain.name = primaryDomain;
             }
             //
             // -- Landing Page
-            PageContentModel landingPage = PageContentModel.create(core, DefaultLandingPageGuid);
+            PageContentModel landingPage = DbBaseModel.create<PageContentModel>(core.cpParent, DefaultLandingPageGuid);
             if (landingPage == null) {
-                landingPage = PageContentModel.addDefault(core, ContentMetadataModel.createByUniqueName( core, "page content"));
+                landingPage = PageContentModel.addDefault<PageContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict( core, "page content"));
                 landingPage.name = "Home";
                 landingPage.ccguid = DefaultLandingPageGuid;
             }
             //
             // -- default template
-            PageTemplateModel defaultTemplate = PageTemplateModel.create(core, guidBootstrapStarterTemplate);
+            PageTemplateModel defaultTemplate = DbBaseModel.create<PageTemplateModel>(core.cpParent, guidBootstrapStarterTemplate);
             if (defaultTemplate == null) {
                 // -- did not install correctly, build a placeholder
-                defaultTemplate = PageTemplateModel.addDefault(core, ContentMetadataModel.createByUniqueName(core, "page templates"));
+                defaultTemplate = DbBaseModel.addDefault<PageTemplateModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, "page templates"));
                 defaultTemplate.name = "Default";
                 defaultTemplate.ccguid = guidBootstrapStarterTemplate;
             }
             defaultTemplate.bodyHTML = Properties.Resources.DefaultTemplateHtml;
-            defaultTemplate.save(core);
+            defaultTemplate.save(core.cpParent);
             //
             // -- verify menu record
-            var menu = MenuModel.create<MenuModel>(core, "Home Top Nav");
+            var menu = MenuModel.create<MenuModel>(core.cpParent, "Home Top Nav");
             if(menu == null ) {
-                menu = MenuModel.addDefault<MenuModel>(core, ContentMetadataModel.createByUniqueName(core, "Menus"));
+                menu = MenuModel.addDefault<MenuModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, "Menus"));
                 menu.ccguid = "Home Top Nav";
                 menu.name = "Home Top Nav";
-                menu.save(core);
+                menu.save(core.cpParent);
             }
             //
             // -- create menu record
-            var menuPageRule = MenuPageRuleModel.createFirstOfList<MenuPageRuleModel>(core, "(menuid=" + menu.id + ")and(pageid=" + landingPage.id + ")", "id");
+            var menuPageRule = MenuPageRuleModel.createFirstOfList<MenuPageRuleModel>(core.cpParent, "(menuid=" + menu.id + ")and(pageid=" + landingPage.id + ")", "id");
             if (menuPageRule == null) {
-                menuPageRule = MenuPageRuleModel.addDefault<MenuPageRuleModel>(core, ContentMetadataModel.createByUniqueName(core, "Menu Page Rules"));
+                menuPageRule = MenuPageRuleModel.addDefault<MenuPageRuleModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, "Menu Page Rules"));
                 menuPageRule.menuId = menu.id;
                 menuPageRule.pageId = landingPage.id;
-                menuPageRule.save(core);
+                menuPageRule.save(core.cpParent);
             }
             //
             // -- update domain
@@ -1106,11 +1104,11 @@ namespace Contensive.Processor.Controllers {
             domain.rootPageId = landingPage.id;
             domain.typeId = (int)DomainModel.DomainTypeEnum.Normal;
             domain.visited = false;
-            domain.save(core);
+            domain.save(core.cpParent);
             //
             landingPage.TemplateID = defaultTemplate.id;
             landingPage.copyfilename.content = Constants.defaultLandingPageHtml;
-            landingPage.save(core);
+            landingPage.save(core.cpParent);
             //
             if (core.siteProperties.getInteger("LandingPageID", landingPage.id) == 0) {
                 core.siteProperties.setProperty("LandingPageID", landingPage.id);

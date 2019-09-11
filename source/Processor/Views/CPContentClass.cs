@@ -1,13 +1,14 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
 using System.Data;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor {
     public class CPContentClass : CPContentBaseClass, IDisposable {
@@ -260,7 +261,7 @@ namespace Contensive.Processor {
         //
         public override int AddContent(string contentName, string sqlTableName, string dataSourceName) {
             var tmpList = new List<string> { };
-            DataSourceModel dataSource = DataSourceModel.createByUniqueName(cp.core, dataSourceName, ref tmpList);
+            DataSourceModel dataSource = DbBaseModel.createByUniqueName<DataSourceModel>(cp, dataSourceName, ref tmpList);
             return ContentMetadataModel.verifyContent_returnId(cp.core, new Models.Domain.ContentMetadataModel() {
                 dataSourceName = dataSource.name,
                 tableName = sqlTableName,
@@ -277,7 +278,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override int GetID(string ContentName) {
-            var content = ContentModel.createByUniqueName(cp.core, ContentName);
+            var content = DbBaseModel.createByUniqueName<ContentModel>(cp, ContentName);
             if (content != null) return content.id;
             return 0;
 

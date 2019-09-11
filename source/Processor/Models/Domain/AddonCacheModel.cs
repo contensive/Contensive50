@@ -1,6 +1,7 @@
 ﻿
+using Contensive.Models.Db;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Db;
+
 using System;
 using System.Collections.Generic;
 //
@@ -40,7 +41,7 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="core"></param>
         public AddonCacheModel(CoreController core) {
-            foreach (AddonModel addon in AddonModel.createList(core, "")) {
+            foreach (AddonModel addon in DbBaseModel.createList<AddonModel>(core, "")) {
                 add(core, addon);
             }
             foreach (var includeRule in AddonIncludeRuleModel.createList(core, "", "addonId,includedAddonID")) {
@@ -60,13 +61,13 @@ namespace Contensive.Processor.Models.Domain {
                 dictIdAddon.Add(addon.id, addon);
                 if (string.IsNullOrEmpty(addon.ccguid)) {
                     addon.ccguid = GenericController.getGUID();
-                    addon.save(core);
+                    addon.save(core.cpParent);
                 }
                 if (!dictGuidId.ContainsKey(addon.ccguid.ToLowerInvariant())) {
                     dictGuidId.Add(addon.ccguid.ToLowerInvariant(), addon.id);
                     if (string.IsNullOrEmpty(addon.name.Trim())) {
                         addon.name = "addon " + addon.id.ToString();
-                        addon.save(core);
+                        addon.save(core.cpParent);
                     }
                     if (!dictNameId.ContainsKey(addon.name.ToLowerInvariant())) {
                         dictNameId.Add(addon.name.ToLowerInvariant(), addon.id);

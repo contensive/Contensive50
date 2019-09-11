@@ -1,8 +1,9 @@
 ﻿
 using System;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using System.Text;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.Base {
     //
@@ -19,9 +20,9 @@ namespace Contensive.Addons.Base {
                 //
                 // -- remove any legacy status methods
                 var core = ((CPClass)(cp)).core;
-                foreach ( var addon in DbBaseModel.createList<AddonModel>(core, "(name='status')and(ccguid<>'{6444B5C9-36DD-43FF-978C-26650EB2333F}')")) {
+                foreach ( var addon in DbBaseModel.createList<AddonModel>(core.cpParent, "(name='status')and(ccguid<>'{6444B5C9-36DD-43FF-978C-26650EB2333F}')")) {
                     addon.name = addon.name + "-blocked";
-                    addon.save(core);
+                    addon.save(core.cpParent);
                 }
                 return "ok";
             } catch (Exception ex) {

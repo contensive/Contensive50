@@ -21,7 +21,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         public void controllers_Addon_simpleDoNothingAddon() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
-                var addon = Processor.Models.Db.AddonModel.addDefault(cp.core, Processor.Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, Processor.Models.Db.AddonModel.contentName));
+                var addon = AddonModel.addDefault(cp.core, Processor.Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, AddonModel.contentName));
                 addon.save(cp.core);
                 // act
                 string result = cp.core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
@@ -61,7 +61,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         public void controllers_Addon_copy() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
-                var addon = Processor.Models.Db.AddonModel.addDefault(cp.core, Processor.Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, Processor.Models.Db.AddonModel.contentName));
+                var addon = AddonModel.addDefault(cp.core, Processor.Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, AddonModel.contentName));
                 addon.copy = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 addon.save(cp.core);
                 // act

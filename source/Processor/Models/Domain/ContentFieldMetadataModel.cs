@@ -2,8 +2,9 @@
 using System;
 using System.Data;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Db;
+
 using static Contensive.Processor.Constants;
 
 namespace Contensive.Processor.Models.Domain {
@@ -393,7 +394,7 @@ namespace Contensive.Processor.Models.Domain {
         public string get_lookupContentName(CoreController core) {
             if ((_lookupContentName == null) && (lookupContentID>0)) {
                 _lookupContentName = "";
-                var content = ContentModel.create(core, lookupContentID);
+                var content = ContentModel.create(core.cpParent, lookupContentID);
                 if (content != null) { _lookupContentName = content.name; }
             }
             return _lookupContentName;
@@ -443,7 +444,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (string.IsNullOrEmpty(_memberSelectGroupName)) {
                     _memberSelectGroupId = 0;
                 } else {
-                    var group = GroupModel.createByUniqueName(core, _memberSelectGroupName);
+                    var group = DbBaseModel.createByUniqueName<GroupModel>(core, _memberSelectGroupName);
                     _memberSelectGroupId = (group == null) ? 0 : group.id;
                 };
             }

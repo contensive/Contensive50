@@ -5,10 +5,11 @@ using System.Linq;
 using System.Data;
 using Contensive.BaseClasses;
 using Contensive.Processor.Exceptions;
-using Contensive.Processor.Models.Db;
+
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using static Newtonsoft.Json.JsonConvert;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -772,7 +773,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     addonArgDict.Add("cmdAccumulator", CmdAccumulator);
-                                    AddonModel addon = AddonModel.createByUniqueName(core, addonName);
+                                    AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core, addonName);
                                     var executeContext = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                         addonType = Context,
                                         cssContainerClass = "",
@@ -826,7 +827,7 @@ namespace Contensive.Processor.Controllers {
                                         argumentKeyValuePairs = addonArgDict,
                                         errorContextMessage = "calling Addon [" + addonName + "] during content cmd execution"
                                     };
-                                    AddonModel addon = AddonModel.createByUniqueName(core, addonName);
+                                    AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core, addonName);
                                     CmdAccumulator = core.addon.execute(addon, executeContext);
 
 

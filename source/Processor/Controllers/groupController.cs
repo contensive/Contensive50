@@ -5,6 +5,8 @@ using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using System.Linq;
 using static Contensive.Processor.Controllers.GenericController;
+using Contensive.Models.Db;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -20,7 +22,10 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="groupName"></param>
         /// <returns></returns>
-        public static int add(CoreController core, string groupName, string groupCaption ) => Models.Db.GroupModel.verify(core, groupName, groupCaption).id;
+        public static int add(CoreController core, string groupName, string groupCaption) {
+            var defaultValues = ContentMetadataModel.getDefaultValueDict(core, GroupModel.contentName);
+            return GroupModel.verify(core.cpParent, groupName, groupCaption, defaultValues).id;
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -39,28 +44,27 @@ namespace Contensive.Processor.Controllers {
         /// <param name="group"></param>
         /// <param name="user"></param>
         /// <param name="dateExpires"></param>
-        public static void addUser(CoreController core, Models.Db.GroupModel group, Models.Db.PersonModel user, DateTime dateExpires) {
+        public static void addUser(CoreController core, GroupModel group, PersonModel user, DateTime dateExpires) {
             try {
-                var ruleList = Models.Db.MemberRuleModel.createList(core, "(MemberID=" + user.id.ToString() + ")and(GroupID=" + group.id.ToString() + ")");
+                var ruleList = DbBaseModel.createList<MemberRuleModel>(core.cpParent, "(MemberID=" + user.id.ToString() + ")and(GroupID=" + group.id.ToString() + ")");
                 if ( ruleList.Count==0) {
                     // -- add new rule
-                    var groupsCdef = Models.Domain.ContentMetadataModel.createByUniqueName(core, "groups");
-                    var rule = Models.Db.MemberRuleModel.addDefault(core, groupsCdef ) ;
+                    var rule = DbBaseModel.addDefault<MemberRuleModel>(core.cpParent, Models.Domain.ContentMetadataModel.getDefaultValueDict(core, "groups")) ;
                     rule.groupId = group.id;
                     rule.MemberID = user.id;
                     rule.dateExpires = dateExpires;
-                    rule.save(core);
+                    rule.save(core.cpParent);
                     return;
                 }
                 // at least one rule found, set expire date, delete the rest
                 var ruleFirst = ruleList.First();
                 if (ruleFirst.dateExpires != dateExpires) {
                     ruleFirst.dateExpires = dateExpires;
-                    ruleFirst.save(core);
+                    ruleFirst.save(core.cpParent);
                 }
                 if (ruleList.Count > 1) {
                     foreach (var rule in ruleList) {
-                        if (!rule.Equals(ruleFirst)) Models.Db.MemberRuleModel.delete(core, rule.id);
+                        if (!rule.Equals(ruleFirst)) DbBaseModel.delete<MemberRuleModel>(core.cpParent, rule.id);
                     }
                 }
             } catch (Exception ex) {
@@ -75,7 +79,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="group"></param>
         /// <param name="user"></param>
-        public static void addUser(CoreController core, Models.Db.GroupModel group, Models.Db.PersonModel user) => addUser(core, group, user, DateTime.MinValue);
+        public static void addUser(CoreController core, GroupModel group, PersonModel user) => addUser(core, group, user, DateTime.MinValue);
         //
         //====================================================================================================
         /// <summary>
@@ -86,22 +90,22 @@ namespace Contensive.Processor.Controllers {
         /// <param name="userId"></param>
         /// <param name="dateExpires"></param>
         public static void addUser(CoreController core, int groupId, int userId, DateTime dateExpires) {
-            var group = Models.Db.GroupModel.create(core, groupId);
+            var group = DbBaseModel.create<GroupModel>(core.cpParent, groupId);
             if (group == null) {
                 //
                 // -- invalid groupId
                 LogController.logError(core, new GenericException("addUser called with invalid groupId [" + groupId + "]"));
                 return;
             }
-            Models.Db.PersonModel user = null;
+            PersonModel user = null;
             if (userId.Equals(0)) {
                 //
                 // -- default to keyboard user
-                user = Models.Db.PersonModel.create(core, core.session.user.id);
+                user = DbBaseModel.create<PersonModel>(core.cpParent, core.session.user.id);
                 addUser(core, group, user, dateExpires);
                 return;
             }
-            user = Models.Db.PersonModel.create(core, userId);
+            user = DbBaseModel.create<PersonModel>(core.cpParent, userId);
             if (user == null) {
                 //
                 // -- invalid userId
@@ -120,32 +124,31 @@ namespace Contensive.Processor.Controllers {
         /// <param name="userid"></param>
         /// <param name="dateExpires"></param>
         public static void addUser(CoreController core, string groupNameIdOrGuid, int userid, DateTime dateExpires) {
-            Models.Db.GroupModel group = null;
+            GroupModel group = null;
             if ( groupNameIdOrGuid.IsNumeric()) {
-                group = Models.Db.GroupModel.create(core, GenericController.encodeInteger(groupNameIdOrGuid));
+                group = DbBaseModel.create<GroupModel>(core.cpParent, GenericController.encodeInteger(groupNameIdOrGuid));
                 if (group == null) {
                     LogController.logError(core, new GenericException("addUser called with invalid groupId [" + groupNameIdOrGuid + "]"));
                     return;
                 }
             } else if ( GenericController.isGuid( groupNameIdOrGuid )) {
-                group = Models.Db.GroupModel.create(core, groupNameIdOrGuid);
+                group = DbBaseModel.create<GroupModel>(core.cpParent, groupNameIdOrGuid);
                 if (group == null) {
-                    var groupCdef = Models.Domain.ContentMetadataModel.createByUniqueName(core, "groups");
-                    group = Models.Db.GroupModel.addDefault(core, groupCdef);
+                    var defaultValues = ContentMetadataModel.getDefaultValueDict(core, "groups");
+                    group = DbBaseModel.addDefault<GroupModel>(core.cpParent, defaultValues);
                     group.ccguid = groupNameIdOrGuid;
                     group.name = groupNameIdOrGuid;
                     group.caption = groupNameIdOrGuid;
-                    group.save(core);
+                    group.save(core.cpParent);
                 }
             } else {
-                group = Models.Db.GroupModel.createByUniqueName(core, groupNameIdOrGuid);
+                group = DbBaseModel.createByUniqueName<GroupModel>(core.cpParent, groupNameIdOrGuid);
                 if (group == null) {
-                    var groupCdef = Models.Domain.ContentMetadataModel.createByUniqueName(core, "groups");
-                    group = Models.Db.GroupModel.addDefault(core, groupCdef);
+                    group = DbBaseModel.addDefault<GroupModel>(core.cpParent, Models.Domain.ContentMetadataModel.getDefaultValueDict(core, "groups"));
                     group.ccguid = groupNameIdOrGuid;
                     group.name = groupNameIdOrGuid;
                     group.caption = groupNameIdOrGuid;
-                    group.save(core);
+                    group.save(core.cpParent);
                 }
 
             }
@@ -153,7 +156,7 @@ namespace Contensive.Processor.Controllers {
                 // -- create group if not found
             }
             if (group != null) {
-                var user = Models.Db.PersonModel.create(core, userid);
+                var user = DbBaseModel.create<PersonModel>(core.cpParent, userid);
                 if (user != null) addUser(core, group, user, dateExpires);
             }
         }
@@ -183,7 +186,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="GroupName"></param>
         /// <returns></returns>
         public static int getGroupId(CoreController core, string GroupName) {
-            var group = Models.Db.GroupModel.createByUniqueName(core, GroupName);
+            var group = DbBaseModel.createByUniqueName<GroupModel>(core.cpParent, GroupName);
             if (group != null) return group.id;
             return 0;
         }
@@ -196,7 +199,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="groupId"></param>
         /// <returns></returns>
         public static string getGroupName(CoreController core, int groupId) {
-            var group = Models.Db.GroupModel.create(core, groupId);
+            var group = DbBaseModel.create<GroupModel>(core.cpParent, groupId);
             if (group != null) return group.name;
             return String.Empty;
         }
@@ -208,9 +211,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="group"></param>
         /// <param name="user"></param>
-        public static void removeUser(CoreController core, Models.Db.GroupModel group, Models.Db.PersonModel user) {
+        public static void removeUser(CoreController core, GroupModel group, PersonModel user) {
             if ((group != null) && (user != null)) {
-                Models.Db.MemberRuleModel.deleteSelection(core, "(MemberID=" + DbController.encodeSQLNumber(user.id) + ")AND(groupid=" + DbController.encodeSQLNumber(group.id) + ")");
+                MemberRuleModel.deleteRows<MemberRuleModel>(core.cpParent, "(MemberID=" + DbController.encodeSQLNumber(user.id) + ")AND(groupid=" + DbController.encodeSQLNumber(group.id) + ")");
             }
         }
         //
@@ -222,9 +225,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="groupName"></param>
         /// <param name="userId"></param>
         public static void removeUser(CoreController core, string groupName, int userId) {
-            var group = Models.Db.GroupModel.createByUniqueName(core, groupName);
+            var group = DbBaseModel.createByUniqueName<GroupModel>(core.cpParent, groupName);
             if ( group != null ) {
-                var user = Models.Db.PersonModel.create(core, userId);
+                var user = DbBaseModel.create<PersonModel>(core.cpParent, userId);
                 if (user != null) {
                     removeUser(core, group, user);
                 }

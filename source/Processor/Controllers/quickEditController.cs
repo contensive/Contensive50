@@ -5,12 +5,13 @@ using System.Xml;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 using System.Linq;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -45,7 +46,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- First Active Record - Output Quick Editor form
                 Models.Domain.ContentMetadataModel cdef = Models.Domain.ContentMetadataModel.createByUniqueName(core, PageContentModel.contentName);
-                var pageContentTable = Models.Db.TableModel.create(core, cdef.id);
+                var pageContentTable = DbBaseModel.create<TableModel>(core.cpParent, cdef.id);
                 var editLock = WorkflowController.getEditLock(core, pageContentTable.id, core.doc.pageController.page.id);
                 WorkflowController.recordWorkflowStatusClass authoringStatus = WorkflowController.getWorkflowStatus(core, PageContentModel.contentName, core.doc.pageController.page.id);
                 PermissionController.UserContentPermissions userContentPermissions = PermissionController.getUserContentPermissions(core, cdef);
@@ -135,7 +136,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Child pages
                 //
-                AddonModel addon = AddonModel.create(core, addonGuidChildList);
+                AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidChildList);
                 CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                     addonType = CPUtilsBaseClass.addonContext.ContextPage,
                     hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {

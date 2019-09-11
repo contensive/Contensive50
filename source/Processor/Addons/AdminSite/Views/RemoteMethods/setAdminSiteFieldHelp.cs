@@ -1,9 +1,10 @@
 ﻿
 using System;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
+using Contensive.Models.Db;
 
 namespace Contensive.Addons.AdminSite {
     //
@@ -21,14 +22,14 @@ namespace Contensive.Addons.AdminSite {
                 CoreController core = ((CPClass)cp).core;
                 if (cp.User.IsAdmin) {
                     int fieldId = cp.Doc.GetInteger("fieldId");
-                    ContentFieldHelpModel help = ContentFieldHelpModel.createByFieldId(core, fieldId);
+                    var help = ContentFieldHelpModel.createByFieldId(cp, fieldId);
                     if (help == null) {
-                        help = ContentFieldHelpModel.addDefault(core, Processor.Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentFieldHelpModel.contentName));
+                        help = DbBaseModel.addDefault<ContentFieldHelpModel>(core.cpParent, Processor.Models.Domain.ContentMetadataModel.getDefaultValueDict(core, ContentFieldHelpModel.contentName));
                         help.fieldID = fieldId;
                     }
                     help.helpCustom = cp.Doc.GetText("helpcustom");
-                    help.save(core);
-                    ContentFieldModel contentField = ContentFieldModel.create(core, fieldId);
+                    help.save(cp);
+                    ContentFieldModel contentField = DbBaseModel.create<ContentFieldModel>(core.cpParent, fieldId);
                     if (contentField != null) {
                         ContentMetadataModel.invalidateCache(core, contentField.contentID);
                     }

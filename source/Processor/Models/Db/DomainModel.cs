@@ -172,7 +172,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <returns></returns>
         public static string getTableInvalidationKey(CoreController core) {
-            return getTableCacheKey<DomainModel>(core);
+            return CreateDependencyKeyInvalidateOnChange<DomainModel>(core);
         }
     }
 }

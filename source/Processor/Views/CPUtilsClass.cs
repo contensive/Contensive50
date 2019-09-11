@@ -5,9 +5,10 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Processor.Exceptions;
-using Contensive.Processor.Models.Db;
+
 using static Contensive.Processor.Constants;
 using System.IO;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor {
     //
@@ -237,7 +238,7 @@ namespace Contensive.Processor {
         //
         public override void ExportCsv(string sql, string exportName, string filename) {
             try {
-                var ExportCSVAddon = AddonModel.create(cp.core, addonGuidExportCSV);
+                var ExportCSVAddon = DbBaseModel.create<AddonModel>(cp, addonGuidExportCSV);
                 if (ExportCSVAddon == null) {
                     LogController.logError(cp.core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
                 } else {
@@ -362,7 +363,7 @@ namespace Contensive.Processor {
         [Obsolete("Deprecated, use cp.addon.Execute", false)]
         public override string ExecuteAddonAsProcess(string addonIDGuidOrName) {
             try {
-                Models.Db.AddonModel addon = null;
+                AddonModel addon = null;
                 if (addonIDGuidOrName.IsNumeric()) {
                     addon = cp.core.addonCache.getAddonById(EncodeInteger(addonIDGuidOrName));
                 } else if (GenericController.isGuid(addonIDGuidOrName)) {

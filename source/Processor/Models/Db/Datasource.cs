@@ -107,12 +107,64 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// Special case for create. If id less than or equal to 0  return default datasource
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public static DataSourceModel create(CoreController core, int recordId) {
+            return (recordId > 0) ? create<DataSourceModel>(core, recordId) : getDefaultDatasource(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Special case for create. If id less than or equal to 0  return default datasource
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="recordId"></param>
+        /// <param name="callersCacheNameList"></param>
+        /// <returns></returns>
+        public static DataSourceModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
+            return (recordId > 0) ? create<DataSourceModel>(core, recordId, ref callersCacheNameList) : getDefaultDatasource(core);
+        }
+        //
+        //====================================================================================================
+        public static DataSourceModel createByUniqueName(CoreController core, string recordName) {
+            return (string.IsNullOrWhiteSpace(recordName)|(recordName.ToLowerInvariant()=="default")) ? getDefaultDatasource(core) : createByUniqueName<DataSourceModel>(core, recordName );
+        }
+        //
+        //====================================================================================================
+        public static DataSourceModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return (string.IsNullOrWhiteSpace(recordName) || (recordName.ToLowerInvariant() == "default")) ? getDefaultDatasource(core) : createByUniqueName<DataSourceModel>(core, recordName, ref callersCacheNameList);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<DataSourceModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return true if the datasource name is either blank or the word default (in this case, use the config model's datasource
+        /// </summary>
+        /// <returns></returns>
+        public static bool isDataSourceDefault( string datasourceName ) {
+            return (string.IsNullOrWhiteSpace(datasourceName) || (datasourceName.ToLower() == "default"));
+        }
+        //
+        //====================================================================================================
         public static Dictionary<string, DataSourceModel> getNameDict(CoreController core) {
             Dictionary<string, DataSourceModel> result = new Dictionary<string, DataSourceModel>();
             try {
                 CsModel cs = new CsModel(core);
                 List<string> ignoreCacheNames = new List<string>();
-                if ( cs.openSql( "select id from ccdatasources where active>0")) {
+                if (cs.openSql("select id from ccdatasources where active>0")) {
                     do {
                         DataSourceModel instance = create(core, cs.getInteger("id"));
                         if (instance != null) {
@@ -170,58 +222,6 @@ namespace Contensive.Processor.Models.Db {
                 return DataSourceName.Trim().ToLowerInvariant();
             }
             return string.Empty;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Special case for create. If id less than or equal to 0  return default datasource
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="recordId"></param>
-        /// <returns></returns>
-        public static DataSourceModel create(CoreController core, int recordId) {
-            return (recordId > 0) ? create<DataSourceModel>(core, recordId) : getDefaultDatasource(core);
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Special case for create. If id less than or equal to 0  return default datasource
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="recordId"></param>
-        /// <param name="callersCacheNameList"></param>
-        /// <returns></returns>
-        public static DataSourceModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
-            return (recordId > 0) ? create<DataSourceModel>(core, recordId, ref callersCacheNameList) : getDefaultDatasource(core);
-        }
-        //
-        //====================================================================================================
-        public static DataSourceModel createByUniqueName(CoreController core, string recordName) {
-            return (string.IsNullOrWhiteSpace(recordName)|(recordName.ToLowerInvariant()=="default")) ? getDefaultDatasource(core) : createByUniqueName<DataSourceModel>(core, recordName );
-        }
-        //
-        //====================================================================================================
-        public static DataSourceModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return (string.IsNullOrWhiteSpace(recordName) || (recordName.ToLowerInvariant() == "default")) ? getDefaultDatasource(core) : createByUniqueName<DataSourceModel>(core, recordName, ref callersCacheNameList);
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
-        /// </summary>
-        /// <param name="core"></param>
-        /// <returns></returns>
-        public static string getTableInvalidationKey(CoreController core) {
-            return getTableCacheKey<DataSourceModel>(core);
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// return true if the datasource name is either blank or the word default (in this case, use the config model's datasource
-        /// </summary>
-        /// <returns></returns>
-        public static bool isDataSourceDefault( string datasourceName ) {
-            return (string.IsNullOrWhiteSpace(datasourceName) || (datasourceName.ToLower() == "default"));
         }
     }
 }

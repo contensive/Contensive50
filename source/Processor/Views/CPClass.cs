@@ -1,10 +1,11 @@
 ﻿
 using System;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor {
     public class CPClass : CPBaseClass, IDisposable {
@@ -161,7 +162,7 @@ namespace Contensive.Processor {
                 if (GenericController.isGuid(addonNameOrGuid)) {
                     //
                     // -- call by guid
-                    AddonModel addon = Models.Db.AddonModel.create(core, addonNameOrGuid);
+                    AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, addonNameOrGuid);
                     if ( addon == null ) {
                         throw new GenericException("Addon [" + addonNameOrGuid + "] could not be found.");
                     } else {
@@ -171,7 +172,7 @@ namespace Contensive.Processor {
                         });
                     }
                 } else {
-                    AddonModel addon = Models.Db.AddonModel.createByUniqueName(core, addonNameOrGuid);
+                    AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core, addonNameOrGuid);
                     if ( addon != null ) {
                         //
                         // -- call by name
@@ -202,7 +203,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public string executeAddon(int addonId, Contensive.BaseClasses.CPUtilsBaseClass.addonContext addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) {
             try {
-                AddonModel addon = AddonModel.create(core, addonId);
+                AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, addonId);
                 if ( addon == null) {
                     throw new GenericException("Addon [#" + addonId.ToString() + "] could not be found.");
                 } else {
@@ -422,6 +423,20 @@ namespace Contensive.Processor {
             }
         }
         private CPHtml5Class _html5Obj;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Json serialize/deserialize
+        /// </summary>
+        public override CPJSONBaseClass JSON {
+            get {
+                if (_jsonObj == null) {
+                    _jsonObj = new CPJSONClass(this);
+                }
+                return _jsonObj;
+            }
+        }
+        private CPJSONBaseClass _jsonObj;
         //
         //====================================================================================================
         public override CPLogBaseClass Log {
@@ -665,9 +680,6 @@ namespace Contensive.Processor {
                     if (_htmlObj != null) {
                         _htmlObj.Dispose();
                     }
-                    //if (_myAddonObj != null) {
-                    //    _myAddonObj.Dispose();
-                    //}
                     if (_requestObj != null) {
                         _requestObj.Dispose();
                     }

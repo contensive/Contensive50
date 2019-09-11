@@ -1,10 +1,11 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor {
     public class CPSiteClass : BaseClasses.CPSiteBaseClass, IDisposable {
@@ -297,7 +298,7 @@ namespace Contensive.Processor {
         [Obsolete("Use GetInteger(LandingPageID)", false)]
         public override int LandingPageId(string domainName) {
             if (string.IsNullOrWhiteSpace(domainName)) return GetInteger("LandingPageID", 0);
-            var domain = DomainModel.createByUniqueName(cp.core, domainName);
+            var domain = DbBaseModel.createByUniqueName<DomainModel>(cp, domainName);
             if (domain == null)  return GetInteger("LandingPageID", 0);
             return domain.rootPageId;
         }

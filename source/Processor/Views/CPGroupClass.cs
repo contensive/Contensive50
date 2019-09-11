@@ -1,6 +1,6 @@
 ﻿
 using System;
-using Contensive.Processor.Models.Db;
+using Contensive.Models.Db;
 using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor {
@@ -97,9 +97,9 @@ namespace Contensive.Processor {
         public override int GetId(string GroupNameOrGuid) {
             GroupModel group;
             if (GenericController.isGuid(GroupNameOrGuid)) {
-                group = GroupModel.create(cp.core, GroupNameOrGuid);
+                group = DbBaseModel.create<GroupModel>(cp, GroupNameOrGuid);
             } else {
-                group = GroupModel.createByUniqueName(cp.core, GroupNameOrGuid);
+                group = DbBaseModel.createByUniqueName<GroupModel>(cp, GroupNameOrGuid);
             }
             if (group != null) { return group.id; }
             return 0;

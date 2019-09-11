@@ -10,7 +10,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Contensive.BaseClasses;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
@@ -49,6 +49,10 @@ namespace Contensive.Addons.Housekeeping {
                     ALittleWhileAgo = rightNow.AddDays(-90).Date,
                     SQLNow = DbController.encodeSQLDate(rightNow)
                 };
+                //
+                // -- hourly tasks
+                //
+                // -- daily tasks
                 if (env.force || env.RunServerHousekeep) {
                     //
                     // Get ArchiveAgeDays - use this as the oldest data they care about
@@ -80,7 +84,7 @@ namespace Contensive.Addons.Housekeeping {
                         core.siteProperties.setProperty("ArchiveEmailDropAgeDays", env.EmailDropArchiveAgeDays.ToString());
                     }
                     env.defaultMemberName = ContentFieldMetadataModel.getDefaultValue(core, "people", "name");
-                    houseKeep(core, env);
+                    dailyTasks(core, env);
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
@@ -90,7 +94,15 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        public void houseKeep(CoreController core, HousekeepEnvironment env) {
+        public void hourlyTasks( CoreController core, HousekeepEnvironment env ) {
+            //
+            // -- delete temp files
+            deleteTempFiles(core);
+        }
+        //
+        //====================================================================================================
+        //
+        public void dailyTasks(CoreController core, HousekeepEnvironment env) {
             try {
                 core.siteProperties.setProperty("housekeep, last check", env.rightNow);
                 //
@@ -1650,7 +1662,32 @@ namespace Contensive.Addons.Housekeeping {
             housekeep_userProperties(core);
             housekeep_visitProperties(core);
             housekeep_visitorProperties(core);
-
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// delete all files over 1 hour old
+        /// </summary>
+        /// <param name="core"></param>
+        public static void deleteTempFiles(CoreController core) {
+            deleteTempFiles(core, "\\");
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// delete all files over 1 hour old from the current path, recursive
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="path"></param>
+        public static void deleteTempFiles(CoreController core, string path) {
+            foreach( var folder in core.tempFiles.getFolderList( path )) {
+                deleteTempFiles(core, path + folder.Name + "\\");
+            }
+            foreach( var file in core.tempFiles.getFileList( path )) {
+                if ( file.DateCreated.AddHours(1) < DateTime.Now ) {
+                    core.tempFiles.deleteFile(path + file.Name);
+                }
+            }
         }
     }
     //

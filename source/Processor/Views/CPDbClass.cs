@@ -3,6 +3,7 @@ using System;
 using System.Data;
 using Contensive.Processor.Controllers;
 using Contensive.BaseClasses;
+using Contensive.Models;
 
 namespace Contensive.Processor {
     //
@@ -350,6 +351,34 @@ namespace Contensive.Processor {
         public override void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public override string CreateFieldPathFilename(string tableName, string fieldName, int recordId, CPContentBaseClass.fileTypeIdEnum fieldType) {
+            throw new NotImplementedException();
+        }
+
+        public override string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename, CPContentBaseClass.fileTypeIdEnum fieldType) {
+            throw new NotImplementedException();
+        }
+
+        public override int Add(string tableName, int createdByUserId) {
+            throw new NotImplementedException();
+        }
+
+        public override void Update(string tableName, string criteria, SqlFieldListClass sqlList) {
+            throw new NotImplementedException();
+        }
+
+        public override void Update(string tableName, string criteria, SqlFieldListClass sqlList, bool Async) {
+            throw new NotImplementedException();
+        }
+
+        public override void Delete(string tableName, string guid) {
+            throw new NotImplementedException();
+        }
+
+        public override void DeleteRows(string tableName, string sqlCriteria) {
+            throw new NotImplementedException();
         }
 
         ~CPDbClass() {

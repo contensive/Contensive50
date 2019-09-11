@@ -1,10 +1,11 @@
 ﻿
 using System;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor;
+using Contensive.Models.Db;
 
 namespace Contensive.Addons.AdminSite {
     public class FormRoot {
@@ -25,7 +26,7 @@ namespace Contensive.Addons.AdminSite {
                 if (core.session.visit.id == core.docProperties.getInteger(RequestNameDashboardReset)) {
                     //$$$$$ cache this
                     using (var csData = new CsModel(core)) {
-                        csData.open(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(addonGuidDashboard));
+                        csData.open(AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(addonGuidDashboard));
                         if (csData.ok()) {
                             addonId = csData.getInteger("id");
                             core.siteProperties.setProperty("AdminRootAddonID", GenericController.encodeText(addonId));
@@ -54,7 +55,7 @@ namespace Contensive.Addons.AdminSite {
                         addonId = GenericController.encodeInteger(AddonIDText);
                         //
                         // Verify it so there is no error when it runs
-                        if (AddonModel.create(core, addonId) == null) {
+                        if (DbBaseModel.create<AddonModel>(core.cpParent, addonId) == null) {
                             addonId = -1;
                             core.siteProperties.setProperty("AdminRootAddonID", "");
                         }
@@ -62,7 +63,7 @@ namespace Contensive.Addons.AdminSite {
                     if (addonId == -1) {
                         //
                         // This has never been set, try to get the dashboard ID
-                        var addon = AddonModel.create(core, addonGuidDashboard);
+                        var addon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidDashboard);
                         if (addon != null) {
                             addonId = addon.id;
                             core.siteProperties.setProperty("AdminRootAddonID", addonId);
@@ -77,7 +78,7 @@ namespace Contensive.Addons.AdminSite {
                         returnHtml = returnHtml + "<div style=\"clear:both;margin-top:20px;\">&nbsp;</div>"
                         + "<div style=\"clear:both;margin-top:20px;\">" + Processor.Controllers.ErrorController.getUserError(core) + "</div>";
                     }
-                    returnHtml += core.addon.execute(AddonModel.create(core, addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                    returnHtml += core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                         errorContextMessage = "executing addon id:" + addonId + " set as Admin Root addon"
                     });

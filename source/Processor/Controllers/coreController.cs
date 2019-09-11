@@ -3,7 +3,7 @@ using System;
 using System.Reflection;
 using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
-using Contensive.Processor.Models.Db;
+
 using System.Collections.Generic;
 using static Contensive.Processor.Constants;
 using static Contensive.Processor.Controllers.GenericController;
@@ -11,6 +11,7 @@ using System.Diagnostics;
 using Contensive.Processor.Exceptions;
 using System.Security.Policy;
 using NLog;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -24,7 +25,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// a reference to the cp api interface that parents this object. CP is the api to addons, based on the abstract classes exposed to developers.
         /// </summary>
-        internal CPClass cp_forAddonExecutionOnly { get; set; }
+        internal CPClass cpParent { get; set; }
         //
         //===================================================================================================
         /// <summary>
@@ -543,7 +544,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cp"></param>
         /// <remarks></remarks>
         public CoreController(CPClass cp) {
-            cp_forAddonExecutionOnly = cp;
+            cpParent = cp;
             deleteSessionOnExit = true;
             LogController.log(this, "CoreController constructor-0, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
@@ -567,7 +568,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cp"></param>
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName) : base() {
-            this.cp_forAddonExecutionOnly = cp;
+            this.cpParent = cp;
             deleteSessionOnExit = true;
             LogController.log(this, "CoreController constructor-1, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
@@ -621,7 +622,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cp"></param>
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig) : base() {
-            cp_forAddonExecutionOnly = cp;
+            cpParent = cp;
             deleteSessionOnExit = true;
             LogController.log(this, "CoreController constructor-2, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
@@ -647,7 +648,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cp"></param>
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
-            this.cp_forAddonExecutionOnly = cp;
+            this.cpParent = cp;
             deleteSessionOnExit = false;
             LogController.log(this, "CoreController constructor-3, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
@@ -668,7 +669,7 @@ namespace Contensive.Processor.Controllers {
         /// coreClass constructor for a web request/response environment. coreClass is the primary object internally, created by cp.
         /// </summary>
         public CoreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) : base() {
-            this.cp_forAddonExecutionOnly = cp;
+            this.cpParent = cp;
             LogController.log(this, "CoreController constructor-4, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
@@ -842,16 +843,16 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             // -- delete visit
                                             visitProperty.deleteAll(session.user.id);
-                                            DbBaseModel.delete<VisitModel>(this, session.visit.id);
+                                            DbBaseModel.delete<VisitModel>(cpParent, session.visit.id);
                                             //
                                             // -- delete viewing
-                                            DbBaseModel.deleteSelection<ViewingModel>(this, "(visitId=" + session.visit.id + ")");
+                                            DbBaseModel.deleteSelection<ViewingModel>(cpParent, "(visitId=" + session.visit.id + ")");
                                         }
                                         if ((session.visitor != null) && (session.visitor.id > 0)) {
                                             //
                                             // -- delete visitor
                                             visitorProperty.deleteAll(session.user.id);
-                                            DbBaseModel.delete<VisitorModel>(this, session.visit.id);
+                                            DbBaseModel.delete<VisitorModel>(cpParent, session.visit.id);
                                         }
                                     }
                                 }

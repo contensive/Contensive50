@@ -2,9 +2,10 @@
 using System;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-using Contensive.Processor.Models.Db;
+
 using System.Collections.Generic;
 using System.Linq;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     public class WorkflowController : IDisposable {
@@ -87,7 +88,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         private static string getAuthoringControlCriteria(CoreController core, Models.Domain.ContentMetadataModel cdef, int recordId) {
             if (cdef == null) return "(1=0)";
-            var table = Models.Db.TableModel.createByUniqueName(core, cdef.tableName);
+            var table = DbBaseModel.createByUniqueName<TableModel>(core.cpParent, cdef.tableName);
             if (table == null) return "(1=0)";
             return getAuthoringControlCriteria(getTableRecordKey(table.id, recordId));
         }
@@ -103,14 +104,14 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static editLockClass getEditLock(CoreController core, int tableId, int recordId) {
             try {
-                var table = Models.Db.TableModel.create(core, tableId);
+                var table = DbBaseModel.create<TableModel>(core.cpParent, tableId);
                 if (table != null) {
                     //
                     // -- get the edit control for this record (not by this person) with the oldest expiration date
                     string criteria = "(createdby<>" + core.session.user.id + ")and" + getAuthoringControlCriteria(getTableRecordKey(table.id, recordId),AuthoringControls.Editing);
-                    var authoringControlList = AuthoringControlModel.createList(core, criteria, "dateexpires desc");
+                    var authoringControlList = DbBaseModel.createList<AuthoringControlModel>(core.cpParent, criteria, "dateexpires desc");
                     if (authoringControlList.Count > 0) {
-                        var person = Models.Db.PersonModel.create(core, authoringControlList.First().createdBy);
+                        var person = DbBaseModel.create<PersonModel>(core.cpParent, authoringControlList.First().createdBy);
                         return new editLockClass() {
                             isEditLocked = true,
                             editLockExpiresDate = authoringControlList.First().DateExpires,
@@ -160,7 +161,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="RecordID"></param>
         public static void clearEditLock(CoreController core, int tableId, int recordId) {
             string criteria = "(contentRecordKey=" + getTableRecordKey(tableId, recordId) + ")";
-            Models.Db.AuthoringControlModel.deleteSelection(core, criteria);
+            DbBaseModel.deleteRows<AuthoringControlModel>(core.cpParent, criteria);
         }
         //
         //========================================================================
@@ -180,13 +181,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="userId"></param>
         public static void setEditLock(CoreController core, int tableId, int recordId, int userId) {
             string contentRecordKey = getTableRecordKey(tableId, recordId);
-            var editLockList = Models.Db.AuthoringControlModel.createList(core, "(contentRecordKey=" + contentRecordKey + ")");
-            var editLock = (editLockList.Count > 0) ? editLockList.First() : Models.Db.AuthoringControlModel.addEmpty(core);
+            var editLockList = DbBaseModel.createList<AuthoringControlModel>(core.cpParent, "(contentRecordKey=" + contentRecordKey + ")");
+            var editLock = (editLockList.Count > 0) ? editLockList.First() : DbBaseModel.addEmpty<AuthoringControlModel>(core.cpParent);
             editLock.contentRecordKey = contentRecordKey;
             editLock.controlType = (int)AuthoringControls.Editing;
             editLock.createdBy = userId;
             editLock.dateAdded = DateTime.Now;
-            editLock.save(core);
+            editLock.save(core.cpParent);
         }
         //
         //=====================================================================================================
@@ -247,7 +248,7 @@ namespace Contensive.Processor.Controllers {
                     Models.Domain.ContentMetadataModel CDef = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
                     if (CDef.id > 0) {
                         var nameDict = new Dictionary<int, string>();
-                        foreach (var recordLock in Models.Db.AuthoringControlModel.createList(core, getAuthoringControlCriteria(core, ContentName, RecordID))) {
+                        foreach (var recordLock in DbBaseModel.createList<AuthoringControlModel>(core.cpParent, getAuthoringControlCriteria(core, ContentName, RecordID))) {
                             switch((AuthoringControls)recordLock.controlType) {
                                 case AuthoringControls.Editing:
                                     if (!result.isEditLocked) {
@@ -256,7 +257,7 @@ namespace Contensive.Processor.Controllers {
                                         if (nameDict.ContainsKey(recordLock.createdBy)) {
                                             result.editLockByMemberName = nameDict[recordLock.createdBy];
                                         } else {
-                                            result.editLockByMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
+                                            result.editLockByMemberName = DbBaseModel.getRecordName< PersonModel>(core.cpParent, recordLock.createdBy);
                                             nameDict.Add(recordLock.createdBy, result.workflowModifiedByMemberName);
                                         }
                                     }
@@ -268,7 +269,7 @@ namespace Contensive.Processor.Controllers {
                                         if (nameDict.ContainsKey(recordLock.createdBy)) {
                                             result.workflowModifiedByMemberName = nameDict[recordLock.createdBy];
                                         } else {
-                                            result.workflowModifiedByMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
+                                            result.workflowModifiedByMemberName = DbBaseModel.getRecordName<PersonModel>(core.cpParent, recordLock.createdBy);
                                             nameDict.Add(recordLock.createdBy, result.workflowModifiedByMemberName);
                                         }
                                     }
@@ -280,7 +281,7 @@ namespace Contensive.Processor.Controllers {
                                         if (nameDict.ContainsKey(recordLock.createdBy)) {
                                             result.workflowSubmittedMemberName = nameDict[recordLock.createdBy];
                                         } else {
-                                            result.workflowSubmittedMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
+                                            result.workflowSubmittedMemberName = DbBaseModel.getRecordName<PersonModel>(core.cpParent, recordLock.createdBy);
                                             nameDict.Add(recordLock.createdBy, result.workflowSubmittedMemberName);
                                         }
                                     }
@@ -292,7 +293,7 @@ namespace Contensive.Processor.Controllers {
                                         if (nameDict.ContainsKey(recordLock.createdBy)) {
                                             result.workflowApprovedMemberName = nameDict[recordLock.createdBy];
                                         } else {
-                                            result.workflowApprovedMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
+                                            result.workflowApprovedMemberName = DbBaseModel.getRecordName<PersonModel>(core.cpParent, recordLock.createdBy);
                                             nameDict.Add(recordLock.createdBy, result.workflowSubmittedMemberName);
                                         }
                                     }

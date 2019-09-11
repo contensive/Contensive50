@@ -2,7 +2,7 @@
 using System;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Runtime.Caching;
@@ -14,6 +14,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -412,7 +413,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// future method. To support a cpbase implementation, but wait until Models.Db.BaseModel is exposed
+        /// future method. To support a cpbase implementation, but wait until BaseModel is exposed
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="guid"></param>

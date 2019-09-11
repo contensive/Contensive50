@@ -4,12 +4,14 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Data;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Models;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.Tools {
     //
@@ -66,7 +68,7 @@ namespace Contensive.Addons.Tools {
                 if (string.IsNullOrEmpty(SQL)) {
                     SQL = core.docProperties.getText("SQLList");
                 }
-                DataSourceModel datasource = DataSourceModel.create(core, core.docProperties.getInteger("dataSourceid"));
+                DataSourceModel datasource = DataSourceModel.create<DataSourceModel>(core.cpParent, core.docProperties.getInteger("dataSourceid"));
                 //
                 if ((core.docProperties.getText("button")) == ButtonRun) {
                     //

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor {
@@ -46,13 +47,13 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override object Execute(string addonGuid) {
-            return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
+            return cp.core.addon.execute(DbBaseModel.create<AddonModel>(cp, addonGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
         }
         //
         //====================================================================================================
         //
         public override object Execute(string addonGuid, Dictionary<string, string> argumentKeyValuePairs) {
-            return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+            return cp.core.addon.execute(DbBaseModel.create<AddonModel>(cp, addonGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                 argumentKeyValuePairs = argumentKeyValuePairs
             });
         }
@@ -60,19 +61,19 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override object Execute(string addonGuid, CPUtilsBaseClass.addonExecuteContext executeContext) {
-            return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonGuid), executeContext);
+            return cp.core.addon.execute(DbBaseModel.create<AddonModel>(cp, addonGuid), executeContext);
         }
         //
         //====================================================================================================
         //
         public override object Execute(int addonId) {
-            return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
+            return cp.core.addon.execute(DbBaseModel.create<AddonModel>(cp, addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
         }
         //
         //====================================================================================================
         //
         public override object Execute(int addonId, Dictionary<string, string> argumentKeyValuePairs) {
-            return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+            return cp.core.addon.execute(DbBaseModel.create<AddonModel>(cp, addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                 argumentKeyValuePairs = argumentKeyValuePairs
             });
         }
@@ -80,19 +81,19 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override object Execute(int addonId, CPUtilsBaseClass.addonExecuteContext executeContext) {
-            return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonId), executeContext);
+            return cp.core.addon.execute(DbBaseModel.create<AddonModel>(cp, addonId), executeContext);
         }
         //
         //====================================================================================================
         //
         public override object ExecuteByUniqueName(string addonName) {
-            return cp.core.addon.execute(Models.Db.AddonModel.createByUniqueName(cp.core, addonName), new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
+            return cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, addonName), new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
         }
         //
         //====================================================================================================
         //
         public override object ExecuteByUniqueName(string addonName, Dictionary<string, string> argumentKeyValuePairs) {
-            return cp.core.addon.execute(Models.Db.AddonModel.createByUniqueName(cp.core, addonName), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+            return cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, addonName), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                 argumentKeyValuePairs = argumentKeyValuePairs
             });
         }
@@ -100,7 +101,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override object ExecuteByUniqueName(string addonName, CPUtilsBaseClass.addonExecuteContext executeContext) {
-            return cp.core.addon.execute(Models.Db.AddonModel.createByUniqueName(cp.core, addonName), executeContext);
+            return cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, addonName), executeContext);
         }
         //
         //====================================================================================================
@@ -111,7 +112,7 @@ namespace Contensive.Processor {
         /// <param name="keyValuePairs"></param>
         public override void ExecuteAsync(int Addonid, Dictionary<string, string> keyValuePairs) {
             if (Addonid <= 0) { throw new ArgumentException("ExecuteAsync called with invalid AddonId [" + Addonid + "]"); }
-            var addon = Models.Db.AddonModel.create(cp.core, Addonid);
+            var addon = DbBaseModel.create<AddonModel>(cp, Addonid);
             if (addon == null) { throw new ArgumentException("ExecuteAsync cannot find AddonId [" + Addonid + "]"); }
             cp.core.addon.executeAsync(addon, keyValuePairs);
         }
@@ -124,7 +125,7 @@ namespace Contensive.Processor {
         //
         public override void ExecuteAsync(string guid, Dictionary<string, string> keyValuePairs) {
             if (string.IsNullOrEmpty(guid)) { throw new ArgumentException("ExecuteAsync called with invalid guid [" + guid + "]"); }
-            var addon = Models.Db.AddonModel.create(cp.core, guid);
+            var addon = DbBaseModel.create<AddonModel>(cp, guid);
             if (addon == null) { throw new ArgumentException("ExecuteAsync cannot find Addon for guid [" + guid + "]"); }
             cp.core.addon.executeAsync(addon, keyValuePairs);
         }
@@ -137,7 +138,7 @@ namespace Contensive.Processor {
         //
         public override void ExecuteAsyncByUniqueName(string name, Dictionary<string, string> keyValuePairs) {
             if (string.IsNullOrEmpty(name)) { throw new ArgumentException("ExecuteAsyncByUniqueName called with invalid name [" + name + "]"); }
-            var addon = Models.Db.AddonModel.createByUniqueName(cp.core, name);
+            var addon = DbBaseModel.createByUniqueName<AddonModel>(cp, name);
             if (addon == null) { throw new ArgumentException("ExecuteAsyncByUniqueName cannot find Addon for name [" + name + "]"); }
             cp.core.addon.executeAsync(addon, keyValuePairs);
         }

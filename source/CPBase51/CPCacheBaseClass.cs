@@ -94,11 +94,27 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Invalidate a key based on the table and recordId
+        /// Invalidate a key based on the content name  and recordId
         /// </summary>
         /// <param name="contentName"></param>
         /// <param name="recordId"></param>
         public abstract void InvalidateContentRecord(string contentName, int recordId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Invalidate a key based on the table and recordId
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
+        public abstract void InvalidateTableRecord(string tableName, int recordId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Invalidate all cache entries dependent on this tableKey
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
+        public abstract void InvalidateTable(string tableName);
         //
         //====================================================================================================
         /// <summary>
@@ -269,6 +285,14 @@ namespace Contensive.BaseClasses {
         /// <param name="invalidationDate"></param>
         /// <param name="dependentKey"></param>
         public abstract void Store(string key, object value, DateTime invalidationDate, string dependentKey);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Store a ptr to a cache entry. For example you may store an object by its recordId, but need to reference it by its guid. Create the cache key with the id, and a cache ptr which refers the guid to the cacheKey and a Get of the ptr will return the cache entry for the id.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public abstract void StorePtr(string keyPtr, string key);
         //
         //====================================================================================================
         //

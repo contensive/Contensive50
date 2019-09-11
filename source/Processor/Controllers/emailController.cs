@@ -2,11 +2,12 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -338,21 +339,21 @@ namespace Contensive.Processor.Controllers {
         /// <param name="additionalMemberID"></param>
         /// <returns>Admin message if something went wrong (email addresses checked, etc.</returns>
         public static bool queueSystemEmail(CoreController core, string emailName, string appendedCopy, int additionalMemberID, ref string userErrorMessage) {
-            SystemEmailModel email = SystemEmailModel.createByUniqueName(core, emailName);
+            SystemEmailModel email = DbBaseModel.createByUniqueName<SystemEmailModel>(core.cpParent, emailName);
             if (email == null) {
                 if (emailName.IsNumeric()) {
                     //
                     // -- compatibility for really ugly legacy nonsense where old interface has argument "EmailIdOrName".
-                    email = SystemEmailModel.create(core, GenericController.encodeInteger(emailName));
+                    email = DbBaseModel.create<SystemEmailModel>(core.cpParent, GenericController.encodeInteger(emailName));
                 }
                 if (email == null) {
                     //
                     // -- create new system email with this name - exposure of possible integer used as name
-                    email = SystemEmailModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, SystemEmailModel.contentName));
+                    email = DbBaseModel.addDefault<SystemEmailModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, SystemEmailModel.contentName));
                     email.name = emailName;
                     email.subject = emailName;
                     email.fromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
-                    email.save(core);
+                    email.save(core.cpParent);
                     LogController.logError(core, new GenericException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
                 }
             }
@@ -375,7 +376,7 @@ namespace Contensive.Processor.Controllers {
         }
         //
         public static bool queueSystemEmail(CoreController core, int emailid, string appendedCopy, int additionalMemberID, ref string userErrorMessage) {
-            SystemEmailModel email = SystemEmailModel.create(core, emailid);
+            SystemEmailModel email = DbBaseModel.create<SystemEmailModel>(core.cpParent, emailid);
             if (email == null) {
                 userErrorMessage = "The notification email could not be sent.";
                 LogController.logError(core, new GenericException("No system email was found with the id [" + emailid + "]"));
@@ -414,7 +415,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(BounceAddress)) {
                     BounceAddress = email.fromAddress;
                 }
-                EmailTemplateModel emailTemplate = EmailTemplateModel.create(core, email.emailTemplateID);
+                EmailTemplateModel emailTemplate = DbBaseModel.create<EmailTemplateModel>(core.cpParent, email.emailTemplateID);
                 string EmailTemplateSource = "";
                 if (emailTemplate != null) {
                     EmailTemplateSource = emailTemplate.bodyHTML;
@@ -444,7 +445,7 @@ namespace Contensive.Processor.Controllers {
                 // --- Send message to the additional member
                 if (additionalMemberID != 0) {
                     confirmationMessage += BR + "Primary Recipient:" + BR;
-                    PersonModel person = PersonModel.create(core, additionalMemberID);
+                    PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, additionalMemberID);
                     if (person == null) {
                         confirmationMessage += "&nbsp;&nbsp;Error: Not sent to additional user [#" + additionalMemberID + "] because the user record could not be found." + BR;
                     } else {
@@ -462,9 +463,9 @@ namespace Contensive.Processor.Controllers {
                 // --- Send message to everyone selected
                 //
                 confirmationMessage += BR + "Recipients in selected System Email groups:" + BR;
-                List<int> peopleIdList = PersonModel.createidListForEmail(core, EmailRecordID);
+                List<int> peopleIdList = PersonModel.createidListForEmail(core.cpParent, EmailRecordID);
                 foreach (var personId in peopleIdList) {
-                    var person = PersonModel.create(core, personId);
+                    var person = DbBaseModel.create<PersonModel>(core.cpParent, personId);
                     if (person == null) {
                         confirmationMessage += "&nbsp;&nbsp;Error: Not sent to user [#" + additionalMemberID + "] because the user record could not be found." + BR;
                     } else {
@@ -483,7 +484,7 @@ namespace Contensive.Processor.Controllers {
                 // --- Send the completion message to the administrator
                 //
                 if (emailConfirmationMemberId != 0) {
-                    PersonModel person = PersonModel.create(core, emailConfirmationMemberId);
+                    PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, emailConfirmationMemberId);
                     if (person != null) {
                         string ConfirmBody = "<div style=\"padding:10px;\">" + BR;
                         ConfirmBody += "The follow System Email was sent." + BR;
@@ -580,12 +581,12 @@ namespace Contensive.Processor.Controllers {
                     string TotalList = "";
                     int contentControlId = csData.getInteger("contentControlId");
                     bool isGroupEmail = contentControlId.Equals(ContentMetadataModel.getContentId(core, "Group Email"));
-                    var personIdList = PersonModel.createidListForEmail(core, EmailID);
+                    var personIdList = PersonModel.createidListForEmail(core.cpParent, EmailID);
                     if (isGroupEmail && personIdList.Count.Equals(0)) {
                         ErrorController.addUserError(core, "There are no valid recipients of this email other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.");
                     } else {
                         foreach (var personId in personIdList) {
-                            var person = PersonModel.create(core, personId);
+                            var person = DbBaseModel.create<PersonModel>(core.cpParent, personId);
                             string Emailtext = person.email;
                             string EMailName = person.name;
                             int EmailMemberID = person.id;
@@ -661,7 +662,7 @@ namespace Contensive.Processor.Controllers {
                     if (ConfirmationMemberID == 0) {
                         ErrorController.addUserError(core, "No confirmation email was send because a Confirmation member is not selected");
                     } else {
-                        PersonModel person = PersonModel.create(core, ConfirmationMemberID);
+                        PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, ConfirmationMemberID);
                         if (person == null) {
                             ErrorController.addUserError(core, "No confirmation email was send because a Confirmation member is not selected");
                         } else {
@@ -763,7 +764,7 @@ namespace Contensive.Processor.Controllers {
         public static bool queueGroupEmail(CoreController core, List<string> groupNameList, string fromAddress, string subject, string body, bool isImmediate, bool isHtml, ref string userErrorMessage) {
             try {
                 if (groupNameList.Count <= 0) { return true; }
-                foreach (var person in PersonModel.createListFromGroupNameList(core, groupNameList, true)) {
+                foreach (var person in PersonModel.createListFromGroupNameList(core.cpParent, groupNameList, true)) {
                     queuePersonEmail(core, "Group Email", person, fromAddress, subject, body, "", "", isImmediate, isHtml, 0, "", false);
                 }
                 return true;
@@ -794,7 +795,7 @@ namespace Contensive.Processor.Controllers {
         public static bool queueGroupEmail(CoreController core, List<int> groupIdList, string fromAddress, string subject, string body, bool isImmediate, bool isHtml, ref string userErrorMessage) {
             try {
                 if (groupIdList.Count <= 0) { return true; }
-                foreach (var person in PersonModel.createListFromGroupIdList(core, groupIdList, true)) {
+                foreach (var person in PersonModel.createListFromGroupIdList(core.cpParent, groupIdList, true)) {
                     queuePersonEmail(core, "Group Email", person, fromAddress, subject, body, "", "", isImmediate, isHtml, 0, "", false);
                 }
                 return true;
@@ -830,14 +831,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="emailContextMessage">A short description of the email (Conditional Email, Group Email, Confirmation for Group Email, etc.)</param>
         private static void queueEmail(CoreController core, bool immediate, string emailContextMessage, EmailClass email) {
             try {
-                var emailQueue = EmailQueueModel.addEmpty(core);
+                var emailQueue = EmailQueueModel.addEmpty<EmailQueueModel>(core.cpParent);
                 emailQueue.name = emailContextMessage;
                 emailQueue.immediate = immediate;
                 emailQueue.toAddress = email.toAddress;
                 emailQueue.subject = email.subject;
                 emailQueue.content = SerializeObject(email);
                 emailQueue.attempts = email.attempts;
-                emailQueue.save(core);
+                emailQueue.save(core.cpParent);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
@@ -849,12 +850,12 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public static void sendEmailInQueue(CoreController core) {
             try {
-                List<EmailQueueModel> queue = EmailQueueModel.createList(core, "", "immediate,id desc");
+                List<EmailQueueModel> queue = EmailQueueModel.createList<EmailQueueModel>(core.cpParent, "", "immediate,id desc");
                 bool sendWithSES = core.siteProperties.getBoolean(Constants.spSendEmailWithAmazonSES);
                 string awsSecretAccessKey = core.siteProperties.getText(Constants.spAwsSecretAccessKey);
                 string awsAccessKeyId = core.siteProperties.getText(Constants.spAwsAccessKeyId);
                 foreach (EmailQueueModel queueRecord in queue) {
-                    EmailQueueModel.delete(core, queueRecord.id);
+                    EmailQueueModel.delete<EmailQueueModel>(core.cpParent, queueRecord.id);
                     bool sendSuccess = false;
                     EmailClass email = DeserializeObject<EmailClass>(queueRecord.content);
                     string reasonForFail = "";
@@ -871,7 +872,7 @@ namespace Contensive.Processor.Controllers {
                     if (sendSuccess) {
                         //
                         // -- success, log the send
-                        var log = EmailLogModel.addEmpty(core);
+                        var log = EmailLogModel.addEmpty<EmailLogModel>(core.cpParent);
                         log.name = "Successfully sent: " + queueRecord.name;
                         log.toAddress = email.toAddress;
                         log.fromAddress = email.fromAddress;
@@ -881,7 +882,7 @@ namespace Contensive.Processor.Controllers {
                         log.logType = EmailLogTypeImmediateSend;
                         log.emailID = email.emailId;
                         log.memberID = email.toMemberId;
-                        log.save(core);
+                        log.save(core.cpParent);
                         LogController.logInfo(core, "sendEmailInQueue, send successful, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "]");
                     } else {
                         //
@@ -889,7 +890,7 @@ namespace Contensive.Processor.Controllers {
                         if (email.attempts >= 3) {
                             //
                             // -- too many retries, log error
-                            var log = EmailLogModel.addEmpty(core);
+                            var log = EmailLogModel.addEmpty<EmailLogModel>(core.cpParent);
                             log.name = "Aborting unsuccessful send: " + queueRecord.name;
                             log.toAddress = email.toAddress;
                             log.fromAddress = email.fromAddress;
@@ -899,7 +900,7 @@ namespace Contensive.Processor.Controllers {
                             log.logType = EmailLogTypeImmediateSend;
                             log.emailID = email.emailId;
                             log.memberID = email.toMemberId;
-                            log.save(core);
+                            log.save(core.cpParent);
                             LogController.logInfo(core, "sendEmailInQueue, send FAILED [" + reasonForFail + "], NOT resent because too many retries, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "], attempts [" + email.attempts + "]");
                         } else {
                             //
@@ -907,7 +908,7 @@ namespace Contensive.Processor.Controllers {
                             string sendStatus = "Retrying unsuccessful send (" + email.attempts.ToString() + " of 3), reason [" + reasonForFail + "]";
                             sendStatus = sendStatus.Substring(0, (sendStatus.Length > 254) ? 254 : sendStatus.Length);
                             email.attempts += 1;
-                            var log = EmailLogModel.addEmpty(core);
+                            var log = EmailLogModel.addEmpty<EmailLogModel>(core.cpParent);
                             log.name = "Failed send queued for retry: " + queueRecord.name;
                             log.toAddress = email.toAddress;
                             log.fromAddress = email.fromAddress;
@@ -917,7 +918,7 @@ namespace Contensive.Processor.Controllers {
                             log.logType = EmailLogTypeImmediateSend;
                             log.emailID = email.emailId;
                             log.memberID = email.toMemberId;
-                            log.save(core);
+                            log.save(core.cpParent);
                             queueEmail(core, false, queueRecord.name, email);
                             LogController.logInfo(core, "sendEmailInQueue, failed attempt (" + email.attempts.ToString() + " of 3), reason [" + reasonForFail + "], added to end of queue, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "], attempts [" + email.attempts + "]");
                         }

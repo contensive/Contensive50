@@ -9,11 +9,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.Primitives {
     public class ProcessSiteExplorerMethodClass : Contensive.BaseClasses.AddonBaseClass {
@@ -38,7 +39,7 @@ namespace Contensive.Addons.Primitives {
                     core.doc.addRefreshQueryString("LinkObjectName", LinkObjectName);
                     core.html.addTitle("Site Explorer");
                     core.doc.setMetaContent(0, 0);
-                    string copy = core.addon.execute(AddonModel.createByUniqueName(core, "Site Explorer"), new CPUtilsBaseClass.addonExecuteContext() {
+                    string copy = core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, "Site Explorer"), new CPUtilsBaseClass.addonExecuteContext() {
                         addonType = CPUtilsBaseClass.addonContext.ContextPage,
                         errorContextMessage = "processing site explorer response"
                     });

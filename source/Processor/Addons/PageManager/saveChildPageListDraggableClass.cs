@@ -9,11 +9,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.PageManager {
     public class saveChildPageListDraggableClass : Contensive.BaseClasses.AddonBaseClass {
@@ -54,7 +55,7 @@ namespace Contensive.Addons.PageManager {
                                 }
                             }
                             //
-                           PageContentModel parentPage = PageContentModel.create(core, parentPageId );
+                           PageContentModel parentPage = DbBaseModel.create<PageContentModel>(core.cpParent, parentPageId );
                             if (parentPage == null) {
                                 //
                                 // -- parent page is not valid
@@ -62,23 +63,23 @@ namespace Contensive.Addons.PageManager {
                             } else {
                                 //
                                 // -- verify page set to required sort method Id
-                                SortMethodModel sortMethod = SortMethodModel.createByUniqueName(core, "By Alpha Sort Order Field");
+                                SortMethodModel sortMethod = DbBaseModel.createByUniqueName<SortMethodModel>(core.cpParent, "By Alpha Sort Order Field");
                                 if (sortMethod == null) {
-                                    sortMethod = SortMethodModel.createByUniqueName(core, "Alpha Sort Order Field");
+                                    sortMethod = DbBaseModel.createByUniqueName<SortMethodModel>(core.cpParent, "Alpha Sort Order Field");
                                 }
                                 if (sortMethod == null) {
                                     //
                                     // -- create the required sortMethod
-                                    sortMethod = SortMethodModel.addDefault(core, Processor.Models.Domain.ContentMetadataModel.createByUniqueName(core, SortMethodModel.contentName));
+                                    sortMethod = DbBaseModel.addDefault<SortMethodModel>(core.cpParent, Processor.Models.Domain.ContentMetadataModel.getDefaultValueDict(core, SortMethodModel.contentName));
                                     sortMethod.name = "By Alpha Sort Order Field";
                                     sortMethod.OrderByClause = "sortOrder";
-                                    sortMethod.save(core);
+                                    sortMethod.save(core.cpParent);
                                 }
                                 if (parentPage.childListSortMethodID != sortMethod.id) {
                                     //
                                     // -- update page if not set correctly
                                     parentPage.childListSortMethodID = sortMethod.id;
-                                    parentPage.save(core);
+                                    parentPage.save(core.cpParent);
                                 }
                                 int pagePtr = 0;
                                 foreach (var childPageId in childPageIdList) {
@@ -88,10 +89,10 @@ namespace Contensive.Addons.PageManager {
                                         cp.Site.ErrorReport(new GenericException("child page id is invalid from remote request [" + pageCommaList + "]"));
                                     } else {
                                         string SortOrder = (100000 + (pagePtr * 10)).ToString();
-                                       PageContentModel childPage = PageContentModel.create(core, childPageId);
+                                       PageContentModel childPage = DbBaseModel.create<PageContentModel>(core.cpParent, childPageId);
                                         if (childPage.sortOrder != SortOrder) {
                                             childPage.sortOrder = SortOrder;
-                                            childPage.save(core);
+                                            childPage.save(core.cpParent);
                                         }
                                     }
                                     pagePtr += 1;

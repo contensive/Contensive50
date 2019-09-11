@@ -9,12 +9,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -409,7 +410,7 @@ namespace Contensive.Processor.Controllers {
         public string getTextFromDb(string PropertyName, string DefaultValue, ref bool return_propertyFound) {
             string returnString = "";
             try {
-                returnString = SitePropertyModel.getValue(core, PropertyName, ref return_propertyFound);
+                returnString = SitePropertyModel.getValue(core.cpParent, PropertyName, ref return_propertyFound);
                 if (!return_propertyFound) {
                     if (!string.IsNullOrEmpty(DefaultValue)) {
                         // do not set - set may have to save, and save needs contentId, which now loads ondemand, which checks cache, which does a getSiteProperty.
@@ -601,7 +602,7 @@ namespace Contensive.Processor.Controllers {
                     throw new GenericException("Cannot access site property collection if database is not ready.");
                 } else {
                     if (_nameValueDict == null) {
-                        _nameValueDict = SitePropertyModel.getNameValueDict(core);
+                        _nameValueDict = SitePropertyModel.getNameValueDict(core.cpParent);
                     }
                 }
                 return _nameValueDict;

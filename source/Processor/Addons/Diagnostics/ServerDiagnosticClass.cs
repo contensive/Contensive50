@@ -1,10 +1,11 @@
 ﻿
 using System;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using System.Text;
 using System.IO;
 using Contensive.Processor.Controllers;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.Diagnostics {
     //
@@ -62,16 +63,16 @@ namespace Contensive.Addons.Diagnostics {
                 result.AppendLine("ok, database connection passed.");
                 //
                 // -- test for taskscheduler not running
-                if (AddonModel.createList(core, "(ProcessNextRun<" + DbController.encodeSQLDate(DateTime.Now.AddHours(-1)) + ")").Count > 0) {
+                if (DbBaseModel.createList<AddonModel>(core.cpParent, "(ProcessNextRun<" + DbController.encodeSQLDate(DateTime.Now.AddHours(-1)) + ")").Count > 0) {
                     return "ERROR, there are process addons unexecuted for over 1 hour. TaskScheduler may not be enabled, or no server is running the Contensive Task Service.";
                 }
-                if (TaskModel.createList(core, "(dateCompleted is null)and(dateStarted<" + DbController.encodeSQLDate(DateTime.Now.AddHours(-1)) + ")").Count > 0) {
+                if (DbBaseModel.createList<TaskModel>(core.cpParent, "(dateCompleted is null)and(dateStarted<" + DbController.encodeSQLDate(DateTime.Now.AddHours(-1)) + ")").Count > 0) {
                     return "ERROR, there are tasks that have been executing for over 1 hour. The Task Runner Server may have stopped.";
                 }
                 result.AppendLine("ok, taskscheduler running.");
                 //
                 // -- test for taskrunner not running
-                if (TaskModel.createList(core, "(dateCompleted is null)and(dateStarted is null)").Count > 100) {
+                if (DbBaseModel.createList<TaskModel>(core.cpParent, "(dateCompleted is null)and(dateStarted is null)").Count > 100) {
                     return "ERROR, there are over 100 task waiting to be execute. The Task Runner Server may have stopped.";
                 }
                 result.AppendLine("ok, taskrunner running.");

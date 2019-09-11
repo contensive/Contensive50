@@ -3,9 +3,10 @@
 using System;
 using System.Collections.Generic;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
 //
@@ -64,10 +65,10 @@ namespace Contensive.Addons.AddonListEditor {
                 List<AddonModel> addonModelList = null;
                 switch (metadata.name.ToLower()) {
                     case "page content":
-                        addonModelList = AddonModel.createList(core, "(active>0)and(content>0)");
+                        addonModelList = DbBaseModel.createList<AddonModel>(core.cpParent, "(active>0)and(content>0)");
                         break;
                     case "page templates":
-                        addonModelList = AddonModel.createList(core, "(active>0)and(template>0)");
+                        addonModelList = DbBaseModel.createList<AddonModel>(core.cpParent, "(active>0)and(template>0)");
                         break;
                     default:
                         return SerializeObject(new GetAddonPanel_ResponseClass() {

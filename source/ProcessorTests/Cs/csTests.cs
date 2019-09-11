@@ -7,6 +7,7 @@ using Contensive.Processor.Models;
 using Contensive.BaseClasses;
 using Contensive.Processor.Controllers;
 using static Tests.testConstants;
+using Contensive.Models.Db;
 
 namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     //
@@ -46,7 +47,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 using (CPCSBaseClass csAddon = cp.CSNew()) {
-                    if (!csAddon.Insert(Processor.Models.Db.AddonModel.contentName)) Assert.Fail("Insert addon failed");
+                    if (!csAddon.Insert(AddonModel.contentName)) Assert.Fail("Insert addon failed");
                     // integer
                     csAddon.SetField("IconHeight", 123);
                     Assert.AreEqual(123, csAddon.GetInteger("IconHeight"));
@@ -118,7 +119,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 //
                 // fileText
                 using (CPCSBaseClass csGroups = cp.CSNew()) {
-                    if (!csGroups.Insert(Processor.Models.Db.GroupModel.contentName)) Assert.Fail("Insert Groups failed");
+                    if (!csGroups.Insert(GroupModel.contentName)) Assert.Fail("Insert Groups failed");
                     csGroups.SetField("CopyFilename", "abcdef");
                     Assert.AreEqual("abcdef", csGroups.GetText("CopyFilename"));
                 }
@@ -127,7 +128,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 //
                 // float (double)
                 using (CPCSBaseClass csState = cp.CSNew()) {
-                    if (!csState.Insert(Processor.Models.Db.StateModel.contentName)) Assert.Fail("Insert states failed");
+                    if (!csState.Insert(StateModel.contentName)) Assert.Fail("Insert states failed");
                     csState.SetField("SalesTax", 0.045);
                     Assert.AreEqual(0.045, csState.GetNumber("SalesTax"));
                 }
@@ -139,11 +140,11 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // todo - find example of this field type
                 //
                 // memberselect
-                var testPerson = Processor.Models.Db.PersonModel.addEmpty(cp.core);
+                var testPerson = PersonModel.addEmpty(cp.core);
                 testPerson.name = "person" + testPerson.id;
-                testPerson.save(cp.core);
+                testPerson.save(cp);
                 using (CPCSBaseClass csEmail = cp.CSNew()) {
-                    if (!csEmail.Insert(Processor.Models.Db.EmailModel.contentName)) Assert.Fail("Insert email failed");
+                    if (!csEmail.Insert(EmailModel.contentName)) Assert.Fail("Insert email failed");
                     csEmail.SetField("TestMemberID", testPerson.id);
                     Assert.AreEqual(testPerson.id, csEmail.GetInteger("TestMemberID"));
                     Assert.AreEqual(testPerson.name, csEmail.GetText("TestMemberID"), "cs.getText of a memberselect field returns the name of the referenced record");
@@ -160,7 +161,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                     string fieldname = "copy";
                     string valueString = Guid.NewGuid().ToString();
                     using (CPCSBaseClass cs = cp.CSNew()) {
-                        if (!cs.Insert(Processor.Models.Db.AddonModel.contentName)) Assert.Fail("Insert addon failed");
+                        if (!cs.Insert(AddonModel.contentName)) Assert.Fail("Insert addon failed");
                         cs.SetField(fieldname, valueString);
                         Assert.AreEqual(valueString, cs.GetText(fieldname));
                         string filename = cs.GetFilename(fieldname);
@@ -174,7 +175,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // filehtml
                 {
                     string fieldName = "Copyfilename";
-                    string contentName = Processor.Models.Db.PageContentModel.contentName;
+                    string contentName = PageContentModel.contentName;
                     string valueString = Guid.NewGuid().ToString();
                     using (CPCSBaseClass cs = cp.CSNew()) {
                         if (!cs.Insert(contentName)) Assert.Fail("Insert layout failed");
@@ -191,7 +192,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // currency
                 {
                     // create test field if missing
-                    string contentName = Processor.Models.Db.AddonModel.contentName;
+                    string contentName = AddonModel.contentName;
                     string fieldName = "testField" + Guid.NewGuid().ToString().Replace("{", "").Replace("}", "").Replace("-", "");
                     if (!cp.Content.IsField(contentName, fieldName)) {
                         cp.Content.AddContentField(contentName, fieldName, CPContentBaseClass.fileTypeIdEnum.Currency);

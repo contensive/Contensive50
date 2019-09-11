@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Tests.testConstants;
+using Contensive.Models.Db;
 
 namespace Contensive.ProcessorTests.UnitTests.ViewTests {
     [TestClass()]
@@ -58,7 +59,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
                     string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
                     string echoText = "text added to document";
                     //
-                    if (cs.Insert(Processor.Models.Db.AddonModel.contentName)) {
+                    if (cs.Insert(AddonModel.contentName)) {
                         recordId = cs.GetInteger("id");
                         cs.SetField("name", addonName);
                         cs.SetField("copytext", htmlText);
@@ -75,7 +76,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
                     Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeAddon(addonGuid));
                     //
                     Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeAddon(recordId.ToString()));
-                    cp.Content.Delete(Processor.Models.Db.AddonModel.contentName, "id=" + recordId.ToString());
+                    cp.Content.Delete(AddonModel.contentName, "id=" + recordId.ToString());
                 }
             }
         }
@@ -99,7 +100,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
                 string echoText = "text added to document";
                 //
                 using (CPCSBaseClass cs = cp.CSNew()) {
-                    if (cs.Insert(Processor.Models.Db.AddonModel.contentName)) {
+                    if (cs.Insert(AddonModel.contentName)) {
                         recordId = cs.GetInteger("id");
                         cs.SetField("name", addonName);
                         cs.SetField("copytext", htmlText);

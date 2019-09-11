@@ -1,13 +1,14 @@
 ﻿
 using System;
 using Contensive.BaseClasses;
-using Contensive.Processor.Models.Db;
+
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
 using System.Collections.Generic;
 using System.Linq;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -236,7 +237,7 @@ namespace Contensive.Processor.Controllers {
                                                                         instanceGuid = ACInstanceID,
                                                                         errorContextMessage = "rendering addon found in active content within an email"
                                                                     };
-                                                                    AddonModel addon = AddonModel.createByUniqueName(core, ACName);
+                                                                    AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, ACName);
                                                                     Copy = core.addon.execute(addon, executeContext);
                                                                     break;
                                                             }
@@ -250,7 +251,7 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             // Get IconFilename, update the optionstring, and execute optionstring replacement functions
                                                             //
-                                                            string AddonContentName = Models.Db.AddonModel.contentName;
+                                                            string AddonContentName = AddonModel.contentName;
                                                             string SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid";
                                                             int IconWidth = 0;
                                                             int IconHeight = 0;
@@ -561,7 +562,7 @@ namespace Contensive.Processor.Controllers {
                                             //            int ACAttrHSpace = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HSPACE"));
                                             //            string ACAttrAlign = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALIGN"));
                                             //            //
-                                            //            libraryFilesModel file = libraryFilesModel.create(core, ACAttrRecordID);
+                                            //            libraryFilesModel file = libraryFilesModel.create(core.cpInternal, ACAttrRecordID);
                                             //            if (file != null) {
                                             //                string Filename = file.filename;
                                             //                Filename = genericController.vbReplace(Filename, "\\", "/");
@@ -638,7 +639,7 @@ namespace Contensive.Processor.Controllers {
                                             //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/IconDownload3.GIF"">"
                                             //        } else if (encodeACResourceLibraryImages) {
                                             //            //
-                                            //            libraryFilesModel file = libraryFilesModel.create(core, ACAttrRecordID);
+                                            //            libraryFilesModel file = libraryFilesModel.create(core.cpInternal, ACAttrRecordID);
                                             //            if (file != null) {
                                             //                if (string.IsNullOrEmpty(ACAttrAlt)) {
                                             //                    ACAttrAlt = genericController.encodeText(file.altText);
@@ -1083,7 +1084,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 //
                                                                                 // Get the record values
                                                                                 //
-                                                                                LibraryFilesModel file = LibraryFilesModel.create(core, RecordID);
+                                                                                LibraryFilesModel file = LibraryFilesModel.create(core.cpParent, RecordID);
                                                                                 if (file != null) {
                                                                                     string RecordVirtualFilename = file.filename;
                                                                                     int RecordWidth = file.width;
@@ -1440,9 +1441,9 @@ namespace Contensive.Processor.Controllers {
                                             };
                                             hint = "57, AddonGuid [" + AddonGuid + "], AddonName [" + AddonName + "]";
                                             if (!string.IsNullOrEmpty(AddonGuid)) {
-                                                Copy = core.addon.execute(AddonModel.create(core, AddonGuid), executeContext);
+                                                Copy = core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, AddonGuid), executeContext);
                                             } else {
-                                                Copy = core.addon.execute(AddonModel.createByUniqueName(core, AddonName), executeContext);
+                                                Copy = core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(core, AddonName), executeContext);
                                             }
                                         }
                                     }
@@ -1551,7 +1552,7 @@ namespace Contensive.Processor.Controllers {
                         if (libraryFileSplit.GetUpperBound(0) > 2) {
                             int libraryRecordID = encodeInteger(libraryFileSplit[2]);
                             if ((libraryFileSplit[0].ToLower() == "cclibraryfiles") && (libraryFileSplit[1].ToLower() == "filename") && (libraryRecordID != 0)) {
-                                LibraryFilesModel file = LibraryFilesModel.create(core, libraryRecordID);
+                                LibraryFilesModel file = LibraryFilesModel.create(core.cpParent, libraryRecordID);
                                 if ((file != null) && (htmlContentSegment_file != file.filename)) { htmlContentSegment_file = file.filename; }
                             }
                         }

@@ -3,9 +3,10 @@
 using System;
 using System.Collections.Generic;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Addons.AddonListEditor {
@@ -16,7 +17,7 @@ namespace Contensive.Addons.AddonListEditor {
         public override object Execute(CPBaseClass CP) {
             try {
                 CoreController core = ((CPClass)CP).core;
-                var content = ContentModel.create(core, CP.Doc.GetInteger("contentId"));
+                var content = ContentModel.create<ContentModel>(core.cpParent, CP.Doc.GetInteger("contentId"));
                 if (content == null) { return "<!-- contentId not valid -->"; };
                 string recordGuid = "";
                 using (var cs = CP.CSNew() ) {

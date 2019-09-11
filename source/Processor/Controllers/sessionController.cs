@@ -3,12 +3,12 @@ using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -53,14 +53,14 @@ namespace Contensive.Processor.Controllers {
                     if (user.languageID > 0) {
                         //
                         // -- get user language
-                        _language = LanguageModel.create(core, user.languageID);
+                        _language = DbBaseModel.create<LanguageModel>(core.cpParent, user.languageID);
                     }
                     if (_language == null) {
                         //
                         // -- try browser language if available
                         string HTTP_Accept_Language = Controllers.WebServerController.getBrowserAcceptLanguage(core);
                         if (!string.IsNullOrEmpty(HTTP_Accept_Language)) {
-                            List<LanguageModel> languageList = LanguageModel.createList(core, "(HTTP_Accept_Language='" + HTTP_Accept_Language + "')");
+                            List<LanguageModel> languageList = DbBaseModel.createList<LanguageModel>(core.cpParent, "(HTTP_Accept_Language='" + HTTP_Accept_Language + "')");
                             if (languageList.Count > 0) {
                                 _language = languageList[0];
                             }
@@ -70,22 +70,23 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- try default language
                         string defaultLanguageName = core.siteProperties.getText("Language", "English");
-                        _language = LanguageModel.createByUniqueName(core, defaultLanguageName);
+                        _language = DbBaseModel.createByUniqueName<LanguageModel>(core.cpParent, defaultLanguageName);
                     }
                     if (_language == null) {
                         //
                         // -- try english
-                        _language = LanguageModel.createByUniqueName(core, "English");
+                        _language = DbBaseModel.createByUniqueName< LanguageModel>(core.cpParent, "English");
                     }
                     if (_language == null) {
                         //
                         // -- add english to the table
-                        _language = LanguageModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, LanguageModel.contentName));
+                        Dictionary<string, String> defaultValues = ContentMetadataModel.getDefaultValueDict(core, LanguageModel.contentName);
+                        _language = LanguageModel.addDefault<LanguageModel>(core.cpParent, defaultValues);
                         _language.name = "English";
                         _language.http_Accept_Language = "en";
-                        _language.save(core);
+                        _language.save(core.cpParent);
                         user.languageID = _language.id;
-                        user.save(core);
+                        user.save(core.cpParent);
                     }
                 }
                 return _language;
@@ -203,17 +204,17 @@ namespace Contensive.Processor.Controllers {
                     if (visitToken.id != 0) {
                         //
                         // -- Visit is good, setup visit, then secondary visitor/user if possible
-                        resultSessionContext.visit = VisitModel.create(core, visitToken.id);
+                        resultSessionContext.visit = VisitModel.create< VisitModel>(core.cpParent, visitToken.id);
                         if (resultSessionContext.visit == null) {
                             //
                             // -- visit record is missing, create a new visit
                             LogController.logTrace(core, "cookie visit record is missing, create a new visit");
-                            resultSessionContext.visit = VisitModel.addEmpty(core);
+                            resultSessionContext.visit = VisitModel.addEmpty<VisitModel>(core.cpParent);
                         } else if (resultSessionContext.visit.lastVisitTime.AddHours(1) < core.doc.profileStartTime) {
                             //
                             // -- visit has expired, create new visit
                             LogController.logTrace(core, "cookie visit has expired, create new visit, lastVisitTime [" + resultSessionContext.visit.lastVisitTime + "], profileStartTime [" + core.doc.profileStartTime + "]");
-                            resultSessionContext.visit = VisitModel.addEmpty(core);
+                            resultSessionContext.visit = VisitModel.addEmpty<VisitModel>(core.cpParent);
                         } else {
                             //
                             // -- visit object is valid, share its data with other objects
@@ -226,7 +227,7 @@ namespace Contensive.Processor.Controllers {
                             if (resultSessionContext.visit.visitorID > 0) {
                                 //
                                 // -- try visit's visitor object
-                                VisitorModel testVisitor = VisitorModel.create(core, resultSessionContext.visit.visitorID);
+                                VisitorModel testVisitor = VisitorModel.create<VisitorModel>(core.cpParent, resultSessionContext.visit.visitorID);
                                 if (testVisitor != null) {
                                     resultSessionContext.visitor = testVisitor;
                                 }
@@ -234,7 +235,7 @@ namespace Contensive.Processor.Controllers {
                             if (resultSessionContext.visit.memberID > 0) {
                                 //
                                 // -- try visit's person object
-                                PersonModel testUser = PersonModel.create(core, resultSessionContext.visit.memberID);
+                                PersonModel testUser = DbBaseModel.create<PersonModel>(core.cpParent, resultSessionContext.visit.memberID);
                                 if (testUser != null) {
                                     resultSessionContext.user = testUser;
                                 }
@@ -255,7 +256,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- create new visit record
                         LogController.logTrace(core, "visit id=0, create new visit");
-                        resultSessionContext.visit = VisitModel.addEmpty(core);
+                        resultSessionContext.visit = VisitModel.addEmpty<VisitModel>(core.cpParent);
                         if (string.IsNullOrEmpty(resultSessionContext.visit.name)) {
                             resultSessionContext.visit.name = "User";
                         }
@@ -291,7 +292,7 @@ namespace Contensive.Processor.Controllers {
                                 if (visitorToken.id != 0) {
                                     //
                                     // -- visitor cookie good
-                                    VisitorModel testVisitor = VisitorModel.create(core, visitorToken.id);
+                                    VisitorModel testVisitor = VisitorModel.create<VisitorModel>(core.cpParent, visitorToken.id);
                                     if (testVisitor != null) {
                                         resultSessionContext.visitor = testVisitor;
                                         visitor_changes = true;
@@ -303,7 +304,7 @@ namespace Contensive.Processor.Controllers {
                         if (resultSessionContext.visitor.id == 0) {
                             //
                             // -- create new visitor
-                            resultSessionContext.visitor = VisitorModel.addEmpty(core);
+                            resultSessionContext.visitor = VisitorModel.addEmpty<VisitorModel>(core.cpParent);
                             visitor_changes = false;
                             //
                             resultSessionContext.visit.visitorNew = true;
@@ -324,7 +325,7 @@ namespace Contensive.Processor.Controllers {
                                 if (core.siteProperties.allowAutoLogin & resultSessionContext.user.autoLogin & resultSessionContext.visit.cookieSupport) {
                                     //
                                     // -- they allow it, now Check if they were logged in on their last visit
-                                    VisitModel lastVisit = VisitModel.getLastVisitByVisitor(core, resultSessionContext.visit.id, resultSessionContext.visitor.id);
+                                    VisitModel lastVisit = VisitModel.getLastVisitByVisitor(core.cpParent, resultSessionContext.visit.id, resultSessionContext.visitor.id);
                                     if (lastVisit != null) {
                                         if (lastVisit.visitAuthenticated && (lastVisit.memberID == resultSessionContext.visit.id)) {
                                             if (authenticateById(core, resultSessionContext.user.id, resultSessionContext)) {
@@ -468,7 +469,7 @@ namespace Contensive.Processor.Controllers {
                     if (resultSessionContext.visitor.id == 0) {
                         //
                         // -- create new visitor
-                        resultSessionContext.visitor = VisitorModel.addEmpty(core);
+                        resultSessionContext.visitor = DbBaseModel.addEmpty<VisitorModel>(core.cpParent);
                         visitor_changes = true;
                         //
                         resultSessionContext.visit.visitorNew = true;
@@ -550,13 +551,13 @@ namespace Contensive.Processor.Controllers {
                     // -- Save anything that changed
                     //LogController.logTrace(core, "save visit,visitor,user if updated");
                     if (visit_changes) {
-                        resultSessionContext.visit.save(core, true);
+                        resultSessionContext.visit.save(core.cpParent, true);
                     }
                     if (visitor_changes) {
-                        resultSessionContext.visitor.save(core, true);
+                        resultSessionContext.visitor.save(core.cpParent, true);
                     }
                     if (user_changes) {
-                        resultSessionContext.user.save(core, true);
+                        resultSessionContext.user.save(core.cpParent, true);
                     }
                     string visitCookieNew = SecurityController.encodeToken(core, resultSessionContext.visit.id, resultSessionContext.visit.lastVisitTime);
                     if (trackVisits && (visitCookie != visitCookieNew)) {
@@ -729,16 +730,17 @@ namespace Contensive.Processor.Controllers {
                 //
                 LogController.addSiteActivity(core, "logout", user.id, user.organizationID);
                 //
-                user = PersonModel.addDefault(core, ContentMetadataModel.createByUniqueName(core, PersonModel.contentName));
-                if ( user == null ) {
+                var defaultValues = ContentMetadataModel.getDefaultValueDict(core, PersonModel.contentName);
+                user = DbBaseModel.addDefault<PersonModel>(core.cpParent, defaultValues);
+                if (user == null) {
                     LogController.logError(core, "logout failed because new user could not be created");
                     return;
                 }
                 visit.memberID = user.id;
                 visit.visitAuthenticated = false;
-                visit.save(core);
+                visit.save(core.cpParent);
                 visitor.MemberID = user.id;
-                visitor.save(core);
+                visitor.save(core.cpParent);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -966,7 +968,7 @@ namespace Contensive.Processor.Controllers {
                     if (authContext.visit.startTime == DateTime.MinValue) {
                         authContext.visit.startTime = core.doc.profileStartTime;
                     }
-                    authContext.visit.save(core);
+                    authContext.visit.save(core.cpParent);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -996,13 +998,13 @@ namespace Contensive.Processor.Controllers {
         public static bool recognizeById(CoreController core, int userId, ref SessionController sessionContext) {
             bool result = false;
             try {
-                PersonModel contextUser = PersonModel.create(core, userId);
+                PersonModel contextUser = DbBaseModel.create<PersonModel>(core.cpParent, userId);
                 if (contextUser != null) {
                     if ((sessionContext.visitor == null) || (sessionContext.visitor.id == 0)) {
-                        sessionContext.visitor = VisitorModel.addEmpty(core);
+                        sessionContext.visitor = DbBaseModel.addEmpty<VisitorModel>(core.cpParent);
                     }
                     if ((sessionContext.visit == null) || (sessionContext.visit.id == 0)) {
-                        sessionContext.visit = VisitModel.addEmpty(core);
+                        sessionContext.visit = DbBaseModel.addEmpty<VisitModel>(core.cpParent);
                     }
                     sessionContext.user = contextUser;
                     sessionContext.visitor.MemberID = sessionContext.user.id;
@@ -1018,9 +1020,9 @@ namespace Contensive.Processor.Controllers {
                     }
                     sessionContext.user.LastVisit = core.doc.profileStartTime;
                     sessionContext.visit.excludeFromAnalytics = sessionContext.visit.excludeFromAnalytics || sessionContext.visit.bot || sessionContext.user.excludeFromAnalytics || sessionContext.user.admin || sessionContext.user.developer;
-                    sessionContext.visit.save(core);
-                    sessionContext.visitor.save(core);
-                    sessionContext.user.save(core);
+                    sessionContext.visit.save(core.cpParent);
+                    sessionContext.visitor.save(core.cpParent);
+                    sessionContext.user.save(core.cpParent);
                     result = true;
                 }
             } catch (Exception ex) {

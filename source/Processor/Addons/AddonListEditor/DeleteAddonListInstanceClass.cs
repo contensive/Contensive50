@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
@@ -57,7 +58,7 @@ namespace Contensive.Addons.AddonListEditor {
                 List<AddonListItemModel> addonList;
                 switch (metadata.name.ToLower()) {
                     case "page content":
-                        var page = Contensive.Processor.Models.Db.PageContentModel.create(core, request.parentRecordGuid);
+                        var page = DbBaseModel.create<PageContentModel>(core.cpParent, request.parentRecordGuid);
                         if (page == null) {
                             return SerializeObject(new DeleteAddonListInstance_ResponseClass() {
                                 errorList = new List<string> { "The parent record in [Page Content] could not be determined from the guid [" + request.parentRecordGuid + "]" }
@@ -76,7 +77,7 @@ namespace Contensive.Addons.AddonListEditor {
                         }
                         break;
                     case "page templates":
-                        var template = Contensive.Processor.Models.Db.PageTemplateModel.create(core, request.parentRecordGuid);
+                        var template = DbBaseModel.create<PageTemplateModel>(core.cpParent, request.parentRecordGuid);
                         if (template == null) {
                             return SerializeObject(new DeleteAddonListInstance_ResponseClass() {
                                 errorList = new List<string> { "The parent record in [Page Templates] could not be determined from the guid [" + request.parentRecordGuid + "]" }

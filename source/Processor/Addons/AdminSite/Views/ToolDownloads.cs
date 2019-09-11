@@ -1,11 +1,10 @@
 ﻿
 using System;
-using Contensive.Processor;
+using Contensive.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Addons.AdminSite.Controllers;
-using Contensive.Processor.Models.Db;
+
 
 namespace Contensive.Addons.AdminSite {
     public class ToolDownloads {
@@ -48,7 +47,7 @@ namespace Contensive.Addons.AdminSite {
                                     int RowPtr = 0;
                                     for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                         if (core.docProperties.getBoolean("Row" + RowPtr)) {
-                                            DownloadModel.delete<DownloadModel>(core, core.docProperties.getInteger("RowID" + RowPtr));
+                                            DownloadModel.delete<DownloadModel>(core.cpParent, core.docProperties.getInteger("RowID" + RowPtr));
                                         }
                                     }
                                 }
@@ -107,7 +106,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     //   Get Downloads available
                     //
-                    var downloadList = DownloadModel.createList<DownloadModel>(core, "", "id desc");
+                    var downloadList = DownloadModel.createList<DownloadModel>(core.cpParent, "", "id desc");
                     int RowPointer = 0;
                     int DataRowCount = 0;
                     if (downloadList.Count == 0) {
@@ -120,7 +119,7 @@ namespace Contensive.Addons.AdminSite {
                         string LinkSuffix = "\" target=_blank>Download</a>";
                         foreach (var download in downloadList) {
                             if (RowPointer >= PageSize) break;
-                            var requestedBy = PersonModel.create(core, download.requestedBy);
+                            var requestedBy = DbBaseModel.create<PersonModel>(core.cpParent, download.requestedBy);
                             Cells[RowPointer, 0] = HtmlController.checkbox("Row" + RowPointer) + HtmlController.inputHidden("RowID" + RowPointer, download.id);
                             Cells[RowPointer, 1] = download.name;
                             Cells[RowPointer, 2] = (requestedBy == null) ? "unknown" : requestedBy.name;

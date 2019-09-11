@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
@@ -19,6 +19,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.Tools {
     public class LegacyToolsClass {
@@ -219,7 +220,7 @@ namespace Contensive.Addons.Tools {
                                 break;
                             case AdminFormToolDefineContentFieldsFromTable:
                                 //
-                                Stream.Add((new DefineContentFieldsFromTableClass()).Execute(core.cp_forAddonExecutionOnly).ToString());
+                                Stream.Add((new DefineContentFieldsFromTableClass()).Execute(core.cpParent).ToString());
                                 break;
                             case AdminFormToolConfigureListing:
                                 //
@@ -228,11 +229,11 @@ namespace Contensive.Addons.Tools {
                             case AdminFormToolConfigureEdit:
                                 //
                                 //Call Stream.Add(core.addon.execute(guid_ToolConfigureEdit))
-                                Stream.Add( ConfigureContentEditClass.configureContentEdit(core.cp_forAddonExecutionOnly));
+                                Stream.Add( ConfigureContentEditClass.configureContentEdit(core.cpParent));
                                 break;
                             case AdminFormToolManualQuery:
                                 //
-                                Stream.Add( ManualQueryClass.getForm_ManualQuery(core.cp_forAddonExecutionOnly));
+                                Stream.Add( ManualQueryClass.getForm_ManualQuery(core.cpParent));
                                 break;
                             case AdminFormToolCreateChildContent:
                                 //
@@ -395,7 +396,7 @@ namespace Contensive.Addons.Tools {
                 string Caption = null;
                 int NavID = 0;
                 int ParentNavID = 0;
-                DataSourceModel datasource = DataSourceModel.create(core, core.docProperties.getInteger("DataSourceID"));
+                DataSourceModel datasource = DataSourceModel.create<DataSourceModel>(core.cpParent, core.docProperties.getInteger("DataSourceID"));
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 Caption = "Create Content Definition";
@@ -422,7 +423,7 @@ namespace Contensive.Addons.Tools {
                         core.cache.invalidateAll();
                         core.clearMetaData();
                         ContentID = Processor.Models.Domain.ContentMetadataModel.getContentId(core, ContentName);
-                        ParentNavID = MetadataController.getRecordIdByUniqueName( core,Processor.Models.Db.NavigatorEntryModel.contentName, "Manage Site Content");
+                        ParentNavID = MetadataController.getRecordIdByUniqueName( core,NavigatorEntryModel.contentName, "Manage Site Content");
                         if (ParentNavID != 0) {
                             ParentNavID = 0;
                             using (var csSrc = new CsModel(core)) {
@@ -1070,7 +1071,7 @@ namespace Contensive.Addons.Tools {
                         //
                         //If AddAdminMenuEntry Then
                         //    Stream.Add("<br>Adding menu entry (will not display until the next page)...")
-                        //    csData.cs_open(Processor.Models.Db.NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
+                        //    csData.cs_open(NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
                         //    If csData.cs_ok(CS) Then
                         //        MenuName = csData.cs_getText(CS, "name")
                         //        AdminOnly = csData.cs_getBoolean(CS, "AdminOnly")
@@ -1533,7 +1534,7 @@ namespace Contensive.Addons.Tools {
                 string ButtonList = null;
                 DataTable RSSchema = null;
                 var tmpList = new List<string> { };
-                DataSourceModel datasource = DataSourceModel.create(core, core.docProperties.getInteger("DataSourceID"),ref tmpList);
+                DataSourceModel datasource = DataSourceModel.create<DataSourceModel>(core.cpParent, core.docProperties.getInteger("DataSourceID"),ref tmpList);
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
@@ -2584,7 +2585,7 @@ namespace Contensive.Addons.Tools {
             string result = "";
             try {
                 string InstanceOptionString = "AdminLayout=1&filesystem=content files";
-                AddonModel addon = AddonModel.create(core, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
+                AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
                 string Content = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                     addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                     argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, InstanceOptionString),
@@ -2608,7 +2609,7 @@ namespace Contensive.Addons.Tools {
             string result = "";
             try {
                 string InstanceOptionString = "AdminLayout=1&filesystem=website files";
-                AddonModel addon = AddonModel.create(core, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
+                AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
                 string Content = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                     addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                     argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, InstanceOptionString),

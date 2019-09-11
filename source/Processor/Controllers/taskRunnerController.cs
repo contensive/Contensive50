@@ -9,12 +9,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using static Newtonsoft.Json.JsonConvert;
 using Contensive.Processor.Models.Domain;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -129,7 +130,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    LogController.logError(cp.core,ex);
+                    LogController.logError(cp.core, ex);
                 }
             }
         }
@@ -144,7 +145,7 @@ namespace Contensive.Processor.Controllers {
                 swProcess.Start();
                 //
                 foreach (KeyValuePair<string, Models.Domain.AppConfigModel> appKVP in serverCore.serverConfig.apps) {
-                    if ( appKVP.Value.enabled && appKVP.Value.appStatus.Equals(AppConfigModel.AppStatusEnum.ok)){
+                    if (appKVP.Value.enabled && appKVP.Value.appStatus.Equals(AppConfigModel.AppStatusEnum.ok)) {
                         //
                         // query tasks that need to be run
                         //
@@ -235,7 +236,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 using (var cp = new Contensive.Processor.CPClass(appName)) {
                     try {
-                        foreach (var task in TaskModel.createList(cp.core, "(cmdRunner=" + DbController.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
+                        foreach (var task in DbBaseModel.createList<TaskModel>(cp, "(cmdRunner=" + DbController.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
                             //
                             // -- trace log without core
                             LogController.log(cp.core, "taskRunner.runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
@@ -243,7 +244,7 @@ namespace Contensive.Processor.Controllers {
                             DateTime dateStarted = DateTime.Now;
                             var cmdDetail = DeserializeObject<TaskModel.CmdDetailClass>(task.cmdDetail);
                             if (cmdDetail != null) {
-                                var addon = AddonModel.create(cp.core, cmdDetail.addonId);
+                                var addon = DbBaseModel.create<AddonModel>(cp, cmdDetail.addonId);
                                 if (addon != null) {
                                     var context = new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                         backgroundProcess = true,
@@ -256,7 +257,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // -- save output
                                         if (task.resultDownloadId > 0) {
-                                            var download = DbBaseModel.create<DownloadModel>(cp.core, task.resultDownloadId);
+                                            var download = DbBaseModel.create<DownloadModel>(cp, task.resultDownloadId);
                                             if (download != null) {
                                                 if (string.IsNullOrEmpty(download.name)) {
                                                     download.name = "Download";
@@ -265,7 +266,7 @@ namespace Contensive.Processor.Controllers {
                                                 download.filename.content = result;
                                                 download.dateRequested = dateStarted;
                                                 download.dateCompleted = DateTime.Now;
-                                                download.save(cp.core);
+                                                download.save(cp);
                                             }
                                         }
                                         //task.filename.content = result;
@@ -274,7 +275,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             task.dateCompleted = DateTime.Now;
                             //task.save(cp.core);
-                            TaskModel.delete(cp.core, task.id);
+                            DbBaseModel.delete<TaskModel>(cp, task.id);
                             //
                             // -- info log the task running - so info state will log for memory leaks
                             LogController.log(cp.core, "TaskRunner exit, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
@@ -297,8 +298,8 @@ namespace Contensive.Processor.Controllers {
         }
         ~TaskRunnerController() {
             Dispose(false);
-            
-            
+
+
         }
         #endregion
     }

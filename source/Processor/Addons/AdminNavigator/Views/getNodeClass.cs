@@ -3,9 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Db;
+
 
 namespace Contensive.Addons.AdminNavigator {
     public class GetNodeClass : AddonBaseClass {
@@ -470,8 +471,8 @@ namespace Contensive.Addons.AdminNavigator {
                                     cp.Db.ExecuteNonQuery(SQL);
                                 }
                                 var dependentList = new List<string> {
-                                    Contensive.Processor.Models.Db.AddonModel.contentTableNameLowerCase,
-                                    Contensive.Processor.Models.Db.AddonCollectionModel.contentTableNameLowerCase
+                                    AddonModel.contentTableNameLowerCase,
+                                    AddonCollectionModel.contentTableNameLowerCase
                                 };
                                 cp.Cache.Store(cacheName, nodeHtml, dependentList);
                             }
@@ -849,7 +850,7 @@ namespace Contensive.Addons.AdminNavigator {
                     //
                     //
                     //
-                    cp.Cache.Store(BakeName, EmptyNodeList, Contensive.Processor.Models.Db.NavigatorEntryModel.contentTableNameLowerCase);
+                    cp.Cache.Store(BakeName, EmptyNodeList, NavigatorEntryModel.contentTableNameLowerCase);
                     //               if (EmptyNodeListInitial != EmptyNodeList) {
                     //	cp.Cache.Save(BakeName, EmptyNodeList, "Navigator Entries");
                     //}

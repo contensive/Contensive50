@@ -7,6 +7,7 @@ using Contensive.Processor.Exceptions;
 using static Contensive.Processor.Constants;
 using Contensive.Addons.AdminSite.Controllers;
 using System.Net;
+using Contensive.Models.Db;
 
 namespace Contensive.Addons.AdminSite {
     public class ControlEditor {
@@ -147,7 +148,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                                 string sqlFilter = "(ContentTableID=" + TableID + ")";
-                                int contentCID = MetadataController.getRecordIdByUniqueName(core, Processor.Models.Db.ContentModel.contentName, Processor.Models.Db.ContentModel.contentName);
+                                int contentCID = MetadataController.getRecordIdByUniqueName(core, ContentModel.contentName, ContentModel.contentName);
                                 HTMLFieldString += AdminUIController.getDefaultEditor_lookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, adminData.editRecord.userReadOnly, "", "", true, sqlFilter);
                                 FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)";
                             }

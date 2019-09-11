@@ -2,13 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Linq;
 using Contensive.BaseClasses;
 using Contensive.Processor.Exceptions;
+using Contensive.Models;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Models.Domain {
     //
@@ -368,7 +370,7 @@ namespace Contensive.Processor.Models.Domain {
                                 result.parentID = -1;
                             } else {
                                 Models.Domain.ContentMetadataModel parentMetaData = create(core, result.parentID, loadInvalidFields, forceDbLoad);
-                                if ( parentMetaData == null ) {
+                                if (parentMetaData == null) {
                                     LogController.logError(core, new GenericException("ContentMetadataModel error, loading content [" + content.id + ", " + content.name + "], parentId [" + result.parentID + "] but no parent content found."));
                                 } else {
                                     foreach (var keyvaluepair in parentMetaData.fields) {
@@ -605,7 +607,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="forceDbLoad"></param>
         /// <returns></returns>
         public static ContentMetadataModel create(CoreController core, string contentGuid, bool loadInvalidFields, bool forceDbLoad) {
-            var content = ContentModel.create(core, contentGuid);
+            var content = ContentModel.create(core.cpParent, contentGuid);
             if (content == null) { return null; }
             return create(core, content, loadInvalidFields, forceDbLoad);
         }
@@ -624,7 +626,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="forceDbLoad"></param>
         /// <returns></returns>
         public static ContentMetadataModel create(CoreController core, int contentId, bool loadInvalidFields, bool forceDbLoad) {
-            var content = ContentModel.create(core, contentId);
+            var content = ContentModel.create(core.cpParent, contentId);
             if (content == null) { return null; }
             return create(core, content, loadInvalidFields, forceDbLoad);
         }
@@ -640,7 +642,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="contentName"></param>
         /// <returns></returns>
         public static ContentMetadataModel createByUniqueName(CoreController core, string contentName, bool loadInvalidFields, bool forceDbLoad) {
-            var content = ContentModel.createByUniqueName(core, contentName);
+            var content = DbBaseModel.createByUniqueName<ContentModel>(core.cpParent, contentName);
             if (content == null) { return null; }
             return create(core, content, loadInvalidFields, forceDbLoad);
         }
@@ -813,7 +815,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (string.IsNullOrWhiteSpace(contentName)) return 0;
                 var nameLower = contentName.Trim().ToLowerInvariant();
                 if (core.contentNameIdDictionary.ContainsKey(nameLower)) { return core.contentNameIdDictionary[nameLower]; }
-                ContentModel content = ContentModel.createByUniqueName(core, contentName);
+                ContentModel content = DbBaseModel.createByUniqueName<ContentModel>(core.cpParent, contentName);
                 if (content == null) { return 0; }
                 core.contentNameIdDictionary.Add(nameLower, content.id);
                 return content.id;
@@ -881,7 +883,7 @@ namespace Contensive.Processor.Models.Domain {
                         // Get the installedByCollectionId
                         int InstalledByCollectionID = 0;
                         if (!string.IsNullOrEmpty(fieldMetadata.installedByCollectionGuid)) {
-                            var addonCollection = AddonCollectionModel.create(core, fieldMetadata.installedByCollectionGuid);
+                            var addonCollection = AddonCollectionModel.create(core.cpParent, fieldMetadata.installedByCollectionGuid);
                             if (addonCollection != null) {
                                 InstalledByCollectionID = addonCollection.id;
                             }
@@ -901,7 +903,7 @@ namespace Contensive.Processor.Models.Domain {
                         }
                         //
                         // create or update the field
-                        SqlFieldListClass sqlList = new SqlFieldListClass();
+                        var sqlList = new SqlFieldListClass();
                         sqlList.add("ACTIVE", DbController.encodeSQLBoolean(fieldMetadata.active));
                         sqlList.add("MODIFIEDBY", DbController.encodeSQLNumber(SystemMemberID));
                         sqlList.add("MODIFIEDDATE", DbController.encodeSQLDate(DateTime.Now));
@@ -1006,7 +1008,7 @@ namespace Contensive.Processor.Models.Domain {
                             throw (new GenericException("Could not create Field [" + fieldMetadata.nameLc + "] because insert into ccfields failed."));
                         } else {
                             db.updateTableRecord("ccFields", "ID=" + fieldMetadata.id, sqlList);
-                            ContentFieldModel.invalidateRecordCache(core, fieldMetadata.id);
+                            ContentFieldModel.invalidateCacheOfRecord(core, fieldMetadata.id);
                         }
                     }
                 }
@@ -1035,11 +1037,11 @@ namespace Contensive.Processor.Models.Domain {
                     db.createSQLTable(contentMetadata.tableName);
                     //
                     // get contentId, guid, IsBaseContent
-                    var content = ContentModel.createByUniqueName(core, contentMetadata.name);
+                    var content = DbBaseModel.createByUniqueName<ContentModel>(core.cpParent, contentMetadata.name);
                     if (content == null) {
                         content = ContentModel.addDefault(core, contentMetadata);
                         content.name = contentMetadata.name;
-                        content.save(core);
+                        content.save(core.cpParent);
                     }
                     contentMetadata.id = content.id;
                     string contentGuid = content.ccguid;
@@ -1049,17 +1051,17 @@ namespace Contensive.Processor.Models.Domain {
                     // get parentId
                     int parentId = 0;
                     if (!string.IsNullOrEmpty(contentMetadata.parentName)) {
-                        var parentContent = ContentModel.createByUniqueName(core, contentMetadata.parentName);
+                        var parentContent = DbBaseModel.createByUniqueName<ContentModel>(core.cpParent, contentMetadata.parentName);
                         if (parentContent != null) { parentId = parentContent.id; }
                     }
                     //
                     // get InstalledByCollectionID
                     int InstalledByCollectionID = 0;
-                    var collection = AddonCollectionModel.create(core, contentMetadata.installedByCollectionGuid);
+                    var collection = AddonCollectionModel.create(core.cpParent, contentMetadata.installedByCollectionGuid);
                     if (collection != null) { InstalledByCollectionID = collection.id; }
                     //
                     // Get the table object for this content metadata, create one if missing
-                    var table = TableModel.createByUniqueName(core, contentMetadata.tableName);
+                    var table = DbBaseModel.createByUniqueName<TableModel>(core.cpParent, contentMetadata.tableName);
                     if (table == null) {
                         //
                         // -- table model not found, create it - only name and datasource matter
@@ -1077,31 +1079,31 @@ namespace Contensive.Processor.Models.Domain {
                         if (!DataSourceModel.isDataSourceDefault(contentMetadata.dataSourceName)) {
                             //
                             // -- is not the default datasource, open a datasource model for it to get the id
-                            var dataSource = DataSourceModel.createByUniqueName(core, contentMetadata.dataSourceName);
+                            var dataSource = DbBaseModel.createByUniqueName<DataSourceModel>(core.cpParent, contentMetadata.dataSourceName);
                             if (dataSource == null) {
                                 //
                                 // -- datasource record does not exist, create it now
                                 dataSource = DataSourceModel.addEmpty(core);
                                 dataSource.name = contentMetadata.dataSourceName;
-                                dataSource.save(core);
+                                dataSource.save(core.cpParent);
                             }
                         }
-                        table.save(core);
+                        table.save(core.cpParent);
                         content.contentTableID = table.id;
                         content.authoringTableID = table.id;
-                        content.save(core);
+                        content.save(core.cpParent);
                     }
                     //
                     // sortmethod - First try lookup by name
                     int defaultSortMethodID = 0;
                     if (!string.IsNullOrEmpty(contentMetadata.defaultSortMethod)) {
-                        var sortMethod = SortMethodModel.createByUniqueName(core, contentMetadata.defaultSortMethod);
+                        var sortMethod = DbBaseModel.createByUniqueName<SortMethodModel>(core.cpParent, contentMetadata.defaultSortMethod);
                         if (sortMethod != null) { defaultSortMethodID = sortMethod.id; }
                     }
                     if (defaultSortMethodID == 0) {
                         //
                         // fallback - maybe they put the orderbyclause in (common mistake)
-                        var sortMethodList = SortMethodModel.createList(core, "(OrderByClause=" + DbController.encodeSQLText(contentMetadata.defaultSortMethod) + ")and(active<>0)", "id");
+                        var sortMethodList = DbBaseModel.createList<SortMethodModel>(core.cpParent, "(OrderByClause=" + DbController.encodeSQLText(contentMetadata.defaultSortMethod) + ")and(active<>0)", "id");
                         if (sortMethodList.Count() > 0) { defaultSortMethodID = sortMethodList.First().id; }
                     }
 
@@ -1137,10 +1139,10 @@ namespace Contensive.Processor.Models.Domain {
                     sqlList.add("installedByCollectionid", DbController.encodeSQLNumber(InstalledByCollectionID));
                     sqlList.add("isBaseContent", DbController.encodeSQLBoolean(contentMetadata.isBaseContent));
                     db.updateTableRecord("ccContent", "ID=" + contentMetadata.id, sqlList);
-                    ContentModel.invalidateRecordCache(core, contentMetadata.id);
+                    ContentModel.invalidateCacheOfRecord<ContentModel>(core.cpParent, contentMetadata.id);
                     //
                     // -- reload metadata
-                    contentMetadata = ContentMetadataModel.create(core, contentMetadata.id, false, true);
+                    contentMetadata = create(core, contentMetadata.id, false, true);
                     //
                     // Verify Core Content Definition Fields
                     if (parentId < 1) {
@@ -1316,8 +1318,8 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 // ----- Load metadata
                 //
-                ContentModel.invalidateTableCache(core);
-                ContentFieldModel.invalidateTableCache(core);
+                ContentModel.invalidateCacheOfTable<ContentModel>(core.cpParent);
+                ContentFieldModel.invalidateCacheOfTable<ContentFieldModel>(core.cpParent);
                 core.clearMetaData();
                 core.cache.invalidateAll();
             } catch (Exception ex) {
@@ -1550,7 +1552,7 @@ namespace Contensive.Processor.Models.Domain {
             try {
                 //
                 // -- test if the child already exists
-                var childContent = ContentModel.createByUniqueName(core, childContentName);
+                var childContent = DbBaseModel.createByUniqueName<ContentModel>(core.cpParent, childContentName);
                 if (childContent != null) {
                     //
                     // -- child content already exists
@@ -1559,14 +1561,14 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 //
                 // -- convert this object to a child of the record it was opened with, and save
-                childContent = ContentModel.createByUniqueName(core, name);
+                childContent = DbBaseModel.createByUniqueName<ContentModel>(core.cpParent, name);
                 childContent.parentID = childContent.id;
                 childContent.name = childContentName;
                 childContent.createdBy = childContent.modifiedBy = memberID;
                 childContent.dateAdded = childContent.modifiedDate = DateTime.Now;
                 childContent.ccguid = createGuid();
                 childContent.id = 0;
-                childContent.save(core);
+                childContent.save(core.cpParent);
                 //
                 // ----- Load metadata
                 //
@@ -1606,8 +1608,8 @@ namespace Contensive.Processor.Models.Domain {
                 }
             }
         }
-        //
-        //=============================================================
+        //   
+        //============================================================================================================
         /// <summary>
         /// Return a record name given the record id. If not record is found, blank is returned.
         /// </summary>
@@ -1624,6 +1626,8 @@ namespace Contensive.Processor.Models.Domain {
                 throw;
             }
         }
+        //   
+        //============================================================================================================
         //
         public int getRecordId(CoreController core, string recordGuid) {
             try {
@@ -1640,6 +1644,8 @@ namespace Contensive.Processor.Models.Domain {
                 throw;
             }
         }
+        //   
+        //============================================================================================================
         //
         public int getRecordIdByUniqueName(CoreController core, string recordName) {
             try {
@@ -1653,6 +1659,19 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.logError(core, ex);
                 throw;
             }
+        }
+        //   
+        //============================================================================================================
+        //
+        public static Dictionary<string, String> getDefaultValueDict(CoreController core, string contentName) {
+            var defaultValueDict = new Dictionary<string, String>();
+            ContentMetadataModel meta = createByUniqueName(core, contentName);
+            foreach (var fieldKvp in meta.fields) {
+                if (!string.IsNullOrWhiteSpace(fieldKvp.Value.defaultValue)) {
+                    defaultValueDict.Add(fieldKvp.Key.ToLower(), fieldKvp.Value.defaultValue);
+                }
+            }
+            return defaultValueDict;
         }
     }
 }

@@ -55,7 +55,7 @@ namespace Contensive.Processor.Controllers {
                 //    // -- new record
                 //    result.allowSave = true;
                 //} else {
-                //    CDef = Models.Domain.CDefModel.create(core, contentName);
+                //    CDef = Models.Domain.CDefModel.create(core.cpInternal, contentName);
                 //    result.allowSave = true;
                 //    if ((CDef.allowDelete) && (recordId != 0)) {
                 //        //

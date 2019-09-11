@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Data;
-using Contensive.Processor.Models.Db;
+
 using Contensive.BaseClasses;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
@@ -11,6 +11,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Text;
 using Contensive.Processor.Models.Domain;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -70,7 +71,7 @@ namespace Contensive.Processor.Controllers {
                         int posDot = 0;
                         int loopCnt = 10;
                         do {
-                            core.doc.domain = DomainModel.createByUniqueName(core, domainTest);
+                            core.doc.domain = DbBaseModel.createByUniqueName<DomainModel>(core.cpParent, domainTest);
                             posDot = domainTest.IndexOf('.');
                             if ((posDot >= 0) && (domainTest.Length > 1)) {
                                 domainTest = domainTest.Substring(posDot + 1);
@@ -96,7 +97,7 @@ namespace Contensive.Processor.Controllers {
                     };
                     //
                     // -- execute template Dependencies
-                    List<Models.Db.AddonModel> templateAddonList = AddonModel.createList_templateDependencies(core, core.doc.pageController.template.id);
+                    List<AddonModel> templateAddonList = AddonModel.createList_templateDependencies(core.cpParent, core.doc.pageController.template.id);
                     if (templateAddonList.Count > 0) {
                         string addonContextMessage = executeContext.errorContextMessage;
                         foreach (AddonModel addon in templateAddonList) {
@@ -111,7 +112,7 @@ namespace Contensive.Processor.Controllers {
                     // -- execute page addons
                     //
                     // -- execute page Dependencies
-                    List<Models.Db.AddonModel> pageAddonList = AddonModel.createList_pageDependencies(core, core.doc.pageController.page.id);
+                    List<AddonModel> pageAddonList = AddonModel.createList_pageDependencies(core.cpParent, core.doc.pageController.page.id);
                     if (pageAddonList.Count > 0) {
                         string addonContextMessage = executeContext.errorContextMessage;
                         foreach (AddonModel addon in pageAddonList) {
@@ -155,13 +156,13 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- Active Download hook
-                    LibraryFilesModel file = LibraryFilesModel.create(core, core.docProperties.getText(RequestNameDownloadFileGuid));
+                    LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, core.docProperties.getText(RequestNameDownloadFileGuid));
                     if (file == null) {
                         //
                         // -- compatibility mode, downloadid, this exposes all library files because it exposes the sequential id number
                         int downloadId = core.docProperties.getInteger(RequestNameDownloadFileId);
                         if ((downloadId > 0) && (core.siteProperties.getBoolean("Allow library file download by id", false))) {
-                            file = LibraryFilesModel.create(core, downloadId);
+                            file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, downloadId);
                         }
                     }
                     if (file != null) {
@@ -169,18 +170,18 @@ namespace Contensive.Processor.Controllers {
                         // -- lookup record and set clicks
                         if (file != null) {
                             file.clicks += 1;
-                            file.save(core);
+                            file.save(core.cpParent);
                             if (file.filename != "") {
                                 //
                                 // -- create log entry
-                                LibraryFileLogModel log = LibraryFileLogModel.addEmpty(core);
+                                LibraryFileLogModel log = LibraryFileLogModel.addEmpty<LibraryFileLogModel>(core.cpParent);
                                 if (log != null) {
                                     log.name = DateTime.Now.ToString() + " user [#" + core.session.user.name + ", " + core.session.user.name + "]";
                                     log.fileID = file.id;
                                     log.visitID = core.session.visit.id;
                                     log.memberID = core.session.user.id;
                                     log.FromUrl = core.webServer.requestPageReferer;
-                                    log.save(core);
+                                    log.save(core.cpParent);
                                 }
                                 //
                                 // -- and go
@@ -318,7 +319,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             if (!string.IsNullOrEmpty(linkAliasTest1 + linkAliasTest2)) {
                                 string sqlLinkAliasCriteria = "(name=" + DbController.encodeSQLText(linkAliasTest1) + ")or(name=" + DbController.encodeSQLText(linkAliasTest2) + ")";
-                                List<Models.Db.LinkAliasModel> linkAliasList = LinkAliasModel.createList(core, sqlLinkAliasCriteria, "id desc");
+                                List<LinkAliasModel> linkAliasList = DbBaseModel.createList<LinkAliasModel>(core.cpParent, sqlLinkAliasCriteria, "id desc");
                                 if (linkAliasList.Count > 0) {
                                     LinkAliasModel linkAlias = linkAliasList.First();
                                     string LinkQueryString = rnPageId + "=" + linkAlias.pageID + "&" + linkAlias.queryStringSuffix;
@@ -366,7 +367,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // -- block with login
                                     core.doc.continueProcessing = false;
-                                    return core.addon.execute(AddonModel.create(core, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
+                                    return core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
                                         addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                         errorContextMessage = "calling login page addon [" + addonGuidLoginPage + "] because page is blocked"
                                     });
@@ -387,7 +388,7 @@ namespace Contensive.Processor.Controllers {
                     // -- check secure certificate required
                     bool SecureLink_Template_Required = core.doc.pageController.template.isSecure;
                     bool SecureLink_Page_Required = false;
-                    foreach (Models.Db.PageContentModel page in core.doc.pageController.pageToRootList) {
+                    foreach (PageContentModel page in core.doc.pageController.pageToRootList) {
                         if (core.doc.pageController.page.isSecure) {
                             SecureLink_Page_Required = true;
                             break;
@@ -422,7 +423,7 @@ namespace Contensive.Processor.Controllers {
                     // -- if endpoint is domain + route (link alias), the route determines the page, which may determine the core.doc.pageController.template. If this template is not allowed for this domain, redirect to the domain's landingcore.doc.pageController.page.
                     //
                     Sql = "(domainId=" + core.doc.domain.id + ")";
-                    List<Models.Db.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(core, Sql);
+                    List<TemplateDomainRuleModel> allowTemplateRuleList = DbBaseModel.createList<TemplateDomainRuleModel>(core.cpParent, Sql);
                     if (allowTemplateRuleList.Count == 0) {
                         //
                         // -- current template has no domain preference, use current
@@ -582,7 +583,7 @@ namespace Contensive.Processor.Controllers {
                 // -- If Link field populated, do redirect
                 if (core.doc.pageController.page.pageLink != "") {
                     core.doc.pageController.page.clicks += 1;
-                    core.doc.pageController.page.save(core);
+                    core.doc.pageController.page.save(core.cpParent);
                     core.doc.redirectLink = core.doc.pageController.page.pageLink;
                     core.doc.redirectReason = "Redirect required because this page (PageRecordID=" + core.doc.pageController.page.id + ") has a Link Override [" + core.doc.pageController.page.pageLink + "].";
                     core.doc.redirectBecausePageNotFound = false;
@@ -710,7 +711,7 @@ namespace Contensive.Processor.Controllers {
                                         // -- not recognized
                                         BlockForm = ""
                                             + "<p>This content has limited access. If you have an account, please login using this form.</p>"
-                                            + core.addon.execute(AddonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
+                                            + core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
                                                 addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                                 errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked and user not recognized"
                                             });
@@ -719,7 +720,7 @@ namespace Contensive.Processor.Controllers {
                                         // -- recognized, not authenticated
                                         BlockForm = ""
                                             + "<p>This content has limited access. You were recognized as \"<b>" + core.session.user.name + "</b>\", but you need to login to continue. To login to this account or another, please use this form.</p>"
-                                            + core.addon.execute(AddonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
+                                            + core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
                                                 addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                                 errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked and user not authenticated"
                                             });
@@ -730,7 +731,7 @@ namespace Contensive.Processor.Controllers {
                                     BlockForm = ""
                                         + "<p>You are currently logged in as \"<b>" + core.session.user.name + "</b>\". If this is not you, please <a href=\"?" + core.doc.refreshQueryString + "&method=logout\" rel=\"nofollow\">Click Here</a>.</p>"
                                         + "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>"
-                                        + core.addon.execute(AddonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
+                                        + core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
                                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                             errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked and user does not have access to content"
                                         });
@@ -750,7 +751,7 @@ namespace Contensive.Processor.Controllers {
                                     BlockForm = ""
                                         + "<p>This content has limited access. If you have an account, please login using this form.</p>"
                                         + "<p>If you do not have an account, <a href=\"?" + core.doc.refreshQueryString + "&subform=0\">click here to register</a>.</p>"
-                                        + core.addon.execute(AddonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
+                                        + core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
                                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                             errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked for registration"
                                         });
@@ -828,7 +829,7 @@ namespace Contensive.Processor.Controllers {
                             if (!allowChildListComposite) {
                                 result = result + core.html.getAdminHintWrapper("<p>Child page list display is disabled for this page. To enable the child page list, edit this page and check 'Display Child Pages' in the navigation tab.</p>");
                             }
-                            AddonModel addon = AddonModel.create(core, addonGuidChildList);
+                            AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidChildList);
                             CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                 hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
@@ -847,7 +848,7 @@ namespace Contensive.Processor.Controllers {
                         // Page Hit Notification
                         //
                         if ((!core.session.visit.excludeFromAnalytics) && (core.doc.pageController.page.contactMemberID != 0) && (core.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase) == -1)) {
-                            PersonModel person = PersonModel.create(core, core.doc.pageController.page.contactMemberID);
+                            PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, core.doc.pageController.page.contactMemberID);
                             if (person != null) {
                                 if (core.doc.pageController.page.allowHitNotification) {
                                     string PageName = core.doc.pageController.page.name;
@@ -1089,7 +1090,7 @@ namespace Contensive.Processor.Controllers {
                             if (addonList == null) {
                                 LogController.logWarn(core, "The addonList for page [" + core.doc.pageController.page.id + ", " + core.doc.pageController.page.name + "] was not empty, but deserialized to null, addonList '" + core.doc.pageController.page.addonList + "'");
                             }
-                            htmlPageContent += AddonListController.render(core.cp_forAddonExecutionOnly, addonList);
+                            htmlPageContent += AddonListController.render(core.cpParent, addonList);
                         } catch (Exception) {
                             LogController.logWarn(core, "The addonList for page [" + core.doc.pageController.page.id + ", " + core.doc.pageController.page.name + "] was not empty, but deserialized to null, addonList '" + core.doc.pageController.page.addonList + "'");
                         }
@@ -1182,17 +1183,17 @@ namespace Contensive.Processor.Controllers {
         internal static string getContentBlockMessage(CoreController core, bool UseContentWatchLink) {
             string result = "";
             try {
-                var copyRecord = CopyContentModel.createByUniqueName(core, ContentBlockCopyName);
+                var copyRecord = DbBaseModel.createByUniqueName<CopyContentModel>(core.cpParent, ContentBlockCopyName);
                 if (copyRecord != null) {
                     return copyRecord.copy;
                 }
                 //
                 // ----- Do not allow blank message - if still nothing, create default
                 result = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=\"?method=login\" rel=\"nofollow\">Click Here</a>. For more information, please contact the administrator.</p>";
-                copyRecord = CopyContentModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, CopyContentModel.contentName));
+                copyRecord = DbBaseModel.addDefault<CopyContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, CopyContentModel.contentName));
                 copyRecord.name = ContentBlockCopyName;
                 copyRecord.copy = result;
-                copyRecord.save(core);
+                copyRecord.save(core.cpParent);
                 return result;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1206,7 +1207,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 string Copy = "";
-                var person = PersonModel.create(core, PeopleID);
+                var person = DbBaseModel.create<PersonModel>(core.cpParent, PeopleID);
                 if (person != null) {
                     if (!string.IsNullOrEmpty(person.name)) {
                         Copy += "For more information, please contact " + person.name;
@@ -1263,11 +1264,11 @@ namespace Contensive.Processor.Controllers {
                 // -- attempt requested page
                 PageContentModel requestedPage = null;
                 if (!requestedPageId.Equals(0)) {
-                    requestedPage = PageContentModel.create(core, requestedPageId);
+                    requestedPage = DbBaseModel.create<PageContentModel>(core.cpParent, requestedPageId);
                     if (requestedPage == null) {
                         //
                         // -- requested page not found
-                        requestedPage = PageContentModel.create(core, getPageNotFoundPageId(core));
+                        requestedPage = DbBaseModel.create<PageContentModel>(core.cpParent, getPageNotFoundPageId(core));
                     }
                 }
                 if (requestedPage == null) {
@@ -1288,13 +1289,13 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- build parentpageList (first = current page, last = root)
                 // -- add a 0, then repeat until another 0 is found, or there is a repeat
-                core.doc.pageController.pageToRootList = new List<Models.Db.PageContentModel>();
+                core.doc.pageController.pageToRootList = new List<PageContentModel>();
                 List<int> usedPageIdList = new List<int>();
                 int targetPageId = requestedPage.id;
                 usedPageIdList.Add(0);
                 while (!usedPageIdList.Contains(targetPageId)) {
                     usedPageIdList.Add(targetPageId);
-                    PageContentModel targetpage = PageContentModel.create(core, targetPageId);
+                    PageContentModel targetpage = DbBaseModel.create<PageContentModel>(core.cpParent, targetPageId);
                     if (targetpage == null) {
                         break;
                     } else {
@@ -1305,10 +1306,10 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.pageController.pageToRootList.Count == 0) {
                     //
                     // -- attempt failed, create default page
-                    core.doc.pageController.page = PageContentModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, PageContentModel.contentName));
+                    core.doc.pageController.page = PageContentModel.addDefault<PageContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PageContentModel.contentName));
                     core.doc.pageController.page.name = DefaultNewLandingPageName + ", " + domain.name;
                     core.doc.pageController.page.copyfilename.content = landingPageDefaultHtml;
-                    core.doc.pageController.page.save(core);
+                    core.doc.pageController.page.save(core.cpParent);
                     core.doc.pageController.pageToRootList.Add(core.doc.pageController.page);
                 } else {
                     core.doc.pageController.page = core.doc.pageController.pageToRootList.First();
@@ -1316,14 +1317,14 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- get template from pages
                 core.doc.pageController.template = null;
-                foreach (Models.Db.PageContentModel page in core.doc.pageController.pageToRootList) {
+                foreach (PageContentModel page in core.doc.pageController.pageToRootList) {
                     if (page.TemplateID > 0) {
-                        core.doc.pageController.template = PageTemplateModel.create(core, page.TemplateID);
+                        core.doc.pageController.template = DbBaseModel.create<PageTemplateModel>(core.cpParent, page.TemplateID);
                         if (core.doc.pageController.template == null) {
                             //
                             // -- templateId is not valid
                             page.TemplateID = 0;
-                            page.save(core);
+                            page.save(core.cpParent);
                         } else {
                             if (page == core.doc.pageController.pageToRootList.First()) {
                                 core.doc.pageController.templateReason = "This template was used because it is selected by the current page.";
@@ -1340,32 +1341,32 @@ namespace Contensive.Processor.Controllers {
                     // -- get template from domain
                     if (domain != null) {
                         if (domain.defaultTemplateId > 0) {
-                            core.doc.pageController.template = PageTemplateModel.create(core, domain.defaultTemplateId);
+                            core.doc.pageController.template = DbBaseModel.create<PageTemplateModel>(core.cpParent, domain.defaultTemplateId);
                             if (core.doc.pageController.template == null) {
                                 //
                                 // -- domain templateId is not valid
                                 domain.defaultTemplateId = 0;
-                                domain.save(core);
+                                domain.save(core.cpParent);
                             }
                         }
                     }
                     if (core.doc.pageController.template == null) {
                         //
                         // -- get template named Default
-                        core.doc.pageController.template = PageTemplateModel.createByUniqueName(core, defaultTemplateName);
+                        core.doc.pageController.template = DbBaseModel.createByUniqueName<PageTemplateModel>(core.cpParent, defaultTemplateName);
                         if (core.doc.pageController.template == null) {
                             //
                             // -- ceate new template named Default
-                            core.doc.pageController.template = PageTemplateModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, PageTemplateModel.contentName));
+                            core.doc.pageController.template = DbBaseModel.addDefault<PageTemplateModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PageTemplateModel.contentName));
                             core.doc.pageController.template.name = defaultTemplateName;
                             core.doc.pageController.template.bodyHTML = Properties.Resources.DefaultTemplateHtml;
-                            core.doc.pageController.template.save(core);
+                            core.doc.pageController.template.save(core.cpParent);
                         }
                         //
                         // -- set this new template to all domains without a template
-                        foreach (DomainModel d in DomainModel.createList(core, "((DefaultTemplateId=0)or(DefaultTemplateId is null))")) {
+                        foreach (DomainModel d in DbBaseModel.createList<DomainModel>(core.cpParent, "((DefaultTemplateId=0)or(DefaultTemplateId is null))")) {
                             d.defaultTemplateId = core.doc.pageController.template.id;
-                            d.save(core);
+                            d.save(core.cpParent);
                         }
                     }
                 }
@@ -1439,10 +1440,10 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- attempt domain landing page
                     if (!domain.rootPageId.Equals(0)) {
-                        landingPage = PageContentModel.create(core, domain.rootPageId);
+                        landingPage = DbBaseModel.create<PageContentModel>(core.cpParent, domain.rootPageId);
                         if (landingPage == null) {
                             domain.rootPageId = 0;
-                            domain.save(core);
+                            domain.save(core.cpParent);
                         }
                     }
                     if (landingPage == null) {
@@ -1450,26 +1451,26 @@ namespace Contensive.Processor.Controllers {
                         // -- attempt site landing page
                         int siteLandingPageID = core.siteProperties.getInteger("LandingPageID", 0);
                         if (!siteLandingPageID.Equals(0)) {
-                            landingPage = PageContentModel.create(core, siteLandingPageID);
+                            landingPage = DbBaseModel.create<PageContentModel>(core.cpParent, siteLandingPageID);
                             if (landingPage == null) {
                                 core.siteProperties.setProperty("LandingPageID", 0);
                                 domain.rootPageId = 0;
-                                domain.save(core);
+                                domain.save(core.cpParent);
                             }
                         }
                         if (landingPage == null) {
                             //
                             // -- create detault landing page
-                            landingPage = PageContentModel.addDefault(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, PageContentModel.contentName));
+                            landingPage = DbBaseModel.addDefault<PageContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PageContentModel.contentName));
                             landingPage.name = DefaultNewLandingPageName + ", " + domain.name;
                             landingPage.copyfilename.content = landingPageDefaultHtml;
-                            landingPage.save(core);
+                            landingPage.save(core.cpParent);
                             core.doc.landingPageID = landingPage.id;
                         }
                         //
                         // -- save new page to the domain
                         domain.rootPageId = landingPage.id;
-                        domain.save(core);
+                        domain.save(core.cpParent);
                     }
                 }
             } catch (Exception ex) {
@@ -1613,7 +1614,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- domain -- determine if the domain has any template requirements, and if so, is this template allowed
                 string SqlCriteria = "(domainId=" + core.doc.domain.id + ")";
-                List<Models.Db.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(core, SqlCriteria);
+                List<TemplateDomainRuleModel> allowTemplateRuleList = DbBaseModel.createList<TemplateDomainRuleModel>(core.cpParent, SqlCriteria);
                 bool templateAllowed = false;
                 foreach (TemplateDomainRuleModel rule in allowTemplateRuleList) {
                     if (rule.templateId == core.doc.pageController.template.id) {
@@ -2130,7 +2131,7 @@ namespace Contensive.Processor.Controllers {
                             NoteCopy = NoteCopy + Copy + BR;
                         }
                         //
-                        PersonModel person = PersonModel.create(core, ToMemberID);
+                        PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, ToMemberID);
                         if (person != null) {
                             string sendStatus = "";
                             string queryStringForLinkAppend = "";
@@ -2228,7 +2229,7 @@ namespace Contensive.Processor.Controllers {
                 //string sqlCriteria = "(parentId=" + parentPageID + ")";
                 //string sqlCriteria = "(parentId=" + core.doc.pageController.page.id + ")";
                 //string sqlOrderBy = "sortOrder";
-                List<PageContentModel> childPageList = PageContentModel.createList(core, "(parentId=" + parentPageID + ")", "sortOrder");
+                List<PageContentModel> childPageList = DbBaseModel.createList<PageContentModel>(core.cpParent, "(parentId=" + parentPageID + ")", "sortOrder");
                 string inactiveList = "";
                 string activeList = "";
                 foreach (PageContentModel childPage in childPageList) {
@@ -2439,13 +2440,13 @@ namespace Contensive.Processor.Controllers {
             string button = core.docProperties.getText("Button");
             if ((!string.IsNullOrEmpty(button)) && (recordId != 0) && (core.session.isAuthenticatedContentManager(PageContentModel.contentName))) {
                 var pageCdef = Models.Domain.ContentMetadataModel.createByUniqueName(core, "page content");
-                var pageTable = Models.Db.TableModel.createByContentName(core, pageCdef.name);
+                var pageTable = TableModel.createByContentName(core.cpParent, pageCdef.name);
                 WorkflowController.editLockClass editLock = WorkflowController.getEditLock(core, pageTable.id, recordId);
                 WorkflowController.clearEditLock(core, pageTable.id, recordId);
                 //
                 // tough case, in Quick mode, lets mark the record reviewed, no matter what button they push, except cancel
                 if (button != ButtonCancel) {
-                    PageContentModel.markReviewed(core, recordId);
+                    PageContentModel.markReviewed(core.cpParent, recordId);
                 }
                 bool allowSave = false;
                 //
@@ -2464,7 +2465,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- Save Changes
                     bool SaveButNoChanges = true;
-                    PageContentModel page = PageContentModel.create(core, recordId);
+                    PageContentModel page = DbBaseModel.create<PageContentModel>(core.cpParent, recordId);
                     if (page != null) {
                         string Copy = core.docProperties.getText("copyFilename");
                         Copy = ActiveContentController.processWysiwygResponseForSave(core, Copy);
@@ -2478,11 +2479,11 @@ namespace Contensive.Processor.Controllers {
                             LinkAliasController.addLinkAlias(core, RecordName, recordId, "");
                             SaveButNoChanges = false;
                         }
-                        page.save(core);
+                        page.save(core.cpParent);
                         WorkflowController.setEditLock(core, pageTable.id, page.id);
                         if (!SaveButNoChanges) {
                             ContentController.processAfterSave(core, false, pageCdef.name, page.id, page.name, page.parentID, false);
-                            PageContentModel.invalidateRecordCache(core, page.id);
+                            DbBaseModel.invalidateCacheOfRecord<PageContentModel>(core.cpParent, page.id);
                         }
                     }
                 }
@@ -2502,7 +2503,7 @@ namespace Contensive.Processor.Controllers {
                             core.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", false, false);
                         }
                     }
-                    PageContentModel.invalidateRecordCache(core, recordId);
+                    DbBaseModel.invalidateCacheOfRecord<PageContentModel>(core.cpParent, recordId);
                 }
                 int ParentID = 0;
                 if (button == ButtonAddSiblingPage) {
@@ -2540,7 +2541,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     MetadataController.deleteContentRecord(core, pageCdef.name, recordId);
-                    PageContentModel.invalidateRecordCache(core, recordId);
+                    DbBaseModel.invalidateCacheOfRecord<PageContentModel>(core.cpParent, recordId);
                     //
                     if (!false) {
                         Link = PageContentController.getPageLink(core, ParentID, "", true, false);
@@ -2692,7 +2693,7 @@ namespace Contensive.Processor.Controllers {
                     int cutClipRecordID = GenericController.encodeInteger(clipBoardArray[1]);
                     if (!pasteParentContentMetadata.isParentOf(core, cutClipContentID)) { return; }
                     var clipChildContentMetadata = Models.Domain.ContentMetadataModel.create(core, cutClipContentID);
-                    if (DbBaseModel.isChildOf<PageContentController>(core, pasteParentRecordID, cutClipRecordID, new List<int>())) {
+                    if (DbBaseModel.isChildOf<PageContentController>(core.cpParent, pasteParentRecordID, cutClipRecordID, new List<int>())) {
                         ErrorController.addUserError(core, "The paste operation failed because the destination location is a child of the clipboard data record.");
                     } else {
                         //
@@ -2754,8 +2755,8 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // clear cache
-                        PageContentModel.invalidateRecordCache(core, pasteParentRecordID);
-                        PageContentModel.invalidateRecordCache(core, cutClipRecordID);
+                        DbBaseModel.invalidateCacheOfRecord<PageContentModel>(core.cpParent, pasteParentRecordID);
+                        DbBaseModel.invalidateCacheOfRecord<PageContentModel>(core.cpParent, cutClipRecordID);
                     }
                 }
             }

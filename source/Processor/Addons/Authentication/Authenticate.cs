@@ -2,9 +2,10 @@
 using System;
 using System.Collections.Generic;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using System.Text;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.Primitives {
     public class AuthenticateClass : Contensive.BaseClasses.AddonBaseClass {
@@ -32,8 +33,8 @@ namespace Contensive.Addons.Primitives {
                 }
                 //
                 // -- count the login attempt
-                core.session.visit.loginAttempts = core.session.visit.loginAttempts + 1;
-                core.session.visit.save(core);
+                core.session.visit.loginAttempts++;
+                core.session.visit.save(core.cpParent);
                 //
                 // -- test for username/password authentication
                 {
@@ -46,7 +47,7 @@ namespace Contensive.Addons.Primitives {
                     }
                 }
                 //
-                // -- test for username/password authentication
+                // -- test for basic username/password authentication
                 string basicAuthentication = core.docProperties.getText("authorization");
                 if ((!string.IsNullOrWhiteSpace(basicAuthentication)) && (basicAuthentication.Length > 7) && (basicAuthentication.Substring(0, 6).ToLower() == "basic ")) {
                     string usernamePasswordEncoded = basicAuthentication.Substring(6);
@@ -89,7 +90,7 @@ namespace Contensive.Addons.Primitives {
                         data = new AuthenticateResponseData()
                     };
                 } else {
-                    var user = PersonModel.create(core, core.session.user.id);
+                    var user = DbBaseModel.create<PersonModel>(core.cpParent, core.session.user.id);
                     if (user == null) {
                         core.webServer.setResponseStatus(WebServerController.httpResponseStatus401_Unauthorized);
                         return new AuthenticateResponse() {

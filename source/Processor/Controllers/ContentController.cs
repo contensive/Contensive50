@@ -1,6 +1,6 @@
 ﻿
 using Contensive.BaseClasses;
-using Contensive.Processor.Models.Db;
+using Contensive.Models.Db;
 using Contensive.Processor.Models.Domain;
 using System;
 using System.Collections.Generic;
@@ -40,7 +40,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // todo - if a collection is deleted, consider deleting the collection folder (or saving as archive)
                         } else {
-                            var addonCollection = Models.Db.AddonCollectionModel.create(core, recordID);
+                            var addonCollection = AddonCollectionModel.create(core.cpParent, recordID);
                             if (addonCollection != null) {
                                 string CollectionVersionFolderName = CollectionFolderController.verifyCollectionVersionFolderName(core, addonCollection.ccguid, addonCollection.name);
                                 if (string.IsNullOrEmpty(CollectionVersionFolderName)) {
@@ -99,13 +99,13 @@ namespace Contensive.Processor.Controllers {
                         //hint = hint & ",130"
                         switch (GenericController.vbLCase(recordName)) {
                             case "allowlinkalias":
-                                PageContentModel.invalidateTableCache(core);
+                                PageContentModel.invalidateCacheOfTable(core);
                                 break;
                             case "sectionlandinglink":
-                                PageContentModel.invalidateTableCache(core);
+                                PageContentModel.invalidateCacheOfTable(core);
                                 break;
                                 case Constants._siteproperty_serverPageDefault_name:
-                                PageContentModel.invalidateTableCache(core);
+                                PageContentModel.invalidateCacheOfTable(core);
                                 break;
                         }
                         break;
@@ -137,7 +137,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             core.db.executeQuery("delete from cclinkAliases where PageID=" + recordID);
                         }
-                        PageContentModel.invalidateRecordCache(core, recordID);
+                        DbBaseModel.invalidateCacheOfRecord<PageContentModel>(core.cpParent, recordID);
                         break;
                     case LibraryFilesModel.contentTableNameLowerCase:
                         //
@@ -252,7 +252,7 @@ namespace Contensive.Processor.Controllers {
                             + Environment.NewLine + "recordid=" + recordID + "";
                     }
                     while (csData.ok()) {
-                        var addon = AddonModel.create(core, csData.getInteger("Addonid"));
+                        var addon = DbBaseModel.create<AddonModel>(core.cpParent, csData.getInteger("Addonid"));
                         if (addon != null) {
                             if (onChangeAddonsAsync) {
                                 //

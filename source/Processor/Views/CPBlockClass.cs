@@ -1,9 +1,10 @@
 ﻿
 using System;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor {
     public class CPBlockClass : BaseClasses.CPBlockBaseClass, IDisposable {
@@ -141,7 +142,7 @@ namespace Contensive.Processor {
                 } else {
                     //
                     // -- record name
-                    copy = CopyContentModel.createByUniqueName(cp.core, copyRecordNameOrGuid);
+                    copy = DbBaseModel.createByUniqueName<CopyContentModel>(cp, copyRecordNameOrGuid);
                 }
                 if (copy != null ) {
                     accum = copy.copy;
@@ -175,15 +176,15 @@ namespace Contensive.Processor {
                 if (layoutRecordNameOrGuid.IsNumeric()) {
                     //
                     // -- recordId
-                    layout = DbBaseModel.create<LayoutModel>(cp.core, GenericController.encodeInteger(layoutRecordNameOrGuid));
+                    layout = DbBaseModel.create<LayoutModel>(cp, GenericController.encodeInteger(layoutRecordNameOrGuid));
                 } else if (GenericController.isGuid(layoutRecordNameOrGuid)) {
                     //
                     // -- record guid
-                    layout = LayoutModel.create<LayoutModel>(cp.core, layoutRecordNameOrGuid);
+                    layout = LayoutModel.create<LayoutModel>(cp, layoutRecordNameOrGuid);
                 } else {
                     //
                     // -- record name
-                    layout = LayoutModel.createByUniqueName<LayoutModel>(cp.core, layoutRecordNameOrGuid);
+                    layout = LayoutModel.createByUniqueName<LayoutModel>(cp, layoutRecordNameOrGuid);
                 }
                 if (layout != null) {
                     accum = layout.layout.content;

@@ -2,7 +2,7 @@
 using System;
 using System.Xml;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.IO;
@@ -15,6 +15,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
 using System.Reflection;
 using NLog;
+using Contensive.Models.Db;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -252,6 +253,7 @@ namespace Contensive.Processor.Controllers {
                                                 string wwwFileList = "";
                                                 string ContentFileList = "";
                                                 string ExecFileList = "";
+                                                bool collectionIncludesDiagnosticAddon = false;
                                                 foreach (XmlNode MetaDataSection in Doc.DocumentElement.ChildNodes) {
                                                     switch (MetaDataSection.Name.ToLowerInvariant()) {
                                                         case "resource": {
@@ -358,7 +360,7 @@ namespace Contensive.Processor.Controllers {
                                                 //-------------------------------------------------------------------------------
                                                 //
                                                 bool OKToInstall = false;
-                                                AddonCollectionModel collection = AddonCollectionModel.create(core, collectionGuid);
+                                                AddonCollectionModel collection = AddonCollectionModel.create(core.cpParent, collectionGuid);
                                                 if (collection != null) {
                                                     //
                                                     // Upgrade addon
@@ -435,7 +437,7 @@ namespace Contensive.Processor.Controllers {
                                                         // ----- remove any current navigator nodes installed by the collection previously
                                                         //
                                                         if (collection.id != 0) {
-                                                            MetadataController.deleteContentRecords(core, Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + collection.id);
+                                                            MetadataController.deleteContentRecords(core, NavigatorEntryModel.contentName, "installedbycollectionid=" + collection.id);
                                                         }
                                                         collection.save(core);
                                                     }
@@ -789,7 +791,7 @@ namespace Contensive.Processor.Controllers {
                                                                 // Add-on Node, do part 1 of 2
                                                                 //   (include add-on node must be done after all add-ons are installed)
                                                                 //
-                                                                InstallAddonNode(core, metaDataSection, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                                InstallAddonNode(core, metaDataSection, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
                                                                 if (!result) { return result; }
                                                                 break;
                                                             case "interfaces":
@@ -797,7 +799,7 @@ namespace Contensive.Processor.Controllers {
                                                                 // Legacy Interface Node
                                                                 //
                                                                 foreach (XmlNode metaDataInterfaces in metaDataSection.ChildNodes) {
-                                                                    InstallAddonNode(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                                    InstallAddonNode(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
                                                                     if (!result) { return result; }
                                                                 }
                                                                 break;
@@ -943,9 +945,22 @@ namespace Contensive.Processor.Controllers {
                                                 collection.dataRecordList = DataRecordList;
                                                 collection.save(core);
                                                 //
+                                                // -- test for diagnostic addon, warn if missing
+                                                if( !collectionIncludesDiagnosticAddon ) {
+                                                    //
+                                                    // -- log warning. This collection does not have an install addon
+                                                    LogController.logWarn(core, "Collection does not include a Diagnostic addon, [" + collection.name + "]");
+                                                }
+                                                //
                                                 // -- execute onInstall addon if found
-                                                if (!string.IsNullOrEmpty(onInstallAddonGuid)) {
-                                                    var addon = Models.Db.AddonModel.create(core, onInstallAddonGuid);
+                                                if (string.IsNullOrEmpty(onInstallAddonGuid)) {
+                                                    //
+                                                    // -- log warning. This collection does not have an install addon
+                                                    LogController.logWarn(core, "Collection does not include an install addon, [" + collection.name + "]");
+                                                } else {
+                                                //
+                                                // -- install the install addon
+                                                    var addon = DbBaseModel.create<AddonModel>(core.cpParent, onInstallAddonGuid);
                                                     if (addon != null) {
                                                         var executeContext = new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                                             addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
@@ -1183,7 +1198,7 @@ namespace Contensive.Processor.Controllers {
         //
         //======================================================================================================
         //
-        private static void InstallAddonNode(CoreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool return_UpgradeOK, ref string return_ErrorMessage) {
+        private static void InstallAddonNode(CoreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool return_UpgradeOK, ref string return_ErrorMessage, ref bool collectionIncludesDiagnosticAddons) {
             // todo - return bool
             return_ErrorMessage = "";
             return_UpgradeOK = true;
@@ -1206,7 +1221,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     using (var cs = new CsModel(core)) {
                         string Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(addonGuid) + ")";
-                        cs.open(Models.Db.AddonModel.contentName, Criteria, "", false);
+                        cs.open(AddonModel.contentName, Criteria, "", false);
                         if (cs.ok()) {
                             //
                             // Update the Addon
@@ -1218,7 +1233,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             cs.close();
                             Criteria = "(name=" + DbController.encodeSQLText(addonName) + ")and(" + AddonGuidFieldName + " is null)";
-                            cs.open(Models.Db.AddonModel.contentName, Criteria, "", false);
+                            cs.open(AddonModel.contentName, Criteria, "", false);
                             if (cs.ok()) {
                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                             }
@@ -1228,7 +1243,7 @@ namespace Contensive.Processor.Controllers {
                             // not found by GUID or by name, Insert a new addon
                             //
                             cs.close();
-                            cs.insert(Models.Db.AddonModel.contentName);
+                            cs.insert(AddonModel.contentName);
                             if (cs.ok()) {
                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAppFromLocalCollection, Creating new Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                             }
@@ -1256,7 +1271,7 @@ namespace Contensive.Processor.Controllers {
                                         string test = null;
                                         int scriptinglanguageid = 0;
                                         string ScriptingCode = null;
-                                        string FieldName = null;
+                                        string fieldName = null;
                                         string NodeName = null;
                                         string NewValue = null;
                                         string menuNameSpace = null;
@@ -1451,14 +1466,14 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // these add-ons will be "non-developer only" in navigation
                                                 //
-                                                FieldName = PageInterfaceWithinLoop.Name;
+                                                fieldName = PageInterfaceWithinLoop.Name;
                                                 FieldValue = PageInterfaceWithinLoop.InnerText;
-                                                if (!cs.isFieldSupported(FieldName)) {
+                                                if (!cs.isFieldSupported(fieldName)) {
                                                     //
                                                     // Bad field name - need to report it somehow
                                                     //
                                                 } else {
-                                                    cs.set(FieldName, FieldValue);
+                                                    cs.set(fieldName, FieldValue);
                                                     if (GenericController.encodeBoolean(PageInterfaceWithinLoop.InnerText)) {
                                                         //
                                                         // if template, admin or content - let non-developers have navigator entry
@@ -1526,30 +1541,36 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // these all translate to JSFilename
                                                 //
-                                                FieldName = "jsfilename";
-                                                cs.set(FieldName, PageInterfaceWithinLoop.InnerText);
+                                                fieldName = "jsfilename";
+                                                cs.set(fieldName, PageInterfaceWithinLoop.InnerText);
 
                                                 break;
                                             case "iniframe":
                                                 //
                                                 // typo - field is inframe
                                                 //
-                                                FieldName = "inframe";
-                                                cs.set(FieldName, PageInterfaceWithinLoop.InnerText);
+                                                fieldName = "inframe";
+                                                cs.set(fieldName, PageInterfaceWithinLoop.InnerText);
+                                                break;
+                                            case "diagnostic": {
+                                                    bool fieldValue = encodeBoolean(PageInterfaceWithinLoop.InnerText);
+                                                    cs.set("diagnostic", fieldValue);
+                                                    collectionIncludesDiagnosticAddons = collectionIncludesDiagnosticAddons ||fieldValue;
+                                                }
                                                 break;
                                             default:
                                                 //
                                                 // All the other fields should match the Db fields
                                                 //
-                                                FieldName = PageInterfaceWithinLoop.Name;
+                                                fieldName = PageInterfaceWithinLoop.Name;
                                                 FieldValue = PageInterfaceWithinLoop.InnerText;
-                                                if (!cs.isFieldSupported(FieldName)) {
+                                                if (!cs.isFieldSupported(fieldName)) {
                                                     //
                                                     // Bad field name - need to report it somehow
                                                     //
-                                                    LogController.logError(core, new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + MetadataController.getRecordName(core, "add-on collections", CollectionID) + "]"));
+                                                    LogController.logError(core, new ApplicationException("bad field found [" + fieldName + "], in addon node [" + addonName + "], of collection [" + MetadataController.getRecordName(core, "add-on collections", CollectionID) + "]"));
                                                 } else {
-                                                    cs.set(FieldName, FieldValue);
+                                                    cs.set(fieldName, FieldValue);
                                                 }
                                                 break;
                                         }
@@ -1628,7 +1649,7 @@ namespace Contensive.Processor.Controllers {
                     //                                                End If
                     //                                                If Criteria <> "" Then
                     //                                                    '$$$$$ cache this
-                    //                                                    CS2 = csAddon.cs_open(Models.Db.AddonModel.contentName, Criteria, "ID")
+                    //                                                    CS2 = csAddon.cs_open(AddonModel.contentName, Criteria, "ID")
                     //                                                    If csAddon.cs_ok(CS2) Then
                     //                                                        SrcAddonID = csAddon.cs_getInteger(CS2, "ID")
                     //                                                    End If
@@ -1695,7 +1716,7 @@ namespace Contensive.Processor.Controllers {
                     string AddOnType = XmlController.GetXMLAttribute(core, IsFound, AddonNode, "type", "");
                     string Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(AOGuid) + ")";
                     using (var csData = new CsModel(core)) {
-                        if (csData.open(Models.Db.AddonModel.contentName, Criteria, "", false)) {
+                        if (csData.open(AddonModel.contentName, Criteria, "", false)) {
                             //
                             // Update the Addon
                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" + AOName + "], Guid [" + AOGuid + "]");
@@ -1703,7 +1724,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // not found by GUID - search name against name to update legacy Add-ons
                             Criteria = "(name=" + DbController.encodeSQLText(AOName) + ")and(" + AddonGuidFieldName + " is null)";
-                            csData.open(Models.Db.AddonModel.contentName, Criteria, "", false);
+                            csData.open(AddonModel.contentName, Criteria, "", false);
                         }
                         if (!csData.ok()) {
                             //
@@ -1736,7 +1757,7 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                                 if (!string.IsNullOrEmpty(Criteria)) {
                                                     using (var CS2 = new CsModel(core)) {
-                                                        CS2.open(Models.Db.AddonModel.contentName, Criteria);
+                                                        CS2.open(AddonModel.contentName, Criteria);
                                                         if (CS2.ok()) {
                                                             IncludeAddonID = CS2.getInteger("ID");
                                                         }

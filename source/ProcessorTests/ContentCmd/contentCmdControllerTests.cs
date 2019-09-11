@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Db;
+
 using static Tests.testConstants;
 using Contensive.BaseClasses;
 using Contensive.Processor;

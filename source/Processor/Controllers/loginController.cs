@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
+
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
@@ -17,6 +17,7 @@ using static Contensive.Processor.Constants;
 // todo -- should not be here
 using Contensive.BaseClasses;
 using System.Xml.Linq;
+using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -124,7 +125,7 @@ namespace Contensive.Processor.Controllers {
                     if (loginAddonID != 0) {
                         //
                         // -- Custom Login
-                        AddonModel addon = AddonModel.create(core, loginAddonID);
+                        AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, loginAddonID);
                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                             errorContextMessage = "calling login form addon [" + loginAddonID + "] from internal method"
@@ -218,7 +219,7 @@ namespace Contensive.Processor.Controllers {
                     if (LocalMemberID == 0) {
                         if ((core.session.isAuthenticated) || (core.session.isRecognized())) { core.session.logout(); }
                         core.session.visit.loginAttempts = core.session.visit.loginAttempts + 1;
-                        core.session.visit.save(core);
+                        core.session.visit.save(core.cpParent);
                     } else {
                         returnResult = core.session.authenticateById(LocalMemberID, core.session);
                         if (returnResult) {
@@ -487,7 +488,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                PersonModel.invalidateRecordCache(core, core.session.user.id);
+                PersonModel.invalidateCacheOfRecord<PersonModel>(core.cpParent, core.session.user.id);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

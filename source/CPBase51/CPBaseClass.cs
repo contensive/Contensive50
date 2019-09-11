@@ -145,6 +145,15 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// utilities for json
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract CPJSONBaseClass JSON { get; }
+        //
+        //====================================================================================================
+        /// <summary>
         /// The Log class manages server logs
         /// </summary>
         /// <value></value>
@@ -176,6 +185,15 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract CPResponseBaseClass Response { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The Site Class handles features related to the current site. See CPSiteBaseClass for more details.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract ServerConfigModel ServerConfig { get; }
         //
         //====================================================================================================
         /// <summary>

@@ -1,18 +1,10 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Models.Db;
 //
 namespace Contensive.Addons.Primitives {
     public class BlockEmailClass : Contensive.BaseClasses.AddonBaseClass {
@@ -33,10 +25,10 @@ namespace Contensive.Addons.Primitives {
                     //
                     string recipientEmailToBlock = core.docProperties.getText(rnEmailBlockRecipientEmail);
                     if (string.IsNullOrEmpty(recipientEmailToBlock)) {
-                        List<PersonModel> recipientList = PersonModel.createList(core, "(email=" + DbController.encodeSQLText(recipientEmailToBlock) + ")");
+                        List<PersonModel> recipientList = DbBaseModel.createList<PersonModel>(core.cpParent, "(email=" + DbController.encodeSQLText(recipientEmailToBlock) + ")");
                         foreach (var recipient in recipientList) {
                             recipient.allowBulkEmail = false;
-                            recipient.save(core);
+                            recipient.save(cp);
                             //
                             // -- Email spam footer was clicked, clear the AllowBulkEmail field
                             EmailController.addToBlockList(core, recipientEmailToBlock);
@@ -44,7 +36,7 @@ namespace Contensive.Addons.Primitives {
                             // -- log entry to track the result of this email drop
                             int emailDropId = core.docProperties.getInteger(rnEmailBlockRequestDropID);
                             if (emailDropId != 0) {
-                                EmailDropModel emailDrop = DbBaseModel.create<EmailDropModel>(core, emailDropId);
+                                EmailDropModel emailDrop = DbBaseModel.create<EmailDropModel>(cp, emailDropId);
                                 if (emailDrop != null) {
                                     EmailLogModel log = new EmailLogModel() {
                                         name = "User " + recipient.name + " clicked linked spam block from email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString(),
