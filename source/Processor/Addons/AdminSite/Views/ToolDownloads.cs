@@ -107,15 +107,15 @@ namespace Contensive.Addons.AdminSite {
                     //
                     //   Get Downloads available
                     //
-                    var downloadList = DownloadModel.createList<DownloadModel>(core, "", "id desc");
-                    int RowPointer = 0;
                     int DataRowCount = 0;
+                    var downloadList = DownloadModel.createList<DownloadModel>(core, "", "id desc", PageSize, PageNumber);
+                    int RowPointer = 0;
                     if (downloadList.Count == 0) {
                         Cells[0, 1] = "There are no download requests";
                         RowPointer = 1;
                     } else {
                         RowPointer = 0;
-                        DataRowCount = downloadList.Count;
+                        DataRowCount = DownloadModel.getCount<DownloadModel>(core);
                         string LinkPrefix = "<a href=\"" + core.appConfig.cdnFileUrl;
                         string LinkSuffix = "\" target=_blank>Download</a>";
                         foreach (var download in downloadList) {
