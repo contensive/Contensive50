@@ -5,13 +5,12 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Exceptions;
+using System.Collections.Generic;
+using Contensive.Processor.Models.Db;
 
 namespace Contensive.Addons.AdminSite {
     public class ToolCustomReports {
-        //
-        //========================================================================
-        //
-        //========================================================================
         //
         //========================================================================
         //
@@ -20,7 +19,6 @@ namespace Contensive.Addons.AdminSite {
                 //
                 string Button = null;
                 string RecordName = null;
-                int RecordID = 0;
                 string SQL = null;
                 string RQS = null;
                 int PageSize = 0;
@@ -101,14 +99,17 @@ namespace Contensive.Addons.AdminSite {
                                     if ((string.IsNullOrEmpty(Name)) || (string.IsNullOrEmpty(SQL))) {
                                         Processor.Controllers.ErrorController.addUserError(core, "A name and SQL Query are required to save a new custom report.");
                                     } else {
+                                        int customReportId = 0;
                                         using (var csData = new CsModel(core)) {
                                             csData.insert("Custom Reports");
                                             if (csData.ok()) {
+                                                customReportId = csData.getInteger("id");
                                                 csData.set("Name", Name);
                                                 csData.set(SQLFieldName, SQL);
                                             }
                                             csData.close();
                                         }
+                                        requestDownload(core, customReportId);
                                     }
                                 }
                                 //
@@ -116,33 +117,15 @@ namespace Contensive.Addons.AdminSite {
                                 if (RowCnt > 0) {
                                     for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                         if (core.docProperties.getBoolean("Row" + RowPtr)) {
-                                            RecordID = core.docProperties.getInteger("RowID" + RowPtr);
+                                            int customReportId =core.docProperties.getInteger("RowID" + RowPtr);
                                             using (var csData = new CsModel(core)) {
-                                                csData.openRecord("Custom Reports", RecordID);
+                                                csData.openRecord("Custom Reports", customReportId);
                                                 if (csData.ok()) {
                                                     SQL = csData.getText(SQLFieldName);
                                                     Name = csData.getText("Name");
                                                 }
                                             }
-                                            //
-                                            using (var csData = new CsModel(core)) {
-                                                csData.insert("Tasks");
-                                                if (csData.ok()) {
-                                                    RecordName = "CSV Download, Custom Report [" + Name + "]";
-                                                    Filename = "CustomReport_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".csv";
-                                                    csData.set("Name", RecordName);
-                                                    csData.set("Filename", Filename);
-                                                    if (Format == "XML") {
-                                                        csData.set("Command", "BUILDXML");
-                                                    } else {
-                                                        csData.set("Command", "BUILDCSV");
-                                                    }
-                                                    csData.set(SQLFieldName, SQL);
-                                                    Description = Description + "<p>Your Download [" + Name + "] has been requested, and will be available in the <a href=\"?" + rnAdminForm + "=30\">Download Manager</a> when it is complete. This may take a few minutes depending on the size of the report.</p>";
-                                                }
-                                                csData.close();
-
-                                            }
+                                            requestDownload(core, customReportId);
                                         }
                                     }
                                 }
@@ -208,8 +191,8 @@ namespace Contensive.Addons.AdminSite {
                         } else {
                             DataRowCount = csData.getRowCount();
                             while (csData.ok() && (RowPointer < PageSize)) {
-                                RecordID = csData.getInteger("ID");
-                                Cells[RowPointer, 0] = HtmlController.checkbox("Row" + RowPointer) + HtmlController.inputHidden("RowID" + RowPointer, RecordID);
+                                int customReportId = csData.getInteger("ID");
+                                Cells[RowPointer, 0] = HtmlController.checkbox("Row" + RowPointer) + HtmlController.inputHidden("RowID" + RowPointer, customReportId);
                                 Cells[RowPointer, 1] = csData.getText("name");
                                 Cells[RowPointer, 2] = csData.getText("CreatedBy");
                                 Cells[RowPointer, 3] = csData.getDate("DateAdded").ToShortDateString();
@@ -260,5 +243,34 @@ namespace Contensive.Addons.AdminSite {
                 return toolExceptionMessage;
             }
         }
+        //
+        //========================================================================
+        //
+        public static void requestDownload( CoreController core, int customReportId ) {
+            //
+            // Request the download
+            //
+            var customReport = DbBaseModel.create<CustomReportModel>(core, customReportId);
+            if ( customReport != null) {
+                var ExportCSVAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportCSV);
+                if (ExportCSVAddon == null) {
+                    LogController.logError(core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
+                } else {
+                    var docProperties = new Dictionary<string, string> {
+                                                { "sql", customReport.SQLQuery },
+                                                { "datasource", "default" }
+                                            };
+                    var cmdDetail = new TaskModel.CmdDetailClass() {
+                        addonId = ExportCSVAddon.id,
+                        addonName = ExportCSVAddon.name,
+                        args = docProperties
+                    };
+                    string ExportName = "CustomReport_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".csv";
+                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false, ExportName);
+                }
+            }
+        }
+
+
     }
 }
