@@ -2058,7 +2058,7 @@ namespace Contensive.Processor.Controllers {
             string addonDescription = "[invalid addon]";
             if (addon != null) {
                 string collectionName = "invalid collection or collection not set";
-                AddonCollectionModel collection = AddonCollectionModel.create(core.cpParent, addon.collectionID);
+                AddonCollectionModel collection = AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, addon.collectionID);
                 if (collection != null) {
                     collectionName = collection.name;
                 }

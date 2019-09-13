@@ -896,26 +896,26 @@ namespace Contensive.Addons.AdminSite {
                     //    End If
                     if (field.active & !GenericController.IsNull(defaultValue)) {
                         switch (field.fieldTypeId) {
-                            case CPContentBaseClass.fileTypeIdEnum.Integer:
-                            case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
-                            case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
+                            case CPContentBaseClass.FieldTypeIdEnum.Integer:
+                            case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
+                            case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeInteger(defaultValue);
                                 break;
-                            case CPContentBaseClass.fileTypeIdEnum.Currency:
-                            case CPContentBaseClass.fileTypeIdEnum.Float:
+                            case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                            case CPContentBaseClass.FieldTypeIdEnum.Float:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeNumber(defaultValue);
                                 break;
-                            case CPContentBaseClass.fileTypeIdEnum.Boolean:
+                            case CPContentBaseClass.FieldTypeIdEnum.Boolean:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeBoolean(defaultValue);
                                 break;
-                            case CPContentBaseClass.fileTypeIdEnum.Date:
+                            case CPContentBaseClass.FieldTypeIdEnum.Date:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeDate(defaultValue);
                                 break;
-                            case CPContentBaseClass.fileTypeIdEnum.Lookup:
+                            case CPContentBaseClass.FieldTypeIdEnum.Lookup:
 
                                 DefaultValueText = GenericController.encodeText(field.defaultValue);
                                 if (!string.IsNullOrEmpty(DefaultValueText)) {
@@ -994,26 +994,26 @@ namespace Contensive.Addons.AdminSite {
                     DefaultValueText = getWherePairValue(field.nameLc);
                     if (field.active & (!string.IsNullOrEmpty(DefaultValueText))) {
                         switch (field.fieldTypeId) {
-                            case CPContentBaseClass.fileTypeIdEnum.Integer:
-                            case CPContentBaseClass.fileTypeIdEnum.Lookup:
-                            case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
+                            case CPContentBaseClass.FieldTypeIdEnum.Integer:
+                            case CPContentBaseClass.FieldTypeIdEnum.Lookup:
+                            case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeInteger(DefaultValueText);
                                 break;
-                            case CPContentBaseClass.fileTypeIdEnum.Currency:
-                            case CPContentBaseClass.fileTypeIdEnum.Float:
+                            case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                            case CPContentBaseClass.FieldTypeIdEnum.Float:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeNumber(DefaultValueText);
                                 break;
-                            case CPContentBaseClass.fileTypeIdEnum.Boolean:
+                            case CPContentBaseClass.FieldTypeIdEnum.Boolean:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeBoolean(DefaultValueText);
                                 break;
-                            case CPContentBaseClass.fileTypeIdEnum.Date:
+                            case CPContentBaseClass.FieldTypeIdEnum.Date:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeDate(DefaultValueText);
                                 break;
-                            case CPContentBaseClass.fileTypeIdEnum.ManyToMany:
+                            case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
                                 //
                                 // Many to Many can capture a list of ID values representing the 'secondary' values in the Many-To-Many Rules table
                                 //
@@ -1130,15 +1130,15 @@ namespace Contensive.Addons.AdminSite {
                                 // Load the current Database value
                                 //
                                 switch (adminContentcontent.fieldTypeId) {
-                                    case CPContentBaseClass.fileTypeIdEnum.Redirect:
-                                    case CPContentBaseClass.fileTypeIdEnum.ManyToMany:
+                                    case CPContentBaseClass.FieldTypeIdEnum.Redirect:
+                                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
                                         DBValueVariant = "";
                                         break;
-                                    case CPContentBaseClass.fileTypeIdEnum.FileText:
-                                    case CPContentBaseClass.fileTypeIdEnum.FileCSS:
-                                    case CPContentBaseClass.fileTypeIdEnum.FileXML:
-                                    case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
-                                    case CPContentBaseClass.fileTypeIdEnum.FileHTML:
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileText:
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileXML:
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                                         DBValueVariant = csData.getText(adminContentcontent.nameLc);
                                         break;
                                     default:
@@ -1289,9 +1289,6 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // fixup the string so it can be reduced by each field found, leaving and empty string if all correct
                     //
-                    var tmpList = new List<string>();
-                    //DataSourceModel datasource = DataSourceModel.create(core.cpInternal, adminContent.dataSourceId, ref tmpList);
-                    //DataSourceName = core.db.getDataSourceNameByID(adminContext.content.dataSourceId)
                     foreach (var keyValuePair in adminContent.fields) {
                         ContentFieldMetadataModel field = keyValuePair.Value;
                         LoadEditRecord_RequestField(core, field, FormFieldLcListToBeLoaded, FormEmptyFieldLcList);
@@ -1412,7 +1409,7 @@ namespace Contensive.Addons.AdminSite {
                             // Is blocked from authoring, leave current value
                             //
                             ResponseFieldValueIsOKToSave = false;
-                        } else if ((field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement) || (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Redirect) || (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.ManyToMany)) {
+                        } else if ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement) || (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Redirect) || (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.ManyToMany)) {
                             //
                             // These fields types have no values to load, leave current value
                             // (many to many is handled during save)
@@ -1451,7 +1448,7 @@ namespace Contensive.Addons.AdminSite {
                             // Test input value for valid data
                             //
                             switch (field.fieldTypeId) {
-                                case CPContentBaseClass.fileTypeIdEnum.Integer:
+                                case CPContentBaseClass.FieldTypeIdEnum.Integer:
                                     //
                                     // ----- Integer
                                     //
@@ -1465,8 +1462,8 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                     }
                                     break;
-                                case CPContentBaseClass.fileTypeIdEnum.Currency:
-                                case CPContentBaseClass.fileTypeIdEnum.Float:
+                                case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                                case CPContentBaseClass.FieldTypeIdEnum.Float:
                                     //
                                     // ----- Floating point number
                                     //
@@ -1480,7 +1477,7 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                     }
                                     break;
-                                case CPContentBaseClass.fileTypeIdEnum.Lookup:
+                                case CPContentBaseClass.FieldTypeIdEnum.Lookup:
                                     //
                                     // ----- Must be a recordID
                                     //
@@ -1494,7 +1491,7 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                     }
                                     break;
-                                case CPContentBaseClass.fileTypeIdEnum.Date:
+                                case CPContentBaseClass.FieldTypeIdEnum.Date:
                                     //
                                     // ----- Must be a Date value
                                     //
@@ -1507,13 +1504,13 @@ namespace Contensive.Addons.AdminSite {
                                     }
                                     //End Case
                                     break;
-                                case CPContentBaseClass.fileTypeIdEnum.Boolean:
+                                case CPContentBaseClass.FieldTypeIdEnum.Boolean:
                                     //
                                     // ----- translate to boolean
                                     //
                                     ResponseFieldValueText = GenericController.encodeBoolean(ResponseFieldValueText).ToString();
                                     break;
-                                case CPContentBaseClass.fileTypeIdEnum.Link:
+                                case CPContentBaseClass.FieldTypeIdEnum.Link:
                                     //
                                     // ----- Link field - if it starts with 'www.', add the http:// automatically
                                     //
@@ -1522,8 +1519,8 @@ namespace Contensive.Addons.AdminSite {
                                         ResponseFieldValueText = "http//" + ResponseFieldValueText;
                                     }
                                     break;
-                                case CPContentBaseClass.fileTypeIdEnum.HTML:
-                                case CPContentBaseClass.fileTypeIdEnum.FileHTML:
+                                case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                                case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                                     //
                                     // ----- Html fields
                                     //

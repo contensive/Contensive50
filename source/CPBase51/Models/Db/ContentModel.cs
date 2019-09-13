@@ -1,4 +1,7 @@
 ﻿
+using Contensive.BaseClasses;
+using System.Collections.Generic;
+
 namespace Contensive.Models.Db {
     [System.Serializable]
     public class ContentModel : DbBaseModel {
@@ -32,5 +35,17 @@ namespace Contensive.Models.Db {
         public int installedByCollectionID { get; set; }
         public bool isBaseContent { get; set; }
         public int parentID { get; set; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Create a list of content records that are assocated to a collection, alphabetically by content name
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="collectionId"></param>
+        /// <returns></returns>
+        public static List<ContentModel> createListFromCollection(CPBaseClass cp, int collectionId) {
+            return createList<ContentModel>(cp, "id in (select distinct contentId from ccAddonCollectionCDefRules where collectionid=" + collectionId + ")", "name");
+
+        }
     }
 }

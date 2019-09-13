@@ -182,12 +182,12 @@ namespace Contensive.Processor.Controllers {
         public static void setEditLock(CoreController core, int tableId, int recordId, int userId) {
             string contentRecordKey = getTableRecordKey(tableId, recordId);
             var editLockList = DbBaseModel.createList<AuthoringControlModel>(core.cpParent, "(contentRecordKey=" + contentRecordKey + ")");
-            var editLock = (editLockList.Count > 0) ? editLockList.First() : DbBaseModel.addEmpty<AuthoringControlModel>(core.cpParent);
+            var editLock = (editLockList.Count > 0) ? editLockList.First() : DbBaseModel.addEmpty<AuthoringControlModel>(core.cpParent, userId);
             editLock.contentRecordKey = contentRecordKey;
             editLock.controlType = (int)AuthoringControls.Editing;
             editLock.createdBy = userId;
             editLock.dateAdded = DateTime.Now;
-            editLock.save(core.cpParent);
+            editLock.save(core.cpParent, userId);
         }
         //
         //=====================================================================================================

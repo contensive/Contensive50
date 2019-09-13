@@ -586,7 +586,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (string domain in core.appConfig.domainList) {
                         if (!core.domainDictionary.ContainsKey(domain.ToLowerInvariant())) {
                             LogController.logTrace(core, "adding domain record because configList domain not found [" + domain.ToLowerInvariant() + "]");
-                            var newDomain = DomainModel.addEmpty<DomainModel>(core.cpParent);
+                            var newDomain = DomainModel.addEmpty<DomainModel>(core.cpParent, 0);
                             newDomain.name = domain;
                             newDomain.rootPageId = 0;
                             newDomain.noFollow = false;
@@ -597,7 +597,7 @@ namespace Contensive.Processor.Controllers {
                             newDomain.pageNotFoundPageId = 0;
                             newDomain.forwardDomainId = 0;
                             newDomain.defaultRouteId = core.siteProperties.getInteger("");
-                            newDomain.save(core.cpParent);
+                            newDomain.save(core.cpParent,0);
                             core.domainDictionary.Add(domain.ToLowerInvariant(), newDomain);
                             updateDomainCache = true;
                         }
@@ -606,7 +606,7 @@ namespace Contensive.Processor.Controllers {
                     // -- verify request domain
                     if (!core.domainDictionary.ContainsKey(requestDomain.ToLowerInvariant())) {
                         LogController.logTrace(core, "adding domain record because requestDomain [" + requestDomain.ToLowerInvariant() + "] not found");
-                        var newDomain = DomainModel.addEmpty<DomainModel>(core.cpParent);
+                        var newDomain = DomainModel.addEmpty<DomainModel>(core.cpParent, 0);
                         newDomain.name = requestDomain;
                         newDomain.rootPageId = 0;
                         newDomain.noFollow = false;
@@ -616,7 +616,7 @@ namespace Contensive.Processor.Controllers {
                         newDomain.defaultTemplateId = 0;
                         newDomain.pageNotFoundPageId = 0;
                         newDomain.forwardDomainId = 0;
-                        newDomain.save(core.cpParent);
+                        newDomain.save(core.cpParent, 0);
                         core.domainDictionary.Add(requestDomain.ToLowerInvariant(), newDomain);
                         updateDomainCache = true;
                     }
@@ -646,7 +646,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // todo - would prefer not save new template
                         // -- fix, must save or template selection fails.
-                        domain.save(core.cpParent);
+                        domain.save(core.cpParent, 0);
                         core.domain.id = domain.id;
                     }
                     if (!core.domain.visited) {

@@ -262,7 +262,7 @@ namespace Contensive.Processor.Controllers {
                             } else if ((FieldContentID == contentId) && (fieldId != LastFieldID)) {
                                 if (IncludeBaseFields || (",id,dateadded,createdby,modifiedby,ContentControlID,CreateKey,ModifiedDate,ccguid,".IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase) == -1)) {
                                     sb.Append(Environment.NewLine + "\t\t<Field");
-                                    string fieldType = Models.Domain.ContentFieldMetadataModel.getFieldTypeNameFromFieldTypeId(core, (CPContentBaseClass.fileTypeIdEnum)encodeInteger(fieldMeta[f_Type, CFieldPtr]));
+                                    string fieldType = Models.Domain.ContentFieldMetadataModel.getFieldTypeNameFromFieldTypeId(core, (CPContentBaseClass.FieldTypeIdEnum)encodeInteger(fieldMeta[f_Type, CFieldPtr]));
                                     sb.Append(" Name=\"" + xmlValueText(FieldName) + "\"");
                                     sb.Append(" active=\"" + xmlValueBoolean(fieldMeta[f_Active, CFieldPtr]) + "\"");
                                     sb.Append(" AdminOnly=\"" + xmlValueBoolean(fieldMeta[f_AdminOnly, CFieldPtr]) + "\"");

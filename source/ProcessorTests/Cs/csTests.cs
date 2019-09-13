@@ -140,7 +140,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // todo - find example of this field type
                 //
                 // memberselect
-                var testPerson = PersonModel.addEmpty(cp.core);
+                var testPerson = PersonModel.addEmpty<PersonModel>(cp);
                 testPerson.name = "person" + testPerson.id;
                 testPerson.save(cp);
                 using (CPCSBaseClass csEmail = cp.CSNew()) {
@@ -195,7 +195,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                     string contentName = AddonModel.contentName;
                     string fieldName = "testField" + Guid.NewGuid().ToString().Replace("{", "").Replace("}", "").Replace("-", "");
                     if (!cp.Content.IsField(contentName, fieldName)) {
-                        cp.Content.AddContentField(contentName, fieldName, CPContentBaseClass.fileTypeIdEnum.Currency);
+                        cp.Content.AddContentField(contentName, fieldName, CPContentBaseClass.FieldTypeIdEnum.Currency);
                     }
                     double testValue = ((Double)GenericController.GetRandomInteger(cp.core)) / 100.0;
                     using (CPCSBaseClass cs = cp.CSNew()) {

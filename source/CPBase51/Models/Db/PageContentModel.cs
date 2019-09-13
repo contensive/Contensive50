@@ -91,7 +91,7 @@ namespace Contensive.Models.Db {
                 if (page != null) {
                     page.dateReviewed = DateTime.Now;
                     page.reviewedBy = cp.User.Id;
-                    page.save(cp);
+                    page.save(cp, cp.User.Id, true);
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

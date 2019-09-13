@@ -1,12 +1,8 @@
 ﻿
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using Contensive.Processor;
-using Contensive.Processor.Models.Db;
 using Amazon;
+using Contensive.Models.Db;
 
 namespace Contensive.CLI {
     class ConfigureCmd {

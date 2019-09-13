@@ -42,7 +42,7 @@ namespace Contensive.Addons.AdminSite {
                 bool IsRecordLimitSet = false;
                 string RecordLimitText = null;
                 var cacheNameList = new List<string>();
-                DataSourceModel datasource = DataSourceModel.create<DataSourceModel>(core.cpParent, adminData.adminContent.dataSourceId, ref cacheNameList);
+                DataSourceModel datasource = DataSourceModel.create(core.cpParent, adminData.adminContent.dataSourceId, ref cacheNameList);
                 //
                 // ----- Process Input
                 //

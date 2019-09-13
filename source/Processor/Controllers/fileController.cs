@@ -1407,7 +1407,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Create a filename for the virtual directory for field types not associated to upload files
         /// </summary>
-        public static string getVirtualRecordUnixPathFilename(string tableName, string fieldName, int recordID, CPContentClass.fileTypeIdEnum fieldType) {
+        public static string getVirtualRecordUnixPathFilename(string tableName, string fieldName, int recordID, CPContentClass.FieldTypeIdEnum fieldType) {
             string result = "";
             string idFilename = recordID.ToString();
             if (recordID == 0) {
@@ -1416,16 +1416,16 @@ namespace Contensive.Processor.Controllers {
                 idFilename = recordID.ToString().PadLeft(12, '0');
             }
             switch (fieldType) {
-                case CPContentBaseClass.fileTypeIdEnum.FileCSS:
+                case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                     result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".css";
                     break;
-                case CPContentBaseClass.fileTypeIdEnum.FileXML:
+                case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                     result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".xml";
                     break;
-                case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
+                case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
                     result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".js";
                     break;
-                case CPContentBaseClass.fileTypeIdEnum.FileHTML:
+                case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                     result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".html";
                     break;
                 default:
@@ -1440,12 +1440,15 @@ namespace Contensive.Processor.Controllers {
         public int getFileSize(string pathFilename) {
             int fileSize = 0;
             try {
-                pathFilename = normalizeDosPathFilename(pathFilename);
+                string dosPathFilename = normalizeDosPathFilename(pathFilename);
                 if (!isLocal) {
-                    // todo implement remote getFileList
-                    throw new NotImplementedException("getFileSize, remote mode not implemented");
+                    //
+                    // -- 0 if the remote file does not exist
+                    FileDetail remoteFile = getFileDetails_remote(dosPathFilename);
+                    if (remoteFile == null) return 0;
+                    return (int)remoteFile.Size;
                 } else {
-                    List<FileDetail> files = getFileList(pathFilename);
+                    List<FileDetail> files = getFileList(dosPathFilename);
                     if (files.Count > 0) {
                         fileSize = (int)(files[0].Size);
                     }

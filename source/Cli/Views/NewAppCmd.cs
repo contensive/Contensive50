@@ -10,7 +10,6 @@ using System.Security;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using Contensive.Processor.Models.Domain;
-using Contensive.Processor.Models.Db;
 using System.Reflection;
 
 namespace Contensive.CLI {

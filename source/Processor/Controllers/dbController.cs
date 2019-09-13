@@ -12,6 +12,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
 using Contensive.Models;
 using Contensive.Models.Db;
+using System.Collections.Specialized;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -315,7 +316,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="criteria"></param>
         /// <param name="sqlList"></param>
-        public void updateTableRecord(string tableName, string criteria, SqlFieldListClass sqlList, bool asyncSave = false) {
+        public void update(string tableName, string criteria, NameValueCollection sqlList, bool asyncSave = false) {
             try {
                 string SQL = "update " + tableName + " set " + sqlList.getNameValueList() + " where " + criteria + ";";
                 if (!asyncSave) {
@@ -329,8 +330,8 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        public void updateTableRecord(string tableName, string criteria, SqlFieldListClass sqlList)
-            => updateTableRecord(tableName, criteria, sqlList, false);
+        public void update(string tableName, string criteria, NameValueCollection sqlList)
+            => update(tableName, criteria, sqlList, false);
         //
         //========================================================================
         /// <summary>
@@ -340,9 +341,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="memberId"></param>
         /// <returns></returns>
-        public int insertTableRecordGetId(string tableName, int memberId) {
+        public int insertGetId(string tableName, int memberId) {
             try {
-                using (DataTable dt = insertTableRecordGetDataTable(tableName, memberId)) {
+                using (DataTable dt = insert(tableName, memberId)) {
                     if (dt.Rows.Count > 0) { return encodeInteger(dt.Rows[0]["id"]); }
                 }
                 return 0;
@@ -352,8 +353,8 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        public int insertTableRecordGetId(string tableName)
-            => insertTableRecordGetId(tableName, 0);
+        public int insertGetId(string tableName)
+            => insertGetId(tableName, 0);
         //
         //========================================================================
         /// <summary>
@@ -363,21 +364,21 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="memberId"></param>
         /// <returns></returns>
-        public DataTable insertTableRecordGetDataTable(string tableName, int memberId) {
+        public DataTable insert(string tableName, int memberId) {
             try {
                 string sqlGuid = encodeSQLText(GenericController.getGUID());
                 string sqlDateAdded = encodeSQLDate(DateTime.Now);
-                SqlFieldListClass sqlList = new SqlFieldListClass();
-                sqlList.add("ccGuid", sqlGuid);
-                sqlList.add("dateadded", sqlDateAdded);
-                sqlList.add("createdby", encodeSQLNumber(memberId));
-                sqlList.add("ModifiedDate", sqlDateAdded);
-                sqlList.add("ModifiedBy", encodeSQLNumber(memberId));
-                sqlList.add("contentControlId", encodeSQLNumber(0));
-                sqlList.add("Name", encodeSQLText(""));
-                sqlList.add("Active", encodeSQLNumber(1));
+                NameValueCollection sqlList = new NameValueCollection();
+                sqlList.Add("ccGuid", sqlGuid);
+                sqlList.Add("dateadded", sqlDateAdded);
+                sqlList.Add("createdby", encodeSQLNumber(memberId));
+                sqlList.Add("ModifiedDate", sqlDateAdded);
+                sqlList.Add("ModifiedBy", encodeSQLNumber(memberId));
+                sqlList.Add("contentControlId", encodeSQLNumber(0));
+                sqlList.Add("Name", encodeSQLText(""));
+                sqlList.Add("Active", encodeSQLNumber(1));
                 //
-                insertTableRecord(tableName, sqlList);
+                insert(tableName, sqlList);
                 return openTable(tableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1, 1);
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "] inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
@@ -385,8 +386,8 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        public DataTable insertTableRecordGetDataTable(string tableName)
-            => insertTableRecordGetDataTable(tableName, 0);
+        public DataTable insert(string tableName)
+            => insert(tableName, 0);
         //
         //========================================================================
         /// <summary>
@@ -395,9 +396,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dataSourceName"></param>
         /// <param name="tableName"></param>
         /// <param name="sqlList"></param>
-        public void insertTableRecord(string tableName, SqlFieldListClass sqlList, bool asyncSave) {
+        public void insert(string tableName, NameValueCollection sqlList, bool asyncSave) {
             try {
-                if (sqlList.count == 0) { return; }
+                if (sqlList.Count == 0) { return; }
                 string sql = "INSERT INTO " + tableName + "(" + sqlList.getNameList() + ")values(" + sqlList.getValueList() + ")";
                 if (!asyncSave) {
                     executeNonQuery(sql);
@@ -410,8 +411,8 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        public void insertTableRecord(string tableName, SqlFieldListClass sqlList)
-            => insertTableRecord(tableName, sqlList, false);
+        public void insert(string tableName, NameValueCollection sqlList)
+            => insert(tableName, sqlList, false);
         //
         //========================================================================
         /// <summary>
@@ -520,29 +521,29 @@ namespace Contensive.Processor.Controllers {
                     //
                     if (Models.Domain.TableSchemaModel.getTableSchema(core, tableName, dataSourceName) == null) {
                         if (!allowAutoIncrement) {
-                            string SQL = "Create Table " + tableName + "(ID " + getSQLAlterColumnType(CPContentBaseClass.fileTypeIdEnum.Integer) + ");";
+                            string SQL = "Create Table " + tableName + "(ID " + getSQLAlterColumnType(CPContentBaseClass.FieldTypeIdEnum.Integer) + ");";
                             executeQuery(SQL).Dispose();
                         } else {
-                            string SQL = "Create Table " + tableName + "(ID " + getSQLAlterColumnType(CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement) + ");";
+                            string SQL = "Create Table " + tableName + "(ID " + getSQLAlterColumnType(CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement) + ");";
                             executeQuery(SQL).Dispose();
                         }
                     }
                     //
                     // ----- Test the common fields required in all tables
                     //
-                    createSQLTableField(tableName, "id", CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement);
-                    createSQLTableField(tableName, "name", CPContentBaseClass.fileTypeIdEnum.Text);
-                    createSQLTableField(tableName, "dateAdded", CPContentBaseClass.fileTypeIdEnum.Date);
-                    createSQLTableField(tableName, "createdby", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    createSQLTableField(tableName, "modifiedBy", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    createSQLTableField(tableName, "modifiedDate", CPContentBaseClass.fileTypeIdEnum.Date);
-                    createSQLTableField(tableName, "active", CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    createSQLTableField(tableName, "sortOrder", CPContentBaseClass.fileTypeIdEnum.Text);
-                    createSQLTableField(tableName, "contentControlId", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    createSQLTableField(tableName, "ccGuid", CPContentBaseClass.fileTypeIdEnum.Text);
+                    createSQLTableField(tableName, "id", CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement);
+                    createSQLTableField(tableName, "name", CPContentBaseClass.FieldTypeIdEnum.Text);
+                    createSQLTableField(tableName, "dateAdded", CPContentBaseClass.FieldTypeIdEnum.Date);
+                    createSQLTableField(tableName, "createdby", CPContentBaseClass.FieldTypeIdEnum.Integer);
+                    createSQLTableField(tableName, "modifiedBy", CPContentBaseClass.FieldTypeIdEnum.Integer);
+                    createSQLTableField(tableName, "modifiedDate", CPContentBaseClass.FieldTypeIdEnum.Date);
+                    createSQLTableField(tableName, "active", CPContentBaseClass.FieldTypeIdEnum.Boolean);
+                    createSQLTableField(tableName, "sortOrder", CPContentBaseClass.FieldTypeIdEnum.Text);
+                    createSQLTableField(tableName, "contentControlId", CPContentBaseClass.FieldTypeIdEnum.Integer);
+                    createSQLTableField(tableName, "ccGuid", CPContentBaseClass.FieldTypeIdEnum.Text);
                     // -- 20171029 - deprecating fields makes migration difficult. add back and figure out future path
-                    createSQLTableField(tableName, "createKey", CPContentBaseClass.fileTypeIdEnum.Integer);
-                    createSQLTableField(tableName, "contentCategoryId", CPContentBaseClass.fileTypeIdEnum.Integer);
+                    createSQLTableField(tableName, "createKey", CPContentBaseClass.FieldTypeIdEnum.Integer);
+                    createSQLTableField(tableName, "contentCategoryId", CPContentBaseClass.FieldTypeIdEnum.Integer);
                     //
                     // ----- setup core indexes
                     //
@@ -572,9 +573,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="fieldName"></param>
         /// <param name="fieldType"></param>
         /// <param name="clearMetadataCache">If true, the metadata cache is cleared on success.</param>
-        public void createSQLTableField(string tableName, string fieldName, CPContentBaseClass.fileTypeIdEnum fieldType, bool clearMetadataCache = false) {
+        public void createSQLTableField(string tableName, string fieldName, CPContentBaseClass.FieldTypeIdEnum fieldType, bool clearMetadataCache = false) {
             try {
-                if ((fieldType == CPContentBaseClass.fileTypeIdEnum.Redirect) || (fieldType == CPContentBaseClass.fileTypeIdEnum.ManyToMany)) { return; }
+                if ((fieldType == CPContentBaseClass.FieldTypeIdEnum.Redirect) || (fieldType == CPContentBaseClass.FieldTypeIdEnum.ManyToMany)) { return; }
                 if (string.IsNullOrEmpty(tableName)) { throw new ArgumentException("Table Name cannot be blank."); }
                 if (fieldType == 0) { throw new ArgumentException("invalid fieldtype [" + fieldType + "]"); }
                 if (GenericController.vbInstr(1, tableName, ".") != 0) { throw new ArgumentException("Table name cannot include a period(.)"); }
@@ -682,46 +683,46 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DataSourceName"></param>
         /// <param name="fieldType"></param>
         /// <returns></returns>
-        public string getSQLAlterColumnType(CPContentBaseClass.fileTypeIdEnum fieldType) {
+        public string getSQLAlterColumnType(CPContentBaseClass.FieldTypeIdEnum fieldType) {
             string returnType = "";
             try {
                 switch (fieldType) {
-                    case CPContentBaseClass.fileTypeIdEnum.Boolean:
+                    case CPContentBaseClass.FieldTypeIdEnum.Boolean:
                         returnType = "Int NULL";
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Currency:
+                    case CPContentBaseClass.FieldTypeIdEnum.Currency:
                         returnType = "Float NULL";
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Date:
+                    case CPContentBaseClass.FieldTypeIdEnum.Date:
                         // 20180416 - ms recommends using new, higher precision. Code requires 3 digits so 7 is more than enough
                         returnType = "DateTime2(7) NULL";
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Float:
+                    case CPContentBaseClass.FieldTypeIdEnum.Float:
                         returnType = "Float NULL";
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Integer:
+                    case CPContentBaseClass.FieldTypeIdEnum.Integer:
                         returnType = "Int NULL";
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Lookup:
-                    case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
+                    case CPContentBaseClass.FieldTypeIdEnum.Lookup:
+                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
                         returnType = "Int NULL";
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.ManyToMany:
-                    case CPContentBaseClass.fileTypeIdEnum.Redirect:
-                    case CPContentBaseClass.fileTypeIdEnum.FileImage:
-                    case CPContentBaseClass.fileTypeIdEnum.Link:
-                    case CPContentBaseClass.fileTypeIdEnum.ResourceLink:
-                    case CPContentBaseClass.fileTypeIdEnum.Text:
-                    case CPContentBaseClass.fileTypeIdEnum.File:
-                    case CPContentBaseClass.fileTypeIdEnum.FileText:
-                    case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
-                    case CPContentBaseClass.fileTypeIdEnum.FileXML:
-                    case CPContentBaseClass.fileTypeIdEnum.FileCSS:
-                    case CPContentBaseClass.fileTypeIdEnum.FileHTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
+                    case CPContentBaseClass.FieldTypeIdEnum.Redirect:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileImage:
+                    case CPContentBaseClass.FieldTypeIdEnum.Link:
+                    case CPContentBaseClass.FieldTypeIdEnum.ResourceLink:
+                    case CPContentBaseClass.FieldTypeIdEnum.Text:
+                    case CPContentBaseClass.FieldTypeIdEnum.File:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileText:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileXML:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                         returnType = "VarChar(255) NULL";
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.LongText:
-                    case CPContentBaseClass.fileTypeIdEnum.HTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.LongText:
+                    case CPContentBaseClass.FieldTypeIdEnum.HTML:
                         //
                         // ----- Longtext, depends on datasource
                         returnType = "varchar(max) Null";
@@ -737,7 +738,7 @@ namespace Contensive.Processor.Controllers {
                         //        csv_returnType = "VarChar(65535)"
                         //End Select
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
+                    case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
                         //
                         // ----- autoincrement type, depends on datasource
                         //
@@ -773,7 +774,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DataSourceName"></param>
         /// <param name="TableName"></param>
         /// <param name="IndexName"></param>
-        public void deleteSqlIndex(string TableName, string IndexName) {
+        public void deleteIndex(string TableName, string IndexName) {
             try {
                 TableSchemaModel ts = TableSchemaModel.getTableSchema(core, TableName, dataSourceName);
                 if (ts != null) {
@@ -816,42 +817,42 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="ADOFieldType"></param>
         /// <returns></returns>
-        public CPContentBaseClass.fileTypeIdEnum getFieldTypeIdByADOType(int ADOFieldType) {
-            CPContentBaseClass.fileTypeIdEnum returnType = 0;
+        public CPContentBaseClass.FieldTypeIdEnum getFieldTypeIdByADOType(int ADOFieldType) {
+            CPContentBaseClass.FieldTypeIdEnum returnType = 0;
             try {
                 switch (ADOFieldType) {
                     case 2:
-                        returnType = CPContentBaseClass.fileTypeIdEnum.Float;
+                        returnType = CPContentBaseClass.FieldTypeIdEnum.Float;
                         break;
                     case 3:
-                        returnType = CPContentBaseClass.fileTypeIdEnum.Integer;
+                        returnType = CPContentBaseClass.FieldTypeIdEnum.Integer;
                         break;
                     case 4:
-                        returnType = CPContentBaseClass.fileTypeIdEnum.Float;
+                        returnType = CPContentBaseClass.FieldTypeIdEnum.Float;
                         break;
                     case 5:
-                        returnType = CPContentBaseClass.fileTypeIdEnum.Float;
+                        returnType = CPContentBaseClass.FieldTypeIdEnum.Float;
                         break;
                     case 6:
-                        returnType = CPContentBaseClass.fileTypeIdEnum.Integer;
+                        returnType = CPContentBaseClass.FieldTypeIdEnum.Integer;
                         break;
                     case 11:
-                        returnType = CPContentBaseClass.fileTypeIdEnum.Boolean;
+                        returnType = CPContentBaseClass.FieldTypeIdEnum.Boolean;
                         break;
                     case 135:
-                        returnType = CPContentBaseClass.fileTypeIdEnum.Date;
+                        returnType = CPContentBaseClass.FieldTypeIdEnum.Date;
                         break;
                     case 200:
-                        returnType = CPContentBaseClass.fileTypeIdEnum.Text;
+                        returnType = CPContentBaseClass.FieldTypeIdEnum.Text;
                         break;
                     case 201:
-                        returnType = CPContentBaseClass.fileTypeIdEnum.LongText;
+                        returnType = CPContentBaseClass.FieldTypeIdEnum.LongText;
                         break;
                     case 202:
-                        returnType = CPContentBaseClass.fileTypeIdEnum.Text;
+                        returnType = CPContentBaseClass.FieldTypeIdEnum.Text;
                         break;
                     default:
-                        returnType = CPContentBaseClass.fileTypeIdEnum.Text;
+                        returnType = CPContentBaseClass.FieldTypeIdEnum.Text;
                         break;
                 }
             } catch (Exception ex) {
@@ -867,92 +868,92 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="FieldTypeName"></param>
         /// <returns></returns>
-        public CPContentBaseClass.fileTypeIdEnum getFieldTypeIdFromFieldTypeName(string FieldTypeName) {
-            CPContentBaseClass.fileTypeIdEnum returnTypeId = 0;
+        public CPContentBaseClass.FieldTypeIdEnum getFieldTypeIdFromFieldTypeName(string FieldTypeName) {
+            CPContentBaseClass.FieldTypeIdEnum returnTypeId = 0;
             try {
                 switch (GenericController.vbLCase(FieldTypeName)) {
                     case Constants.FieldTypeNameLcaseBoolean:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.Boolean;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Boolean;
                         break;
                     case Constants.FieldTypeNameLcaseCurrency:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.Currency;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Currency;
                         break;
                     case Constants.FieldTypeNameLcaseDate:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.Date;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Date;
                         break;
                     case Constants.FieldTypeNameLcaseFile:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.File;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.File;
                         break;
                     case Constants.FieldTypeNameLcaseFloat:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.Float;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Float;
                         break;
                     case Constants.FieldTypeNameLcaseImage:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.FileImage;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.FileImage;
                         break;
                     case Constants.FieldTypeNameLcaseLink:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.Link;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Link;
                         break;
                     case Constants.FieldTypeNameLcaseResourceLink:
                     case "resource link":
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.ResourceLink;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.ResourceLink;
                         break;
                     case Constants.FieldTypeNameLcaseInteger:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.Integer;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Integer;
                         break;
                     case Constants.FieldTypeNameLcaseLongText:
                     case "Long text":
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.LongText;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.LongText;
                         break;
                     case Constants.FieldTypeNameLcaseLookup:
                     case "lookuplist":
                     case "lookup list":
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Lookup;
                         break;
                     case Constants.FieldTypeNameLcaseMemberSelect:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.MemberSelect;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.MemberSelect;
                         break;
                     case Constants.FieldTypeNameLcaseRedirect:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.Redirect;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Redirect;
                         break;
                     case Constants.FieldTypeNameLcaseManyToMany:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.ManyToMany;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.ManyToMany;
                         break;
                     case Constants.FieldTypeNameLcaseTextFile:
                     case "text file":
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.FileText;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.FileText;
                         break;
                     case Constants.FieldTypeNameLcaseCSSFile:
                     case "css file":
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.FileCSS;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.FileCSS;
                         break;
                     case Constants.FieldTypeNameLcaseXMLFile:
                     case "xml file":
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.FileXML;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.FileXML;
                         break;
                     case Constants.FieldTypeNameLcaseJavascriptFile:
                     case "javascript file":
                     case "js file":
                     case "jsfile":
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.FileJavascript;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.FileJavascript;
                         break;
                     case Constants.FieldTypeNameLcaseText:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.Text;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Text;
                         break;
                     case "autoincrement":
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement;
                         break;
                     case Constants.FieldTypeNameLcaseHTML:
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.HTML;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.HTML;
                         break;
                     case Constants.FieldTypeNameLcaseHTMLFile:
                     case "html file":
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.FileHTML;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.FileHTML;
                         break;
                     default:
                         //
                         // Bad field type is a text field
                         //
-                        returnTypeId = CPContentBaseClass.fileTypeIdEnum.Text;
+                        returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Text;
                         break;
                 }
             } catch (Exception ex) {
@@ -1091,7 +1092,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="recordId"></param>
         //
-        public void deleteTableRecord(int recordId, string tableName) {
+        public void delete(int recordId, string tableName) {
             try {
                 if (string.IsNullOrEmpty(tableName.Trim())) { throw new GenericException("tablename cannot be blank"); }
                 if (recordId <= 0) { throw new GenericException("record id is not valid [" + recordId + "]"); }
@@ -1107,7 +1108,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="guid"></param>
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
-        public void deleteTableRecord(string guid, string tableName) {
+        public void delete(string guid, string tableName) {
             try {
                 if (string.IsNullOrWhiteSpace(tableName)) { throw new GenericException("tablename cannot be blank"); }
                 if (!isGuid(guid)) { throw new GenericException("Guid is not valid [" + guid + "]"); }
@@ -1126,7 +1127,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="criteria"></param>
         //
-        public void deleteTableRecords(string tableName, string criteria) {
+        public void deleteRows(string tableName, string criteria) {
             try {
                 if (string.IsNullOrEmpty(tableName)) { throw new ArgumentException("TableName cannot be blank"); }
                 if (string.IsNullOrEmpty(criteria)) { throw new ArgumentException("Criteria cannot be blank"); }
@@ -1355,7 +1356,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // If not SQL server, just delete them
                 //
-                deleteTableRecords(TableName, Criteria);
+                deleteRows(TableName, Criteria);
             } else {
                 //
                 // ----- Clear up to date for the properties
@@ -1466,7 +1467,7 @@ namespace Contensive.Processor.Controllers {
         public DataTable executeRemoteQuery(string remoteQueryKey) {
             DataTable result = null;
             try {
-                var remoteQuery = RemoteQueryModel.create(core.cpParent, remoteQueryKey);
+                var remoteQuery = DbBaseModel.create<RemoteQueryModel>(core.cpParent, remoteQueryKey);
                 if (remoteQuery == null) {
                     throw new GenericException("remoteQuery was not found with key [" + remoteQueryKey + "]");
                 } else {
@@ -1590,7 +1591,7 @@ namespace Contensive.Processor.Controllers {
     ///// <summary>
     ///// Model to create name=value lists
     ///// </summary>
-    //public class SqlFieldListClass {
+    //public class NameValueCollection {
     //    /// <summary>
     //    /// store
     //    /// </summary>

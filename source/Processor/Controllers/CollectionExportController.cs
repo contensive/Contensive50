@@ -273,22 +273,22 @@ namespace Contensive.Processor.Controllers {
 																	}
 																}
 																switch (FieldTypeNumber) {
-																	case (int)fileTypeIdEnum.Lookup:
-																	case (int)fileTypeIdEnum.Boolean:
-																	case (int)fileTypeIdEnum.FileCSS:
-																	case (int)fileTypeIdEnum.FileJavascript:
-																	case (int)fileTypeIdEnum.FileText:
-																	case (int)fileTypeIdEnum.FileXML:
-																	case (int)fileTypeIdEnum.Currency:
-																	case (int)fileTypeIdEnum.Float:
-																	case (int)fileTypeIdEnum.Integer:
-																	case (int)fileTypeIdEnum.Date:
-																	case (int)fileTypeIdEnum.Link:
-																	case (int)fileTypeIdEnum.LongText:
-																	case (int)fileTypeIdEnum.ResourceLink:
-																	case (int)fileTypeIdEnum.Text:
-																	case (int)fileTypeIdEnum.HTML:
-																	case (int)fileTypeIdEnum.FileHTML:
+																	case (int)FieldTypeIdEnum.Lookup:
+																	case (int)FieldTypeIdEnum.Boolean:
+																	case (int)FieldTypeIdEnum.FileCSS:
+																	case (int)FieldTypeIdEnum.FileJavascript:
+																	case (int)FieldTypeIdEnum.FileText:
+																	case (int)FieldTypeIdEnum.FileXML:
+																	case (int)FieldTypeIdEnum.Currency:
+																	case (int)FieldTypeIdEnum.Float:
+																	case (int)FieldTypeIdEnum.Integer:
+																	case (int)FieldTypeIdEnum.Date:
+																	case (int)FieldTypeIdEnum.Link:
+																	case (int)FieldTypeIdEnum.LongText:
+																	case (int)FieldTypeIdEnum.ResourceLink:
+																	case (int)FieldTypeIdEnum.Text:
+																	case (int)FieldTypeIdEnum.HTML:
+																	case (int)FieldTypeIdEnum.FileHTML:
 																		//
 																		// this is a keeper
 																		//
@@ -335,42 +335,42 @@ namespace Contensive.Processor.Controllers {
 													//Dim ContentID As Integer
 													string FieldValue = null;
 													switch (FieldTypeNumber) {
-														case (int)fileTypeIdEnum.Boolean:
+														case (int)FieldTypeIdEnum.Boolean:
 															//
 															// true/false
 															//
 															FieldValue = CSData.GetBoolean(FieldName).ToString();
 															break;
-														case (int)fileTypeIdEnum.FileCSS:
-														case (int)fileTypeIdEnum.FileJavascript:
-														case (int)fileTypeIdEnum.FileText:
-														case (int)fileTypeIdEnum.FileXML:
+														case (int)FieldTypeIdEnum.FileCSS:
+														case (int)FieldTypeIdEnum.FileJavascript:
+														case (int)FieldTypeIdEnum.FileText:
+														case (int)FieldTypeIdEnum.FileXML:
 															//
 															// text files
 															//
 															FieldValue = CSData.GetText(FieldName);
 															FieldValue = EncodeCData(cp, FieldValue);
 															break;
-														case (int)fileTypeIdEnum.Integer:
+														case (int)FieldTypeIdEnum.Integer:
 															//
 															// integer
 															//
 															FieldValue = CSData.GetInteger(FieldName).ToString();
 															break;
-														case (int)fileTypeIdEnum.Currency:
-														case (int)fileTypeIdEnum.Float:
+														case (int)FieldTypeIdEnum.Currency:
+														case (int)FieldTypeIdEnum.Float:
 															//
 															// numbers
 															//
 															FieldValue = CSData.GetNumber(FieldName).ToString();
 															break;
-														case (int)fileTypeIdEnum.Date:
+														case (int)FieldTypeIdEnum.Date:
 															//
 															// date
 															//
 															FieldValue = CSData.GetDate(FieldName).ToString();
 															break;
-														case (int)fileTypeIdEnum.Lookup:
+														case (int)FieldTypeIdEnum.Lookup:
 															//
 															// lookup
 															//
@@ -435,11 +435,11 @@ namespace Contensive.Processor.Controllers {
 					// CDef
 					//
 					//Call Main.testpoint("getCollection, 700")
-					foreach (ContentModel content in ContentModel.createListFromCollection(cp.core, CollectionID)) {
+					foreach (ContentModel content in ContentModel.createListFromCollection(cp, CollectionID)) {
 						//bool reload = false;
 						if (string.IsNullOrEmpty(content.ccguid)) {
 							content.ccguid = cp.Utils.CreateGuid();
-							content.save(cp.core);
+							content.save(cp);
 							//reload = true;
 						}
                         Node = CollectionExportCDefController.getCollectionCdef(cp.core, content.name, false);

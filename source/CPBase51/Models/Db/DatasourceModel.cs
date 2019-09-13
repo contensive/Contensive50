@@ -31,7 +31,53 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// return true if the datasource name is either blank or the word default (in this case, use the config model's datasource
+        /// Special case for create. If id less than or equal to 0  return default datasource
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public static DataSourceModel create(CPBaseClass cp, int recordId) {
+            return (recordId > 0) ? create<DataSourceModel>(cp, recordId) : getDefaultDatasource(cp);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Special case.  if id=0, return default datasource
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="recordId"></param>
+        /// <param name="callersCacheNameList"></param>
+        /// <returns></returns>
+        public static DataSourceModel create(CPBaseClass cp, int recordId, ref List<string> callersCacheNameList) {
+            return (recordId > 0) ? create<DataSourceModel>(cp, recordId, ref callersCacheNameList) : getDefaultDatasource(cp);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Special case.  if name=default, return default datasource
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="recordName"></param>
+        /// <returns></returns>
+        public static DataSourceModel createByUniqueName(CPBaseClass cp, string recordName) {
+            return (string.IsNullOrWhiteSpace(recordName) | (recordName.ToLowerInvariant() == "default")) ? getDefaultDatasource(cp) : createByUniqueName<DataSourceModel>(cp, recordName);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Special case.  if name=default, return default datasource
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="recordName"></param>
+        /// <param name="callersCacheNameList"></param>
+        /// <returns></returns>
+        public static DataSourceModel createByUniqueName(CPBaseClass cp, string recordName, ref List<string> callersCacheNameList) {
+            return (string.IsNullOrWhiteSpace(recordName) || (recordName.ToLowerInvariant() == "default")) ? getDefaultDatasource(cp) : createByUniqueName<DataSourceModel>(cp, recordName, ref callersCacheNameList);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Special case.  if name=default, return default datasource
         /// </summary>
         /// <returns></returns>
         public static bool isDataSourceDefault(string datasourceName) {
@@ -79,10 +125,8 @@ namespace Contensive.Models.Db {
                     createKey = 0,
                     dateAdded = DateTime.MinValue,
                     dbTypeId = (int)DataSourceTypeEnum.sqlServerNative,
-                    endpoint = cp.serverConfig.defaultDataSourceAddress,
+                    endpoint = cp.ServerConfig.defaultDataSourceAddress,
                     name = "default"
-                    //password = core.serverConfig.password,
-                    //username = core.serverConfig.username
                 };
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

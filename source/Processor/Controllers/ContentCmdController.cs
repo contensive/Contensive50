@@ -773,7 +773,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     addonArgDict.Add("cmdAccumulator", CmdAccumulator);
-                                    AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core, addonName);
+                                    AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, addonName);
                                     var executeContext = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                         addonType = Context,
                                         cssContainerClass = "",
@@ -827,7 +827,7 @@ namespace Contensive.Processor.Controllers {
                                         argumentKeyValuePairs = addonArgDict,
                                         errorContextMessage = "calling Addon [" + addonName + "] during content cmd execution"
                                     };
-                                    AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core, addonName);
+                                    AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, addonName);
                                     CmdAccumulator = core.addon.execute(addon, executeContext);
 
 

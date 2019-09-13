@@ -61,7 +61,7 @@ namespace Contensive.Addons.Tools {
                                 for (RecordPointer = 0; RecordPointer < RecordCount; RecordPointer++) {
                                     //
                                     string formFieldName = cp.Doc.GetText("dtfaName." + RecordPointer);
-                                    CPContentBaseClass.fileTypeIdEnum formFieldTypeId = (CPContentBaseClass.fileTypeIdEnum)cp.Doc.GetInteger("dtfaType." + RecordPointer);
+                                    CPContentBaseClass.FieldTypeIdEnum formFieldTypeId = (CPContentBaseClass.FieldTypeIdEnum)cp.Doc.GetInteger("dtfaType." + RecordPointer);
                                     formFieldId = GenericController.encodeInteger(cp.Doc.GetInteger("dtfaID." + RecordPointer));
                                     bool formFieldInherited = cp.Doc.GetBoolean("dtfaInherited." + RecordPointer);
                                     //
@@ -181,12 +181,12 @@ namespace Contensive.Addons.Tools {
                         if (ToolButton == ButtonAdd) {
                             //
                             // ----- Insert a blank Field
-                            var fieldMeta = ContentMetadataModel.createByUniqueName(core, ContentFieldModel.contentName);
-                            var field = ContentFieldModel.addDefault(core, fieldMeta);
+                            var defaultValues = ContentMetadataModel.getDefaultValueDict(core, ContentFieldModel.contentName);
+                            var field = ContentFieldModel.addDefault<ContentFieldModel>(core.cpParent, defaultValues);
                             field.name = "unnamedField" + field.id.ToString();
                             field.contentID = ContentID;
                             field.editSortPriority = 0;
-                            field.save(core);
+                            field.save(core.cpParent);
                             ReloadCDef = true;
                             //
                             //using (var csData = new CsModel(core)) {

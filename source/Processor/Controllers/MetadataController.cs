@@ -226,7 +226,7 @@ namespace Contensive.Processor.Controllers {
             var meta = ContentMetadataModel.createByUniqueName(core, contentName);
             if (meta == null) { return; }
             using (var db = new DbController(core, meta.dataSourceName)) {
-                core.db.deleteTableRecord(recordId, meta.tableName);
+                core.db.delete(recordId, meta.tableName);
             }
         }
         //
@@ -242,7 +242,7 @@ namespace Contensive.Processor.Controllers {
             var meta = ContentMetadataModel.createByUniqueName(core, contentName);
             if (meta == null) { return; }
             using (var db = new DbController(core, meta.dataSourceName)) {
-                core.db.deleteTableRecords(meta.tableName, sqlCriteria);
+                core.db.deleteRows(meta.tableName, sqlCriteria);
             }
         }
         //
@@ -253,36 +253,36 @@ namespace Contensive.Processor.Controllers {
         /// <param name="expression"></param>
         /// <param name="fieldType"></param>
         /// <returns></returns>
-        public static string encodeSQL(object expression, CPContentBaseClass.fileTypeIdEnum fieldType = CPContentBaseClass.fileTypeIdEnum.Text) {
+        public static string encodeSQL(object expression, CPContentBaseClass.FieldTypeIdEnum fieldType = CPContentBaseClass.FieldTypeIdEnum.Text) {
             try {
                 switch (fieldType) {
-                    case CPContentBaseClass.fileTypeIdEnum.Boolean:
+                    case CPContentBaseClass.FieldTypeIdEnum.Boolean:
                         return DbController.encodeSQLBoolean(GenericController.encodeBoolean(expression));
-                    case CPContentBaseClass.fileTypeIdEnum.Currency:
-                    case CPContentBaseClass.fileTypeIdEnum.Float:
+                    case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                    case CPContentBaseClass.FieldTypeIdEnum.Float:
                         return DbController.encodeSQLNumber(GenericController.encodeNumber(expression));
-                    case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
-                    case CPContentBaseClass.fileTypeIdEnum.Integer:
-                    case CPContentBaseClass.fileTypeIdEnum.Lookup:
-                    case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
+                    case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
+                    case CPContentBaseClass.FieldTypeIdEnum.Integer:
+                    case CPContentBaseClass.FieldTypeIdEnum.Lookup:
+                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
                         return DbController.encodeSQLNumber(GenericController.encodeInteger(expression));
-                    case CPContentBaseClass.fileTypeIdEnum.Date:
+                    case CPContentBaseClass.FieldTypeIdEnum.Date:
                         return DbController.encodeSQLDate(GenericController.encodeDate(expression));
-                    case CPContentBaseClass.fileTypeIdEnum.LongText:
-                    case CPContentBaseClass.fileTypeIdEnum.HTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.LongText:
+                    case CPContentBaseClass.FieldTypeIdEnum.HTML:
                         return DbController.encodeSQLText(GenericController.encodeText(expression));
-                    case CPContentBaseClass.fileTypeIdEnum.File:
-                    case CPContentBaseClass.fileTypeIdEnum.FileImage:
-                    case CPContentBaseClass.fileTypeIdEnum.Link:
-                    case CPContentBaseClass.fileTypeIdEnum.ResourceLink:
-                    case CPContentBaseClass.fileTypeIdEnum.Redirect:
-                    case CPContentBaseClass.fileTypeIdEnum.ManyToMany:
-                    case CPContentBaseClass.fileTypeIdEnum.Text:
-                    case CPContentBaseClass.fileTypeIdEnum.FileText:
-                    case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
-                    case CPContentBaseClass.fileTypeIdEnum.FileXML:
-                    case CPContentBaseClass.fileTypeIdEnum.FileCSS:
-                    case CPContentBaseClass.fileTypeIdEnum.FileHTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.File:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileImage:
+                    case CPContentBaseClass.FieldTypeIdEnum.Link:
+                    case CPContentBaseClass.FieldTypeIdEnum.ResourceLink:
+                    case CPContentBaseClass.FieldTypeIdEnum.Redirect:
+                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
+                    case CPContentBaseClass.FieldTypeIdEnum.Text:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileText:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileXML:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                         return DbController.encodeSQLText(GenericController.encodeText(expression));
                     default:
                         throw new GenericException("Unknown Field Type [" + fieldType + "");

@@ -810,7 +810,7 @@ namespace Contensive.Processor.Models.Domain {
                                     if (DbController.isDataTableOk(rs)) {
                                         FieldHelpID = GenericController.encodeInteger(rs.Rows[0]["id"]);
                                     } else {
-                                        FieldHelpID = core.db.insertTableRecordGetId("ccfieldhelp", 0);
+                                        FieldHelpID = core.db.insertGetId("ccfieldhelp", 0);
                                     }
                                 }
                                 if (FieldHelpID != 0) {

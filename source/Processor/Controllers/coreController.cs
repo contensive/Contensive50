@@ -3,7 +3,6 @@ using System;
 using System.Reflection;
 using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
-
 using System.Collections.Generic;
 using static Contensive.Processor.Constants;
 using static Contensive.Processor.Controllers.GenericController;
@@ -12,6 +11,7 @@ using Contensive.Processor.Exceptions;
 using System.Security.Policy;
 using NLog;
 using Contensive.Models.Db;
+using Contensive.BaseModels;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -174,7 +174,7 @@ namespace Contensive.Processor.Controllers {
         public Dictionary<string, DataSourceModel> dataSourceDictionary {
             get {
                 if (_dataSources == null) {
-                    _dataSources = DataSourceModel.getNameDict(this);
+                    _dataSources = DataSourceModel.getNameDict(this.cpParent);
                 }
                 return _dataSources;
             }
@@ -569,6 +569,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName) : base() {
             this.cpParent = cp;
+            this.cpParent.core = this;
             deleteSessionOnExit = true;
             LogController.log(this, "CoreController constructor-1, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
@@ -649,6 +650,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
             this.cpParent = cp;
+            this.cpParent.core = this;
             deleteSessionOnExit = false;
             LogController.log(this, "CoreController constructor-3, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
@@ -670,6 +672,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public CoreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) : base() {
             this.cpParent = cp;
+            this.cpParent.core = this;
             LogController.log(this, "CoreController constructor-4, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
@@ -846,7 +849,7 @@ namespace Contensive.Processor.Controllers {
                                             DbBaseModel.delete<VisitModel>(cpParent, session.visit.id);
                                             //
                                             // -- delete viewing
-                                            DbBaseModel.deleteSelection<ViewingModel>(cpParent, "(visitId=" + session.visit.id + ")");
+                                            DbBaseModel.deleteRows<ViewingModel>(cpParent, "(visitId=" + session.visit.id + ")");
                                         }
                                         if ((session.visitor != null) && (session.visitor.id > 0)) {
                                             //

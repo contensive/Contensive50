@@ -28,7 +28,7 @@ namespace Contensive.Addons.Primitives {
                         List<PersonModel> recipientList = DbBaseModel.createList<PersonModel>(core.cpParent, "(email=" + DbController.encodeSQLText(recipientEmailToBlock) + ")");
                         foreach (var recipient in recipientList) {
                             recipient.allowBulkEmail = false;
-                            recipient.save(cp);
+                            recipient.save(cp, 0);
                             //
                             // -- Email spam footer was clicked, clear the AllowBulkEmail field
                             EmailController.addToBlockList(core, recipientEmailToBlock);

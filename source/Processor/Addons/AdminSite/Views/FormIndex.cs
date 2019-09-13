@@ -52,7 +52,7 @@ namespace Contensive.Addons.AdminSite {
                     Stream.Add(AdminErrorController.get( core, "Access to this content [" + adminData.adminContent.name + "] requires developer permissions. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
                 } else {
                     List<string> tmp = new List<string> { };
-                    DataSourceModel datasource = DataSourceModel.create<DataSourceModel>(core.cpParent, adminData.adminContent.dataSourceId, ref tmp);
+                    DataSourceModel datasource = DataSourceModel.create(core.cpParent, adminData.adminContent.dataSourceId, ref tmp);
                     //
                     // get access rights
                     //bool allowCMEdit = false;
@@ -723,15 +723,15 @@ namespace Contensive.Addons.AdminSite {
                                                             Value = FindValue
                                                         };
                                                         switch (field.fieldTypeId) {
-                                                            case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
-                                                            case CPContentBaseClass.fileTypeIdEnum.Currency:
-                                                            case CPContentBaseClass.fileTypeIdEnum.Float:
-                                                            case CPContentBaseClass.fileTypeIdEnum.Integer:
-                                                            case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
-                                                            case CPContentBaseClass.fileTypeIdEnum.Date:
+                                                            case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
+                                                            case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                                                            case CPContentBaseClass.FieldTypeIdEnum.Float:
+                                                            case CPContentBaseClass.FieldTypeIdEnum.Integer:
+                                                            case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
+                                                            case CPContentBaseClass.FieldTypeIdEnum.Date:
                                                                 findWord.MatchOption = FindWordMatchEnum.MatchEquals;
                                                                 break;
-                                                            case CPContentBaseClass.fileTypeIdEnum.Boolean:
+                                                            case CPContentBaseClass.FieldTypeIdEnum.Boolean:
                                                                 if (encodeBoolean(FindValue)) {
                                                                     findWord.MatchOption = FindWordMatchEnum.MatchTrue;
                                                                 } else {
@@ -982,21 +982,21 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // disallow IncludedInColumns if a non-supported field type
                     switch (field.fieldTypeId) {
-                        case CPContentBaseClass.fileTypeIdEnum.FileCSS:
-                        case CPContentBaseClass.fileTypeIdEnum.File:
-                        case CPContentBaseClass.fileTypeIdEnum.FileImage:
-                        case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
-                        case CPContentBaseClass.fileTypeIdEnum.LongText:
-                        case CPContentBaseClass.fileTypeIdEnum.ManyToMany:
-                        case CPContentBaseClass.fileTypeIdEnum.Redirect:
-                        case CPContentBaseClass.fileTypeIdEnum.FileText:
-                        case CPContentBaseClass.fileTypeIdEnum.FileXML:
-                        case CPContentBaseClass.fileTypeIdEnum.HTML:
-                        case CPContentBaseClass.fileTypeIdEnum.FileHTML:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
+                        case CPContentBaseClass.FieldTypeIdEnum.File:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileImage:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
+                        case CPContentBaseClass.FieldTypeIdEnum.LongText:
+                        case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
+                        case CPContentBaseClass.FieldTypeIdEnum.Redirect:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileText:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileXML:
+                        case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                             IncludedInColumns = false;
                             break;
                     }
-                    if ((field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.MemberSelect) || ((field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Lookup) && (field.lookupContentID != 0))) {
+                    if ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.MemberSelect) || ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Lookup) && (field.lookupContentID != 0))) {
                         //
                         // This is a lookup field -- test if IncludedInLeftJoins
                         IncludedInLeftJoin = IncludedInColumns;
@@ -1020,7 +1020,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // include this lookup field
                             ContentMetadataModel lookupContentMetadata = null;
-                            if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.MemberSelect) {
+                            if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.MemberSelect) {
                                 lookupContentMetadata = ContentMetadataModel.createByUniqueName(core, "people");
                             } else {
                                 lookupContentMetadata = ContentMetadataModel.create(core, field.lookupContentID);
@@ -1185,8 +1185,8 @@ namespace Contensive.Addons.AdminSite {
                                     FieldPtr = field.id;
                                     if (GenericController.vbLCase(field.nameLc) == FindWordName) {
                                         switch (field.fieldTypeId) {
-                                            case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
-                                            case CPContentBaseClass.fileTypeIdEnum.Integer:
+                                            case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
+                                            case CPContentBaseClass.FieldTypeIdEnum.Integer:
                                                 //
                                                 // integer
                                                 //
@@ -1211,8 +1211,8 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 goto ExitLabel1;
 
-                                            case CPContentBaseClass.fileTypeIdEnum.Currency:
-                                            case CPContentBaseClass.fileTypeIdEnum.Float:
+                                            case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                                            case CPContentBaseClass.FieldTypeIdEnum.Float:
                                                 //
                                                 // double
                                                 double FindWordValueDouble = GenericController.encodeNumber(FindWordValue);
@@ -1235,8 +1235,8 @@ namespace Contensive.Addons.AdminSite {
                                                         break;
                                                 }
                                                 goto ExitLabel1;
-                                            case CPContentBaseClass.fileTypeIdEnum.File:
-                                            case CPContentBaseClass.fileTypeIdEnum.FileImage:
+                                            case CPContentBaseClass.FieldTypeIdEnum.File:
+                                            case CPContentBaseClass.FieldTypeIdEnum.FileImage:
                                                 //
                                                 // Date
                                                 switch (FindMatchOption) {
@@ -1248,7 +1248,7 @@ namespace Contensive.Addons.AdminSite {
                                                         break;
                                                 }
                                                 goto ExitLabel1;
-                                            case CPContentBaseClass.fileTypeIdEnum.Date:
+                                            case CPContentBaseClass.FieldTypeIdEnum.Date:
                                                 //
                                                 // Date
                                                 DateTime findDate = DateTime.MinValue;
@@ -1274,8 +1274,8 @@ namespace Contensive.Addons.AdminSite {
                                                         break;
                                                 }
                                                 goto ExitLabel1;
-                                            case CPContentBaseClass.fileTypeIdEnum.Lookup:
-                                            case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
+                                            case CPContentBaseClass.FieldTypeIdEnum.Lookup:
+                                            case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
                                                 //
                                                 // Lookup
                                                 if (IsLookupFieldValid[field.nameLc]) {
@@ -1325,7 +1325,7 @@ namespace Contensive.Addons.AdminSite {
                                                     }
                                                 }
                                                 goto ExitLabel1;
-                                            case CPContentBaseClass.fileTypeIdEnum.Boolean:
+                                            case CPContentBaseClass.FieldTypeIdEnum.Boolean:
                                                 //
                                                 // Boolean
                                                 switch (FindMatchOption) {
@@ -1385,7 +1385,7 @@ namespace Contensive.Addons.AdminSite {
                     if (adminData.adminContent.fields.ContainsKey(sort.fieldName)) {
                         var tempVar = adminData.adminContent.fields[sort.fieldName];
                         FieldPtr = tempVar.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
-                        if ((tempVar.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Lookup) && IsLookupFieldValid[sort.fieldName]) {
+                        if ((tempVar.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Lookup) && IsLookupFieldValid[sort.fieldName]) {
                             return_SQLOrderBy += orderByDelim + "LookupTable" + FieldPtr + ".Name";
                         } else {
                             return_SQLOrderBy += orderByDelim + adminData.adminContent.tableName + "." + SortFieldName;
@@ -1726,8 +1726,8 @@ namespace Contensive.Addons.AdminSite {
                 var Stream = new StringBuilderLegacyController();
                 int Pos = 0;
                 switch (field.fieldTypeId) {
-                    case CPContentBaseClass.fileTypeIdEnum.File:
-                    case CPContentBaseClass.fileTypeIdEnum.FileImage:
+                    case CPContentBaseClass.FieldTypeIdEnum.File:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileImage:
                         Filename = csData.getText(field.nameLc);
                         Filename = GenericController.vbReplace(Filename, "\\", "/");
                         Pos = Filename.LastIndexOf("/") + 1;
@@ -1736,7 +1736,7 @@ namespace Contensive.Addons.AdminSite {
                         }
                         Stream.Add(Filename);
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Lookup:
+                    case CPContentBaseClass.FieldTypeIdEnum.Lookup:
                         if (IsLookupFieldValid) {
                             Stream.Add(csData.getText("LookupTable" + lookupTableCnt + "Name"));
                             lookupTableCnt += 1;
@@ -1754,7 +1754,7 @@ namespace Contensive.Addons.AdminSite {
                             Stream.Add(" ");
                         }
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
+                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
                         if (IsLookupFieldValid) {
                             Stream.Add(csData.getText("LookupTable" + lookupTableCnt + "Name"));
                             lookupTableCnt += 1;
@@ -1762,29 +1762,29 @@ namespace Contensive.Addons.AdminSite {
                             Stream.Add(csData.getText(field.nameLc));
                         }
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Boolean:
+                    case CPContentBaseClass.FieldTypeIdEnum.Boolean:
                         if (csData.getBoolean(field.nameLc)) {
                             Stream.Add("yes");
                         } else {
                             Stream.Add("no");
                         }
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Currency:
+                    case CPContentBaseClass.FieldTypeIdEnum.Currency:
                         Stream.Add(string.Format("{0:C}", csData.getNumber(field.nameLc)));
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.LongText:
-                    case CPContentBaseClass.fileTypeIdEnum.HTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.LongText:
+                    case CPContentBaseClass.FieldTypeIdEnum.HTML:
                         FieldText = csData.getText(field.nameLc);
                         if (FieldText.Length > 50) {
                             FieldText = FieldText.Left(50) + "[more]";
                         }
                         Stream.Add(FieldText);
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.FileText:
-                    case CPContentBaseClass.fileTypeIdEnum.FileCSS:
-                    case CPContentBaseClass.fileTypeIdEnum.FileXML:
-                    case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
-                    case CPContentBaseClass.fileTypeIdEnum.FileHTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileText:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileXML:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                         // rw( "n/a" )
                         Filename = csData.getText(field.nameLc);
                         if (!string.IsNullOrEmpty(Filename)) {
@@ -1792,8 +1792,8 @@ namespace Contensive.Addons.AdminSite {
                             Stream.Add(Copy);
                         }
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Redirect:
-                    case CPContentBaseClass.fileTypeIdEnum.ManyToMany:
+                    case CPContentBaseClass.FieldTypeIdEnum.Redirect:
+                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
                         Stream.Add("n/a");
                         break;
                     default:

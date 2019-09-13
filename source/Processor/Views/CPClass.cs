@@ -6,6 +6,8 @@ using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
+using Contensive.Models;
+using Contensive.BaseModels;
 
 namespace Contensive.Processor {
     public class CPClass : CPBaseClass, IDisposable {
@@ -40,7 +42,7 @@ namespace Contensive.Processor {
         /// constructor for non-Internet app use. Configuration provided manually
         /// </summary>
         /// <remarks></remarks>
-        public CPClass(string appName, ServerConfigModel serverConfig ) : base() {
+        public CPClass(string appName,  ServerConfigModel serverConfig ) : base() {
             core = new CoreController(this, appName, serverConfig);
         }
         //
@@ -172,7 +174,7 @@ namespace Contensive.Processor {
                         });
                     }
                 } else {
-                    AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core, addonNameOrGuid);
+                    AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, addonNameOrGuid);
                     if ( addon != null ) {
                         //
                         // -- call by name
@@ -605,6 +607,23 @@ namespace Contensive.Processor {
                 return _CdnFiles;
             }
         }
+        //
+        //=========================================================================================================
+        //
+        public override BaseModels.AppConfigBaseModel AppConfig {
+            get {
+                return core.appConfig;
+            }
+        }
+        //
+        //=========================================================================================================
+        //
+        public override BaseModels.ServerConfigBaseModel ServerConfig {
+            get {
+                return core.serverConfig;
+            }
+        }
+
         private CPFileSystemClass _CdnFiles;
         //
         //=========================================================================================================

@@ -255,6 +255,19 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        //
+        public override bool validateEmail(string toAddress) {
+            return EmailController.verifyEmailAddress(cp.core, toAddress);
+        }
+        //
+        //====================================================================================================
+        //
+        public override bool validateUserEmail(int toUserId) {
+            var user = DbBaseModel.create<PersonModel>(cp, toUserId);
+            return EmailController.verifyEmailAddress(cp.core, user.email);
+        }
+        //
+        //====================================================================================================
         /// <summary>
         /// deprecated. Use the integer toUserId method
         /// </summary>
@@ -321,15 +334,6 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-        public override bool validateEmail(string toAddress) {
-            throw new NotImplementedException();
-        }
-
-        public override bool validateUserEmail(int toUserId) {
-            throw new NotImplementedException();
-        }
-
         ~CPEmailClass() {
             Dispose(false);
         }

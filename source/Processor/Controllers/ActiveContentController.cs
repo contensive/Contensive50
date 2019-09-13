@@ -1084,7 +1084,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 //
                                                                                 // Get the record values
                                                                                 //
-                                                                                LibraryFilesModel file = LibraryFilesModel.create(core.cpParent, RecordID);
+                                                                                LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, RecordID);
                                                                                 if (file != null) {
                                                                                     string RecordVirtualFilename = file.filename;
                                                                                     int RecordWidth = file.width;
@@ -1111,7 +1111,7 @@ namespace Contensive.Processor.Controllers {
                                                                                             if (imageEditor.load(ImageVirtualFilename, core.cdnFiles)) {
                                                                                                 file.width = imageEditor.width;
                                                                                                 file.height = imageEditor.height;
-                                                                                                file.save(core);
+                                                                                                file.save(core.cpParent);
                                                                                             }
                                                                                         }
                                                                                     }
@@ -1279,7 +1279,7 @@ namespace Contensive.Processor.Controllers {
                                                                                             }
                                                                                         }
                                                                                     }
-                                                                                    file.save(core);
+                                                                                    file.save(core.cpParent);
                                                                                 }
                                                                             }
                                                                         }
@@ -1443,7 +1443,7 @@ namespace Contensive.Processor.Controllers {
                                             if (!string.IsNullOrEmpty(AddonGuid)) {
                                                 Copy = core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, AddonGuid), executeContext);
                                             } else {
-                                                Copy = core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(core, AddonName), executeContext);
+                                                Copy = core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, AddonName), executeContext);
                                             }
                                         }
                                     }
@@ -1552,7 +1552,7 @@ namespace Contensive.Processor.Controllers {
                         if (libraryFileSplit.GetUpperBound(0) > 2) {
                             int libraryRecordID = encodeInteger(libraryFileSplit[2]);
                             if ((libraryFileSplit[0].ToLower() == "cclibraryfiles") && (libraryFileSplit[1].ToLower() == "filename") && (libraryRecordID != 0)) {
-                                LibraryFilesModel file = LibraryFilesModel.create(core.cpParent, libraryRecordID);
+                                LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, libraryRecordID);
                                 if ((file != null) && (htmlContentSegment_file != file.filename)) { htmlContentSegment_file = file.filename; }
                             }
                         }

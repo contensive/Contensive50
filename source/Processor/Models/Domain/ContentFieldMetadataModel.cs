@@ -24,7 +24,7 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="fieldName"></param>
         /// <returns></returns>
-        public static ContentFieldMetadataModel createDefault(CoreController core, string fieldName, CPContentBaseClass.fileTypeIdEnum fieldType) {
+        public static ContentFieldMetadataModel createDefault(CoreController core, string fieldName, CPContentBaseClass.FieldTypeIdEnum fieldType) {
             var fieldMeta = new ContentFieldMetadataModel {
                 active = true,
                 adminOnly = false,
@@ -89,7 +89,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// The type of data the field holds
         /// </summary>
-        public CPContentBaseClass.fileTypeIdEnum fieldTypeId { get; set; }
+        public CPContentBaseClass.FieldTypeIdEnum fieldTypeId { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -394,7 +394,7 @@ namespace Contensive.Processor.Models.Domain {
         public string get_lookupContentName(CoreController core) {
             if ((_lookupContentName == null) && (lookupContentID>0)) {
                 _lookupContentName = "";
-                var content = ContentModel.create(core.cpParent, lookupContentID);
+                var content = ContentModel.create<ContentModel>(core.cpParent, lookupContentID);
                 if (content != null) { _lookupContentName = content.name; }
             }
             return _lookupContentName;
@@ -444,7 +444,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (string.IsNullOrEmpty(_memberSelectGroupName)) {
                     _memberSelectGroupId = 0;
                 } else {
-                    var group = DbBaseModel.createByUniqueName<GroupModel>(core, _memberSelectGroupName);
+                    var group = DbBaseModel.createByUniqueName<GroupModel>(core.cpParent, _memberSelectGroupName);
                     _memberSelectGroupId = (group == null) ? 0 : group.id;
                 };
             }
@@ -506,7 +506,7 @@ namespace Contensive.Processor.Models.Domain {
                     case "ACTIVE":
                         field.caption = "Active";
                         field.editSortPriority = 200;
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Boolean;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Boolean;
                         field.defaultValue = "1";
                         break;
                     case "DATEADDED":
@@ -516,7 +516,7 @@ namespace Contensive.Processor.Models.Domain {
                         break;
                     case "CREATEDBY":
                         field.caption = "Created By";
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Members");
                         field.readOnly = true;
                         field.editSortPriority = 5030;
@@ -528,7 +528,7 @@ namespace Contensive.Processor.Models.Domain {
                         break;
                     case "MODIFIEDBY":
                         field.caption = "Modified By";
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Members");
                         field.readOnly = true;
                         field.editSortPriority = 5050;
@@ -543,7 +543,7 @@ namespace Contensive.Processor.Models.Domain {
                         break;
                     case "CONTENTCONTROLID":
                         field.caption = "Content Definition";
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Content");
                         field.editSortPriority = 5070;
                         field.authorable = true;
@@ -579,7 +579,7 @@ namespace Contensive.Processor.Models.Domain {
                         break;
                     case "ORGANIZATIONID":
                         field.caption = "Organization";
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Organizations");
                         field.editSortPriority = 2005;
                         field.authorable = true;
@@ -587,30 +587,30 @@ namespace Contensive.Processor.Models.Domain {
                         break;
                     case "COPYFILENAME":
                         field.caption = "Copy";
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileHTML;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileHTML;
                         field.textBuffered = true;
                         field.editSortPriority = 2010;
                         break;
                     case "BRIEFFILENAME":
                         field.caption = "Overview";
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileHTML;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileHTML;
                         field.textBuffered = true;
                         field.editSortPriority = 2020;
                         field.htmlContent = false;
                         break;
                     case "IMAGEFILENAME":
                         field.caption = "Image";
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.File;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.File;
                         field.editSortPriority = 2040;
                         break;
                     case "THUMBNAILFILENAME":
                         field.caption = "Thumbnail";
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.File;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.File;
                         field.editSortPriority = 2050;
                         break;
                     case "CONTENTID":
                         field.caption = "Content";
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Content");
                         field.readOnly = false;
                         field.editSortPriority = 2060;
@@ -620,21 +620,21 @@ namespace Contensive.Processor.Models.Domain {
                         break;
                     case "PARENTID":
                         field.caption = "Parent";
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, contentMetadata.name);
                         field.readOnly = false;
                         field.editSortPriority = 3000;
                         break;
                     case "MEMBERID":
                         field.caption = "Member";
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Members");
                         field.readOnly = false;
                         field.editSortPriority = 3005;
                         break;
                     case "CONTACTMEMBERID":
                         field.caption = "Contact";
-                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
+                        field.fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Members");
                         field.readOnly = false;
                         field.editSortPriority = 3010;
@@ -685,77 +685,77 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="fieldType"></param>
         /// <returns></returns>
         //
-        public static string getFieldTypeNameFromFieldTypeId(CoreController core, CPContentBaseClass.fileTypeIdEnum fieldType) {
+        public static string getFieldTypeNameFromFieldTypeId(CoreController core, CPContentBaseClass.FieldTypeIdEnum fieldType) {
             string returnFieldTypeName = "";
             try {
                 switch (fieldType) {
-                    case CPContentBaseClass.fileTypeIdEnum.Boolean:
+                    case CPContentBaseClass.FieldTypeIdEnum.Boolean:
                         returnFieldTypeName = FieldTypeNameBoolean;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Currency:
+                    case CPContentBaseClass.FieldTypeIdEnum.Currency:
                         returnFieldTypeName = FieldTypeNameCurrency;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Date:
+                    case CPContentBaseClass.FieldTypeIdEnum.Date:
                         returnFieldTypeName = FieldTypeNameDate;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.File:
+                    case CPContentBaseClass.FieldTypeIdEnum.File:
                         returnFieldTypeName = FieldTypeNameFile;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Float:
+                    case CPContentBaseClass.FieldTypeIdEnum.Float:
                         returnFieldTypeName = FieldTypeNameFloat;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.FileImage:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileImage:
                         returnFieldTypeName = FieldTypeNameImage;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Link:
+                    case CPContentBaseClass.FieldTypeIdEnum.Link:
                         returnFieldTypeName = FieldTypeNameLink;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.ResourceLink:
+                    case CPContentBaseClass.FieldTypeIdEnum.ResourceLink:
                         returnFieldTypeName = FieldTypeNameResourceLink;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Integer:
+                    case CPContentBaseClass.FieldTypeIdEnum.Integer:
                         returnFieldTypeName = FieldTypeNameInteger;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.LongText:
+                    case CPContentBaseClass.FieldTypeIdEnum.LongText:
                         returnFieldTypeName = FieldTypeNameLongText;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Lookup:
+                    case CPContentBaseClass.FieldTypeIdEnum.Lookup:
                         returnFieldTypeName = FieldTypeNameLookup;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
+                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
                         returnFieldTypeName = FieldTypeNameMemberSelect;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Redirect:
+                    case CPContentBaseClass.FieldTypeIdEnum.Redirect:
                         returnFieldTypeName = FieldTypeNameRedirect;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.ManyToMany:
+                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
                         returnFieldTypeName = FieldTypeNameManyToMany;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.FileText:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileText:
                         returnFieldTypeName = FieldTypeNameTextFile;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.FileCSS:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                         returnFieldTypeName = FieldTypeNameCSSFile;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.FileXML:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                         returnFieldTypeName = FieldTypeNameXMLFile;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
                         returnFieldTypeName = FieldTypeNameJavascriptFile;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Text:
+                    case CPContentBaseClass.FieldTypeIdEnum.Text:
                         returnFieldTypeName = FieldTypeNameText;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.HTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.HTML:
                         returnFieldTypeName = FieldTypeNameHTML;
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.FileHTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                         returnFieldTypeName = FieldTypeNameHTMLFile;
                         break;
                     default:
-                        if (fieldType == CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement) {
+                        if (fieldType == CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement) {
                             returnFieldTypeName = "AutoIncrement";
-                        } else if (fieldType == CPContentBaseClass.fileTypeIdEnum.MemberSelect) {
+                        } else if (fieldType == CPContentBaseClass.FieldTypeIdEnum.MemberSelect) {
                             returnFieldTypeName = "MemberSelect";
                         } else {
                             //

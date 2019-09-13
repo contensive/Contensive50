@@ -30,7 +30,9 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override int GetTableID(string tableName) {
-            throw new NotImplementedException();
+            var table = DbBaseModel.createByUniqueName<TableModel>(cp, tableName);
+            if ( table == null ) { return 0;  }
+            return table.id;
         }
         //
         //====================================================================================================
@@ -156,7 +158,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool IsLocked(string contentName, string recordId) {
-            var contentTable = TableModel.createByContentName(cp.core, contentName);
+            var contentTable = TableModel.createByContentName(cp, contentName);
             if (contentTable != null) return WorkflowController.isRecordLocked(cp.core, contentTable.id, GenericController.encodeInteger(recordId));
             return false;
         }
@@ -230,12 +232,12 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void DeleteContent(string contentName) {
-            ContentModel.delete(cp.core, Models.Domain.ContentMetadataModel.getContentId(cp.core, contentName));
+            DbBaseModel.delete<ContentModel>(cp, ContentMetadataModel.getContentId(cp.core, contentName));
         }
         //
         //====================================================================================================
         //
-        public override int AddContentField(string contentName, string fieldName, CPContentBaseClass.fileTypeIdEnum fieldType) {
+        public override int AddContentField(string contentName, string fieldName, CPContentBaseClass.FieldTypeIdEnum fieldType) {
             var contentMetadata = ContentMetadataModel.createByUniqueName(cp.core, contentName);
             var fieldMeta = ContentFieldMetadataModel.createDefault(cp.core, fieldName, fieldType);
             contentMetadata.verifyContentField(cp.core, fieldMeta, false);
@@ -243,7 +245,7 @@ namespace Contensive.Processor {
         }
         //
         public override int AddContentField(string contentName, string fieldName, int fieldTypeId)
-            => AddContentField(contentName, fieldName, (CPContentBaseClass.fileTypeIdEnum)fieldTypeId);
+            => AddContentField(contentName, fieldName, (CPContentBaseClass.FieldTypeIdEnum)fieldTypeId);
         //
         //====================================================================================================
         //
@@ -330,6 +332,12 @@ namespace Contensive.Processor {
             return contentMetadata.getContentProperty(cp.core, PropertyName);
         }
         //
+        [Obsolete("Deprecated, use methods tih FieldTypeIdEnum instead", false)]
+        public override int AddContentField(string ContentName, string FieldName, fileTypeIdEnum fileTypeEnum) {
+            AddContentField(ContentName, FieldName, (FieldTypeIdEnum)fileTypeEnum);
+            throw new NotImplementedException();
+        }
+        //
         //
         #region  IDisposable Support 
         //
@@ -355,6 +363,7 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         ~CPContentClass() {
             Dispose(false);
         }

@@ -174,7 +174,9 @@ namespace Contensive.Processor {
             return returnOk;
         }
         //
-        public override int InstallCollectionFileAsync(string privatePathFilename) { throw new NotImplementedException(); }
+        public override int InstallCollectionFileAsync(string privatePathFilename) {
+            throw new NotImplementedException("InstallCollectionFileAsync, async methods are not yet implemented.");
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -195,7 +197,9 @@ namespace Contensive.Processor {
             return CollectionInstallController.installCollectionsFromPrivateFolder(cp.core, context, privateFolder, ref ignoreUserMessage, ref collectionsInstalledList, false, false, ref ignoreList2, logPrefix, true, ref collectionsDownloaded);
         }
         //
-        public override int InstallCollectionsFromFolderAsync(string privateFolder, bool deleteFolderWhenDone) { throw new NotImplementedException(); }
+        public override int InstallCollectionsFromFolderAsync(string privateFolder, bool deleteFolderWhenDone) {
+            throw new NotImplementedException("InstallCollectionsFromFolderAsync, async methods are not yet implemented");
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -211,13 +215,19 @@ namespace Contensive.Processor {
             return CollectionLibraryController.installCollectionFromLibrary(cp.core, context, collectionGuid, ref ignoreUserMessage, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
         }
         //
-        public override int InstallCollectionFromLibraryAsync(string collectionGuid) { throw new NotImplementedException(); }
+        public override int InstallCollectionFromLibraryAsync(string collectionGuid) {
+            throw new NotImplementedException("InstallCollectionFromLibraryAsync, async methods are not yet implemented");
+        }
         //
         //====================================================================================================
         //
-        public override bool InstallCollectionFromLink(string link, ref string returnUserError) { throw new NotImplementedException(); }
+        public override bool InstallCollectionFromLink(string link, ref string returnUserError) {
+            throw new NotImplementedException("InstallCollectionFromLink, methods are not yet implemented");
+        }
         //
-        public override int InstallCollectionFromLinkAsync(string link) { throw new NotImplementedException(); }
+        public override int InstallCollectionFromLinkAsync(string link) {
+            throw new NotImplementedException("InstallCollectionFromLink, methods are not yet implemented");
+        }
         //
         //====================================================================================================
         // Deprecated methods

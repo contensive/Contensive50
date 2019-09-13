@@ -41,10 +41,10 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="core"></param>
         public AddonCacheModel(CoreController core) {
-            foreach (AddonModel addon in DbBaseModel.createList<AddonModel>(core, "")) {
+            foreach (AddonModel addon in DbBaseModel.createList<AddonModel>(core.cpParent, "")) {
                 add(core, addon);
             }
-            foreach (var includeRule in AddonIncludeRuleModel.createList(core, "", "addonId,includedAddonID")) {
+            foreach (var includeRule in AddonIncludeRuleModel.createList<AddonIncludeRuleModel>(core.cpParent, "", "addonId,includedAddonID")) {
                 if (!dependencyDictionary.ContainsKey(includeRule.addonID)) dependencyDictionary.Add(includeRule.addonID, new List<int>());
                 dependencyDictionary[includeRule.addonID].Add(includeRule.includedAddonID);
             }

@@ -653,7 +653,7 @@ namespace Contensive.Addons.AdminSite {
                                         Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                     } else {
                                         adminData.LoadEditRecord(cp.core);
-                                        db.deleteTableRecord(adminData.editRecord.id, adminData.adminContent.tableName);
+                                        db.delete(adminData.editRecord.id, adminData.adminContent.tableName);
                                         ContentController.processAfterSave(cp.core,true, adminData.editRecord.contentControlId_Name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     }
                                     adminData.Admin_Action = Constants.AdminActionNop;
@@ -1407,15 +1407,15 @@ namespace Contensive.Addons.AdminSite {
                                     // ----- save the value by field type
                                     //
                                     switch (field.fieldTypeId) {
-                                        case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
-                                        case CPContentBaseClass.fileTypeIdEnum.Redirect: {
+                                        case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
+                                        case CPContentBaseClass.FieldTypeIdEnum.Redirect: {
                                                 //
                                                 // do nothing with these
                                                 //
                                                 break;
                                             }
-                                        case CPContentBaseClass.fileTypeIdEnum.File:
-                                        case CPContentBaseClass.fileTypeIdEnum.FileImage: {
+                                        case CPContentBaseClass.FieldTypeIdEnum.File:
+                                        case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
                                                 //
                                                 // filenames, upload to cdnFiles
                                                 //
@@ -1437,7 +1437,7 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 break;
                                             }
-                                        case CPContentBaseClass.fileTypeIdEnum.Boolean: {
+                                        case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
                                                 //
                                                 // boolean
                                                 //
@@ -1449,8 +1449,8 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 break;
                                             }
-                                        case CPContentBaseClass.fileTypeIdEnum.Currency:
-                                        case CPContentBaseClass.fileTypeIdEnum.Float: {
+                                        case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                                        case CPContentBaseClass.FieldTypeIdEnum.Float: {
                                                 //
                                                 // Floating pointer numbers
                                                 //
@@ -1462,7 +1462,7 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 break;
                                             }
-                                        case CPContentBaseClass.fileTypeIdEnum.Date: {
+                                        case CPContentBaseClass.FieldTypeIdEnum.Date: {
                                                 //
                                                 // Date
                                                 //
@@ -1474,8 +1474,8 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 break;
                                             }
-                                        case CPContentBaseClass.fileTypeIdEnum.Integer:
-                                        case CPContentBaseClass.fileTypeIdEnum.Lookup: {
+                                        case CPContentBaseClass.FieldTypeIdEnum.Integer:
+                                        case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
                                                 //
                                                 // Integers
                                                 //
@@ -1487,14 +1487,14 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 break;
                                             }
-                                        case CPContentBaseClass.fileTypeIdEnum.LongText:
-                                        case CPContentBaseClass.fileTypeIdEnum.Text:
-                                        case CPContentBaseClass.fileTypeIdEnum.FileText:
-                                        case CPContentBaseClass.fileTypeIdEnum.FileCSS:
-                                        case CPContentBaseClass.fileTypeIdEnum.FileXML:
-                                        case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
-                                        case CPContentBaseClass.fileTypeIdEnum.HTML:
-                                        case CPContentBaseClass.fileTypeIdEnum.FileHTML: {
+                                        case CPContentBaseClass.FieldTypeIdEnum.LongText:
+                                        case CPContentBaseClass.FieldTypeIdEnum.Text:
+                                        case CPContentBaseClass.FieldTypeIdEnum.FileText:
+                                        case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
+                                        case CPContentBaseClass.FieldTypeIdEnum.FileXML:
+                                        case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
+                                        case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                                        case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
                                                 //
                                                 // Text
                                                 //
@@ -1506,7 +1506,7 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 break;
                                             }
-                                        case CPContentBaseClass.fileTypeIdEnum.ManyToMany: {
+                                        case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
                                                 //
                                                 // Many to Many checklist
                                                 //
@@ -2264,7 +2264,7 @@ namespace Contensive.Addons.AdminSite {
                                     // record exists and it is not needed, delete it
                                     //
                                     MemberRuleID = csData.getInteger("ID");
-                                    cp.core.db.deleteTableRecord(MemberRuleID, "ccMemberRules");
+                                    cp.core.db.delete(MemberRuleID, "ccMemberRules");
                                 }
                             }
                         }

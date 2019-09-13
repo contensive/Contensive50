@@ -13,6 +13,7 @@ using Contensive.Processor.Models.Domain;
 using System.Reflection;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 
 namespace Contensive.CLI {
     class FixTableFolderCaseCmd {
@@ -50,15 +51,15 @@ namespace Contensive.CLI {
                 using (var cp = new CPClass(appName)) {
                     Console.Write("\n\rRename all tablePathnames to lowercase table and fieldnames.");
                     var rootFolderList = cp.CdnFiles.FolderList("");
-                    var contentList = Contensive.Processor.Models.Db.ContentModel.createList(cp.core, "");
-                    var filenameinFieldTypeList = new List<CPContentBaseClass.fileTypeIdEnum>() {
-                        CPContentBaseClass.fileTypeIdEnum.FileCSS,
-                        CPContentBaseClass.fileTypeIdEnum.FileHTML,
-                        CPContentBaseClass.fileTypeIdEnum.FileImage,
-                        CPContentBaseClass.fileTypeIdEnum.FileJavascript,
-                        CPContentBaseClass.fileTypeIdEnum.FileText,
-                        CPContentBaseClass.fileTypeIdEnum.FileXML,
-                        CPContentBaseClass.fileTypeIdEnum.File
+                    var contentList = DbBaseModel.createList<ContentModel>(cp, "");
+                    var filenameinFieldTypeList = new List<CPContentBaseClass.FieldTypeIdEnum>() {
+                        CPContentBaseClass.FieldTypeIdEnum.FileCSS,
+                        CPContentBaseClass.FieldTypeIdEnum.FileHTML,
+                        CPContentBaseClass.FieldTypeIdEnum.FileImage,
+                        CPContentBaseClass.FieldTypeIdEnum.FileJavascript,
+                        CPContentBaseClass.FieldTypeIdEnum.FileText,
+                        CPContentBaseClass.FieldTypeIdEnum.FileXML,
+                        CPContentBaseClass.FieldTypeIdEnum.File
                     };
                     foreach ( var content in contentList ) {
                         Console.Write("\n\rContent [" + content.name + "].");

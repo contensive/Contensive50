@@ -122,6 +122,12 @@ namespace Contensive.Processor {
         public override void Store(string key, object value, DateTime invalidationDate, string dependentKey) => cp.core.cache.storeObject(key, value, invalidationDate, dependentKey.Split(',').ToList());
         //
         //====================================================================================================
+        //
+        public override void StorePtr(string keyPtr, string key) {
+            cp.core.cache.storePtr(keyPtr, key);
+        }
+        //
+        //====================================================================================================
         /// <summary>
         /// Clear all cache values
         /// </summary>
@@ -171,6 +177,12 @@ namespace Contensive.Processor {
         //
         public override void InvalidateTableRecord(string tableName, int recordId) {
             cp.core.cache.invalidateDbRecord(recordId, tableName);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void InvalidateTable(string tableName) {
+            cp.core.cache.invalidateTableObjects(tableName);
         }
         //
         //====================================================================================================
@@ -267,15 +279,6 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-        public override void InvalidateTable(string tableName) {
-            throw new NotImplementedException();
-        }
-
-        public override void StorePtr(string keyPtr, string key) {
-            throw new NotImplementedException();
-        }
-
         ~CPCacheClass() {
             Dispose(false);
         }

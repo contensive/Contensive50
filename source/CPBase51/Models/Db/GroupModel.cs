@@ -29,20 +29,20 @@ namespace Contensive.Models.Db {
         /// <param name="groupName"></param>
         /// <param name="groupCaption"></param>
         /// <returns></returns>
-        public static GroupModel verify(CPBaseClass cp, string groupName, string groupCaption, Dictionary<string,string> DefaultValues) {
+        public static GroupModel verify(CPBaseClass cp, string groupName, string groupCaption, int userId, Dictionary<string,string> DefaultValues) {
             Models.Db.GroupModel result = null;
             try {
                 result = createByUniqueName<GroupModel>(cp, groupName);
                 if (result != null) {
                     if (result.caption != groupCaption) {
                         result.caption = groupCaption;
-                        result.save(cp);
+                        result.save(cp, userId);
                     }
                 } else {
-                    result = addDefault<GroupModel>(cp, DefaultValues);
+                    result = addDefault<GroupModel>(cp, DefaultValues, userId);
                     result.name = groupName;
                     result.caption = groupCaption;
-                    result.save(cp);
+                    result.save(cp, userId);
                 }
             } catch (Exception ex) {
                 throw (ex);

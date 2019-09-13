@@ -68,7 +68,7 @@ namespace Contensive.Addons.Tools {
                 if (string.IsNullOrEmpty(SQL)) {
                     SQL = core.docProperties.getText("SQLList");
                 }
-                DataSourceModel datasource = DataSourceModel.create<DataSourceModel>(core.cpParent, core.docProperties.getInteger("dataSourceid"));
+                DataSourceModel datasource = DataSourceModel.create(core.cpParent, core.docProperties.getInteger("dataSourceid"));
                 //
                 if ((core.docProperties.getText("button")) == ButtonRun) {
                     //

@@ -196,10 +196,10 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
                     // assert
                     //
                     Assert.AreNotEqual(0, cp.Content.AddContent(contentName1));
-                    Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldTextName, CPContentBaseClass.fileTypeIdEnum.Text));
-                    Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldBooleanName, CPContentBaseClass.fileTypeIdEnum.Boolean));
-                    Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldDateName, CPContentBaseClass.fileTypeIdEnum.Date));
-                    Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldIntegerName, CPContentBaseClass.fileTypeIdEnum.Integer));
+                    Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldTextName, CPContentBaseClass.FieldTypeIdEnum.Text));
+                    Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldBooleanName, CPContentBaseClass.FieldTypeIdEnum.Boolean));
+                    Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldDateName, CPContentBaseClass.FieldTypeIdEnum.Date));
+                    Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldIntegerName, CPContentBaseClass.FieldTypeIdEnum.Integer));
                     //
                     if (cs.Insert(contentName1)) {
                         recordId = cs.GetInteger("id");

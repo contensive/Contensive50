@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -238,5 +239,41 @@ public static class ExtensionMethods {
         }
         int totalDays = (weeksBase * 7) + addDays;
         return startDate.AddDays(totalDays * direction);
+    }
+    //
+    public static string getNameValueList(this NameValueCollection sqlList) {
+        string returnPairs = "";
+        string delim = "";
+        foreach (string key in sqlList.AllKeys) {
+            if (!string.IsNullOrWhiteSpace(key)) {
+                returnPairs += delim + key + "=" + sqlList[key];
+                delim = ",";
+            }
+        }
+        return returnPairs;
+    }
+    //
+    public static string getNameList(this NameValueCollection sqlList) {
+        string returnPairs = "";
+        string delim = "";
+        foreach ( string key in sqlList.AllKeys) {
+            if (!string.IsNullOrWhiteSpace(key)) {
+                returnPairs += delim + key;
+                delim = ",";
+            }
+        }
+        return returnPairs;
+    }
+    //
+    public static string getValueList(this NameValueCollection sqlList) {
+        string returnPairs = "";
+        string delim = "";
+        foreach (string key in sqlList.AllKeys) {
+            if (!string.IsNullOrWhiteSpace(key)) {
+                returnPairs += delim + sqlList[key];
+                delim = ",";
+            }
+        }
+        return returnPairs;
     }
 }

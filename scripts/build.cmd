@@ -7,7 +7,7 @@ rem
 rem @echo off
 rem Setup deployment folder
 set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\
-set deploymentFolderRoot=C:\Users\jay\Desktop\deployments\v51\Install\
+set deploymentFolderRoot=C:\Users\jay\Desktop\deployments\v51\Dev\
 set deploymentNumber=%1
 set year=%date:~12,4%
 set month=%date:~4,2%

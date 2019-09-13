@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Contensive.BaseClasses;
+using Contensive.BaseModels;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 
@@ -208,7 +209,7 @@ namespace Contensive.Processor {
             return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
         }
         // todo implement wysiwyg features
-        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId, List<SimplestDataModel> addonList) {
+        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId, List<SimplestDataBaseModel> addonList) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
             return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
         }

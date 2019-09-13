@@ -78,19 +78,25 @@ namespace Contensive.Processor {
         //
         public override void Delete(string GroupNameIdOrGuid) {
             if ( GenericController.isGuid(GroupNameIdOrGuid )) {
-                GroupModel.delete(core, GroupNameIdOrGuid);
+                //
+                // -- guid
+                GroupModel.delete<GroupModel>(core.cpParent, GroupNameIdOrGuid);
                 return;
             }
             if ( GroupNameIdOrGuid.IsNumeric()) {
-                GroupModel.delete(core, GenericController.encodeInteger( GroupNameIdOrGuid));
+                //
+                // -- id
+                GroupModel.delete<GroupModel>(core.cpParent, GenericController.encodeInteger( GroupNameIdOrGuid));
                 return;
             }
-            GroupModel.delete(core, "name=" + DbController.encodeSQLText(GroupNameIdOrGuid));
+            //
+            // -- name
+            GroupModel.deleteRows<GroupModel>(core.cpParent, "(name=" + DbController.encodeSQLText(GroupNameIdOrGuid) + ")");
         }
         //
         //====================================================================================================
         //
-        public override void Delete(int GroupId) => GroupModel.delete(core, GroupId);
+        public override void Delete(int GroupId) => GroupModel.delete<GroupModel>(core.cpParent, GroupId);
         //
         //====================================================================================================
         //
@@ -109,13 +115,17 @@ namespace Contensive.Processor {
         //
         public override string GetName(string GroupIdOrGuid) {
             if (GroupIdOrGuid.IsNumeric()) {
-                return DbBaseModel.getRecordName<GroupModel>(core, GenericController.encodeInteger(GroupIdOrGuid));
+                //
+                // id
+                return DbBaseModel.getRecordName<GroupModel>(core.cpParent, GenericController.encodeInteger(GroupIdOrGuid));
             } else {
-                return DbBaseModel.getRecordName<GroupModel>(core, GroupIdOrGuid);
+                //
+                // guid
+                return DbBaseModel.getRecordName<GroupModel>(core.cpParent, GroupIdOrGuid);
             }
         }
         public override string GetName(int GroupId) 
-            => DbBaseModel.getRecordName<GroupModel>(core, GroupId);
+            => DbBaseModel.getRecordName<GroupModel>(core.cpParent, GroupId);
         //
         //====================================================================================================
         //

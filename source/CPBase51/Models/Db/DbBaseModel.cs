@@ -7,8 +7,8 @@ using System.Text;
 using Contensive.BaseClasses;
 using System.Linq;
 using Contensive.Exceptions;
-//using Contensive.CPBase.Controllers;
-//
+using System.Collections.Specialized;
+
 namespace Contensive.Models.Db {
     //
     //====================================================================================================
@@ -153,53 +153,6 @@ namespace Contensive.Models.Db {
         }
         //
         //====================================================================================================
-        // -- instance properties (inherits basefieldmodel)
-        ///// <summary>
-        ///// identity integer, primary key for every table
-        ///// </summary>
-        //public int id { get; set; }
-        ///// <summary>
-        ///// name of the record used for lookup lists
-        ///// </summary>
-        //public string name { get; set; }
-        ///// <summary>
-        ///// optional guid, created automatically in the model
-        ///// </summary>
-        //public string ccguid { get; set; }
-        ///// <summary>
-        ///// optionally can be used to disable a record. Must be implemented in each query
-        ///// </summary>
-        //public bool active { get; set; }
-        ///// <summary>
-        ///// id of the metadata record in ccContent that controls the display and handing for this record
-        ///// </summary>
-        //public int contentControlID { get; set; }
-        ///// <summary>
-        ///// foreign key to ccmembers table, populated by admin when record added.
-        ///// </summary>
-        //public int createdBy { get; set; }
-        ///// <summary>
-        ///// used when creating new record
-        ///// </summary>
-        //public int createKey { get; set; }
-        ///// <summary>
-        ///// date record added, populated by admin when record added.
-        ///// </summary>
-        //public DateTime dateAdded { get; set; }
-        ///// <summary>
-        ///// foreign key to ccmembers table set to user who modified the record last in the admin site
-        ///// </summary>
-        //public int modifiedBy { get; set; }
-        ///// <summary>
-        ///// date when the record was last modified in the admin site
-        ///// </summary>
-        //public DateTime modifiedDate { get; set; }
-        ///// <summary>
-        ///// optionally used to sort recrods in the table
-        ///// </summary>
-        //public string sortOrder { get; set; }
-        //
-        //====================================================================================================
         /// <summary>
         /// simple constructor needed for deserialization
         /// </summary>
@@ -243,14 +196,27 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// Add a new recod to the db and open it. Starting a new model with this method will use the default values in Contensive metadata (active, contentcontrolid, etc).
+        /// Add a new record to the db as the system user and open it. 
+        /// Starting a new model with this method will use the default values in Contensive metadata (active, contentcontrolid, etc).
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <param name="DefaultValues"></param>
+        /// <returns></returns>
+        public static T addDefault<T>(CPBaseClass cp, Dictionary<string, string> DefaultValues) where T : DbBaseModel {
+            return addDefault<T>(cp, DefaultValues, 0);
+        }
+        //====================================================================================================
+        /// <summary>
+        /// Add a new record to the db and open it. 
+        /// Starting a new model with this method will use the default values in Contensive metadata (active, contentcontrolid, etc).
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="cp"></param>
         /// <returns></returns>
-        public static T addDefault<T>(CPBaseClass cp, Dictionary<string, string> DefaultValues) where T : DbBaseModel {
+        public static T addDefault<T>(CPBaseClass cp, Dictionary<string, string> DefaultValues, int userId) where T : DbBaseModel {
             var callersCacheNameList = new List<string>();
-            return addDefault<T>(cp, DefaultValues, ref callersCacheNameList);
+            return addDefault<T>(cp, DefaultValues, userId,  ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -260,10 +226,10 @@ namespace Contensive.Models.Db {
         /// <param name="cp"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        public static T addDefault<T>(CPBaseClass cp, Dictionary<string, string> defaultValues, ref List<string> callersCacheNameList) where T : DbBaseModel {
+        public static T addDefault<T>(CPBaseClass cp, Dictionary<string, string> defaultValues, int userId, ref List<string> callersCacheNameList) where T : DbBaseModel {
             T result = default(T);
             try {
-                result = addEmpty<T>(cp);
+                result = addEmpty<T>(cp, userId);
                 if (result != null) {
                     foreach (PropertyInfo modelProperty in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         string propertyName = modelProperty.Name;
@@ -281,13 +247,15 @@ namespace Contensive.Models.Db {
                                     // -- set true
                                     modelProperty.SetValue(result, true, null);
                                     break;
+
                                 //case "contentcontrolid":
+                                // - do not force, use the contentcontrolid from defaults.
                                 //    // -- set to content's id
                                 //    modelProperty.SetValue(result, metaData.id, null);
                                 //    break;
                                 case "createdby":
                                     // -- set to current user if available
-                                    if (cp.User != null) { modelProperty.SetValue(result, cp.User.Id, null); }
+                                    modelProperty.SetValue(result, userId, null);
                                     break;
                                 case "dateadded":
                                     // -- set to now
@@ -295,7 +263,7 @@ namespace Contensive.Models.Db {
                                     break;
                                 case "modifiedby":
                                     // -- set to current user if available
-                                    if (cp.User != null) { modelProperty.SetValue(result, cp.User.Id, null); }
+                                    modelProperty.SetValue(result, userId, null);
                                     break;
                                 case "modifieddate":
                                     // -- set to now
@@ -370,16 +338,25 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
+        /// Add a new empty record to the db as the system user and return an object of it.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <returns></returns>
+        public static T addEmpty<T>(CPBaseClass cp) where T : DbBaseModel => addEmpty<T>(cp, 0);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Add a new empty record to the db and return an object of it.
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        public static T addEmpty<T>(CPBaseClass cp) where T : DbBaseModel {
+        public static T addEmpty<T>(CPBaseClass cp, int userId) where T : DbBaseModel {
             try {
                 T result = default(T);
                 if (isAppInvalid(cp)) { return result; }
-                return create<T>(cp, cp.Db.Add(derivedTableName(typeof(T)), cp.User.Id));
+                return create<T>(cp, cp.Db.Add(derivedTableName(typeof(T)), userId));
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
                 throw;
@@ -658,67 +635,86 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
+        /// save the instance properties to a record as the system user with matching id. 
+        /// If id is not provided, a new record is created.
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <returns></returns>
+        public int save(CPBaseClass cp) => save(cp, 0, false);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// save the instance properties to a record user with matching id. 
+        /// If id is not provided, a new record is created.
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public int save(CPBaseClass cp, int userId) => save(cp, userId, false);
+        //
+        //====================================================================================================
+        /// <summary>
         /// save the instance properties to a record with matching id. If id is not provided, a new record is created.
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
-        public int save(CPBaseClass cp, bool asyncSave = false) {
+        public int save(CPBaseClass cp, int userId, bool asyncSave) {
             try {
                 if (isAppInvalid(cp)) { return 0; }
                 Type instanceType = this.GetType();
                 string tableName = derivedTableName(instanceType);
                 string datasourceName = derivedDataSourceName(instanceType);
-                var sqlPairs = new SqlFieldListClass();
+                var sqlPairs = new NameValueCollection();
                 foreach (PropertyInfo instanceProperty in this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                     switch (instanceProperty.Name.ToLowerInvariant()) {
                         case "id":
                             break;
                         case "ccguid":
                             if (string.IsNullOrEmpty(ccguid)) { ccguid = cp.Utils.CreateGuid(); }
-                            sqlPairs.add(instanceProperty.Name, cp.Db.EncodeSQLText(instanceProperty.GetValue(this, null).ToString()));
+                            sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(instanceProperty.GetValue(this, null).ToString()));
                             break;
                         default:
-                            CPContentBaseClass.fileTypeIdEnum fieldTypeId = 0;
+                            CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
                             bool fileFieldContentUpdated = false;
                             FieldTypeFileBase fileProperty = null;
                             switch (instanceProperty.PropertyType.Name) {
                                 case "Int32":
                                     Int32 valueInt32 = (int)instanceProperty.GetValue(this);
-                                    sqlPairs.add(instanceProperty.Name, cp.Db.EncodeSQLNumber(valueInt32));
+                                    sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLNumber(valueInt32));
                                     break;
                                 case "Boolean":
                                     bool valueBool = (bool)instanceProperty.GetValue(this);
-                                    sqlPairs.add(instanceProperty.Name, cp.Db.EncodeSQLBoolean(valueBool));
+                                    sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLBoolean(valueBool));
                                     break;
                                 case "DateTime":
                                     DateTime valueDate = (DateTime)instanceProperty.GetValue(this, null);
-                                    sqlPairs.add(instanceProperty.Name, cp.Db.EncodeSQLDate(valueDate));
+                                    sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLDate(valueDate));
                                     break;
                                 case "Double":
                                     double valueDbl = (double)instanceProperty.GetValue(this);
-                                    sqlPairs.add(instanceProperty.Name, cp.Db.EncodeSQLNumber(valueDbl));
+                                    sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLNumber(valueDbl));
                                     break;
                                 case "String":
                                     string valueString = (string)instanceProperty.GetValue(this, null);
-                                    sqlPairs.add(instanceProperty.Name, cp.Db.EncodeSQLText(valueString));
+                                    sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(valueString));
                                     break;
                                 case "FieldTypeTextFile": {
-                                        fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileText;
+                                        fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileText;
                                         fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
                                     }
                                     break;
                                 case "FieldTypeJavascriptFile": {
-                                        fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileJavascript;
+                                        fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileJavascript;
                                         fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
                                     }
                                     break;
                                 case "FieldTypeCSSFile": {
-                                        fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileCSS;
+                                        fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileCSS;
                                         fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
                                     }
                                     break;
                                 case "FieldTypeHTMLFile": {
-                                        fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileHTML;
+                                        fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileHTML;
                                         fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
                                     }
                                     break;
@@ -750,7 +746,7 @@ namespace Contensive.Models.Db {
                                     if ((string.IsNullOrEmpty(fileFieldContent)) && (!string.IsNullOrEmpty(fileFieldFilename))) {
                                         //
                                         // -- empty content and valid filename, delete the file and clear the filename
-                                        sqlPairs.add(instanceProperty.Name, cp.Db.EncodeSQLText(string.Empty));
+                                        sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(string.Empty));
                                         cp.CdnFiles.DeleteFile(fileFieldFilename);
                                         fileFieldFilenameProperty.SetValue(fileProperty, string.Empty);
                                     } else {
@@ -761,7 +757,7 @@ namespace Contensive.Models.Db {
                                             fileFieldFilenameProperty.SetValue(fileProperty, fileFieldFilename);
                                         }
                                         cp.CdnFiles.Save(fileFieldFilename, fileFieldContent);
-                                        sqlPairs.add(instanceProperty.Name, cp.Db.EncodeSQLText(fileFieldFilename));
+                                        sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(fileFieldFilename));
                                     }
                                 }
 
@@ -769,8 +765,8 @@ namespace Contensive.Models.Db {
                             break;
                     }
                 }
-                if (sqlPairs.count > 0) {
-                    if (id == 0) { id = cp.Db.Add(tableName, cp.User.Id); }
+                if (sqlPairs.Count > 0) {
+                    if (id == 0) { id = cp.Db.Add(tableName, userId); }
                     cp.Db.Update(tableName, "(id=" + id.ToString() + ")", sqlPairs, asyncSave);
                 }
                 //
@@ -954,12 +950,23 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// Create an empty model object, populating only control fields (guid, active, created/modified)
+        /// Create an empty model object as the system user.
+        /// Populate only control fields (guid, active, created/modified)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="cp"></param>
         /// <returns></returns>
-        public static T createEmpty<T>(CPBaseClass cp) where T : DbBaseModel {
+        public static T createEmpty<T>(CPBaseClass cp) where T : DbBaseModel => createEmpty<T>(cp, 0);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Create an empty model object.
+        /// Populate only control fields (guid, active, created/modified)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <returns></returns>
+        public static T createEmpty<T>(CPBaseClass cp, int userId) where T : DbBaseModel {
             try {
                 T instance = (T)Activator.CreateInstance(typeof(T));
                 if (isAppInvalid(cp)) { return instance; }
@@ -968,8 +975,8 @@ namespace Contensive.Models.Db {
                 instance.GetType().GetProperty("ccguid", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, cp.Utils.CreateGuid(), null);
                 instance.GetType().GetProperty("dateadded", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, rightNow, null);
                 instance.GetType().GetProperty("modifieddate", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, rightNow, null);
-                instance.GetType().GetProperty("createdby", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, cp.User.Id, null);
-                instance.GetType().GetProperty("modifiedby", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, cp.User.Id, null);
+                instance.GetType().GetProperty("createdby", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, userId, null);
+                instance.GetType().GetProperty("modifiedby", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, userId, null);
                 return instance;
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
@@ -1013,22 +1020,6 @@ namespace Contensive.Models.Db {
         public static string getSelectSql<T>(CPBaseClass cp, List<string> fieldList) where T : DbBaseModel => getSelectSql<T>(cp, fieldList, null, null);
         //
         public static string getSelectSql<T>(CPBaseClass cp) where T : DbBaseModel => getSelectSql<T>(cp, null, null, null);
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// create the cache key for the table cache
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="cp"></param>
-        ///// <returns></returns>
-        //public static string getTableCacheKey<T>(CPBaseClass cp) {
-        //    try {
-        //        return cp.Cache. CacheController.createCacheKey_TableObjectsInvalidationDate(derivedTableName(typeof(T)));
-        //    } catch (Exception ex) {
-        //        cp.Site.ErrorReport( ex);
-        //        throw;
-        //    }
-        //}
         //
         //====================================================================================================
         /// <summary>

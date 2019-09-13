@@ -360,7 +360,7 @@ namespace Contensive.Processor.Controllers {
                                                 //-------------------------------------------------------------------------------
                                                 //
                                                 bool OKToInstall = false;
-                                                AddonCollectionModel collection = AddonCollectionModel.create(core.cpParent, collectionGuid);
+                                                AddonCollectionModel collection = AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, collectionGuid);
                                                 if (collection != null) {
                                                     //
                                                     // Upgrade addon
@@ -382,7 +382,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // Install new on this application
                                                     //
-                                                    collection = AddonCollectionModel.addEmpty(core);
+                                                    collection = AddonCollectionModel.addEmpty<AddonCollectionModel>(core.cpParent);
                                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], App does not have this collection so it will be installed.");
                                                     OKToInstall = true;
                                                 }
@@ -439,7 +439,7 @@ namespace Contensive.Processor.Controllers {
                                                         if (collection.id != 0) {
                                                             MetadataController.deleteContentRecords(core, NavigatorEntryModel.contentName, "installedbycollectionid=" + collection.id);
                                                         }
-                                                        collection.save(core);
+                                                        collection.save(core.cpParent);
                                                     }
                                                     //
                                                     //-------------------------------------------------------------------------------
@@ -866,7 +866,7 @@ namespace Contensive.Processor.Controllers {
                                                                                             if (FieldNode.Name.ToLowerInvariant() == "field") {
                                                                                                 bool IsFieldFound = false;
                                                                                                 string FieldName = XmlController.GetXMLAttribute(core, IsFound, FieldNode, "name", "").ToLowerInvariant();
-                                                                                                CPContentBaseClass.fileTypeIdEnum fieldTypeId = 0;
+                                                                                                CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
                                                                                                 int FieldLookupContentID = -1;
                                                                                                 foreach (var keyValuePair in metaData.fields) {
                                                                                                     Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
@@ -880,13 +880,13 @@ namespace Contensive.Processor.Controllers {
                                                                                                 if (IsFieldFound) {
                                                                                                     string fieldValue = FieldNode.InnerText;
                                                                                                     switch (fieldTypeId) {
-                                                                                                        case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
-                                                                                                        case CPContentBaseClass.fileTypeIdEnum.Redirect: {
+                                                                                                        case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
+                                                                                                        case CPContentBaseClass.FieldTypeIdEnum.Redirect: {
                                                                                                                 //
                                                                                                                 // not supported
                                                                                                                 break;
                                                                                                             }
-                                                                                                        case CPContentBaseClass.fileTypeIdEnum.Lookup: {
+                                                                                                        case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
                                                                                                                 //
                                                                                                                 // read in text value, if a guid, use it, otherwise assume name
                                                                                                                 if (!string.IsNullOrWhiteSpace(fieldValue)) {
@@ -943,7 +943,7 @@ namespace Contensive.Processor.Controllers {
                                                     // --- end of pass
                                                 }
                                                 collection.dataRecordList = DataRecordList;
-                                                collection.save(core);
+                                                collection.save(core.cpParent);
                                                 //
                                                 // -- test for diagnostic addon, warn if missing
                                                 if( !collectionIncludesDiagnosticAddon ) {

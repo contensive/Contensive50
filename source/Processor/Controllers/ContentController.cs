@@ -26,7 +26,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 int contentID = ContentMetadataModel.getContentId(core, contentName);
                 string tableName = MetadataController.getContentTablename(core, contentName);
-                PageContentModel.markReviewed(core, recordID);
+                PageContentModel.markReviewed(core.cpParent, recordID);
                 //
                 // -- invalidate the specific cache for this record
                 core.cache.invalidateDbRecord(recordID, tableName);
@@ -40,7 +40,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // todo - if a collection is deleted, consider deleting the collection folder (or saving as archive)
                         } else {
-                            var addonCollection = AddonCollectionModel.create(core.cpParent, recordID);
+                            var addonCollection = AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, recordID);
                             if (addonCollection != null) {
                                 string CollectionVersionFolderName = CollectionFolderController.verifyCollectionVersionFolderName(core, addonCollection.ccguid, addonCollection.name);
                                 if (string.IsNullOrEmpty(CollectionVersionFolderName)) {
@@ -99,13 +99,13 @@ namespace Contensive.Processor.Controllers {
                         //hint = hint & ",130"
                         switch (GenericController.vbLCase(recordName)) {
                             case "allowlinkalias":
-                                PageContentModel.invalidateCacheOfTable(core);
+                                PageContentModel.invalidateCacheOfTable<PageContentModel>(core.cpParent);
                                 break;
                             case "sectionlandinglink":
-                                PageContentModel.invalidateCacheOfTable(core);
+                                PageContentModel.invalidateCacheOfTable<PageContentModel>(core.cpParent);
                                 break;
-                                case Constants._siteproperty_serverPageDefault_name:
-                                PageContentModel.invalidateCacheOfTable(core);
+                            case Constants._siteproperty_serverPageDefault_name:
+                                PageContentModel.invalidateCacheOfTable<PageContentModel>(core.cpParent);
                                 break;
                         }
                         break;

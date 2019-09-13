@@ -396,7 +396,7 @@ namespace Contensive.Addons.Tools {
                 string Caption = null;
                 int NavID = 0;
                 int ParentNavID = 0;
-                DataSourceModel datasource = DataSourceModel.create<DataSourceModel>(core.cpParent, core.docProperties.getInteger("DataSourceID"));
+                DataSourceModel datasource = DataSourceModel.create(core.cpParent, core.docProperties.getInteger("DataSourceID"));
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 Caption = "Create Content Definition";
@@ -845,37 +845,37 @@ namespace Contensive.Addons.Tools {
                             // display the column if it is not in use
                             //
                             if (skipField) {
-                                if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileText) {
+                                if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileText) {
                                     //
                                     // text filename can not be search
                                     //
                                     Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (text file field)<br>");
-                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileCSS) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileCSS) {
                                     //
                                     // text filename can not be search
                                     //
                                     Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (css file field)<br>");
-                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileXML) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileXML) {
                                     //
                                     // text filename can not be search
                                     //
                                     Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (xml file field)<br>");
-                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileJavascript) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileJavascript) {
                                     //
                                     // text filename can not be search
                                     //
                                     Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (javascript file field)<br>");
-                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.LongText) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.LongText) {
                                     //
                                     // long text can not be search
                                     //
                                     Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (long text field)<br>");
-                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileImage) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileImage) {
                                     //
                                     // long text can not be search
                                     //
                                     Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (image field)<br>");
-                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Redirect) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Redirect) {
                                     //
                                     // long text can not be search
                                     //
@@ -1534,7 +1534,7 @@ namespace Contensive.Addons.Tools {
                 string ButtonList = null;
                 DataTable RSSchema = null;
                 var tmpList = new List<string> { };
-                DataSourceModel datasource = DataSourceModel.create<DataSourceModel>(core.cpParent, core.docProperties.getInteger("DataSourceID"),ref tmpList);
+                DataSourceModel datasource = DataSourceModel.create(core.cpParent, core.docProperties.getInteger("DataSourceID"),ref tmpList);
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
@@ -1821,7 +1821,7 @@ namespace Contensive.Addons.Tools {
                                 if (core.docProperties.getBoolean("DropIndex." + Pointer)) {
                                     IndexName = core.docProperties.getText("DropIndexName." + Pointer);
                                     result += "<br>Dropping index [" + IndexName + "] from table [" + TableName + "]";
-                                    db.deleteSqlIndex(TableName, IndexName);
+                                    db.deleteIndex(TableName, IndexName);
                                 }
                             }
                         }

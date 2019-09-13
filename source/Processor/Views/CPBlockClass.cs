@@ -134,11 +134,11 @@ namespace Contensive.Processor {
                 if (copyRecordNameOrGuid.IsNumeric()) {
                     //
                     // -- recordId
-                    copy = CopyContentModel.create(cp.core, GenericController.encodeInteger(copyRecordNameOrGuid));
+                    copy = CopyContentModel.create<CopyContentModel>(cp, GenericController.encodeInteger(copyRecordNameOrGuid));
                 } else if (GenericController.isGuid(copyRecordNameOrGuid)) {
                     //
                     // -- record guid
-                    copy = CopyContentModel.create(cp.core, copyRecordNameOrGuid);
+                    copy = CopyContentModel.create<CopyContentModel>(cp, copyRecordNameOrGuid);
                 } else {
                     //
                     // -- record name

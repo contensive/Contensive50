@@ -551,13 +551,13 @@ namespace Contensive.Processor.Controllers {
                     // -- Save anything that changed
                     //LogController.logTrace(core, "save visit,visitor,user if updated");
                     if (visit_changes) {
-                        resultSessionContext.visit.save(core.cpParent, true);
+                        resultSessionContext.visit.save(core.cpParent, 0, true);
                     }
                     if (visitor_changes) {
-                        resultSessionContext.visitor.save(core.cpParent, true);
+                        resultSessionContext.visitor.save(core.cpParent, 0, true);
                     }
                     if (user_changes) {
-                        resultSessionContext.user.save(core.cpParent, true);
+                        resultSessionContext.user.save(core.cpParent, 0, true);
                     }
                     string visitCookieNew = SecurityController.encodeToken(core, resultSessionContext.visit.id, resultSessionContext.visit.lastVisitTime);
                     if (trackVisits && (visitCookie != visitCookieNew)) {

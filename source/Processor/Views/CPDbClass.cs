@@ -4,6 +4,7 @@ using System.Data;
 using Contensive.Processor.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Models;
+using System.Collections.Specialized;
 
 namespace Contensive.Processor {
     //
@@ -144,31 +145,98 @@ namespace Contensive.Processor {
                 db.sqlCommandTimeout = value;
             }
         }
+        //
+        //====================================================================================================
+        //
         public override void Delete(string TableName, int RecordId) {
-            db.deleteTableRecord(RecordId, TableName);
+            db.delete(RecordId, TableName);
         }
+        //
+        //====================================================================================================
+        //
         public override string EncodeSQLNumber(int SourceNumber) {
             return DbController.encodeSQLNumber(SourceNumber);
         }
+        //
+        //====================================================================================================
         //
         public override void ExecuteNonQuery(string sql) {
             db.executeNonQuery(sql);
         }
         //
+        //====================================================================================================
+        //
         public override void ExecuteNonQueryAsync(string sql) {
             db.executeNonQueryAsync(sql);
         }
+        //
+        //====================================================================================================
+        //
         public override DataTable ExecuteQuery(string sql) {
             return db.executeQuery(sql);
         }
+        //
+        //====================================================================================================
+        //
         public override bool IsTable(string TableName) {
             return db.isSQLTable(TableName);
         }
+        //
+        //====================================================================================================
+        //
         public override bool IsTableField(string TableName, string FieldName) {
             return db.isSQLTableField(TableName, FieldName);
         }
+        //
+        //====================================================================================================
+        //
         public override DataTable ExecuteRemoteQuery(string remoteQueryKey) {
             return db.executeRemoteQuery(remoteQueryKey);
+        }
+        //
+        //====================================================================================================
+        //
+        public override string CreateFieldPathFilename(string tableName, string fieldName, int recordId, CPContentBaseClass.FieldTypeIdEnum fieldType) {
+            return FileController.getVirtualRecordUnixPathFilename(tableName, fieldName, recordId, fieldType);
+        }
+        //
+        //====================================================================================================
+        //
+        public override string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename, CPContentBaseClass.FieldTypeIdEnum fieldType) {
+            if ((fieldType==CPContentBaseClass.FieldTypeIdEnum.File)|| (fieldType == CPContentBaseClass.FieldTypeIdEnum.FileImage)) {
+                return FileController.getVirtualRecordUnixPathFilename(tableName, fieldName, recordId, filename);
+            }
+            return FileController.getVirtualRecordUnixPathFilename(tableName, fieldName, recordId, fieldType);
+        }
+        //
+        //====================================================================================================
+        //
+        public override int Add(string tableName, int createdByUserId) {
+            return db.insertGetId(tableName, createdByUserId);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void Update(string tableName, string criteria, NameValueCollection sqlList) {
+            db.update(tableName, criteria, sqlList);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void Update(string tableName, string criteria, NameValueCollection sqlList, bool async) {
+            db.update(tableName, criteria, sqlList, async);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void Delete(string tableName, string guid) {
+            db.delete(tableName, guid);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void DeleteRows(string tableName, string sqlCriteria) {
+            db.deleteRows(tableName, sqlCriteria);
         }
         //
         //====================================================================================================
@@ -251,7 +319,7 @@ namespace Contensive.Processor {
         //
         [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override void Delete(string ignoreDataSourceName, string TableName, int RecordId) {
-            db.deleteTableRecord(RecordId, TableName);
+            db.delete(RecordId, TableName);
         }
         //
         [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
@@ -322,6 +390,18 @@ namespace Contensive.Processor {
             db.executeNonQueryAsync(sql);
         }
         //
+        [Obsolete("Deprecated. Use methods with FieldTypeIdEnum.", false)]
+        public override string CreateFieldPathFilename(string tableName, string fieldName, int recordId, CPContentBaseClass.fileTypeIdEnum fieldType) {
+            return FileController.getVirtualRecordUnixPathFilename(tableName, fieldName, recordId, (CPContentBaseClass.FieldTypeIdEnum)fieldType);
+        }
+        [Obsolete("Deprecated. Use methods with FieldTypeIdEnum.", false)]
+        public override string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename, CPContentBaseClass.fileTypeIdEnum fieldType) {
+            var fieldTypeCorrected = (CPContentBaseClass.FieldTypeIdEnum)fieldType;
+            if ((fieldTypeCorrected == CPContentBaseClass.FieldTypeIdEnum.File) || (fieldTypeCorrected == CPContentBaseClass.FieldTypeIdEnum.FileImage)) {
+                return FileController.getVirtualRecordUnixPathFilename(tableName, fieldName, recordId, filename);
+            }
+            return FileController.getVirtualRecordUnixPathFilename(tableName, fieldName, recordId, fieldTypeCorrected);
+        }
         //
         //====================================================================================================
         //
@@ -351,34 +431,6 @@ namespace Contensive.Processor {
         public override void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        public override string CreateFieldPathFilename(string tableName, string fieldName, int recordId, CPContentBaseClass.fileTypeIdEnum fieldType) {
-            throw new NotImplementedException();
-        }
-
-        public override string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename, CPContentBaseClass.fileTypeIdEnum fieldType) {
-            throw new NotImplementedException();
-        }
-
-        public override int Add(string tableName, int createdByUserId) {
-            throw new NotImplementedException();
-        }
-
-        public override void Update(string tableName, string criteria, SqlFieldListClass sqlList) {
-            throw new NotImplementedException();
-        }
-
-        public override void Update(string tableName, string criteria, SqlFieldListClass sqlList, bool Async) {
-            throw new NotImplementedException();
-        }
-
-        public override void Delete(string tableName, string guid) {
-            throw new NotImplementedException();
-        }
-
-        public override void DeleteRows(string tableName, string sqlCriteria) {
-            throw new NotImplementedException();
         }
 
         ~CPDbClass() {

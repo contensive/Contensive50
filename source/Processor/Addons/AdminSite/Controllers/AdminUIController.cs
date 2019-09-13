@@ -1199,7 +1199,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         public static string getDefaultEditor_memberSelect(CoreController core, string htmlName, int selectedRecordId, int groupId, string groupName, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
             string EditorString = "";
             if ((groupId > 0) & (string.IsNullOrWhiteSpace(groupName))) {
-                var group = GroupModel.create(core.cpParent, groupId);
+                var group = DbBaseModel.create<GroupModel>(core.cpParent, groupId);
                 if (group != null) {
                     groupName = "Group " + group.id.ToString();
                     group.save(core.cpParent);
@@ -1844,7 +1844,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         //core.menuFlyout.menu_AddEntry(MenuName + ":" + content.name, ParentMenuName, "", "", Link, ButtonCaption, "", "", true);
                         //
                         // Create child submenu if Child Entries found
-                        var childList = ContentModel.createList(core, "ParentID=" + content.id);
+                        var childList = DbBaseModel.createList<ContentModel>(core.cpParent, "ParentID=" + content.id);
                         if (childList.Count > 0) {
                             //
                             // Add the child menu

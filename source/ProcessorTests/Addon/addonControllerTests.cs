@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using static Tests.testConstants;
 using Contensive.Processor;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     //
@@ -21,8 +23,8 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         public void controllers_Addon_simpleDoNothingAddon() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
-                var addon = AddonModel.addDefault(cp.core, Processor.Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, AddonModel.contentName));
-                addon.save(cp.core);
+                var addon = AddonModel.addDefault<AddonModel>(cp, ContentMetadataModel.getDefaultValueDict(cp.core, AddonModel.contentName));
+                addon.save(cp);
                 // act
                 string result = cp.core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
                     addonType = CPUtilsBaseClass.addonContext.ContextSimple,
@@ -61,9 +63,9 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         public void controllers_Addon_copy() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
-                var addon = AddonModel.addDefault(cp.core, Processor.Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, AddonModel.contentName));
+                var addon = AddonModel.addDefault<AddonModel>(cp, ContentMetadataModel.getDefaultValueDict(cp.core, AddonModel.contentName));
                 addon.copy = "test" + GenericController.GetRandomInteger(cp.core).ToString();
-                addon.save(cp.core);
+                addon.save(cp);
                 // act
                 string result = cp.core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
                     addonType = CPUtilsBaseClass.addonContext.ContextSimple,
