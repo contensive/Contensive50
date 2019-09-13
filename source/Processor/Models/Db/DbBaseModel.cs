@@ -858,12 +858,41 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
         /// <returns></returns>
-        public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) where T : DbBaseModel {
+        public static int getCount<T>(CoreController core, string sqlCriteria) where T : DbBaseModel {
+            try {
+                int result = 0;
+                if (isAppInvalid(core)) { return result; }
+                using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
+                    using (var dt = db.executeQuery(getCountSql<T>(core, sqlCriteria))) {
+                        if (dt.Rows.Count == 0) return result;
+                        return GenericController.encodeInteger(dt.Rows[0][0]);
+                    }
+                }
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public static int getCount<T>(CoreController core) where T : DbBaseModel => getCount<T>(core, "");
+            //
+            //====================================================================================================
+            /// <summary>
+            /// create a list of objects based on the sql criteria and sort order, and add a cache object to an argument
+            /// </summary>
+            /// <param name="cp"></param>
+            /// <param name="sqlCriteria"></param>
+            /// <returns></returns>
+            public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy, int pageSize, int pageNumber, List<string> callersCacheNameList) where T : DbBaseModel {
             try {
                 List<T> result = new List<T>();
                 if (isAppInvalid(core)) { return result; }
+                int startRecord = pageSize * (pageNumber - 1);
+                int maxRecords = pageSize;
                 using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
-                    using (var dt = db.executeQuery(getSelectSql<T>(core, null, sqlCriteria, sqlOrderBy))) {
+                    using (var dt = db.executeQuery(getSelectSql<T>(core, null, sqlCriteria, sqlOrderBy), startRecord, maxRecords)) {
                         foreach (DataRow row in dt.Rows) {
                             T instance = loadRecord<T>(core, row, ref callersCacheNameList);
                             if (instance != null) { result.Add(instance); }
@@ -876,6 +905,21 @@ namespace Contensive.Processor.Models.Db {
                 throw;
             }
         }
+        //
+        //====================================================================================================
+        //
+        public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy, int pageSize, int pageNumber) where T : DbBaseModel
+            => createList<T>(core, sqlCriteria, sqlOrderBy, pageSize, pageNumber, new List<string>());
+        //
+        //====================================================================================================
+        //
+        public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy, int pageSize) where T : DbBaseModel
+            => createList<T>(core, sqlCriteria, sqlOrderBy, pageSize, 1, new List<string>());
+        //
+        //====================================================================================================
+        //
+        public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) where T : DbBaseModel
+            => createList<T>(core, sqlCriteria, sqlOrderBy, 999999, 1, callersCacheNameList);
         //
         //====================================================================================================
         /// <summary>
@@ -994,6 +1038,16 @@ namespace Contensive.Processor.Models.Db {
                 LogController.logError(core, ex);
                 throw;
             }
+        }
+        //
+        //====================================================================================================
+        //
+        public static string getCountSql<T>(CoreController core, string sqlCriteria) where T : DbBaseModel {
+            var sb = (new StringBuilder("select count(*)"))
+                .Append(" from ").Append(derivedTableName(typeof(T)))
+                .Append(" where (active>0)");
+            if (!string.IsNullOrEmpty(sqlCriteria)) { sb.Append("and(" + sqlCriteria + ")"); }
+            return sb.ToString();
         }
         //
         //====================================================================================================

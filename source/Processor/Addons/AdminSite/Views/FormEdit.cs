@@ -824,7 +824,8 @@ namespace Contensive.Addons.AdminSite {
                                         // ----- File ReadOnly
                                         return_NewFieldList += "," + field.nameLc;
                                         NonEncodedLink = GenericController.getCdnFileLink(core, fieldValue_text);
-                                        EncodedLink = GenericController.encodeURL(NonEncodedLink);
+                                        EncodedLink = System.Net.WebUtility.HtmlEncode(NonEncodedLink);
+                                        //EncodedLink = GenericController.encodeURL(NonEncodedLink);
                                         EditorString += (HtmlController.inputHidden(field.nameLc, ""));
                                         if (string.IsNullOrEmpty(fieldValue_text)) {
                                             EditorString += ("[no file]");
@@ -832,7 +833,7 @@ namespace Contensive.Addons.AdminSite {
                                             string filename = "";
                                             string path = "";
                                             core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
-                                            EditorString += ("&nbsp;<a href=\"http://" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
+                                            EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
                                         }
                                         EditorString += WhyReadOnlyMsg;
                                         //
