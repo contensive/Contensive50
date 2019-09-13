@@ -139,7 +139,7 @@ namespace Contensive.Processor.Models.Db {
             public bool contentUpdated { get; set; } = false;
             //
             // -- set by load(). Used by field to read content from filename when needed
-            [NonSerialized] public CoreController internalcore= null;
+            [NonSerialized] public CoreController internalcore = null;
         }
         //
         [Serializable]
@@ -877,15 +877,15 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //
         public static int getCount<T>(CoreController core) where T : DbBaseModel => getCount<T>(core, "");
-            //
-            //====================================================================================================
-            /// <summary>
-            /// create a list of objects based on the sql criteria and sort order, and add a cache object to an argument
-            /// </summary>
-            /// <param name="cp"></param>
-            /// <param name="sqlCriteria"></param>
-            /// <returns></returns>
-            public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy, int pageSize, int pageNumber, List<string> callersCacheNameList) where T : DbBaseModel {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create a list of objects based on the sql criteria and sort order, and add a cache object to an argument
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <returns></returns>
+        public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy, int pageSize, int pageNumber, List<string> callersCacheNameList) where T : DbBaseModel {
             try {
                 List<T> result = new List<T>();
                 if (isAppInvalid(core)) { return result; }
@@ -950,7 +950,7 @@ namespace Contensive.Processor.Models.Db {
         //
         public static T createFirstOfList<T>(CoreController core, string sqlCriteria, string sqlOrderBy) where T : DbBaseModel {
             var list = createList<T>(core, sqlCriteria, sqlOrderBy, new List<string>());
-            if (list.Count==0 ) { return null; }
+            if (list.Count == 0) { return null; }
             return list.First();
         }
         //

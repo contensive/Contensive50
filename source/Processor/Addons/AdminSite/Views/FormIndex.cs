@@ -1796,7 +1796,7 @@ namespace Contensive.Addons.AdminSite {
                     case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
                         Stream.Add("n/a");
                         break;
-                    case CPContentBaseClass.fileTypeIdEnum.Date:
+                    case CPContentBaseClass.FieldTypeIdEnum.Date:
                         //
                         // -- date type. isolate to handle special case of time==12:00:00AM, user would like to not see the time in this case
                         DateTime cellValueDate = csData.getDate(field.nameLc);

@@ -80,7 +80,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.1.190913.10\lib\net461\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.1.190913.17\lib\net461\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -109,8 +109,8 @@
     <Reference Include="Nustache.Core, Version=1.16.0.10, Culture=neutral, PublicKeyToken=efd6f3d8f76ecd9f, processorArchitecture=MSIL">
       <HintPath>..\packages\Nustache.1.16.0.10\lib\net20\Nustache.Core.dll</HintPath>
     </Reference>
-    <Reference Include="processor, Version=5.1.7195.18490, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Contensive.Processor.5.1.190913.10\lib\net461\Processor.dll</HintPath>
+    <Reference Include="processor, Version=5.1.7195.30736, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Contensive.Processor.5.1.190913.17\lib\net461\Processor.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

@@ -7,7 +7,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.Processor.Exceptions;
 using System.Collections.Generic;
-using Contensive.Processor.Models.Db;
+using Contensive.Models.Db;
 
 namespace Contensive.Addons.AdminSite {
     public class ToolCustomReports {
@@ -250,9 +250,9 @@ namespace Contensive.Addons.AdminSite {
             //
             // Request the download
             //
-            var customReport = DbBaseModel.create<CustomReportModel>(core, customReportId);
+            var customReport = DbBaseModel.create<CustomReportModel>(core.cpParent, customReportId);
             if ( customReport != null) {
-                var ExportCSVAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportCSV);
+                var ExportCSVAddon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidExportCSV);
                 if (ExportCSVAddon == null) {
                     LogController.logError(core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
                 } else {

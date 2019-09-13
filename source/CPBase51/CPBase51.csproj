@@ -74,6 +74,7 @@
     <Compile Include="BaseClasses\CPVisitorBaseClass.cs" />
     <Compile Include="Exceptions\Exception.cs" />
     <Compile Include="BaseModels\AppConfigModel.cs" />
+    <Compile Include="Models\Db\CustomReportModel.cs" />
     <Compile Include="Models\Db\AddonCollectionModel.cs" />
     <Compile Include="Models\Db\AddonContentFieldTypeRulesModel.cs" />
     <Compile Include="Models\Db\AddonIncludeRuleModel.cs" />

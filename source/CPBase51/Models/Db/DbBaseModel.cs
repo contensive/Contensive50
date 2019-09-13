@@ -216,7 +216,7 @@ namespace Contensive.Models.Db {
         /// <returns></returns>
         public static T addDefault<T>(CPBaseClass cp, Dictionary<string, string> DefaultValues, int userId) where T : DbBaseModel {
             var callersCacheNameList = new List<string>();
-            return addDefault<T>(cp, DefaultValues, userId,  ref callersCacheNameList);
+            return addDefault<T>(cp, DefaultValues, userId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -837,11 +837,13 @@ namespace Contensive.Models.Db {
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
         /// <returns></returns>
-        public static List<T> createList<T>(CPBaseClass cp, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) where T : DbBaseModel {
+        public static List<T> createList<T>(CPBaseClass cp, string sqlCriteria, string sqlOrderBy, int pageSize, int pageNumber, List<string> callersCacheNameList) where T : DbBaseModel {
             try {
                 List<T> result = new List<T>();
                 if (isAppInvalid(cp)) { return result; }
-                using (var dt = cp.Db.ExecuteQuery(getSelectSql<T>(cp, null, sqlCriteria, sqlOrderBy))) {
+                int startRecord = pageSize * (pageNumber - 1);
+                int maxRecords = pageSize;
+                using (var dt = cp.Db.ExecuteQuery(getSelectSql<T>(cp, null, sqlCriteria, sqlOrderBy), startRecord, maxRecords)) {
                     foreach (DataRow row in dt.Rows) {
                         T instance = loadRecord<T>(cp, row, ref callersCacheNameList);
                         if (instance != null) { result.Add(instance); }
@@ -855,6 +857,16 @@ namespace Contensive.Models.Db {
         }
         //
         //====================================================================================================
+        //
+        public static List<T> createList<T>(CPBaseClass cp, string sqlCriteria, string sqlOrderBy, int pageSize, int pageNumber) where T : DbBaseModel
+            => createList<T>(cp, sqlCriteria, sqlOrderBy, pageSize, pageNumber, new List<string>());
+        //
+        //====================================================================================================
+        //
+        public static List<T> createList<T>(CPBaseClass cp, string sqlCriteria, string sqlOrderBy, int pageSize) where T : DbBaseModel
+            => createList<T>(cp, sqlCriteria, sqlOrderBy, pageSize, 1, new List<string>());
+        //
+        //====================================================================================================
         /// <summary>
         /// create a list of objects based on the sql criteria and sort order
         /// </summary>
@@ -863,7 +875,8 @@ namespace Contensive.Models.Db {
         /// <param name="sqlCriteria"></param>
         /// <param name="sqlOrderBy"></param>
         /// <returns></returns>
-        public static List<T> createList<T>(CPBaseClass cp, string sqlCriteria, string sqlOrderBy) where T : DbBaseModel => createList<T>(cp, sqlCriteria, sqlOrderBy, new List<string> { });
+        public static List<T> createList<T>(CPBaseClass cp, string sqlCriteria, string sqlOrderBy) where T : DbBaseModel
+            => createList<T>(cp, sqlCriteria, sqlOrderBy, 99999, 1, new List<string> { });
         //
         //====================================================================================================
         /// <summary>
@@ -873,16 +886,18 @@ namespace Contensive.Models.Db {
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
         /// <returns></returns>
-        public static List<T> createList<T>(CPBaseClass cp, string sqlCriteria) where T : DbBaseModel => createList<T>(cp, sqlCriteria, "id", new List<string> { });
+        public static List<T> createList<T>(CPBaseClass cp, string sqlCriteria) where T : DbBaseModel
+            => createList<T>(cp, sqlCriteria, "id", 99999, 1, new List<string> { });
         //
         //====================================================================================================
         //
-        public static List<T> createList<T>(CPBaseClass cp) where T : DbBaseModel => createList<T>(cp, "", "id", new List<string> { });
+        public static List<T> createList<T>(CPBaseClass cp) where T : DbBaseModel
+            => createList<T>(cp, "", "id", 99999, 1, new List<string> { });
         //
         //====================================================================================================
         //
         public static T createFirstOfList<T>(CPBaseClass cp, string sqlCriteria, string sqlOrderBy) where T : DbBaseModel {
-            var list = createList<T>(cp, sqlCriteria, sqlOrderBy, new List<string>());
+            var list = createList<T>(cp, sqlCriteria, sqlOrderBy, 1, 1, new List<string>());
             if (list.Count == 0) { return null; }
             return list.First();
         }
@@ -1020,6 +1035,16 @@ namespace Contensive.Models.Db {
         public static string getSelectSql<T>(CPBaseClass cp, List<string> fieldList) where T : DbBaseModel => getSelectSql<T>(cp, fieldList, null, null);
         //
         public static string getSelectSql<T>(CPBaseClass cp) where T : DbBaseModel => getSelectSql<T>(cp, null, null, null);
+        //
+        //====================================================================================================
+        //
+        public static string getCountSql<T>(CPBaseClass cp, string sqlCriteria) where T : DbBaseModel {
+            var sb = (new StringBuilder("select count(*)"))
+                .Append(" from ").Append(derivedTableName(typeof(T)))
+                .Append(" where (active>0)");
+            if (!string.IsNullOrEmpty(sqlCriteria)) { sb.Append("and(" + sqlCriteria + ")"); }
+            return sb.ToString();
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -1243,5 +1268,30 @@ namespace Contensive.Models.Db {
                 }
             }
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create a list of objects based on the sql criteria and sort order, and add a cache object to an argument
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <returns></returns>
+        public static int getCount<T>(CPBaseClass cp, string sqlCriteria) where T : DbBaseModel {
+            try {
+                int result = 0;
+                if (isAppInvalid(cp)) { return result; }
+                using (var dt = cp.Db.ExecuteQuery(getCountSql<T>(cp, sqlCriteria))) {
+                    if (dt.Rows.Count == 0) return result;
+                    return cp.Utils.EncodeInteger(dt.Rows[0][0]);
+                }
+            } catch (Exception ex) {
+                cp.Site.ErrorReport(ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public static int getCount<T>(CPBaseClass core) where T : DbBaseModel => getCount<T>(core, "");
     }
 }
