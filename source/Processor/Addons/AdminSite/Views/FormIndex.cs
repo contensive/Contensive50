@@ -37,19 +37,19 @@ namespace Contensive.Addons.AdminSite {
                 } else if (string.IsNullOrEmpty(adminData.adminContent.name)) {
                     //
                     // Bad content name
-                    Stream.Add(AdminErrorController.get( core, "No content definition could be found for ContentID [" + adminData.adminContent.id + "]. This could be a menu error. Please contact your application developer for more assistance.", "No content definition for ContentID [" + adminData.adminContent.id + "] could be found."));
+                    Stream.Add(AdminErrorController.get(core, "No content definition could be found for ContentID [" + adminData.adminContent.id + "]. This could be a menu error. Please contact your application developer for more assistance.", "No content definition for ContentID [" + adminData.adminContent.id + "] could be found."));
                 } else if (adminData.adminContent.tableName == "") {
                     //
                     // No tablename
-                    Stream.Add(AdminErrorController.get( core, "The content definition [" + adminData.adminContent.name + "] is not associated with a valid database table. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] ContentTablename is empty."));
+                    Stream.Add(AdminErrorController.get(core, "The content definition [" + adminData.adminContent.name + "] is not associated with a valid database table. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] ContentTablename is empty."));
                 } else if (adminData.adminContent.fields.Count == 0) {
                     //
                     // No Fields
-                    Stream.Add(AdminErrorController.get( core, "This content [" + adminData.adminContent.name + "] cannot be accessed because it has no fields. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
+                    Stream.Add(AdminErrorController.get(core, "This content [" + adminData.adminContent.name + "] cannot be accessed because it has no fields. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
                 } else if (adminData.adminContent.developerOnly & (!core.session.isAuthenticatedDeveloper())) {
                     //
                     // Developer Content and not developer
-                    Stream.Add(AdminErrorController.get( core, "Access to this content [" + adminData.adminContent.name + "] requires developer permissions. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
+                    Stream.Add(AdminErrorController.get(core, "Access to this content [" + adminData.adminContent.name + "] requires developer permissions. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
                 } else {
                     List<string> tmp = new List<string> { };
                     DataSourceModel datasource = DataSourceModel.create(core.cpParent, adminData.adminContent.dataSourceId, ref tmp);
@@ -66,7 +66,7 @@ namespace Contensive.Addons.AdminSite {
                     if (SubForm != 0) {
                         switch (SubForm) {
                             case AdminFormIndex_SubFormExport:
-                                Copy = FormIndexExport.get( core, adminData);
+                                Copy = FormIndexExport.get(core, adminData);
                                 break;
                             case AdminFormIndex_SubFormSetColumns:
                                 Copy = FormIndexSetColumnsClass.get(cp, core, adminData);
@@ -321,27 +321,27 @@ namespace Contensive.Addons.AdminSite {
                                         } else {
                                             RowColor = "class=\"ccAdminListRowOdd\"";
                                         }
-                                        DataTableRows.Append( Environment.NewLine + "<tr>");
+                                        DataTableRows.Append(Environment.NewLine + "<tr>");
                                         //
                                         // --- Edit button column
-                                        DataTableRows.Append( "<td align=center " + RowColor + ">");
+                                        DataTableRows.Append("<td align=center " + RowColor + ">");
                                         string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + Constants.AdminActionNop + "&cid=" + adminData.adminContent.id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.TitleExtension) + "&ad=" + adminData.ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminData.AdminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
                                         if (adminData.WherePairCount > 0) {
                                             for (int WhereCount = 0; WhereCount < adminData.WherePairCount; WhereCount++) {
                                                 URI = URI + "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[1, WhereCount]);
                                             }
                                         }
-                                        DataTableRows.Append( AdminUIController.getRecordEditLink(URI));
-                                        DataTableRows.Append( ("</td>"));
+                                        DataTableRows.Append(AdminUIController.getRecordEditLink(URI));
+                                        DataTableRows.Append(("</td>"));
                                         //
                                         // --- Record Number column
                                         //DataTable_DataRows.Append( "<td align=right " + RowColor + ">" + SpanClassAdminSmall + "[" + (RecordPointer + 1) + "]</span></td>";
                                         //
                                         // --- Delete Checkbox Columns
                                         if (AllowDelete) {
-                                            DataTableRows.Append( "<td align=center " + RowColor + "><input TYPE=CheckBox NAME=row" + RecordPointer + " VALUE=1 ID=\"DelCheck\"><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>");
+                                            DataTableRows.Append("<td align=center " + RowColor + "><input TYPE=CheckBox NAME=row" + RecordPointer + " VALUE=1 ID=\"DelCheck\"><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>");
                                         } else {
-                                            DataTableRows.Append( "<td align=center " + RowColor + "><input TYPE=CheckBox disabled=\"disabled\" NAME=row" + RecordPointer + " VALUE=1><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>");
+                                            DataTableRows.Append("<td align=center " + RowColor + "><input TYPE=CheckBox disabled=\"disabled\" NAME=row" + RecordPointer + " VALUE=1><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>");
                                         }
                                         //
                                         // --- field columns
@@ -349,17 +349,17 @@ namespace Contensive.Addons.AdminSite {
                                             string columnNameLc = column.Name.ToLowerInvariant();
                                             if (FieldUsedInColumns.ContainsKey(columnNameLc)) {
                                                 if (FieldUsedInColumns[columnNameLc]) {
-                                                    DataTableRows.Append( (Environment.NewLine + "<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal));
-                                                    DataTableRows.Append( getForm_Index_GetCell(core, adminData, column.Name, csData, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail"));
-                                                    DataTableRows.Append( ("&nbsp;</span></td>"));
+                                                    DataTableRows.Append((Environment.NewLine + "<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal));
+                                                    DataTableRows.Append(getForm_Index_GetCell(core, adminData, column.Name, csData, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail"));
+                                                    DataTableRows.Append(("&nbsp;</span></td>"));
                                                 }
                                             }
                                         }
-                                        DataTableRows.Append( ("\n    </tr>"));
+                                        DataTableRows.Append(("\n    </tr>"));
                                         csData.goNext();
                                         RecordPointer = RecordPointer + 1;
                                     }
-                                    DataTableRows.Append( "<input type=hidden name=rowcnt value=" + RecordPointer + ">");
+                                    DataTableRows.Append("<input type=hidden name=rowcnt value=" + RecordPointer + ">");
                                     //
                                     // --- print out the stuff at the bottom
                                     //
@@ -385,18 +385,18 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // No records found
                                 //
-                                DataTableRows.Append( ("<tr><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td colspan=" + IndexConfig.columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">no records were found</td></tr>"));
+                                DataTableRows.Append(("<tr><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td colspan=" + IndexConfig.columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">no records were found</td></tr>"));
                             } else {
                                 if (RecordPointer < RecordLast) {
                                     //
                                     // End of list
                                     //
-                                    DataTableRows.Append( ("<tr><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td colspan=" + IndexConfig.columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">----- end of list</td></tr>"));
+                                    DataTableRows.Append(("<tr><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td colspan=" + IndexConfig.columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">----- end of list</td></tr>"));
                                 }
                                 //
                                 // Add another header to the data rows
                                 //
-                                DataTableRows.Append( DataTable_HdrRow);
+                                DataTableRows.Append(DataTable_HdrRow);
                             }
                             //
                             // ----- DataTable_FindRow
@@ -516,7 +516,7 @@ namespace Contensive.Addons.AdminSite {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
                     var fieldMeta = ContentMetadataModel.getField(core, content, findWord.Name);
-                    if ( fieldMeta != null ) {
+                    if (fieldMeta != null) {
                         string FieldCaption = fieldMeta.caption;
                         switch (findWord.MatchOption) {
                             case FindWordMatchEnum.MatchEmpty:
@@ -624,7 +624,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="core"></param>
         /// <param name="adminData"></param>
         /// <param name="IndexConfig"></param>
-        public static void setIndexSQL_ProcessIndexConfigRequests( CoreController core, AdminDataModel adminData, ref IndexConfigClass IndexConfig) {
+        public static void setIndexSQL_ProcessIndexConfigRequests(CoreController core, AdminDataModel adminData, ref IndexConfigClass IndexConfig) {
             try {
                 //
                 int TestInteger = 0;
@@ -953,7 +953,7 @@ namespace Contensive.Addons.AdminSite {
         //   
         //========================================================================================
         //
-        public static void setIndexSQL( CoreController core, AdminDataModel adminData, IndexConfigClass IndexConfig, ref bool Return_AllowAccess, ref string return_sqlFieldList, ref string return_sqlFrom, ref string return_SQLWhere, ref string return_SQLOrderBy, ref bool return_IsLimitedToSubContent, ref string return_ContentAccessLimitMessage, ref Dictionary<string, bool> FieldUsedInColumns, Dictionary<string, bool> IsLookupFieldValid) {
+        public static void setIndexSQL(CoreController core, AdminDataModel adminData, IndexConfigClass IndexConfig, ref bool Return_AllowAccess, ref string return_sqlFieldList, ref string return_sqlFrom, ref string return_SQLWhere, ref string return_SQLOrderBy, ref bool return_IsLimitedToSubContent, ref string return_ContentAccessLimitMessage, ref Dictionary<string, bool> FieldUsedInColumns, Dictionary<string, bool> IsLookupFieldValid) {
             try {
                 Return_AllowAccess = true;
                 //
@@ -967,7 +967,7 @@ namespace Contensive.Addons.AdminSite {
                     ContentFieldMetadataModel field = keyValuePair.Value;
                     //
                     // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
-                    FieldPtr = field.id; 
+                    FieldPtr = field.id;
                     bool IncludedInColumns = false;
                     bool IncludedInLeftJoin = false;
                     if (!IsLookupFieldValid.ContainsKey(field.nameLc)) {
@@ -1045,7 +1045,7 @@ namespace Contensive.Addons.AdminSite {
                 // Sub CDef filter
                 if (IndexConfig.subCDefID > 0) {
                     var contentMetadata = Contensive.Processor.Models.Domain.ContentMetadataModel.create(core, IndexConfig.subCDefID);
-                    if ( contentMetadata != null ) { return_SQLWhere += "AND(" + contentMetadata.legacyContentControlCriteria + ")"; }
+                    if (contentMetadata != null) { return_SQLWhere += "AND(" + contentMetadata.legacyContentControlCriteria + ")"; }
                 }
                 //
                 // Return_sqlFrom and Where Clause for Groups filter
@@ -1408,7 +1408,7 @@ namespace Contensive.Addons.AdminSite {
         /// </summary>
         /// <param name="adminData.content"></param>
         /// <returns></returns>
-        public static string getForm_IndexFilterContent( CoreController core, AdminDataModel adminData) {
+        public static string getForm_IndexFilterContent(CoreController core, AdminDataModel adminData) {
             string returnContent = "";
             try {
                 var IndexConfig = IndexConfigClass.get(core, adminData);
@@ -1606,7 +1606,7 @@ namespace Contensive.Addons.AdminSite {
                 SubFilterList = "";
                 if (adminData.adminContent.tableName.ToLower() == GenericController.vbLCase("ccmembers")) {
                     using (var csData = new CsModel(core)) {
-                        csData.openSql(core.db.getSQLSelect( "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
+                        csData.openSql(core.db.getSQLSelect("ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
                         while (csData.ok()) {
                             string Name = csData.getText("Name");
                             Ptr = 0;
@@ -1717,7 +1717,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="IsLookupFieldValid"></param>
         /// <param name="IsEmailContent"></param>
         /// <returns></returns>
-        public static string getForm_Index_GetCell( CoreController core, AdminDataModel adminData, string fieldName, CsModel csData, bool IsLookupFieldValid, bool IsEmailContent) {
+        public static string getForm_Index_GetCell(CoreController core, AdminDataModel adminData, string fieldName, CsModel csData, bool IsLookupFieldValid, bool IsEmailContent) {
             try {
                 var field = adminData.adminContent.fields[fieldName.ToLowerInvariant()];
                 int lookupTableCnt = field.id;
@@ -1798,9 +1798,11 @@ namespace Contensive.Addons.AdminSite {
                         break;
                     case CPContentBaseClass.FieldTypeIdEnum.Date:
                         //
-                        // -- date type. isolate to handle special case of time==12:00:00AM, user would like to not see the time in this case
+                        // -- if minvalue, use blank, if no time-part, do short-date
                         DateTime cellValueDate = csData.getDate(field.nameLc);
-                        if (cellValueDate.Equals(cellValueDate.Date)) {
+                        if (cellValueDate.Equals(DateTime.MinValue)) {
+                            Stream.Add("");
+                        } else if (cellValueDate.Equals(cellValueDate.Date)) {
                             Stream.Add(cellValueDate.ToShortDateString());
                         } else {
                             Stream.Add(cellValueDate.ToString());

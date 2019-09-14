@@ -1062,13 +1062,15 @@ namespace Contensive.Processor.Controllers {
         /// <param name="expression"></param>
         /// <returns></returns>
         //
-        public static string encodeSQLNumber(double expression) {
+        public static string encodeSQLNumber(double? expression) {
+            if (expression == null) return "null";
             return expression.ToString();
         }
         //
         //========================================================================
         //
-        public static string encodeSQLNumber(int expression) {
+        public static string encodeSQLNumber(int? expression) {
+            if (expression == null) return "null";
             return expression.ToString();
         }
         //

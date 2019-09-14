@@ -1312,11 +1312,23 @@ namespace Contensive.Processor {
                                 case CPContentBaseClass.FieldTypeIdEnum.Lookup:
                                 case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
                                 case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
-                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLNumber(encodeInteger(writeCacheValue));
+                                    //
+                                    // -- allow nullable (if null, set db to null). for example, a field 'chargesremaining' could be blank or numeric
+                                    if (string.IsNullOrWhiteSpace(encodeText(writeCacheValue))) {
+                                        SQLSetPair = fieldName + "=null";
+                                    } else {
+                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLNumber(encodeInteger(writeCacheValue));
+                                    }
                                     break;
                                 case CPContentBaseClass.FieldTypeIdEnum.Currency:
                                 case CPContentBaseClass.FieldTypeIdEnum.Float:
-                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLNumber(encodeNumber(writeCacheValue));
+                                    //
+                                    // -- allow nullable (if null, set db to null). for example, a field 'chargesremaining' could be blank or numeric
+                                    if (string.IsNullOrWhiteSpace(encodeText(writeCacheValue))) {
+                                        SQLSetPair = fieldName + "=null";
+                                    } else {
+                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLNumber(encodeNumber(writeCacheValue));
+                                    }
                                     break;
                                 case CPContentBaseClass.FieldTypeIdEnum.Boolean:
                                     SQLSetPair = fieldName + "=" + DbController.encodeSQLBoolean(encodeBoolean(writeCacheValue));
