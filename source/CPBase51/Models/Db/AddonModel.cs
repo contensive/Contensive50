@@ -33,9 +33,9 @@ namespace Contensive.Models.Db {
         public string help { get; set; }
         public string helpLink { get; set; }
         public string iconFilename { get; set; }
-        public int iconHeight { get; set; }
-        public int iconSprites { get; set; }
-        public int iconWidth { get; set; }
+        public int? iconHeight { get; set; }
+        public int? iconSprites { get; set; }
+        public int? iconWidth { get; set; }
         public bool inFrame { get; set; }
         public bool isInline { get; set; }
         public bool javascriptForceHead { get; set; }
@@ -54,7 +54,7 @@ namespace Contensive.Models.Db {
         public bool htmlDocument { get; set; }
         public string otherHeadTags { get; set; }
         public string pageTitle { get; set; }
-        public int processInterval { get; set; }
+        public int? processInterval { get; set; }
         public DateTime processNextRun { get; set; }
         public bool processRunOnce { get; set; }
         public string processServerKey { get; set; }

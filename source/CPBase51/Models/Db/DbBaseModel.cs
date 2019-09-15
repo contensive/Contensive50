@@ -526,78 +526,88 @@ namespace Contensive.Models.Db {
                 if (row != null) {
                     Type instanceType = typeof(T);
                     modelInstance = (T)Activator.CreateInstance(instanceType);
-                    foreach (PropertyInfo modelProperty in modelInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
-                        string propertyName = modelProperty.Name;
+                    foreach (PropertyInfo instanceProperty in modelInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
+                        string propertyName = instanceProperty.Name;
                         string propertyValue = row[propertyName].ToString();
                         switch (propertyName.ToLowerInvariant()) {
                             case "specialcasefield":
                                 break;
                             default:
-                                switch (modelProperty.PropertyType.Name) {
-                                    case "Int32": {
-                                            modelProperty.SetValue(modelInstance, cp.Utils.EncodeInteger(propertyValue), null);
-                                            break;
-                                        }
-                                    case "Boolean": {
-                                            modelProperty.SetValue(modelInstance, cp.Utils.EncodeBoolean(propertyValue), null);
-                                            break;
-                                        }
-                                    case "DateTime": {
-                                            modelProperty.SetValue(modelInstance, cp.Utils.EncodeDate(propertyValue), null);
-                                            break;
-                                        }
-                                    case "Double": {
-                                            modelProperty.SetValue(modelInstance, cp.Utils.EncodeNumber(propertyValue), null);
-                                            break;
-                                        }
-                                    case "String": {
-                                            modelProperty.SetValue(modelInstance, propertyValue, null);
-                                            break;
-                                        }
-                                    case "FieldTypeTextFile": {
-                                            //
-                                            // -- cdn files
-                                            FieldTypeTextFile instanceFileType = new FieldTypeTextFile {
-                                                filename = propertyValue,
-                                                cpInternal = cp
-                                            };
-                                            modelProperty.SetValue(modelInstance, instanceFileType);
-                                            break;
-                                        }
-                                    case "FieldTypeJavascriptFile": {
-                                            //
-                                            // -- cdn files
-                                            FieldTypeJavascriptFile instanceFileType = new FieldTypeJavascriptFile {
-                                                filename = propertyValue,
-                                                cpInternal = cp
-                                            };
-                                            modelProperty.SetValue(modelInstance, instanceFileType);
-                                            break;
-                                        }
-                                    case "FieldTypeCSSFile": {
-                                            //
-                                            // -- cdn files
-                                            FieldTypeCSSFile instanceFileType = new FieldTypeCSSFile {
-                                                filename = propertyValue,
-                                                cpInternal = cp
-                                            };
-                                            modelProperty.SetValue(modelInstance, instanceFileType);
-                                            break;
-                                        }
-                                    case "FieldTypeHTMLFile": {
-                                            //
-                                            // -- private files
-                                            FieldTypeHTMLFile instanceFileType = new FieldTypeHTMLFile {
-                                                filename = propertyValue,
-                                                cpInternal = cp
-                                            };
-                                            modelProperty.SetValue(modelInstance, instanceFileType);
-                                            break;
-                                        }
-                                    default: {
-                                            modelProperty.SetValue(modelInstance, propertyValue, null);
-                                            break;
-                                        }
+                                //
+                                // -- get the underlying type if this is nullable
+                                bool targetNullable = isNullable(instanceProperty.PropertyType);
+                                if (targetNullable && (string.IsNullOrWhiteSpace(propertyValue))) {
+                                    // property is nullable and the db value is empty
+                                    // set the property null
+                                    instanceProperty.SetValue(modelInstance, null, null);
+                                } else {
+                                    Type targetType = (targetNullable) ? Nullable.GetUnderlyingType(instanceProperty.PropertyType) : instanceProperty.PropertyType;
+                                    switch (targetType.Name) {
+                                        case "Int32": {
+                                                instanceProperty.SetValue(modelInstance, cp.Utils.EncodeInteger(propertyValue), null);
+                                                break;
+                                            }
+                                        case "Boolean": {
+                                                instanceProperty.SetValue(modelInstance, cp.Utils.EncodeBoolean(propertyValue), null);
+                                                break;
+                                            }
+                                        case "DateTime": {
+                                                instanceProperty.SetValue(modelInstance, cp.Utils.EncodeDate(propertyValue), null);
+                                                break;
+                                            }
+                                        case "Double": {
+                                                instanceProperty.SetValue(modelInstance, cp.Utils.EncodeNumber(propertyValue), null);
+                                                break;
+                                            }
+                                        case "String": {
+                                                instanceProperty.SetValue(modelInstance, propertyValue, null);
+                                                break;
+                                            }
+                                        case "FieldTypeTextFile": {
+                                                //
+                                                // -- cdn files
+                                                FieldTypeTextFile instanceFileType = new FieldTypeTextFile {
+                                                    filename = propertyValue,
+                                                    cpInternal = cp
+                                                };
+                                                instanceProperty.SetValue(modelInstance, instanceFileType);
+                                                break;
+                                            }
+                                        case "FieldTypeJavascriptFile": {
+                                                //
+                                                // -- cdn files
+                                                FieldTypeJavascriptFile instanceFileType = new FieldTypeJavascriptFile {
+                                                    filename = propertyValue,
+                                                    cpInternal = cp
+                                                };
+                                                instanceProperty.SetValue(modelInstance, instanceFileType);
+                                                break;
+                                            }
+                                        case "FieldTypeCSSFile": {
+                                                //
+                                                // -- cdn files
+                                                FieldTypeCSSFile instanceFileType = new FieldTypeCSSFile {
+                                                    filename = propertyValue,
+                                                    cpInternal = cp
+                                                };
+                                                instanceProperty.SetValue(modelInstance, instanceFileType);
+                                                break;
+                                            }
+                                        case "FieldTypeHTMLFile": {
+                                                //
+                                                // -- private files
+                                                FieldTypeHTMLFile instanceFileType = new FieldTypeHTMLFile {
+                                                    filename = propertyValue,
+                                                    cpInternal = cp
+                                                };
+                                                instanceProperty.SetValue(modelInstance, instanceFileType);
+                                                break;
+                                            }
+                                        default: {
+                                                instanceProperty.SetValue(modelInstance, propertyValue, null);
+                                                break;
+                                            }
+                                    }
                                 }
                                 break;
                         }
@@ -674,93 +684,102 @@ namespace Contensive.Models.Db {
                             sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(instanceProperty.GetValue(this, null).ToString()));
                             break;
                         default:
-                            CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
-                            bool fileFieldContentUpdated = false;
-                            FieldTypeFileBase fileProperty = null;
-                            switch (instanceProperty.PropertyType.Name) {
-                                case "Int32":
-                                    Int32 valueInt32 = (int)instanceProperty.GetValue(this);
-                                    sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLNumber(valueInt32));
-                                    break;
-                                case "Boolean":
-                                    bool valueBool = (bool)instanceProperty.GetValue(this);
-                                    sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLBoolean(valueBool));
-                                    break;
-                                case "DateTime":
-                                    DateTime valueDate = (DateTime)instanceProperty.GetValue(this, null);
-                                    sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLDate(valueDate));
-                                    break;
-                                case "Double":
-                                    double valueDbl = (double)instanceProperty.GetValue(this);
-                                    sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLNumber(valueDbl));
-                                    break;
-                                case "String":
-                                    string valueString = (string)instanceProperty.GetValue(this, null);
-                                    sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(valueString));
-                                    break;
-                                case "FieldTypeTextFile": {
-                                        fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileText;
-                                        fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
-                                    }
-                                    break;
-                                case "FieldTypeJavascriptFile": {
-                                        fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileJavascript;
-                                        fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
-                                    }
-                                    break;
-                                case "FieldTypeCSSFile": {
-                                        fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileCSS;
-                                        fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
-                                    }
-                                    break;
-                                case "FieldTypeHTMLFile": {
-                                        fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileHTML;
-                                        fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
-                                    }
-                                    break;
-                                default:
-                                    //
-                                    // -- invalid field type
-                                    throw new GenericException("Unsupported type [" + instanceProperty.PropertyType.Name + "] in Model [" + instanceType.Name + "] Property [" + instanceProperty.Name + "]");
-                                    //sqlPairs.add(instanceProperty.Name, cp.Db.EncodeSQLText(instanceProperty.GetValue(this, null)?.ToString()));
-                                    //break;
-                            }
-                            if (!((int)fieldTypeId).Equals(0)) {
-                                fileProperty.cpInternal = cp;
-                                PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                if (fileFieldContentUpdated) {
-                                    PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                    string fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
-                                    if ((String.IsNullOrEmpty(fileFieldFilename)) && (id != 0)) {
-                                        // 
-                                        // -- if record exists and file property's filename is not set, get the filename from the Db
-                                        using (DataTable dt = cp.Db.ExecuteQuery("select " + instanceProperty.Name + " from " + tableName + " where (id=" + id + ")")) {
-                                            if (dt.Rows.Count > 0) {
-                                                fileFieldFilename = cp.Utils.EncodeText(dt.Rows[0][instanceProperty.Name]);
+                            //
+                            // -- get the underlying type if this is nullable
+                            bool targetNullable = isNullable(instanceProperty.PropertyType);
+                            if(targetNullable && (instanceProperty.GetValue(this, null) == null)) {
+                                // property is nullable and the value is null
+                                // set the Db to null value by setting the write cache empty
+                                sqlPairs.Add(instanceProperty.Name, "null");
+                            } else {
+                                CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
+                                bool fileFieldContentUpdated = false;
+                                FieldTypeFileBase fileProperty = null;
+                                Type targetType = (targetNullable) ? Nullable.GetUnderlyingType(instanceProperty.PropertyType) : instanceProperty.PropertyType;
+                                switch (targetType.Name) {
+                                    case "Int32":
+                                        Int32 valueInt32 = (int)instanceProperty.GetValue(this);
+                                        sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLNumber(valueInt32));
+                                        break;
+                                    case "Boolean":
+                                        bool valueBool = (bool)instanceProperty.GetValue(this);
+                                        sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLBoolean(valueBool));
+                                        break;
+                                    case "DateTime":
+                                        DateTime valueDate = (DateTime)instanceProperty.GetValue(this, null);
+                                        sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLDate(valueDate));
+                                        break;
+                                    case "Double":
+                                        double valueDbl = (double)instanceProperty.GetValue(this);
+                                        sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLNumber(valueDbl));
+                                        break;
+                                    case "String":
+                                        string valueString = (string)instanceProperty.GetValue(this, null);
+                                        sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(valueString));
+                                        break;
+                                    case "FieldTypeTextFile": {
+                                            fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileText;
+                                            fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
+                                        }
+                                        break;
+                                    case "FieldTypeJavascriptFile": {
+                                            fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileJavascript;
+                                            fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
+                                        }
+                                        break;
+                                    case "FieldTypeCSSFile": {
+                                            fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileCSS;
+                                            fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
+                                        }
+                                        break;
+                                    case "FieldTypeHTMLFile": {
+                                            fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileHTML;
+                                            fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
+                                        }
+                                        break;
+                                    default:
+                                        //
+                                        // -- invalid field type
+                                        throw new GenericException("Unsupported type [" + instanceProperty.PropertyType.Name + "] in Model [" + instanceType.Name + "] Property [" + instanceProperty.Name + "]");
+                                        //sqlPairs.add(instanceProperty.Name, cp.Db.EncodeSQLText(instanceProperty.GetValue(this, null)?.ToString()));
+                                        //break;
+                                }
+                                if (!((int)fieldTypeId).Equals(0)) {
+                                    fileProperty.cpInternal = cp;
+                                    PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+                                    fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
+                                    if (fileFieldContentUpdated) {
+                                        PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
+                                        string fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                        if ((String.IsNullOrEmpty(fileFieldFilename)) && (id != 0)) {
+                                            // 
+                                            // -- if record exists and file property's filename is not set, get the filename from the Db
+                                            using (DataTable dt = cp.Db.ExecuteQuery("select " + instanceProperty.Name + " from " + tableName + " where (id=" + id + ")")) {
+                                                if (dt.Rows.Count > 0) {
+                                                    fileFieldFilename = cp.Utils.EncodeText(dt.Rows[0][instanceProperty.Name]);
+                                                }
                                             }
                                         }
-                                    }
-                                    PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                    string fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                    if ((string.IsNullOrEmpty(fileFieldContent)) && (!string.IsNullOrEmpty(fileFieldFilename))) {
-                                        //
-                                        // -- empty content and valid filename, delete the file and clear the filename
-                                        sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(string.Empty));
-                                        cp.CdnFiles.DeleteFile(fileFieldFilename);
-                                        fileFieldFilenameProperty.SetValue(fileProperty, string.Empty);
-                                    } else {
-                                        //
-                                        // -- save content
-                                        if (string.IsNullOrEmpty(fileFieldFilename)) {
-                                            fileFieldFilename = cp.Db.CreateFieldPathFilename(tableName, instanceProperty.Name.ToLowerInvariant(), id, fieldTypeId);
-                                            fileFieldFilenameProperty.SetValue(fileProperty, fileFieldFilename);
+                                        PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
+                                        string fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
+                                        if ((string.IsNullOrEmpty(fileFieldContent)) && (!string.IsNullOrEmpty(fileFieldFilename))) {
+                                            //
+                                            // -- empty content and valid filename, delete the file and clear the filename
+                                            sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(string.Empty));
+                                            cp.CdnFiles.DeleteFile(fileFieldFilename);
+                                            fileFieldFilenameProperty.SetValue(fileProperty, string.Empty);
+                                        } else {
+                                            //
+                                            // -- save content
+                                            if (string.IsNullOrEmpty(fileFieldFilename)) {
+                                                fileFieldFilename = cp.Db.CreateFieldPathFilename(tableName, instanceProperty.Name.ToLowerInvariant(), id, fieldTypeId);
+                                                fileFieldFilenameProperty.SetValue(fileProperty, fileFieldFilename);
+                                            }
+                                            cp.CdnFiles.Save(fileFieldFilename, fileFieldContent);
+                                            sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(fileFieldFilename));
                                         }
-                                        cp.CdnFiles.Save(fileFieldFilename, fileFieldContent);
-                                        sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(fileFieldFilename));
                                     }
                                 }
-
                             }
                             break;
                     }
@@ -1288,6 +1307,12 @@ namespace Contensive.Models.Db {
                 cp.Site.ErrorReport(ex);
                 throw;
             }
+        }
+        //
+        //====================================================================================================
+        //
+        public static bool isNullable( Type type ) {
+            return Nullable.GetUnderlyingType(type) != null;
         }
         //
         //====================================================================================================

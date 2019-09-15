@@ -313,17 +313,17 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         [Obsolete("Deprecated", false)]
-        public override int IconHeight => cp.core.doc.addonModelStack.Peek().iconHeight;
+        public override int IconHeight => GenericController.encodeInteger(cp.core.doc.addonModelStack.Peek().iconHeight);
         //
         //====================================================================================================
         //
         [Obsolete("Deprecated", false)]
-        public override int IconSprites => cp.core.doc.addonModelStack.Peek().iconSprites;
+        public override int IconSprites => GenericController.encodeInteger(cp.core.doc.addonModelStack.Peek().iconSprites);
         //
         //====================================================================================================
         //
         [Obsolete("Deprecated", false)]
-        public override int IconWidth => cp.core.doc.addonModelStack.Peek().iconWidth;
+        public override int IconWidth => GenericController.encodeInteger(cp.core.doc.addonModelStack.Peek().iconWidth);
         //
         //====================================================================================================
         //

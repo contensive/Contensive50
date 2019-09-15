@@ -149,9 +149,11 @@ namespace Contensive.Processor.Controllers {
                                     + " )";
                                 var addonList = DbBaseModel.createList<AddonModel>(cpApp, sqlAddonsCriteria);
                                 foreach (var addon in addonList) {
+                                    //
+                                    // -- calculate next run if processInternal is not null and > 0
                                     DateTime nextRun = DateTime.MinValue;
-                                    if (addon.processInterval > 0) {
-                                        nextRun = RightNow.AddMinutes(addon.processInterval);
+                                    if (encodeInteger(addon.processInterval) > 0) {
+                                        nextRun = RightNow.AddMinutes(encodeInteger(addon.processInterval));
                                     }
                                     if ((addon.processNextRun < RightNow) || (addon.processRunOnce)) {
                                         //
