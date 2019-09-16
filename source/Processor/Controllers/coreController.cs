@@ -93,27 +93,27 @@ namespace Contensive.Processor.Controllers {
             }
         }
         internal Dictionary<string, int> _contentNameIdDictionary = null;
-        //
-        //===================================================================================================
-        /// <summary>
-        /// list of DLLs in the addon assembly path that are not adds. As they are discovered, they are added to this list
-        /// and not loaded in the future. The me.dispose compares the list count to the loaded count and caches if different.
-        /// </summary>
-        /// <returns></returns>
-        public List<string> assemblyList_NonAddonsFound {
-            get {
-                if (_assemblyList_NonAddonsFound == null) {
-                    _assemblyList_NonAddonsFound = cache.getObject<List<string>>(cacheName_AssemblyList_NonAddonsFound);
-                    if (_assemblyList_NonAddonsFound == null) {
-                        _assemblyList_NonAddonsFound = new List<string>();
-                    }
-                    _assemblyList_NonAddonsFound_CountWhenLoaded = _assemblyList_NonAddonsFound.Count;
-                }
-                return _assemblyList_NonAddonsFound;
-            }
-        }
-        private List<string> _assemblyList_NonAddonsFound;
-        private int _assemblyList_NonAddonsFound_CountWhenLoaded;
+        ////
+        ////===================================================================================================
+        ///// <summary>
+        ///// list of DLLs in the addon assembly path that are not adds. As they are discovered, they are added to this list
+        ///// and not loaded in the future. The me.dispose compares the list count to the loaded count and caches if different.
+        ///// </summary>
+        ///// <returns></returns>
+        //public List<string> assemblyList_NonAddonsFound {
+        //    get {
+        //        if (_assemblyList_NonAddonsFound == null) {
+        //            _assemblyList_NonAddonsFound = cache.getObject<List<string>>(cacheName_AssemblyList_NonAddonsFound);
+        //            if (_assemblyList_NonAddonsFound == null) {
+        //                _assemblyList_NonAddonsFound = new List<string>();
+        //            }
+        //            _assemblyList_NonAddonsFound_CountWhenLoaded = _assemblyList_NonAddonsFound.Count;
+        //        }
+        //        return _assemblyList_NonAddonsFound;
+        //    }
+        //}
+        //private List<string> _assemblyList_NonAddonsFound;
+        //private int _assemblyList_NonAddonsFound_CountWhenLoaded;
         //
         // -- assembly files to skip
         public List<string> assemblyList_NonAddonsInstalled = new List<string>() {
@@ -817,11 +817,11 @@ namespace Contensive.Processor.Controllers {
                     doc.continueProcessing = false;
                     //
                     // -- save assemblySkipList
-                    if (_assemblyList_NonAddonsFound != null) {
-                        if (_assemblyList_NonAddonsFound.Count > _assemblyList_NonAddonsFound_CountWhenLoaded) {
-                            cache.storeObject(cacheName_AssemblyList_NonAddonsFound, _assemblyList_NonAddonsFound);
-                        }
-                    }
+                    //if (_assemblyList_NonAddonsFound != null) {
+                    //    if (_assemblyList_NonAddonsFound.Count > _assemblyList_NonAddonsFound_CountWhenLoaded) {
+                    //        cache.storeObject(cacheName_AssemblyList_NonAddonsFound, _assemblyList_NonAddonsFound);
+                    //    }
+                    //}
                     //
                     // content server object is valid
                     //
