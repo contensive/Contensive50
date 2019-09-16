@@ -1541,7 +1541,8 @@ namespace Contensive.Processor.Controllers {
                     if (!string.IsNullOrEmpty(core.assemblyList_NonAddonsInstalled.Find(x => testPathFilename.ToLower().Right(x.Length) == x))) {
                         //
                         // -- this assembly is a non-addon installed file, block full path
-                        core.assemblyList_NonAddonsFound.Add(testPathFilename);
+                        //LogController.logTrace(core, "execute_dotNetClass_byPath, assemblyList_NonAddonsFound.add [" + testPathFilename + "]");
+                        //core.assemblyList_NonAddonsFound.Add(testPathFilename);
                         continue;
                     };
                     string returnValue = execute_dotNetClass_assembly(addon, testPathFilename, ref addonFound);
@@ -1579,6 +1580,9 @@ namespace Contensive.Processor.Controllers {
         private string execute_dotNetClass_assembly(AddonModel addon, string assemblyPhysicalPrivatePathname, ref bool addonFound) {
             string result = "";
             try {
+                //
+                LogController.logTrace(core, "execute_dotNetClass_assembly, enter, [" + assemblyPhysicalPrivatePathname + "]");
+                //
                 Assembly testAssembly = null;
                 addonFound = false;
                 try {
@@ -1588,28 +1592,42 @@ namespace Contensive.Processor.Controllers {
                 } catch (System.BadImageFormatException) {
                     //
                     // -- file is not an assembly, return addonFound false
-                    core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
+                    //
+                    LogController.logTrace(core, "execute_dotNetClass_assembly, 1, [" + assemblyPhysicalPrivatePathname + "]");
+                    addonFound = false;
                     return string.Empty;
                 } catch (Exception ex) {
                     //
                     // -- file is not an assembly, return addonFound false
-                    LogController.logInfo(core, "Assembly.LoadFrom failure [" + assemblyPhysicalPrivatePathname + "], ex [" + ex.Message + "]");
+                    //
+                    LogController.logTrace(core, "execute_dotNetClass_assembly, 2, [" + assemblyPhysicalPrivatePathname + "]");
+                    addonFound = false;
                     return string.Empty;
                 }
                 //
                 // -- assembly loaded, it is a proper assembly. Test if it is the one we are looking for (match class + baseclass)
-                var typeMap = testAssembly.GetTypes().ToDictionary(t => t.FullName, t => t, StringComparer.OrdinalIgnoreCase);
-                if (typeMap.TryGetValue(addon.dotNetClass, out Type addonType)) {
-                    if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
-                        //
-                        // -- assembly is public, not abstract, based on a base type
-                        if (addonType.BaseType.FullName != null) {
+                Type addonType = null;
+                try {
+                    //
+                    // -- catch exceptions found (Select.Pdf.dll has two classes that differ by only case)
+                    var typeMap = testAssembly.GetTypes().ToDictionary(t => t.FullName, t => t, StringComparer.OrdinalIgnoreCase);
+                    if (typeMap.TryGetValue(addon.dotNetClass, out addonType)) {
+                        if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
                             //
-                            // -- assembly has a baseType fullname
-                            addonFound = ((addonType.BaseType.FullName.ToLowerInvariant() == "addonbaseclass") || (addonType.BaseType.FullName.ToLowerInvariant() == "contensive.baseclasses.addonbaseclass"));
+                            // -- assembly is public, not abstract, based on a base type
+                            if (addonType.BaseType.FullName != null) {
+                                //
+                                // -- assembly has a baseType fullname
+                                addonFound = ((addonType.BaseType.FullName.ToLowerInvariant() == "addonbaseclass") || (addonType.BaseType.FullName.ToLowerInvariant() == "contensive.baseclasses.addonbaseclass"));
+                            }
                         }
                     }
+                } catch (Exception) {
+                    addonFound = false;
+                    return string.Empty;
                 }
+                //
+                LogController.logTrace(core, "execute_dotNetClass_assembly, 4, [" + assemblyPhysicalPrivatePathname + "]");
                 //
                 // -- if not addon found, exit now
                 if (!addonFound) { return string.Empty; }
@@ -1618,22 +1636,26 @@ namespace Contensive.Processor.Controllers {
                 AddonBaseClass AddonObj = null;
                 try {
                     //
+                    LogController.logTrace(core, "execute_dotNetClass_assembly, 5, [" + assemblyPhysicalPrivatePathname + "]");
+                    //
                     // -- Create an object from the Assembly
                     AddonObj = (AddonBaseClass)testAssembly.CreateInstance(addonType.FullName);
                 } catch (ReflectionTypeLoadException ex) {
                     //
                     // -- exception thrown out of application bin folder when xunit library included -- ignore
-                    LogController.logDebug(core, "Assembly ReflectionTypeLoadException, [" + assemblyPhysicalPrivatePathname + "], ex [" + ex.Message + "]");
-                    core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
+                    //
+                    LogController.logWarn(core, "execute_dotNetClass_assembly, 6, Assembly matches addon pattern but caused a ReflectionTypeLoadException. Return blank. addon [" + addon.name + "], [" + assemblyPhysicalPrivatePathname + "], exception [" + ex.ToString() + "]");
+                    return string.Empty;
                 } catch (Exception ex) {
                     //
                     // -- problem loading types
-                    LogController.logDebug(core, "Assembly exception, [" + assemblyPhysicalPrivatePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
-                    core.assemblyList_NonAddonsFound.Add(assemblyPhysicalPrivatePathname);
-                    string detailedErrorMessage = "While locating assembly for addon [" + addon.name + "], there was an error loading types for assembly [" + assemblyPhysicalPrivatePathname + "]. This assembly was skipped and should be removed from the folder.";
-                    throw new GenericException(detailedErrorMessage);
+                    //
+                    LogController.logWarn(core, "execute_dotNetClass_assembly, 6, Assembly matches addon pattern but caused a load exception. Return blank. addon [" + addon.name + "], [" + assemblyPhysicalPrivatePathname + "], exception [" + ex.ToString() + "]");
+                    return string.Empty;
                 }
                 try {
+                    //
+                    LogController.logTrace(core, "execute_dotNetClass_assembly, 8, [" + assemblyPhysicalPrivatePathname + "]");
                     //
                     // -- Call Execute
                     object AddonObjResult = AddonObj.Execute(core.cpParent);
@@ -1643,8 +1665,9 @@ namespace Contensive.Processor.Controllers {
                 } catch (Exception ex) {
                     //
                     // -- error in the addon
-                    LogController.logError(core, ex, "There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + assemblyPhysicalPrivatePathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + ex.ToString() + "]");
-                    //Throw new GenericException(detailedErrorMessage)
+                    //
+                    LogController.logError(core, ex, "execute_dotNetClass_assembly, 9, [" + assemblyPhysicalPrivatePathname + "]. There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + assemblyPhysicalPrivatePathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + ex.ToString() + "]");
+                    return string.Empty;
                 }
             } catch (Exception ex) {
                 //
@@ -1652,7 +1675,6 @@ namespace Contensive.Processor.Controllers {
                 LogController.logError(core, ex);
                 throw;
             }
-            return result;
         }
         //
         //====================================================================================================================

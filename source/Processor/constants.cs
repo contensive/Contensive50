@@ -1053,7 +1053,7 @@ namespace Contensive.Processor {
         internal const bool ALLOWLEGACYAPI = false;
         internal const bool ALLOWPROFILING = false;
         //
-        internal const string cacheName_AssemblyList_NonAddonsFound = "assembly-skip-list";
+        //internal const string cacheName_AssemblyList_NonAddonsFound = "assembly-skip-list";
         internal const string cacheNameGlobalInvalidationDate = "global-invalidation-date";
         //
         // put content definitions here

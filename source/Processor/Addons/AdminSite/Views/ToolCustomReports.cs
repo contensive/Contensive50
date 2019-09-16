@@ -18,7 +18,7 @@ namespace Contensive.Addons.AdminSite {
             try {
                 //
                 string Button = null;
-                string RecordName = null;
+                //string RecordName = null;
                 string SQL = null;
                 string RQS = null;
                 int PageSize = 0;
@@ -38,7 +38,7 @@ namespace Contensive.Addons.AdminSite {
                 int RowPtr = 0;
                 int ContentID = 0;
                 string Format = null;
-                string Filename = null;
+                //string Filename = null;
                 string Name = null;
                 string title = null;
                 string Description = null;
