@@ -19,7 +19,7 @@ namespace Contensive.Models.Db {
         public FieldTypeHTMLFile copyFilename { get; set; }
         public int emailTemplateID { get; set; }
         public string fromAddress { get; set; }
-        public DateTime scheduleDate { get; set; }
+        public DateTime? scheduleDate { get; set; }
         public bool sent { get; set; }
         public string subject { get; set; }
         public bool submitted { get; set; }

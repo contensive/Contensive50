@@ -20,7 +20,7 @@ namespace Contensive.Models.Db {
         public string execFileList { get; set; }
         public string help { get; set; }
         public string helpLink { get; set; }
-        public DateTime lastChangeDate { get; set; }
+        public DateTime? lastChangeDate { get; set; }
         public string otherXML { get; set; }
         public bool system { get; set; }
         public bool updatable { get; set; }

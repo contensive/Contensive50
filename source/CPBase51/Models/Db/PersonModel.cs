@@ -42,7 +42,7 @@ namespace Contensive.Models.Db {
         public string company { get; set; }
         public string country { get; set; }
         public bool createdByVisit { get; set; }
-        public DateTime dateExpires { get; set; }
+        public DateTime? dateExpires { get; set; }
         public bool developer { get; set; }
         public string email { get; set; }
         public bool excludeFromAnalytics { get; set; }
@@ -51,7 +51,7 @@ namespace Contensive.Models.Db {
         public string imageFilename { get; set; }
         public int languageID { get; set; }
         public string lastName { get; set; }
-        public DateTime LastVisit { get; set; }
+        public DateTime? LastVisit { get; set; }
         public string nickName { get; set; }
         public string notesFilename { get; set; }
         public int organizationID { get; set; }

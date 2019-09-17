@@ -19,7 +19,7 @@ namespace Contensive.Models.Db {
         public int ContentID { get; set; }
         public string Criteria { get; set; }
         public int DataSourceID { get; set; }
-        public DateTime DateExpires { get; set; }
+        public DateTime? DateExpires { get; set; }
         public int MaxRows { get; set; }
         public int QueryTypeID { get; set; }
         public string RemoteKey { get; set; }

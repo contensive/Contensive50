@@ -46,7 +46,7 @@ namespace Contensive.Addons.AdminSite {
                                 Array.Resize(ref membershipListDateExpires, membershipSize + 1);
                             }
                             membershipListGroupId[membershipCount] = memberRule.groupId;
-                            membershipListDateExpires[membershipCount] = memberRule.dateExpires;
+                            membershipListDateExpires[membershipCount] = GenericController.encodeDate(memberRule.dateExpires);
                             membershipListActive[membershipCount] = memberRule.active;
                             membershipCount = membershipCount + 1;
                         }

@@ -817,7 +817,7 @@ namespace Contensive.Addons.AdminSite {
                     editRecord.EditLock = WorkflowController.getEditLock(core, table.id, editRecord.id);
                     editRecord.SubmitLock = authoringStatus.isWorkflowSubmitted;
                     editRecord.SubmittedName = authoringStatus.workflowSubmittedMemberName;
-                    editRecord.SubmittedDate = authoringStatus.workflowSubmittedDate;
+                    editRecord.SubmittedDate = encodeDate(authoringStatus.workflowSubmittedDate);
                     editRecord.ApproveLock = authoringStatus.isWorkflowApproved;
                     editRecord.ApprovedName = authoringStatus.workflowApprovedMemberName;
                     editRecord.ApprovedDate = authoringStatus.workflowApprovedDate;
@@ -825,7 +825,7 @@ namespace Contensive.Addons.AdminSite {
                     editRecord.IsDeleted = authoringStatus.isWorkflowDeleted;
                     editRecord.IsModified = authoringStatus.isWorkflowModified;
                     editRecord.LockModifiedName = authoringStatus.workflowModifiedByMemberName;
-                    editRecord.LockModifiedDate = authoringStatus.workflowModifiedDate;
+                    editRecord.LockModifiedDate = encodeDate(authoringStatus.workflowModifiedDate);
                     //
                     // ----- Set flags used to determine the Authoring State
                     PermissionController.UserContentPermissions userPermissions = PermissionController.getUserContentPermissions(core, adminContent);

@@ -44,6 +44,22 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
+        /// If the session was initialize without visit tracking, use verifyUser to initialize a user.
+        /// This is called automatically when an addon references cp.user.id
+        /// </summary>
+        public void verifyUser() {
+            if (user.id == 0) {
+                var user = DbBaseModel.addDefault<PersonModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PersonModel.contentName));
+                user.createdByVisit = true;
+                user.save(core.cpParent);
+                SessionController session = this;
+                recognizeById(core, user.id, ref session);
+            }
+        }
+
+        //
+        //====================================================================================================
+        /// <summary>
         /// userLanguage will return a valid populated language object
         /// </summary>
         /// <returns></returns>
@@ -75,7 +91,7 @@ namespace Contensive.Processor.Controllers {
                     if (_language == null) {
                         //
                         // -- try english
-                        _language = DbBaseModel.createByUniqueName< LanguageModel>(core.cpParent, "English");
+                        _language = DbBaseModel.createByUniqueName<LanguageModel>(core.cpParent, "English");
                     }
                     if (_language == null) {
                         //
@@ -204,13 +220,13 @@ namespace Contensive.Processor.Controllers {
                     if (visitToken.id != 0) {
                         //
                         // -- Visit is good, setup visit, then secondary visitor/user if possible
-                        resultSessionContext.visit = VisitModel.create< VisitModel>(core.cpParent, visitToken.id);
+                        resultSessionContext.visit = VisitModel.create<VisitModel>(core.cpParent, visitToken.id);
                         if (resultSessionContext.visit == null) {
                             //
                             // -- visit record is missing, create a new visit
                             LogController.logTrace(core, "cookie visit record is missing, create a new visit");
                             resultSessionContext.visit = VisitModel.addEmpty<VisitModel>(core.cpParent);
-                        } else if (resultSessionContext.visit.lastVisitTime.AddHours(1) < core.doc.profileStartTime) {
+                        } else if (encodeDate(resultSessionContext.visit.lastVisitTime).AddHours(1) < core.doc.profileStartTime) {
                             //
                             // -- visit has expired, create new visit
                             LogController.logTrace(core, "cookie visit has expired, create new visit, lastVisitTime [" + resultSessionContext.visit.lastVisitTime + "], profileStartTime [" + core.doc.profileStartTime + "]");
@@ -221,7 +237,7 @@ namespace Contensive.Processor.Controllers {
                             LogController.logTrace(core, "valid cookie visit [" + visitToken.id + "]");
                             resultSessionContext.visit.timeToLastHit = 0;
                             if (resultSessionContext.visit.startTime > DateTime.MinValue) {
-                                resultSessionContext.visit.timeToLastHit = encodeInteger((core.doc.profileStartTime - resultSessionContext.visit.startTime).TotalSeconds);
+                                resultSessionContext.visit.timeToLastHit = encodeInteger((core.doc.profileStartTime - encodeDate(resultSessionContext.visit.startTime)).TotalSeconds);
                             }
                             resultSessionContext.visit.cookieSupport = true;
                             if (resultSessionContext.visit.visitorID > 0) {
@@ -240,7 +256,7 @@ namespace Contensive.Processor.Controllers {
                                     resultSessionContext.user = testUser;
                                 }
                             }
-                            if (((visitToken.timeStamp - resultSessionContext.visit.lastVisitTime).TotalSeconds) > 2) {
+                            if (((visitToken.timeStamp - encodeDate(resultSessionContext.visit.lastVisitTime)).TotalSeconds) > 2) {
                                 LogController.logTrace(core, "visit cookie timestamp [" + visitToken.timeStamp + "] does not match lastvisittime [" + resultSessionContext.visit.lastVisitTime + "]");
                                 resultSessionContext.visitStateOk = false;
                             }
@@ -455,7 +471,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- new visit, update the persistant visitor cookie
                         if (trackVisits) {
-                            core.webServer.addResponseCookie(appNameCookiePrefix + main_cookieNameVisitor, SecurityController.encodeToken(core, resultSessionContext.visitor.id, resultSessionContext.visit.startTime), resultSessionContext.visit.startTime.AddYears(1), "", appRootPath, false);
+                            core.webServer.addResponseCookie(appNameCookiePrefix + main_cookieNameVisitor, SecurityController.encodeToken(core, resultSessionContext.visitor.id, encodeDate(resultSessionContext.visit.startTime)), encodeDate(resultSessionContext.visit.startTime).AddYears(1), "", appRootPath, false);
                         }
                         //
                         // -- OnNewVisit Add-on call
@@ -559,7 +575,7 @@ namespace Contensive.Processor.Controllers {
                     if (user_changes) {
                         resultSessionContext.user.save(core.cpParent, 0, true);
                     }
-                    string visitCookieNew = SecurityController.encodeToken(core, resultSessionContext.visit.id, resultSessionContext.visit.lastVisitTime);
+                    string visitCookieNew = SecurityController.encodeToken(core, resultSessionContext.visit.id, encodeDate(resultSessionContext.visit.lastVisitTime));
                     if (trackVisits && (visitCookie != visitCookieNew)) {
                         visitCookie = visitCookieNew;
                     }

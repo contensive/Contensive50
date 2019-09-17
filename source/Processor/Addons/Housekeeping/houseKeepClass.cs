@@ -94,7 +94,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        public void hourlyTasks( CoreController core, HousekeepEnvironment env ) {
+        public void hourlyTasks(CoreController core, HousekeepEnvironment env) {
             //
             // -- delete temp files
             deleteTempFiles(core);
@@ -112,7 +112,7 @@ namespace Contensive.Addons.Housekeeping {
                 // -- Register and unregister files in the Addon folder
                 housekeepAddonFolder(core);
                 //
-                string DefaultMemberName = ContentFieldMetadataModel.getDefaultValue( core, "people", "name");
+                string DefaultMemberName = ContentFieldMetadataModel.getDefaultValue(core, "people", "name");
                 //
                 // Do non-optional housekeeping
                 //
@@ -297,28 +297,28 @@ namespace Contensive.Addons.Housekeeping {
                     // delete visits from the non-cookie visits
                     //
                     logHousekeeping(core, "Deleting visits with no cookie support older than Midnight, Two Days Ago");
-                    core.db.deleteTableRecordChunks( "ccvisits", "(CookieSupport=0)and(LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")", 1000, 10000);
+                    core.db.deleteTableRecordChunks("ccvisits", "(CookieSupport=0)and(LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")", 1000, 10000);
                 }
                 //
                 // Visits with no DateAdded
                 //
                 logHousekeeping(core, "Deleting visits with no DateAdded");
-                core.db.deleteTableRecordChunks( "ccvisits", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(new DateTime(1995, 1, 1)) + ")", 1000, 10000);
+                core.db.deleteTableRecordChunks("ccvisits", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(new DateTime(1995, 1, 1)) + ")", 1000, 10000);
                 //
                 // Visits with no visitor
                 //
                 logHousekeeping(core, "Deleting visits with no DateAdded");
-                core.db.deleteTableRecordChunks( "ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000);
+                core.db.deleteTableRecordChunks("ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000);
                 //
                 // viewings with no visit
                 //
                 logHousekeeping(core, "Deleting viewings with null or invalid VisitID");
-                core.db.deleteTableRecordChunks( "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000);
+                core.db.deleteTableRecordChunks("ccviewings", "(visitid=0 or visitid is null)", 1000, 10000);
                 DateTime OldestVisitDate = default(DateTime);
                 //
                 // Get Oldest Visit
                 using (var csData = new CsModel(core)) {
-                    if (csData.openSql(core.db.getSQLSelect( "ccVisits", "DateAdded", "", "dateadded", "", 1))) {
+                    if (csData.openSql(core.db.getSQLSelect("ccVisits", "DateAdded", "", "dateadded", "", 1))) {
                         OldestVisitDate = csData.getDate("DateAdded").Date;
                     }
                 }
@@ -403,7 +403,7 @@ namespace Contensive.Addons.Housekeeping {
                 string FieldNew = null;
                 int FieldRecordID = 0;
                 using (var csData = new CsModel(core)) {
-                    csData.openSql("Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" +(int) CPContentBaseClass.FieldTypeIdEnum.Redirect + ") Order By ContentID, Caption, ID");
+                    csData.openSql("Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" + (int)CPContentBaseClass.FieldTypeIdEnum.Redirect + ") Order By ContentID, Caption, ID");
                     FieldLast = "";
                     while (csData.ok()) {
                         FieldContentID = csData.getInteger("Contentid");
@@ -423,7 +423,7 @@ namespace Contensive.Addons.Housekeeping {
                 using (var csData = new CsModel(core)) {
                     FieldLast = "";
                     string FieldName = null;
-                    csData.openSql("Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" +(int) CPContentBaseClass.FieldTypeIdEnum.Redirect + ") Order By ContentID, Name, Type, ID");
+                    csData.openSql("Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" + (int)CPContentBaseClass.FieldTypeIdEnum.Redirect + ") Order By ContentID, Name, Type, ID");
                     while (csData.ok()) {
                         int fieldType = csData.getInteger("Type");
                         FieldContentID = csData.getInteger("Contentid");
@@ -684,12 +684,12 @@ namespace Contensive.Addons.Housekeeping {
                 // Visits older then archive age
                 //
                 logHousekeeping(core, "Deleting visits before [" + DeleteBeforeDateSQL + "]");
-                core.db.deleteTableRecordChunks( "ccVisits", "(DateAdded<" + DeleteBeforeDateSQL + ")", 1000, 10000);
+                core.db.deleteTableRecordChunks("ccVisits", "(DateAdded<" + DeleteBeforeDateSQL + ")", 1000, 10000);
                 //
                 // Viewings with visits before the first
                 //
                 logHousekeeping(core, "Deleting viewings with visitIDs lower then the lowest ccVisits.ID");
-                core.db.deleteTableRecordChunks( "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000);
+                core.db.deleteTableRecordChunks("ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000);
                 //
                 // Visitors with no visits
                 //
@@ -728,7 +728,7 @@ namespace Contensive.Addons.Housekeeping {
                     + " and(Visits=1)"
                     + " and(Username is null)"
                     + " and(email is null)";
-                core.db.deleteTableRecordChunks( "ccmembers", SQLCriteria, 1000, 10000);
+                core.db.deleteTableRecordChunks("ccmembers", SQLCriteria, 1000, 10000);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             } finally {
@@ -1547,7 +1547,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        public void doNonOptionalHousekeeping( CoreController core, HousekeepEnvironment env ) {
+        public void doNonOptionalHousekeeping(CoreController core, HousekeepEnvironment env) {
             string SQL = "";
             {
                 //
@@ -1680,11 +1680,11 @@ namespace Contensive.Addons.Housekeeping {
         /// <param name="core"></param>
         /// <param name="path"></param>
         public static void deleteTempFiles(CoreController core, string path) {
-            foreach( var folder in core.tempFiles.getFolderList( path )) {
+            foreach (var folder in core.tempFiles.getFolderList(path)) {
                 deleteTempFiles(core, path + folder.Name + "\\");
             }
-            foreach( var file in core.tempFiles.getFileList( path )) {
-                if ( file.DateCreated.AddHours(1) < DateTime.Now ) {
+            foreach (var file in core.tempFiles.getFileList(path)) {
+                if (encodeDate(file.DateCreated).AddHours(1) < DateTime.Now) {
                     core.tempFiles.deleteFile(path + file.Name);
                 }
             }

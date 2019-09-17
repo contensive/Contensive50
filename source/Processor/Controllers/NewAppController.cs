@@ -122,7 +122,7 @@ namespace Contensive.Processor.Controllers {
                         if (memberRuleList.Count() == 0) {
                             var memberRule = DbBaseModel.addEmpty<MemberRuleModel>(core.cpParent);
                             memberRule.groupId = group.id;
-                            memberRule.MemberID = root.id;
+                            memberRule.memberID = root.id;
                             memberRule.save(core.cpParent);
                         }
                     }

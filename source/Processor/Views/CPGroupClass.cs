@@ -134,9 +134,9 @@ namespace Contensive.Processor {
             int userId = removeUserId;
             if (groupID != 0) {
                 if (userId == 0) {
-                    cp.Content.Delete("Member Rules", "((memberid=" + cp.User.Id.ToString() + ")and(groupid=" + groupID.ToString() + "))");
+                    GroupController.removeUser(core, groupID);
                 } else {
-                    cp.Content.Delete("Member Rules", "((memberid=" + removeUserId.ToString() + ")and(groupid=" + groupID.ToString() + "))");
+                    GroupController.removeUser(core, groupID,userId);
                 }
             }
         }

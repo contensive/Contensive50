@@ -24,9 +24,9 @@ namespace Contensive.BaseClasses
         public class FileDetail {
             public string Name;
             public int Attributes;
-            public DateTime DateCreated;
-            public DateTime DateLastAccessed;
-            public DateTime DateLastModified;
+            public DateTime? DateCreated;
+            public DateTime? DateLastAccessed;
+            public DateTime? DateLastModified;
             public long Size;
             public string Type;
             public string Extension {
@@ -49,9 +49,9 @@ namespace Contensive.BaseClasses
         public class FolderDetail {
             public string Name;
             public int Attributes;
-            public DateTime DateCreated;
-            public DateTime DateLastAccessed;
-            public DateTime DateLastModified;
+            public DateTime? DateCreated;
+            public DateTime? DateLastAccessed;
+            public DateTime? DateLastModified;
             public string Type;
         }
         //

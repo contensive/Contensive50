@@ -16,8 +16,8 @@ namespace Contensive.Models.Db {
         // -- instance properties
         public FieldTypeTextFile filename { get; set; }
         public int requestedBy { get; set; }
-        public DateTime dateRequested { get; set; }
-        public DateTime dateCompleted { get; set; }
+        public DateTime? dateRequested { get; set; }
+        public DateTime? dateCompleted { get; set; }
         public string resultMessage { get; set; }
     }
 }

@@ -46,10 +46,10 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// datetime when the task is started
         /// </summary>
-        public DateTime dateStarted { get; set; }
+        public DateTime? dateStarted { get; set; }
         /// <summary>
         /// datetime when the task completes
         /// </summary>
-        public DateTime dateCompleted { get; set; }
+        public DateTime? dateCompleted { get; set; }
     }
 }

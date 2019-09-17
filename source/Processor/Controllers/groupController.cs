@@ -51,7 +51,7 @@ namespace Contensive.Processor.Controllers {
                     // -- add new rule
                     var rule = DbBaseModel.addDefault<MemberRuleModel>(core.cpParent, Models.Domain.ContentMetadataModel.getDefaultValueDict(core, "groups")) ;
                     rule.groupId = group.id;
-                    rule.MemberID = user.id;
+                    rule.memberID = user.id;
                     rule.dateExpires = dateExpires;
                     rule.save(core.cpParent);
                     return;
@@ -226,7 +226,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="userId"></param>
         public static void removeUser(CoreController core, string groupName, int userId) {
             var group = DbBaseModel.createByUniqueName<GroupModel>(core.cpParent, groupName);
-            if ( group != null ) {
+            if (group != null) {
                 var user = DbBaseModel.create<PersonModel>(core.cpParent, userId);
                 if (user != null) {
                     removeUser(core, group, user);
@@ -241,6 +241,31 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="groupName"></param>
         public static void removeUser(CoreController core, string groupName) => removeUser(core, groupName, core.session.user.id);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Remove a user from a group. 
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="groupId"></param>
+        /// <param name="userId"></param>
+        public static void removeUser(CoreController core, int groupId, int userId) {
+            var group = DbBaseModel.create<GroupModel>(core.cpParent, groupId);
+            if (group != null) {
+                var user = DbBaseModel.create<PersonModel>(core.cpParent, userId);
+                if (user != null) {
+                    removeUser(core, group, user);
+                }
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Remove the current user from a group
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="groupName"></param>
+        public static void removeUser(CoreController core, int groupId) => removeUser(core, groupId, core.session.user.id);
         //
         //========================================================================
         /// <summary>

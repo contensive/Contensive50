@@ -55,7 +55,7 @@ namespace Contensive.Models.Db {
         public string otherHeadTags { get; set; }
         public string pageTitle { get; set; }
         public int? processInterval { get; set; }
-        public DateTime processNextRun { get; set; }
+        public DateTime? processNextRun { get; set; }
         public bool processRunOnce { get; set; }
         public string processServerKey { get; set; }
         public string remoteAssetLink { get; set; }

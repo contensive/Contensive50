@@ -428,7 +428,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         [Obsolete("Deprecated", false)]
-        public override DateTime ProcessNextRun => cp.core.doc.addonModelStack.Peek().processNextRun;
+        public override DateTime ProcessNextRun => GenericController.encodeDate(cp.core.doc.addonModelStack.Peek().processNextRun);
         //
         //====================================================================================================
         //

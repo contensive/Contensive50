@@ -48,9 +48,9 @@ namespace Contensive.Models.Db {
         public int contentPadding { get; set; }
         public FieldTypeHTMLFile copyfilename { get; set; } = new FieldTypeHTMLFile();
         public string customBlockMessage { get; set; }
-        public DateTime dateArchive { get; set; }
-        public DateTime dateExpires { get; set; }
-        public DateTime dateReviewed { get; set; }
+        public DateTime? dateArchive { get; set; }
+        public DateTime? dateExpires { get; set; }
+        public DateTime? dateReviewed { get; set; }
         public string headline { get; set; }
         public string imageFilename { get; set; }
         public bool isSecure { get; set; }
@@ -67,7 +67,7 @@ namespace Contensive.Models.Db {
         public string pageTitle { get; set; }
         public int parentID { get; set; }
         public string parentListName { get; set; }
-        public DateTime pubDate { get; set; }
+        public DateTime? pubDate { get; set; }
         public int RegistrationGroupID { get; set; }
         public int reviewedBy { get; set; }
         public int TemplateID { get; set; }

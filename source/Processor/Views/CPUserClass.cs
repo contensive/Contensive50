@@ -60,10 +60,7 @@ namespace Contensive.Processor {
         public override int Id {
             get {
                 if (cp.core.session.user.id==0) {
-                    var user = DbBaseModel.addDefault<PersonModel>(cp, ContentMetadataModel.getDefaultValueDict( cp.core, PersonModel.contentName));
-                    user.createdByVisit = true;
-                    user.save(cp);
-                    SessionController.recognizeById(cp.core, user.id, ref cp.core.session);
+                    cp.core.session.verifyUser();
                 }
                 return cp.core.session.user.id;
             }

@@ -14,7 +14,7 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         //
-        public DateTime conditionExpireDate { get; set; }
+        public DateTime? conditionExpireDate { get; set; }
         public int conditionID { get; set; }
         public int conditionPeriod { get; set; }
         public bool sent { get; set; }

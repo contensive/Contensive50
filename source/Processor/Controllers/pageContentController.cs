@@ -1063,8 +1063,8 @@ namespace Contensive.Processor.Controllers {
                     if (core.siteProperties.getBoolean("Allow AddonList Editor For Quick Editor")) {
                         core.docProperties.setProperty("contentid", ContentMetadataModel.getContentId(core, PageContentModel.contentName));
                         core.docProperties.setProperty("recordid", core.doc.pageController.page.id);
-                        resultContent.Append( core.addon.execute("{92B75A6A-E84B-4551-BBF3-849E91D084BC}", new CPUtilsBaseClass.addonExecuteContext() {
-                             addonType = CPUtilsBaseClass.addonContext.ContextSimple
+                        resultContent.Append(core.addon.execute("{92B75A6A-E84B-4551-BBF3-849E91D084BC}", new CPUtilsBaseClass.addonExecuteContext() {
+                            addonType = CPUtilsBaseClass.addonContext.ContextSimple
                         }));
                     } else {
                         //
@@ -1115,12 +1115,12 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- Last Modified line
                 if ((core.doc.pageController.page.modifiedDate != DateTime.MinValue) & core.doc.pageController.page.allowLastModifiedFooter) {
-                    result.Append("\r<p>This page was last modified " + core.doc.pageController.page.modifiedDate.ToString("G"));
+                    result.Append("\r<p>This page was last modified " + encodeDate(core.doc.pageController.page.modifiedDate).ToString("G"));
                     if (core.session.isAuthenticatedAdmin()) {
                         if (core.doc.pageController.page.modifiedBy == 0) {
                             result.Append(" (admin only: modified by unknown)");
                         } else {
-                            string personName = MetadataController.getRecordName(core, "people", core.doc.pageController.page.modifiedBy);
+                            string personName = MetadataController.getRecordName(core, "people", encodeInteger(core.doc.pageController.page.modifiedBy));
                             if (string.IsNullOrEmpty(personName)) {
                                 result.Append(" (admin only: modified by person with unnamed or deleted record #" + core.doc.pageController.page.modifiedBy + ")");
                             } else {
@@ -1133,7 +1133,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- Last Reviewed line
                 if ((core.doc.pageController.page.dateReviewed != DateTime.MinValue) & core.doc.pageController.page.allowReviewedFooter) {
-                    result.Append("\r<p>This page was last reviewed " + core.doc.pageController.page.dateReviewed.ToString(""));
+                    result.Append("\r<p>This page was last reviewed " + encodeDate(core.doc.pageController.page.dateReviewed).ToString(""));
                     if (core.session.isAuthenticatedAdmin()) {
                         if (core.doc.pageController.page.reviewedBy == 0) {
                             result.Append(" (by unknown)");
@@ -1376,7 +1376,7 @@ namespace Contensive.Processor.Controllers {
                 //---------------------------------------------------------------------------------
                 //
                 if (core.doc.pageController.page.modifiedDate != DateTime.MinValue) {
-                    core.webServer.addResponseHeader("LAST-MODIFIED", GenericController.GetRFC1123PatternDateFormat(core.doc.pageController.page.modifiedDate));
+                    core.webServer.addResponseHeader("LAST-MODIFIED", GenericController.GetRFC1123PatternDateFormat(encodeDate(core.doc.pageController.page.modifiedDate)));
                 }
                 //
                 //---------------------------------------------------------------------------------

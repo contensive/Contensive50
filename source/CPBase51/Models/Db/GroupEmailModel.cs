@@ -21,8 +21,8 @@ namespace Contensive.Models.Db {
         public int emailTemplateID { get; set; }
         public string fromAddress { get; set; }
         public string inlineStyles { get; set; }
-        public DateTime lastSendTestDate { get; set; }
-        public DateTime scheduleDate { get; set; }
+        public DateTime? lastSendTestDate { get; set; }
+        public DateTime? scheduleDate { get; set; }
         public bool sent { get; set; }
         public string stylesFilename { get; set; }
         public string subject { get; set; }

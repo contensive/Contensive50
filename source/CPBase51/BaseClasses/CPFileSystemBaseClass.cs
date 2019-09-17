@@ -26,15 +26,15 @@ namespace Contensive.BaseClasses {
             /// <summary>
             /// 
             /// </summary>
-            public DateTime DateCreated { get; set; }
+            public DateTime? DateCreated { get; set; }
             /// <summary>
             /// 
             /// </summary>
-            public DateTime DateLastAccessed { get; set; }
+            public DateTime? DateLastAccessed { get; set; }
             /// <summary>
             /// 
             /// </summary>
-            public DateTime DateLastModified { get; set; }
+            public DateTime? DateLastModified { get; set; }
             /// <summary>
             /// 
             /// </summary>
@@ -69,9 +69,9 @@ namespace Contensive.BaseClasses {
         public class FolderDetail {
             public string Name { get; set; }
             public int Attributes { get; set; }
-            public DateTime DateCreated { get; set; }
-            public DateTime DateLastAccessed { get; set; }
-            public DateTime DateLastModified { get; set; }
+            public DateTime? DateCreated { get; set; }
+            public DateTime? DateLastAccessed { get; set; }
+            public DateTime? DateLastModified { get; set; }
             public string Type { get; set; }
         }
         //

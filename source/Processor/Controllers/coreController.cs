@@ -564,6 +564,8 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         /// <summary>
         /// coreClass constructor for app, non-Internet use. coreClass is the primary object internally, created by cp.
+        /// In this mode, user, visit and visitor or empty objects.
+        /// To create a session.user, call session.verifyUser()
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>

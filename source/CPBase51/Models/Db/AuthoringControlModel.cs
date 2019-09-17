@@ -27,6 +27,6 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// date time when this lock expires
         /// </summary>
-        public DateTime DateExpires { get; set; }
+        public DateTime? DateExpires { get; set; }
     }
 }

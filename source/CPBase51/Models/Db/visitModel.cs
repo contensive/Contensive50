@@ -25,7 +25,7 @@ namespace Contensive.Models.Db {
         public string http_from { get; set; }
         public string http_referer { get; set; }
         public string http_via { get; set; }
-        public DateTime lastVisitTime { get; set; }
+        public DateTime? lastVisitTime { get; set; }
         public int loginAttempts { get; set; }
         public int memberID { get; set; }
         public bool memberNew { get; set; }
@@ -35,8 +35,8 @@ namespace Contensive.Models.Db {
         public string remote_addr { get; set; }
         public string remoteName { get; set; }
         public int startDateValue { get; set; }
-        public DateTime startTime { get; set; }
-        public DateTime stopTime { get; set; }
+        public DateTime? startTime { get; set; }
+        public DateTime? stopTime { get; set; }
         public int timeToLastHit { get; set; }
         public bool verboseReporting { get; set; }
         public bool visitAuthenticated { get; set; }

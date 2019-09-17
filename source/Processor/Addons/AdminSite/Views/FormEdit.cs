@@ -133,7 +133,7 @@ namespace Contensive.Addons.AdminSite {
                     //recordDateAdded = adminInfo.editRecord.dateAdded,
                     //recordDateModified = adminInfo.editRecord.modifiedDate,
                     recordLockById = adminData.editRecord.EditLock.editLockByMemberId,
-                    recordLockExpiresDate = adminData.editRecord.EditLock.editLockExpiresDate,
+                    recordLockExpiresDate = encodeDate(adminData.editRecord.EditLock.editLockExpiresDate),
                     //recordModifiedById = adminInfo.editRecord.modifiedBy.id,
                     recordName = adminData.editRecord.nameLc
                 };

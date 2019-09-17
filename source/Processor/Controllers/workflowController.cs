@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="contentName"></param>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        private static string getAuthoringControlCriteria(CoreController core, string contentName, int recordId) 
+        private static string getAuthoringControlCriteria(CoreController core, string contentName, int recordId)
             => getAuthoringControlCriteria(core, Models.Domain.ContentMetadataModel.createByUniqueName(core, contentName), recordId);
         //
         //=====================================================================================================
@@ -108,16 +108,16 @@ namespace Contensive.Processor.Controllers {
                 if (table != null) {
                     //
                     // -- get the edit control for this record (not by this person) with the oldest expiration date
-                    string criteria = "(createdby<>" + core.session.user.id + ")and" + getAuthoringControlCriteria(getTableRecordKey(table.id, recordId),AuthoringControls.Editing);
+                    string criteria = "(createdby<>" + core.session.user.id + ")and" + getAuthoringControlCriteria(getTableRecordKey(table.id, recordId), AuthoringControls.Editing);
                     var authoringControlList = DbBaseModel.createList<AuthoringControlModel>(core.cpParent, criteria, "dateexpires desc");
                     if (authoringControlList.Count > 0) {
-                        var person = DbBaseModel.create<PersonModel>(core.cpParent, authoringControlList.First().createdBy);
+                        var person = DbBaseModel.create<PersonModel>(core.cpParent, GenericController.encodeInteger(authoringControlList.First().createdBy));
                         return new editLockClass() {
                             isEditLocked = true,
                             editLockExpiresDate = authoringControlList.First().DateExpires,
                             editLockByMemberId = (person == null) ? 0 : person.id,
                             editLockByMemberName = (person == null) ? "" : person.name
-                        };                    
+                        };
                     }
                 };
             } catch (Exception ex) {
@@ -151,7 +151,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ContentName"></param>
         /// <param name="RecordID"></param>
         /// <returns></returns>
-        public static DateTime getEditLockDateExpires(CoreController core, int tableId, int recordId) => getEditLock(core, tableId, recordId).editLockExpiresDate;
+        public static DateTime? getEditLockDateExpires(CoreController core, int tableId, int recordId) => getEditLock(core, tableId, recordId).editLockExpiresDate;
         //
         //========================================================================
         /// <summary>
@@ -212,7 +212,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -249,16 +249,17 @@ namespace Contensive.Processor.Controllers {
                     if (CDef.id > 0) {
                         var nameDict = new Dictionary<int, string>();
                         foreach (var recordLock in DbBaseModel.createList<AuthoringControlModel>(core.cpParent, getAuthoringControlCriteria(core, ContentName, RecordID))) {
-                            switch((AuthoringControls)recordLock.controlType) {
+                            int createdBy = GenericController.encodeInteger(recordLock.createdBy);
+                            switch ((AuthoringControls)recordLock.controlType) {
                                 case AuthoringControls.Editing:
                                     if (!result.isEditLocked) {
                                         result.isEditLocked = true;
                                         result.editLockExpiresDate = recordLock.dateAdded;
-                                        if (nameDict.ContainsKey(recordLock.createdBy)) {
-                                            result.editLockByMemberName = nameDict[recordLock.createdBy];
+                                        if (nameDict.ContainsKey(createdBy)) {
+                                            result.editLockByMemberName = nameDict[createdBy];
                                         } else {
-                                            result.editLockByMemberName = DbBaseModel.getRecordName< PersonModel>(core.cpParent, recordLock.createdBy);
-                                            nameDict.Add(recordLock.createdBy, result.workflowModifiedByMemberName);
+                                            result.editLockByMemberName = DbBaseModel.getRecordName<PersonModel>(core.cpParent, createdBy);
+                                            nameDict.Add(createdBy, result.workflowModifiedByMemberName);
                                         }
                                     }
                                     break;
@@ -266,11 +267,11 @@ namespace Contensive.Processor.Controllers {
                                     if (!result.isWorkflowModified) {
                                         result.isWorkflowModified = true;
                                         result.workflowSubmittedDate = recordLock.dateAdded;
-                                        if (nameDict.ContainsKey(recordLock.createdBy)) {
-                                            result.workflowModifiedByMemberName = nameDict[recordLock.createdBy];
+                                        if (nameDict.ContainsKey(createdBy)) {
+                                            result.workflowModifiedByMemberName = nameDict[createdBy];
                                         } else {
-                                            result.workflowModifiedByMemberName = DbBaseModel.getRecordName<PersonModel>(core.cpParent, recordLock.createdBy);
-                                            nameDict.Add(recordLock.createdBy, result.workflowModifiedByMemberName);
+                                            result.workflowModifiedByMemberName = DbBaseModel.getRecordName<PersonModel>(core.cpParent, createdBy);
+                                            nameDict.Add(createdBy, result.workflowModifiedByMemberName);
                                         }
                                     }
                                     break;
@@ -278,23 +279,23 @@ namespace Contensive.Processor.Controllers {
                                     if (!result.isWorkflowSubmitted) {
                                         result.isWorkflowSubmitted = true;
                                         result.workflowModifiedDate = recordLock.dateAdded;
-                                        if (nameDict.ContainsKey(recordLock.createdBy)) {
-                                            result.workflowSubmittedMemberName = nameDict[recordLock.createdBy];
+                                        if (nameDict.ContainsKey(createdBy)) {
+                                            result.workflowSubmittedMemberName = nameDict[createdBy];
                                         } else {
-                                            result.workflowSubmittedMemberName = DbBaseModel.getRecordName<PersonModel>(core.cpParent, recordLock.createdBy);
-                                            nameDict.Add(recordLock.createdBy, result.workflowSubmittedMemberName);
+                                            result.workflowSubmittedMemberName = DbBaseModel.getRecordName<PersonModel>(core.cpParent, createdBy);
+                                            nameDict.Add(createdBy, result.workflowSubmittedMemberName);
                                         }
                                     }
                                     break;
                                 case AuthoringControls.Approved:
                                     if (!result.isWorkflowApproved) {
                                         result.isWorkflowApproved = true;
-                                        result.workflowApprovedDate = recordLock.dateAdded;
-                                        if (nameDict.ContainsKey(recordLock.createdBy)) {
-                                            result.workflowApprovedMemberName = nameDict[recordLock.createdBy];
+                                        result.workflowApprovedDate = encodeDate(recordLock.dateAdded);
+                                        if (nameDict.ContainsKey(createdBy)) {
+                                            result.workflowApprovedMemberName = nameDict[createdBy];
                                         } else {
-                                            result.workflowApprovedMemberName = DbBaseModel.getRecordName<PersonModel>(core.cpParent, recordLock.createdBy);
-                                            nameDict.Add(recordLock.createdBy, result.workflowSubmittedMemberName);
+                                            result.workflowApprovedMemberName = DbBaseModel.getRecordName<PersonModel>(core.cpParent, createdBy);
+                                            nameDict.Add(createdBy, result.workflowSubmittedMemberName);
                                         }
                                     }
                                     break;
@@ -305,7 +306,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -327,7 +328,7 @@ namespace Contensive.Processor.Controllers {
             /// <summary>
             /// The date and time when the record will be released from editing lock
             /// </summary>
-            public DateTime editLockExpiresDate { get; set; }
+            public DateTime? editLockExpiresDate { get; set; }
             /// <summary>
             /// For deprected workflow editing. This user has submitted this record for publication
             /// </summary>
@@ -355,11 +356,11 @@ namespace Contensive.Processor.Controllers {
             /// <summary>
             /// For deprected workflow editing. The date and time when the record was modified
             /// </summary>
-            public DateTime workflowModifiedDate { get; set; }
+            public DateTime? workflowModifiedDate { get; set; }
             /// <summary>
             /// For deprected workflow editing. The date and time when the record was submitted for publishing
             /// </summary>
-            public DateTime workflowSubmittedDate { get; set; }
+            public DateTime? workflowSubmittedDate { get; set; }
             /// <summary>
             /// For deprected workflow editing. The date and time when the record was approved for publishing
             /// </summary>
@@ -395,7 +396,7 @@ namespace Contensive.Processor.Controllers {
             /// <summary>
             /// The date and time when the record will be released from editing lock
             /// </summary>
-            public DateTime editLockExpiresDate { get; set; }
+            public DateTime? editLockExpiresDate { get; set; }
         }
         //
         //==========================================================================================
@@ -423,8 +424,8 @@ namespace Contensive.Processor.Controllers {
         }
         ~WorkflowController() {
             Dispose(false);
-            
-            
+
+
         }
         #endregion
     }

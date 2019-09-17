@@ -34,7 +34,7 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// foreign key to ccmembers table, populated by admin when record added.
         /// </summary>
-        public int createdBy { get; set; }
+        public int? createdBy { get; set; }
         /// <summary>
         /// used when creating new record
         /// </summary>
@@ -42,15 +42,15 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// date record added, populated by admin when record added.
         /// </summary>
-        public DateTime dateAdded { get; set; }
+        public DateTime? dateAdded { get; set; }
         /// <summary>
         /// foreign key to ccmembers table set to user who modified the record last in the admin site
         /// </summary>
-        public int modifiedBy { get; set; }
+        public int? modifiedBy { get; set; }
         /// <summary>
         /// date when the record was last modified in the admin site
         /// </summary>
-        public DateTime modifiedDate { get; set; }
+        public DateTime? modifiedDate { get; set; }
         /// <summary>
         /// optionally used to sort recrods in the table
         /// </summary>

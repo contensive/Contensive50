@@ -14,7 +14,7 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         // -- instance properties
-        public DateTime dateBlockExpires { get; set; }
+        public DateTime? dateBlockExpires { get; set; }
         public int emailDropID { get; set; }
         public int emailID { get; set; }
         public string fromAddress { get; set; }

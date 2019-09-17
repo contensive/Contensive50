@@ -48,7 +48,7 @@ namespace Contensive.Processor {
         /// </summary>
         public override DateTime LastTime {
             get {
-                return cp.core.session.visit.lastVisitTime;
+                return GenericController.encodeDate(cp.core.session.visit.lastVisitTime);
             }
         }
         //
@@ -244,7 +244,7 @@ namespace Contensive.Processor {
         //
         public override DateTime StartTime {
             get {
-                return cp.core.session.visit.startTime;
+                return GenericController.encodeDate(cp.core.session.visit.startTime);
             }
         }
         //
