@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Contensive.Models</id>
+    <version>5.1.999999.9</version>
+    <title>Contensive Addon Models</title>
+    <authors>Contensive</authors>
+    <owners>Contensive</owners>
+    <license type="expression">MIT</license>
+    <projectUrl>http://contensive.io</projectUrl>
+    <iconUrl>http://contensive.io/img/contensiveNuGetLogo.png"</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<summary>The models shared between Contensive modules and available for addon assemblies.</summary>
+    <description>The CPBaseClass package is used to build Contensive Addons. See http://Contensive.io/Docs for details.
+	</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags></tags>
+		<dependencies>
+			<dependency id="Contensive.CPBaseClass" version="5.1.190825.13" />
+		</dependencies>
+  </metadata>
+    <files>
+        <file src="bin\Debug\CPModels.dll" target="lib\net461\CPModels.dll" />
+    </files>
+</package>

@@ -49,7 +49,7 @@ namespace Contensive.Processor.Models.Domain {
         public override bool enableEnyimNLog { get; set; }
         //
         // -- datasource for the cluster (only sql support for now)
-        public override DataSourceModel.DataSourceTypeEnum defaultDataSourceType { get; set; }
+        public override DataSourceTypeEnum defaultDataSourceType { get; set; }
         public override string defaultDataSourceAddress { get; set; }
         public override string defaultDataSourceUsername { get; set; }
         public override string defaultDataSourcePassword { get; set; }
@@ -78,9 +78,6 @@ namespace Contensive.Processor.Models.Domain {
         //      - ecommerce batch should only run in production
         // todo figure out how to expose this, add it to configuration setup
         public override bool productionEnvironment { get; set; }
-        //
-        // -- Allow logging. NLog config should be used primarily. This is needed for file logging
-        //public bool enableLogging { get; set; }
         //
         // -- List of all apps on this server
         public CaseInsensitiveDictionary<string, AppConfigModel> apps { get; set; }

@@ -37,6 +37,19 @@ rem ==============================================================
 rem
 rem clean build folders
 rem
+
+rd /S /Q "..\source\cpbase51\bin"
+rd /S /Q "..\source\cpbase51\obj"
+
+rd /S /Q "..\source\models\bin"
+rd /S /Q "..\source\models\obj"
+
+rd /S /Q "..\source\processor\bin"
+rd /S /Q "..\source\processor\obj"
+
+rd /S /Q "..\source\processortests\bin"
+rd /S /Q "..\source\processortests\obj"
+
 rd /S /Q "..\source\cli\bin"
 rd /S /Q "..\source\cli\obj"
 
@@ -47,17 +60,8 @@ rd /S /Q "..\source\clisetup\DevDefaultApp"
 rd /S /Q "..\source\clisetup\Release"
 rd /S /Q "..\source\clisetup\StagingDefaultApp"
 
-rd /S /Q "..\source\cpbase51\bin"
-rd /S /Q "..\source\cpbase51\obj"
-
 rd /S /Q "..\source\iisDefault\bin"
 rd /S /Q "..\source\iisDefault\obj"
-
-rd /S /Q "..\source\processor\bin"
-rd /S /Q "..\source\processor\obj"
-
-rd /S /Q "..\source\processortests\bin"
-rd /S /Q "..\source\processortests\obj"
 
 rd /S /Q "..\source\taskservice\bin"
 rd /S /Q "..\source\taskservice\obj"
@@ -77,7 +81,6 @@ if errorlevel 1 (
 )
 cd ..\scripts
 
-
 rem ==============================================================
 rem
 rem build CPBaseClass Nuget
@@ -94,6 +97,50 @@ if errorlevel 1 (
 )
 xcopy "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Documents\nugetLocalPackages" /Y
 xcopy "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" "%deploymentFolderRoot%%deploymentNumber%" /Y
+cd ..\..\scripts
+
+rem ==============================================================
+rem
+rem update models nuget packages  
+rem
+
+cd ..\source\Models
+nuget update Models.csproj -noninteractive
+cd ..\ModelTests
+nuget update ModelTests.csproj -noninteractive
+cd ..\..\scripts
+
+rem ==============================================================
+rem
+rem build Models
+rem
+
+cd ..\source
+"%msbuildLocation%msbuild.exe" contensiveModels.sln
+if errorlevel 1 (
+   echo failure building ContensiveModels.dll
+   pause
+   exit /b %errorlevel%
+)
+cd ..\scripts
+
+rem ==============================================================
+rem
+rem build ContensiveModels Nuget
+rem
+
+cd ..\source\Models
+IF EXIST "Contensive.Models.5.1.%deploymentNumber%.nupkg" (
+	del "Contensive.Models.5.1.%deploymentNumber%.nupkg" /Q
+)
+"nuget.exe" pack "Contensive.Models.nuspec" -version 5.1.%deploymentNumber%
+if errorlevel 1 (
+   echo failure in nuget Models
+   pause
+   exit /b %errorlevel%
+)
+xcopy "Contensive.Models.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Documents\nugetLocalPackages" /Y
+xcopy "Contensive.Models.5.1.%deploymentNumber%.nupkg" "%deploymentFolderRoot%%deploymentNumber%" /Y
 cd ..\..\scripts
 
 rem ==============================================================

@@ -1,7 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Models.Db;
 
 namespace Contensive.BaseModels {
     //
@@ -45,7 +44,7 @@ namespace Contensive.BaseModels {
         public abstract bool enableEnyimNLog { get; set; }
         //
         // -- datasource for the cluster (only sql support for now)
-        public abstract DataSourceModel.DataSourceTypeEnum defaultDataSourceType { get; set; }
+        public abstract DataSourceTypeEnum defaultDataSourceType { get; set; }
         public abstract string defaultDataSourceAddress { get; set; }
         public abstract string defaultDataSourceUsername { get; set; }
         public abstract string defaultDataSourcePassword { get; set; }
@@ -69,19 +68,11 @@ namespace Contensive.BaseModels {
         //      - ecommerce batch should only run in production
         // todo figure out how to expose this, add it to configuration setup
         public abstract bool productionEnvironment { get; set; }
-        ////
-        //public abstract CaseInsensitiveDictionary<string, AppConfigBaseModel> apps { get; set; }
-        ////
-        ///// <summary>
-        ///// case insensative dictionary. Use for application lookup
-        ///// </summary>
-        ///// <typeparam name="V"></typeparam>
-        //[Serializable]
-        //public class CaseInsensitiveDictionary<S, V> : Dictionary<string, V> {
-        //    public CaseInsensitiveDictionary() : base(StringComparer.OrdinalIgnoreCase) {
-        //    }
-        //}
-
+        //
+        public enum DataSourceTypeEnum {
+            legacy = 1,
+            sqlServer = 2
+        }
     }
 }
 

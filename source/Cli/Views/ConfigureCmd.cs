@@ -124,7 +124,7 @@ namespace Contensive.CLI {
                     }
                     //
                     // -- Sql Server Driver
-                    cp.core.serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
+                    cp.core.serverConfig.defaultDataSourceType = BaseModels.ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
                     //
                     // -- Sql Server end-point
                     {

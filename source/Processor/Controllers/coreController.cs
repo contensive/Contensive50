@@ -555,7 +555,7 @@ namespace Contensive.Processor.Controllers {
             session = new SessionController(this);
             //
             serverConfig = ServerConfigModel.getObject(this);
-            this.serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
+            this.serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
             webServer.iisContext = null;
             constructorInitialize(false);
             LogController.log(this, "CoreController constructor-0, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
@@ -582,7 +582,7 @@ namespace Contensive.Processor.Controllers {
             session = new SessionController(this);
             //
             serverConfig = ServerConfigModel.getObject(this);
-            serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
+            serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
             appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
             if (appConfig != null) {
                 webServer.iisContext = null;
@@ -636,7 +636,7 @@ namespace Contensive.Processor.Controllers {
             session = new SessionController(this);
             //
             this.serverConfig = serverConfig;
-            this.serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
+            this.serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
             appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
             appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
             webServer.iisContext = null;
@@ -660,7 +660,7 @@ namespace Contensive.Processor.Controllers {
             session = new SessionController(this);
             //
             this.serverConfig = serverConfig;
-            this.serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
+            this.serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
             appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
             this.appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
             webServer.initWebContext(httpContext);
@@ -684,7 +684,7 @@ namespace Contensive.Processor.Controllers {
             session = new SessionController(this);
             //
             serverConfig = ServerConfigModel.getObject(this);
-            serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
+            serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
             appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
             if (appConfig != null) {
                 webServer.initWebContext(httpContext);
