@@ -160,7 +160,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         //======================================================================================================
         //
-        internal static void installMetaDataMiniCollectionFromXml(bool quick, CoreController core, string srcXml, bool isNewBuild, bool isRepairMode, bool isBaseCollection, ref List<string> nonCriticalErrorList, string logPrefix) {
+        internal static void installMetaDataMiniCollectionFromXml(bool quick, CoreController core, string srcXml, bool isNewBuild, bool reinstallDependencies, bool isBaseCollection, ref List<string> nonCriticalErrorList, string logPrefix) {
             try {
                 if (quick) {
                     //
@@ -169,7 +169,7 @@ namespace Contensive.Processor.Models.Domain {
                     // -- method 1, just install
                     MetadataMiniCollectionModel baseCollection = loadXML(core, srcXml, true, true, isNewBuild, new MetadataMiniCollectionModel(), logPrefix);
                     
-                    installMetaDataMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix);
+                    installMetaDataMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
                 } else {
                     //
                     // -- method 2, merge with application collection and install
@@ -177,7 +177,7 @@ namespace Contensive.Processor.Models.Domain {
                     MetadataMiniCollectionModel miniCollectionWorking = getApplicationMetaDataMiniCollection(core, isNewBuild, logPrefix);
                     MetadataMiniCollectionModel miniCollectionToAdd = loadXML(core, srcXml, isBaseCollection, false, isNewBuild, miniCollectionWorking, logPrefix);
                     addMiniCollectionSrcToDst(core, ref miniCollectionWorking, miniCollectionToAdd);
-                    installMetaDataMiniCollection_BuildDb(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix);
+                    installMetaDataMiniCollection_BuildDb(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -679,7 +679,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Verify ccContent and ccFields records from the metadata nodes of a a collection file. This is the last step of loading teh metadata nodes of a collection file. ParentId field is set based on ParentName node.
         /// </summary>
-        private static void installMetaDataMiniCollection_BuildDb(CoreController core, MetadataMiniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix) {
+        private static void installMetaDataMiniCollection_BuildDb(CoreController core, MetadataMiniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix) {
             try {
                 //
                 logPrefix += ", installCollection_BuildDbFromMiniCollection";

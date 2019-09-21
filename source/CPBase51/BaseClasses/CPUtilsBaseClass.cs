@@ -463,7 +463,7 @@ namespace Contensive.BaseClasses {
         [Obsolete("Deprecated", false)]
         public abstract string GetPleaseWaitStart();
         //
-        [Obsolete("Use System.Net.HttpUtility.JavaScriptStringEncode()", false)]
+        [Obsolete("Use System.Web.HttpUtility.JavaScriptStringEncode()", false)]
         public abstract string EncodeJavascript(string source);
         //
         [Obsolete("Encode each key value first with EncodeResponseVariable(), then assemble them into the querystring.", false)]

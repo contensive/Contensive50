@@ -52,11 +52,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="contextLog">For logging. A list of reasons why this installation was called, the last explaining this call, the one before explain the reason the caller was installed.</param>
         /// <param name="isNewBuild"></param>
-        /// <param name="isRepairMode"></param>
+        /// <param name="reinstallDependencies"></param>
         /// <param name="nonCriticalErrorList"></param>
         /// <param name="logPrefix"></param>
         /// <param name="collectionsInstalledList">A list of collection guids that are already installed this pass. All collections that install will be added to it. </param>
-        public static void installBaseCollection(CoreController core, Stack<string> contextLog, bool isNewBuild, bool isRepairMode, ref List<string> nonCriticalErrorList, string logPrefix) {
+        public static void installBaseCollection(CoreController core, Stack<string> contextLog, bool isNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix) {
             try {
                 contextLog.Push("installBaseCollection");
                 traceContextLog(core, contextLog);
@@ -74,7 +74,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- Special Case - must install base collection metadata first because it builds the system that the system needs to do everything else
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installBaseCollection, install metadata first to verify system requirements");
-                    MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, true, isRepairMode, ref nonCriticalErrorList, logPrefix);
+                    MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, true, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
                 }
                 {
                     //
@@ -86,7 +86,7 @@ namespace Contensive.Processor.Controllers {
                         string installErrorMessage = "";
                         string installedCollectionGuid = "";
                         var collectionsInstalledList = new List<string>();
-                        if (!installCollectionFromPrivateFile(core, contextLog, installPrivatePath + baseCollectionFilename, ref installErrorMessage, ref installedCollectionGuid, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList)) {
+                        if (!installCollectionFromPrivateFile(core, contextLog, installPrivatePath + baseCollectionFilename, ref installErrorMessage, ref installedCollectionGuid, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList)) {
                             throw new GenericException(installErrorMessage);
                         }
                     } catch (Exception) {
@@ -118,14 +118,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="collectionGuid"></param>
         /// <param name="return_ErrorMessage"></param>
         /// <param name="IsNewBuild"></param>
-        /// <param name="repair"></param>
+        /// <param name="reinstallDependencies"></param>
         /// <param name="nonCriticalErrorList"></param>
         /// <param name="logPrefix"></param>
         /// <param name="collectionsInstalledList"></param>
         /// <param name="includeBaseMetaDataInstall"></param>
         /// <param name="collectionsDownloaded">Collections downloaded but not installed yet. Do not need to download them again.</param>
         /// <returns></returns>
-        public static bool installCollectionFromCollectionFolder(CoreController core, Stack<string> contextLog, string collectionGuid, ref string return_ErrorMessage, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList, bool includeBaseMetaDataInstall, ref List<string> collectionsDownloaded) {
+        public static bool installCollectionFromCollectionFolder(CoreController core, Stack<string> contextLog, string collectionGuid, ref string return_ErrorMessage, bool IsNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList, bool includeBaseMetaDataInstall, ref List<string> collectionsDownloaded) {
             bool result = false;
             try {
                 //
@@ -342,8 +342,7 @@ namespace Contensive.Processor.Controllers {
                                                                 } else {
                                                                     //
                                                                     // -- all included collections should already be installed, because buildfolder is called before call
-                                                                    installCollectionFromCollectionFolder(core, contextLog, ChildCollectionGUID, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, false, ref collectionsDownloaded);
-                                                                    //installCollectionFromLibrary(core, contextLog, ChildCollectionGUID, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList);
+                                                                    installCollectionFromCollectionFolder(core, contextLog, ChildCollectionGUID, ref return_ErrorMessage, IsNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, false, ref collectionsDownloaded);
                                                                 }
                                                                 break;
                                                             }
@@ -371,7 +370,7 @@ namespace Contensive.Processor.Controllers {
                                                     } else if (collectionFolderConfig.lastChangeDate > collection.modifiedDate) {
                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], App has an older version of collection. It will be upgraded.");
                                                         OKToInstall = true;
-                                                    } else if (repair) {
+                                                    } else if (reinstallDependencies) {
                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], App has an up-to-date version of collection, but the repair option is true so it will be reinstalled.");
                                                         OKToInstall = true;
                                                     } else {
@@ -479,7 +478,7 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             // -- Use the upgrade code to import this part
                                                             metaDataMiniCollection = "<" + CollectionFileRootNode + ">" + metaDataMiniCollection + "</" + CollectionFileRootNode + ">";
-                                                            MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(false, core, metaDataMiniCollection, IsNewBuild, repair, isBaseCollection, ref nonCriticalErrorList, logPrefix);
+                                                            MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(false, core, metaDataMiniCollection, IsNewBuild, reinstallDependencies, isBaseCollection, ref nonCriticalErrorList, logPrefix);
                                                             //
                                                             // -- Process nodes to save Collection data
                                                             XmlDocument NavDoc = new XmlDocument();
@@ -1008,13 +1007,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="return_ErrorMessage"></param>
         /// <param name="collectionsInstalledList">a list of the collections installed to the database during this installation (dependencies etc.). The collections installed are added to this list</param>
         /// <param name="IsNewBuild"></param>
-        /// <param name="repair"></param>
+        /// <param name="reinstallDependencies"></param>
         /// <param name="nonCriticalErrorList"></param>
         /// <param name="logPrefix"></param>
         /// <param name="includeBaseMetaDataInstall"></param>
         /// <param name="collectionsDownloaded">List of collections that have been downloaded during this istall pass but have not been installed yet. Do no need to download them again.</param>
         /// <returns></returns>
-        public static bool installCollectionsFromPrivateFolder(CoreController core, Stack<string> contextLog, string installPrivatePath, ref string return_ErrorMessage, ref List<string> collectionsInstalledList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, bool includeBaseMetaDataInstall, ref List<string> collectionsDownloaded) {
+        public static bool installCollectionsFromPrivateFolder(CoreController core, Stack<string> contextLog, string installPrivatePath, ref string return_ErrorMessage, ref List<string> collectionsInstalledList, bool IsNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix, bool includeBaseMetaDataInstall, ref List<string> collectionsDownloaded) {
             bool returnSuccess = false;
             try {
                 contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + installPrivatePath + "]");
@@ -1032,7 +1031,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
                 } else {
                     foreach (string collectionGuid in collectionsToInstall) {
-                        if (!installCollectionFromCollectionFolder(core, contextLog, collectionGuid, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, includeBaseMetaDataInstall, ref collectionsDownloaded)) {
+                        if (!installCollectionFromCollectionFolder(core, contextLog, collectionGuid, ref return_ErrorMessage, IsNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, includeBaseMetaDataInstall, ref collectionsDownloaded)) {
                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
                             break;
                         }
@@ -1059,7 +1058,7 @@ namespace Contensive.Processor.Controllers {
         /// Builds the Collection Folder. 
         /// Calls installCollectionFromCollectionFolder.
         /// </summary>
-        public static bool installCollectionFromPrivateFile(CoreController core, Stack<string> contextLog, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList) {
+        public static bool installCollectionFromPrivateFile(CoreController core, Stack<string> contextLog, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList) {
             bool returnSuccess = true;
             try {
                 contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + pathFilename + "]");
@@ -1079,7 +1078,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (collectionsDownloaded.Count > 0) {
                     return_CollectionGUID = collectionsDownloaded.First();
                     foreach (var collection in collectionsDownloaded) {
-                        if (!installCollectionFromCollectionFolder(core, contextLog, collection, ref return_ErrorMessage, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, true, ref collectionsDownloaded)) {
+                        if (!installCollectionFromCollectionFolder(core, contextLog, collection, ref return_ErrorMessage, IsNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, true, ref collectionsDownloaded)) {
                             //
                             // Upgrade all apps failed
                             //
