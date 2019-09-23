@@ -951,11 +951,21 @@ namespace Contensive.Processor.Controllers {
             } else if (body.ToLower().IndexOf("<html") >= 0) {
                 //
                 // -- isHtml, if the body includes an html tag, this is the entire body, just send it
-                return NUglify.Uglify.HtmlToText("<body>" + body + "</body>").Code.Trim();
+                try {
+                    return NUglify.Uglify.HtmlToText(body).Code.Trim();
+                } catch (Exception ex) {
+                    LogController.logError(core, ex, "Nuglify error while creating text body from full html.");
+                    return string.Empty;
+                }
             } else {
                 //
                 // -- isHtml but no body tag, add an html wrapper
-                return NUglify.Uglify.HtmlToText("<body>" + body + "</body>").Code.Trim();
+                try {
+                    return NUglify.Uglify.HtmlToText("<body>" + body + "</body>").Code.Trim();
+                } catch (Exception ex) {
+                    LogController.logError(core, ex, "Nuglify error while creating text body from html body.");
+                    return string.Empty;
+                }
             }
         }
         //
@@ -982,7 +992,12 @@ namespace Contensive.Processor.Controllers {
             if (!string.IsNullOrWhiteSpace(subject)) {
                 subject = ActiveContentController.renderHtmlForEmail(core, subject, recipientId, queryStringForLinkAppend);
                 subject = GenericController.convertLinksToAbsolute(subject, rootUrl);
-                subject = NUglify.Uglify.HtmlToText("<body>" + subject + "</body>").Code;
+                try {
+                    subject = NUglify.Uglify.HtmlToText("<body>" + subject + "</body>").Code;
+                } catch (Exception ex) {
+                    LogController.logError(core, ex, "Nuglify error while creating text subject line.");
+                    subject = string.Empty;
+                }
                 if ( subject == null ) { subject = string.Empty; }
                 subject = subject.Trim();
             }
