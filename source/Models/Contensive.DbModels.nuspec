@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Contensive.Models</id>
+    <id>Contensive.DbModels</id>
     <version>5.1.999999.9</version>
     <title>Contensive Addon Models</title>
     <authors>Contensive</authors>
@@ -21,6 +21,6 @@
 		</dependencies>
   </metadata>
     <files>
-        <file src="bin\Debug\CPModels.dll" target="lib\net461\CPModels.dll" />
+        <file src="bin\Debug\ContensiveDbModels.dll" target="lib\net461\ContensiveDbModels.dll" />
     </files>
 </package>

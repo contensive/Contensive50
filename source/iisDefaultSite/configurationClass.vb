@@ -8,8 +8,8 @@ Imports Contensive.Processor.Controllers
 Imports Contensive.Processor.Controllers.GenericController
 Imports System.Web.Routing
 Imports System.IO
-Imports Contensive.Processor.Models.Domain
 Imports Contensive
+Imports Contensive.Processor.Models.Domain
 
 Public Class ConfigurationClass
     '
@@ -83,9 +83,9 @@ Public Class ConfigurationClass
     Public Shared Sub loadRouteMap(cp As CPClass)
         '
         ' -- if application var does not equal routemap.datecreated rebuild
-        If (routeMapDateInValid OrElse (cp.routeMap.dateCreated <> CDate(HttpContext.Current.Application("RouteMapDateCreated")))) Then
+        If (routeMapDateInvalid() OrElse (cp.routeMap.dateCreated <> CDate(HttpContext.Current.Application("RouteMapDateCreated")))) Then
             '
-            If routeMapDateInValid Then
+            If routeMapDateInvalid() Then
                 LogController.logLocalOnly("configurationClass, loadRouteMap, [" + cp.Site.Name + "], rebuild because HttpContext.Current.Application(RouteMapDateCreated) is not valid", BaseClasses.CPLogBaseClass.LogLevel.Info)
             Else
                 LogController.logLocalOnly("configurationClass, loadRouteMap, [" + cp.Site.Name + "], rebuild because not equal, cp.routeMap.dateCreated [" + cp.routeMap.dateCreated.ToString() + "], HttpContext.Current.Application(RouteMapDateCreated) [" + HttpContext.Current.Application("RouteMapDateCreated").ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Info)

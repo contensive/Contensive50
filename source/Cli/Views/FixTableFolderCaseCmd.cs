@@ -63,7 +63,7 @@ namespace Contensive.CLI {
                     };
                     foreach ( var content in contentList ) {
                         Console.Write("\n\rContent [" + content.name + "].");
-                        var contentMeta = Processor.Models.Domain.ContentMetadataModel.create(cp.core, content.id);
+                        var contentMeta = Contensive.Processor.Models.Domain.ContentMetadataModel.create(cp.core, content.id);
                         if ( contentMeta != null ) {
                             string tablename = contentMeta.tableName.ToLower();
                             //

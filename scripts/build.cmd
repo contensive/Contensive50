@@ -116,9 +116,13 @@ rem build Models
 rem
 
 cd ..\source
-"%msbuildLocation%msbuild.exe" contensiveModels.sln
+"%msbuildLocation%msbuild.exe" contensiveDbModels.sln
+
+pause
+
+
 if errorlevel 1 (
-   echo failure building ContensiveModels.dll
+   echo failure building contensiveDbModels.dll
    pause
    exit /b %errorlevel%
 )
@@ -126,21 +130,21 @@ cd ..\scripts
 
 rem ==============================================================
 rem
-rem build ContensiveModels Nuget
+rem build ContensiveDbModels Nuget
 rem
 
 cd ..\source\Models
 IF EXIST "Contensive.Models.5.1.%deploymentNumber%.nupkg" (
 	del "Contensive.Models.5.1.%deploymentNumber%.nupkg" /Q
 )
-"nuget.exe" pack "Contensive.Models.nuspec" -version 5.1.%deploymentNumber%
+"nuget.exe" pack "Contensive.DbModels.nuspec" -version 5.1.%deploymentNumber%
 if errorlevel 1 (
-   echo failure in nuget Models
+   echo failure in nuget Contensive.DbModels
    pause
    exit /b %errorlevel%
 )
-xcopy "Contensive.Models.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Documents\nugetLocalPackages" /Y
-xcopy "Contensive.Models.5.1.%deploymentNumber%.nupkg" "%deploymentFolderRoot%%deploymentNumber%" /Y
+xcopy "Contensive.DbModels.5.1.%deploymentNumber%.nupkg" "C:\Users\jay\Documents\nugetLocalPackages" /Y
+xcopy "Contensive.DbModels.5.1.%deploymentNumber%.nupkg" "%deploymentFolderRoot%%deploymentNumber%" /Y
 cd ..\..\scripts
 
 rem ==============================================================

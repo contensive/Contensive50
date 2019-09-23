@@ -18,7 +18,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="addonName"></param>
         /// <returns></returns>
-        public abstract object Execute(string addonGuid);
+        public abstract string Execute(string addonGuid);
         //
         //====================================================================================================
         /// <summary>
@@ -27,7 +27,7 @@ namespace Contensive.BaseClasses {
         /// <param name="addonGuid"></param>
         /// <param name="argumentKeyValuePairs"></param>
         /// <returns></returns>
-        public abstract object Execute(string addonGuid, Dictionary<string, string> argumentKeyValuePairs);
+        public abstract string Execute(string addonGuid, Dictionary<string, string> argumentKeyValuePairs);
         //
         //====================================================================================================
         /// <summary>
@@ -36,7 +36,7 @@ namespace Contensive.BaseClasses {
         /// <param name="addonGuid"></param>
         /// <param name="executeContext"></param>
         /// <returns></returns>
-        public abstract object Execute(string addonGuid, CPUtilsBaseClass.addonExecuteContext executeContext);
+        public abstract string Execute(string addonGuid, CPUtilsBaseClass.addonExecuteContext executeContext);
         //
         //====================================================================================================
         /// <summary>
@@ -44,7 +44,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="addonId"></param>
         /// <returns></returns>
-        public abstract object Execute(int addonId);
+        public abstract string Execute(int addonId);
         //
         //====================================================================================================
         /// <summary>
@@ -53,7 +53,7 @@ namespace Contensive.BaseClasses {
         /// <param name="addonId"></param>
         /// <param name="argumentKeyValuePairs"></param>
         /// <returns></returns>
-        public abstract object Execute(int addonId, Dictionary<string, string> argumentKeyValuePairs);
+        public abstract string Execute(int addonId, Dictionary<string, string> argumentKeyValuePairs);
         //
         //====================================================================================================
         /// <summary>
@@ -62,7 +62,7 @@ namespace Contensive.BaseClasses {
         /// <param name="addonId"></param>
         /// <param name="executeContext"></param>
         /// <returns></returns>
-        public abstract object Execute(int addonId, CPUtilsBaseClass.addonExecuteContext executeContext);
+        public abstract string Execute(int addonId, CPUtilsBaseClass.addonExecuteContext executeContext);
         //
         //====================================================================================================
         /// <summary>

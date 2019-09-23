@@ -53,11 +53,10 @@ namespace Contensive.Addons.AdminSite {
                         + "\r</ul>"
                         + "";
                     result = ""
+                        + "<div style=\"display:table;padding:100px 0 0 0;margin:0 auto;\">" 
                         + cp.core.html.getPanelHeader("Unauthorized Access")
-                        + cp.core.html.getPanel(result, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15);
-                    result = ""
-                        + "\r<div style=\"display:table;padding:100px 0 0 0;margin:0 auto;\">"
-                        + GenericController.nop(result) + "\r</div>";
+                        + cp.core.html.getPanel(result, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15)
+                        + "</div>";
                     cp.core.doc.setMetaContent(0, 0);
                     cp.core.html.addTitle("Unauthorized Access", "adminSite");
                     result = HtmlController.div(result, "container-fluid ccBodyAdmin ccCon");

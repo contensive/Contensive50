@@ -2539,13 +2539,13 @@ namespace Contensive.Processor.Controllers {
         //
         public string getPanel(string content) => getPanel(content, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5, 1);
         //
-        public string getPanel(string content, string stylePanel, string styleHilite, string styleShadow, string width, int padding) => getPanel(content, stylePanel, styleHilite, styleShadow, width, padding, 1);
+        public string getPanel(string content, string stylePanel, string styleHilite, string styleShadow, string width, int padding) 
+            => getPanel(content, stylePanel, styleHilite, styleShadow, width, padding, 1);
         //
         //====================================================================================================
         //
-        public string getPanelHeader(string HeaderMessage, string RightSideMessage = "") {
-            string iRightSideMessage = GenericController.encodeEmpty(RightSideMessage, core.doc.profileStartTime.ToString("G"));
-            return AdminUIController.getHeader(core, HeaderMessage, iRightSideMessage);
+        public string getPanelHeader(string RightSideMessage) {
+            return AdminUIController.getHeader(core, "", RightSideMessage);
         }
         //
         //====================================================================================================

@@ -8,7 +8,7 @@
             If (ConfigurationManager.AppSettings("ContensiveUseWebConfig").ToLower = "true") Then
                 '
                 ' -- initialize with web.config settings (everything in VS project, no contensive server.config needed)
-                Dim serverConfig As Contensive.Processor.Models.Domain.serverConfigModel = DefaultSite.configurationClass.getServerConfig()
+                Dim serverConfig As Contensive.Processor.Models.Domain.ServerConfigModel = DefaultSite.ConfigurationClass.getServerConfig()
                 Using cp As New Contensive.Processor.CPClass(serverConfig.apps(0).name, serverConfig, HttpContext.Current)
                     Response.Write(cp.executeRoute())
                     DefaultSite.ConfigurationClass.loadRouteMap(cp)

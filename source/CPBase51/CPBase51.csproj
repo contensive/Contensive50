@@ -72,8 +72,8 @@
     <Compile Include="BaseClasses\CPUtilsBaseClass.cs" />
     <Compile Include="BaseClasses\CPVisitBaseClass.cs" />
     <Compile Include="BaseClasses\CPVisitorBaseClass.cs" />
-    <Compile Include="BaseModels\AppConfigModel.cs" />
-    <Compile Include="BaseModels\ServerConfigModel.cs" />
+    <Compile Include="BaseModels\AppConfigBaseModel.cs" />
+    <Compile Include="BaseModels\ServerConfigBaseModel.cs" />
     <Compile Include="BaseModels\SimplestDataModel.cs" />
     <Compile Include="Exceptions\Exception.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

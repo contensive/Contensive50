@@ -30,6 +30,10 @@ namespace Contensive.CLI {
                     Console.WriteLine("Server Configuration not loaded correctly. Please run --configure");
                     return;
                 }
+                if (!System.IO.File.Exists(collectionPhysicalPathFilename)) {
+                    Console.WriteLine("The file could not be found [" + collectionPhysicalPathFilename + "]");
+                    return;
+                }
                 var collectionsInstalledList = new List<string>();
                 var nonCritialErrorList = new List<string>();
                 if (string.IsNullOrEmpty(appName)) {

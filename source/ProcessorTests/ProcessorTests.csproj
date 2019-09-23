@@ -52,12 +52,12 @@
       <HintPath>..\packages\AWSSDK.S3.3.3.104.30\lib\net45\AWSSDK.S3.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.1.190921.2\lib\net461\CPBase.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.1.7205.22305, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.5.1.190923.8\lib\net461\ContensiveDbModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CPModels, Version=5.1.7203.24390, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.Models.5.1.190921.2\lib\net461\CPModels.dll</HintPath>
+    <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
+      <HintPath>..\packages\Contensive.CPBaseClass.5.1.190923.8\lib\net461\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">

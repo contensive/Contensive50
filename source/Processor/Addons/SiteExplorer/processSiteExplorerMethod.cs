@@ -39,7 +39,7 @@ namespace Contensive.Addons.Primitives {
                     core.doc.addRefreshQueryString("LinkObjectName", LinkObjectName);
                     core.html.addTitle("Site Explorer");
                     core.doc.setMetaContent(0, 0);
-                    string copy = core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, "Site Explorer"), new CPUtilsBaseClass.addonExecuteContext() {
+                    string copy = core.addon.execute( DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, "Site Explorer"), new CPUtilsBaseClass.addonExecuteContext() {
                         addonType = CPUtilsBaseClass.addonContext.ContextPage,
                         errorContextMessage = "processing site explorer response"
                     });
