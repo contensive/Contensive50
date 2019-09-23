@@ -133,7 +133,7 @@ namespace Contensive.Addons.AdminSite {
                                 // There are no records to request
                                 //
                                 Content = ""
-                                    + "<p>This selection has no records.. Hit Cancel to return to the " + adminData.adminContent.name + " list page.</p>"
+                                    + "<p>This selection has no records. Hit Cancel to return to the " + adminData.adminContent.name + " list page.</p>"
                                     + HtmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                                 ButtonCommaList = ButtonCancel;
                             } else if (Button == ButtonRequestDownload) {
@@ -153,7 +153,7 @@ namespace Contensive.Addons.AdminSite {
                                         addonName = ExportCSVAddon.name,
                                         args = docProperties
                                     };
-                                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false, ExportName);
+                                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false, ExportName, "export_" + adminData.adminContent.name.Replace(" ","_") + ".csv");
                                 }
                                 //
                                 Content = ""

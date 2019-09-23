@@ -1311,15 +1311,15 @@ namespace Contensive.Addons.AdminSite {
                                                             break;
                                                         case (int)FindWordMatchEnum.MatchEquals:
                                                         case (int)FindWordMatchEnum.matchincludes:
-                                                            lookups = field.lookupList.Split(',');
-                                                            LookupQuery = "";
+                                                            lookups = field.lookupList.ToLower().Split(',');
+                                                            LookupQuery = "(1=0)";
                                                             for (LookupPtr = 0; LookupPtr <= lookups.GetUpperBound(0); LookupPtr++) {
-                                                                if (lookups[LookupPtr].Contains(FindWordValue)) {
+                                                                if (lookups[LookupPtr].Contains(FindWordValue.ToLower())) {
                                                                     LookupQuery = LookupQuery + "OR(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(LookupPtr + 1) + ")";
                                                                 }
                                                             }
                                                             if (!string.IsNullOrEmpty(LookupQuery)) {
-                                                                return_SQLWhere += "AND(" + LookupQuery.Substring(2) + ")";
+                                                                return_SQLWhere += "AND(" + LookupQuery + ")";
                                                             }
                                                             break;
                                                     }

@@ -117,10 +117,7 @@ rem
 
 cd ..\source
 "%msbuildLocation%msbuild.exe" contensiveDbModels.sln
-
-pause
-
-
+ 
 if errorlevel 1 (
    echo failure building contensiveDbModels.dll
    pause
