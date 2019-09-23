@@ -1314,7 +1314,7 @@ namespace Contensive.Addons.AdminSite {
                                                             lookups = field.lookupList.Split(',');
                                                             LookupQuery = "";
                                                             for (LookupPtr = 0; LookupPtr <= lookups.GetUpperBound(0); LookupPtr++) {
-                                                                if (!lookups[LookupPtr].Contains(FindWordValue)) {
+                                                                if (lookups[LookupPtr].Contains(FindWordValue)) {
                                                                     LookupQuery = LookupQuery + "OR(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(LookupPtr + 1) + ")";
                                                                 }
                                                             }
