@@ -255,10 +255,15 @@ namespace Contensive.Processor.Controllers {
                                     string result = cp.core.addon.execute(addon, context);
                                     if (!string.IsNullOrEmpty(result)) {
                                         //
+                                        LogController.logTrace(cp.core, "executeRunnerTasks, result not empty, downloadId [" + task.resultDownloadId + "], result first 100 [" + (result.Length > 100 ? result.Substring(0, 100) : result) + "]");
+                                        //
                                         // -- save output
                                         if (task.resultDownloadId > 0) {
                                             var download = DbBaseModel.create<DownloadModel>(cp, task.resultDownloadId);
                                             if (download != null) {
+                                                //
+                                                LogController.logTrace(cp.core, "executeRunnerTasks, download found, [id" + download.id + ", name:" + download.name + ", filename:" + download.filename + "]");
+                                                //
                                                 if (string.IsNullOrEmpty(download.name)) {
                                                     download.name = "Download";
                                                 }

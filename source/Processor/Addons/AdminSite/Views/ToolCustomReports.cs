@@ -265,8 +265,9 @@ namespace Contensive.Addons.AdminSite {
                         addonName = ExportCSVAddon.name,
                         args = docProperties
                     };
-                    string ExportFilename = "CustomReport_" + encodeText(GenericController.dateToSeconds(DateTime.Now)) + ".csv";
-                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false, "Custom Report for " + core.session.user.name , ExportFilename);
+                    string ExportFilename = "CustomReport_" + customReport.id.ToString("00000000") + ".csv";
+                    string reportName = (customReport.name == null) ? "#" + customReport.id : customReport.name;
+                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false, "Custom Report, " + reportName, ExportFilename);
                 }
             }
         }

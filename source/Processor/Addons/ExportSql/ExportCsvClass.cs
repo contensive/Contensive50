@@ -1,4 +1,6 @@
 ﻿
+using Contensive.Processor;
+using Contensive.Processor.Controllers;
 using System;
 using System.Data;
 //
@@ -14,9 +16,17 @@ namespace Contensive.Addons.ExportSql {
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             try {
+                CoreController core = ((CPClass)cp).core;
+                //
+                LogController.logTrace(core, "ExportCsvClass.execute, sql [" + cp.Doc.GetText("sql") + "]");
+                //
                 using ( var db = cp.DbNew(cp.Doc.GetText("datasource"))) {
                     using (DataTable dt = db.ExecuteQuery(cp.Doc.GetText("sql"))) {
-                        return dt.ToCsv();
+                        string result = dt.ToCsv();
+                        //
+                        LogController.logTrace(core, "ExportCsvClass.execute, result [" + (result.Length>100 ? result.Substring(0,100) : result) + "]");
+                        //
+                        return result;
                     }
                 }
             } catch (Exception ex) {

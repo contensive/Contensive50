@@ -124,7 +124,7 @@ namespace Contensive.Addons.AdminSite {
                             Cells[RowPointer, 1] = download.name;
                             Cells[RowPointer, 2] = (requestedBy == null) ? "unknown" : requestedBy.name;
                             Cells[RowPointer, 3] = download.dateRequested.ToString();
-                            if (download.dateCompleted == DateTime.MinValue) {
+                            if ( string.IsNullOrEmpty(download.resultMessage)) {
                                 Cells[RowPointer, 4] = "\r\n<div id=\"pending" + RowPointer + "\">Pending <img src=\"/ccLib/images/ajax-loader-small.gif\" width=16 height=16></div>";
                             } else if (!string.IsNullOrEmpty(download.filename.filename)) {
                                 Cells[RowPointer, 4] = "<div id=\"pending" + RowPointer + "\">" + LinkPrefix + download.filename.filename + LinkSuffix + "</div>";
