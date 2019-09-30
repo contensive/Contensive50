@@ -8,6 +8,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
 using Contensive.Models;
 using Contensive.BaseModels;
+using System.Collections.Generic;
 
 namespace Contensive.Processor {
     public class CPClass : CPBaseClass, IDisposable {
@@ -607,14 +608,8 @@ namespace Contensive.Processor {
                 return _CdnFiles;
             }
         }
-        //
-        //=========================================================================================================
-        //
-        public override BaseModels.AppConfigBaseModel AppConfig {
-            get {
-                return core.appConfig;
-            }
-        }
+        private CPFileSystemClass _CdnFiles;
+        
         //
         //=========================================================================================================
         //
@@ -623,8 +618,29 @@ namespace Contensive.Processor {
                 return core.serverConfig;
             }
         }
-
-        private CPFileSystemClass _CdnFiles;
+        //
+        //=========================================================================================================
+        //
+        public override List<string> GetAppNameList() {
+            var result = new List<string>();
+            foreach ( var app in core.serverConfig.apps) {
+                result.Add(app.Key);
+            }
+            return result;
+        }
+        //
+        //=========================================================================================================
+        //
+        public override AppConfigBaseModel GetAppConfig(string appName) {
+            if (!core.serverConfig.apps.ContainsKey(appName)) return null;
+            return core.serverConfig.apps[appName];
+        }
+        //
+        //=========================================================================================================
+        //
+        public override AppConfigBaseModel GetAppConfig() {
+            return core.appConfig;
+        }
         //
         //=========================================================================================================
         // deprecated

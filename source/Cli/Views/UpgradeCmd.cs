@@ -35,7 +35,7 @@ namespace Contensive.CLI {
             } else {
                 //
                 // -- upgrade all apps
-                foreach (KeyValuePair<String, AppConfigModel> kvp in cp.core.serverConfig.apps) {
+                foreach (var kvp in cp.core.serverConfig.apps) {
                     using (CPClass upgradeApp = new Contensive.Processor.CPClass(kvp.Key)) {
                         NewAppController.upgrade(upgradeApp.core, false, repair);
                         upgradeApp.Cache.InvalidateAll();

@@ -34,7 +34,7 @@ namespace Contensive.CLI {
             } else {
                 //
                 // -- flush all apps
-                foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
+                foreach (var kvp in cpServer.core.serverConfig.apps) {
                     String housekeepAppName = kvp.Key;
                     using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
                         cpApp.Cache.InvalidateAll();

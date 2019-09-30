@@ -251,3 +251,4 @@ rem upgrade nuget for ContensiveMvc
 rem
 
 
+pause

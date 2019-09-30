@@ -56,7 +56,7 @@ namespace Contensive.CLI {
                 var collectionsInstalledList = new List<string>();
                 var nonCritialErrorList = new List<string>();
                 if (string.IsNullOrEmpty(appName)) {
-                    foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
+                    foreach (var kvp in cpServer.core.serverConfig.apps) {
                         using (CPClass cpApp = new CPClass(kvp.Key)) {
                             var context = new Stack<string>();
                             context.Push("command line interface install command [" + collectionName + ", " + collectionGuid + "]");

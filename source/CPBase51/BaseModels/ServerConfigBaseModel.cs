@@ -69,6 +69,11 @@ namespace Contensive.BaseModels {
         // todo figure out how to expose this, add it to configuration setup
         public abstract bool productionEnvironment { get; set; }
         //
+        // -- List of all apps on this server
+        // problem. if abstract (serverconfigbase) has a dictionary (apps) referencing another abstract (appconfigbase), then when you create a concrete subclass
+        // of serverconfig, and the property is marked override, , the subsclass has to have the same 
+        //public abstract Dictionary<string, AppConfigBaseModel> apps { get; set; }
+        //
         public enum DataSourceTypeEnum {
             legacy = 1,
             sqlServer = 2

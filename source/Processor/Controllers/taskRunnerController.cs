@@ -144,7 +144,7 @@ namespace Contensive.Processor.Controllers {
                 Stopwatch swProcess = new Stopwatch();
                 swProcess.Start();
                 //
-                foreach (KeyValuePair<string, Models.Domain.AppConfigModel> appKVP in serverCore.serverConfig.apps) {
+                foreach (var appKVP in serverCore.serverConfig.apps) {
                     if (appKVP.Value.enabled && appKVP.Value.appStatus.Equals(AppConfigModel.AppStatusEnum.ok)) {
                         //
                         // query tasks that need to be run

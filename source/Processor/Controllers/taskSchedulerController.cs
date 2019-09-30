@@ -131,7 +131,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // -- run tasks for each app
-                foreach (KeyValuePair<string, Models.Domain.AppConfigModel> appKvp in coreServer.serverConfig.apps) {
+                foreach (var appKvp in coreServer.serverConfig.apps) {
                     if (appKvp.Value.enabled && appKvp.Value.appStatus.Equals(AppConfigModel.AppStatusEnum.ok)) {
                         LogController.logTrace(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
                         using (CPClass cpApp = new CPClass(appKvp.Value.name)) {

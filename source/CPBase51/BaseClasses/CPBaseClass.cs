@@ -1,6 +1,7 @@
 ﻿
 using Contensive.BaseModels;
 using System;
+using System.Collections.Generic;
 
 namespace Contensive.BaseClasses {
     //
@@ -31,12 +32,26 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Server configuration
+        /// Return the configuration of the app name specified. Use 
         /// </summary>
-        /// <value></value>
+        /// <param name="appName"></param>
         /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract AppConfigBaseModel AppConfig { get; }
+        public abstract AppConfigBaseModel GetAppConfig(string appName);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The current application
+        /// </summary>
+        /// <returns></returns>
+        public abstract AppConfigBaseModel GetAppConfig();
+        //
+        //====================================================================================================
+        /// <summary>
+        /// A list of the names (keys) for all apps on this server groups
+        /// </summary>
+        public abstract List<string> GetAppNameList();
+        //
+        //====================================================================================================
         //
         //====================================================================================================
         /// <summary>
@@ -96,7 +111,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns>Returns a new Db class. If the Datasource cannot be opened an exception is thrown.</returns>
         /// <remarks></remarks>
-        public abstract CPDbBaseClass DbNew( string DataSourceName );
+        public abstract CPDbBaseClass DbNew(string DataSourceName);
         //
         //====================================================================================================
         /// <summary>

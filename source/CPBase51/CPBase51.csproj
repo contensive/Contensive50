@@ -74,7 +74,8 @@
     <Compile Include="BaseClasses\CPVisitorBaseClass.cs" />
     <Compile Include="BaseModels\AppConfigBaseModel.cs" />
     <Compile Include="BaseModels\ServerConfigBaseModel.cs" />
-    <Compile Include="BaseModels\SimplestDataModel.cs" />
+    <Compile Include="BaseModels\CaseInsensitiveDictionaryBaseModel.cs" />
+    <Compile Include="BaseModels\SimplestDataBaseModel.cs" />
     <Compile Include="Exceptions\Exception.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -149,7 +149,7 @@ namespace Contensive.Processor.Models.Domain {
                     } else {
                         //
                         // -- return config object from serverConfig
-                        returnModel = serverConfig.apps[appName.ToLowerInvariant()];
+                        returnModel = (AppConfigModel)serverConfig.apps[appName.ToLowerInvariant()];
                     }
                 }
             } catch (Exception ex) {

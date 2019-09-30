@@ -80,7 +80,7 @@ namespace Contensive.Processor.Models.Domain {
         public override bool productionEnvironment { get; set; }
         //
         // -- List of all apps on this server
-        public CaseInsensitiveDictionary<string, AppConfigModel> apps { get; set; }
+        public Dictionary <string, AppConfigModel> apps { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -106,7 +106,7 @@ namespace Contensive.Processor.Models.Domain {
             awsBucketName = "";
             awsElastiCacheConfigurationEndpoint = "";
             awsCloudWatchLogGroup = "";
-            apps = new CaseInsensitiveDictionary<string, AppConfigModel>();
+            apps = new Dictionary<string, AppConfigModel>(StringComparer.OrdinalIgnoreCase);
         }
         //
         //====================================================================================================
@@ -151,16 +151,16 @@ namespace Contensive.Processor.Models.Domain {
             }
             return 0;
         }
-        //
-        /// <summary>
-        /// case insensative dictionary. Use for application lookup
-        /// </summary>
-        /// <typeparam name="V"></typeparam>
-        [Serializable]
-        public class CaseInsensitiveDictionary<S, V> : Dictionary<string, V> {
-            public CaseInsensitiveDictionary() : base(StringComparer.OrdinalIgnoreCase) {
-            }
-        }
+        ////
+        ///// <summary>
+        ///// case insensative dictionary. Use for application lookup
+        ///// </summary>
+        ///// <typeparam name="V"></typeparam>
+        //[Serializable]
+        //public class CaseInsensitiveDictionary<S, V> : Dictionary<string, V> {
+        //    public CaseInsensitiveDictionary() : base(StringComparer.OrdinalIgnoreCase) {
+        //    }
+        //}
     }
 }
 

@@ -57,8 +57,8 @@ namespace Contensive.CLI {
                 //Console.WriteLine("Logging:");
                 //Console.WriteLine("    enableLogging: " + cpServer.core.serverConfig.enableLogging.ToString());
                 Console.WriteLine("Applications: " + cpServer.core.serverConfig.apps.Count);
-                foreach (KeyValuePair<string, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
-                    AppConfigModel app = kvp.Value;
+                foreach (var kvp in cpServer.core.serverConfig.apps) {
+                    AppConfigModel app = (AppConfigModel)kvp.Value;
                     Console.WriteLine("    name: " + app.name);
                     Console.WriteLine("        enabled: " + app.enabled);
                     Console.WriteLine("        delete protection: " + app.deleteProtection);

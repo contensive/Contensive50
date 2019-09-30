@@ -37,7 +37,7 @@ namespace Contensive.CLI {
                 var collectionsInstalledList = new List<string>();
                 var nonCritialErrorList = new List<string>();
                 if (string.IsNullOrEmpty(appName)) {
-                    foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
+                    foreach (var kvp in cpServer.core.serverConfig.apps) {
                         installCollectionFile(kvp.Key, collectionPhysicalPathFilename);
                     }
                 } else {

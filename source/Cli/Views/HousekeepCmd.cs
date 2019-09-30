@@ -36,7 +36,7 @@ namespace Contensive.CLI {
             } else {
                 //
                 // -- housekeep all apps
-                foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
+                foreach (var kvp in cpServer.core.serverConfig.apps) {
                     String housekeepAppName = kvp.Key;
                     using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
                         cpApp.Doc.SetProperty("force", "1");
