@@ -21,7 +21,7 @@ namespace Contensive.Processor.Controllers {
     /// code to built and upgrade apps
     /// not IDisposable - not contained classes that need to be disposed
     /// </summary>
-    public class NewAppController {
+    public class BuildController {
         //
         //====================================================================================================
         /// <summary>
@@ -136,7 +136,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- data updates
                         LogController.logInfo(core, logPrefix + ", run database conversions, DataBuildVersion [" + DataBuildVersion + "], software version [" + core.codeVersion() + "]");
-                        Upgrade_Conversion(core, DataBuildVersion, logPrefix);
+                        BuildDataMigrationController.migrateData(core, DataBuildVersion, logPrefix);
                     }
                     LogController.logInfo(core, logPrefix + ", verify records required");
                     //
@@ -198,6 +198,7 @@ namespace Contensive.Processor.Controllers {
                     core.siteProperties.getText("TextSearchStartTag", "<!-- TextSearchStart -->");
                     core.siteProperties.getText("TrapEmail", "");
                     core.siteProperties.getText("TrapErrors", "0");
+                    core.siteProperties.getBoolean("AllowLinkAlias", true);
                     AddonModel defaultRouteAddon = DbBaseModel.create<AddonModel>(core.cpParent, core.siteProperties.defaultRouteId);
                     if (defaultRouteAddon == null) {
                         defaultRouteAddon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidPageManager);
@@ -230,27 +231,6 @@ namespace Contensive.Processor.Controllers {
                     core.cache.invalidateAll();
                     LogController.logInfo(core, logPrefix + ", Upgrade Complete");
                 }
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// when breaking changes are required for data, update them here
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="DataBuildVersion"></param>
-        private static void Upgrade_Conversion(CoreController core, string DataBuildVersion, string logPrefix) {
-            try {
-                //
-                // -- Roll the style sheet cache if it is setup
-                core.siteProperties.setProperty("StylesheetSerialNumber", (-1).ToString());
-                //
-                // -- Reload
-                core.cache.invalidateAll();
-                core.clearMetaData();
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -339,6 +319,10 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 LogController.logInfo(core, logPrefix + ", verifySqlFieldCompatibility, conversion required, table [" + table.name + "], field [" + column.COLUMN_NAME + "], reason [datetime precision too low (" + column.DATETIME_PRECISION.ToString() + ")]");
                                 //
+                                // these can be very long queries for big tables 
+                                int sqlTimeout = core.cpParent.Db.SQLTimeout;
+                                core.cpParent.Db.SQLTimeout = 1800;
+                                //
                                 // drop any indexes that use this field
                                 hint = "5";
                                 bool indexDropped = false;
@@ -373,6 +357,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                 }
+                                core.cpParent.Db.SQLTimeout = sqlTimeout;
                             }
                         }
                     }

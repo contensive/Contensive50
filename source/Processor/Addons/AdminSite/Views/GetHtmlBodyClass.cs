@@ -2059,7 +2059,7 @@ namespace Contensive.Addons.AdminSite {
                             // Site Properties
                             SaveEditRecord(cp, adminData);
                             if (editRecord.nameLc.ToLowerInvariant() == "allowlinkalias") {
-                                if (cp.core.siteProperties.getBoolean("AllowLinkAlias")) {
+                                if (cp.core.siteProperties.getBoolean("AllowLinkAlias",true)) {
                                     TurnOnLinkAlias(cp, UseContentWatchLink);
                                 }
                             }
@@ -2698,14 +2698,14 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // Add the link alias
                                 //
-                                LinkAliasController.addLinkAlias(cp.core, linkAlias, csData.getInteger("ID"), "", false, true);
+                                LinkAliasController.addLinkAlias(cp.core, linkAlias, csData.getInteger("ID"), "", true, true);
                             } else {
                                 //
                                 // Add the name
                                 //
                                 linkAlias = csData.getText("name");
                                 if (!string.IsNullOrEmpty(linkAlias)) {
-                                    LinkAliasController.addLinkAlias(cp.core, linkAlias, csData.getInteger("ID"), "", false, false);
+                                    LinkAliasController.addLinkAlias(cp.core, linkAlias, csData.getInteger("ID"), "", true, false);
                                 }
                             }
                             //

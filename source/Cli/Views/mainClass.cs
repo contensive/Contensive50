@@ -186,7 +186,7 @@ namespace Contensive.CLI {
                                 return;
                             case "--verifybasicwebsite":
                                 using (var cp = new CPClass(appName)) {
-                                    NewAppController.verifyBasicWebSiteData(cp.core);
+                                    BuildController.verifyBasicWebSiteData(cp.core);
                                     Console.WriteLine("verified basic website data.");
                                 }
                                 return;

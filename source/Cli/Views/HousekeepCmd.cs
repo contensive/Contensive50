@@ -29,7 +29,7 @@ namespace Contensive.CLI {
                 //
                 // -- housekeep app
                 using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(appName)) {
-                    cpApp.Doc.SetProperty("force", "1");
+                    cpApp.Doc.SetProperty("force", true);
                     cpApp.executeAddon(Contensive.Processor.Constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
                     cpApp.Cache.InvalidateAll();
                 }
@@ -39,7 +39,7 @@ namespace Contensive.CLI {
                 foreach (var kvp in cpServer.core.serverConfig.apps) {
                     String housekeepAppName = kvp.Key;
                     using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
-                        cpApp.Doc.SetProperty("force", "1");
+                        cpApp.Doc.SetProperty("force", true);
                         cpApp.executeAddon(Contensive.Processor.Constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
                         cpApp.Cache.InvalidateAll();
                     }

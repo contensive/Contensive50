@@ -110,6 +110,8 @@ namespace Contensive.Processor {
         internal const string baseCollectionGuid = "{7C6601A7-9D52-40A3-9570-774D0D43D758}"; // part of software dist - base cdef plus addons with classes in in core library, plus depenancy on coreCollection
         internal const string ApplicationCollectionGuid = "{C58A76E2-248B-4DE8-BF9C-849A960F79C6}"; // exported from application during upgrade
         internal const string AdminNavigatorGuid = "{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}";
+        internal const string fontAwesomeCollectionGuid = "{3db6a433-59ca-43d1-9fb6-a539b6b947f2}";
+        internal const string redactorCollectionGuid = "{E87AFAFF-2503-44DE-A343-EFF8C64B652D}";
         //
         // -- navigator entries
         internal const string addonGuidManageAddon = "{DBA354AB-5D3E-4882-8718-CF23CAAB7927}";
@@ -211,7 +213,6 @@ namespace Contensive.Processor {
             + "</ul>"
             + "";
         internal const string defaultTemplateName = "Default";
-        internal const string defaultTemplateHomeFilename = "ContensiveBase\\TemplateHomeDefault.html";
         //
         internal const int ignoreInteger = 0;
         internal const string ignoreString = "";

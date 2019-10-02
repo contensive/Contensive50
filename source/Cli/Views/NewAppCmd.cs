@@ -220,7 +220,7 @@ namespace Contensive.CLI {
                     Processor.Controllers.WebServerController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
                     //
                     Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Run db upgrade.");
-                    Processor.Controllers.NewAppController.upgrade(cp.core, true, true);
+                    Processor.Controllers.BuildController.upgrade(cp.core, true, true);
                     //
                     // -- set the application back to normal mode
                     cp.core.serverConfig.save(cp.core);

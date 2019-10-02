@@ -212,7 +212,7 @@ namespace Contensive.Processor.Controllers {
                                             bool CollectionUpdatable_fileValueOK = false;
                                             //												Dim CollectionblockNavigatorNode_fileValueOK As Boolean
                                             bool CollectionSystem = GenericController.encodeBoolean(XmlController.GetXMLAttribute(core, CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
-                                            int Parent_NavID = NewAppController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
+                                            int Parent_NavID = BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
                                                 Guid = addonGuidManageAddon,
                                                 name = "Manage Add-ons",
                                                 AdminOnly = false,
@@ -936,7 +936,7 @@ namespace Contensive.Processor.Controllers {
                                                     var defaultMiniCollection = new MetadataMiniCollectionModel();
                                                     MetadataMiniCollectionModel Collection = MetadataMiniCollectionModel.loadXML(core, collectionFileContent, isBaseCollection, false, IsNewBuild, defaultMiniCollection, "");
                                                     foreach (var kvp in Collection.menus) {
-                                                        NewAppController.verifyNavigatorEntry(core, kvp.Value, 0);
+                                                        BuildController.verifyNavigatorEntry(core, kvp.Value, 0);
                                                     }
                                                     //
                                                     // --- end of pass
@@ -1404,7 +1404,7 @@ namespace Contensive.Processor.Controllers {
                                                         NavIconTypeString = "Addon";
                                                     }
                                                     //Dim builder As New coreBuilderClass(core)
-                                                    NewAppController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
+                                                    BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
                                                         menuNameSpace = menuNameSpace,
                                                         name = addonName,
                                                         AdminOnly = false,
