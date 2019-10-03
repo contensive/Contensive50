@@ -1509,7 +1509,7 @@ namespace Contensive.Processor.Controllers {
                                                         }
                                                     }
                                                     cs.set("IconFilename", FieldValue);
-                                                    if (true) {
+                                                    {
                                                         cs.set("IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "width", "0")));
                                                         cs.set("IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "height", "0")));
                                                         cs.set("IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "sprites", "0")));
@@ -1531,7 +1531,7 @@ namespace Contensive.Processor.Controllers {
                                                 //   this replaces the settings add-on type, and soo to be report add-on types as well.
                                                 //   this removes the ccsettingpages and settingcollectionrules, etc.
                                                 //
-                                                if (true) {
+                                                {
                                                     cs.set("formxml", PageInterfaceWithinLoop.InnerXml);
                                                 }
                                                 break;
@@ -1741,7 +1741,7 @@ namespace Contensive.Processor.Controllers {
                                             // include add-ons - NOTE - import collections must be run before interfaces
                                             // when importing a collectin that will be used for an include
                                             //
-                                            if (true) {
+                                            {
                                                 string IncludeAddonName = XmlController.GetXMLAttribute(core, IsFound, PageInterface, "name", "");
                                                 string IncludeAddonGuid = XmlController.GetXMLAttribute(core, IsFound, PageInterface, "guid", IncludeAddonName);
                                                 int IncludeAddonID = 0;

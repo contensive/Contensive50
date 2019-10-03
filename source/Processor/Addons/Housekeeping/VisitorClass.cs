@@ -13,7 +13,7 @@ namespace Contensive.Addons.Housekeeping {
                 // delete nocookie visits
                 // This must happen after the housekeep summarizing, and no sooner then 48 hours ago so all hits have been summarized before deleting
                 //
-                if (env.ArchiveDeleteNoCookie) {
+                if (env.archiveDeleteNoCookie) {
                     //
                     // delete visitors from the non-cookie visits
                     //
@@ -21,7 +21,7 @@ namespace Contensive.Addons.Housekeeping {
                     string sql = "delete from ccvisitors"
                         + " from ccvisitors r,ccvisits v"
                         + " where r.id=v.visitorid"
-                        + " and(v.CookieSupport=0)and(v.LastVisitTime<" + env.SQLDateMidnightTwoDaysAgo + ")";
+                        + " and(v.CookieSupport=0)and(v.LastVisitTime<" + env.sqlDateMidnightTwoDaysAgo + ")";
                     try {
                         core.db.executeQuery(sql);
                     } catch (Exception) {

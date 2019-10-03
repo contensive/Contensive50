@@ -1863,7 +1863,7 @@ namespace Contensive.Processor.Controllers {
             PageFormModel result = new PageFormModel();
             try {
                 //
-                if (true) {
+                {
                     int PtrFront = GenericController.vbInstr(1, Formhtml, "{{REPEATSTART", 1);
                     if (PtrFront > 0) {
                         int PtrBack = GenericController.vbInstr(PtrFront, Formhtml, "}}");

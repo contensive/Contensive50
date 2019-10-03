@@ -1906,7 +1906,7 @@ namespace Contensive.Processor.Controllers {
                         AddonOptionConstructor = GenericController.vbReplace(AddonOptionConstructor, Environment.NewLine, "\r");
                         AddonOptionConstructor = GenericController.vbReplace(AddonOptionConstructor, "\n", "\r");
                         AddonOptionConstructor = GenericController.vbReplace(AddonOptionConstructor, "\r", Environment.NewLine);
-                        if (true) {
+                        {
                             if (!string.IsNullOrEmpty(AddonOptionConstructor)) {
                                 AddonOptionConstructor = AddonOptionConstructor + Environment.NewLine;
                             }
@@ -2636,7 +2636,7 @@ namespace Contensive.Processor.Controllers {
                         string TagID = null;
                         string OptionsPanel = "";
                         //
-                        if (true) {
+                        {
                             string EditTagID = "AllowEditing";
                             string QuickEditTagID = "AllowQuickEditor";
                             string AdvancedEditTagID = "AllowAdvancedEditor";
@@ -3159,7 +3159,7 @@ namespace Contensive.Processor.Controllers {
                         //returnCopy = contentCmdController.executeContentCommands(core, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, ref Return_ErrorMessage);
                         returnCopy = ActiveContentController.renderHtmlForWeb(core, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
                         //
-                        if (true) {
+                        {
                             if (core.session.isEditing()) {
                                 returnCopy = csData.getRecordEditLink(false) + returnCopy;
                                 if (AllowEditWrapper) {

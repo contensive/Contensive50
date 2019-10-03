@@ -505,7 +505,7 @@ namespace Contensive.Processor.Controllers {
                     Id = csData.getInteger("ID");
                     csData.set("name", PageName);
                     csData.set("active", "1");
-                    if (true) {
+                    {
                         csData.set("ccGuid", pageGuid);
                     }
                     csData.save();

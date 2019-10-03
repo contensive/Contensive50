@@ -293,7 +293,7 @@ namespace Contensive.Processor.Controllers {
                                     sb.Append(" ManyToManyRulePrimaryField=\"" + xmlValueText(fieldMeta[f_ManyToManyRulePrimaryField, CFieldPtr]) + "\"");
                                     sb.Append(" ManyToManyRuleSecondaryField=\"" + xmlValueText(fieldMeta[f_ManyToManyRuleSecondaryField, CFieldPtr]) + "\"");
                                     sb.Append(" IsModified=\"" + (encodeInteger(fieldMeta[f_ModifiedBy, CFieldPtr]) != 0) + "\"");
-                                    if (true) {
+                                    {
                                         sb.Append(" IsBaseField=\"" + xmlValueBoolean(fieldMeta[f_IsBaseField, CFieldPtr]) + "\"");
                                     }
                                     //

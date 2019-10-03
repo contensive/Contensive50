@@ -22,7 +22,7 @@ namespace Contensive.Addons.Housekeeping {
                     //
                     bool NeedToClearCache = false;
                     LogController.logInfo(core, "Archive update for pages on [" + core.appConfig.name + "]");
-                    SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + env.SQLNow + "))and(active<>0)";
+                    SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + env.sQLNow + "))and(active<>0)";
                     using (var csData = new CsModel(core)) {
                         csData.openSql(SQL, "Default");
                         while (csData.ok()) {
@@ -55,14 +55,14 @@ namespace Contensive.Addons.Housekeeping {
                 {
                     DateTime datePtr = default(DateTime);
                     using (var csData = new CsModel(core)) {
-                        if (!csData.openSql(core.db.getSQLSelect("ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + env.OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
-                            datePtr = env.OldestVisitSummaryWeCareAbout;
+                        if (!csData.openSql(core.db.getSQLSelect("ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + env.oldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
+                            datePtr = env.oldestVisitSummaryWeCareAbout;
                         } else {
                             datePtr = DateTime.MinValue.AddDays(csData.getInteger("DateNumber"));
                         }
                     }
-                    if (datePtr < env.OldestVisitSummaryWeCareAbout) { datePtr = env.OldestVisitSummaryWeCareAbout; }
-                    pageViewSummary(core, datePtr, env.Yesterday, 24, core.siteProperties.dataBuildVersion, env.OldestVisitSummaryWeCareAbout);
+                    if (datePtr < env.oldestVisitSummaryWeCareAbout) { datePtr = env.oldestVisitSummaryWeCareAbout; }
+                    pageViewSummary(core, datePtr, env.yesterday, 24, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -97,7 +97,6 @@ namespace Contensive.Addons.Housekeeping {
                     }
                     DateTime PeriodDatePtr = default(DateTime);
                     PeriodDatePtr = PeriodStart.Date;
-                    double PeriodStep = (double)HourDuration / 24.0F;
                     while (PeriodDatePtr < EndTimeDate) {
                         hint = 2;
                         //
@@ -151,7 +150,7 @@ namespace Contensive.Addons.Housekeeping {
                                     csPages.set("PageTitle", PageTitle);
                                     csPages.set("AuthenticatedPageViews", AuthenticatedPageViews);
                                     csPages.set("NoCookiePageViews", NoCookiePageViews);
-                                    if (true) {
+                                    {
                                         csPages.set("MobilePageViews", MobilePageViews);
                                         csPages.set("BotPageViews", BotPageViews);
                                     }
@@ -271,7 +270,7 @@ namespace Contensive.Addons.Housekeeping {
                                             csPVS.set("AuthenticatedPageViews", AuthenticatedPageViews);
                                             csPVS.set("NoCookiePageViews", NoCookiePageViews);
                                             hint = 12;
-                                            if (true) {
+                                            {
                                                 csPVS.set("MobilePageViews", MobilePageViews);
                                                 csPVS.set("BotPageViews", BotPageViews);
                                             }

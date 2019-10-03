@@ -12,8 +12,8 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 // delete email log entries not realted to a drop, older than archive.
                 //
-                LogController.logInfo(core, "Deleting non-drop email logs older then " + env.EmailDropArchiveAgeDays + " days");
-                DateTime ArchiveEmailDropDate = env.rightNow.AddDays(-env.EmailDropArchiveAgeDays).Date;
+                LogController.logInfo(core, "Deleting non-drop email logs older then " + env.emailDropArchiveAgeDays + " days");
+                DateTime ArchiveEmailDropDate = env.rightNow.AddDays(-env.emailDropArchiveAgeDays).Date;
                 MetadataController.deleteContentRecords(core, "Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + "))");
 
             } catch (Exception ex) {

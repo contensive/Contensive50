@@ -23,14 +23,14 @@ namespace Contensive.Addons.Housekeeping {
                     + " and(m.createdbyvisit=1)"
                     + " and(m.Username is null)"
                     + " and(m.email is null)"
-                    + " and(v.CookieSupport=0)and(v.LastVisitTime<" + env.SQLDateMidnightTwoDaysAgo + ")";
+                    + " and(v.CookieSupport=0)and(v.LastVisitTime<" + env.sqlDateMidnightTwoDaysAgo + ")";
                 try {
                     core.db.executeQuery(sql);
                 } catch (Exception) {
                 }
                 //
                 // -- Remove old guest records
-                DateTime ArchiveDate = env.rightNow.AddDays(-env.GuestArchiveAgeDays).Date;
+                DateTime ArchiveDate = env.rightNow.AddDays(-env.guestArchiveAgeDays).Date;
                 string SQLTablePeople = MetadataController.getContentTablename(core, "People");
                 string DeleteBeforeDateSQL = DbController.encodeSQLDate(ArchiveDate);
                 //

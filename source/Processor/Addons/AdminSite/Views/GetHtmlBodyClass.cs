@@ -2019,7 +2019,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 string EditorStyleRulesFilename = null;
                 //
-                if (true) {
+                {
                     //
                     //
                     //

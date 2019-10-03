@@ -44,7 +44,7 @@ namespace Contensive.Addons.Housekeeping {
                 HourlyTasksClass.housekeep(core, env);
                 //
                 // -- daily tasks
-                if (env.force || env.RunDailyTasks) {
+                if (env.force || env.runDailyTasks) {
                     DailyTasksClass.housekeep(core, env);
                 }
                 core.db.sqlCommandTimeout = TimeoutSave;

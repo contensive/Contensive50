@@ -7,6 +7,7 @@ using System.Xml;
 using System.Collections.Generic;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using Contensive.Exceptions;
+using System.Globalization;
 
 namespace Contensive.Addons.Housekeeping {
     //
@@ -39,7 +40,7 @@ namespace Contensive.Addons.Housekeeping {
                         //
                         LogController.logInfo(core, "Collection.xml root name ok");
                         //
-                        if (true) {
+                        {
                             //If genericController.vbLCase(.name) <> "collectionlist" Then
                             //    Call AppendClassLog(core,"Server", "", "RegisterAddonFolder, basename was not collectionlist, [" & .name & "].")
                             //Else
@@ -52,29 +53,29 @@ namespace Contensive.Addons.Housekeeping {
                                 string LocalGuid = "";
                                 string LocalName = "no name found";
                                 DateTime LastChangeDate = default(DateTime);
-                                switch (GenericController.vbLCase(LocalListNode.Name)) {
-                                    case "collection":
-                                        LocalGuid = "";
-                                        foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
-                                            switch (GenericController.vbLCase(CollectionNode.Name)) {
-                                                case "name":
-                                                    //
-                                                    LocalName = GenericController.vbLCase(CollectionNode.InnerText);
-                                                    break;
-                                                case "guid":
-                                                    //
-                                                    LocalGuid = GenericController.vbLCase(CollectionNode.InnerText);
-                                                    break;
-                                                case "path":
-                                                    //
-                                                    CollectionPath = GenericController.vbLCase(CollectionNode.InnerText);
-                                                    break;
-                                                case "lastchangedate":
-                                                    LastChangeDate = GenericController.encodeDate(CollectionNode.InnerText);
-                                                    break;
-                                            }
+                                if (LocalListNode.Name.ToLower().Equals("collection")) {
+                                    LocalGuid = "";
+                                    foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
+                                        switch (CollectionNode.Name.ToLower()) {
+                                            case "name":
+                                                //
+                                                LocalName = CollectionNode.InnerText.ToLower();
+                                                break;
+                                            case "guid":
+                                                //
+                                                LocalGuid = CollectionNode.InnerText.ToLower();
+                                                break;
+                                            case "path":
+                                                //
+                                                CollectionPath = CollectionNode.InnerText.ToLower();
+                                                break;
+                                            case "lastchangedate":
+                                                LastChangeDate = GenericController.encodeDate(CollectionNode.InnerText);
+                                                break;
+                                            default:
+                                                break;
                                         }
-                                        break;
+                                    }
                                 }
                                 //
                                 LogController.logInfo(core, "Node[" + NodeCnt + "], LocalName=[" + LocalName + "], LastChangeDate=[" + LastChangeDate + "], CollectionPath=[" + CollectionPath + "], LocalGuid=[" + LocalGuid + "]");

@@ -593,7 +593,7 @@ namespace Contensive.Processor.Models.Domain {
                                     break;
                                 case "getcollection":
                                 case "importcollection":
-                                    //if (true) {
+                                    //{
                                     //    //If Not UpgradeDbOnly Then
                                     //    //
                                     //    // Import collections are blocked from the BuildDatabase upgrade b/c the resulting Db must be portable
@@ -695,7 +695,7 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.logInfo(core, "metadata Load, stage 2: create SQL tables in default datasource");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                if (true) {
+                {
                     string UsedTables = "";
                     foreach (var keypairvalue in Collection.metaData) {
                         ContentMetadataModel contentMetaData = keypairvalue.Value;

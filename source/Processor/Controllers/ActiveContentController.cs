@@ -808,8 +808,8 @@ namespace Contensive.Processor.Controllers {
                                                 int RecordID = 0;
                                                 string ImageStyle = null;
                                                 if (ACIdentifier == "AC") {
-                                                    if (true) {
-                                                        if (true) {
+                                                    {
+                                                        {
                                                             //
                                                             // ----- Process AC Tag
                                                             //

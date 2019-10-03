@@ -99,7 +99,7 @@ namespace Contensive.Addons.Tools {
                                                 //
                                                 // not inherited, save the field values and mark for a reload
                                                 //
-                                                if (true) {
+                                                {
                                                     if (formFieldName.IndexOf(" ") != -1) {
                                                         //
                                                         // remoave spaces from new name

@@ -25,7 +25,6 @@ namespace Contensive.Addons.Housekeeping {
                 AddonContentFieldTypeRuleClass.housekeep(core, env);
                 AddonContentTriggerRuleClass.housekeep(core, env);
                 ContentWatchClass.housekeep(core, env);
-                EmailClass.housekeep(core, env);
                 EmailDropClass.housekeep(core, env);
                 EmailLogClass.housekeep(core, env);
                 FieldHelpClass.housekeep(core, env);

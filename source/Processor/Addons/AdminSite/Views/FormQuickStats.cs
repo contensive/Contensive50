@@ -100,7 +100,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- Visits currently online
                 //
-                if (true) {
+                {
                     Panel = "";
                     Stream.Add("<h2>Current Visits</h2>");
                     using (var csData = new CsModel(core)) {

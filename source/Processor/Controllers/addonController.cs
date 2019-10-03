@@ -635,26 +635,11 @@ namespace Contensive.Processor.Controllers {
                                     if (IncludeEditWrapper) {
                                         //
                                         // Edit Icon
-                                        var editSegmentList = new List<string>();
-                                        editSegmentList.Add(AdminUIController.getAddonEditSegment(core, addon.id, addon.name));
+                                        var editSegmentList = new List<string> {
+                                            AdminUIController.getAddonEditSegment(core, addon.id, addon.name)
+                                        };
                                         result = AdminUIController.getAddonEditLink(core, editSegmentList) + result;
                                         result = AdminUIController.getEditWrapper(core, result);
-                                        //string EditWrapperHTMLID = "eWrapper" + core.doc.addonInstanceCnt;
-                                        //string DialogList = "";
-                                        //string HelpIcon = getHelpBubble(addon.id, addon.help, addon.collectionID, ref DialogList);
-                                        //if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
-                                        //    string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
-                                        //    string AddonEditIcon = getIconSprite("", 0, "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
-                                        //    AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + Models.Domain.ContentMetadataModel.getContentId(core, AddonModel.contentName) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
-                                        //    string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
-                                        //    string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
-                                        //    string SiteStylesEditIcon = ""; // ?????
-                                        //    string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, ref DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
-                                        //    ToolBar = GenericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, 1);
-                                        //    result = AdminUIController.getEditWrapper(core, "<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
-                                        //} else if (core.visitProperty.getBoolean("AllowEditing")) {
-                                        //    result = AdminUIController.getEditWrapper(core, "<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
-                                        //}
                                     }
                                 }
                                 //
@@ -1578,7 +1563,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="addonFound">If found, the search for the assembly can be abandoned</param>
         /// <returns></returns>
         private string execute_dotNetClass_assembly(AddonModel addon, string assemblyPhysicalPrivatePathname, ref bool addonFound) {
-            string result = "";
             try {
                 //
                 LogController.logTrace(core, "execute_dotNetClass_assembly, enter, [" + assemblyPhysicalPrivatePathname + "]");
@@ -1600,7 +1584,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- file is not an assembly, return addonFound false
                     //
-                    LogController.logTrace(core, "execute_dotNetClass_assembly, 2, [" + assemblyPhysicalPrivatePathname + "]");
+                    LogController.logError(core, ex, "execute_dotNetClass_assembly, 2, [" + assemblyPhysicalPrivatePathname + "]");
                     addonFound = false;
                     return string.Empty;
                 }

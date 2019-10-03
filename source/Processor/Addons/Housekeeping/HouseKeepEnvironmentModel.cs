@@ -27,70 +27,69 @@ namespace Contensive.Addons.Housekeeping {
     /// housekeep environment, to facilitate argument passing
     /// </summary>
     public class HouseKeepEnvironmentModel {
-        public bool force;
-        public bool RunDailyTasks;
-        public DateTime rightNow;
-        public DateTime LastCheckDateTime;
-        public int ServerHousekeepHour;
-        public DateTime Yesterday;
-        public DateTime ALittleWhileAgo;
-        public string SQLNow;
-        public DateTime OldestVisitSummaryWeCareAbout;
-        public int VisitArchiveAgeDays;
-        public DateTime VisitArchiveDate;
-        public string defaultMemberName;
-        public int GuestArchiveAgeDays;
-        public int EmailDropArchiveAgeDays;
-        public string DefaultMemberName;
-        public bool ArchiveDeleteNoCookie;
-        public string SQLDateMidnightTwoDaysAgo;
-        public DateTime MidnightTwoDaysAgo;
-        public DateTime thirtyDaysAgo;
-        public bool archiveAlarm;
+        public bool force { get; set; }
+        public bool runDailyTasks { get; set; }
+        public DateTime rightNow { get; set; }
+        public DateTime lastCheckDateTime { get; set; }
+        public int serverHousekeepHour { get; set; }
+        public DateTime yesterday { get; set; }
+        public DateTime aLittleWhileAgo { get; set; }
+        public string sQLNow { get; set; }
+        public DateTime oldestVisitSummaryWeCareAbout { get; set; }
+        public int visitArchiveAgeDays { get; set; }
+        public DateTime visitArchiveDate { get; set; }
+        public string defaultMemberName { get; set; }
+        public int guestArchiveAgeDays { get; set; }
+        public int emailDropArchiveAgeDays { get; set; }
+        public bool archiveDeleteNoCookie { get; set; }
+        public string sqlDateMidnightTwoDaysAgo { get; set; }
+        public DateTime midnightTwoDaysAgo { get; set; }
+        public DateTime thirtyDaysAgo { get; set; }
+        public bool archiveAlarm { get; set; }
         //
         public HouseKeepEnvironmentModel(CoreController core) {
             try {
                 archiveAlarm = false;
                 rightNow = DateTime.Now;
-                LastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default(DateTime));
+                lastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default(DateTime));
                 core.siteProperties.setProperty("housekeep, last check", rightNow);
                 force = core.docProperties.getBoolean("force");
-                ServerHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2); ;
-                RunDailyTasks = ((rightNow.Date > LastCheckDateTime.Date) && (ServerHousekeepHour < rightNow.Hour));
-                Yesterday = rightNow.AddDays(-1).Date;
-                ALittleWhileAgo = rightNow.AddDays(-90).Date;
-                SQLNow = DbController.encodeSQLDate(rightNow);
-                DefaultMemberName = ContentFieldMetadataModel.getDefaultValue(core, "people", "name");
-                ArchiveDeleteNoCookie = core.siteProperties.getBoolean("ArchiveDeleteNoCookie", true);
-                SQLDateMidnightTwoDaysAgo = DbController.encodeSQLDate(MidnightTwoDaysAgo);
-                Yesterday = rightNow.AddDays(-1).Date;
-                MidnightTwoDaysAgo = rightNow.AddDays(-2).Date;
+                serverHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2); ;
+                runDailyTasks = ((rightNow.Date > lastCheckDateTime.Date) && (serverHousekeepHour < rightNow.Hour));
+                yesterday = rightNow.AddDays(-1).Date;
+                aLittleWhileAgo = rightNow.AddDays(-90).Date;
+                sQLNow = DbController.encodeSQLDate(rightNow);
+                defaultMemberName = ContentFieldMetadataModel.getDefaultValue(core, "people", "name");
+                archiveDeleteNoCookie = core.siteProperties.getBoolean("ArchiveDeleteNoCookie", true);
+                sqlDateMidnightTwoDaysAgo = DbController.encodeSQLDate(midnightTwoDaysAgo);
+                yesterday = rightNow.AddDays(-1).Date;
+                midnightTwoDaysAgo = rightNow.AddDays(-2).Date;
                 thirtyDaysAgo = rightNow.AddDays(-30).Date;
                 //
                 // -- Get ArchiveAgeDays - use this as the oldest data they care about
-                VisitArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveRecordAgeDays", "365"));
-                if (VisitArchiveAgeDays < 2) {
-                    VisitArchiveAgeDays = 2;
+                visitArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveRecordAgeDays", "365"));
+                if (visitArchiveAgeDays < 2) {
+                    visitArchiveAgeDays = 2;
                     core.siteProperties.setProperty("ArchiveRecordAgeDays", "2");
                 }
-                VisitArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date;
-                OldestVisitSummaryWeCareAbout = DateTime.Now.Date.AddDays(-120);
-                if (OldestVisitSummaryWeCareAbout < VisitArchiveDate) {
-                    OldestVisitSummaryWeCareAbout = VisitArchiveDate;
+                visitArchiveDate = rightNow.AddDays(-visitArchiveAgeDays).Date;
+                oldestVisitSummaryWeCareAbout = DateTime.Now.Date.AddDays(-120);
+                if (oldestVisitSummaryWeCareAbout < visitArchiveDate) {
+                    oldestVisitSummaryWeCareAbout = visitArchiveDate;
                 }
                 //
                 // -- Get GuestArchiveAgeDays
-                GuestArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchivePeopleAgeDays", "2"));
-                if (GuestArchiveAgeDays < 2) {
-                    GuestArchiveAgeDays = 2;
-                    core.siteProperties.setProperty("ArchivePeopleAgeDays", GuestArchiveAgeDays.ToString());
+                guestArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchivePeopleAgeDays", "2"));
+                if (guestArchiveAgeDays < 2) {
+                    guestArchiveAgeDays = 2;
+                    core.siteProperties.setProperty("ArchivePeopleAgeDays", guestArchiveAgeDays.ToString());
                 }
                 //
                 // -- Get EmailDropArchiveAgeDays
-                EmailDropArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveEmailDropAgeDays", "90"));
-                if (EmailDropArchiveAgeDays < 2) {
-                    EmailDropArchiveAgeDays = 2;
-                    core.siteProperties.setProperty("ArchiveEmailDropAgeDays", EmailDropArchiveAgeDays.ToString());
+                emailDropArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveEmailDropAgeDays", "90"));
+                if (emailDropArchiveAgeDays < 2) {
+                    emailDropArchiveAgeDays = 2;
+                    core.siteProperties.setProperty("ArchiveEmailDropAgeDays", emailDropArchiveAgeDays.ToString());
                 }
                 defaultMemberName = ContentFieldMetadataModel.getDefaultValue(core, "people", "name");
                 //
@@ -106,7 +105,7 @@ namespace Contensive.Addons.Housekeeping {
                     core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
                 }
                 double minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes;
-                double LastCheckMinutesFromMidnight = LastCheckDateTime.TimeOfDay.TotalMinutes;
+                double LastCheckMinutesFromMidnight = lastCheckDateTime.TimeOfDay.TotalMinutes;
                 if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
                     //
                     // Same Day - Midnight is before last and after current

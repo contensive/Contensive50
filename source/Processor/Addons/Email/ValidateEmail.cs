@@ -21,7 +21,7 @@ namespace Contensive.Addons.Primitives {
                 CoreController core = ((CPClass)cp).core;
                 //
                 // -- click spam block detected
-                if (true) {
+                {
                     //
                     string recipientEmailToBlock = core.docProperties.getText(rnEmailBlockRecipientEmail);
                     if (string.IsNullOrEmpty(recipientEmailToBlock)) {

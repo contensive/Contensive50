@@ -86,7 +86,7 @@ namespace Contensive.Addons.AdminNavigator {
                 const bool AutoManageAddons = true;
                 var Index = new Dictionary<int, int>();
                 //
-                if (true) {
+                {
                     string BakeName = null;
                     if (env.isDeveloper) {
                         BakeName = "AdminNav EmptyNodeList Dev";

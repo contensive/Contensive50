@@ -74,7 +74,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override void IISReset() {
-            if (true) {
+            {
                 cp.core.webServer.reset();
             }
         }

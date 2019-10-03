@@ -13,10 +13,10 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 // delete email drops older than archive.
                 //
-                LogController.logInfo(core, "Deleting email drops older then " + env.EmailDropArchiveAgeDays + " days");
+                LogController.logInfo(core, "Deleting email drops older then " + env.emailDropArchiveAgeDays + " days");
                 //
                 DateTime ArchiveEmailDropDate = default(DateTime);
-                ArchiveEmailDropDate = env.rightNow.AddDays(-env.EmailDropArchiveAgeDays).Date;
+                ArchiveEmailDropDate = env.rightNow.AddDays(-env.emailDropArchiveAgeDays).Date;
                 MetadataController.deleteContentRecords(core, "Email drops", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + ")");
 
             } catch (Exception ex) {

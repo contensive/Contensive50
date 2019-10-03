@@ -167,7 +167,6 @@
     <Compile Include="Addons\Housekeeping\TempFilesClass.cs" />
     <Compile Include="Addons\Housekeeping\VisitClass.cs" />
     <Compile Include="Addons\Housekeeping\LogFolderClass.cs" />
-    <Compile Include="Addons\Housekeeping\EmailClass.cs" />
     <Compile Include="Addons\Housekeeping\EmailLogClass.cs" />
     <Compile Include="Addons\Housekeeping\HouseKeepEnvironmentModel.cs" />
     <Compile Include="Addons\OnInstallBase51.cs" />
