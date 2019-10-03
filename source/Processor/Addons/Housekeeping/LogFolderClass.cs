@@ -8,7 +8,7 @@ using Contensive.BaseClasses;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class LogFolderClass {
+    public static class LogFolderClass {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //

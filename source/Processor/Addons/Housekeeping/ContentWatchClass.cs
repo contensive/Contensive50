@@ -7,7 +7,7 @@ using Contensive.Processor;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class ContentWatchClass {
+    public static class ContentWatchClass {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //

@@ -7,7 +7,7 @@ using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class VisitPropertyClass {
+    public static class VisitPropertyClass {
 
         //
         //====================================================================================================

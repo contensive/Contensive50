@@ -7,7 +7,7 @@ using Contensive.Processor;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class AddonContentFieldTypeRuleClass {
+    public static class AddonContentFieldTypeRuleClass {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //

@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class SoftwareUpdatesClass {
+    public static class SoftwareUpdatesClass {
         //====================================================================================================
         //
         public static bool DownloadAndInstall(CoreController core) {

@@ -8,7 +8,7 @@ using Contensive.Processor;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class VisitSummaryClass {
+    public static class VisitSummaryClass {
         //
         //=========================================================================================
         /// <summary>

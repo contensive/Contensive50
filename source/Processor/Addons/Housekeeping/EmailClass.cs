@@ -6,7 +6,7 @@ using static Contensive.Processor.Constants;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class EmailClass {
+    public static class EmailClass {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
 

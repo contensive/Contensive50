@@ -6,7 +6,7 @@ using static Contensive.Processor.Constants;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class TempFilesClass {
+    public static class TempFilesClass {
 
         //====================================================================================================
         /// <summary>

@@ -6,7 +6,7 @@ using static Contensive.Processor.Constants;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class RemoveVisitsClass {
+    public static class RemoveVisitsClass {
         //====================================================================================================
         //
         public static void HouseKeep_App_Daily_RemoveVisitRecords(CoreController core, DateTime DeleteBeforeDate) {

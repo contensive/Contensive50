@@ -7,7 +7,7 @@ using Contensive.Processor;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class GroupRulesClass {
+    public static class GroupRulesClass {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //

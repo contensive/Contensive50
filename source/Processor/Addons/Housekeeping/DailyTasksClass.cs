@@ -8,7 +8,7 @@ using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class DailyTasksClass {
+    public static class DailyTasksClass {
         //====================================================================================================
         //
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {

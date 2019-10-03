@@ -7,7 +7,7 @@ using Contensive.Processor;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class EmailDropClass {
+    public static class EmailDropClass {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class MetadataClass {
+    public static class MetadataClass {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //

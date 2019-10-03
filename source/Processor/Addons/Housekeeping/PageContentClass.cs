@@ -9,7 +9,7 @@ using Contensive.Exceptions;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class PageContentClass {
+    public static class PageContentClass {
 
         //====================================================================================================
         //

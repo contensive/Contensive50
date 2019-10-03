@@ -10,33 +10,19 @@ using Contensive.Exceptions;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class AddonFolderClass {
+    public static class AddonFolderClass {
         //====================================================================================================
         //
         public static void housekeep(CoreController core) {
             try {
-                string RegisterPathList = null;
-                string RegisterPath = null;
-                string[] RegisterPaths = null;
-                string Path = null;
-                int NodeCnt = 0;
-                string Cmd = null;
-                string CollectionRootPath = null;
-                int Pos = 0;
-                string LocalGuid = null;
-                XmlDocument Doc = new XmlDocument();
-                string CollectionPath = null;
-                DateTime LastChangeDate = default(DateTime);
-                string hint = "";
-                string LocalName = null;
-                int Ptr = 0;
-                string collectionFileFilename = null;
                 //
                 LogController.logInfo(core, "Entering RegisterAddonFolder");
                 //
                 bool loadOK = true;
+                XmlDocument Doc = new XmlDocument();
+                string hint = "";
                 try {
-                    collectionFileFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
+                    string collectionFileFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
                     string collectionFileContent = core.privateFiles.readFileText(collectionFileFilename);
                     Doc.LoadXml(collectionFileContent);
                 } catch (Exception) {
@@ -57,15 +43,15 @@ namespace Contensive.Addons.Housekeeping {
                             //If genericController.vbLCase(.name) <> "collectionlist" Then
                             //    Call AppendClassLog(core,"Server", "", "RegisterAddonFolder, basename was not collectionlist, [" & .name & "].")
                             //Else
-                            NodeCnt = 0;
-                            RegisterPathList = "";
+                            int NodeCnt = 0;
                             foreach (XmlNode LocalListNode in Doc.DocumentElement.ChildNodes) {
                                 //
                                 // Get the collection path
                                 //
-                                CollectionPath = "";
-                                LocalGuid = "";
-                                LocalName = "no name found";
+                                string CollectionPath = "";
+                                string LocalGuid = "";
+                                string LocalName = "no name found";
+                                DateTime LastChangeDate = default(DateTime);
                                 switch (GenericController.vbLCase(LocalListNode.Name)) {
                                     case "collection":
                                         LocalGuid = "";
@@ -102,15 +88,15 @@ namespace Contensive.Addons.Housekeeping {
                                     //
                                 } else {
                                     CollectionPath = GenericController.vbLCase(CollectionPath);
-                                    CollectionRootPath = CollectionPath;
-                                    Pos = CollectionRootPath.LastIndexOf("\\") + 1;
+                                    string CollectionRootPath = CollectionPath;
+                                    int Pos = CollectionRootPath.LastIndexOf("\\") + 1;
                                     if (Pos <= 0) {
                                         //
                                         LogController.logInfo(core, "CollectionPath has no '\\', skipping");
                                         //
                                     } else {
                                         CollectionRootPath = CollectionRootPath.Left(Pos - 1);
-                                        Path = core.addon.getPrivateFilesAddonPath() + CollectionRootPath + "\\";
+                                        string Path = core.addon.getPrivateFilesAddonPath() + CollectionRootPath + "\\";
                                         List<FolderDetail> folderList = new List<FolderDetail>();
                                         if (core.privateFiles.pathExists(Path)) {
                                             folderList = core.privateFiles.getFolderList(Path);

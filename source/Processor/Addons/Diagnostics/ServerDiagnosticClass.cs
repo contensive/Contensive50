@@ -6,6 +6,7 @@ using System.Text;
 using System.IO;
 using Contensive.Processor.Controllers;
 using Contensive.Models.Db;
+using System.Globalization;
 //
 namespace Contensive.Addons.Diagnostics {
     //
@@ -29,13 +30,13 @@ namespace Contensive.Addons.Diagnostics {
                     DriveInfo driveTest = new DriveInfo("c");
                     double freeSpace = Math.Round(100.0 * (Convert.ToDouble(driveTest.AvailableFreeSpace) / Convert.ToDouble(driveTest.TotalSize)), 2);
                     if (freeSpace < 10) { return "ERROR, Drive-C does not have 10% free"; };
-                    result.AppendLine("ok, drive-c free space [" + freeSpace + "%], [" + (driveTest.AvailableFreeSpace / (1024 * 1024)) + " MB]");
+                    result.AppendLine("ok, drive-c free space [" + freeSpace + "%], [" + (driveTest.AvailableFreeSpace / (1024 * 1024)).ToString("F2", CultureInfo.InvariantCulture) + " MB]");
                 }
                 if (Directory.Exists(@"d:\")) {
                     DriveInfo driveTest = new DriveInfo("d");
                     double freeSpace = Math.Round( 100.0 * (Convert.ToDouble(driveTest.AvailableFreeSpace) / Convert.ToDouble(driveTest.TotalSize)), 2);
-                    if (freeSpace < 10) { return "ERROR, Drive-C does not have 10% free"; };
-                    result.AppendLine("ok, drive-d free space [" + freeSpace + "%], [" + (driveTest.AvailableFreeSpace / (1024 * 1024)) + " MB]");
+                    if (freeSpace < 10) { return "ERROR, Drive-D does not have 10% free"; };
+                    result.AppendLine("ok, drive-D free space [" + freeSpace + "%], [" + (driveTest.AvailableFreeSpace / (1024 * 1024)).ToString("F2", CultureInfo.InvariantCulture) + " MB]");
                 }
                 //
                 // -- log files under 1MB

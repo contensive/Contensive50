@@ -4,7 +4,7 @@ using System;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class HourlyTasksClass {
+    public static class HourlyTasksClass {
         //
         //====================================================================================================
         //

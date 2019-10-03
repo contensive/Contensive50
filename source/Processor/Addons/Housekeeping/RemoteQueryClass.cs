@@ -7,7 +7,7 @@ using Contensive.Processor;
 
 namespace Contensive.Addons.Housekeeping {
     //
-    public class RemoteQueryClass {
+    public static class RemoteQueryClass {
 
         //====================================================================================================
         //
