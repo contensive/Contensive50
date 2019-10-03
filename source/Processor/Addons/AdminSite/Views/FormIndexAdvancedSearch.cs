@@ -174,69 +174,6 @@ namespace Contensive.Addons.AdminSite {
                     }
                     FieldPtr += 1;
                 }
-                //        Criteria = "(active<>0)and(ContentID=" & adminContext.content.id & ")and(authorable<>0)"
-                //        CS = core.app.csOpen("Content Fields", Criteria, "EditSortPriority")
-                //        FieldPtr = 0
-                //        Do While core.app.csv_IsCSOK(CS)
-                //            If FieldPtr >= FieldSize Then
-                //                FieldSize = FieldSize + 100
-                //                ReDim Preserve FieldNames(FieldSize)
-                //                ReDim Preserve FieldCaption(FieldSize)
-                //                ReDim Preserve FieldID(FieldSize)
-                //                ReDim Preserve FieldType(FieldSize)
-                //                ReDim Preserve FieldValue(FieldSize)
-                //                ReDim Preserve FieldMatchOptions(FieldSize)
-                //                ReDim Preserve FieldLookupContentName(FieldSize)
-                //                ReDim Preserve FieldLookupList(FieldSize)
-                //            End If
-                //            FieldName = genericController.vbLCase(csData.cs_getText(CS, "name"))
-                //            FieldNames(FieldPtr) = FieldName
-                //            FieldCaption(FieldPtr) = csData.cs_getText(CS, "Caption")
-                //            FieldID(FieldPtr) = core.app.cs_getInteger(CS, "ID")
-                //            FieldType(FieldPtr) = core.app.cs_getInteger(CS, "Type")
-                //            If FieldType(FieldPtr) = 7 Then
-                //                ContentID = core.app.cs_getInteger(CS, "LookupContentID")
-                //                If ContentID > 0 Then
-                //                    FieldLookupContentName(FieldPtr) = CdefController.getContentNameByID(core,ContentID)
-                //                End If
-                //                FieldLookupList(FieldPtr) = csData.cs_getText(CS, "LookupList")
-                //            End If
-                //            '
-                //            ' set prepoplate value from indexconfig
-                //            '
-                //            With IndexConfig
-                //                If .findwords.count > 0 Then
-                //                    For Ptr = 0 To .findwords.count - 1
-                //                        If .FindWords[Ptr].Name = FieldName Then
-                //                            FieldValue(FieldPtr) = .FindWords[Ptr].Value
-                //                            FieldMatchOptions(FieldPtr) = .FindWords[Ptr].MatchOption
-                //                            Exit For
-                //                        End If
-                //                    Next
-                //                End If
-                //            End With
-                //            If CriteriaCount > 0 Then
-                //                For CriteriaPointer = 0 To CriteriaCount - 1
-                //                    FieldMatchOptions(FieldPtr) = 0
-                //                    If genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "=", vbTextCompare) = 1 Then
-                //                        NameValues = Split(CriteriaValues(CriteriaPointer), "=")
-                //                        FieldValue(FieldPtr) = NameValues(1)
-                //                        FieldMatchOptions(FieldPtr) = 1
-                //                    ElseIf genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & ">", vbTextCompare) = 1 Then
-                //                        NameValues = Split(CriteriaValues(CriteriaPointer), ">")
-                //                        FieldValue(FieldPtr) = NameValues(1)
-                //                        FieldMatchOptions(FieldPtr) = 2
-                //                    ElseIf genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "<", vbTextCompare) = 1 Then
-                //                        NameValues = Split(CriteriaValues(CriteriaPointer), "<")
-                //                        FieldValue(FieldPtr) = NameValues(1)
-                //                        FieldMatchOptions(FieldPtr) = 3
-                //                    End If
-                //                Next
-                //            End If
-                //            FieldPtr = FieldPtr + 1
-                //            Call core.app.nextCSRecord(CS)
-                //        Loop
-                //        Call core.app.closeCS(CS)
                 FieldCnt = FieldPtr;
                 //
                 // Add headers to stream

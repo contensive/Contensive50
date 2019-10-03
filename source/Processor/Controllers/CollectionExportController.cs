@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using ICSharpCode.SharpZipLib.GZip;
@@ -111,7 +112,7 @@ namespace Contensive.Processor.Controllers {
 									Path = PathFilename.Substring(0, Pos - 1);
 								}
 								string ManualFilename = "";
-								if (Filename.ToLower() != ManualFilename.ToLower()) {
+								if (Filename.ToLower(CultureInfo.InvariantCulture) != ManualFilename.ToLower(CultureInfo.InvariantCulture)) {
 									//AddFilename = AddonPath & CollectionPath & Filename
 									cp.PrivateFiles.Copy(AddonPath + CollectionPath + Filename, tempExportPath + Filename, cp.TempFiles);
 									if (!tempPathFileList.Contains(tempExportPath + Filename)) {
@@ -123,14 +124,6 @@ namespace Contensive.Processor.Controllers {
 							}
 						}
 					}
-					//Call Main.testpoint("getCollection, 500")
-					//If (ResourceCnt = 0) And (CollectionPath <> "") Then
-					//    '
-					//    ' If no resources were in the collection record, this might be an old installation
-					//    ' Add all .dll files in the CollectionPath
-					//    '
-					//    ExecFileListNode = ExecFileListNode & AddCompatibilityResources(cp, AddonPath & CollectionPath, cdnTempZipPathFilename, "")
-					//End If
 					//
 					// helpLink
 					//
@@ -249,7 +242,7 @@ namespace Contensive.Processor.Controllers {
 														int FieldLookupContentID = 0;
 														FieldLookupContentName = "";
 														FieldTypeNumber = csFields.GetInteger("type");
-														switch (FieldName.ToLower()) {
+														switch (FieldName.ToLower(CultureInfo.InvariantCulture)) {
 															case "ccguid":
 															case "name":
 															case "id":
@@ -543,7 +536,7 @@ namespace Contensive.Processor.Controllers {
 									Filename = PathFilename.Substring(Pos);
 									Path = PathFilename.Substring(0, Pos - 1);
 								}
-								if (Filename.ToLower() == "collection.hlp") {
+								if (Filename.ToLower(CultureInfo.InvariantCulture) == "collection.hlp") {
 									//
 									// legacy file, remove it
 									//
@@ -578,10 +571,6 @@ namespace Contensive.Processor.Controllers {
 									Filename = PathFilename.Substring(Pos);
 									Path = PathFilename.Substring(0, Pos - 1);
 								}
-								//PathFilename = Replace(PathFilename, "/", "\")
-								//If Left(PathFilename, 1) = "\" Then
-								//    PathFilename = Mid(PathFilename, 2)
-								//End If
 								if (tempPathFileList.Contains(tempExportPath + Filename)) {
 									cp.UserError.Add("There was an error exporting this collection because there were multiple files with the same filename [" + Filename + "]");
 								} else {
@@ -656,7 +645,7 @@ namespace Contensive.Processor.Controllers {
 				if (CS.OpenRecord("Add-ons", addonid)) {
 					addonName = CS.GetText("name");
 					processRunOnce = CS.GetBoolean("ProcessRunOnce");
-					if ((addonName.ToLower() == "oninstall") || (addonName.ToLower() == "_oninstall")) {
+					if ((addonName.ToLower(CultureInfo.InvariantCulture) == "oninstall") || (addonName.ToLower(CultureInfo.InvariantCulture) == "_oninstall")) {
 						processRunOnce = true;
 					}
 					//
@@ -997,9 +986,9 @@ namespace Contensive.Processor.Controllers {
 				return_LastChangedate = DateTime.MinValue;
 				System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
 				Doc.LoadXml(cp.PrivateFiles.Read("addons\\Collections.xml"));
-                if (Doc.DocumentElement.Name.ToLower() != CollectionListRootNode.ToLower()) {
+                if (Doc.DocumentElement.Name.ToLower(CultureInfo.InvariantCulture) != CollectionListRootNode.ToLower(CultureInfo.InvariantCulture)) {
                 } else {
-                    if (Doc.DocumentElement.Name.ToLower() != "collectionlist") {
+                    if (Doc.DocumentElement.Name.ToLower(CultureInfo.InvariantCulture) != "collectionlist") {
                     } else {
                         foreach (System.Xml.XmlNode LocalListNode in Doc.DocumentElement.ChildNodes) {
                             string LocalName = "no name found";
@@ -1008,22 +997,22 @@ namespace Contensive.Processor.Controllers {
                             string LocalGuid = "";
                             string CollectionPath = "";
                             DateTime LastChangeDate = default(DateTime);
-                            switch (LocalListNode.Name.ToLower()) {
+                            switch (LocalListNode.Name.ToLower(CultureInfo.InvariantCulture)) {
                                 case "collection":
                                     LocalGuid = "";
                                     foreach (System.Xml.XmlNode CollectionNode in LocalListNode.ChildNodes) {
-                                        switch (CollectionNode.Name.ToLower()) {
+                                        switch (CollectionNode.Name.ToLower(CultureInfo.InvariantCulture)) {
                                             case "name":
                                                 //
-                                                LocalName = CollectionNode.InnerText.ToLower();
+                                                LocalName = CollectionNode.InnerText.ToLower(CultureInfo.InvariantCulture);
                                                 break;
                                             case "guid":
                                                 //
-                                                LocalGuid = CollectionNode.InnerText.ToLower();
+                                                LocalGuid = CollectionNode.InnerText.ToLower(CultureInfo.InvariantCulture);
                                                 break;
                                             case "path":
                                                 //
-                                                CollectionPath = CollectionNode.InnerText.ToLower();
+                                                CollectionPath = CollectionNode.InnerText.ToLower(CultureInfo.InvariantCulture);
                                                 break;
                                             case "lastchangedate":
                                                 LastChangeDate = cp.Utils.EncodeDate(CollectionNode.InnerText);
@@ -1032,7 +1021,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     break;
                             }
-                            if (CollectionGuid.ToLower() == LocalGuid) {
+                            if (CollectionGuid.ToLower(CultureInfo.InvariantCulture) == LocalGuid) {
                                 return_CollectionPath = CollectionPath;
                                 return_LastChangedate = LastChangeDate;
                                 break;
@@ -1044,119 +1033,6 @@ namespace Contensive.Processor.Controllers {
 				cp.Site.ErrorReport(ex, "GetLocalCollectionArgs");
 			}
 		}
-		//'
-		//'====================================================================================================
-		//Public Function GetConfig(cp As CPBaseClass) As String
-		//    GetConfig = ""
-		//    Try
-		//        Dim AddonPath As String
-		//        '
-		//        AddonPath = cp.Site.PhysicalInstallPath & "\addons"
-		//        AddonPath = AddonPath & "\Collections.xml"
-		//        GetConfig = cp.File.Read(AddonPath)
-		//    Catch ex As Exception
-		//        cp.Site.ErrorReport(ex, "GetConfig")
-		//    End Try
-		//End Function
-		//
-		//====================================================================================================
-		//Private Function AddCompatibilityResources(cp As CPBaseClass, CollectionPath As String, ArchiveFilename As String, SubPath As String) As String
-		//    AddCompatibilityResources = ""
-		//    Dim s As String = ""
-		//    Try
-		//        Dim AddFilename As String
-		//        Dim FileExt As String
-		//        Dim FileList As String
-		//        Dim Files() As String
-		//        Dim Filename As String
-		//        Dim Ptr As Integer
-		//        Dim FileArgs() As String
-		//        Dim FolderList As String
-		//        Dim Folders() As String
-		//        Dim FolderArgs() As String
-		//        Dim Folder As String
-		//        Dim Pos As Integer
-		//        '
-		//        ' Process all SubPaths
-		//        '
-		//        FolderList = cp.File.folderList(CollectionPath & SubPath)
-		//        If FolderList <> "" Then
-		//            Folders = Split(FolderList, vbCrLf)
-		//            For Ptr = 0 To UBound(Folders)
-		//                Folder = Folders(Ptr)
-		//                If Folder <> "" Then
-		//                    FolderArgs = Split(Folders(Ptr), ",")
-		//                    Folder = FolderArgs(0)
-		//                    If Folder <> "" Then
-		//                        s = s & AddCompatibilityResources(cp, CollectionPath, ArchiveFilename, SubPath & Folder & "\")
-		//                    End If
-		//                End If
-		//            Next
-		//        End If
-		//        '
-		//        ' Process files in this path
-		//        '
-		//        'Set Remote = CreateObject("ccRemote.RemoteClass")
-		//        FileList = cp.File.fileList(CollectionPath)
-		//        If FileList <> "" Then
-		//            Files = Split(FileList, vbCrLf)
-		//            For Ptr = 0 To UBound(Files)
-		//                Filename = Files(Ptr)
-		//                If Filename <> "" Then
-		//                    FileArgs = Split(Filename, ",")
-		//                    If UBound(FileArgs) > 0 Then
-		//                        Filename = FileArgs(0)
-		//                        Pos = InStrRev(Filename, ".")
-		//                        FileExt = ""
-		//                        If Pos > 0 Then
-		//                            FileExt = Mid(Filename, Pos + 1)
-		//                        End If
-		//                        If LCase(Filename) = "collection.hlp" Then
-		//                            '
-		//                            ' legacy help system, ignore this file
-		//                            '
-		//                        ElseIf LCase(FileExt) = "xml" Then
-		//                            '
-		//                            ' compatibility resources can not include an xml file in the wwwroot
-		//                            '
-		//                        ElseIf InStr(1, CollectionPath, "\ContensiveFiles\", vbTextCompare) <> 0 Then
-		//                            '
-		//                            ' Content resources
-		//                            '
-		//                            s = s & vbCrLf & vbTab & "<Resource name=""" & System.Net.WebUtility.HtmlEncode(Filename) & """ type=""content"" path=""" & System.Net.WebUtility.HtmlEncode(SubPath) & """ />"
-		//                            AddFilename = CollectionPath & SubPath & "\" & Filename
-		//                            'Call zipFile(ArchiveFilename, AddFilename)
-		//                            'Call runAtServer("zipfile", "archive=" & kmaEncodeRequestVariable(ArchiveFilename) & "&add=" & kmaEncodeRequestVariable(AddFilename))
-		//                            'Call Remote.executeCmd("zipfile", "archive=" & kmaEncodeRequestVariable(ArchiveFilename) & "&add=" & kmaEncodeRequestVariable(AddFilename))
-		//                        ElseIf LCase(FileExt) = "dll" Then
-		//                            '
-		//                            ' Executable resources
-		//                            '
-		//                            s = s & vbCrLf & vbTab & "<Resource name=""" & System.Net.WebUtility.HtmlEncode(Filename) & """ type=""executable"" path=""" & System.Net.WebUtility.HtmlEncode(SubPath) & """ />"
-		//                            AddFilename = CollectionPath & SubPath & "\" & Filename
-		//                            'Call zipFile(ArchiveFilename, AddFilename)
-		//                            'Call runAtServer("zipfile", "archive=" & kmaEncodeRequestVariable(ArchiveFilename) & "&add=" & kmaEncodeRequestVariable(AddFilename))
-		//                            'Call Remote.executeCmd("zipfile", "archive=" & kmaEncodeRequestVariable(ArchiveFilename) & "&add=" & kmaEncodeRequestVariable(AddFilename))
-		//                        Else
-		//                            '
-		//                            ' www resources
-		//                            '
-		//                            s = s & vbCrLf & vbTab & "<Resource name=""" & System.Net.WebUtility.HtmlEncode(Filename) & """ type=""www"" path=""" & System.Net.WebUtility.HtmlEncode(SubPath) & """ />"
-		//                            AddFilename = CollectionPath & SubPath & "\" & Filename
-		//                            'Call zipFile(ArchiveFilename, AddFilename)
-		//                            'Call runAtServer("zipfile", "archive=" & kmaEncodeRequestVariable(ArchiveFilename) & "&add=" & kmaEncodeRequestVariable(AddFilename))
-		//                            'Call Remote.executeCmd("zipfile", "archive=" & kmaEncodeRequestVariable(ArchiveFilename) & "&add=" & kmaEncodeRequestVariable(AddFilename))
-		//                        End If
-		//                    End If
-		//                End If
-		//            Next
-		//        End If
-		//        '
-		//        AddCompatibilityResources = s
-		//    Catch ex As Exception
-		//        cp.Site.ErrorReport(ex, "GetNodeInteger")
-		//    End Try
-		//End Function
 		//
 		//====================================================================================================
 		internal string EncodeCData(CPBaseClass cp, string Source) {
@@ -1250,7 +1126,7 @@ namespace Contensive.Processor.Controllers {
 		}
 		//
 		//=======================================================================================
-		public string GetFilename(CPBaseClass cp, string PathFilename) {
+		public string getFilename(CPBaseClass cp, string PathFilename) {
 			string tempGetFilename = null;
 			int Position = 0;
 			//
@@ -1315,10 +1191,6 @@ namespace Contensive.Processor.Controllers {
 				}
 				temptabIndent = tabIndent(cp, pre) + target + tabIndent(cp, post);
 			}
-			//    kmaIndent = Source
-			//    If InStr(1, kmaIndent, "<textarea", vbTextCompare) = 0 Then
-			//        kmaIndent = Replace(Source, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
-			//    End If
 			return temptabIndent;
 		}
 

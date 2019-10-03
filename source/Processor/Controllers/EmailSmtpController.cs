@@ -62,16 +62,6 @@ namespace Contensive.Processor.Controllers {
                     alternate = AlternateView.CreateAlternateViewFromString(email.htmlBody, mimeType);
                     mailMessage.AlternateViews.Add(alternate);
                 }
-                //
-                // Create  the file attachment for this e-mail message.
-                //if (!string.IsNullOrEmpty(AttachmentFilename)) {
-                //    data = new Attachment(AttachmentFilename, MediaTypeNames.Application.Octet);
-                //    disposition = data.ContentDisposition;
-                //    disposition.CreationDate = System.IO.File.GetCreationTime(AttachmentFilename);
-                //    disposition.ModificationDate = System.IO.File.GetLastWriteTime(AttachmentFilename);
-                //    disposition.ReadDate = System.IO.File.GetLastAccessTime(AttachmentFilename);
-                //    mailMessage.Attachments.Add(data);
-                //}
                 if (core.mockEmail) {
                     //
                     // -- for unit tests, mock interface by adding email to core.mockSmptList

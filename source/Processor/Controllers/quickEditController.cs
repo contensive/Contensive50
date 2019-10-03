@@ -83,12 +83,6 @@ namespace Contensive.Processor.Controllers {
                     leftButtonCommaList = leftButtonCommaList.Substring(1);
                     leftButtonCommaList = core.html.getPanelButtons(leftButtonCommaList);
                 }
-                //If OptionsPanelAuthoringStatus <> "" Then
-                //    result = result & "" _
-                //        & cr & "<tr>" _
-                //        & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & OptionsPanelAuthoringStatus & "</div></td>" _
-                //        & cr & "</tr>"
-                //End If
                 if (!core.doc.userErrorList.Count.Equals(0)) {
                     result += ""
                         + "\r<tr>"
@@ -233,9 +227,6 @@ namespace Contensive.Processor.Controllers {
             if (!this.disposed) {
                 this.disposed = true;
                 if (disposing) {
-                    //If (cacheClient IsNot Nothing) Then
-                    //    cacheClient.Dispose()
-                    //End If
                 }
                 //
                 // cleanup non-managed objects

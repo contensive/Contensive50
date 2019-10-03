@@ -49,25 +49,6 @@ namespace Contensive.Processor.Controllers {
                     // Authenticated and not admin or developer
                     result = getUserAuthoringPermissions_ContentManager(core, cdef, new List<int>());
                 }
-                //Models.Domain.CDefModel CDef = null;
-                //if (recordId == 0) {
-                //    //
-                //    // -- new record
-                //    result.allowSave = true;
-                //} else {
-                //    CDef = Models.Domain.CDefModel.create(core.cpInternal, contentName);
-                //    result.allowSave = true;
-                //    if ((CDef.allowDelete) && (recordId != 0)) {
-                //        //
-                //        // -- allow delete if not new record and cdef allows
-                //        result.allowDelete = true;
-                //    }
-                //    if (CDef.allowAdd) {
-                //        //
-                //        // -- allow delete if cdef allows
-                //        result.allowAdd = true;
-                //    }
-                //}
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
@@ -226,9 +207,6 @@ namespace Contensive.Processor.Controllers {
             if (!this.disposed) {
                 this.disposed = true;
                 if (disposing) {
-                    //If (cacheClient IsNot Nothing) Then
-                    //    cacheClient.Dispose()
-                    //End If
                 }
                 //
                 // cleanup non-managed objects

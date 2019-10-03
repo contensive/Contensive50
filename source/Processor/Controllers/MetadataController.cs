@@ -10,6 +10,7 @@ using System.Linq;
 using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
+using System.Globalization;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -193,7 +194,7 @@ namespace Contensive.Processor.Controllers {
         public static bool isMetadataField(CoreController core, int ContentID, string FieldName) {
             var meta = ContentMetadataModel.create(core, ContentID);
             if (meta == null) { return false; }
-            return meta.fields.ContainsKey(FieldName.Trim().ToLower());
+            return meta.fields.ContainsKey(FieldName.Trim().ToLower(CultureInfo.InvariantCulture));
         }
         ////
         ////========================================================================

@@ -108,18 +108,6 @@ namespace Contensive.Processor.Controllers {
                     if (File.Exists(privateResponseFilename)) {
                         privateResponseLength = (int)((new FileInfo(privateResponseFilename)).Length);
                     }
-                    //Catch ex As WebException
-                    //    '
-                    //    ' http error, not 200
-                    //    '
-                    //    Dim we As WebException
-                    //    Dim response As HttpWebResponse
-                    //    we = DirectCast(ex, WebException)
-                    //    response = we.Response
-                    //    privateResponseStatusCode = response.StatusCode
-                    //    privateResponseStatusDescription = response.StatusDescription
-                    //    privateResponseHeaders = response.Headers
-                    //    privateResponseLength = 0
                 } catch {
                     //
                     //
@@ -130,12 +118,6 @@ namespace Contensive.Processor.Controllers {
                     privateResponseLength = 0;
                     throw;
                 }
-                //http.DownloadFile(URL, privateResponseFilename)
-                //privateResponseHeaders = http.ResponseHeaders
-                //privateResponseLength = 0
-                //If (File.Exists(privateResponseFilename)) Then
-                //    privateResponseLength = (New FileInfo(privateResponseFilename)).Length
-                //End If
             } catch (Exception ex) {
                 //
                 //
@@ -190,20 +172,6 @@ namespace Contensive.Processor.Controllers {
                     privateResponseStatusDescription = HttpStatusCode.OK.ToString();
                     privateResponseHeaders = http.ResponseHeaders;
                     privateResponseLength = returnString.Length;
-                    //Catch ex As WebException
-                    //    '
-                    //    ' http error, not 200
-                    //    '
-                    //    Dim we As WebException
-                    //    Dim response As HttpWebResponse
-                    //    we = DirectCast(ex, WebException)
-                    //    If Not (we.Response Is Nothing) Then
-                    //        response = we.Response
-                    //        privateResponseStatusCode = response.StatusCode
-                    //        privateResponseStatusDescription = response.StatusDescription
-                    //        privateResponseHeaders = response.Headers
-                    //        privateResponseLength = CInt(response.ContentLength)
-                    //    End If
                 } catch {
                     //
                     //

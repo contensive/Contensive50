@@ -58,7 +58,7 @@ namespace Contensive.Addons.AdminSite {
                 } else {
                     //
                     // otherwise, load the record, even if it was loaded during a previous form process
-                    adminData.LoadEditRecord(core, true);
+                    adminData.loadEditRecord(core, true);
                 }
                 if (!AdminDataModel.userHasContentAccess(core, ((adminData.editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : adminData.editRecord.contentControlId))) {
                     Processor.Controllers.ErrorController.addUserError(core, "Your account on this system does not have access rights to edit this content.");
@@ -102,26 +102,6 @@ namespace Contensive.Addons.AdminSite {
                         IsRootPage = IsPageContentTable && (adminData.editRecord.parentID == 0);
                     }
                 }
-                //
-                //bool IsLandingSection = false;
-                //bool IsLandingPageTemp = false;
-                ////
-                //// ----- special case messages
-                ////
-                //string CustomDescription = "";
-                //if (IsLandingSection) {
-                //    CustomDescription = "<div>This is the default Landing Section for this website. This section is displayed when no specific page is requested. It should not be deleted, renamed, marked inactive, blocked or hidden.</div>";
-                //} else if (IsLandingPageTemp) {
-                //    CustomDescription = "<div>This page is being used as the default Landing Page for this website, although it has not been set. This may be because a landing page has not been created, or it has been deleted. To make this page the permantent landing page, check the appropriate box in the control tab.</div>";
-                //} else if (IsLandingPage) {
-                //    CustomDescription = "<div>This is the default Landing Page for this website. It should not be deleted. You can not mark this record inactive, or use the Publish Date, Expire Date or Archive Date features.</div>";
-                //} else if (IsLandingPageParent) {
-                //    CustomDescription = "<div>This page is a parent of the default Landing Page for this website. It should not be deleted. You can not mark this record inactive, or use the Publish Date, Expire Date or Archive Date features.</div>";
-                //} else if (IsRootPage) {
-                //    CustomDescription = "<div>This page is a Root Page. A Root Page is the primary page of a section. If you delete or inactivate this page, the section will create a new blank page in its place.</div>";
-                //}
-                //
-                // ----- Determine TemplateIDForStyles
                 if (IsTemplateTable) {
                     TemplateIDForStyles = adminData.editRecord.id;
                 } else if (IsPageContentTable) {
@@ -129,12 +109,8 @@ namespace Contensive.Addons.AdminSite {
                 }
                 var headerInfo = new RecordEditHeaderInfoClass() {
                     recordId = adminData.editRecord.id,
-                    //recordAddedById = adminInfo.editRecord.createdBy.id,
-                    //recordDateAdded = adminInfo.editRecord.dateAdded,
-                    //recordDateModified = adminInfo.editRecord.modifiedDate,
                     recordLockById = adminData.editRecord.EditLock.editLockByMemberId,
                     recordLockExpiresDate = encodeDate(adminData.editRecord.EditLock.editLockExpiresDate),
-                    //recordModifiedById = adminInfo.editRecord.modifiedBy.id,
                     recordName = adminData.editRecord.nameLc
                 };
                 string titleBarDetails = AdminUIController.getEditForm_TitleBarDetails(core, headerInfo, adminData.editRecord);
@@ -165,55 +141,6 @@ namespace Contensive.Addons.AdminSite {
                 //   with custom FancyBox form in edit window with button "set editor preference"
                 //   this button causes a 'refresh' action, reloads fields with stream without save
                 //
-                //string fieldEditorListKey = "editorPreferencesForContentV2:" + adminData.adminContent.id;
-                //List<FieldEditorAddonModel> fieldEditorList = core.userProperty.getObject<List<FieldEditorAddonModel>>(fieldEditorListKey);
-
-
-                //if (fieldEditorList == null) {
-                //    fieldEditorList = new List<FieldEditorAddonModel>();
-                //    //
-                //    // -- check for legacy fieldeditor preference comma-string
-                //    string fieldEditorCommaList = core.userProperty.getText("editorPreferencesForContent:" + adminData.adminContent.id, "");
-                //    if (!string.IsNullOrEmpty(fieldEditorCommaList)) {
-                //        foreach (var fieldPair in fieldEditorCommaList.Split(',')) {
-                //            var fieldEditor = fieldPair.Split(':');
-                //            fieldEditorList.Add(new FieldEditorAddonModel() {
-                //                fieldId = encodeInteger(fieldEditor[0]),
-                //                editorAddonId = encodeInteger(fieldEditor[1])
-                //            });
-                //        }
-                //    }
-                //    core.userProperty.setProperty(fieldEditorListKey, fieldEditorList);
-                //}
-                ////
-                //// todo - this should be added to metaData load
-                //// add the addon editors assigned to each field
-                //string SQL = "select f.id,f.editorAddonID from ccfields f where f.ContentID=" + adminData.adminContent.id + " and f.editorAddonId is not null";
-                //using (DataTable dt = core.db.executeQuery(SQL)) {
-                //    foreach (DataRow row in dt.Rows) {
-                //        fieldEditorList.Add(new FieldEditorAddonModel() {
-                //            fieldId =  encodeInteger(row[0]),
-                //            editorAddonId = encodeInteger(row[1])
-                //        });
-                //    };
-                //}
-                ////
-                //// load fieldEditorOptions - these are all the editors available for each field
-                ////
-                //Dictionary<string, int> fieldEditorOptions = new Dictionary<string, int>();
-                //SQL = "select r.contentFieldTypeId,a.Id"
-                //    + " from ccAddonContentFieldTypeRules r"
-                //    + " left join ccaggregatefunctions a on a.id=r.addonid"
-                //    + " where (r.active<>0)and(a.active<>0)and(a.id is not null) order by r.contentFieldTypeID";
-                //using (DataTable dt = core.db.executeQuery(SQL)) {
-                //    foreach (DataRow row in dt.Rows) {
-                //        int fieldId = encodeInteger(row[0]);
-                //        if ((fieldId > 0) && (!fieldEditorOptions.ContainsKey(fieldId.ToString()))) {
-                //            fieldEditorOptions.Add(fieldId.ToString(), encodeInteger(row[1]));
-                //        }
-
-                //    }
-                //}
                 //
                 // ----- determine contentType for editor
                 //
@@ -521,7 +448,7 @@ namespace Contensive.Addons.AdminSite {
                     foreach (var keyValuePair in adminData.adminContent.fields) {
                         ContentFieldMetadataModel field = keyValuePair.Value;
                         if (field.editTabName.ToLowerInvariant() == EditTab.ToLowerInvariant()) {
-                            if (AdminDataModel.IsVisibleUserField(core, field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminData.adminContent.tableName)) {
+                            if (AdminDataModel.isVisibleUserField(core, field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminData.adminContent.tableName)) {
                                 string AlphaSort = GenericController.getIntegerString(field.editSortPriority, 10) + "-" + GenericController.getIntegerString(field.id, 10);
                                 sortingFields.Add(AlphaSort, field);
                             }
@@ -557,7 +484,7 @@ namespace Contensive.Addons.AdminSite {
                             fieldCaption = "&nbsp;*" + fieldCaption;
                         }
                         bool IsBaseField = field.blockAccess;
-                        adminData.FormInputCount = adminData.FormInputCount + 1;
+                        adminData.formInputCount = adminData.formInputCount + 1;
                         bool fieldForceReadOnly = false;
                         //
                         // Read only Special Cases
@@ -694,7 +621,7 @@ namespace Contensive.Addons.AdminSite {
                                 if (field.redirectPath != "") {
                                     RedirectPath = field.redirectPath;
                                 }
-                                RedirectPath = RedirectPath + "?" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(" For " + editRecord.nameLc + adminData.TitleExtension) + "&" + RequestNameAdminDepth + "=" + (adminData.ignore_legacyMenuDepth + 1) + "&wl0=" + field.redirectID + "&wr0=" + editRecord.id;
+                                RedirectPath = RedirectPath + "?" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(" For " + editRecord.nameLc + adminData.titleExtension) + "&" + RequestNameAdminDepth + "=" + (adminData.ignore_legacyMenuDepth + 1) + "&wl0=" + field.redirectID + "&wr0=" + editRecord.id;
                                 if (field.redirectContentID != 0) {
                                     RedirectPath = RedirectPath + "&cid=" + field.redirectContentID;
                                 } else {
@@ -1239,9 +1166,9 @@ namespace Contensive.Addons.AdminSite {
                     } else {
                         fieldCaption = "Content Fields - " + EditTab;
                     }
-                    adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
+                    adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
                     returnHtml = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), fieldCaption, "", AdminUIController.editTable(resultBody.Text));
-                    adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
+                    adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
                     resultBody = null;
                 }
             } catch (Exception ex) {
@@ -1370,7 +1297,7 @@ namespace Contensive.Addons.AdminSite {
                 result = GenericController.vbReplace(result, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\" autocomplete=\"off\">");
                 result += Environment.NewLine + "<!-- block --><div class=\"d-none\"><input type=password name=\"password_block\" value=\"\"><input type=text name=\"username_block\" value=\"\"></div><!-- end block -->";
                 result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + rnAdminSourceForm + "\" VALUE=\"" + AdminFormID.ToString() + "\">";
-                result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + adminData.TitleExtension + "\">";
+                result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + adminData.titleExtension + "\">";
                 result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminDepth + "\" VALUE=\"" + adminData.ignore_legacyMenuDepth + "\">";
                 result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"FormEmptyFieldList\" ID=\"FormEmptyFieldList\" VALUE=\",\">";
             } catch (Exception ex) {

@@ -9,6 +9,7 @@ using Contensive.Addons.AdminSite.Controllers;
 using System.Collections.Generic;
 using System.Linq;
 using Contensive.Models.Db;
+using System.Globalization;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -164,7 +165,6 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 Value = Value + "&" + AnchorQuery;
                                                             }
-                                                            //    End If
                                                         }
                                                     }
                                                     Copy += " " + Name + "=\"" + Value + "\"";
@@ -387,268 +387,6 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                     break;
                                                 }
-                                            //case ACTypeEnd: {
-                                            //        //
-                                            //        // End Tag - Personalization
-                                            //        //       This tag causes an end to the all tags, like Language
-                                            //        //       It is removed by with EncodeEditIcons (on the way to the editor)
-                                            //        //       It is added to the end of the content with Decode(activecontent)
-                                            //        //
-                                            //        if (encodeForWysiwygEditor) {
-                                            //            Copy = "";
-                                            //        } else if (EncodeNonCachableTags) {
-                                            //            Copy = "<!-- Language ANY -->";
-                                            //        }
-                                            //        break;
-                                            //    }
-                                            //case ACTypeDate: {
-                                            //        //
-                                            //        // Date Tag
-                                            //        //
-                                            //        if (encodeForWysiwygEditor) {
-                                            //            string IconIDControlString = "AC," + ACTypeDate;
-                                            //            Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0);
-                                            //            //Copy = IconImg;
-                                            //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as the current date"" ID=""AC," & ACTypeDate & """ src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ACDate.GIF"">"
-                                            //        } else if (EncodeNonCachableTags) {
-                                            //            Copy = DateTime.Now.ToString();
-                                            //        }
-                                            //        break;
-                                            //    }
-                                            //case ACTypeOrganization: {
-                                            //        string fieldName = KmaHTML.ElementAttribute(ElementPointer, "FIELD").ToLowerInvariant();
-                                            //        if (string.IsNullOrWhiteSpace(fieldName)) {
-                                            //            fieldName = "name";
-                                            //        }
-                                            //        if (encodeForWysiwygEditor) {
-                                            //            string IconIDControlString = "AC," + ACType + "," + fieldName;
-                                            //            Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Organization " + fieldName, "Renders as [User's Organization " + fieldName + "]", ACInstanceID, 0);
-                                            //        } else if (EncodeNonCachableTags) {
-                                            //            if ( !csData.csOk(csOrganization)) {
-                                            //                if (!csData.csOk(csPeople)) {
-                                            //                    csPeople = csData.csOpen(personModel.contentName, "(id=" + personalizationPeopleId + ")");
-                                            //                }
-                                            //                if ( csData.csOk( csPeople)) {
-                                            //                    csOrganization = csData.csOpen(organizationModel.contentName, "(id=" + csData.csGetInteger(csPeople, "organizationId") + ")");
-                                            //                }
-                                            //            }
-                                            //            if (csData.csOk(csOrganization)) {
-                                            //                Copy = csData.csGetLookup(csOrganization, fieldName);
-                                            //            }
-                                            //        }
-                                            //        break;
-                                            //    }
-                                            //case ACTypeMember:
-                                            //case ACTypePersonalization: {
-                                            //        //
-                                            //        // Member Tag works regardless of authentication
-                                            //        // cm must be sure not to reveal anything
-                                            //        //
-                                            //        string fieldName = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "FIELD"));
-                                            //        if (string.IsNullOrEmpty(fieldName)) {
-                                            //            fieldName = HtmlController.getAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"));
-                                            //        }
-                                            //        string fieldNameInitialCaps = genericController.encodeInitialCaps(fieldName);
-                                            //        if (string.IsNullOrEmpty(fieldNameInitialCaps)) {
-                                            //            fieldNameInitialCaps = "Name";
-                                            //        }
-                                            //        if (encodeForWysiwygEditor) {
-                                            //            switch (genericController.vbUCase(fieldNameInitialCaps)) {
-                                            //                case "FIRSTNAME":
-                                            //                    //
-                                            //                    string IconIDControlString = "AC," + ACType + "," + fieldNameInitialCaps;
-                                            //                    Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's First Name", "Renders as [User's First Name]", ACInstanceID, 0);
-                                            //                    //Copy = IconImg;
-                                            //                    //
-                                            //                    break;
-                                            //                case "LASTNAME":
-                                            //                    //
-                                            //                    IconIDControlString = "AC," + ACType + "," + fieldNameInitialCaps;
-                                            //                    Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Last Name", "Renders as [User's Last Name]", ACInstanceID, 0);
-                                            //                    //Copy = IconImg;
-                                            //                    //
-                                            //                    break;
-                                            //                default:
-                                            //                    //
-                                            //                    IconIDControlString = "AC," + ACType + "," + fieldNameInitialCaps;
-                                            //                    Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's " + fieldNameInitialCaps, "Renders as [User's " + fieldNameInitialCaps + "]", ACInstanceID, 0);
-                                            //                    //Copy = IconImg;
-                                            //                    //
-                                            //                    break;
-                                            //            }
-                                            //        } else if (EncodeNonCachableTags) {
-                                            //            if (personalizationPeopleId != 0) {
-                                            //                if (genericController.vbUCase(fieldNameInitialCaps) == "EID") {
-                                            //                    Copy = SecurityController.encodeToken(core, personalizationPeopleId, DateTime.Now);
-                                            //                } else {
-                                            //                    if (!csData.csOk(csPeople)) {
-                                            //                        csPeople = csData.csOpen(personModel.contentName, "(id=" + personalizationPeopleId + ")");
-                                            //                    }
-                                            //                    if (csData.csOk(csPeople)) {
-                                            //                        Copy = csData.csGetLookup(csPeople, fieldName);
-                                            //                    }
-                                            //                }
-                                            //            }
-                                            //        }
-                                            //        break;
-                                            //    }
-                                            //case ACTypeChildList: {
-                                            //        //
-                                            //        // Child List
-                                            //        //
-                                            //        string ListName = genericController.encodeText((KmaHTML.ElementAttribute(ElementPointer, "name")));
-
-                                            //        if (encodeForWysiwygEditor) {
-                                            //            string IconIDControlString = "AC," + ACType + ",," + ACName;
-                                            //            Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "List of Child Pages", "Renders as [List of Child Pages]", ACInstanceID, 0);
-                                            //            //Copy = IconImg;
-                                            //        } else if (EncodeCachableTags) {
-                                            //            //
-                                            //            // Handle in webclient
-                                            //            //
-                                            //            // removed sort method because all child pages are read in together in the order set by the parent - improve this later
-                                            //            Copy = "{{" + ACTypeChildList + "?name=" + genericController.encodeNvaArgument(ListName) + "}}";
-                                            //        }
-                                            //        break;
-                                            //    }
-                                            //case ACTypeContact: {
-                                            //        //
-                                            //        // Formatting Tag
-                                            //        //
-                                            //        if (encodeForWysiwygEditor) {
-                                            //            //
-                                            //            string IconIDControlString = "AC," + ACType;
-                                            //            Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0);
-                                            //            //Copy = IconImg;
-                                            //            //
-                                            //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ACContact.GIF"">"
-                                            //        } else if (EncodeCachableTags) {
-                                            //            if (moreInfoPeopleId != 0) {
-                                            //                Copy = pageContentController.getMoreInfoHtml(core, moreInfoPeopleId);
-                                            //            }
-                                            //        }
-                                            //        break;
-                                            //    }
-                                            //case ACTypeFeedback: {
-                                            //        //
-                                            //        // Formatting tag - change from information to be included after submission
-                                            //        //
-                                            //        if (encodeForWysiwygEditor) {
-                                            //            //
-                                            //            string IconIDControlString = "AC," + ACType;
-                                            //            Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, false, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0);
-                                            //            //Copy = IconImg;
-                                            //            //
-                                            //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a feedback form, sent to this record's primary contact."" id=""AC," & ACType & """ src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ACFeedBack.GIF"">"
-                                            //        } else if (EncodeNonCachableTags) {
-                                            //            if ((moreInfoPeopleId != 0) && (!string.IsNullOrEmpty(ContextContentName)) && (ContextRecordID != 0)) {
-                                            //                Copy = FeedbackFormNotSupportedComment;
-                                            //            }
-                                            //        }
-                                            //        break;
-                                            //    }
-                                            //case ACTypeImage: {
-                                            //        //
-                                            //        // ----- Image Tag, substitute image placeholder with the link from the REsource Library Record
-                                            //        if (encodeACResourceLibraryImages) {
-                                            //            Copy = "";
-                                            //            int ACAttrRecordID = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"));
-                                            //            int ACAttrWidth = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "WIDTH"));
-                                            //            int ACAttrHeight = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HEIGHT"));
-                                            //            string ACAttrAlt = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"));
-                                            //            int ACAttrBorder = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "BORDER"));
-                                            //            int ACAttrLoop = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "LOOP"));
-                                            //            int ACAttrVSpace = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "VSPACE"));
-                                            //            int ACAttrHSpace = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HSPACE"));
-                                            //            string ACAttrAlign = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALIGN"));
-                                            //            //
-                                            //            libraryFilesModel file = libraryFilesModel.create(core.cpInternal, ACAttrRecordID);
-                                            //            if (file != null) {
-                                            //                string Filename = file.filename;
-                                            //                Filename = genericController.vbReplace(Filename, "\\", "/");
-                                            //                Filename = genericController.encodeURL(Filename);
-                                            //                Copy += "<img ID=\"AC,IMAGE,," + ACAttrRecordID + "\" src=\"" + genericController.getCdnFileLink(core, Filename) + "\"";
-                                            //                //
-                                            //                if (ACAttrWidth == 0) {
-                                            //                    ACAttrWidth = file.width;
-                                            //                }
-                                            //                if (ACAttrWidth != 0) {
-                                            //                    Copy += " width=\"" + ACAttrWidth + "\"";
-                                            //                }
-                                            //                //
-                                            //                if (ACAttrHeight == 0) {
-                                            //                    ACAttrHeight = file.height;
-                                            //                }
-                                            //                if (ACAttrHeight != 0) {
-                                            //                    Copy += " height=\"" + ACAttrHeight + "\"";
-                                            //                }
-                                            //                //
-                                            //                if (ACAttrVSpace != 0) {
-                                            //                    Copy += " vspace=\"" + ACAttrVSpace + "\"";
-                                            //                }
-                                            //                //
-                                            //                if (ACAttrHSpace != 0) {
-                                            //                    Copy += " hspace=\"" + ACAttrHSpace + "\"";
-                                            //                }
-                                            //                //
-                                            //                if (!string.IsNullOrEmpty(ACAttrAlt)) {
-                                            //                    Copy += " alt=\"" + ACAttrAlt + "\"";
-                                            //                }
-                                            //                //
-                                            //                if (!string.IsNullOrEmpty(ACAttrAlign)) {
-                                            //                    Copy += " align=\"" + ACAttrAlign + "\"";
-                                            //                }
-                                            //                //
-                                            //                // no, 0 is an important value
-                                            //                //If ACAttrBorder <> 0 Then
-                                            //                Copy += " border=\"" + ACAttrBorder + "\"";
-                                            //                //    End If
-                                            //                //
-                                            //                if (ACAttrLoop != 0) {
-                                            //                    Copy += " loop=\"" + ACAttrLoop + "\"";
-                                            //                }
-                                            //                //
-                                            //                string attr = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "STYLE"));
-                                            //                if (!string.IsNullOrEmpty(attr)) {
-                                            //                    Copy += " style=\"" + attr + "\"";
-                                            //                }
-                                            //                //
-                                            //                attr = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "CLASS"));
-                                            //                if (!string.IsNullOrEmpty(attr)) {
-                                            //                    Copy += " class=\"" + attr + "\"";
-                                            //                }
-                                            //                //
-                                            //                Copy += ">";
-                                            //            }
-                                            //        }
-                                            //        break;
-                                            //    }
-                                            //case ACTypeDownload: {
-                                            //        //
-                                            //        // ----- substitute and anchored download image for the AC-Download tag
-                                            //        int ACAttrRecordID = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"));
-                                            //        string ACAttrAlt = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"));
-                                            //        //
-                                            //        if (encodeForWysiwygEditor) {
-                                            //            //
-                                            //            // Encoding the edit icons for the active editor form
-                                            //            string IconIDControlString = "AC," + ACTypeDownload + ",," + ACAttrRecordID;
-                                            //            Copy = AddonController.getAddonIconImg(AdminURL, 16, 16, 0, true, IconIDControlString, "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0);
-                                            //            //Copy = IconImg;
-                                            //            //
-                                            //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/IconDownload3.GIF"">"
-                                            //        } else if (encodeACResourceLibraryImages) {
-                                            //            //
-                                            //            libraryFilesModel file = libraryFilesModel.create(core.cpInternal, ACAttrRecordID);
-                                            //            if (file != null) {
-                                            //                if (string.IsNullOrEmpty(ACAttrAlt)) {
-                                            //                    ACAttrAlt = genericController.encodeText(file.altText);
-                                            //                }
-                                            //                Copy = "<a href=\"" + protocolHost + "/" + core.siteProperties.serverPageDefault + "?" + RequestNameDownloadID + "=" + ACAttrRecordID + "\" target=\"_blank\"><img src=\"" + protocolHost + "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/IconDownload3.gif\" width=\"16\" height=\"16\" border=\"0\" alt=\"" + ACAttrAlt + "\"></a>";
-                                            //            }
-                                            //        }
-                                            //        break;
-                                            //    }
                                             case ACTypeTemplateContent: {
                                                     //
                                                     // ----- Create Template Content
@@ -796,9 +534,6 @@ namespace Contensive.Processor.Controllers {
                                                                 ACInstanceName = ImageIDArray[3];
                                                                 if (ImageIDArrayCount > 4) {
                                                                     ACQueryString = ImageIDArray[4];
-                                                                    //If ImageIDArrayCount > 5 Then
-                                                                    //    ACGuid = ImageIDArray(5)
-                                                                    //End If
                                                                 }
                                                             }
                                                         }
@@ -862,49 +597,12 @@ namespace Contensive.Processor.Controllers {
                                                                                             ImageHeightText = ImageStylePairValue;
                                                                                             break;
                                                                                     }
-                                                                                    //If genericController.vbInstr(1, ImageStylePair, "WIDTH", vbTextCompare) = 1 Then
-                                                                                    //    End If
                                                                                 }
                                                                             }
                                                                         }
                                                                         ElementText = "<AC type=\"IMAGE\" ACInstanceID=\"" + ACInstanceID + "\" RecordID=\"" + RecordID + "\" Style=\"" + ImageStyle + "\" Width=\"" + ImageWidthText + "\" Height=\"" + ImageHeightText + "\" VSpace=\"" + ImageVSpace + "\" HSpace=\"" + ImageHSpace + "\" Alt=\"" + ImageAlt + "\" Align=\"" + ImageAlign + "\" Border=\"" + ImageBorder + "\" Loop=\"" + ImageLoop + "\">";
                                                                     }
                                                                     break;
-                                                                //case ACTypeDownload:
-                                                                //    //
-                                                                //    // AC Download
-                                                                //    //
-                                                                //    if (ImageIDArrayCount >= 4) {
-                                                                //        RecordID = genericController.encodeInteger(ACInstanceName);
-                                                                //        ElementText = "<AC type=\"DOWNLOAD\" ACInstanceID=\"" + ACInstanceID + "\" RecordID=\"" + RecordID + "\">";
-                                                                //    }
-                                                                //    break;
-                                                                //case ACTypeDate:
-                                                                //    //
-                                                                //    // Date
-                                                                //    //
-                                                                //    ElementText = "<AC type=\"" + ACTypeDate + "\">";
-                                                                //    break;
-                                                                //case ACTypeVisit:
-                                                                //case ACTypeVisitor:
-                                                                //case ACTypeMember:
-                                                                //case ACTypeOrganization:
-                                                                //case ACTypePersonalization:
-                                                                //    //
-                                                                //    // Visit, etc
-                                                                //    //
-                                                                //    ElementText = "<AC type=\"" + ACType + "\" ACInstanceID=\"" + ACInstanceID + "\" field=\"" + ACFieldName + "\">";
-                                                                //    break;
-                                                                ////case ACTypeChildList:
-                                                                //case ACTypeLanguage:
-                                                                //    //
-                                                                //    // ChildList, Language
-                                                                //    //
-                                                                //    if (ACInstanceName == "0") {
-                                                                //        ACInstanceName = genericController.GetRandomInteger(core).ToString();
-                                                                //    }
-                                                                //    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\">";
-                                                                //    break;
                                                                 case ACTypeAggregateFunction:
                                                                     //
                                                                     // Function
@@ -929,13 +627,6 @@ namespace Contensive.Processor.Controllers {
                                                                     }
                                                                     ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\" querystring=\"" + QueryString + "\" guid=\"" + ACGuid + "\">";
                                                                     break;
-                                                                // c/*ase ACType*/Contact:
-                                                                //case ACTypeFeedback:
-                                                                //    //
-                                                                //    // Contact and Feedback
-                                                                //    //
-                                                                //    ElementText = "<AC type=\"" + ACType + "\" ACInstanceID=\"" + ACInstanceID + "\">";
-                                                                //    break;
                                                                 case ACTypeTemplateContent:
                                                                 case ACTypeTemplateText:
                                                                     //
@@ -953,38 +644,6 @@ namespace Contensive.Processor.Controllers {
                                                                     }
                                                                     ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\" querystring=\"" + QueryString + "\">";
                                                                     break;
-                                                                //case ACTypeWatchList:
-                                                                //    //
-                                                                //    // Watch List
-                                                                //    //
-                                                                //    QueryString = "";
-                                                                //    if (ImageIDArrayCount > 4) {
-                                                                //        QueryString = genericController.encodeText(ImageIDArray[4]);
-                                                                //        QueryString = HtmlController.decodeHtml(QueryString);
-                                                                //        QSSplit = QueryString.Split('&');
-                                                                //        for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                //            QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
-                                                                //        }
-                                                                //        QueryString = string.Join("&", QSSplit);
-                                                                //    }
-                                                                //    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\" querystring=\"" + QueryString + "\">";
-                                                                //    break;
-                                                                //case ACTypeRSSLink:
-                                                                //    //
-                                                                //    // RSS Link
-                                                                //    //
-                                                                //    QueryString = "";
-                                                                //    if (ImageIDArrayCount > 4) {
-                                                                //        QueryString = genericController.encodeText(ImageIDArray[4]);
-                                                                //        QueryString = HtmlController.decodeHtml(QueryString);
-                                                                //        QSSplit = QueryString.Split('&');
-                                                                //        for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                //            QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
-                                                                //        }
-                                                                //        QueryString = string.Join("&", QSSplit);
-                                                                //    }
-                                                                //    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\" querystring=\"" + QueryString + "\">";
-                                                                //    break;
                                                                 default:
                                                                     //
                                                                     // All others -- added querystring from element(4) to all others to cover the group access AC object
@@ -1551,7 +1210,7 @@ namespace Contensive.Processor.Controllers {
                         string[] libraryFileSplit = htmlContentSegment_file.Split('/');
                         if (libraryFileSplit.GetUpperBound(0) > 2) {
                             int libraryRecordID = encodeInteger(libraryFileSplit[2]);
-                            if ((libraryFileSplit[0].ToLower() == "cclibraryfiles") && (libraryFileSplit[1].ToLower() == "filename") && (libraryRecordID != 0)) {
+                            if ((libraryFileSplit[0].ToLower(CultureInfo.InvariantCulture) == "cclibraryfiles") && (libraryFileSplit[1].ToLower(CultureInfo.InvariantCulture) == "filename") && (libraryRecordID != 0)) {
                                 LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, libraryRecordID);
                                 if ((file != null) && (htmlContentSegment_file != file.filename)) { htmlContentSegment_file = file.filename; }
                             }

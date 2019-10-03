@@ -104,7 +104,7 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         // ----- private instance storage
         //
-        private bool remoteCacheInitialized;
+        private readonly bool remoteCacheInitialized;
         //
         //========================================================================
         /// <summary>
@@ -159,16 +159,14 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- this is a pointer key, load the primary
                         result = getObject<TData>(cacheDocument.keyPtr);
-                    } else if (cacheDocument.content is Newtonsoft.Json.Linq.JObject) {
+                    } else if (cacheDocument.content is Newtonsoft.Json.Linq.JObject dataJObject) {
                         //
                         // -- newtonsoft types
-                        Newtonsoft.Json.Linq.JObject data = (Newtonsoft.Json.Linq.JObject)cacheDocument.content;
-                        result = data.ToObject<TData>();
-                    } else if (cacheDocument.content is Newtonsoft.Json.Linq.JArray) {
+                        result = dataJObject.ToObject<TData>();
+                    } else if (cacheDocument.content is Newtonsoft.Json.Linq.JArray dataJArray) {
                         //
                         // -- newtonsoft types
-                        Newtonsoft.Json.Linq.JArray data = (Newtonsoft.Json.Linq.JArray)cacheDocument.content;
-                        result = data.ToObject<TData>();
+                        result = dataJArray.ToObject<TData>();
                     } else if (cacheDocument.content == null) {
                         //
                         // -- if cache data was left as a string (might be empty), and return object is not string, there was an error
@@ -662,7 +660,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.serverConfig.enableRemoteCache) {
                     //
                     // -- leave off, it causes a performance hit
-                    if (core.serverConfig.enableEnyimNLog) { Enyim.Caching.LogManager.AssignFactory(new NLogFactory()); };
+                    if (core.serverConfig.enableEnyimNLog) { Enyim.Caching.LogManager.AssignFactory(new NLogFactory()); }
                     //
                     // -- initialize memcached drive (Enyim)
                     string cacheEndpoint = core.serverConfig.awsElastiCacheConfigurationEndpoint;

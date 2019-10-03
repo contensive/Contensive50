@@ -520,7 +520,6 @@ namespace Contensive.Addons.Tools {
                             foreach (var keyValuePair in CDef.fields) {
                                 Processor.Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
                                 if (field.id == FieldIDToAdd) {
-                                    //If field.Name = FieldNameToAdd Then
                                     if (field.inherited) {
                                         SourceContentID = field.contentId;
                                         SourceName = field.nameLc;
@@ -580,7 +579,6 @@ namespace Contensive.Addons.Tools {
                                     // Add a field to the Listing Page
                                     //
                                     if (FieldIDToAdd != 0) {
-                                        //If FieldNameToAdd <> "" Then
                                         columnPtr = 0;
                                         if (CDef.adminColumns.Count > 1) {
                                             foreach (var keyValuePair in CDef.adminColumns) {
@@ -834,12 +832,6 @@ namespace Contensive.Addons.Tools {
                                         break;
                                     }
                                 }
-                                //For ColumnPointer = 0 To CDef.adminColumns.Count - 1
-                                //    If .nameLc = CDef.adminColumns(ColumnPointer).Name Then
-                                //        skipField = True
-                                //        Exit For
-                                //    End If
-                                //Next
                             }
                             //
                             // display the column if it is not in use
@@ -1066,24 +1058,6 @@ namespace Contensive.Addons.Tools {
                         Stream.Add("<br>Reloading Content Definitions...");
                         core.cache.invalidateAll();
                         core.clearMetaData();
-                        //
-                        // Add Admin Menu Entry
-                        //
-                        //If AddAdminMenuEntry Then
-                        //    Stream.Add("<br>Adding menu entry (will not display until the next page)...")
-                        //    csData.cs_open(NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
-                        //    If csData.cs_ok(CS) Then
-                        //        MenuName = csData.cs_getText(CS, "name")
-                        //        AdminOnly = csData.cs_getBoolean(CS, "AdminOnly")
-                        //        DeveloperOnly = csData.cs_getBoolean(CS, "DeveloperOnly")
-                        //    End If
-                        //    Call csData.cs_Close(CS)
-                        //    If MenuName <> "" Then
-                        //        Call Controllers.appBuilderController.admin_VerifyAdminMenu(core, MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
-                        //    Else
-                        //        Call Controllers.appBuilderController.admin_VerifyAdminMenu(core, "Site Content", ChildContentName, ChildContentName, "", "")
-                        //    End If
-                        //End If
                         Stream.Add("<br>Finished</P>");
                     }
                     Stream.Add("</SPAN>");
@@ -2306,276 +2280,6 @@ namespace Contensive.Addons.Tools {
             }
             return result;
         }
-        //
-        //=============================================================================
-        //   Import the htm and html files in the FileRootPath and below into Page Templates
-        //       FileRootPath is the path to the root of the site
-        //       AppPath is the path to the folder currently
-        //=============================================================================
-        //
-        //Private Function ImportTemplates(ByVal FileRootPath As String, ByVal AppPath As String, ByVal AllowBodyHTML As Boolean, ByVal AllowScriptLink As Boolean, ByVal AllowImageImport As Boolean, ByVal AllowStyleImport As Boolean) As String
-        //    Dim result As String = ""
-        //    Try
-        //        '
-        //        Dim Stream As New stringBuilderLegacyController
-        //        Dim Folders() As String
-        //        Dim FolderList As String
-        //        Dim FolderDetailString As String
-        //        Dim FolderDetails() As String
-        //        Dim FolderName As String
-        //        Dim FileList As String
-        //        Dim Files() As String
-        //        Dim Ptr As Integer
-        //        Dim FileDetailString As String
-        //        Dim FileDetails() As String
-        //        Dim Filename As String
-        //        Dim PageSource As String
-        //        Dim CS As Integer
-        //        Dim Link As String
-        //        Dim TemplateName As String
-        //        Dim Copy As String
-        //        '
-        //        FileList = core.appRootFiles.convertFileINfoArrayToParseString(core.appRootFiles.getFileList(FileRootPath & AppPath))
-        //        Files = Split(FileList, vbCrLf)
-        //        For Ptr = 0 To UBound(Files)
-        //            FileDetailString = Files[Ptr]
-        //            FileDetails = Split(FileDetailString, ",")
-        //            Filename = FileDetails(0)
-        //            Link = genericController.vbReplace(AppPath & Filename, "\", "/")
-        //            If AllowScriptLink And (InStr(1, Filename, ".asp", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
-        //                '
-        //                result = result & "<br>Create Hard Template for script page [" & Link & "]"
-        //                '
-        //                Link = genericController.vbReplace(AppPath & Filename, "\", "/")
-        //                TemplateName = genericController.vbReplace(Link, "/", "-")
-        //                If genericController.vbInstr(1, TemplateName, ".") <> 0 Then
-        //                    TemplateName = Mid(TemplateName, 1, genericController.vbInstr(1, TemplateName, ".") - 1)
-
-        //                End If
-        //                '
-        //                csData.cs_open("Page Templates", "Link=" & DbController.encodeSQLText(Link))
-        //                If Not csData.cs_ok(CS) Then
-        //                    Call csData.cs_Close(CS)
-        //                    csData.cs_insertRecord("Page Templates")
-        //                    Call csData.cs_set(CS, "Link", Link)
-        //                End If
-        //                If csData.cs_ok(CS) Then
-        //                    Call csData.cs_set(CS, "name", TemplateName)
-        //                End If
-        //                Call csData.cs_Close(CS)
-        //            ElseIf AllowBodyHTML And (InStr(1, Filename, ".htm", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
-        //                '
-        //                ' HTML, import body
-        //                '
-        //                PageSource = core.appRootFiles.readFile(Filename)
-        //                Call core.main_EncodePage_SplitBody(PageSource, PageSource, "", "")
-        //                Link = genericController.vbReplace(AppPath & Filename, "\", "/")
-        //                TemplateName = genericController.vbReplace(Link, "/", "-")
-        //                If genericController.vbInstr(1, TemplateName, ".") <> 0 Then
-        //                    TemplateName = Mid(TemplateName, 1, genericController.vbInstr(1, TemplateName, ".") - 1)
-
-        //                End If
-        //                '
-        //                result = result & "<br>Create Soft Template from source [" & Link & "]"
-        //                '
-        //                csData.cs_open("Page Templates", "Source=" & DbController.encodeSQLText(Link))
-        //                If Not csData.cs_ok(CS) Then
-        //                    Call csData.cs_Close(CS)
-        //                    csData.cs_insertRecord("Page Templates")
-        //                    Call csData.cs_set(CS, "Source", Link)
-        //                    Call csData.cs_set(CS, "name", TemplateName)
-        //                End If
-        //                If csData.cs_ok(CS) Then
-        //                    Call csData.cs_set(CS, "Link", "")
-        //                    Call csData.cs_set(CS, "bodyhtml", PageSource)
-        //                End If
-        //                Call csData.cs_Close(CS)
-        //                '
-        //            ElseIf AllowImageImport And (InStr(1, Filename, ".gif", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
-        //                '
-        //                ' Import GIF images
-        //                '
-        //                result = result & "<br>Import Image Link to Resource Library [" & Link & "]"
-        //                '
-        //            ElseIf AllowStyleImport And (InStr(1, Filename, ".css", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
-        //                '
-        //                ' Import CSS to Dynamic styles
-        //                '
-        //                result = result & "<br>Import style sheet to Dynamic Styles [" & Link & "]"
-        //                '
-        //                Dim DynamicFilename As String
-        //                DynamicFilename = "templates\styles.css"
-        //                Copy = core.appRootFiles.readFile(DynamicFilename)
-        //                Copy = RemoveStyleTags(Copy)
-        //                Copy = Copy _
-        //                    & vbCrLf _
-        //                    & vbCrLf & "/* Import of " & FileRootPath & AppPath & Filename & "*/" _
-        //                    & vbCrLf _
-        //                    & vbCrLf
-        //                Copy = Copy & RemoveStyleTags(core.appRootFiles.readFile(Filename))
-        //                Call core.appRootFiles.saveFile(DynamicFilename, Copy)
-        //            End If
-        //        Next
-        //        '
-        //        ' Now process all subfolders
-        //        '
-        //        FolderList = core.getFolderNameList(FileRootPath & AppPath)
-        //        If FolderList <> "" Then
-        //            Folders = Split(FolderList, vbCrLf)
-        //            For Ptr = 0 To UBound(Folders)
-        //                FolderDetailString = Folders[Ptr]
-        //                If FolderDetailString <> "" Then
-        //                    FolderDetails = Split(FolderDetailString, ",")
-        //                    FolderName = FolderDetails(0)
-        //                    If Mid(FolderName, 1, 1) <> "_" Then
-        //                        result = result & ImportTemplates(FileRootPath, AppPath & FolderName & "\", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport)
-        //                    End If
-        //                End If
-        //            Next
-        //        End If
-        //    Catch ex As Exception
-        //        core.handleExceptionAndContinue(ex) : Throw
-        //    End Try
-        //    Return result
-        //End Function
-        //        '
-        //        '
-        //        '
-        //        Private Function LoadCDef(ByVal ContentName As String) As coreMetaDataClass.CDefClass
-        //            On Error GoTo ErrorTrap
-        //            '
-        //            Dim SQL As String
-        //            Dim CS As Integer
-        //            Dim ContentID As Integer
-        //            Dim CSContent As Integer
-        //            Dim ParentContentName As String
-        //            Dim ParentID As Integer
-        //            '
-        //            CSContent = csData.cs_open("Content", "name=" & DbController.encodeSQLText(ContentName))
-        //            If csData.cs_ok(CSContent) Then
-        //                '
-        //                ' Start with parent CDef
-        //                '
-        //                ParentID = csData.cs_getInteger(CSContent, "parentID")
-        //                If ParentID <> 0 Then
-        //                    ParentContentName = Models.Complex.CdefController.getContentNameByID(core,ParentID)
-        //                    If ParentContentName <> "" Then
-        //                        LoadCDef = LoadCDef(ParentContentName)
-        //                    End If
-        //                End If
-        //                '
-        //                ' Add this definition on it
-        //                '
-        //                With LoadCDef
-        //                    csData.cs_open("Content Fields", "contentid=" & ContentID)
-        //                    Do While csData.cs_ok(CS)
-        //                        Select Case genericController.vbUCase(csData.cs_getText(CS, "name"))
-        //                            Case "NAME"
-        //                                .Name = ""
-        //                        End Select
-        //                        Call csData.cs_goNext(CS)
-        //                    Loop
-        //                    Call csData.cs_Close(CS)
-        //                End With
-        //            End If
-        //            Call csData.cs_Close(CSContent)
-        //            throw (new GenericException("Unexpected exception"))'  Call handleLegacyClassErrors1("ImportTemplates", "ErrorTrap")
-        //        End Function
-        //        '
-        //        '=================================================================================
-        //        '
-        //        ' From Admin code in ccWeb42
-        //        '   Put it here so the same data will be used for both the admin site and the tool page
-        //        '   change this so it reads from the CDef, not the database
-        //        '
-        //        '
-        //        '=================================================================================
-        //        '
-        //        Public Sub GetDbCDef_SetAdminColumns(ByRef CDef As appServices_metaDataClass.CDefClass)
-        //            On Error GoTo ErrorTrap
-        //            '
-        //            Dim DestPtr As Integer
-        //            Dim UcaseFieldName As String
-        //            Dim DefaultFieldPointer As Integer
-        //            ' converted array to dictionary - Dim FieldPointer As Integer
-        //            Dim FieldActive As Boolean
-        //            Dim FieldAuthorable As Boolean
-        //            Dim FieldWidth As Integer
-        //            Dim FieldWidthTotal As Integer
-        //            'Dim IndexColumn() As Integer
-        //            Dim adminColumn As appServices_metaDataClass.CDefAdminColumnClass
-        //            '
-        //            With CDef
-        //                If .Id > 0 Then
-        //                    For Each keyValuePair As KeyValuePair(Of String, appServices_metaDataClass.CDefFieldClass) In .fields
-        //                        Dim field As appServices_metaDataClass.CDefFieldClass = keyValuePair.Value
-        //                        FieldActive = field.active
-        //                        FieldWidth = genericController.EncodeInteger(field.IndexWidth)
-        //                        If FieldActive And (FieldWidth > 0) Then
-        //                            adminColumn = New appServices_metaDataClass.CDefAdminColumnClass
-        //                            FieldWidthTotal = FieldWidthTotal + FieldWidth
-        //                            'ReDim Preserve IndexColumn(.adminColumns.Count)
-        //                            DestPtr = -1
-        //                            If .adminColumns.Count > 0 Then
-        //                                '
-        //                                ' Sort the columns to make room
-        //                                '
-        //                                For DestPtr = .adminColumns.Count - 1 To 0 Step -1
-        //                                    If field.IndexColumn >= IndexColumn(DestPtr) Then
-        //                                        '
-        //                                        ' Put the new entry into Destination+1
-        //                                        '
-        //                                        Exit For
-        //                                    Else
-        //                                        '
-        //                                        ' move entry destination->destination+1
-        //                                        '
-        //                                        IndexColumn(DestPtr + 1) = IndexColumn(DestPtr)
-        //                                        adminColumn.Name = .adminColumns(DestPtr).Name
-        //                                        adminColumn.SortDirection = .adminColumns(DestPtr).SortDirection
-        //                                        adminColumn.SortPriority = .adminColumns(DestPtr).SortPriority
-        //                                        adminColumn.Width = .adminColumns(DestPtr).Width
-        //                                    End If
-        //                                Next
-        //                            End If
-        //                            IndexColumn(DestPtr + 1) = field.IndexColumn
-        //                            adminColumn.Name = field.Name
-        //                            adminColumn.SortDirection = field.IndexSortDirection
-        //                            adminColumn.SortPriority = genericController.EncodeInteger(field.IndexSortOrder)
-        //                            adminColumn.Width = FieldWidth
-        //                            .adminColumns.Add(adminColumn)
-        //                        End If
-        //                    Next
-        //                    If .adminColumns.Count = 0 Then
-        //                        '
-        //                        ' Force the Name field as the only column
-        //                        '
-        //                        adminColumn = New appServices_metaDataClass.CDefAdminColumnClass
-        //                        With adminColumn
-        //                            .Name = "Name"
-        //                            .SortDirection = 1
-        //                            .SortPriority = 1
-        //                            .Width = 100
-        //                            FieldWidthTotal = FieldWidthTotal + .Width
-        //                        End With
-        //                        .adminColumns.Add(adminColumn)
-        //                    End If
-        //                    '
-        //                    ' Normalize the column widths
-        //                    '
-        //                    For FieldPointer = 0 To .adminColumns.Count - 1
-        //                        With .adminColumns(FieldPointer)
-        //                            .Width = 100 * (.Width / FieldWidthTotal)
-        //                        End With
-        //                    Next
-        //                End If
-        //            End With
-        //            Exit Sub
-        //            '
-        //            ' ----- Error Trap
-        //            '
-        //            throw (new GenericException("Unexpected exception"))'  Call handleLegacyClassErrors1("GetDbCDef_SetAdminColumns", "ErrorTrap")
-        //        End Sub
         //
         //=============================================================================
         //   Print the manual query form

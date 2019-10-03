@@ -2,6 +2,7 @@
 using Contensive.Processor.Controllers;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Xml;
 //
 namespace Contensive.Processor.Models.Domain {
@@ -44,7 +45,7 @@ namespace Contensive.Processor.Models.Domain {
                     return null;
                 }
                 foreach (XmlNode collectionNode in LibCollections.DocumentElement.ChildNodes) {
-                    if (collectionNode.Name.ToLower().Equals("collection")) {
+                    if (collectionNode.Name.ToLower(CultureInfo.InvariantCulture).Equals("collection")) {
                         //
                         // Read the collection
                         var collection = new CollectionLibraryModel();

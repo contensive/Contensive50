@@ -12,6 +12,7 @@ using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.BaseClasses;
 using System.Text;
 using Contensive.Models.Db;
+using System.Globalization;
 
 namespace Contensive.Addons.AdminSite {
     public class FormIndex {
@@ -137,13 +138,13 @@ namespace Contensive.Addons.AdminSite {
                             // Refresh Query String
                             //
                             core.doc.addRefreshQueryString("tr", IndexConfig.recordTop.ToString());
-                            core.doc.addRefreshQueryString("asf", adminData.AdminForm.ToString());
+                            core.doc.addRefreshQueryString("asf", adminData.adminForm.ToString());
                             core.doc.addRefreshQueryString("cid", adminData.adminContent.id.ToString());
-                            core.doc.addRefreshQueryString(RequestNameTitleExtension, GenericController.encodeRequestVariable(adminData.TitleExtension));
-                            if (adminData.WherePairCount > 0) {
-                                for (int WhereCount = 0; WhereCount < adminData.WherePairCount; WhereCount++) {
-                                    core.doc.addRefreshQueryString("wl" + WhereCount, adminData.WherePair[0, WhereCount]);
-                                    core.doc.addRefreshQueryString("wr" + WhereCount, adminData.WherePair[1, WhereCount]);
+                            core.doc.addRefreshQueryString(RequestNameTitleExtension, GenericController.encodeRequestVariable(adminData.titleExtension));
+                            if (adminData.wherePairCount > 0) {
+                                for (int WhereCount = 0; WhereCount < adminData.wherePairCount; WhereCount++) {
+                                    core.doc.addRefreshQueryString("wl" + WhereCount, adminData.wherePair[0, WhereCount]);
+                                    core.doc.addRefreshQueryString("wr" + WhereCount, adminData.wherePair[1, WhereCount]);
                                 }
                             }
                             //
@@ -245,9 +246,9 @@ namespace Contensive.Addons.AdminSite {
                                 //fieldId = column.FieldId
                                 string FieldName = column.Name;
                                 //
-                                //if this is a current sort ,add the reverse flag
+                                // if this is a current sort ,add the reverse flag
                                 //
-                                string ButtonHref = "/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormIndex + "&SetSortField=" + FieldName + "&RT=0&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.TitleExtension) + "&cid=" + adminData.adminContent.id + "&ad=" + adminData.ignore_legacyMenuDepth;
+                                string ButtonHref = "/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormIndex + "&SetSortField=" + FieldName + "&RT=0&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.titleExtension) + "&cid=" + adminData.adminContent.id + "&ad=" + adminData.ignore_legacyMenuDepth;
                                 foreach (var sortKvp in IndexConfig.sorts) {
                                     IndexConfigClass.IndexConfigSortClass sort = sortKvp.Value;
 
@@ -269,11 +270,11 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 //----- column header includes WherePairCount
                                 //
-                                if (adminData.WherePairCount > 0) {
-                                    for (int WhereCount = 0; WhereCount < adminData.WherePairCount; WhereCount++) {
-                                        if (adminData.WherePair[0, WhereCount] != "") {
-                                            ButtonHref += "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[0, WhereCount]);
-                                            ButtonHref += "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[1, WhereCount]);
+                                if (adminData.wherePairCount > 0) {
+                                    for (int WhereCount = 0; WhereCount < adminData.wherePairCount; WhereCount++) {
+                                        if (adminData.wherePair[0, WhereCount] != "") {
+                                            ButtonHref += "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[0, WhereCount]);
+                                            ButtonHref += "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[1, WhereCount]);
                                         }
                                     }
                                 }
@@ -295,7 +296,7 @@ namespace Contensive.Addons.AdminSite {
                                     }
                                 }
                                 //ButtonObject = "Button" + ButtonObjectCount;
-                                adminData.ButtonObjectCount += 1;
+                                adminData.buttonObjectCount += 1;
                                 DataTable_HdrRow += "<td width=\"" + ColumnWidth + "%\" valign=bottom align=left class=\"small ccAdminListCaption\">";
                                 DataTable_HdrRow += ("<a title=\"" + SortTitle + "\" href=\"" + HtmlController.encodeHtml(ButtonHref) + "\" class=\"ccAdminListCaption\">" + ButtonFace + "</A>");
                                 DataTable_HdrRow += ("</td>");
@@ -325,10 +326,10 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // --- Edit button column
                                         DataTableRows.Append("<td align=center " + RowColor + ">");
-                                        string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + Constants.AdminActionNop + "&cid=" + adminData.adminContent.id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.TitleExtension) + "&ad=" + adminData.ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminData.AdminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
-                                        if (adminData.WherePairCount > 0) {
-                                            for (int WhereCount = 0; WhereCount < adminData.WherePairCount; WhereCount++) {
-                                                URI = URI + "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[1, WhereCount]);
+                                        string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + Constants.AdminActionNop + "&cid=" + adminData.adminContent.id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.titleExtension) + "&ad=" + adminData.ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminData.adminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
+                                        if (adminData.wherePairCount > 0) {
+                                            for (int WhereCount = 0; WhereCount < adminData.wherePairCount; WhereCount++) {
+                                                URI = URI + "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[1, WhereCount]);
                                             }
                                         }
                                         DataTableRows.Append(AdminUIController.getRecordEditLink(URI));
@@ -433,15 +434,6 @@ namespace Contensive.Addons.AdminSite {
                             string grid = ""
                                 + "<table ID=\"DataTable\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"Background-Color:white;\">"
                                 + DataTable_HdrRow + DataTableRows.ToString() + DataTable_FindRow + "</table>";
-                            //DataTable = BodyIndexAdvancedSearchClass.get( core, )
-                            //
-                            // Assemble DataFilterTable
-                            //
-                            //string filterCell = "";
-                            //if (!string.IsNullOrEmpty(IndexFilterContent)) {
-                            //    filterCell = "<td valign=top style=\"border-right:1px solid black;\" class=\"ccToolsCon\">" + IndexFilterJS + IndexFilterHead + IndexFilterContent + "</td>";
-                            //    //FilterColumn = "<td valign=top class=""ccPanel3DReverse ccAdminEditBody"" style=""border-right:1px solid black;"">" & IndexFilterJS & IndexFilterHead & IndexFilterContent & "</td>"
-                            //}
                             string formContent = ""
                                 + "<table ID=\"DataFilterTable\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"Background-Color:white;\">"
                                 + "<tr>"
@@ -469,8 +461,6 @@ namespace Contensive.Addons.AdminSite {
                             core.html.addTitle(adminData.adminContent.name);
                         }
                     }
-                    //End If
-                    //
                 }
                 result = HtmlController.form(core, Stream.Text, "", "adminForm");
                 //
@@ -777,19 +767,6 @@ namespace Contensive.Addons.AdminSite {
                     if (VarInteger != 0) {
                         IndexConfig.subCDefID = VarInteger;
                         IndexConfig.pageNumber = 1;
-                        //                If .SubCDefCnt > 0 Then
-                        //                    For Ptr = 0 To .SubCDefCnt - 1
-                        //                        If VarInteger = .SubCDefs[Ptr] Then
-                        //                            Exit For
-                        //                        End If
-                        //                    Next
-                        //                End If
-                        //                If Ptr = .SubCDefCnt Then
-                        //                    ReDim Preserve .SubCDefs(.SubCDefCnt)
-                        //                    .SubCDefs(.SubCDefCnt) = VarInteger
-                        //                    .SubCDefCnt = .SubCDefCnt + 1
-                        //                    .PageNumber = 1
-                        //                End If
                     }
                     //
                     // Remove CDef
@@ -798,15 +775,6 @@ namespace Contensive.Addons.AdminSite {
                     if (VarInteger != 0) {
                         IndexConfig.subCDefID = 0;
                         IndexConfig.pageNumber = 1;
-                        //                If .SubCDefCnt > 0 Then
-                        //                    For Ptr = 0 To .SubCDefCnt - 1
-                        //                        If .SubCDefs[Ptr] = VarInteger Then
-                        //                            .SubCDefs[Ptr] = 0
-                        //                            .PageNumber = 1
-                        //                            Exit For
-                        //                        End If
-                        //                    Next
-                        //                End If
                     }
                     //
                     // Add Groups
@@ -850,16 +818,6 @@ namespace Contensive.Addons.AdminSite {
                         if (IndexConfig.findWords.ContainsKey(VarText)) {
                             IndexConfig.findWords.Remove(VarText);
                         }
-                        //If .FindWords.Count > 0 Then
-                        //    For Ptr = 0 To .FindWords.Count - 1
-                        //        If .FindWords[Ptr].Name = VarText Then
-                        //            .FindWords[Ptr].MatchOption = FindWordMatchEnum.MatchIgnore
-                        //            .FindWords[Ptr].Value = ""
-                        //            .PageNumber = 1
-                        //            Exit For
-                        //        End If
-                        //    Next
-                        //End If
                     }
                     //
                     // Read ActiveOnly
@@ -1145,20 +1103,20 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // Where Clause: Where Pairs
                 for (WCount = 0; WCount <= 9; WCount++) {
-                    if (!string.IsNullOrEmpty(adminData.WherePair[1, WCount])) {
+                    if (!string.IsNullOrEmpty(adminData.wherePair[1, WCount])) {
                         //
                         // Verify that the fieldname called out is in this table
                         if (adminData.adminContent.fields.Count > 0) {
                             foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
                                 ContentFieldMetadataModel field = keyValuePair.Value;
-                                if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(adminData.WherePair[0, WCount])) {
+                                if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(adminData.wherePair[0, WCount])) {
                                     //
                                     // found it, add it in the sql
-                                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + adminData.WherePair[0, WCount] + "=";
-                                    if (adminData.WherePair[1, WCount].IsNumeric()) {
-                                        return_SQLWhere += adminData.WherePair[1, WCount] + ")";
+                                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + adminData.wherePair[0, WCount] + "=";
+                                    if (adminData.wherePair[1, WCount].IsNumeric()) {
+                                        return_SQLWhere += adminData.wherePair[1, WCount] + ")";
                                     } else {
-                                        return_SQLWhere += "'" + adminData.WherePair[1, WCount] + "')";
+                                        return_SQLWhere += "'" + adminData.wherePair[1, WCount] + "')";
                                     }
                                     break;
                                 }
@@ -1311,10 +1269,10 @@ namespace Contensive.Addons.AdminSite {
                                                             break;
                                                         case (int)FindWordMatchEnum.MatchEquals:
                                                         case (int)FindWordMatchEnum.matchincludes:
-                                                            lookups = field.lookupList.ToLower().Split(',');
+                                                            lookups = field.lookupList.ToLower(CultureInfo.InvariantCulture).Split(',');
                                                             LookupQuery = "(1=0)";
                                                             for (LookupPtr = 0; LookupPtr <= lookups.GetUpperBound(0); LookupPtr++) {
-                                                                if (lookups[LookupPtr].Contains(FindWordValue.ToLower())) {
+                                                                if (lookups[LookupPtr].Contains(FindWordValue.ToLower(CultureInfo.InvariantCulture))) {
                                                                     LookupQuery = LookupQuery + "OR(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(LookupPtr + 1) + ")";
                                                                 }
                                                             }
@@ -1513,7 +1471,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     foreach (var findWordKvp in IndexConfig.findWords) {
                         IndexConfigClass.IndexConfigFindWordClass findWord = findWordKvp.Value;
-                        string fieldCaption = (!adminData.adminContent.fields.ContainsKey(findWord.Name.ToLower())) ? findWord.Name : adminData.adminContent.fields[findWord.Name.ToLower()].caption;
+                        string fieldCaption = (!adminData.adminContent.fields.ContainsKey(findWord.Name.ToLower(CultureInfo.InvariantCulture))) ? findWord.Name : adminData.adminContent.fields[findWord.Name.ToLower(CultureInfo.InvariantCulture)].caption;
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1604,7 +1562,7 @@ namespace Contensive.Addons.AdminSite {
                 // people filters
                 //
                 SubFilterList = "";
-                if (adminData.adminContent.tableName.ToLower() == GenericController.vbLCase("ccmembers")) {
+                if (adminData.adminContent.tableName.ToLower(CultureInfo.InvariantCulture) == GenericController.vbLCase("ccmembers")) {
                     using (var csData = new CsModel(core)) {
                         csData.openSql(core.db.getSQLSelect("ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
                         while (csData.ok()) {

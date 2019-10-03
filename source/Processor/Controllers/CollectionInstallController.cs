@@ -16,6 +16,7 @@ using Contensive.BaseClasses;
 using System.Reflection;
 using NLog;
 using Contensive.Models.Db;
+using System.Globalization;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -132,7 +133,7 @@ namespace Contensive.Processor.Controllers {
                 contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + collectionGuid + "]");
                 traceContextLog(core, contextLog);
                 //
-                if (collectionsInstalledList.Contains(collectionGuid.ToLower())) {
+                if (collectionsInstalledList.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture))) {
                     //
                     // -- this collection has already been installed during this installation process. Skip and return success
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", [" + collectionGuid + "] was not installed because it was previously installed during this installation.");
@@ -140,7 +141,7 @@ namespace Contensive.Processor.Controllers {
                     return true;
                 }
                 // -- collection needs to be 
-                if (!collectionsInstalledList.Contains(collectionGuid.ToLower())) { collectionsInstalledList.Add(collectionGuid.ToLower()); }
+                if (!collectionsInstalledList.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture))) { collectionsInstalledList.Add(collectionGuid.ToLower(CultureInfo.InvariantCulture)); }
                 //
                 var collectionFolderConfig =  CollectionFolderModel.getCollectionFolderConfig(core, collectionGuid);
                 if (string.IsNullOrEmpty(collectionFolderConfig.path)) {
@@ -301,7 +302,7 @@ namespace Contensive.Processor.Controllers {
                                                                         core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.wwwFiles);
                                                                         if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
                                                                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping www file [" + core.appConfig.localWwwPath + dstDosPath + filename + "].");
-                                                                            core.wwwFiles.UnzipFile(dstDosPath + filename);
+                                                                            core.wwwFiles.unzipFile(dstDosPath + filename);
                                                                         }
                                                                         break;
                                                                     case "file":
@@ -311,7 +312,7 @@ namespace Contensive.Processor.Controllers {
                                                                         core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.cdnFiles);
                                                                         if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
                                                                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping content file [" + dstDosPath + filename + "].");
-                                                                            core.cdnFiles.UnzipFile(dstDosPath + filename);
+                                                                            core.cdnFiles.unzipFile(dstDosPath + filename);
                                                                         }
                                                                         break;
                                                                     default:
@@ -334,7 +335,7 @@ namespace Contensive.Processor.Controllers {
                                                                 if (string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                     ChildCollectionGUID = MetaDataSection.InnerText;
                                                                 }
-                                                                if (collectionsInstalledList.Contains(ChildCollectionGUID.ToLower())) {
+                                                                if (collectionsInstalledList.Contains(ChildCollectionGUID.ToLower(CultureInfo.InvariantCulture))) {
                                                                     //
                                                                     // circular import detected, this collection is already imported
                                                                     //
@@ -449,7 +450,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (!isBaseCollection || includeBaseMetaDataInstall) {
                                                         string metaDataMiniCollection = "";
                                                         foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                            switch (metaDataSection.Name.ToLower()) {
+                                                            switch (metaDataSection.Name.ToLower(CultureInfo.InvariantCulture)) {
                                                                 case "contensivecdef":
                                                                     //
                                                                     // old metadata section -- take the inner
@@ -654,136 +655,10 @@ namespace Contensive.Processor.Controllers {
                                                                 result = false;
                                                                 return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a scripting module which is no longer supported. Move scripts to the code tab.</P>";
                                                                 return false;
-                                                                //    '
-                                                                //    ' Scripting modules
-                                                                //    '
-                                                                //    ScriptingModuleID = 0
-                                                                //    ScriptingName =xmlController.GetXMLAttribute(core,IsFound, metadataSection, "name", "No Name")
-                                                                //    If ScriptingName = "" Then
-                                                                //        ScriptingName = "No Name"
-                                                                //    End If
-                                                                //    ScriptingGuid =xmlController.GetXMLAttribute(core,IsFound, metadataSection, "guid", AOName)
-                                                                //    If ScriptingGuid = "" Then
-                                                                //        ScriptingGuid = ScriptingName
-                                                                //    End If
-                                                                //    Criteria = "(ccguid=" & DbController.encodeSQLText(ScriptingGuid) & ")"
-                                                                //    ScriptingModuleID = 0
-                                                                //    csData.cs_open("Scripting Modules", Criteria)
-                                                                //    If csData.cs_ok(CS) Then
-                                                                //        '
-                                                                //        ' Update the Addon
-                                                                //        '
-                                                                //        Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, GUID match with existing scripting module, Updating module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
-                                                                //    Else
-                                                                //        '
-                                                                //        ' not found by GUID - search name against name to update legacy Add-ons
-                                                                //        '
-                                                                //        Call csData.cs_Close(CS)
-                                                                //        Criteria = "(name=" & DbController.encodeSQLText(ScriptingName) & ")and(ccguid is null)"
-                                                                //        csData.cs_open("Scripting Modules", Criteria)
-                                                                //        If csData.cs_ok(CS) Then
-                                                                //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Scripting Module matched an existing Module that has no GUID, Updating to [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
-                                                                //        End If
-                                                                //    End If
-                                                                //    If Not csData.cs_ok(CS) Then
-                                                                //        '
-                                                                //        ' not found by GUID or by name, Insert a new
-                                                                //        '
-                                                                //        Call csData.cs_Close(CS)
-                                                                //        csData.cs_insertRecord("Scripting Modules", 0)
-                                                                //        If csData.cs_ok(CS) Then
-                                                                //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Creating new Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
-                                                                //        End If
-                                                                //    End If
-                                                                //    If Not csData.cs_ok(CS) Then
-                                                                //        '
-                                                                //        ' Could not create new
-                                                                //        '
-                                                                //        Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Scripting Module could not be created, skipping Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
-                                                                //    Else
-                                                                //        ScriptingModuleID = csData.cs_getInteger("ID")
-                                                                //        Call csData.cs_set("code", metadataSection.InnerText)
-                                                                //        Call csData.cs_set("name", ScriptingName)
-                                                                //        Call csData.cs_set("ccguid", ScriptingGuid)
-                                                                //    End If
-                                                                //    Call csData.cs_Close(CS)
-                                                                //    If ScriptingModuleID <> 0 Then
-                                                                //        '
-                                                                //        ' Add Add-on Collection Module Rule
-                                                                //        '
-                                                                //        csData.cs_insertRecord("Add-on Collection Module Rules", 0)
-                                                                //        If csData.cs_ok(CS) Then
-                                                                //            Call csData.cs_set("Collectionid", CollectionID)
-                                                                //            Call csData.cs_set("ScriptingModuleID", ScriptingModuleID)
-                                                                //        End If
-                                                                //        Call csData.cs_Close(CS)
-                                                                //    End If
-                                                                //break;
                                                             case "sharedstyle":
                                                                 result = false;
                                                                 return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a shared style which is no longer supported. Move styles to the default styles tab.</P>";
                                                                 return false;
-
-                                                                //    '
-                                                                //    ' added 9/3/2012
-                                                                //    ' Shared Style
-                                                                //    '
-                                                                //    sharedStyleId = 0
-                                                                //    NodeName =xmlController.GetXMLAttribute(core,IsFound, metadataSection, "name", "No Name")
-                                                                //    If NodeName = "" Then
-                                                                //        NodeName = "No Name"
-                                                                //    End If
-                                                                //    nodeGuid =xmlController.GetXMLAttribute(core,IsFound, metadataSection, "guid", AOName)
-                                                                //    If nodeGuid = "" Then
-                                                                //        nodeGuid = NodeName
-                                                                //    End If
-                                                                //    Criteria = "(ccguid=" & DbController.encodeSQLText(nodeGuid) & ")"
-                                                                //    ScriptingModuleID = 0
-                                                                //    csData.cs_open("Shared Styles", Criteria)
-                                                                //    If csData.cs_ok(CS) Then
-                                                                //        '
-                                                                //        ' Update the Addon
-                                                                //        '
-                                                                //        Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, GUID match with existing shared style, Updating [" & NodeName & "], Guid [" & nodeGuid & "]")
-                                                                //    Else
-                                                                //        '
-                                                                //        ' not found by GUID - search name against name to update legacy Add-ons
-                                                                //        '
-                                                                //        Call csData.cs_Close(CS)
-                                                                //        Criteria = "(name=" & DbController.encodeSQLText(NodeName) & ")and(ccguid is null)"
-                                                                //        csData.cs_open("shared styles", Criteria)
-                                                                //        If csData.cs_ok(CS) Then
-                                                                //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, shared style matched an existing Module that has no GUID, Updating to [" & NodeName & "], Guid [" & nodeGuid & "]")
-                                                                //        End If
-                                                                //    End If
-                                                                //    If Not csData.cs_ok(CS) Then
-                                                                //        '
-                                                                //        ' not found by GUID or by name, Insert a new
-                                                                //        '
-                                                                //        Call csData.cs_Close(CS)
-                                                                //        csData.cs_insertRecord("shared styles", 0)
-                                                                //        If csData.cs_ok(CS) Then
-                                                                //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Creating new shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
-                                                                //        End If
-                                                                //    End If
-                                                                //    If Not csData.cs_ok(CS) Then
-                                                                //        '
-                                                                //        ' Could not create new
-                                                                //        '
-                                                                //        Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, shared style could not be created, skipping shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
-                                                                //    Else
-                                                                //        sharedStyleId = csData.cs_getInteger("ID")
-                                                                //        Call csData.cs_set("StyleFilename", metadataSection.InnerText)
-                                                                //        Call csData.cs_set("name", NodeName)
-                                                                //        Call csData.cs_set("ccguid", nodeGuid)
-                                                                //        Call csData.cs_set("alwaysInclude",xmlController.GetXMLAttribute(core,IsFound, metadataSection, "alwaysinclude", "0"))
-                                                                //        Call csData.cs_set("prefix",xmlController.GetXMLAttribute(core,IsFound, metadataSection, "prefix", ""))
-                                                                //        Call csData.cs_set("suffix",xmlController.GetXMLAttribute(core,IsFound, metadataSection, "suffix", ""))
-                                                                //        Call csData.cs_set("suffix",xmlController.GetXMLAttribute(core,IsFound, metadataSection, "suffix", ""))
-                                                                //        Call csData.cs_set("sortOrder",xmlController.GetXMLAttribute(core,IsFound, metadataSection, "sortOrder", ""))
-                                                                //    End If
-                                                                //    Call csData.cs_Close(CS)
-                                                                //break;
                                                             case "addon":
                                                             case "add-on":
                                                                 //
@@ -973,7 +848,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // -- import complete, flush caches
                                                 core.cache.invalidateAll();
-                                                result = true; ;
+                                                result = true;
                                             }
                                         }
                                     }
@@ -1365,7 +1240,7 @@ namespace Contensive.Processor.Controllers {
                                                 // when importing a collectin that will be used for an include
                                                 //
                                                 ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "language", "");
-                                                if (ScriptingLanguage.ToLower() == "jscript") {
+                                                if (ScriptingLanguage.ToLower(CultureInfo.InvariantCulture) == "jscript") {
                                                     scriptinglanguageid = (int)AddonController.ScriptLanguages.Javascript;
                                                 } else {
                                                     scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
@@ -1578,117 +1453,9 @@ namespace Contensive.Processor.Controllers {
                             }
                             cs.set("ArgumentList", ArgumentList);
                             cs.set("StylesFilename", StyleSheet);
-                            // these are dynamic now
-                            //            '
-                            //            ' Setup special setting/tool/report Navigator Entry
-                            //            '
-                            //            If navTypeId = NavTypeIDTool Then
-                            //                AddonNavID = GetNonRootNavigatorID(asv, AOName, GetNavIDByGuid(asv, "{801F1F07-20E6-4A5D-AF26-71007CCB834F}"), addonid, 0, NavIconTypeTool, AOName & " Add-on", NavDeveloperOnly, 0, "", 0, 0, CollectionID, navAdminOnly)
-                            //            End If
-                            //            If navTypeId = NavTypeIDReport Then
-                            //                AddonNavID = GetNonRootNavigatorID(asv, AOName, GetNavIDByGuid(asv, "{2ED078A2-6417-46CB-8572-A13F64C4BF18}"), addonid, 0, NavIconTypeReport, AOName & " Add-on", NavDeveloperOnly, 0, "", 0, 0, CollectionID, navAdminOnly)
-                            //            End If
-                            //            If navTypeId = NavTypeIDSetting Then
-                            //                AddonNavID = GetNonRootNavigatorID(asv, AOName, GetNavIDByGuid(asv, "{5FDDC758-4A15-4F98-8333-9CE8B8BFABC4}"), addonid, 0, NavIconTypeSetting, AOName & " Add-on", NavDeveloperOnly, 0, "", 0, 0, CollectionID, navAdminOnly)
-                            //            End If
                         }
                         cs.close();
                     }
-                    //
-                    // -- if this is needed, the installation xml files are available in the addon install folder. - I do not believe this is important
-                    //       as if a collection is missing a dependancy, there is an error and you would expect to have to reinstall.
-                    //
-                    // Addon is now fully installed
-                    // Go through all collection files on this site and see if there are
-                    // any Dependencies on this add-on that need to be attached
-                    // src args are those for the addon that includes the current addon
-                    //   - if this addon is the target of another add-on's  "includeaddon" node
-                    //
-                    //Doc = New XmlDocument
-                    //csCollection.cs_open("Add-on Collections")
-                    //Do While csCollection.cs_ok(CS)
-                    //    CollectionFile = csCollection.cs_get("InstallFile")
-                    //    If CollectionFile <> "" Then
-                    //        Try
-                    //            Call Doc.LoadXml(CollectionFile)
-                    //            If Doc.DocumentElement.HasChildNodes Then
-                    //                For Each TestObject In Doc.DocumentElement.ChildNodes
-                    //                    '
-                    //                    ' 20161002 - maybe this should be testing for an xmlElemetn, not node
-                    //                    '
-                    //                    If (TypeOf (TestObject) Is XmlElement) Then
-                    //                        SrcMainNode = DirectCast(TestObject, XmlElement)
-                    //                        If genericController.vbLCase(SrcMainNode.Name) = "addon" Then
-                    //                            SrcAddonGuid = SrcMainNode.GetAttribute("guid")
-                    //                            SrcAddonName = SrcMainNode.GetAttribute("name")
-                    //                            If SrcMainNode.HasChildNodes Then
-                    //                                '//On Error //Resume Next
-                    //                                For Each TestObject2 In SrcMainNode.ChildNodes
-                    //                                    'For Each SrcAddonNode In SrcMainNode.childNodes
-                    //                                    If TypeOf TestObject2 Is XmlNode Then
-                    //                                        SrcAddonNode = DirectCast(TestObject2, XmlElement)
-                    //                                        If True Then
-                    //                                            'If Err.Number <> 0 Then
-                    //                                            '    ' this is to catch nodes that are not elements
-                    //                                            '    Err.Clear
-                    //                                            'Else
-                    //                                            'On Error GoTo ErrorTrap
-                    //                                            If genericController.vbLCase(SrcAddonNode.Name) = "includeaddon" Then
-                    //                                                TestGuid = SrcAddonNode.GetAttribute("guid")
-                    //                                                TestName = SrcAddonNode.GetAttribute("name")
-                    //                                                Criteria = ""
-                    //                                                If TestGuid <> "" Then
-                    //                                                    If TestGuid = addonGuid Then
-                    //                                                        Criteria = "(" & AddonGuidFieldName & "=" & DbController.encodeSQLText(SrcAddonGuid) & ")"
-                    //                                                    End If
-                    //                                                ElseIf TestName <> "" Then
-                    //                                                    If TestName = addonName Then
-                    //                                                        Criteria = "(name=" & DbController.encodeSQLText(SrcAddonName) & ")"
-                    //                                                    End If
-                    //                                                End If
-                    //                                                If Criteria <> "" Then
-                    //                                                    '$$$$$ cache this
-                    //                                                    CS2 = csAddon.cs_open(AddonModel.contentName, Criteria, "ID")
-                    //                                                    If csAddon.cs_ok(CS2) Then
-                    //                                                        SrcAddonID = csAddon.cs_getInteger(CS2, "ID")
-                    //                                                    End If
-                    //                                                    Call csAddon.cs_Close(CS2)
-                    //                                                    AddRule = False
-                    //                                                    If SrcAddonID = 0 Then
-                    //                                                        UserError = "The add-on being installed is referenced by another add-on in collection [], but this add-on could not be found by the respoective criteria [" & Criteria & "]"
-                    //                                                        Call logcontroller.appendInstallLog(core,  "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
-                    //                                                    Else
-                    //                                                        CS2 = csRules.cs_openCsSql_rev( "select ID from ccAddonIncludeRules where Addonid=" & SrcAddonID & " and IncludedAddonID=" & addonId)
-                    //                                                        AddRule = Not csRules.cs_ok(CS2)
-                    //                                                        Call csRules.cs_Close(CS2)
-                    //                                                    End If
-                    //                                                    If AddRule Then
-                    //                                                        CS2 = csRules.cs_insertRecord("Add-on Include Rules", 0)
-                    //                                                        If csRules.cs_ok(CS2) Then
-                    //                                                            Call csRules.cs_set(CS2, "Addonid", SrcAddonID)
-                    //                                                            Call csRules.cs_set(CS2, "IncludedAddonID", addonId)
-                    //                                                        End If
-                    //                                                        Call csRules.cs_Close(CS2)
-                    //                                                    End If
-                    //                                                End If
-                    //                                            End If
-                    //                                        End If
-                    //                                    End If
-                    //                                Next
-                    //                            End If
-                    //                        End If
-                    //                    Else
-                    //                        CS = CS
-                    //                    End If
-                    //                Next
-                    //            End If
-                    //        Catch ex As Exception
-                    //            core.handleExceptionAndContinue(ex) : Throw
-                    //        End Try
-                    //    End If
-                    //    Call csCollection.cs_goNext(CS)
-                    //Loop
-                    //Call csCollection.cs_Close(CS)
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

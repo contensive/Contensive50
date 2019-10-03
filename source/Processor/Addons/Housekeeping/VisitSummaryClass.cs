@@ -51,15 +51,15 @@ namespace Contensive.Addons.Housekeeping {
                             }
                         }
                     }
-                    //
-                    // Verify there are 24 hour records for every day back the past 90 days
-                    //
-                    DateTime DateofMissingSummary = DateTime.MinValue;
                     //Call AppendClassLog(core, core.appEnvironment.name, "HouseKeep", "Verify there are 24 hour records for the past 90 days")
                     DateTime PeriodStartDate = env.rightNow.Date.AddDays(-90);
                     double PeriodStep = 1;
                     int HoursPerDay = 0;
                     for (double PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
+                        //
+                        // Verify there are 24 hour records for every day back the past 90 days
+                        //
+                        DateTime DateofMissingSummary = DateTime.MinValue;
                         using (var csData = new CsModel(core)) {
                             if (csData.openSql("select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber")) {
                                 HoursPerDay = csData.getInteger("HoursPerDay");
@@ -124,59 +124,25 @@ namespace Contensive.Addons.Housekeeping {
         //
         private static void summarizePeriod(CoreController core, HouseKeepEnvironmentModel env, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
             try {
-                double StartTimeHoursSinceMidnight = 0;
-                DateTime PeriodStart = default(DateTime);
-                double TotalTimeOnSite = 0;
-                int MultiPageVisitCnt = 0;
-                int MultiPageHitCnt = 0;
-                double MultiPageTimetoLastHitSum = 0;
-                double TimeOnSite = 0;
-                DateTime PeriodDatePtr = default(DateTime);
-                int DateNumber = 0;
-                int TimeNumber = 0;
-                DateTime DateStart = default(DateTime);
-                DateTime DateEnd = default(DateTime);
-                int NewVisitorVisits = 0;
-                int SinglePageVisits = 0;
-                int AuthenticatedVisits = 0;
-                int MobileVisits = 0;
-                int BotVisits = 0;
-                int NoCookieVisits = 0;
-                double AveTimeOnSite = 0;
-                int HitCnt = 0;
-                int VisitCnt = 0;
-                XmlDocument LibraryCollections = new XmlDocument();
-                XmlDocument LocalCollections = new XmlDocument();
-                XmlDocument Doc = new XmlDocument();
-                int AveReadTime = 0;
                 //
-                if (string.CompareOrdinal(BuildVersion, core.codeVersion()) < 0) {
-                } else {
+                if (string.CompareOrdinal(BuildVersion, core.codeVersion()) >= 0) {
+                    DateTime PeriodStart = default(DateTime);
                     PeriodStart = StartTimeDate;
                     if (PeriodStart < OldestVisitSummaryWeCareAbout) {
                         PeriodStart = OldestVisitSummaryWeCareAbout;
                     }
-                    StartTimeHoursSinceMidnight = PeriodStart.TimeOfDay.TotalHours;
+                    double StartTimeHoursSinceMidnight = PeriodStart.TimeOfDay.TotalHours;
                     PeriodStart = PeriodStart.Date.AddHours(StartTimeHoursSinceMidnight);
+                    DateTime PeriodDatePtr = default(DateTime);
                     PeriodDatePtr = PeriodStart;
                     while (PeriodDatePtr < EndTimeDate) {
                         //
-                        DateNumber = encodeInteger(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
-                        TimeNumber = encodeInteger(PeriodDatePtr.TimeOfDay.TotalHours);
+                        int DateNumber = encodeInteger(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
+                        int TimeNumber = encodeInteger(PeriodDatePtr.TimeOfDay.TotalHours);
+                        DateTime DateStart = default(DateTime);
                         DateStart = PeriodDatePtr.Date;
+                        DateTime DateEnd = default(DateTime);
                         DateEnd = PeriodDatePtr.AddHours(HourDuration).Date;
-                        //
-                        VisitCnt = 0;
-                        HitCnt = 0;
-                        NewVisitorVisits = 0;
-                        SinglePageVisits = 0;
-                        MultiPageVisitCnt = 0;
-                        MultiPageTimetoLastHitSum = 0;
-                        AuthenticatedVisits = 0;
-                        MobileVisits = 0;
-                        BotVisits = 0;
-                        NoCookieVisits = 0;
-                        AveTimeOnSite = 0;
                         //
                         // No Cookie Visits
                         //
@@ -187,6 +153,7 @@ namespace Contensive.Addons.Housekeeping {
                             + " and (v.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                             + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                             + "";
+                        int NoCookieVisits = 0;
                         using (var csData = new CsModel(core)) {
                             csData.openSql(SQL, "Default");
                             if (csData.ok()) {
@@ -203,17 +170,25 @@ namespace Contensive.Addons.Housekeeping {
                             + " and (v.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                             + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                             + "";
+                        //
+                        int VisitCnt = 0;
+                        int HitCnt = 0;
                         using (var csData = new CsModel(core)) {
                             csData.openSql(SQL, "Default");
                             if (csData.ok()) {
                                 VisitCnt = csData.getInteger("VisitCnt");
                                 HitCnt = csData.getInteger("HitCnt");
-                                TimeOnSite = csData.getNumber("TimeOnSite");
+                                double TimeOnSite = csData.getNumber("TimeOnSite");
                             }
                         }
                         //
-                        // Visits by new visitors
-                        //
+                        // -- Visits by new visitors
+                        int NewVisitorVisits = 0;
+                        int SinglePageVisits = 0;
+                        int AuthenticatedVisits = 0;
+                        int MobileVisits = 0;
+                        int BotVisits = 0;
+                        double AveTimeOnSite = 0;
                         if (VisitCnt > 0) {
                             SQL = "select count(v.id) as NewVisitorVisits"
                                 + " from ccvisits v"
@@ -257,6 +232,9 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(PageVisits>1)"
                                 + "";
+                            int MultiPageHitCnt = 0;
+                            int MultiPageVisitCnt = 0;
+                            double MultiPageTimetoLastHitSum = 0;
                             using (var csData = new CsModel(core)) {
                                 csData.openSql(SQL, "Default");
                                 if (csData.ok()) {
@@ -319,8 +297,11 @@ namespace Contensive.Addons.Housekeeping {
                             }
                             //
                             if ((MultiPageHitCnt > MultiPageVisitCnt) && (HitCnt > 0)) {
-                                AveReadTime = encodeInteger(MultiPageTimetoLastHitSum / (MultiPageHitCnt - MultiPageVisitCnt));
-                                TotalTimeOnSite = MultiPageTimetoLastHitSum + (AveReadTime * VisitCnt);
+                                //XmlDocument LibraryCollections = new XmlDocument();
+                                //XmlDocument LocalCollections = new XmlDocument();
+                                //XmlDocument Doc = new XmlDocument();
+                                int AveReadTime = encodeInteger(MultiPageTimetoLastHitSum / (MultiPageHitCnt - MultiPageVisitCnt));
+                                double TotalTimeOnSite = MultiPageTimetoLastHitSum + (AveReadTime * VisitCnt);
                                 AveTimeOnSite = TotalTimeOnSite / VisitCnt;
                             }
                         }
@@ -401,7 +382,6 @@ namespace Contensive.Addons.Housekeeping {
                             csData.close();
                         }
                     }
-
                 }
                 //
                 return;

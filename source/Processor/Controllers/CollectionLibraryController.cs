@@ -15,6 +15,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
 using System.Reflection;
 using NLog;
+using System.Globalization;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -242,7 +243,7 @@ namespace Contensive.Processor.Controllers {
                 collectionGuid = GenericController.normalizeGuid(collectionGuid);
                 if (string.IsNullOrWhiteSpace(collectionGuid)) {
                     LogController.logWarn(core, "installCollectionFromRemoteRepo, collectionGuid is null");
-                } else if (!collectionsInstalledList.Contains(collectionGuid.ToLower())) {
+                } else if (!collectionsInstalledList.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture))) {
                     //
                     // Download all files for this collection and build the collection folder(s)
                     string privateFilesDownloadPath = core.addon.getPrivateFilesAddonPath() + "temp_" + GenericController.GetRandomInteger(core) + "\\";

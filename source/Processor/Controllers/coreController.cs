@@ -822,13 +822,6 @@ namespace Contensive.Processor.Controllers {
                     doc.blockExceptionReporting = true;
                     doc.continueProcessing = false;
                     //
-                    // -- save assemblySkipList
-                    //if (_assemblyList_NonAddonsFound != null) {
-                    //    if (_assemblyList_NonAddonsFound.Count > _assemblyList_NonAddonsFound_CountWhenLoaded) {
-                    //        cache.storeObject(cacheName_AssemblyList_NonAddonsFound, _assemblyList_NonAddonsFound);
-                    //    }
-                    //}
-                    //
                     // content server object is valid
                     //
                     if (serverConfig != null) {
@@ -836,14 +829,6 @@ namespace Contensive.Processor.Controllers {
                             if (appConfig.appStatus == AppConfigModel.AppStatusEnum.ok) {
                                 if (deleteSessionOnExit) {
                                     if ((session != null)) {
-                                        //
-                                        // -- no, sending test email deletes the confirmation users!!
-                                        //if ((session.user != null) && (session.user.id > 0)) {
-                                        //    //
-                                        //    // -- delete user
-                                        //    userProperty.deleteAll(session.user.id);
-                                        //    DbBaseModel.delete<PersonModel>(this, session.user.id);
-                                        //}
                                         if ((session.visit != null) && (session.visit.id > 0)) {
                                             //
                                             // -- delete visit
@@ -861,7 +846,6 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                 }
-                                //if ((appConfig.appMode == appConfigModel.appModeEnum.normal) && (appConfig.appStatus == appConfigModel.appStatusEnum.OK))
                                 if (!deleteSessionOnExit && siteProperties.allowVisitTracking) {
                                     //
                                     // If visit tracking, save the viewing record
@@ -929,18 +913,6 @@ namespace Contensive.Processor.Controllers {
                         _siteProperties = null;
                     }
                     //
-                    //if (_json != null) {
-                    //    // no dispose
-                    //    //Call _json.Dispose()
-                    //    _json = null;
-                    //}
-                    //
-                    //If Not (_user Is Nothing) Then
-                    //    ' no dispose
-                    //    'Call _user.Dispose()
-                    //    _user = Nothing
-                    //End If
-                    //
                     if (_domains != null) {
                         // no dispose
                         //Call _domains.Dispose()
@@ -958,12 +930,6 @@ namespace Contensive.Processor.Controllers {
                         //Call _webServer.Dispose()
                         _webServer = null;
                     }
-                    //
-                    //if (_menuFlyout != null) {
-                    //    // no dispose
-                    //    //Call _menuFlyout.Dispose()
-                    //    _menuFlyout = null;
-                    //}
                     //
                     if (_visitProperty != null) {
                         // no dispose
@@ -987,10 +953,6 @@ namespace Contensive.Processor.Controllers {
                         _db.Dispose();
                         _db = null;
                     }
-                    ////
-                    //if(_addonAppDomain != null ) {
-                    //    AppDomain.Unload(_addonAppDomain);
-                    //}
                 }
                 //
                 // cleanup non-managed objects

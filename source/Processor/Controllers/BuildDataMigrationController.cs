@@ -2,6 +2,7 @@
 using Contensive.Models.Db;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -37,7 +38,7 @@ namespace Contensive.Processor.Controllers {
                         if ( file == null) { continue; }
                         if ( string.IsNullOrWhiteSpace( file.Name )) { continue;  }
                         if ( file.Name.Length < 4 ) { continue;  }
-                        string extension = System.IO.Path.GetExtension(file.Name).ToLower();
+                        string extension = System.IO.Path.GetExtension(file.Name).ToLower(CultureInfo.InvariantCulture);
                         if ((extension == ".php") || (extension == ".asp")) {
                             core.wwwFiles.deleteFile(file.Name);
                         }
@@ -45,7 +46,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- create www /cclib folder and copy in legacy resources
                     core.programFiles.copyFile("cclib.zip", "cclib.zip", core.wwwFiles);
-                    core.wwwFiles.UnzipFile("cclib.zip");
+                    core.wwwFiles.unzipFile("cclib.zip");
                     //
                     // -- remove all the old menu entries and leave the navigation entries
                     var navContent = DbBaseModel.createByUniqueName<ContentModel>(core.cpParent, Contensive.Models.Db.NavigatorEntryModel.contentName);
@@ -152,9 +153,6 @@ namespace Contensive.Processor.Controllers {
             if (!this.disposed) {
                 this.disposed = true;
                 if (disposing) {
-                    //If (cacheClient IsNot Nothing) Then
-                    //    cacheClient.Dispose()
-                    //End If
                 }
                 //
                 // cleanup non-managed objects

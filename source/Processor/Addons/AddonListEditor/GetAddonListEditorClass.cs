@@ -18,14 +18,14 @@ namespace Contensive.Addons.AddonListEditor {
             try {
                 CoreController core = ((CPClass)CP).core;
                 var content = ContentModel.create<ContentModel>(core.cpParent, CP.Doc.GetInteger("contentId"));
-                if (content == null) { return "<!-- contentId not valid -->"; };
+                if (content == null) { return "<!-- contentId not valid -->"; }
                 string recordGuid = "";
                 using (var cs = CP.CSNew() ) {
                     if ( cs.Open( content.name, "id=" + CP.Doc.GetInteger("recordId"))) {
                         recordGuid = cs.GetText("ccguid");
                     }
                 }
-                if (string.IsNullOrWhiteSpace(recordGuid)) { return "<!-- recordid not valid -->"; };
+                if (string.IsNullOrWhiteSpace(recordGuid)) { return "<!-- recordid not valid -->"; }
                 CP.Doc.AddHeadJavascript("var parentContentGuid='" + content.ccguid + "';var parentRecordGuid='" + recordGuid+ "';");
                 return string.Empty;
             }

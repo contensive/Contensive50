@@ -58,7 +58,6 @@ namespace Contensive.Addons.AdminSite {
                     //
                     var userContentPermissions = PermissionController.getUserContentPermissions(core, adminData.adminContent);
                     if (!userContentPermissions.allowEdit) {
-                        //If Not core.doc.authContext.user.main_IsContentManager2(adminContext.content.Name) Then
                         //
                         // You must be a content manager of this content to use this tool
                         //
@@ -183,29 +182,6 @@ namespace Contensive.Addons.AdminSite {
                                          + HtmlController.inputTextarea(core, "sql", SQL, 4,-1,"export-query",false,false, "form-control")
                                          , "form-group");
                                 }
-
-
-
-                                //Content = Content + "\r<tr>"
-                                //    + cr2 + "<td class=\"exportTblCaption\">Records Found</td>"
-                                //    + cr2 + "<td class=\"exportTblInput\">" + HtmlController.inputText_Legacy(core, "RecordCnt", recordCnt.ToString(), -1, -1, "", false, true) + "</td>"
-                                //    + "\r</tr>";
-                                //Content = Content + "\r<tr>"
-                                //    + cr2 + "<td class=\"exportTblCaption\">Record Limit</td>"
-                                //    + cr2 + "<td class=\"exportTblInput\">" + HtmlController.inputText_Legacy(core, "RecordLimit", RecordLimitText) + "</td>"
-                                //    + "\r</tr>";
-                                //if (core.session.isAuthenticatedDeveloper()) {
-                                //    Content = Content + "\r<tr>"
-                                //        + cr2 + "<td class=\"exportTblCaption\">Results SQL</td>"
-                                //        + cr2 + "<td class=\"exportTblInput\"><div style=\"border:1px dashed #ccc;background-color:#fff;padding:10px;\">" + SQL + "</div></td>"
-                                //        + "\r</tr>"
-                                //        + "";
-                                //}
-                                //
-                                //Content = ""
-                                //    + "\r<table>"
-                                //    + GenericController.nop(Content) + "\r</table>"
-                                //    + "";
                                 //
                                 Content = ""
                                     //+ "\r<style>"

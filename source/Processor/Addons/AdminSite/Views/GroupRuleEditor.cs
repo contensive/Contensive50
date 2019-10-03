@@ -118,18 +118,8 @@ namespace Contensive.Addons.AdminSite {
                     relatedButtonList = "",
                 });
                 body.Add(Render.StringToString(Resources.GroupRuleEditorRow2, groupRuleEditor));
-                //if (GroupCount == 0) {
-                //    body.Add("<tr><td valign=middle align=right>" + SpanClassAdminSmall + "Groups</span></td><td>" + SpanClassAdminNormal + "There are currently no groups defined</span></td></tr>");
-                //} else {
-                //    body.Add("<input type=\"hidden\" name=\"MemberRules.RowCount\" value=\"" + GroupCount + "\">");
-                //}
-                //body.Add("<tr>");
-                //body.Add("<td class=\"ccAdminEditCaption\">&nbsp;</td>");
-                //body.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=?cid=" + Models.Domain.MetaModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>");
-                //body.Add("</tr>");
-
                 result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Group Membership", "", body.Text );
-                adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
+                adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

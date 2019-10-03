@@ -81,7 +81,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 tempGetForm_Edit_LinkAliases = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Link Aliases", TabDescription, tabContent);
-                adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
+                adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

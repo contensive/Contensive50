@@ -175,11 +175,11 @@ namespace Contensive.Processor.Controllers {
                 LocalElementCount = (SplitStoreCnt * 2);
                 LocalElements = new Contensive.Processor.Controllers.HtmlParserController.Element[LocalElementCount + 1];
                 return tempLoad;
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
-            LogController.logError( core,new Exception("unexpected exception"));
+            LogController.logError(core, new Exception("unexpected exception"));
             return tempLoad;
         }
         //
@@ -203,7 +203,7 @@ namespace Contensive.Processor.Controllers {
                     result = LocalElements[ElementPointer].IsTag;
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -222,11 +222,11 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 return tempText;
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
-            LogController.logError( core,new Exception("unexpected exception"));
+            LogController.logError(core, new Exception("unexpected exception"));
             return tempText;
         }
         //
@@ -244,11 +244,11 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 return tempTagName;
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
-            LogController.logError( core,new Exception("unexpected exception"));
+            LogController.logError(core, new Exception("unexpected exception"));
             return tempTagName;
         }
         //
@@ -266,11 +266,11 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 return tempPosition;
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
-            LogController.logError( core,new Exception("unexpected exception"));
+            LogController.logError(core, new Exception("unexpected exception"));
             return tempPosition;
         }
         //
@@ -288,11 +288,11 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 return tempElementAttributeCount;
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
-            LogController.logError( core,new Exception("unexpected exception"));
+            LogController.logError(core, new Exception("unexpected exception"));
             return tempElementAttributeCount;
         }
         //
@@ -312,11 +312,11 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 return tempElementAttributeName;
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
-            LogController.logError( core,new Exception("unexpected exception"));
+            LogController.logError(core, new Exception("unexpected exception"));
             return tempElementAttributeName;
         }
         //
@@ -336,11 +336,11 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 return tempElementAttributeValue;
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
-            LogController.logError( core,new Exception("unexpected exception"));
+            LogController.logError(core, new Exception("unexpected exception"));
             return tempElementAttributeValue;
         }
         //
@@ -371,11 +371,11 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 return tempElementAttribute;
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
-            LogController.logError( core,new Exception("unexpected exception"));
+            LogController.logError(core, new Exception("unexpected exception"));
             return tempElementAttribute;
         }
         //
@@ -394,27 +394,14 @@ namespace Contensive.Processor.Controllers {
                 //
                 TagString = LocalElements[ElementPointer].Text.Substring(1, LocalElements[ElementPointer].Text.Length - 2);
                 if (TagString.Substring(TagString.Length - 1) == "/") {
-                    TagString = TagString.Left( TagString.Length - 1);
+                    TagString = TagString.Left(TagString.Length - 1);
                 }
-                //TagString = genericController.vbReplace(TagString, ">", " ") & " "
                 TagString = GenericController.vbReplace(TagString, "\r", " ");
                 TagString = GenericController.vbReplace(TagString, "\n", " ");
                 TagString = GenericController.vbReplace(TagString, "  ", " ");
-                //TagString = genericController.vbReplace(TagString, " =", "=")
-                //TagString = genericController.vbReplace(TagString, "= ", "=")
-                //TagString = genericController.vbReplace(TagString, "'", """")
                 LocalElements[ElementPointer].AttributeCount = 0;
                 LocalElements[ElementPointer].AttributeSize = 1;
-                LocalElements[ElementPointer].Attributes = new Contensive.Processor.Controllers.HtmlParserController.ElementAttributeStructure[1]; // allocates the first
-                                                                                                                                              //ClosePosition = Len(TagString)
-                                                                                                                                              //If ClosePosition <= 2 Then
-                                                                                                                                              //    '
-                                                                                                                                              //    ' ----- there is nothing in the <>, skip element
-                                                                                                                                              //    '
-                                                                                                                                              //Else
-                                                                                                                                              //
-                                                                                                                                              // ----- Get the tag name
-                                                                                                                                              //
+                LocalElements[ElementPointer].Attributes = new Contensive.Processor.Controllers.HtmlParserController.ElementAttributeStructure[1];
                 if (!string.IsNullOrEmpty(TagString)) {
                     AttrSplit = SplitDelimited(TagString, " ");
                     AttrCount = AttrSplit.GetUpperBound(0) + 1;
@@ -445,11 +432,11 @@ namespace Contensive.Processor.Controllers {
                                             AttrValue = AttrName.Substring(EqualPosition);
                                             AttrValueLen = AttrValue.Length;
                                             if (AttrValueLen > 1) {
-                                                if ((AttrValue.Left( 1) == "\"") && (AttrValue.Substring(AttrValueLen - 1, 1) == "\"")) {
+                                                if ((AttrValue.Left(1) == "\"") && (AttrValue.Substring(AttrValueLen - 1, 1) == "\"")) {
                                                     AttrValue = AttrValue.Substring(1, AttrValueLen - 2);
                                                 }
                                             }
-                                            AttrName = AttrName.Left( EqualPosition - 1);
+                                            AttrName = AttrName.Left(EqualPosition - 1);
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Name = AttrName;
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].UcaseName = GenericController.vbUCase(AttrName);
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Value = AttrValue;
@@ -461,62 +448,12 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                //
-                //            CursorPosition = 1
-                //            SpacePosition = GetLesserNonZero(InStr(CursorPosition, TagString, " "), ClosePosition)
-                //            .TagName = Mid(TagString, 2, SpacePosition - 2)
-                //            CursorPosition = SpacePosition + 1
-                //            Do While (CursorPosition < ClosePosition) And (CursorPosition <> 0)
-                //                SpacePosition = GetLesserNonZero(InStr(CursorPosition, TagString, " "), ClosePosition + 1)
-                //                QuotePosition = GetLesserNonZero(InStr(CursorPosition, TagString, """"), ClosePosition + 1)
-                //                EqualPosition = GetLesserNonZero(InStr(CursorPosition, TagString, "="), ClosePosition + 1)
-                //                '
-                //                If .AttributeCount >= .AttributeSize Then
-                //                    .AttributeSize = .AttributeSize + 1
-                //                    ReDim Preserve .Attributes(.AttributeSize)
-                //                    End If
-                //                If SpacePosition < EqualPosition Then
-                //                    '
-                //                    ' ----- Case 1, attribute without a value
-                //                    '
-                //                    Name = Mid(TagString, CursorPosition, SpacePosition - CursorPosition)
-                //                    .Attributes(.AttributeCount).Name = Name
-                //                    .Attributes(.AttributeCount).UcaseName = genericController.vbUCase(Name)
-                //                    .Attributes(.AttributeCount).Value = Name
-                //                    CursorPosition = SpacePosition
-                //                ElseIf QuotePosition < SpacePosition Then
-                //                    '
-                //                    ' ----- Case 2, quoted value
-                //                    '
-                //                    CloseQuotePosition = GetLesserNonZero(InStr(QuotePosition + 1, TagString, """"), ClosePosition)
-                //                    Name = Mid(TagString, CursorPosition, EqualPosition - CursorPosition)
-                //                    .Attributes(.AttributeCount).Name = Name
-                //                    .Attributes(.AttributeCount).UcaseName = genericController.vbUCase(Name)
-                //                    .Attributes(.AttributeCount).Value = Mid(TagString, QuotePosition + 1, CloseQuotePosition - QuotePosition - 1)
-                //                    CursorPosition = CloseQuotePosition
-                //                Else
-                //                    '
-                //                    ' ----- Case 2, unquoted value
-                //                    '
-                //                    Name = Mid(TagString, CursorPosition, EqualPosition - CursorPosition)
-                //                    .Attributes(.AttributeCount).Name = Name
-                //                    .Attributes(.AttributeCount).UcaseName = genericController.vbUCase(Name)
-                //                    .Attributes(.AttributeCount).Value = Mid(TagString, EqualPosition + 1, SpacePosition - EqualPosition - 1)
-                //                    CursorPosition = SpacePosition
-                //                    End If
-                //                If CursorPosition <> 0 Then
-                //                    CursorPosition = PassWhiteSpace(CursorPosition + 1, TagString)
-                //                    End If
-                //                .AttributeCount = .AttributeCount + 1
-                //                Loop
-                //End If
-                //
                 return;
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
-            LogController.logError( core,new Exception("unexpected exception"));
+            LogController.logError(core, new Exception("unexpected exception"));
         }
         //
         //====================================================================================================
@@ -540,11 +477,11 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 return tempGetLesserNonZero;
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
-            LogController.logError( core,new Exception("unexpected exception"));
+            LogController.logError(core, new Exception("unexpected exception"));
             return tempGetLesserNonZero;
         }
         //
@@ -561,11 +498,11 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 return tempPassWhiteSpace;
-            } catch( Exception ex ) {
-                LogController.logError( core,ex);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
-            LogController.logError( core,new Exception("unexpected exception"));
+            LogController.logError(core, new Exception("unexpected exception"));
             return tempPassWhiteSpace;
         }
         //
@@ -592,7 +529,7 @@ namespace Contensive.Processor.Controllers {
                         SrcTag = "";
                         SrcBody = ReplaceBlob(SplitSrc);
                     } else {
-                        SrcTag = ReplaceBlob(SplitSrc.Left( Ptr));
+                        SrcTag = ReplaceBlob(SplitSrc.Left(Ptr));
                         SrcBody = ReplaceBlob(SplitSrc.Substring(Ptr));
                     }
                     if (Ptr == 0) {
@@ -670,7 +607,7 @@ namespace Contensive.Processor.Controllers {
                             if (Ptr < BlobCnt) {
                                 Blob = Blobs[Ptr];
                             }
-                            tempReplaceBlob = Src.Left( Pos - 1) + Blob + Src.Substring(PosEnd);
+                            tempReplaceBlob = Src.Left(Pos - 1) + Blob + Src.Substring(PosEnd);
                         }
                     }
                 }

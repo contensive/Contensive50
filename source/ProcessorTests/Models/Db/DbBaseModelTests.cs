@@ -7,18 +7,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Contensive.Processor;
 using static Tests.testConstants;
+using System.Globalization;
 
 namespace Contensive.Models.Db.Tests {
     [TestClass()]
     public class DbBaseModelTests {
         [TestMethod()]
         public void derivedTableNameTest() {
-            Assert.AreEqual("ccaddoncollections", DbBaseModel.derivedTableName(typeof(AddonCollectionModel)).ToLower());
+            Assert.AreEqual("ccaddoncollections", DbBaseModel.derivedTableName(typeof(AddonCollectionModel)).ToLower(CultureInfo.InvariantCulture));
         }
 
         [TestMethod()]
         public void derivedDataSourceNameTest() {
-            Assert.AreEqual("default", DbBaseModel.derivedDataSourceName(typeof(AddonCollectionModel)).ToLower());
+            Assert.AreEqual("default", DbBaseModel.derivedDataSourceName(typeof(AddonCollectionModel)).ToLower(CultureInfo.InvariantCulture));
         }
 
         [TestMethod()]
@@ -30,34 +31,35 @@ namespace Contensive.Models.Db.Tests {
         [TestMethod()]
         public void addDefaultTest() {
             using (CPClass cp = new CPClass(testAppName)) {
-                var defaultValues = new Dictionary<string, string>();
-                //
-                // -- bool
-                defaultValues.Add("admin", "true");
-                defaultValues.Add("asAjax", "1");
-                defaultValues.Add("htmlDocument", "false");
-                defaultValues.Add("onPageStartEvent", "");
-                defaultValues.Add("onPageEndEvent", "0");
-                //
-                // int
-                defaultValues.Add("navTypeID", "1");
-                defaultValues.Add("scriptingLanguageID", "");
-                //
-                // int nullable
-                defaultValues.Add("processInterval", "");
-                //
-                // string
-                defaultValues.Add("pageTitle", "asdf");
-                defaultValues.Add("otherHeadTags", "");
-                //
-                // double
-                //defaultValues.Add("", "");
-                //
-                // double nullable
-                //defaultValues.Add("", "");
-                //
-                // date
-                defaultValues.Add("processNextRun", "");
+                var defaultValues = new Dictionary<string, string> {
+                    //
+                    // -- bool
+                    { "admin", "true" },
+                    { "asAjax", "1" },
+                    { "htmlDocument", "false" },
+                    { "onPageStartEvent", "" },
+                    { "onPageEndEvent", "0" },
+                    //
+                    // int
+                    { "navTypeID", "1" },
+                    { "scriptingLanguageID", "" },
+                    //
+                    // int nullable
+                    { "processInterval", "" },
+                    //
+                    // string
+                    { "pageTitle", "asdf" },
+                    { "otherHeadTags", "" },
+                    //
+                    // double
+                    //defaultValues.Add("", "");
+                    //
+                    // double nullable
+                    //defaultValues.Add("", "");
+                    //
+                    // date
+                    { "processNextRun", "" }
+                };
                 //
                 //
                 AddonModel test = DbBaseModel.addDefault<AddonModel>(cp, defaultValues);

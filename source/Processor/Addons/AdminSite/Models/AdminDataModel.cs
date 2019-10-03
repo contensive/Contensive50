@@ -12,6 +12,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Processor;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
+using System.Globalization;
 //
 namespace Contensive.Addons.AdminSite {
     /// <summary>
@@ -45,7 +46,7 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// the next form requested (the get)
         /// </summary>
-        public int AdminForm { get; set; }
+        public int adminForm { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -91,43 +92,43 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// true if there was an error loading the edit record - use to block the edit form
         /// </summary>
-        public bool BlockEditForm { get; set; }
+        public bool blockEditForm { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// The action to be performed before the next form
         /// </summary>
-        public int Admin_Action { get; set; }
+        public int admin_Action { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// The form that submitted that the button to process
         /// </summary>
-        public int AdminSourceForm { get; set; }
+        public int adminSourceForm { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// for passing where clause values from page to page
         /// </summary>
-        public string[,] WherePair = new string[3, 11];
+        public string[,] wherePair = new string[3, 11];
         //
         //====================================================================================================
         /// <summary>
         /// the current number of WherePairCount in use
         /// </summary>
-        public int WherePairCount { get; set; }
+        public int wherePairCount { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public int RecordTop { get; set; }
+        public int recordTop { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public int RecordsPerPage { get; set; }
+        public int recordsPerPage { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -139,7 +140,7 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// String that adds on to the end of the title
         /// </summary>
-        public string TitleExtension { get; set; }
+        public string titleExtension { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -157,43 +158,43 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// flag set that shows the rest are valid
         /// </summary>
-        public bool ContentWatchLoaded { get; set; }
+        public bool contentWatchLoaded { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public int ContentWatchRecordID { get; set; }
+        public int contentWatchRecordID { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public string ContentWatchLink { get; set; }
+        public string contentWatchLink { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public int ContentWatchClicks { get; set; }
+        public int contentWatchClicks { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public string ContentWatchLinkLabel { get; set; }
+        public string contentWatchLinkLabel { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public DateTime ContentWatchExpires { get; set; }
+        public DateTime contentWatchExpires { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// list of all ContentWatchLists for this Content, read from response, then later saved to Rules
         /// </summary>
-        public int[] ContentWatchListID {
+        public int[] contentWatchListID {
             get {
                 return _ContentWatchListID;
             }
@@ -207,31 +208,31 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// size of ContentWatchListID() array
         /// </summary>
-        public int ContentWatchListIDSize { get; set; }
+        public int contentWatchListIDSize { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// number of valid entries in ContentWatchListID()
         /// </summary>
-        public int ContentWatchListIDCount { get; set; }
+        public int contentWatchListIDCount { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// Count of Buttons in use
         /// </summary>
-        public int ButtonObjectCount { get; set; }
+        public int buttonObjectCount { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public string[,] ImagePreloads = new string[3, 101];
+        public string[,] imagePreloads = new string[3, 101];
         //
         //====================================================================================================
         /// <summary>
         /// Collected string of Javascript functions to print at end
         /// </summary>
-        public string JavaScriptString { get; set; }
+        public string javaScriptString { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -243,19 +244,19 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// 
         /// </summary>
-        public bool UserAllowContentEdit { get; set; }
+        public bool userAllowContentEdit { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// used to generate labels for form input
         /// </summary>
-        public int FormInputCount { get; set; }
+        public int formInputCount { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public int EditSectionPanelCount { get; set; }
+        public int editSectionPanelCount { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -304,7 +305,7 @@ namespace Contensive.Addons.AdminSite {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public bool AllowAdminFieldCheck(CoreController core) {
+        public bool allowAdminFieldCheck(CoreController core) {
             if (AllowAdminFieldCheck_Local == null) {
                 AllowAdminFieldCheck_Local = core.siteProperties.getBoolean("AllowAdminFieldCheck", true);
             }
@@ -318,7 +319,7 @@ namespace Contensive.Addons.AdminSite {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="adminInfo"></param>
-        public void LoadContentTrackingDataBase(CoreController core) {
+        public void loadContentTrackingDataBase(CoreController core) {
             try {
                 int ContentID = 0;
                 //
@@ -332,12 +333,12 @@ namespace Contensive.Addons.AdminSite {
                     using (var csData = new CsModel(core)) {
                         csData.open("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")AND(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
                         if (csData.ok()) {
-                            ContentWatchLoaded = true;
-                            ContentWatchRecordID = (csData.getInteger("ID"));
-                            ContentWatchLink = (csData.getText("Link"));
-                            ContentWatchClicks = (csData.getInteger("Clicks"));
-                            ContentWatchLinkLabel = (csData.getText("LinkLabel"));
-                            ContentWatchExpires = (csData.getDate("WhatsNewDateExpires"));
+                            contentWatchLoaded = true;
+                            contentWatchRecordID = (csData.getInteger("ID"));
+                            contentWatchLink = (csData.getText("Link"));
+                            contentWatchClicks = (csData.getInteger("Clicks"));
+                            contentWatchLinkLabel = (csData.getText("LinkLabel"));
+                            contentWatchExpires = (csData.getDate("WhatsNewDateExpires"));
                             csData.close();
                         }
 
@@ -353,16 +354,16 @@ namespace Contensive.Addons.AdminSite {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="adminContext"></param>
-        public void LoadContentTrackingResponse(CoreController core) {
+        public void loadContentTrackingResponse(CoreController core) {
             try {
                 int RecordID = 0;
-                ContentWatchListIDCount = 0;
+                contentWatchListIDCount = 0;
                 if ((core.docProperties.getText("WhatsNewResponse") != "") && (adminContent.allowContentTracking)) {
                     //
                     // ----- set single fields
                     //
-                    ContentWatchLinkLabel = core.docProperties.getText("ContentWatchLinkLabel");
-                    ContentWatchExpires = core.docProperties.getDate("ContentWatchExpires");
+                    contentWatchLinkLabel = core.docProperties.getText("ContentWatchLinkLabel");
+                    contentWatchExpires = core.docProperties.getDate("ContentWatchExpires");
                     //
                     // ----- Update ContentWatchListRules for all checked boxes
                     //
@@ -371,12 +372,12 @@ namespace Contensive.Addons.AdminSite {
                         while (csData.ok()) {
                             RecordID = (csData.getInteger("ID"));
                             if (core.docProperties.getBoolean("ContentWatchList." + RecordID)) {
-                                if (ContentWatchListIDCount >= ContentWatchListIDSize) {
-                                    ContentWatchListIDSize = ContentWatchListIDSize + 50;
-                                    Array.Resize(ref _ContentWatchListID, ContentWatchListIDSize);
+                                if (contentWatchListIDCount >= contentWatchListIDSize) {
+                                    contentWatchListIDSize = contentWatchListIDSize + 50;
+                                    Array.Resize(ref _ContentWatchListID, contentWatchListIDSize);
                                 }
-                                ContentWatchListID[ContentWatchListIDCount] = RecordID;
-                                ContentWatchListIDCount = ContentWatchListIDCount + 1;
+                                contentWatchListID[contentWatchListIDCount] = RecordID;
+                                contentWatchListIDCount = contentWatchListIDCount + 1;
                             }
                             csData.goNext();
                         }
@@ -400,11 +401,9 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="Name"></param>
         /// <param name="TableName"></param>
         /// <returns></returns>
-        public static bool IsVisibleUserField(CoreController core, bool AdminOnly, bool DeveloperOnly, bool Active, bool Authorable, string Name, string TableName) {
+        public static bool isVisibleUserField(CoreController core, bool AdminOnly, bool DeveloperOnly, bool Active, bool Authorable, string Name, string TableName) {
             bool tempIsVisibleUserField = false;
             try {
-                //Private Function IsVisibleUserField( Field as CDefFieldClass, AdminOnly As Boolean, DeveloperOnly As Boolean, Active As Boolean, Authorable As Boolean) As Boolean
-                //
                 bool HasEditRights = false;
                 //
                 tempIsVisibleUserField = false;
@@ -494,10 +493,10 @@ namespace Contensive.Addons.AdminSite {
         public string getWherePairValue(string FieldName) {
             try {
                 FieldName = FieldName.ToLowerInvariant();
-                if (WherePairCount > 0) {
-                    for (int WhereCount = 0; WhereCount < WherePairCount; WhereCount++) {
-                        if (FieldName == WherePair[0, WhereCount].ToLowerInvariant()) {
-                            return WherePair[1, WhereCount];
+                if (wherePairCount > 0) {
+                    for (int WhereCount = 0; WhereCount < wherePairCount; WhereCount++) {
+                        if (FieldName == wherePair[0, WhereCount].ToLowerInvariant()) {
+                            return wherePair[1, WhereCount];
                         }
                     }
                 }
@@ -530,8 +529,9 @@ namespace Contensive.Addons.AdminSite {
                 if (requestedContentId != 0) {
                     adminContent = ContentMetadataModel.create(core, requestedContentId);
                     if (adminContent == null) {
-                        adminContent = new ContentMetadataModel();
-                        adminContent.id = 0;
+                        adminContent = new ContentMetadataModel {
+                            id = 0
+                        };
                         Processor.Controllers.ErrorController.addUserError(core, "There is no content with the requested id [" + requestedContentId + "]");
                         requestedContentId = 0;
                     }
@@ -541,10 +541,10 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 // determine user rights to this content
-                UserAllowContentEdit = true;
+                userAllowContentEdit = true;
                 if (!core.session.isAuthenticatedAdmin()) {
                     if (adminContent.id > 0) {
-                        UserAllowContentEdit = userHasContentAccess(core, adminContent.id);
+                        userAllowContentEdit = userHasContentAccess(core, adminContent.id);
                     }
                 }
                 //
@@ -554,7 +554,7 @@ namespace Contensive.Addons.AdminSite {
                     Loaded = false
                 };
                 requestedRecordId = core.docProperties.getInteger("id");
-                if ((UserAllowContentEdit) && (requestedRecordId != 0) && (adminContent.id > 0)) {
+                if ((userAllowContentEdit) && (requestedRecordId != 0) && (adminContent.id > 0)) {
                     //
                     // set adminContext.content to the content definition of the requested record
                     //
@@ -574,26 +574,26 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // Other page control fields
                 //
-                TitleExtension = core.docProperties.getText(RequestNameTitleExtension);
-                RecordTop = core.docProperties.getInteger("RT");
-                RecordsPerPage = core.docProperties.getInteger("RS");
-                if (RecordsPerPage == 0) {
-                    RecordsPerPage = Constants.RecordsPerPageDefault;
+                titleExtension = core.docProperties.getText(RequestNameTitleExtension);
+                recordTop = core.docProperties.getInteger("RT");
+                recordsPerPage = core.docProperties.getInteger("RS");
+                if (recordsPerPage == 0) {
+                    recordsPerPage = Constants.RecordsPerPageDefault;
                 }
                 //
                 // Read WherePairCount
                 //
-                WherePairCount = 99;
+                wherePairCount = 99;
                 int WCount = 0;
                 for (WCount = 0; WCount <= 99; WCount++) {
-                    WherePair[0, WCount] = GenericController.encodeText(core.docProperties.getText("WL" + WCount));
-                    if (WherePair[0, WCount] == "") {
-                        WherePairCount = WCount;
+                    wherePair[0, WCount] = GenericController.encodeText(core.docProperties.getText("WL" + WCount));
+                    if (wherePair[0, WCount] == "") {
+                        wherePairCount = WCount;
                         break;
                     } else {
-                        WherePair[1, WCount] = GenericController.encodeText(core.docProperties.getText("WR" + WCount));
-                        core.doc.addRefreshQueryString("wl" + WCount, GenericController.encodeRequestVariable(WherePair[0, WCount]));
-                        core.doc.addRefreshQueryString("wr" + WCount, GenericController.encodeRequestVariable(WherePair[1, WCount]));
+                        wherePair[1, WCount] = GenericController.encodeText(core.docProperties.getText("WR" + WCount));
+                        core.doc.addRefreshQueryString("wl" + WCount, GenericController.encodeRequestVariable(wherePair[0, WCount]));
+                        core.doc.addRefreshQueryString("wr" + WCount, GenericController.encodeRequestVariable(wherePair[1, WCount]));
                     }
                 }
                 //
@@ -617,41 +617,23 @@ namespace Contensive.Addons.AdminSite {
                                     NameValue = NameValue.Substring(1, NameValue.Length - 2);
                                 }
                                 string[] NVSplit = NameValue.Split('=');
-                                WherePair[0, WherePairCount] = NVSplit[0];
+                                wherePair[0, wherePairCount] = NVSplit[0];
                                 if (NVSplit.GetUpperBound(0) > 0) {
-                                    WherePair[1, WherePairCount] = NVSplit[1];
+                                    wherePair[1, wherePairCount] = NVSplit[1];
                                 }
-                                WherePairCount = WherePairCount + 1;
+                                wherePairCount = wherePairCount + 1;
                             }
                         }
                     }
                 }
                 //
-                // --- If AdminMenuMode is not given locally, use the Members Preferences
-                //
-                //AdminMenuModeID = core.docProperties.getInteger("mm");
-                //if (AdminMenuModeID == 0) {
-                //    AdminMenuModeID = core.session.user.AdminMenuModeID;
-                //}
-                //if (AdminMenuModeID == 0) {
-                //    AdminMenuModeID = AdminMenuModeLeft;
-                //}
-                //if (core.session.user.AdminMenuModeID != AdminMenuModeID) {
-                //    core.session.user.AdminMenuModeID = AdminMenuModeID;
-                //    core.session.user.save(core);
-                //}
-                //    '
-                //    ' ----- FieldName
-                //    '
-                //    InputFieldName = core.main_GetStreamText2(RequestNameFieldName)
-                //
                 // ----- Other
                 //
-                Admin_Action = core.docProperties.getInteger(rnAdminAction);
-                AdminSourceForm = core.docProperties.getInteger(rnAdminSourceForm);
-                AdminForm = core.docProperties.getInteger(rnAdminForm);
+                admin_Action = core.docProperties.getInteger(rnAdminAction);
+                adminSourceForm = core.docProperties.getInteger(rnAdminSourceForm);
+                adminForm = core.docProperties.getInteger(rnAdminForm);
                 requestButton = core.docProperties.getText(RequestNameButton);
-                if (AdminForm == AdminFormEdit) {
+                if (adminForm == AdminFormEdit) {
                     ignore_legacyMenuDepth = 0;
                 } else {
                     ignore_legacyMenuDepth = core.docProperties.getInteger(RequestNameAdminDepth);
@@ -666,8 +648,8 @@ namespace Contensive.Addons.AdminSite {
                         // Editor Preference change attempt. Set new preference and set this as a refresh
                         //
                         requestButton = "";
-                        Admin_Action = Constants.AdminActionEditRefresh;
-                        AdminForm = AdminFormEdit;
+                        admin_Action = Constants.AdminActionEditRefresh;
+                        adminForm = AdminFormEdit;
                         int Pos = GenericController.vbInstr(1, fieldEditorPreference, ":");
                         if (Pos > 0) {
                             int fieldEditorFieldId = GenericController.encodeInteger(fieldEditorPreference.Left(Pos - 1));
@@ -679,36 +661,12 @@ namespace Contensive.Addons.AdminSite {
                                 if (dtTest.Rows.Count == 0) {
                                     editorOk = false;
                                 }
-                                //RS = core.app.executeSql(SQL)
-                                //If (not isdatatableok(rs)) Then
-                                //    editorOk = False
-                                //ElseIf rs.rows.count=0 Then
-                                //    editorOk = False
-                                //End If
-                                //If (isDataTableOk(rs)) Then
-                                //    If false Then
-                                //        'RS.Close()
-                                //    End If
-                                //    'RS = Nothing
-                                //End If
                                 if (editorOk && (fieldEditorAddonId != 0)) {
                                     SQL = "select id from ccaggregatefunctions where (active<>0) and id=" + fieldEditorAddonId;
                                     dtTest = core.db.executeQuery(SQL);
                                     if (dtTest.Rows.Count == 0) {
                                         editorOk = false;
                                     }
-                                    //RS = core.app.executeSql(SQL)
-                                    //If (not isdatatableok(rs)) Then
-                                    //    editorOk = False
-                                    //ElseIf rs.rows.count=0 Then
-                                    //    editorOk = False
-                                    //End If
-                                    //If (isDataTableOk(rs)) Then
-                                    //    If false Then
-                                    //        'RS.Close()
-                                    //    End If
-                                    //    'RS = Nothing
-                                    //End If
                                 }
                                 if (editorOk) {
                                     string Key = "editorPreferencesForContent:" + adminContent.id;
@@ -754,7 +712,7 @@ namespace Contensive.Addons.AdminSite {
         //   Get defaults if no record ID
         //   Then load in any response elements
         //
-        public void LoadEditRecord(CoreController core, bool CheckUserErrors = false) {
+        public void loadEditRecord(CoreController core, bool CheckUserErrors = false) {
             try {
                 // todo refactor out
                 if (string.IsNullOrEmpty(adminContent.name)) {
@@ -772,14 +730,14 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // ----- New record, just load defaults
                         //
-                        LoadEditRecord_Default(core);
-                        LoadEditRecord_WherePairs(core);
+                        loadEditRecord_Default(core);
+                        loadEditRecord_WherePairs(core);
                     } else {
                         //
                         // ----- Load the Live Record specified
                         //
-                        LoadEditRecord_Dbase(core, CheckUserErrors);
-                        LoadEditRecord_WherePairs(core);
+                        loadEditRecord_Dbase(core, CheckUserErrors);
+                        loadEditRecord_WherePairs(core);
                     }
                     //
                     // ----- Capture core fields needed for processing
@@ -845,14 +803,14 @@ namespace Contensive.Addons.AdminSite {
                                 if (GenericController.encodeBoolean(editRecord.fieldsLc["developer"].value)) {
                                     editRecord.userReadOnly = true;
                                     Processor.Controllers.ErrorController.addUserError(core, "You do not have access rights To edit this record.");
-                                    BlockEditForm = true;
+                                    blockEditForm = true;
                                 }
                             }
                         }
                     }
                     //
                     // -- set read only for email.submitted
-                    editRecord.userReadOnly |= (adminContent.name.ToLower().Equals("conditional email")) ? encodeBoolean(editRecord.fieldsLc["submitted"].value) : false;
+                    editRecord.userReadOnly |= (adminContent.name.ToLower(CultureInfo.InvariantCulture).Equals("conditional email")) ? encodeBoolean(editRecord.fieldsLc["submitted"].value) : false;
                     //
                     // ----- Now make sure this record is locked from anyone else
                     //
@@ -869,7 +827,7 @@ namespace Contensive.Addons.AdminSite {
         // ====================================================================================================
         //   Load both Live and Edit Record values from definition defaults
         //
-        public void LoadEditRecord_Default(CoreController core) {
+        public void loadEditRecord_Default(CoreController core) {
             try {
                 //
                 string DefaultValueText = null;
@@ -893,7 +851,6 @@ namespace Contensive.Addons.AdminSite {
                         editRecord.fieldsLc.Add(field.nameLc, editRecordField);
                     }
                     defaultValue = field.defaultValue;
-                    //    End If
                     if (field.active & !GenericController.IsNull(defaultValue)) {
                         switch (field.fieldTypeId) {
                             case CPContentBaseClass.FieldTypeIdEnum.Integer:
@@ -985,7 +942,7 @@ namespace Contensive.Addons.AdminSite {
         // ====================================================================================================
         //   Load both Live and Edit Record values from definition defaults
         //
-        public void LoadEditRecord_WherePairs(CoreController core) {
+        public void loadEditRecord_WherePairs(CoreController core) {
             try {
                 // todo refactor out
                 string DefaultValueText = null;
@@ -1034,7 +991,7 @@ namespace Contensive.Addons.AdminSite {
         // ====================================================================================================
         //   Load Records from the database
         //
-        public void LoadEditRecord_Dbase(CoreController core, bool CheckUserErrors = false) {
+        public void loadEditRecord_Dbase(CoreController core, bool CheckUserErrors = false) {
             try {
                 //
                 //
@@ -1051,21 +1008,21 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // ----- Error: no content ID
                     //
-                    BlockEditForm = true;
+                    blockEditForm = true;
                     Processor.Controllers.ErrorController.addUserError(core, "No content definition was found For Content ID [" + editRecord.id + "]. Please contact your application developer For more assistance.");
                     LogController.logError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, No content definition was found For Content ID [" + editRecord.id + "]."));
                 } else if (string.IsNullOrEmpty(adminContent.name)) {
                     //
                     // ----- Error: no content name
                     //
-                    BlockEditForm = true;
+                    blockEditForm = true;
                     Processor.Controllers.ErrorController.addUserError(core, "No content definition could be found For ContentID [" + adminContent.id + "]. This could be a menu Error. Please contact your application developer For more assistance.");
                     LogController.logError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, No content definition For ContentID [" + adminContent.id + "] could be found."));
                 } else if (adminContent.tableName == "") {
                     //
                     // ----- Error: no content table
                     //
-                    BlockEditForm = true;
+                    blockEditForm = true;
                     Processor.Controllers.ErrorController.addUserError(core, "The content definition [" + adminContent.name + "] is not associated With a valid database table. Please contact your application developer For more assistance.");
                     LogController.logError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, No content definition For ContentID [" + adminContent.id + "] could be found."));
                     //
@@ -1082,7 +1039,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // ----- Error: content definition is not complete
                     //
-                    BlockEditForm = true;
+                    blockEditForm = true;
                     Processor.Controllers.ErrorController.addUserError(core, "The content definition [" + adminContent.name + "] has no field records defined. Please contact your application developer For more assistance.");
                     LogController.logError(core, new GenericException("AdminClass.LoadEditRecord_Dbase, Content [" + adminContent.name + "] has no fields defined."));
                 } else {
@@ -1099,7 +1056,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             //   Live or Edit records were not found
                             //
-                            BlockEditForm = true;
+                            blockEditForm = true;
                             Processor.Controllers.ErrorController.addUserError(core, "The information you have requested could not be found. The record could have been deleted, Or there may be a system Error.");
                             // removed because it was throwing too many false positives (1/14/04 - tried to do it again)
                             // If a CM hits the edit tag for a deleted record, this is hit. It should not cause the Developers to spend hours running down.
@@ -1246,7 +1203,7 @@ namespace Contensive.Addons.AdminSite {
         // ====================================================================================================
         //   Read the Form into the fields array
         //
-        public void LoadEditRecord_Request(CoreController core) {
+        public void loadEditRecord_Request(CoreController core) {
             try {
                 //
                 // List of fields that were created for the form, and should be verified (starts and ends with a comma)
@@ -1277,11 +1234,11 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
                 //
-                if (AllowAdminFieldCheck(core) && (FormFieldLcListToBeLoaded.Count == 0)) {
+                if (allowAdminFieldCheck(core) && (FormFieldLcListToBeLoaded.Count == 0)) {
                     //
                     // The field list was not returned
                     Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The Error Is [no field list].");
-                } else if (AllowAdminFieldCheck(core) && (FormEmptyFieldLcList.Count == 0)) {
+                } else if (allowAdminFieldCheck(core) && (FormEmptyFieldLcList.Count == 0)) {
                     //
                     // The field list was not returned
                     Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The Error Is [no empty field list].");
@@ -1291,12 +1248,12 @@ namespace Contensive.Addons.AdminSite {
                     //
                     foreach (var keyValuePair in adminContent.fields) {
                         ContentFieldMetadataModel field = keyValuePair.Value;
-                        LoadEditRecord_RequestField(core, field, FormFieldLcListToBeLoaded, FormEmptyFieldLcList);
+                        loadEditRecord_RequestField(core, field, FormFieldLcListToBeLoaded, FormEmptyFieldLcList);
                     }
                     //
                     // If there are any form fields that were no loaded, flag the error now
                     //
-                    if (AllowAdminFieldCheck(core) && (FormFieldLcListToBeLoaded.Count > 0)) {
+                    if (allowAdminFieldCheck(core) && (FormFieldLcListToBeLoaded.Count > 0)) {
                         Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The following fields where not found [" + string.Join(",", FormFieldLcListToBeLoaded) + "].");
                         throw (new GenericException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
                     }
@@ -1309,7 +1266,7 @@ namespace Contensive.Addons.AdminSite {
         // ====================================================================================================
         //   Read the Form into the fields array
         //
-        public void LoadEditRecord_RequestField(CoreController core, ContentFieldMetadataModel field, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
+        public void loadEditRecord_RequestField(CoreController core, ContentFieldMetadataModel field, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
             try {
                 //
                 // -- if field is not active, no change
@@ -1340,7 +1297,7 @@ namespace Contensive.Addons.AdminSite {
                     case "contentcontrolid":
                         //
                         // -- admin can change contentcontrolid to any in the same table
-                        if (AllowAdminFieldCheck(core)) {
+                        if (allowAdminFieldCheck(core)) {
                             if (!core.docProperties.containsKey(field.nameLc.ToUpper())) {
                                 if (!(!core.doc.userErrorList.Count.Equals(0))) {
                                     //
@@ -1360,7 +1317,7 @@ namespace Contensive.Addons.AdminSite {
                     case "active":
                         //
                         // anyone can change active
-                        if (AllowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
+                        if (allowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
                             Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The error is [" + field.nameLc + " not found].");
                             return;
                         }
@@ -1377,7 +1334,7 @@ namespace Contensive.Addons.AdminSite {
                         // -- anyone can change
                         InEmptyFieldList = FormEmptyFieldLcList.Contains(field.nameLc);
                         InResponse = core.docProperties.containsKey(field.nameLc);
-                        if (AllowAdminFieldCheck(core)) {
+                        if (allowAdminFieldCheck(core)) {
                             if ((!InResponse) && (!InEmptyFieldList)) {
                                 Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The Error Is [" + field.nameLc + " not found].");
                                 return;
@@ -1434,7 +1391,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // Was not sent out, so just go with the current value. Also, if the loaded field list is not returned, and the field is not returned, this is the bestwe can do.
                             ResponseFieldValueIsOKToSave = false;
-                        } else if (AllowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
+                        } else if (allowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
                             //
                             // Was sent out non-blank, and no response back, flag error and leave the current value to a retry
                             string errorMessage = "There has been an error reading the response from your browser. The field[" + field.caption + "]" + TabCopy + " was missing. Please Try your change again. If this error happens repeatedly, please report this problem to your site administrator.";
@@ -1581,12 +1538,9 @@ namespace Contensive.Addons.AdminSite {
                             if (field.nameLc == "parentid") {
                                 //
                                 // check circular reference on all parentid fields
-                                //
-
                                 int ParentID = GenericController.encodeInteger(ResponseFieldValueText);
                                 int LoopPtr = 0;
                                 string UsedIDs = editRecord.id.ToString();
-                                //if (field.active) {
                                 const int LoopPtrMax = 100;
                                 while ((LoopPtr < LoopPtrMax) && (ParentID != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentID.ToString() + ",") == -1)) {
                                     UsedIDs = UsedIDs + "," + ParentID.ToString();

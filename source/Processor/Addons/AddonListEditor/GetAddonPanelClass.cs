@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using Contensive.Processor;
@@ -63,7 +64,7 @@ namespace Contensive.Addons.AddonListEditor {
                     });
                 }
                 List<AddonModel> addonModelList = null;
-                switch (metadata.name.ToLower()) {
+                switch (metadata.name.ToLower(CultureInfo.InvariantCulture)) {
                     case "page content":
                         addonModelList = DbBaseModel.createList<AddonModel>(core.cpParent, "(active>0)and(content>0)");
                         break;
@@ -97,7 +98,7 @@ namespace Contensive.Addons.AddonListEditor {
                     };
                     result.addonPanelList.Add(item);
                     // -- hack a structural work-around for now. If this works, build into addon record
-                    switch (addonModel.ccguid.ToLower()) {
+                    switch (addonModel.ccguid.ToLower(CultureInfo.InvariantCulture)) {
                         case guidDesignBlockFourColumn:
                             item.columns = new List<AddonPanelListItemColumnModel> {
                                 new AddonPanelListItemColumnModel() { className="col-3-md", col=3 },

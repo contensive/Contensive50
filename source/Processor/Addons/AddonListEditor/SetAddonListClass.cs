@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using Contensive.Processor;
@@ -21,67 +22,6 @@ namespace Contensive.Addons.AddonListEditor {
                 SetAddonList_RequestClass request = DeserializeObject<SetAddonList_RequestClass>(cp.Request.Body);
                 //
                 cp.Utils.AppendLog("SetAddonListClass, request.body [" + cp.Request.Body + "]");
-                //
-                //if (request == null) {
-                //    request = new SetAddonList_RequestClass();
-                //    //
-                //    request.parentContentGuid = cp.Doc.GetText("parentContentGuid");
-                //    if (string.IsNullOrWhiteSpace(request.parentContentGuid)) {
-                //        //
-                //        // -- parentContentGuid blank
-                //        return SerializeObject(new SetAddonList_ResponseClass() {
-                //            errorList = new List<string> { "Form Entity is not a valid json object, and request key [parentContentGuid] is empty" }
-                //        });
-                //    }
-                //    request.parentRecordGuid = cp.Doc.GetText("parentRecordGuid");
-                //    if (string.IsNullOrWhiteSpace(request.parentRecordGuid)) {
-                //        //
-                //        // -- parentRecordGuid blank
-                //        return SerializeObject(new SetAddonList_ResponseClass() {
-                //            errorList = new List<string> { "Form Entity is not a valid json object, and request key [parentRecordGuid] is empty" }
-                //        });
-                //    }
-                //    string addonListJson = cp.Doc.GetText("addonList");
-                //    if (string.IsNullOrWhiteSpace(addonListJson)) {
-                //        //
-                //        // -- addonList blank
-                //        return SerializeObject(new SetAddonList_ResponseClass() {
-                //            errorList = new List<string> { "Form Entity is not a valid json object, and request key [addonList] is empty" }
-                //        });
-                //    }
-                //    try {
-                //        request.addonList = DeserializeObject<List<AddonListItemModel>>(addonListJson);
-                //    } catch (Exception) {
-                //        //
-                //        // -- addonList did not deserialize correctly
-                //        return SerializeObject(new SetAddonList_ResponseClass() {
-                //            errorList = new List<string> { "Form Entity is not a valid json object, and request key [addonList] did not deserialize into an addonList object. addonList [" + addonListJson + "]" }
-                //        });
-                //    }
-                //    if (request.addonList == null) {
-                //        //
-                //        // -- addonList did not deserialize correctly
-                //        return SerializeObject(new SetAddonList_ResponseClass() {
-                //            errorList = new List<string> { "Form Entity is not a valid json object, and request key [addonList] is did not deserialize into an addonList object. addonList [" + addonListJson + "]" }
-                //        });
-                //    }
-                //    //
-                //    // -- attempt the tmp data format then convert the resulting object to the request type
-                //    SetAddonList_TmpRequestClass tmpRequest = DeserializeObject<SetAddonList_TmpRequestClass>(p.Request.Body);
-                //    if (tmpRequest != null) {
-                //        request = new SetAddonList_RequestClass();
-                //        request.parentContentGuid = tmpRequest.parentContentGuid;
-                //        request.parentRecordGuid = tmpRequest.parentRecordGuid;
-                //        request.addonList = convertTmpAddonList(cp, tmpRequest.addonList);
-                //    }
-                //    if (request == null) {
-                //        //
-                //        // -- request not valid
-                //        return SerializeObject(new SetAddonList_ResponseClass() {
-                //            errorList = new List<string> { "The request is invalid" }
-                //        });
-                //    }
-                //}
                 if (request == null) {
                     //
                     // -- request not valid
@@ -117,7 +57,7 @@ namespace Contensive.Addons.AddonListEditor {
                 //
                 // -- validate addonList from UI and set back into a string
                 AddonListItemModel addonListItem = null;
-                switch (metadata.name.ToLower()) {
+                switch (metadata.name.ToLower(CultureInfo.InvariantCulture)) {
                     case "page content":
                         var page = DbBaseModel.create<PageContentModel>(core.cpParent, request.parentRecordGuid);
                         if (page == null) {

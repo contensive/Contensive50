@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using Contensive.Processor;
@@ -189,7 +190,7 @@ namespace Contensive.Addons.AddonListEditor {
                 };
                 //
                 // -- validate addonList from UI and set back into a string
-                switch (metadata.name.ToLower()) {
+                switch (metadata.name.ToLower(CultureInfo.InvariantCulture)) {
                     case "page content":
                         var page = DbBaseModel.create<PageContentModel>(core.cpParent, request.parentRecordGuid);
                         if (page == null) {

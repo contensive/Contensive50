@@ -9,6 +9,7 @@ using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
+using System.Globalization;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -1066,7 +1067,7 @@ namespace Contensive.Processor.Controllers {
         public bool isAuthenticatedMember() {
             var userPeopleMetadata = ContentMetadataModel.create(core, user.contentControlID);
             if (userPeopleMetadata == null) { return false; }
-            if (userPeopleMetadata.name.ToLower() == "members") { return true; }
+            if (userPeopleMetadata.name.ToLower(CultureInfo.InvariantCulture) == "members") { return true; }
             var memberMetadata = ContentMetadataModel.createByUniqueName(core, "members");
             return (memberMetadata.isParentOf(core, userPeopleMetadata.id));
         }

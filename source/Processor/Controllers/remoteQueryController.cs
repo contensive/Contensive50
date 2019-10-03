@@ -164,9 +164,6 @@ namespace Contensive.Processor.Controllers {
             if (!this.disposed) {
                 this.disposed = true;
                 if (disposing) {
-                    //If (cacheClient IsNot Nothing) Then
-                    //    cacheClient.Dispose()
-                    //End If
                 }
                 //
                 // cleanup non-managed objects

@@ -11,6 +11,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Processor;
 using Contensive.Models;
 using Contensive.Models.Db;
+using System.Globalization;
 
 namespace Contensive.Addons.AdminSite.Controllers {
     //
@@ -563,13 +564,6 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 //
                 if (!string.IsNullOrEmpty(Width)) {
                     Style = Style + "width:" + Width + ";";
-                    //WidthTest = GenericController.encodeInteger(Width.ToLower().Replace("px", ""));
-                    //if (WidthTest != 0) {
-                    //    Style = Style + "width:" + WidthTest + "px;";
-                    //    Copy += "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + WidthTest + "\" height=1 border=0>";
-                    //    //Copy = Copy & "<br><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""" & WidthTest & """ height=1 border=0>"
-                    //} else {
-                    //}
                 }
                 result = Environment.NewLine + "<td style=\"" + Style + "\" class=\"" + ClassStyle + "\">" + Copy + "</td>";
             } catch (Exception ex) {
@@ -678,20 +672,16 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 if (string.IsNullOrEmpty(iClassStyle)) {
                     iClassStyle = "ccPanel";
                 }
-                //If IsArray(Cells) Then
                 ColumnCount = Cells.GetUpperBound(1);
-                //End If
                 RQS = core.doc.refreshQueryString;
                 //
                 SortColPtr = getReportSortColumnPtr(core, DefaultSortColumnPtr);
                 SortColType = getReportSortType(core);
                 //
                 // ----- Start the table
-                //
                 Content.Add(HtmlController.tableStart(3, 1, 0));
                 //
                 // ----- Header
-                //
                 Content.Add(Environment.NewLine + "<tr>");
                 Content.Add(getReport_CellHeader(core, 0, "&nbsp", "50px", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
                 for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
@@ -712,15 +702,6 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         //
                         Content.Add(getReport_CellHeader(core, ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, SortingStateEnum.SortableNotSet));
                     }
-
-                    //If ColumnPtr = SortColPtr Then
-                    //    '
-                    //    ' This column is currently the active sort
-                    //    '
-                    //    Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, SortColType))
-                    //Else
-                    //    Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, SortingStateEnum.SortableNotSet))
-                    //End If
                 }
                 Content.Add(Environment.NewLine + "</tr>");
                 //
@@ -1313,11 +1294,6 @@ namespace Contensive.Addons.AdminSite.Controllers {
                                     //
                                     bool selected = (GenericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + GenericController.vbLCase(OptionValue) + ",") != 0);
                                     result = HtmlController.checkbox(SitePropertyName + OptionPtr, selected, "", false, "", false, OptionValue, OptionCaption);
-                                    //if (genericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + genericController.vbLCase(OptionValue) + ",") != 0) {
-                                    //    result += "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + SitePropertyName + OptionPtr + "\" value=\"" + OptionValue + "\" checked=\"checked\">" + OptionCaption + "</div>";
-                                    //} else {
-                                    //    result += "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + SitePropertyName + OptionPtr + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
-                                    //}
                                     break;
                                 case "radio":
                                     //
@@ -1498,34 +1474,11 @@ namespace Contensive.Addons.AdminSite.Controllers {
         public static string getRecordEditAndCutLink(CoreController core, string contentName, int recordId, bool allowCut, string recordName) {
             try {
                 if (!core.session.isEditing()) { return string.Empty; }
-                var editSegmentList = new List<string>();
-                editSegmentList.Add(getRecordEditSegment(core, contentName, recordId, recordName));
+                var editSegmentList = new List<string> {
+                    getRecordEditSegment(core, contentName, recordId, recordName)
+                };
                 if (allowCut) { editSegmentList.Add(getRecordCutSegment(core, contentName, recordId)); }
                 return getRecordEditLink(core, editSegmentList);
-                //if (string.IsNullOrWhiteSpace(contentName)) { throw (new GenericException("ContentName [" + contentName + "] is invalid")); }
-                //if (recordId < 1) { throw (new GenericException("RecordID [" + recordId + "] is invalid")); }
-                //var cdef = ContentMetadataModel.createByUniqueName(core, contentName);
-                //if (cdef == null) { throw new GenericException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name."); }
-                //string contentCaption = "Edit ";
-                //switch (contentName.ToLower()) {
-                //    case "page content":
-                //        contentCaption += "Page";
-                //        break;
-                //    case "page templates":
-                //        contentCaption += "Template";
-                //        break;
-                //    default:
-                //        contentCaption += HtmlController.encodeHtml(encodeInitialCaps(contentName)) + " record";
-                //        break;
-                //}
-                //contentCaption += ((string.IsNullOrWhiteSpace(recordName)) ? "" : "&nbsp;'" + recordName + "'");
-                //string result = AdminUIController.getRecordEditLink(core, cdef, recordId, contentCaption);
-                //if (allowCut) {
-                //    string WorkingLink = GenericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, GenericController.encodeText(cdef.id) + "." + GenericController.encodeText(recordId), true);
-                //    result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(WorkingLink) + "\">" + iconContentCut.Replace("content cut", "Cut this " + contentCaption + " to clipboard") + "</a>";
-                //}
-                //result += HtmlController.div("&nbsp;", "ccEditLinkEndCap");
-                //return HtmlController.div(result, "ccRecordLinkCon");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 return string.Empty;
@@ -1557,7 +1510,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 captionName = "record";
             }
             string result = verb + "&nbsp;";
-            switch (contentName.ToLower()) {
+            switch (contentName.ToLower(CultureInfo.InvariantCulture)) {
                 case "page content":
                     result += "Page&nbsp;" + captionName;
                     break;

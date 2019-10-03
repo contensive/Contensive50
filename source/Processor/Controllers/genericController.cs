@@ -469,65 +469,6 @@ namespace Contensive.Processor.Controllers {
         public static void splitUrl(string sourceUrl, ref string protocol, ref string host, ref string path, ref string page, ref string queryString) {
             string port = "";
             splitUrl(sourceUrl, ref protocol, ref host, ref port, ref path, ref page, ref queryString);
-            ////
-            //// -- Divide the URL into URLHost, URLPath, and URLPage
-            //string WorkingURL = convertToUnixSlash( sourceUrl);
-            ////
-            //// -- Get Protocol (before the first :)
-            //int Position = vbInstr(1, WorkingURL, ":");
-            //if (Position != 0) {
-            //    protocol = WorkingURL.Left( Position + 2);
-            //    WorkingURL = WorkingURL.Substring(Position + 2);
-            //}
-            ////
-            //// -- compatibility fix
-            //if (vbInstr(1, WorkingURL, "//") == 1) {
-            //    if (string.IsNullOrEmpty(protocol)) {
-            //        protocol = "http:";
-            //    }
-            //    protocol = protocol + "//";
-            //    WorkingURL = WorkingURL.Substring(2);
-            //}
-            ////
-            //// -- Get QueryString
-            //Position = vbInstr(1, WorkingURL, "?");
-            //if (Position > 0) {
-            //    queryString = WorkingURL.Substring(Position - 1);
-            //    WorkingURL = WorkingURL.Left( Position - 1);
-            //}
-            ////
-            //// -- separate host from pathpage
-            //Position = vbInstr(WorkingURL, "/");
-            //if ((Position == 0) && (string.IsNullOrEmpty(protocol))) {
-            //    //
-            //    // -- Page without path or host
-            //    page = WorkingURL;
-            //    path = "";
-            //    host = "";
-            //} else if (Position == 0) {
-            //    //
-            //    // -- host, without path or page
-            //    page = "";
-            //    path = "/";
-            //    host = WorkingURL;
-            //} else {
-            //    //
-            //    // -- host with a path (at least)
-            //    path = WorkingURL.Substring(Position - 1);
-            //    host = WorkingURL.Left( Position - 1);
-            //    //
-            //    // -- separate page from path
-            //    Position = path.LastIndexOf("/") + 1;
-            //    if (Position == 0) {
-            //        //
-            //        // -- no path, just a page
-            //        page = path;
-            //        path = "/";
-            //    } else {
-            //        page = path.Substring(Position);
-            //        path = path.Left( Position);
-            //    }
-            //}
         }
         //
         //================================================================================================================
@@ -1113,7 +1054,6 @@ namespace Contensive.Processor.Controllers {
             string result = url;
             bool VirtualHosted = false;
             if ((result.IndexOf(serverHost, System.StringComparison.OrdinalIgnoreCase) != -1) || (url.IndexOf("/") + 1 == 1)) {
-                //If (InStr(1, EncodeAppRootPath, ServerHost, vbTextCompare) <> 0) And (InStr(1, Link, "/") <> 0) Then
                 //
                 // This link is onsite and has a path
                 //

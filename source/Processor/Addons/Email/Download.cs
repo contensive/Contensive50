@@ -31,14 +31,6 @@ namespace Contensive.Addons.Primitives {
                 //
                 // -- Active Download hook
                 LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, core.docProperties.getText(RequestNameDownloadFileGuid));
-                //if (file == null) {
-                //    //
-                //    // -- compatibility mode, downloadid, this exposes all library files because it exposes the sequential id number
-                //    int downloadId = core.docProperties.getInteger(RequestNameDownloadFileId);
-                //    if ((downloadId > 0) && (core.siteProperties.getBoolean("Allow library file download by id", false))) {
-                //        file = LibraryFilesModel.create(core.cpInternal, downloadId);
-                //    }
-                //}
                 if (file != null) {
                     //
                     // -- lookup record and set clicks
@@ -60,7 +52,6 @@ namespace Contensive.Addons.Primitives {
                             //
                             // -- and go
                             string link = GenericController.getCdnFileLink(core, file.filename);
-                            //string link = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, file.Filename);
                             return core.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.");
                         }
                     }

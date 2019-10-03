@@ -12,6 +12,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Models;
 using Contensive.Models.Db;
 using System.Collections.Specialized;
+using System.Globalization;
 //
 namespace Contensive.Processor.Models.Domain {
     //
@@ -836,8 +837,8 @@ namespace Contensive.Processor.Models.Domain {
         /// <returns></returns>
         public static ContentFieldMetadataModel getField(CoreController core, ContentMetadataModel meta, string fieldName) {
             if (meta == null) return null;
-            if (!meta.fields.ContainsKey(fieldName.ToLower())) return null;
-            return meta.fields[fieldName.ToLower()];
+            if (!meta.fields.ContainsKey(fieldName.ToLower(CultureInfo.InvariantCulture))) return null;
+            return meta.fields[fieldName.ToLower(CultureInfo.InvariantCulture)];
         }
         //
         //====================================================================================================
@@ -904,38 +905,39 @@ namespace Contensive.Processor.Models.Domain {
                         }
                         //
                         // create or update the field
-                        var sqlList = new NameValueCollection();
-                        sqlList.Add("ACTIVE", DbController.encodeSQLBoolean(fieldMetadata.active));
-                        sqlList.Add("MODIFIEDBY", DbController.encodeSQLNumber(SystemMemberID));
-                        sqlList.Add("MODIFIEDDATE", DbController.encodeSQLDate(DateTime.Now));
-                        sqlList.Add("TYPE", DbController.encodeSQLNumber((int)fieldMetadata.fieldTypeId));
-                        sqlList.Add("CAPTION", DbController.encodeSQLText(fieldMetadata.caption));
-                        sqlList.Add("ReadOnly", DbController.encodeSQLBoolean(fieldMetadata.readOnly));
-                        sqlList.Add("REQUIRED", DbController.encodeSQLBoolean(fieldMetadata.required));
-                        sqlList.Add("TEXTBUFFERED", SQLFalse);
-                        sqlList.Add("PASSWORD", DbController.encodeSQLBoolean(fieldMetadata.password));
-                        sqlList.Add("EDITSORTPRIORITY", DbController.encodeSQLNumber(fieldMetadata.editSortPriority));
-                        sqlList.Add("ADMINONLY", DbController.encodeSQLBoolean(fieldMetadata.adminOnly));
-                        sqlList.Add("DEVELOPERONLY", DbController.encodeSQLBoolean(fieldMetadata.developerOnly));
-                        sqlList.Add("CONTENTCONTROLID", DbController.encodeSQLNumber(ContentMetadataModel.getContentId(core, "Content Fields")));
-                        sqlList.Add("DefaultValue", DbController.encodeSQLText(fieldMetadata.defaultValue));
-                        sqlList.Add("HTMLCONTENT", DbController.encodeSQLBoolean(fieldMetadata.htmlContent));
-                        sqlList.Add("NOTEDITABLE", DbController.encodeSQLBoolean(fieldMetadata.notEditable));
-                        sqlList.Add("AUTHORABLE", DbController.encodeSQLBoolean(fieldMetadata.authorable));
-                        sqlList.Add("INDEXCOLUMN", DbController.encodeSQLNumber(fieldMetadata.indexColumn));
-                        sqlList.Add("INDEXWIDTH", DbController.encodeSQLText(fieldMetadata.indexWidth));
-                        sqlList.Add("INDEXSORTPRIORITY", DbController.encodeSQLNumber(fieldMetadata.indexSortOrder));
-                        sqlList.Add("REDIRECTID", DbController.encodeSQLText(fieldMetadata.redirectID));
-                        sqlList.Add("REDIRECTPATH", DbController.encodeSQLText(fieldMetadata.redirectPath));
-                        sqlList.Add("UNIQUENAME", DbController.encodeSQLBoolean(fieldMetadata.uniqueName));
-                        sqlList.Add("RSSTITLEFIELD", DbController.encodeSQLBoolean(fieldMetadata.rssTitleField));
-                        sqlList.Add("RSSDESCRIPTIONFIELD", DbController.encodeSQLBoolean(fieldMetadata.rssDescriptionField));
-                        sqlList.Add("MEMBERSELECTGROUPID", DbController.encodeSQLNumber(fieldMetadata.memberSelectGroupId_get(core)));
-                        sqlList.Add("installedByCollectionId", DbController.encodeSQLNumber(InstalledByCollectionID));
-                        sqlList.Add("EDITTAB", DbController.encodeSQLText(fieldMetadata.editTabName));
-                        sqlList.Add("SCRAMBLE", DbController.encodeSQLBoolean(false));
-                        sqlList.Add("ISBASEFIELD", DbController.encodeSQLBoolean(fieldMetadata.isBaseField));
-                        sqlList.Add("LOOKUPLIST", DbController.encodeSQLText(fieldMetadata.lookupList));
+                        var sqlList = new NameValueCollection {
+                            { "ACTIVE", DbController.encodeSQLBoolean(fieldMetadata.active) },
+                            { "MODIFIEDBY", DbController.encodeSQLNumber(SystemMemberID) },
+                            { "MODIFIEDDATE", DbController.encodeSQLDate(DateTime.Now) },
+                            { "TYPE", DbController.encodeSQLNumber((int)fieldMetadata.fieldTypeId) },
+                            { "CAPTION", DbController.encodeSQLText(fieldMetadata.caption) },
+                            { "ReadOnly", DbController.encodeSQLBoolean(fieldMetadata.readOnly) },
+                            { "REQUIRED", DbController.encodeSQLBoolean(fieldMetadata.required) },
+                            { "TEXTBUFFERED", SQLFalse },
+                            { "PASSWORD", DbController.encodeSQLBoolean(fieldMetadata.password) },
+                            { "EDITSORTPRIORITY", DbController.encodeSQLNumber(fieldMetadata.editSortPriority) },
+                            { "ADMINONLY", DbController.encodeSQLBoolean(fieldMetadata.adminOnly) },
+                            { "DEVELOPERONLY", DbController.encodeSQLBoolean(fieldMetadata.developerOnly) },
+                            { "CONTENTCONTROLID", DbController.encodeSQLNumber(ContentMetadataModel.getContentId(core, "Content Fields")) },
+                            { "DefaultValue", DbController.encodeSQLText(fieldMetadata.defaultValue) },
+                            { "HTMLCONTENT", DbController.encodeSQLBoolean(fieldMetadata.htmlContent) },
+                            { "NOTEDITABLE", DbController.encodeSQLBoolean(fieldMetadata.notEditable) },
+                            { "AUTHORABLE", DbController.encodeSQLBoolean(fieldMetadata.authorable) },
+                            { "INDEXCOLUMN", DbController.encodeSQLNumber(fieldMetadata.indexColumn) },
+                            { "INDEXWIDTH", DbController.encodeSQLText(fieldMetadata.indexWidth) },
+                            { "INDEXSORTPRIORITY", DbController.encodeSQLNumber(fieldMetadata.indexSortOrder) },
+                            { "REDIRECTID", DbController.encodeSQLText(fieldMetadata.redirectID) },
+                            { "REDIRECTPATH", DbController.encodeSQLText(fieldMetadata.redirectPath) },
+                            { "UNIQUENAME", DbController.encodeSQLBoolean(fieldMetadata.uniqueName) },
+                            { "RSSTITLEFIELD", DbController.encodeSQLBoolean(fieldMetadata.rssTitleField) },
+                            { "RSSDESCRIPTIONFIELD", DbController.encodeSQLBoolean(fieldMetadata.rssDescriptionField) },
+                            { "MEMBERSELECTGROUPID", DbController.encodeSQLNumber(fieldMetadata.memberSelectGroupId_get(core)) },
+                            { "installedByCollectionId", DbController.encodeSQLNumber(InstalledByCollectionID) },
+                            { "EDITTAB", DbController.encodeSQLText(fieldMetadata.editTabName) },
+                            { "SCRAMBLE", DbController.encodeSQLBoolean(false) },
+                            { "ISBASEFIELD", DbController.encodeSQLBoolean(fieldMetadata.isBaseField) },
+                            { "LOOKUPLIST", DbController.encodeSQLText(fieldMetadata.lookupList) }
+                        };
                         int RedirectContentID = 0;
                         int LookupContentID = 0;
                         //
@@ -1111,34 +1113,35 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     // ----- update record
                     //
-                    var sqlList = new NameValueCollection();
-                    sqlList.Add("name", DbController.encodeSQLText(contentMetadata.name));
-                    sqlList.Add("CREATEKEY", "0");
-                    sqlList.Add("active", DbController.encodeSQLBoolean(contentMetadata.active));
-                    sqlList.Add("contentControlId", DbController.encodeSQLNumber(ContentIDofContent));
-                    sqlList.Add("AllowAdd", DbController.encodeSQLBoolean(contentMetadata.allowAdd));
-                    sqlList.Add("AllowDelete", DbController.encodeSQLBoolean(contentMetadata.allowDelete));
-                    sqlList.Add("AllowWorkflowAuthoring", DbController.encodeSQLBoolean(false));
-                    sqlList.Add("DeveloperOnly", DbController.encodeSQLBoolean(contentMetadata.developerOnly));
-                    sqlList.Add("AdminOnly", DbController.encodeSQLBoolean(contentMetadata.adminOnly));
-                    sqlList.Add("ParentID", DbController.encodeSQLNumber(parentId));
-                    sqlList.Add("DefaultSortMethodID", DbController.encodeSQLNumber(defaultSortMethodID));
-                    sqlList.Add("DropDownFieldList", DbController.encodeSQLText(encodeEmpty(contentMetadata.dropDownFieldList, "Name")));
-                    sqlList.Add("ContentTableID", DbController.encodeSQLNumber(table.id));
-                    sqlList.Add("AuthoringTableID", DbController.encodeSQLNumber(table.id));
-                    sqlList.Add("ModifiedDate", DbController.encodeSQLDate(DateTime.Now));
-                    sqlList.Add("CreatedBy", DbController.encodeSQLNumber(SystemMemberID));
-                    sqlList.Add("ModifiedBy", DbController.encodeSQLNumber(SystemMemberID));
-                    sqlList.Add("AllowCalendarEvents", DbController.encodeSQLBoolean(contentMetadata.allowCalendarEvents));
-                    sqlList.Add("AllowContentTracking", DbController.encodeSQLBoolean(contentMetadata.allowContentTracking));
-                    sqlList.Add("AllowTopicRules", DbController.encodeSQLBoolean(contentMetadata.allowTopicRules));
-                    sqlList.Add("AllowContentChildTool", DbController.encodeSQLBoolean(contentMetadata.allowContentChildTool));
-                    sqlList.Add("IconLink", DbController.encodeSQLText(encodeEmpty(contentMetadata.iconLink, "")));
-                    sqlList.Add("IconHeight", DbController.encodeSQLNumber(contentMetadata.iconHeight));
-                    sqlList.Add("IconWidth", DbController.encodeSQLNumber(contentMetadata.iconWidth));
-                    sqlList.Add("IconSprites", DbController.encodeSQLNumber(contentMetadata.iconSprites));
-                    sqlList.Add("installedByCollectionid", DbController.encodeSQLNumber(InstalledByCollectionID));
-                    sqlList.Add("isBaseContent", DbController.encodeSQLBoolean(contentMetadata.isBaseContent));
+                    var sqlList = new NameValueCollection {
+                        { "name", DbController.encodeSQLText(contentMetadata.name) },
+                        { "CREATEKEY", "0" },
+                        { "active", DbController.encodeSQLBoolean(contentMetadata.active) },
+                        { "contentControlId", DbController.encodeSQLNumber(ContentIDofContent) },
+                        { "AllowAdd", DbController.encodeSQLBoolean(contentMetadata.allowAdd) },
+                        { "AllowDelete", DbController.encodeSQLBoolean(contentMetadata.allowDelete) },
+                        { "AllowWorkflowAuthoring", DbController.encodeSQLBoolean(false) },
+                        { "DeveloperOnly", DbController.encodeSQLBoolean(contentMetadata.developerOnly) },
+                        { "AdminOnly", DbController.encodeSQLBoolean(contentMetadata.adminOnly) },
+                        { "ParentID", DbController.encodeSQLNumber(parentId) },
+                        { "DefaultSortMethodID", DbController.encodeSQLNumber(defaultSortMethodID) },
+                        { "DropDownFieldList", DbController.encodeSQLText(encodeEmpty(contentMetadata.dropDownFieldList, "Name")) },
+                        { "ContentTableID", DbController.encodeSQLNumber(table.id) },
+                        { "AuthoringTableID", DbController.encodeSQLNumber(table.id) },
+                        { "ModifiedDate", DbController.encodeSQLDate(DateTime.Now) },
+                        { "CreatedBy", DbController.encodeSQLNumber(SystemMemberID) },
+                        { "ModifiedBy", DbController.encodeSQLNumber(SystemMemberID) },
+                        { "AllowCalendarEvents", DbController.encodeSQLBoolean(contentMetadata.allowCalendarEvents) },
+                        { "AllowContentTracking", DbController.encodeSQLBoolean(contentMetadata.allowContentTracking) },
+                        { "AllowTopicRules", DbController.encodeSQLBoolean(contentMetadata.allowTopicRules) },
+                        { "AllowContentChildTool", DbController.encodeSQLBoolean(contentMetadata.allowContentChildTool) },
+                        { "IconLink", DbController.encodeSQLText(encodeEmpty(contentMetadata.iconLink, "")) },
+                        { "IconHeight", DbController.encodeSQLNumber(contentMetadata.iconHeight) },
+                        { "IconWidth", DbController.encodeSQLNumber(contentMetadata.iconWidth) },
+                        { "IconSprites", DbController.encodeSQLNumber(contentMetadata.iconSprites) },
+                        { "installedByCollectionid", DbController.encodeSQLNumber(InstalledByCollectionID) },
+                        { "isBaseContent", DbController.encodeSQLBoolean(contentMetadata.isBaseContent) }
+                    };
                     db.update("ccContent", "ID=" + contentMetadata.id, sqlList);
                     ContentModel.invalidateCacheOfRecord<ContentModel>(core.cpParent, contentMetadata.id);
                     //
@@ -1348,8 +1351,9 @@ namespace Contensive.Processor.Models.Domain {
                 using (var targetDb = new DbController(core, DataSource.name)) {
                     using (DataTable dt = targetDb.executeQuery("select top 1 * from " + TableName)) {
                         if (dt.Rows.Count == 0) {
-                            var fieldList = new NameValueCollection();
-                            fieldList.Add("name", DbController.encodeSQLText("test-record"));
+                            var fieldList = new NameValueCollection {
+                                { "name", DbController.encodeSQLText("test-record") }
+                            };
                             core.db.insert(TableName, fieldList);
                         }
                     }
@@ -1669,7 +1673,7 @@ namespace Contensive.Processor.Models.Domain {
             ContentMetadataModel meta = createByUniqueName(core, contentName);
             foreach (var fieldKvp in meta.fields) {
                 if (!string.IsNullOrWhiteSpace(fieldKvp.Value.defaultValue)) {
-                    defaultValueDict.Add(fieldKvp.Key.ToLower(), fieldKvp.Value.defaultValue);
+                    defaultValueDict.Add(fieldKvp.Key.ToLower(CultureInfo.InvariantCulture), fieldKvp.Value.defaultValue);
                 }
             }
             return defaultValueDict;

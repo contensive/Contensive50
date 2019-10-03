@@ -155,21 +155,9 @@ namespace Contensive.Addons.SafeAddonManager {
                             //
                             if (core.docProperties.getText("LibraryRow") != "") {
                                 Ptr = core.docProperties.getInteger("LibraryRow");
-                                //If core.main_GetStreamBoolean2("LibraryRow" & Ptr) Then
                                 CollectionGuid = core.docProperties.getText("LibraryRowguid" + Ptr);
                                 InstallLibCollectionList = InstallLibCollectionList + "," + CollectionGuid;
                             }
-
-                            //                Cnt = core.main_GetStreamInteger2("LibraryCnt")
-                            //                If Cnt > 0 Then
-                            //                    For Ptr = 0 To Cnt - 1
-                            //                        If core.main_GetStreamText2("LibraryRow") <> "" Then
-                            //                        'If core.main_GetStreamBoolean2("LibraryRow" & Ptr) Then
-                            //                            CollectionGUID = core.main_GetStreamText2("LibraryRowguid" & Ptr)
-                            //                            InstallLibCollectionList = InstallLibCollectionList & "," & CollectionGUID
-                            //                        End If
-                            //                    Next
-                            //                End If
                             //
                             //---------------------------------------------------------------------------------------------
                             // Delete collections
@@ -181,238 +169,11 @@ namespace Contensive.Addons.SafeAddonManager {
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                     if (core.docProperties.getBoolean("ac" + Ptr)) {
                                         TargetCollectionID = core.docProperties.getInteger("acID" + Ptr);
-                                        TargetCollectionName = MetadataController.getRecordName( core,"Add-on Collections", TargetCollectionID);
+                                        TargetCollectionName = MetadataController.getRecordName(core, "Add-on Collections", TargetCollectionID);
                                         //
                                         // Delete any addons from this collection
                                         //
                                         MetadataController.deleteContentRecords(core, AddonModel.contentName, "collectionid=" + TargetCollectionID);
-
-                                        //                            '
-                                        //                            ' Load all collections into local collection storage
-                                        //                            '
-                                        //                            TargetCollectionID = core.main_GetStreamInteger2("acID" & Ptr)
-                                        //                            CS = core.app.csOpen("Add-on Collections")
-                                        //                            CollectionCnt = 0
-                                        //                            TargetCollectionPtr = -1
-                                        //                            Do While core.asv.csv_IsCSOK(CS)
-                                        //                                ReDim Preserve Collections(CollectionCnt)
-                                        //                                CollectionID = core.app.cs_getInteger("ID")
-                                        //                                CollectionName = csData.cs_getText("Name")
-                                        //                                If CollectionID = TargetCollectionID Then
-                                        //                                    TargetCollectionPtr = CollectionCnt
-                                        //                                    'TargetCollectionPtr = Ptr
-                                        //                                    TargetCollectionName = CollectionName
-                                        //                                End If
-                                        //                                '
-                                        //                                ' Get collection addons
-                                        //                                '
-                                        //                                If true Then
-                                        //                                    SQL = "select A.ID,A.name,A." & GuidFieldName _
-                                        //                                        & " from ccAggregateFunctions A" _
-                                        //                                        & " where a.CollectionID=" & CollectionID
-                                        //                                Else
-                                        //                                    SQL = "select A.ID,A.name,A." & GuidFieldName _
-                                        //                                        & " from ccAggregateFunctions A" _
-                                        //                                        & " left join ccAddonCollectionRules R on R.AddonID=A.ID" _
-                                        //                                        & " where R.CollectionID=" & CollectionID
-                                        //                                End If
-                                        //                                CSAddons = core.app.openCsSql_rev( SQL)
-                                        //                                Do While core.asv.csv_IsCSOK(CSAddons)
-                                        //                                    AddonCnt = Collections(CollectionCnt).AddonCnt
-                                        //                                    ReDim Preserve Collections(CollectionCnt).AddonName(AddonCnt)
-                                        //                                    ReDim Preserve Collections(CollectionCnt).AddonGuid(AddonCnt)
-                                        //                                    addonid = core.app.cs_getInteger(CSAddons, "ID")
-                                        //                                    Collections(CollectionCnt).AddonGuid(AddonCnt) = csData.cs_getText(CSAddons, GuidFieldName)
-                                        //                                    Collections(CollectionCnt).AddonName(AddonCnt) = csData.cs_getText(CSAddons, "Name")
-                                        //                                    Collections(CollectionCnt).AddonCnt = AddonCnt + 1
-                                        //                                    Call core.app.nextCSRecord(CSAddons)
-                                        //                                Loop
-                                        //                                Call core.app.closeCS(CSAddons)
-                                        //                                '
-                                        //                                ' GetCDefs from Collection File to remove cdefs and navigators
-                                        //                                '
-                                        //                                CollectionFile = core.app.cs_get("InstallFile")
-                                        //                                If CollectionFile <> "" Then
-                                        //                                    Call Doc.loadXML(CollectionFile)
-                                        //                                    If Doc.parseError.ErrorCode <> 0 Then
-                                        //                                        '
-                                        //                                        ' ********************** add status message here
-                                        //                                        '
-                                        //                                    Else
-                                        //                                        With Doc.documentElement
-                                        //                                            If genericController.vbLCase(.baseName) = "collection" Then
-                                        //                                                CollectionName = GetXMLAttribute(IsFound, Doc.documentElement, "name", "")
-                                        //                                                CollectionSystem = genericController.EncodeBoolean(GetXMLAttribute(IsFound, Doc.documentElement, "system", ""))
-                                        //                                                For Each CDef_Node In .childNodes
-                                        //                                                    Select Case genericController.vbLCase(CDef_Node.name)
-                                        //                                                        Case "interfaces"
-                                        //                                                            For Each InterfaceNode In CDef_Node.childNodes
-                                        //                                                                Select Case genericController.vbLCase(InterfaceNode.name)
-                                        //                                                                    Case "page"
-                                        //                                                                        For Each PageNode In InterfaceNode.childNodes
-                                        //                                                                            If genericController.vbLCase(PageNode.name) = "navigator" Then
-                                        //                                                                                NavigatorCnt = Collections(CollectionCnt).NavigatorCnt
-                                        //                                                                                ReDim Preserve Collections(CollectionCnt).Navigators(NavigatorCnt)
-                                        //                                                                                Collections(CollectionCnt).Navigators(NavigatorCnt).name = GetXMLAttribute(IsFound, PageNode, "name", "")
-                                        //                                                                                Collections(CollectionCnt).Navigators(NavigatorCnt).NameSpace = GetXMLAttribute(IsFound, PageNode, "NameSpace", "")
-                                        //                                                                                Collections(CollectionCnt).NavigatorCnt = NavigatorCnt + 1
-                                        //                                                                            End If
-                                        //                                                                        Next
-                                        //                                                                    Case "setting"
-                                        //                                                                End Select
-                                        //                                                            Next
-                                        //                                                        Case "contensivecdef"
-                                        //                                                            '
-                                        //                                                            ' load Navigator Entries
-                                        //                                                            '
-                                        //                                                            For Each CDefNode In CDef_Node.childNodes
-                                        //                                                                If genericController.vbLCase(CDefNode.name) = "adminmenu" Then
-                                        //                                                                    MenuCnt = Collections(CollectionCnt).MenuCnt
-                                        //                                                                    ReDim Preserve Collections(CollectionCnt).Menus(MenuCnt)
-                                        //                                                                    Collections(CollectionCnt).Menus(MenuCnt) = GetXMLAttribute(IsFound, CDefNode, "name", "")
-                                        //                                                                    Collections(CollectionCnt).MenuCnt = MenuCnt + 1
-                                        //                                                                End If
-                                        //                                                                If genericController.vbLCase(CDefNode.name) = "navigatorentry" Then
-                                        //                                                                    NavigatorCnt = Collections(CollectionCnt).NavigatorCnt
-                                        //                                                                    ReDim Preserve Collections(CollectionCnt).Navigators(NavigatorCnt)
-                                        //                                                                    Collections(CollectionCnt).Navigators(NavigatorCnt).name = GetXMLAttribute(IsFound, CDefNode, "name", "")
-                                        //                                                                    Collections(CollectionCnt).Navigators(NavigatorCnt).NameSpace = GetXMLAttribute(IsFound, CDefNode, "NameSpace", "")
-                                        //                                                                    Collections(CollectionCnt).NavigatorCnt = NavigatorCnt + 1
-                                        //                                                                End If
-                                        //                                                            Next
-                                        //                                                    End Select
-                                        //                                                Next
-                                        //                                            End If
-                                        //                                        End With
-                                        //                                    End If
-                                        //                                End If
-                                        //                                CollectionCnt = CollectionCnt + 1
-                                        //                                core.main_NextCSRecord (CS)
-                                        //                            Loop
-                                        //                            Call core.app.closeCS(CS)
-                                        //                            '
-                                        //                            ' Search through the local collection storage for the addons in the one we want to delete
-                                        //                            '   if not in any other collections, delete the addon from the system
-                                        //                            '
-                                        //                            If true Then
-                                        //                                '
-                                        //                                ' delete all addons associated to this collection
-                                        //                                '
-                                        //                                Call core.app.DeleteContentRecords(AddonModel.contentName, "collectionid=" & TargetCollectionID)
-                                        //                            Else
-                                        //                                ' deprecated the addoncollectionrules for collectionid in addon
-                                        //                                If (TargetCollectionPtr >= 0) And (CollectionCnt <> 0) Then
-                                        //                                    TargetAddonCnt = Collections(TargetCollectionPtr).AddonCnt
-                                        //                                    For TargetAddonPtr = 0 To TargetAddonCnt - 1
-                                        //                                        TargetAddonName = Collections(TargetCollectionPtr).AddonName(TargetAddonPtr)
-                                        //                                        TargetAddonGUID = Collections(TargetCollectionPtr).AddonGuid(TargetAddonPtr)
-                                        //                                        UseGUID = (TargetAddonGUID <> "")
-                                        //                                        KeepTarget = False
-                                        //                                        For SearchCPtr = 0 To CollectionCnt - 1
-                                        //                                            If SearchCPtr <> TargetCollectionPtr Then
-                                        //                                                With Collections(SearchCPtr)
-                                        //                                                    For SearchAPtr = 0 To .AddonCnt - 1
-                                        //                                                        If UseGUID Then
-                                        //                                                            If TargetAddonGUID = .AddonGuid(SearchAPtr) Then
-                                        //                                                                KeepTarget = True
-                                        //                                                                Exit For
-                                        //                                                            End If
-                                        //                                                        Else
-                                        //                                                            If TargetAddonName = .AddonName(SearchAPtr) Then
-                                        //                                                                KeepTarget = True
-                                        //                                                                Exit For
-                                        //                                                            End If
-                                        //                                                        End If
-                                        //                                                    Next
-                                        //                                                End With
-                                        //                                            End If
-                                        //                                        Next
-                                        //                                        If Not KeepTarget Then
-                                        //                                            '
-                                        //                                            ' OK to delete the target addon
-                                        //                                            '
-                                        //                                            If UseGUID Then
-                                        //                                                Criteria = "(" & GuidFieldName & "=" & encodeSQLText(TargetAddonGUID) & ")"
-                                        //                                            Else
-                                        //                                                Criteria = "(name=" & encodeSQLText(TargetAddonName) & ")"
-                                        //                                            End If
-                                        //                                            Call core.app.DeleteContentRecords(AddonModel.contentName, Criteria)
-                                        //                                        End If
-                                        //                                    Next
-                                        //                                End If
-                                        //                                '
-                                        //                                ' Delete Navigator Entries not used by other Collections
-                                        //                                '
-                                        //                                TargetCnt = Collections(TargetCollectionPtr).MenuCnt
-                                        //                                For TargetPtr = 0 To TargetCnt - 1
-                                        //                                    TargetName = Collections(TargetCollectionPtr).Menus(TargetPtr)
-                                        //                                    KeepTarget = False
-                                        //                                    For SearchCPtr = 0 To CollectionCnt - 1
-                                        //                                        If SearchCPtr <> TargetCollectionPtr Then
-                                        //                                            With Collections(SearchCPtr)
-                                        //                                                For SearchMPtr = 0 To .MenuCnt - 1
-                                        //                                                    If TargetName = .Menus(SearchMPtr) Then
-                                        //                                                        KeepTarget = True
-                                        //                                                        Exit For
-                                        //                                                    End If
-                                        //                                                Next
-                                        //                                            End With
-                                        //                                        End If
-                                        //                                    Next
-                                        //                                    If Not KeepTarget Then
-                                        //                                        '
-                                        //                                        ' OK to delete the target addon
-                                        //                                        '
-                                        //                                        Call core.app.DeleteContentRecords(NavigatorEntryModel.contentName, "(name=" & encodeSQLText(TargetName) & ")")
-                                        //                                    End If
-                                        //                                Next
-                                        //                                '
-                                        //                                ' Delete Navigator Entries not used by other Collections
-                                        //                                '
-                                        //                                TargetCnt = Collections(TargetCollectionPtr).NavigatorCnt
-                                        //                                For TargetPtr = 0 To TargetCnt - 1
-                                        //                                    KeepTarget = False
-                                        //                                    TargetName = Collections(TargetCollectionPtr).Navigators(TargetPtr).name
-                                        //                                    TargetNameSpace = Collections(TargetCollectionPtr).Navigators(TargetPtr).NameSpace
-                                        //                                    If TargetNameSpace = "" Then
-                                        //                                        '
-                                        //                                        ' Can not delete root nodes
-                                        //                                        '
-                                        //                                        KeepTarget = True
-                                        //                                    Else
-                                        //                                        For SearchCPtr = 0 To CollectionCnt - 1
-                                        //                                            If SearchCPtr <> TargetCollectionPtr Then
-                                        //                                                With Collections(SearchCPtr)
-                                        //                                                    For SearchMPtr = 0 To .NavigatorCnt - 1
-                                        //                                                        If (TargetName = .Navigators(SearchMPtr).name) And (TargetNameSpace = .Navigators(SearchMPtr).NameSpace) Then
-                                        //                                                            KeepTarget = True
-                                        //                                                            Exit For
-                                        //                                                        End If
-                                        //                                                    Next
-                                        //                                                End With
-                                        //                                            End If
-                                        //                                        Next
-                                        //                                    End If
-                                        //                                    If Not KeepTarget Then
-                                        //                                        '
-                                        //                                        ' OK to delete the target addon
-                                        //                                        '
-                                        //                                        ParentID = GetParentIDFromNameSpace(NavigatorEntryModel.contentName, TargetNameSpace)
-                                        //                                        ReDim Preserve Deletes(DeleteCnt)
-                                        //                                        Deletes(DeleteCnt).name = TargetName
-                                        //                                        Deletes(DeleteCnt).ParentID = ParentID
-                                        //                                        DeleteCnt = DeleteCnt + 1
-                                        //                                    End If
-                                        //                                Next
-                                        //                            End If
-                                        //                            '
-                                        //                            ' Delete any navigator entries found
-                                        //                            '
-                                        //                            If DeleteCnt > 0 Then
-                                        //                                For DeletePtr = 0 To DeleteCnt - 1
-                                        //                                    Call GetForm_SafeModeAddonManager_DeleteNavigatorBranch(Deletes(DeletePtr).name, Deletes(DeletePtr).ParentID)
-                                        //                                Next
-                                        //                            End If
                                         //
                                         // Delete the navigator entry for the collection under 'Add-ons'
                                         //
@@ -452,15 +213,6 @@ namespace Contensive.Addons.SafeAddonManager {
                                     }
                                 }
                             }
-                            // this is the v4.1 core (v5 only has base collection)
-                            ////
-                            ////---------------------------------------------------------------------------------------------
-                            //// Reinstall core collection
-                            ////---------------------------------------------------------------------------------------------
-                            ////
-                            //if (core.session.isAuthenticatedDeveloper() & core.docProperties.getBoolean("InstallCore")) {
-                            //    UpgradeOK = CollectionController.installCollectionFromRemoteRepo(core, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
-                            //}
                             //
                             //---------------------------------------------------------------------------------------------
                             // Upload new collection files
@@ -495,21 +247,13 @@ namespace Contensive.Addons.SafeAddonManager {
                             Cnt = LibGuids.GetUpperBound(0) + 1;
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                 var context = new Stack<string>();
-                                context.Push( "AddonManager Install Library Collection [" + LibGuids[Ptr] + "]" );
+                                context.Push("AddonManager Install Library Collection [" + LibGuids[Ptr] + "]");
                                 UpgradeOK = CollectionLibraryController.installCollectionFromLibrary(core, context, LibGuids[Ptr], ref ErrorMessage, false, true, ref nonCriticalErrorList, "AddonManagerClass.GetForm_SaveModeAddonManager", ref collectionsInstalledList);
                                 if (!UpgradeOK) {
                                     //
                                     // block the reset because we will loose the error message
                                     //
-                                    //IISResetRequired = False
                                     ErrorController.addUserError(core, "This Add-on Collection did not install correctly, " + ErrorMessage);
-                                } else {
-                                    //
-                                    // Save the first collection as the installed collection
-                                    //
-                                    //If InstalledCollectionGuid = "" Then
-                                    //    InstalledCollectionGuid = LibGuids[Ptr]
-                                    //End If
                                 }
                             }
                         }
@@ -525,7 +269,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                 var context = new Stack<string>();
                                 context.Push("AddonManager install from path [" + privateFilesInstallPath + "]");
                                 var collectionsDownloaded = new List<string>();
-                                UpgradeOK = CollectionInstallController.installCollectionsFromPrivateFolder(core,context, privateFilesInstallPath, ref ErrorMessage, ref collectionsInstalledList, false, true, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
+                                UpgradeOK = CollectionInstallController.installCollectionsFromPrivateFolder(core, context, privateFilesInstallPath, ref ErrorMessage, ref collectionsInstalledList, false, true, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
                                         ErrorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");
@@ -546,7 +290,7 @@ namespace Contensive.Addons.SafeAddonManager {
                         }
                         //
                         //   Forward to help page
-                        if ((collectionsInstalledIDList.Count > 0) && (  core.doc.userErrorList.Count.Equals(0))) {
+                        if ((collectionsInstalledIDList.Count > 0) && (core.doc.userErrorList.Count.Equals(0))) {
                             return core.webServer.redirect("/" + core.appConfig.adminRoute + "?helpcollectionid=" + collectionsInstalledIDList[0].ToString(), "Redirecting to help page after collection installation");
                         }
                         //
@@ -871,11 +615,11 @@ namespace Contensive.Addons.SafeAddonManager {
                     if (!string.IsNullOrEmpty(status)) {
                         Description = Description + "<div style=\"Margin-left:50px\">" + status + "</div>";
                     }
-                    addonManager = AdminUIController.getToolBody(core,Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
+                    addonManager = AdminUIController.getToolBody(core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
                     core.html.addTitle("Add-on Manager");
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return addonManager;
@@ -907,10 +651,10 @@ namespace Contensive.Addons.SafeAddonManager {
                         }
                         csData.close();
                     }
-                    MetadataController.deleteContentRecord(core,NavigatorEntryModel.contentName, EntryID);
+                    MetadataController.deleteContentRecord(core, NavigatorEntryModel.contentName, EntryID);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -950,7 +694,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
             HandleClassTrapError("GetXMLAttribute");
@@ -990,11 +734,11 @@ namespace Contensive.Addons.SafeAddonManager {
                         ParentNameSpace = "";
                     } else {
                         ParentName = menuNameSpace.Substring(Pos);
-                        ParentNameSpace = menuNameSpace.Left( Pos - 1);
+                        ParentNameSpace = menuNameSpace.Left(Pos - 1);
                     }
                     if (string.IsNullOrEmpty(ParentNameSpace)) {
                         using (var csData = new CsModel(core)) {
-                            csData.open(ContentName, "(name=" + DbController.encodeSQLText(ParentName) + ")and((parentid is null)or(parentid=0))", "ID", false, 0,"ID");
+                            csData.open(ContentName, "(name=" + DbController.encodeSQLText(ParentName) + ")and((parentid is null)or(parentid=0))", "ID", false, 0, "ID");
                             if (csData.ok()) {
                                 tempGetParentIDFromNameSpace = csData.getInteger("ID");
                             }
@@ -1016,7 +760,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             //ErrorTrap:
             HandleClassTrapError("GetParentIDFromNameSpace");

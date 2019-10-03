@@ -8,6 +8,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
 using Contensive.Models.Db;
+using System.Globalization;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -948,7 +949,7 @@ namespace Contensive.Processor.Controllers {
             //
             if (!isHTML) {
                 return body;
-            } else if (body.ToLower().IndexOf("<html") >= 0) {
+            } else if (body.ToLower(CultureInfo.InvariantCulture).IndexOf("<html") >= 0) {
                 //
                 // -- isHtml, if the body includes an html tag, this is the entire body, just send it
                 try {
@@ -1028,7 +1029,7 @@ namespace Contensive.Processor.Controllers {
                 // -- non html email, return a text version of the finished document
                 return core.html.convertTextToHtml(body);
             }
-            if (body.ToLower().IndexOf("<html") >= 0) {
+            if (body.ToLower(CultureInfo.InvariantCulture).IndexOf("<html") >= 0) {
                 //
                 // -- isHtml and the document includes an html tag -- return as-is
                 return body;

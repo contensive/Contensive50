@@ -13,6 +13,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
+using System.Globalization;
 
 namespace Contensive.Addons.AdminSite {
     public class GetHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
@@ -91,9 +92,9 @@ namespace Contensive.Addons.AdminSite {
                 if (cp.core.doc.continueProcessing) {
                     var adminData = new AdminDataModel(cp.core);
                     cp.core.db.sqlCommandTimeout = 300;
-                    adminData.ButtonObjectCount = 0;
-                    adminData.JavaScriptString = "";
-                    adminData.ContentWatchLoaded = false;
+                    adminData.buttonObjectCount = 0;
+                    adminData.javaScriptString = "";
+                    adminData.contentWatchLoaded = false;
                     //
                     if (string.Compare(cp.core.siteProperties.dataBuildVersion, cp.Version) < 0) {
                         LogController.logWarn(cp.core, new GenericException("Application code (v" + cp.Version + ") is newer than database (v" + cp.core.siteProperties.dataBuildVersion + "). Upgrade the database with the command line 'cc.exe -a " + cp.core.appConfig.name + " -u'."));
@@ -104,7 +105,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Process SourceForm/Button into Action/Form, and process
                     if (adminData.requestButton == ButtonCancelAll) {
-                        adminData.AdminForm = AdminFormRoot;
+                        adminData.adminForm = AdminFormRoot;
                     } else {
                         ProcessForms(cp, adminData);
                         ProcessActions(cp, adminData, cp.core.siteProperties.useContentWatchLink);
@@ -117,21 +118,21 @@ namespace Contensive.Addons.AdminSite {
                             WorkflowController.clearEditLock(cp.core, table.id, adminData.editRecord.id);
                         }
                     }
-                    if (adminData.AdminForm < 1) {
+                    if (adminData.adminForm < 1) {
                         //
                         // No form was set, use default form
                         if (adminData.adminContent.id <= 0) {
-                            adminData.AdminForm = AdminFormRoot;
+                            adminData.adminForm = AdminFormRoot;
                         } else {
-                            adminData.AdminForm = AdminFormIndex;
+                            adminData.adminForm = AdminFormIndex;
                         }
                     }
                     int addonId = cp.core.docProperties.getInteger("addonid");
                     string AddonGuid = cp.core.docProperties.getText("addonguid");
-                    if (adminData.AdminForm == AdminFormLegacyAddonManager) {
+                    if (adminData.adminForm == AdminFormLegacyAddonManager) {
                         //
                         // patch out any old links to the legacy addon manager
-                        adminData.AdminForm = 0;
+                        adminData.adminForm = 0;
                         AddonGuid = addonGuidAddonManager;
                     }
                     //
@@ -141,7 +142,7 @@ namespace Contensive.Addons.AdminSite {
                     // Putting the error on the edit form is confusing because there are fields to fill in
                     //-------------------------------------------------------------------------------
                     //
-                    if (adminData.AdminSourceForm == AdminFormEdit) {
+                    if (adminData.adminSourceForm == AdminFormEdit) {
                         if (cp.core.doc.userErrorList.Count.Equals(0) && (adminData.requestButton.Equals(ButtonOK) || adminData.requestButton.Equals(ButtonCancel) || adminData.requestButton.Equals(ButtonDelete))) {
                             string EditReferer = cp.core.docProperties.getText("EditReferer");
                             string CurrentLink = GenericController.modifyLinkQuery(cp.core.webServer.requestUrl, "editreferer", "", false);
@@ -158,11 +159,11 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // return to the index page for this content
                                 //
-                                adminData.AdminForm = AdminFormIndex;
+                                adminData.adminForm = AdminFormIndex;
                             }
                         }
-                        if (adminData.BlockEditForm) {
-                            adminData.AdminForm = AdminFormIndex;
+                        if (adminData.blockEditForm) {
+                            adminData.adminForm = AdminFormIndex;
                         }
                     }
                     int HelpLevel = cp.core.docProperties.getInteger("helplevel");
@@ -185,17 +186,17 @@ namespace Contensive.Addons.AdminSite {
                     if (adminData.editRecord.id != 0) {
                         cp.core.doc.addRefreshQueryString("id", GenericController.encodeText(adminData.editRecord.id));
                     }
-                    if (adminData.TitleExtension != "") {
-                        cp.core.doc.addRefreshQueryString(RequestNameTitleExtension, GenericController.encodeRequestVariable(adminData.TitleExtension));
+                    if (adminData.titleExtension != "") {
+                        cp.core.doc.addRefreshQueryString(RequestNameTitleExtension, GenericController.encodeRequestVariable(adminData.titleExtension));
                     }
-                    if (adminData.RecordTop != 0) {
-                        cp.core.doc.addRefreshQueryString("rt", GenericController.encodeText(adminData.RecordTop));
+                    if (adminData.recordTop != 0) {
+                        cp.core.doc.addRefreshQueryString("rt", GenericController.encodeText(adminData.recordTop));
                     }
-                    if (adminData.RecordsPerPage != Constants.RecordsPerPageDefault) {
-                        cp.core.doc.addRefreshQueryString("rs", GenericController.encodeText(adminData.RecordsPerPage));
+                    if (adminData.recordsPerPage != Constants.RecordsPerPageDefault) {
+                        cp.core.doc.addRefreshQueryString("rs", GenericController.encodeText(adminData.recordsPerPage));
                     }
-                    if (adminData.AdminForm != 0) {
-                        cp.core.doc.addRefreshQueryString(rnAdminForm, GenericController.encodeText(adminData.AdminForm));
+                    if (adminData.adminForm != 0) {
+                        cp.core.doc.addRefreshQueryString(rnAdminForm, GenericController.encodeText(adminData.adminForm));
                     }
                     if (adminData.ignore_legacyMenuDepth != 0) {
                         cp.core.doc.addRefreshQueryString(RequestNameAdminDepth, GenericController.encodeText(adminData.ignore_legacyMenuDepth));
@@ -250,67 +251,67 @@ namespace Contensive.Addons.AdminSite {
                         //
                         cp.core.doc.addRefreshQueryString("helpcollectionid", HelpCollectionID.ToString());
                         adminBody = GetCollectionHelp(cp, HelpCollectionID, "");
-                    } else if (adminData.AdminForm != 0) {
+                    } else if (adminData.adminForm != 0) {
                         //
                         // -- formindex requires valkid content
-                        if ((adminData.adminContent.tableName == null) && ((adminData.AdminForm == AdminFormIndex) || (adminData.AdminForm == AdminFormIndex))) { adminData.AdminForm = AdminFormRoot; }
+                        if ((adminData.adminContent.tableName == null) && ((adminData.adminForm == AdminFormIndex) || (adminData.adminForm == AdminFormIndex))) { adminData.adminForm = AdminFormRoot; }
                         //
                         // No content so far, try the forms
                         // todo - convert this to switch
-                        if (adminData.AdminForm == AdminFormBuilderCollection) {
+                        if (adminData.adminForm == AdminFormBuilderCollection) {
                             adminBody = GetForm_BuildCollection(cp);
-                        } else if (adminData.AdminForm == AdminFormSecurityControl) {
+                        } else if (adminData.adminForm == AdminFormSecurityControl) {
                             AddonGuid = Constants.AddonGuidPreferences;
-                        } else if (adminData.AdminForm == AdminFormMetaKeywordTool) {
+                        } else if (adminData.adminForm == AdminFormMetaKeywordTool) {
                             adminBody = (new Contensive.Addons.Tools.MetakeywordToolClass()).Execute(cp) as string;
-                        } else if ((adminData.AdminForm == AdminFormMobileBrowserControl) || (adminData.AdminForm == AdminFormPageControl) || (adminData.AdminForm == AdminFormEmailControl)) {
+                        } else if ((adminData.adminForm == AdminFormMobileBrowserControl) || (adminData.adminForm == AdminFormPageControl) || (adminData.adminForm == AdminFormEmailControl)) {
                             adminBody = cp.core.addon.execute(Constants.AddonGuidPreferences, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorContextMessage = "get Preferences for Admin"
                             });
-                        } else if (adminData.AdminForm == AdminFormClearCache) {
+                        } else if (adminData.adminForm == AdminFormClearCache) {
                             adminBody = ToolClearCache.GetForm_ClearCache(cp.core);
-                        } else if (adminData.AdminForm == AdminFormSpiderControl) {
+                        } else if (adminData.adminForm == AdminFormSpiderControl) {
                             adminBody = cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, "Content Spider Control"), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorContextMessage = "get Content Spider Control for Admin"
                             });
-                        } else if (adminData.AdminForm == AdminFormResourceLibrary) {
+                        } else if (adminData.adminForm == AdminFormResourceLibrary) {
                             adminBody = cp.core.html.getResourceLibrary("", false, "", "", true);
-                        } else if (adminData.AdminForm == AdminFormQuickStats) {
+                        } else if (adminData.adminForm == AdminFormQuickStats) {
                             adminBody = (FormQuickStats.GetForm_QuickStats(cp.core));
-                        } else if (adminData.AdminForm == AdminFormIndex) {
+                        } else if (adminData.adminForm == AdminFormIndex) {
                             adminBody = FormIndex.get(cp, cp.core, adminData, (adminData.adminContent.tableName.ToLowerInvariant() == "ccemail"));
-                        } else if (adminData.AdminForm == AdminFormEdit) {
+                        } else if (adminData.adminForm == AdminFormEdit) {
                             adminBody = FormEdit.get(cp.core, adminData);
-                        } else if (adminData.AdminForm == AdminFormClose) {
+                        } else if (adminData.adminForm == AdminFormClose) {
                             Stream.Add("<Script Language=\"JavaScript\" type=\"text/javascript\"> window.close(); </Script>");
-                        } else if (adminData.AdminForm == AdminFormContentChildTool) {
+                        } else if (adminData.adminForm == AdminFormContentChildTool) {
                             adminBody = (GetContentChildTool(cp));
-                        } else if (adminData.AdminForm == AdminformHousekeepingControl) {
+                        } else if (adminData.adminForm == AdminformHousekeepingControl) {
                             adminBody = (GetForm_HouseKeepingControl(cp));
-                        } else if ((adminData.AdminForm == AdminFormTools) || (adminData.AdminForm >= 100 && adminData.AdminForm <= 199)) {
+                        } else if ((adminData.adminForm == AdminFormTools) || (adminData.adminForm >= 100 && adminData.adminForm <= 199)) {
                             LegacyToolsClass Tools = new LegacyToolsClass(cp.core);
                             adminBody = Tools.getToolsList();
-                        } else if (adminData.AdminForm == AdminFormDownloads) {
+                        } else if (adminData.adminForm == AdminFormDownloads) {
                             adminBody = (ToolDownloads.GetForm_Downloads(cp.core));
-                        } else if (adminData.AdminForm == AdminformRSSControl) {
+                        } else if (adminData.adminForm == AdminformRSSControl) {
                             adminBody = cp.core.webServer.redirect("?cid=" + ContentMetadataModel.getContentId(cp.core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
-                        } else if (adminData.AdminForm == AdminFormImportWizard) {
+                        } else if (adminData.adminForm == AdminFormImportWizard) {
                             adminBody = cp.core.addon.execute(addonGuidImportWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorContextMessage = "get Import Wizard for Admin"
                             });
-                        } else if (adminData.AdminForm == AdminFormCustomReports) {
+                        } else if (adminData.adminForm == AdminFormCustomReports) {
                             adminBody = ToolCustomReports.getForm_CustomReports(cp.core);
-                        } else if (adminData.AdminForm == AdminFormFormWizard) {
+                        } else if (adminData.adminForm == AdminFormFormWizard) {
                             adminBody = cp.core.addon.execute(addonGuidFormWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorContextMessage = "get Form Wizard for Admin"
                             });
-                        } else if (adminData.AdminForm == AdminFormLegacyAddonManager) {
+                        } else if (adminData.adminForm == AdminFormLegacyAddonManager) {
                             adminBody = AddonController.getAddonManager(cp.core);
-                        } else if (adminData.AdminForm == AdminFormEditorConfig) {
+                        } else if (adminData.adminForm == AdminFormEditorConfig) {
                             adminBody = FormEditConfig.getForm_EditConfig(cp.core);
                         } else {
                             adminBody = "<p>The form requested is not supported</p>";
@@ -385,8 +386,8 @@ namespace Contensive.Addons.AdminSite {
                     Stream.Add(getAdminHeader(cp, adminData));
                     Stream.Add(adminBody);
                     Stream.Add(adminData.adminFooter);
-                    adminData.JavaScriptString += "ButtonObjectCount = " + adminData.ButtonObjectCount + ";";
-                    cp.core.html.addScriptCode(adminData.JavaScriptString, "Admin Site");
+                    adminData.javaScriptString += "ButtonObjectCount = " + adminData.buttonObjectCount + ";";
+                    cp.core.html.addScriptCode(adminData.javaScriptString, "Admin Site");
                     result = Stream.Text;
                 }
                 if (cp.core.session.user.developer) {
@@ -623,8 +624,8 @@ namespace Contensive.Addons.AdminSite {
                 int RowCnt = 0;
                 int RowPtr = 0;
                 //
-                if (adminData.Admin_Action != Constants.AdminActionNop) {
-                    if (!adminData.UserAllowContentEdit) {
+                if (adminData.admin_Action != Constants.AdminActionNop) {
+                    if (!adminData.userAllowContentEdit) {
                         //
                         // Action blocked by BlockCurrentRecord
                         //
@@ -633,13 +634,13 @@ namespace Contensive.Addons.AdminSite {
                         // Process actions
                         //
                         using (var db = new DbController(cp.core, adminData.adminContent.dataSourceName)) {
-                            switch (adminData.Admin_Action) {
+                            switch (adminData.admin_Action) {
                                 case Constants.AdminActionEditRefresh:
                                     //
                                     // Load the record as if it will be saved, but skip the save
                                     //
-                                    adminData.LoadEditRecord(cp.core);
-                                    adminData.LoadEditRecord_Request(cp.core);
+                                    adminData.loadEditRecord(cp.core);
+                                    adminData.loadEditRecord_Request(cp.core);
                                     break;
                                 case Constants.AdminActionMarkReviewed:
                                     //
@@ -651,11 +652,11 @@ namespace Contensive.Addons.AdminSite {
                                     if (adminData.editRecord.userReadOnly) {
                                         Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                     } else {
-                                        adminData.LoadEditRecord(cp.core);
+                                        adminData.loadEditRecord(cp.core);
                                         db.delete(adminData.editRecord.id, adminData.adminContent.tableName);
                                         ContentController.processAfterSave(cp.core, true, adminData.editRecord.contentControlId_Name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     }
-                                    adminData.Admin_Action = Constants.AdminActionNop;
+                                    adminData.admin_Action = Constants.AdminActionNop;
                                     break;
                                 case Constants.AdminActionSave:
                                     //
@@ -664,12 +665,12 @@ namespace Contensive.Addons.AdminSite {
                                     if (adminData.editRecord.userReadOnly) {
                                         Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                     } else {
-                                        adminData.LoadEditRecord(cp.core);
-                                        adminData.LoadEditRecord_Request(cp.core);
+                                        adminData.loadEditRecord(cp.core);
+                                        adminData.loadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
                                         ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     }
-                                    adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                                                                        //
                                     break;
                                 case Constants.AdminActionSaveAddNew:
@@ -679,18 +680,14 @@ namespace Contensive.Addons.AdminSite {
                                     if (adminData.editRecord.userReadOnly) {
                                         Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                     } else {
-                                        adminData.LoadEditRecord(cp.core);
-                                        adminData.LoadEditRecord_Request(cp.core);
+                                        adminData.loadEditRecord(cp.core);
+                                        adminData.loadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
                                         ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                         adminData.editRecord.id = 0;
                                         adminData.editRecord.Loaded = false;
-                                        //If adminContext.content.fields.Count > 0 Then
-                                        //    ReDim EditRecordValuesObject(adminContext.content.fields.Count)
-                                        //    ReDim EditRecordDbValues(adminContext.content.fields.Count)
-                                        //End If
                                     }
-                                    adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                                                                        //
                                     break;
                                 case Constants.AdminActionDuplicate:
@@ -698,7 +695,7 @@ namespace Contensive.Addons.AdminSite {
                                     // ----- Save Record
                                     //
                                     ProcessActionDuplicate(cp, adminData);
-                                    adminData.Admin_Action = Constants.AdminActionNop;
+                                    adminData.admin_Action = Constants.AdminActionNop;
                                     break;
                                 case Constants.AdminActionSendEmail:
                                     //
@@ -707,8 +704,8 @@ namespace Contensive.Addons.AdminSite {
                                     if (adminData.editRecord.userReadOnly) {
                                         Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                     } else {
-                                        adminData.LoadEditRecord(cp.core);
-                                        adminData.LoadEditRecord_Request(cp.core);
+                                        adminData.loadEditRecord(cp.core);
+                                        adminData.loadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
                                         ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                         if (cp.core.doc.userErrorList.Count.Equals(0)) {
@@ -730,7 +727,7 @@ namespace Contensive.Addons.AdminSite {
                                             }
                                         }
                                     }
-                                    adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                                                                        //
                                     break;
                                 case Constants.AdminActionDeactivateEmail:
@@ -741,17 +738,17 @@ namespace Contensive.Addons.AdminSite {
                                         Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                     } else {
                                         // no save, page was read only - Call ProcessActionSave
-                                        adminData.LoadEditRecord(cp.core);
+                                        adminData.loadEditRecord(cp.core);
                                         if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                             using (var csData = new CsModel(cp.core)) {
                                                 if (csData.openRecord("Conditional Email", adminData.editRecord.id)) { csData.set("submitted", false); }
                                                 csData.close();
                                             }
-                                            adminData.LoadEditRecord(cp.core);
-                                            adminData.LoadEditRecord_Request(cp.core);
+                                            adminData.loadEditRecord(cp.core);
+                                            adminData.loadEditRecord_Request(cp.core);
                                         }
                                     }
-                                    adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                     break;
                                 case Constants.AdminActionActivateEmail:
                                     //
@@ -760,8 +757,8 @@ namespace Contensive.Addons.AdminSite {
                                     if (adminData.editRecord.userReadOnly) {
                                         Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                     } else {
-                                        adminData.LoadEditRecord(cp.core);
-                                        adminData.LoadEditRecord_Request(cp.core);
+                                        adminData.loadEditRecord(cp.core);
+                                        adminData.loadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
                                         ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                         if (cp.core.doc.userErrorList.Count.Equals(0)) {
@@ -778,19 +775,19 @@ namespace Contensive.Addons.AdminSite {
                                                     }
                                                 }
                                             }
-                                            adminData.LoadEditRecord(cp.core);
-                                            adminData.LoadEditRecord_Request(cp.core);
+                                            adminData.loadEditRecord(cp.core);
+                                            adminData.loadEditRecord_Request(cp.core);
                                         }
                                     }
-                                    adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                     break;
                                 case Constants.AdminActionSendEmailTest:
                                     if (adminData.editRecord.userReadOnly) {
                                         Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                     } else {
                                         //
-                                        adminData.LoadEditRecord(cp.core);
-                                        adminData.LoadEditRecord_Request(cp.core);
+                                        adminData.loadEditRecord(cp.core);
+                                        adminData.loadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
                                         ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                         //
@@ -810,7 +807,7 @@ namespace Contensive.Addons.AdminSite {
                                             }
                                         }
                                     }
-                                    adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                                                                        // end case
                                     break;
                                 case Constants.AdminActionDeleteRows:
@@ -857,13 +854,13 @@ namespace Contensive.Addons.AdminSite {
                                     if (adminData.editRecord.userReadOnly) {
                                         Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified Is now locked by another authcontext.user.");
                                     } else {
-                                        adminData.LoadEditRecord(cp.core);
-                                        adminData.LoadEditRecord_Request(cp.core);
+                                        adminData.loadEditRecord(cp.core);
+                                        adminData.loadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
                                         cp.core.cache.invalidateAll();
                                         cp.core.clearMetaData();
                                     }
-                                    adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                     break;
                                 default:
                                     //
@@ -1135,13 +1132,13 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // ----- Set default content watch link label
                     //
-                    if ((adminData.ContentWatchListIDCount > 0) && (adminData.ContentWatchLinkLabel == "")) {
+                    if ((adminData.contentWatchListIDCount > 0) && (adminData.contentWatchLinkLabel == "")) {
                         if (editRecord.menuHeadline != "") {
-                            adminData.ContentWatchLinkLabel = editRecord.menuHeadline;
+                            adminData.contentWatchLinkLabel = editRecord.menuHeadline;
                         } else if (editRecord.nameLc != "") {
-                            adminData.ContentWatchLinkLabel = editRecord.nameLc;
+                            adminData.contentWatchLinkLabel = editRecord.nameLc;
                         } else {
-                            adminData.ContentWatchLinkLabel = "Click Here";
+                            adminData.contentWatchLinkLabel = "Click Here";
                         }
                     }
                     // ----- update/create the content watch record for this content record
@@ -1160,9 +1157,9 @@ namespace Contensive.Addons.AdminSite {
                             LogController.logError(cp.core, new GenericException("SaveContentTracking, can Not create New record"));
                         } else {
                             ContentWatchID = csData.getInteger("ID");
-                            csData.set("LinkLabel", adminData.ContentWatchLinkLabel);
-                            csData.set("WhatsNewDateExpires", adminData.ContentWatchExpires);
-                            csData.set("Link", adminData.ContentWatchLink);
+                            csData.set("LinkLabel", adminData.contentWatchLinkLabel);
+                            csData.set("WhatsNewDateExpires", adminData.contentWatchExpires);
+                            csData.set("Link", adminData.contentWatchLink);
                             //
                             // ----- delete all rules for this ContentWatch record
                             //
@@ -1178,13 +1175,13 @@ namespace Contensive.Addons.AdminSite {
                             // ----- Update ContentWatchListRules for all entries in ContentWatchListID( ContentWatchListIDCount )
                             //
                             int ListPointer = 0;
-                            if (adminData.ContentWatchListIDCount > 0) {
-                                for (ListPointer = 0; ListPointer < adminData.ContentWatchListIDCount; ListPointer++) {
+                            if (adminData.contentWatchListIDCount > 0) {
+                                for (ListPointer = 0; ListPointer < adminData.contentWatchListIDCount; ListPointer++) {
                                     using (var CSRules = new CsModel(cp.core)) {
                                         CSRules.insert("Content Watch List Rules");
                                         if (CSRules.ok()) {
                                             CSRules.set("ContentWatchID", ContentWatchID);
-                                            CSRules.set("ContentWatchListID", adminData.ContentWatchListID[ListPointer]);
+                                            CSRules.set("ContentWatchListID", adminData.contentWatchListID[ListPointer]);
                                         }
                                     }
                                 }
@@ -1266,7 +1263,7 @@ namespace Contensive.Addons.AdminSite {
                 if (!cp.core.doc.userErrorList.Count.Equals(0)) {
                     //
                     // -- If There is an error, block the save
-                    adminData.Admin_Action = Constants.AdminActionNop;
+                    adminData.admin_Action = Constants.AdminActionNop;
                 } else if (!cp.core.session.isAuthenticatedContentManager(adminData.adminContent.name)) {
                     //
                     // -- must be content manager
@@ -1371,10 +1368,10 @@ namespace Contensive.Addons.AdminSite {
                                             if (!GenericController.IsNull(fieldValueObject)) {
                                                 if (GenericController.IsDate(fieldValueObject)) {
                                                     DateTime saveValue = GenericController.encodeDate(fieldValueObject);
-                                                    if (adminData.ContentWatchExpires <= DateTime.MinValue) {
-                                                        adminData.ContentWatchExpires = saveValue;
-                                                    } else if (adminData.ContentWatchExpires > saveValue) {
-                                                        adminData.ContentWatchExpires = saveValue;
+                                                    if (adminData.contentWatchExpires <= DateTime.MinValue) {
+                                                        adminData.contentWatchExpires = saveValue;
+                                                    } else if (adminData.contentWatchExpires > saveValue) {
+                                                        adminData.contentWatchExpires = saveValue;
                                                     }
                                                 }
                                             }
@@ -1388,10 +1385,10 @@ namespace Contensive.Addons.AdminSite {
                                             if (!GenericController.IsNull(fieldValueObject)) {
                                                 if (GenericController.IsDate(fieldValueObject)) {
                                                     DateTime saveValue = GenericController.encodeDate(fieldValueObject);
-                                                    if ((adminData.ContentWatchExpires) <= DateTime.MinValue) {
-                                                        adminData.ContentWatchExpires = saveValue;
-                                                    } else if (adminData.ContentWatchExpires > saveValue) {
-                                                        adminData.ContentWatchExpires = saveValue;
+                                                    if ((adminData.contentWatchExpires) <= DateTime.MinValue) {
+                                                        adminData.contentWatchExpires = saveValue;
+                                                    } else if (adminData.contentWatchExpires > saveValue) {
+                                                        adminData.contentWatchExpires = saveValue;
                                                     }
                                                 }
                                             }
@@ -1401,7 +1398,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // ----- Put the field in the SQL to be saved
                                 //
-                                if (AdminDataModel.IsVisibleUserField(cp.core, field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminData.adminContent.tableName) && (NewRecord || (!field.readOnly)) && (NewRecord || (!field.notEditable))) {
+                                if (AdminDataModel.isVisibleUserField(cp.core, field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminData.adminContent.tableName) && (NewRecord || (!field.readOnly)) && (NewRecord || (!field.notEditable))) {
                                     //
                                     // ----- save the value by field type
                                     //
@@ -1760,25 +1757,25 @@ namespace Contensive.Addons.AdminSite {
                 AdminUIController.EditRecordClass editRecord = adminData.editRecord;
                 //
                 //
-                if (adminData.AdminSourceForm != 0) {
+                if (adminData.adminSourceForm != 0) {
                     string EditorStyleRulesFilename = null;
-                    switch (adminData.AdminSourceForm) {
+                    switch (adminData.adminSourceForm) {
                         case AdminFormReports:
                             //
                             // Reports form cancel button
                             //
                             switch (adminData.requestButton) {
                                 case ButtonCancel:
-                                    adminData.Admin_Action = Constants.AdminActionNop;
-                                    adminData.AdminForm = AdminFormRoot;
+                                    adminData.admin_Action = Constants.AdminActionNop;
+                                    adminData.adminForm = AdminFormRoot;
                                     break;
                             }
                             break;
                         case AdminFormQuickStats:
                             switch (adminData.requestButton) {
                                 case ButtonCancel:
-                                    adminData.Admin_Action = Constants.AdminActionNop;
-                                    adminData.AdminForm = AdminFormRoot;
+                                    adminData.admin_Action = Constants.AdminActionNop;
+                                    adminData.adminForm = AdminFormRoot;
                                     break;
                             }
                             break;
@@ -1788,50 +1785,50 @@ namespace Contensive.Addons.AdminSite {
                             //
                             switch (adminData.requestButton) {
                                 case ButtonCancel:
-                                    adminData.Admin_Action = Constants.AdminActionNop;
-                                    adminData.AdminForm = AdminFormRoot;
+                                    adminData.admin_Action = Constants.AdminActionNop;
+                                    adminData.adminForm = AdminFormRoot;
                                     break;
                             }
                             break;
                         case AdminFormIndex:
                             switch (adminData.requestButton) {
                                 case ButtonCancel:
-                                    adminData.Admin_Action = Constants.AdminActionNop;
-                                    adminData.AdminForm = AdminFormRoot;
+                                    adminData.admin_Action = Constants.AdminActionNop;
+                                    adminData.adminForm = AdminFormRoot;
                                     adminData.adminContent = new ContentMetadataModel();
                                     break;
                                 case ButtonClose:
-                                    adminData.Admin_Action = Constants.AdminActionNop;
-                                    adminData.AdminForm = AdminFormRoot;
+                                    adminData.admin_Action = Constants.AdminActionNop;
+                                    adminData.adminForm = AdminFormRoot;
                                     adminData.adminContent = new ContentMetadataModel();
                                     break;
                                 case ButtonAdd:
-                                    adminData.Admin_Action = Constants.AdminActionNop;
-                                    adminData.AdminForm = AdminFormEdit;
+                                    adminData.admin_Action = Constants.AdminActionNop;
+                                    adminData.adminForm = AdminFormEdit;
                                     break;
                                 case ButtonFind:
-                                    adminData.Admin_Action = Constants.AdminActionFind;
-                                    adminData.AdminForm = adminData.AdminSourceForm;
+                                    adminData.admin_Action = Constants.AdminActionFind;
+                                    adminData.adminForm = adminData.adminSourceForm;
                                     break;
                                 case ButtonFirst:
-                                    adminData.RecordTop = 0;
-                                    adminData.AdminForm = adminData.AdminSourceForm;
+                                    adminData.recordTop = 0;
+                                    adminData.adminForm = adminData.adminSourceForm;
                                     break;
                                 case ButtonPrevious:
-                                    adminData.RecordTop = adminData.RecordTop - adminData.RecordsPerPage;
-                                    if (adminData.RecordTop < 0) {
-                                        adminData.RecordTop = 0;
+                                    adminData.recordTop = adminData.recordTop - adminData.recordsPerPage;
+                                    if (adminData.recordTop < 0) {
+                                        adminData.recordTop = 0;
                                     }
-                                    adminData.Admin_Action = Constants.AdminActionNop;
-                                    adminData.AdminForm = adminData.AdminSourceForm;
+                                    adminData.admin_Action = Constants.AdminActionNop;
+                                    adminData.adminForm = adminData.adminSourceForm;
                                     break;
                                 case ButtonNext:
-                                    adminData.Admin_Action = Constants.AdminActionNext;
-                                    adminData.AdminForm = adminData.AdminSourceForm;
+                                    adminData.admin_Action = Constants.AdminActionNext;
+                                    adminData.adminForm = adminData.adminSourceForm;
                                     break;
                                 case ButtonDelete:
-                                    adminData.Admin_Action = Constants.AdminActionDeleteRows;
-                                    adminData.AdminForm = adminData.AdminSourceForm;
+                                    adminData.admin_Action = Constants.AdminActionDeleteRows;
+                                    adminData.adminForm = adminData.adminSourceForm;
                                     break;
                             }
                             // end case
@@ -1846,64 +1843,64 @@ namespace Contensive.Addons.AdminSite {
                                     // this is a test operation. need this so the user can set editor preferences without saving the record
                                     //   during refresh, the edit page is redrawn just was it was, but no save
                                     //
-                                    adminData.Admin_Action = Constants.AdminActionEditRefresh;
-                                    adminData.AdminForm = AdminFormEdit;
+                                    adminData.admin_Action = Constants.AdminActionEditRefresh;
+                                    adminData.adminForm = AdminFormEdit;
                                     break;
                                 case ButtonMarkReviewed:
-                                    adminData.Admin_Action = Constants.AdminActionMarkReviewed;
-                                    adminData.AdminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth, adminData.adminContent.name, editRecord.id);
+                                    adminData.admin_Action = Constants.AdminActionMarkReviewed;
+                                    adminData.adminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth, adminData.adminContent.name, editRecord.id);
                                     break;
                                 case ButtonSaveandInvalidateCache:
-                                    adminData.Admin_Action = Constants.AdminActionReloadCDef;
-                                    adminData.AdminForm = AdminFormEdit;
+                                    adminData.admin_Action = Constants.AdminActionReloadCDef;
+                                    adminData.adminForm = AdminFormEdit;
                                     break;
                                 case ButtonDelete:
-                                    adminData.Admin_Action = Constants.AdminActionDelete;
-                                    adminData.AdminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth, adminData.adminContent.name, editRecord.id);
+                                    adminData.admin_Action = Constants.AdminActionDelete;
+                                    adminData.adminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth, adminData.adminContent.name, editRecord.id);
                                     break;
                                 case ButtonSave:
-                                    adminData.Admin_Action = Constants.AdminActionSave;
-                                    adminData.AdminForm = AdminFormEdit;
+                                    adminData.admin_Action = Constants.AdminActionSave;
+                                    adminData.adminForm = AdminFormEdit;
                                     break;
                                 case ButtonSaveAddNew:
-                                    adminData.Admin_Action = Constants.AdminActionSaveAddNew;
-                                    adminData.AdminForm = AdminFormEdit;
+                                    adminData.admin_Action = Constants.AdminActionSaveAddNew;
+                                    adminData.adminForm = AdminFormEdit;
                                     break;
                                 case ButtonOK:
-                                    adminData.Admin_Action = Constants.AdminActionSave;
-                                    adminData.AdminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth, adminData.adminContent.name, editRecord.id);
+                                    adminData.admin_Action = Constants.AdminActionSave;
+                                    adminData.adminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth, adminData.adminContent.name, editRecord.id);
                                     break;
                                 case ButtonCancel:
-                                    adminData.Admin_Action = Constants.AdminActionNop;
-                                    adminData.AdminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth, adminData.adminContent.name, editRecord.id);
+                                    adminData.admin_Action = Constants.AdminActionNop;
+                                    adminData.adminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth, adminData.adminContent.name, editRecord.id);
                                     break;
                                 case ButtonSend:
                                     //
                                     // Send a Group Email
                                     //
-                                    adminData.Admin_Action = Constants.AdminActionSendEmail;
-                                    adminData.AdminForm = AdminFormEdit;
+                                    adminData.admin_Action = Constants.AdminActionSendEmail;
+                                    adminData.adminForm = AdminFormEdit;
                                     break;
                                 case ButtonActivate:
                                     //
                                     // Activate (submit) a conditional Email
                                     //
-                                    adminData.Admin_Action = Constants.AdminActionActivateEmail;
-                                    adminData.AdminForm = AdminFormEdit;
+                                    adminData.admin_Action = Constants.AdminActionActivateEmail;
+                                    adminData.adminForm = AdminFormEdit;
                                     break;
                                 case ButtonDeactivate:
                                     //
                                     // Deactivate (clear submit) a conditional Email
                                     //
-                                    adminData.Admin_Action = Constants.AdminActionDeactivateEmail;
-                                    adminData.AdminForm = AdminFormEdit;
+                                    adminData.admin_Action = Constants.AdminActionDeactivateEmail;
+                                    adminData.adminForm = AdminFormEdit;
                                     break;
                                 case ButtonSendTest:
                                     //
                                     // Test an Email (Group, System, or Conditional)
                                     //
-                                    adminData.Admin_Action = Constants.AdminActionSendEmailTest;
-                                    adminData.AdminForm = AdminFormEdit;
+                                    adminData.admin_Action = Constants.AdminActionSendEmailTest;
+                                    adminData.adminForm = AdminFormEdit;
                                     //                Case ButtonSpellCheck
                                     //                    SpellCheckRequest = True
                                     //                    adminContextClass.AdminAction = adminContextClass.AdminActionSave
@@ -1913,8 +1910,8 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // Create a Duplicate record (for email)
                                     //
-                                    adminData.Admin_Action = Constants.AdminActionDuplicate;
-                                    adminData.AdminForm = AdminFormEdit;
+                                    adminData.admin_Action = Constants.AdminActionDuplicate;
+                                    adminData.adminForm = AdminFormEdit;
                                     break;
                             }
                             break;
@@ -1974,7 +1971,7 @@ namespace Contensive.Addons.AdminSite {
                             switch (adminData.requestButton) {
                                 case ButtonCancel:
                                 case ButtonOK:
-                                    adminData.AdminForm = AdminFormRoot;
+                                    adminData.adminForm = AdminFormRoot;
                                     break;
                             }
                             break;
@@ -2042,16 +2039,16 @@ namespace Contensive.Addons.AdminSite {
                             //
                             //
                             SaveEditRecord(cp, adminData);
-                            adminData.LoadContentTrackingDataBase(cp.core);
-                            adminData.LoadContentTrackingResponse(cp.core);
+                            adminData.loadContentTrackingDataBase(cp.core);
+                            adminData.loadContentTrackingResponse(cp.core);
                             SaveLinkAlias(cp, adminData);
                             SaveContentTracking(cp, adminData);
                         } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCLIBRARYFOLDERS") {
                             //
                             //
                             SaveEditRecord(cp, adminData);
-                            adminData.LoadContentTrackingDataBase(cp.core);
-                            adminData.LoadContentTrackingResponse(cp.core);
+                            adminData.loadContentTrackingDataBase(cp.core);
+                            adminData.loadContentTrackingResponse(cp.core);
                             cp.core.html.processCheckList("LibraryFolderRules", adminData.adminContent.name, GenericController.encodeText(editRecord.id), "Groups", "Library Folder Rules", "FolderID", "GroupID");
                             SaveContentTracking(cp, adminData);
                         } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCSETUP") {
@@ -2067,16 +2064,16 @@ namespace Contensive.Addons.AdminSite {
                             //
                             //
                             SaveEditRecord(cp, adminData);
-                            adminData.LoadContentTrackingDataBase(cp.core);
-                            adminData.LoadContentTrackingResponse(cp.core);
+                            adminData.loadContentTrackingDataBase(cp.core);
+                            adminData.loadContentTrackingResponse(cp.core);
                             LoadAndSaveContentGroupRules(cp, editRecord.id);
                             SaveContentTracking(cp, adminData);
                         } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCTEMPLATES") {
                             //
                             // save and clear editorstylerules for this template
                             SaveEditRecord(cp, adminData);
-                            adminData.LoadContentTrackingDataBase(cp.core);
-                            adminData.LoadContentTrackingResponse(cp.core);
+                            adminData.loadContentTrackingDataBase(cp.core);
+                            adminData.loadContentTrackingResponse(cp.core);
                             SaveContentTracking(cp, adminData);
                             EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString(), 1, 99, 1);
                             cp.core.privateFiles.deleteFile(EditorStyleRulesFilename);
@@ -2084,8 +2081,8 @@ namespace Contensive.Addons.AdminSite {
                             //
                             //
                             SaveEditRecord(cp, adminData);
-                            adminData.LoadContentTrackingDataBase(cp.core);
-                            adminData.LoadContentTrackingResponse(cp.core);
+                            adminData.loadContentTrackingDataBase(cp.core);
+                            adminData.loadContentTrackingResponse(cp.core);
                             SaveContentTracking(cp, adminData);
                         }
                     }
@@ -2094,9 +2091,9 @@ namespace Contensive.Addons.AdminSite {
                 // If the content supports datereviewed, mark it
                 //
                 if (!cp.core.doc.userErrorList.Count.Equals(0)) {
-                    adminData.AdminForm = adminData.AdminSourceForm;
+                    adminData.adminForm = adminData.adminSourceForm;
                 }
-                adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
             }
@@ -2107,13 +2104,13 @@ namespace Contensive.Addons.AdminSite {
         private void ProcessActionDuplicate(CPClass cp, AdminDataModel adminData) {
             try {
                 if (cp.core.doc.userErrorList.Count.Equals(0)) {
-                    switch (adminData.adminContent.tableName.ToLower()) {
+                    switch (adminData.adminContent.tableName.ToLower(CultureInfo.InvariantCulture)) {
                         case "ccemail":
                             //
                             // --- preload array with values that may not come back in response
                             //
-                            adminData.LoadEditRecord(cp.core);
-                            adminData.LoadEditRecord_Request(cp.core);
+                            adminData.loadEditRecord(cp.core);
+                            adminData.loadEditRecord_Request(cp.core);
                             //
                             if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                 //
@@ -2136,8 +2133,8 @@ namespace Contensive.Addons.AdminSite {
                         default:
                             //
                             // --- preload array with values that may not come back in response
-                            adminData.LoadEditRecord(cp.core);
-                            adminData.LoadEditRecord_Request(cp.core);
+                            adminData.loadEditRecord(cp.core);
+                            adminData.loadEditRecord_Request(cp.core);
                             //
                             if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                 //
@@ -2178,10 +2175,10 @@ namespace Contensive.Addons.AdminSite {
                             }
                             break;
                     }
-                    adminData.AdminForm = adminData.AdminSourceForm;
+                    adminData.adminForm = adminData.adminSourceForm;
                     //
                     // convert so action can be used in as a refresh
-                    adminData.Admin_Action = Constants.AdminActionNop;
+                    adminData.admin_Action = Constants.AdminActionNop;
                 }
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
@@ -2382,68 +2379,6 @@ namespace Contensive.Addons.AdminSite {
                             if (AddAdminMenuEntry) {
                                 //
                                 // Add Navigator entries
-                                //
-                                //                    cmc = cp.core.main_cs_getv()
-                                //                    MenuContentName = NavigatorEntryModel.contentName
-                                //                    SupportAddonID = cp.core.csv_IsContentFieldSupported(MenuContentName, "AddonID")
-                                //                    SupportGuid = cp.core.csv_IsContentFieldSupported(MenuContentName, "ccGuid")
-                                //                    CS = cp.core.app.csOpen(NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
-                                //                    Do While cp.core.app.csv_IsCSOK(CS)
-                                //                        ParentID = cp.core.app.csv_cs_getText(CS, "ID")
-                                //                        ParentName = cp.core.app.csv_cs_getText(CS, "name")
-                                //                        AdminOnly = csData.cs_getBoolean(CS, "AdminOnly")
-                                //                        DeveloperOnly = csData.cs_getBoolean(CS, "DeveloperOnly")
-                                //                        CSEntry = cp.core.app.csv_InsertCSRecord(MenuContentName)
-                                //                        If cp.core.app.csv_IsCSOK(CSEntry) Then
-                                //                            If ParentID = 0 Then
-                                //                                Call cp.core.app.csv_SetCS(CSEntry, "ParentID", Null)
-                                //                            Else
-                                //                                Call cp.core.app.csv_SetCS(CSEntry, "ParentID", ParentID)
-                                //                            End If
-                                //                            Call cp.core.app.csv_SetCS(CSEntry, "ContentID", ChildContentID)
-                                //                            Call cp.core.app.csv_SetCS(CSEntry, "name", ChildContentName)
-                                //                            Call cp.core.app.csv_SetCS(CSEntry, "LinkPage", "")
-                                //                            Call cp.core.app.csv_SetCS(CSEntry, "SortOrder", "")
-                                //                            Call cp.core.app.csv_SetCS(CSEntry, "AdminOnly", AdminOnly)
-                                //                            Call cp.core.app.csv_SetCS(CSEntry, "DeveloperOnly", DeveloperOnly)
-                                //                            Call cp.core.app.csv_SetCS(CSEntry, "NewWindow", False)
-                                //                            Call cp.core.app.csv_SetCS(CSEntry, "Active", True)
-                                //                            If SupportAddonID Then
-                                //                                Call cp.core.app.csv_SetCS(CSEntry, "AddonID", "")
-                                //                            End If
-                                //                            If SupportGuid Then
-                                //                                GuidGenerator = New guidClass
-                                //                                ccGuid = Guid.NewGuid.ToString()
-                                //                                GuidGenerator = Nothing
-                                //                                Call cp.core.app.csv_SetCS(CSEntry, "ccGuid", ccGuid)
-                                //                            End If
-                                //                        End If
-                                //                        Call cp.core.app.csv_CloseCS(CSEntry)
-                                //                        'Call cp.core.csv_VerifyNavigatorEntry2(ccGuid, menuNameSpace, MenuName, ChildContenName, "", "", AdminOnly, DeveloperOnly, False, True, NavigatorEntryModel.contentName, "")
-                                //                        'Call cp.core.main_CreateAdminMenu(MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
-                                //                        Description = Description _
-                                //                            & "<div>Creating navigator entry for [" & ChildContentName & "] under entry [" & ParentName & "].</div>"
-                                //                        cp.core.main_NextCSRecord (CS)
-                                //                    Loop
-                                //                    Call cp.core.app.closeCS(CS)
-                                //
-                                // Add Legacy Navigator Entries
-                                //
-                                // -- deprecated
-                                //CS = csData.cs_open(NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
-                                //Do While csData.cs_ok(CS)
-                                //    MenuName = csData.cs_get(CS, "name")
-                                //    AdminOnly = csData.cs_getBoolean(CS, "AdminOnly")
-                                //    DeveloperOnly = csData.cs_getBoolean(CS, "DeveloperOnly")
-                                //    If MenuName = "" Then
-                                //        MenuName = "Site Content"
-                                //    End If
-                                //    Call Controllers.appBuilderController.admin_VerifyAdminMenu(cp.core, MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
-                                //    Description = Description _
-                                //        & "<div>Creating Legacy site menu for [" & ChildContentName & "] under entry [" & MenuName & "].</div>"
-                                //    csData.cs_goNext(CS)
-                                //Loop
-                                //Call csData.cs_Close(CS)
                             }
                             //
                             Description = Description + "<div>&nbsp;</div>"

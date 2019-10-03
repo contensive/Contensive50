@@ -3,6 +3,7 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
@@ -35,7 +36,7 @@ namespace Contensive.Processor.Models.Domain {
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", Error loading CollectionFolderConfig file.");
                     return null;
                 }
-                if (doc.DocumentElement.Name.ToLower() != GenericController.vbLCase(Constants.CollectionListRootNode)) {
+                if (doc.DocumentElement.Name.ToLower(CultureInfo.InvariantCulture) != GenericController.vbLCase(Constants.CollectionListRootNode)) {
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", The Collections.xml file has an invalid root node");
                     return null;
                 }

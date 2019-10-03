@@ -13,6 +13,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.Models;
 using Contensive.Models.Db;
+using System.Globalization;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -716,8 +717,6 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 //
-                //If Not (true) Then Exit Function
-                //
                 string Link = null;
                 string IconFilename = null;
                 //
@@ -1084,7 +1083,7 @@ namespace Contensive.Processor.Controllers {
                 string FieldLookupList = "";
                 foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in contentMetadata.fields) {
                     ContentFieldMetadataModel field = keyValuePair.Value;
-                    if (field.nameLc == fieldName.ToLower()) {
+                    if (field.nameLc == fieldName.ToLower(CultureInfo.InvariantCulture)) {
                         FieldValueVariant = field.defaultValue;
                         fieldTypeId = field.fieldTypeId;
                         FieldReadOnly = field.readOnly;
@@ -1950,12 +1949,6 @@ namespace Contensive.Processor.Controllers {
                     }
                     core.db.executeQuery("update ccpagecontent set ChildListInstanceOptions=" + DbController.encodeSQLText(addonOption_String) + " where id=" + RecordID);
                     needToClearCache = true;
-                    //CS = main_OpenCSContentRecord("page content", RecordID)
-                    //If app.csv_IsCSOK(CS) Then
-                    //    Call app.SetCS(CS, "ChildListInstanceOptions", addonOption_String)
-                    //    needToClearCache = True
-                    //End If
-                    //Call app.closeCS(CS)
                 }
             } else if ((ACInstanceID == "-2") && (!string.IsNullOrEmpty(FieldName))) {
                 //
@@ -2266,25 +2259,6 @@ namespace Contensive.Processor.Controllers {
         public string getCheckList(string htmlNamePrefix, string PrimaryContentName, int PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName, string SecondaryContentSelectCriteria = "", string CaptionFieldName = "", bool readOnlyfield = false, bool IncludeContentFolderDivs = false, string DefaultSecondaryIDList = "") {
             string returnHtml = "";
             try {
-                bool CanSeeHiddenFields = false;
-                ContentMetadataModel SecondaryMetaData = null;
-                List<int> ContentIDList = new List<int>();
-                bool Found = false;
-                int RecordID = 0;
-                string SingularPrefixHtmlEncoded = null;
-                //bool IsRuleCopySupported = false;
-                bool AllowRuleCopy = false;
-                ////
-                //// IsRuleCopySupported - if true, the rule records include an allow button, and copy
-                ////   This is for a checkbox like [ ] Other [enter other copy here]
-                ////
-                //IsRuleCopySupported = Models.Complex.metadataModel.isContentFieldSupported(core, RulesContentName, "RuleCopy");
-                //if (IsRuleCopySupported) {
-                //    IsRuleCopySupported = IsRuleCopySupported && Models.Complex.metadataModel.isContentFieldSupported(core, SecondaryContentName, "AllowRuleCopy");
-                //    if (IsRuleCopySupported) {
-                //        IsRuleCopySupported = IsRuleCopySupported && Models.Complex.metadataModel.isContentFieldSupported(core, SecondaryContentName, "RuleCopyCaption");
-                //    }
-                //}
                 if (string.IsNullOrEmpty(CaptionFieldName)) {
                     CaptionFieldName = "name";
                 }
@@ -2297,16 +2271,17 @@ namespace Contensive.Processor.Controllers {
                     // ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     //
                     int PrimaryContentID = ContentMetadataModel.getContentId(core, PrimaryContentName);
-                    SecondaryMetaData = ContentMetadataModel.createByUniqueName(core, SecondaryContentName);
+                    ContentMetadataModel SecondaryMetaData = ContentMetadataModel.createByUniqueName(core, SecondaryContentName);
                     string SecondaryTablename = SecondaryMetaData.tableName;
                     int SecondaryContentID = SecondaryMetaData.id;
+                    List<int> ContentIDList = new List<int>();
                     ContentIDList.Add(SecondaryContentID);
                     ContentIDList.AddRange(SecondaryMetaData.childIdList(core));
                     //
                     //
                     //
                     string rulesTablename = MetadataController.getContentTablename(core, RulesContentName);
-                    SingularPrefixHtmlEncoded = HtmlController.encodeHtml(GenericController.getSingular_Sortof(SecondaryContentName)) + "&nbsp;";
+                    string SingularPrefixHtmlEncoded = HtmlController.encodeHtml(GenericController.getSingular_Sortof(SecondaryContentName)) + "&nbsp;";
                     //
                     int main_MemberShipCount = 0;
                     int main_MemberShipSize = 0;
@@ -2383,19 +2358,11 @@ namespace Contensive.Processor.Controllers {
                         //
                         SQL = "SELECT " + SecondaryTablename + ".ID AS ID, " + SecondaryTablename + "." + CaptionFieldName + " AS OptionCaption, " + SecondaryTablename + ".name AS OptionName, " + SecondaryTablename + ".SortOrder";
                         SQL += ",0 as AllowRuleCopy,'' as RuleCopyCaption";
-                        //if (IsRuleCopySupported) {
-                        //    SQL += "," + SecondaryTablename + ".AllowRuleCopy," + SecondaryTablename + ".RuleCopyCaption";
-                        //} else {
-                        //    SQL += ",0 as AllowRuleCopy,'' as RuleCopyCaption";
-                        //}
                         SQL += " from " + SecondaryTablename + " where (1=1)";
                         if (!string.IsNullOrEmpty(SecondaryContentSelectCriteria)) {
                             SQL += "AND(" + SecondaryContentSelectCriteria + ")";
                         }
                         SQL += " GROUP BY " + SecondaryTablename + ".ID, " + SecondaryTablename + "." + CaptionFieldName + ", " + SecondaryTablename + ".name, " + SecondaryTablename + ".SortOrder";
-                        //if (IsRuleCopySupported) {
-                        //    SQL += ", " + SecondaryTablename + ".AllowRuleCopy," + SecondaryTablename + ".RuleCopyCaption";
-                        //}
                         SQL += " ORDER BY ";
                         SQL += SecondaryTablename + "." + CaptionFieldName;
                         using (var csData = new CsModel(core)) {
@@ -2406,7 +2373,7 @@ namespace Contensive.Processor.Controllers {
                                     string EndDiv = "";
                                     int CheckBoxCnt = 0;
                                     int DivCheckBoxCnt = 0;
-                                    CanSeeHiddenFields = core.session.isAuthenticatedDeveloper();
+                                    bool CanSeeHiddenFields = core.session.isAuthenticatedDeveloper();
                                     string DivName = htmlNamePrefix + ".All";
                                     while (csData.ok()) {
                                         string OptionName = csData.getText("OptionName");
@@ -2414,8 +2381,8 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             // Current checkbox is visible
                                             //
-                                            RecordID = csData.getInteger("ID");
-                                            AllowRuleCopy = csData.getBoolean("AllowRuleCopy");
+                                            int RecordID = csData.getInteger("ID");
+                                            bool AllowRuleCopy = csData.getBoolean("AllowRuleCopy");
                                             string RuleCopyCaption = csData.getText("RuleCopyCaption");
                                             string OptionCaption = csData.getText("OptionCaption");
                                             if (string.IsNullOrEmpty(OptionCaption)) {
@@ -2432,7 +2399,7 @@ namespace Contensive.Processor.Controllers {
                                                 //returnHtml += "<br>\r\n";
                                             }
                                             string RuleCopy = "";
-                                            Found = false;
+                                            bool Found = false;
                                             if (main_MemberShipCount != 0) {
                                                 int main_MemberShipPointer = 0;
                                                 for (main_MemberShipPointer = 0; main_MemberShipPointer < main_MemberShipCount; main_MemberShipPointer++) {
@@ -2462,12 +2429,6 @@ namespace Contensive.Processor.Controllers {
                                                 returnHtml += "<div class=\"checkbox\"><label><input type=\"checkbox\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\">&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
                                                 //returnHtml += "<input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\">";
                                             }
-                                            //returnHtml += "</td><td style=\"vertical-align:top;padding-top:4px;\">";
-                                            //returnHtml += SpanClassAdminNormal + optionCaptionHtmlEncoded;
-                                            //if (AllowRuleCopy) {
-                                            //    returnHtml += ", " + RuleCopyCaption + "&nbsp;" + inputText(core, htmlNamePrefix + "." + CheckBoxCnt + ".RuleCopy", RuleCopy, 1, 20);
-                                            //}
-                                            //returnHtml += "</td></tr></table>";
                                             CheckBoxCnt = CheckBoxCnt + 1;
                                             DivCheckBoxCnt = DivCheckBoxCnt + 1;
                                         }
@@ -2480,7 +2441,6 @@ namespace Contensive.Processor.Controllers {
                         }
                         addScriptCode(javaScriptRequired, "CheckList Categories");
                     }
-                    //End If
                     core.doc.checkListCnt = core.doc.checkListCnt + 1;
                 }
             } catch (Exception ex) {
@@ -2907,15 +2867,6 @@ namespace Contensive.Processor.Controllers {
                     headList.Add(Environment.NewLine + "<meta name=\"robots\" content=\"nofollow\" >");
                     headList.Add(Environment.NewLine + "<meta name=\"mssmarttagspreventparsing\" content=\"true\" >");
                 }
-                ////
-                //// -- base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
-                //if (!string.IsNullOrEmpty(core.webServer.serverFormActionURL)) {
-                //    string BaseHref = core.webServer.serverFormActionURL;
-                //    if (!string.IsNullOrEmpty(core.doc.refreshQueryString)) {
-                //        BaseHref += "?" + core.doc.refreshQueryString;
-                //    }
-                //    headList.Add(Environment.NewLine + "<base href=\"" + BaseHref + "\" >");
-                //}
                 //
                 // -- css and js
                 // -- only select assets with .inHead, which includes those whose depencies are .inHead

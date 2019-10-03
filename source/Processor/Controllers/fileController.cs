@@ -12,6 +12,7 @@ using System.Linq;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
+using System.Globalization;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -96,9 +97,6 @@ namespace Contensive.Processor.Controllers {
                 returnPath = normalizeDosPath(path);
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 returnPath = Path.Combine(returnPath, pathFilename);
-                //if (pathFilename != "\\") {
-                //    returnPath = Path.Combine(returnPath, pathFilename);
-                //}
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -246,9 +244,6 @@ namespace Contensive.Processor.Controllers {
                 string filename = "";
                 splitDosPathFilename(pathFilename, ref path, ref filename);
                 verifyPath(path);
-                //if (!pathExists(path)) {
-                //    createPath(path);
-                //}
                 try {
                     if (isBinary) {
                         File.WriteAllBytes(convertRelativeToLocalAbsPath(pathFilename), binaryContent);
@@ -287,9 +282,6 @@ namespace Contensive.Processor.Controllers {
                     string filename = "";
                     splitDosPathFilename(pathFilename, ref path, ref filename);
                     verifyPath(path);
-                    //if (!pathExists(path)) {
-                    //    createPath(path);
-                    //}
                     if (!isLocal) {
                         //
                         // -- non-local, copy remote file to local
@@ -746,7 +738,6 @@ namespace Contensive.Processor.Controllers {
                     subFolder = subFolder.Substring(0, subFolder.Length - 1);
                     // -- skip subfolders as they match the ends-with-a-slash query
                     if (subFolder.Contains("/")) { continue; }
-                    //if (subFolder.IndexOf("/") > -1) { continue; }
                     returnFolders.Add(new FolderDetail() {
                         Attributes = 0,
                         Type = "",
@@ -756,28 +747,6 @@ namespace Contensive.Processor.Controllers {
                         Name = subFolder
                     });
                 }
-                //IEnumerable<S3Object> folderList = response.S3Objects;
-                ////IEnumerable<S3Object> folderList = response.S3Objects.Where(x => x.Key.EndsWith(@"/") && x.Size == 0);
-                //var returnFolders = new List<FolderDetail>();
-                //int startIndex = unixPath.Length;
-                //foreach (var folder in folderList) {
-                //    string subFolder = folder.Key.Substring(startIndex);
-                //    // -- skip the path being queried (blank subfolder)
-                //    if (string.IsNullOrWhiteSpace(subFolder)) { continue; }
-                //    // -- remove trailing slash as this returns folder names, not paths (path ends in slash, folder name ends in the name)
-                //    subFolder = subFolder.Substring(0,subFolder.Length - 1);
-                //    // -- skip subfolders as they match the ends-with-a-slash query
-                //    if (subFolder.Contains("/")) { continue; }
-                //    //if (subFolder.IndexOf("/") > -1) { continue; }
-                //    returnFolders.Add(new FolderDetail() {
-                //        Attributes = 0,
-                //        Type = "",
-                //        DateCreated = folder.LastModified,
-                //        DateLastAccessed = folder.LastModified,
-                //        DateLastModified = folder.LastModified,
-                //        Name = subFolder
-                //    });
-                //};
                 return returnFolders;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1152,8 +1121,9 @@ namespace Contensive.Processor.Controllers {
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 if ((!string.IsNullOrEmpty(pathFilename)) && (!string.IsNullOrEmpty(Link))) {
                     string URLLink = GenericController.vbReplace(Link, " ", "%20");
-                    HttpRequestController HTTP = new HttpRequestController();
-                    HTTP.timeout = 600;
+                    HttpRequestController HTTP = new HttpRequestController {
+                        timeout = 600
+                    };
                     HTTP.getUrlToFile(encodeText(URLLink), convertRelativeToLocalAbsPath(pathFilename));
                     //
                     if (!isLocal) {
@@ -1171,7 +1141,7 @@ namespace Contensive.Processor.Controllers {
         /// Unzip a zipfile
         /// </summary>
         /// <param name="pathFilename"></param>
-        public void UnzipFile(string pathFilename) {
+        public void unzipFile(string pathFilename) {
             try {
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 bool processLocalFile = true;
@@ -1267,7 +1237,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="pathFilename"></param>
         /// <returns></returns>
         public string convertLocalAbsToRelativePath(string pathFilename) {
-            if (pathFilename.ToLower().IndexOf(localAbsRootPath.ToLower()).Equals(0)) { return pathFilename.Substring(localAbsRootPath.Length); }
+            if (pathFilename.ToLower(CultureInfo.InvariantCulture).IndexOf(localAbsRootPath.ToLower(CultureInfo.InvariantCulture)).Equals(0)) { return pathFilename.Substring(localAbsRootPath.Length); }
             return pathFilename;
         }
 
@@ -1535,17 +1505,6 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- check if local mirror has an up-to-date copy of the file
                 if (!localFileStale(dosPathFilename)) return true;
-                //FileDetail localFile = getFileDetails_local(dosPathFilename);
-                //if (localFile != null) {
-                //    FileDetail remoteFile = getFileDetails_remote(dosPathFilename);
-                //    if (remoteFile != null) {
-                //        if ((remoteFile.Size == localFile.Size) && (remoteFile.DateLastModified <= localFile.DateLastModified)) {
-                //            //
-                //            // -- remote and local files are the same size and modification date, or the remote is older, dont copy
-                //            return true;
-                //        }
-                //    }
-                //}
                 //
                 // note: local call is not exception, can be used regardless of isLocal
                 verifyPath_remote(getPath(dosPathFilename));
@@ -1757,8 +1716,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="bucketName"></param>
         /// <returns></returns>
         double getSpaceUsedMB(string bucketName) {
-            ListObjectsRequest request = new ListObjectsRequest();
-            request.BucketName = bucketName;
+            ListObjectsRequest request = new ListObjectsRequest {
+                BucketName = bucketName
+            };
             ListObjectsResponse response = s3Client.ListObjects(request);
             long totalSize = 0;
             foreach (S3Object o in response.S3Objects) {

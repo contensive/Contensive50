@@ -248,7 +248,7 @@ namespace Contensive.Addons.Tools {
                     //
                     // Configure edit form
                     Stream.Add(HtmlController.inputHidden(RequestNameToolContentID, ContentID));
-                    Stream.Add(core.html.getPanelTop()); ;
+                    Stream.Add(core.html.getPanelTop());
                     ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK + "," + ButtonAdd;
                     //
                     // Get a new copy of the content definition

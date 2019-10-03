@@ -6,6 +6,7 @@ using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using System.Text;
 using Contensive.Models.Db;
+using System.Globalization;
 //
 namespace Contensive.Addons.Primitives {
     public class AuthenticateClass : Contensive.BaseClasses.AddonBaseClass {
@@ -49,7 +50,7 @@ namespace Contensive.Addons.Primitives {
                 //
                 // -- test for basic username/password authentication
                 string basicAuthentication = core.docProperties.getText("authorization");
-                if ((!string.IsNullOrWhiteSpace(basicAuthentication)) && (basicAuthentication.Length > 7) && (basicAuthentication.Substring(0, 6).ToLower() == "basic ")) {
+                if ((!string.IsNullOrWhiteSpace(basicAuthentication)) && (basicAuthentication.Length > 7) && (basicAuthentication.Substring(0, 6).ToLower(CultureInfo.InvariantCulture) == "basic ")) {
                     string usernamePasswordEncoded = basicAuthentication.Substring(6);
                     byte[] usernamePasswordBytes = Convert.FromBase64String(usernamePasswordEncoded);
                     string[] usernamePassword = Encoding.ASCII.GetString(usernamePasswordBytes).Split(':');

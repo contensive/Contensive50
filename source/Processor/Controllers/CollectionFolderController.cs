@@ -15,6 +15,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
 using System.Reflection;
 using NLog;
+using System.Globalization;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -103,7 +104,7 @@ namespace Contensive.Processor.Controllers {
                     string tmpInstallPath = "tmpInstallCollection" + GenericController.getGUIDNaked() + "\\";
                     core.privateFiles.copyFile(sourcePrivateFolderPathFilename, tmpInstallPath + collectionFilename);
                     if (collectionFilename.ToLowerInvariant().Substring(collectionFilename.Length - 4) == ".zip") {
-                        core.privateFiles.UnzipFile(tmpInstallPath + collectionFilename);
+                        core.privateFiles.unzipFile(tmpInstallPath + collectionFilename);
                         core.privateFiles.deleteFile(tmpInstallPath + collectionFilename);
                     }
                     {
@@ -111,7 +112,7 @@ namespace Contensive.Processor.Controllers {
                         // -- find xml file in temp folder and process it
                         bool CollectionFileFound = false;
                         foreach (FileDetail file in core.privateFiles.getFileList(tmpInstallPath)) {
-                            if (file.Name.Substring(file.Name.Length - 4).ToLower() == ".xml") {
+                            if (file.Name.Substring(file.Name.Length - 4).ToLower(CultureInfo.InvariantCulture) == ".xml") {
                                 //
                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", build collection folder for Collection file [" + file.Name + "]");
                                 //
@@ -147,7 +148,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         string Collectionname = XmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "name", "");
                                         string collectionGuid = XmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "guid", Collectionname);
-                                        if ((!collectionsInstalledList.Contains(collectionGuid.ToLower())) && (!collectionsDownloaded.Contains(collectionGuid.ToLower()))) {
+                                        if ((!collectionsInstalledList.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture))) && (!collectionsDownloaded.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture)))) {
                                             if (string.IsNullOrEmpty(Collectionname)) {
                                                 //
                                                 // ----- Error condition -- it must have a collection name
@@ -160,7 +161,7 @@ namespace Contensive.Processor.Controllers {
                                                 // Build Collection folder structure in /Add-ons folder
                                                 //------------------------------------------------------------------
                                                 //
-                                                collectionsDownloaded.Add(collectionGuid.ToLower());
+                                                collectionsDownloaded.Add(collectionGuid.ToLower(CultureInfo.InvariantCulture));
                                                 CollectionFileFound = true;
                                                 if (string.IsNullOrEmpty(collectionGuid)) {
                                                     //
@@ -332,7 +333,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpdateConfig, Error loading Collections.xml file.");
                     return;
                 }
-                if (!Doc.DocumentElement.Name.ToLower().Equals("collectionlist")) {
+                if (!Doc.DocumentElement.Name.ToLower(CultureInfo.InvariantCulture).Equals("collectionlist")) {
                     //
                     // -- exit, top node invalid
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpdateConfig, The Collections.xml file has an invalid root node, [" + Doc.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.");
@@ -340,17 +341,17 @@ namespace Contensive.Processor.Controllers {
                 }
                 bool collectionFound = false;
                 foreach (XmlNode localListNode in Doc.DocumentElement.ChildNodes) {
-                    if (localListNode.Name.ToLower().Equals("collection")) {
+                    if (localListNode.Name.ToLower(CultureInfo.InvariantCulture).Equals("collection")) {
                         //
                         // -- collection node
                         string localGuid = "";
                         foreach (XmlNode CollectionNode in localListNode.ChildNodes) {
-                            if (CollectionNode.Name.ToLower().Equals("guid")) {
-                                localGuid = CollectionNode.InnerText.ToLower();
+                            if (CollectionNode.Name.ToLower(CultureInfo.InvariantCulture).Equals("guid")) {
+                                localGuid = CollectionNode.InnerText.ToLower(CultureInfo.InvariantCulture);
                                 break;
                             }
                         }
-                        if (localGuid.Equals(collectionGuid.ToLower())) {
+                        if (localGuid.Equals(collectionGuid.ToLower(CultureInfo.InvariantCulture))) {
                             collectionFound = true;
                             foreach (XmlNode collectionNode in localListNode.ChildNodes) {
                                 switch (GenericController.vbLCase(collectionNode.Name)) {

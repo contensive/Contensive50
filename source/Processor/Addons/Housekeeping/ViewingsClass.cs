@@ -25,7 +25,8 @@ namespace Contensive.Addons.Housekeeping {
                     // if this fails, continue with the rest of the work
                     try {
                         core.db.executeQuery(sql);
-                    } catch (Exception) {
+                    } catch (Exception ex) {
+                        LogController.logError(core, ex);
                     }
                 }
                 //

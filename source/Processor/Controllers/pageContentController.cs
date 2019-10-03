@@ -944,8 +944,6 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 break;
                         }
-                        //End If
-                        //Call app.closeCS(CS)
                     }
                     //
                     //---------------------------------------------------------------------------------
@@ -2374,12 +2372,6 @@ namespace Contensive.Processor.Controllers {
                     result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + activeList + inactiveList + "\r</ul>";
                     //result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + GenericController.nop(activeList) + "\r</ul>";
                 }
-                //if (!string.IsNullOrEmpty(inactiveList)) {
-                //    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildListInactive\">" + GenericController.nop(inactiveList) + "\r</ul>";
-                //}
-                //
-                // ----- if non-orphan list, authoring and none found, print none message
-                //
                 if ((!string.IsNullOrEmpty(UcaseRequestedListName)) && (ChildListCount == 0) & isAuthoring) {
                     result = "[Child Page List with no pages]</p><p>" + result;
                 }
@@ -2550,14 +2542,6 @@ namespace Contensive.Processor.Controllers {
                         return;
                     }
                 }
-                //
-                //If (Button = ButtonAbortEdit) Then
-                //    Call WorkflowController.abortEdit2(pageCdef.name, RecordID, core.doc.authContext.user.id)
-                //End If
-                //If (Button = ButtonPublishSubmit) Then
-                //    Call WorkflowController.main_SubmitEdit(pageCdef.name, RecordID)
-                //    Call sendPublishSubmitNotice(pageCdef.name, RecordID, "")
-                //End If
                 if ((!(!core.doc.userErrorList.Count.Equals(0))) && ((button == ButtonOK) || (button == ButtonCancel))) {
                     //
                     // ----- Turn off Quick Editor if not save or add child
@@ -2795,9 +2779,6 @@ namespace Contensive.Processor.Controllers {
             if (!this.disposed) {
                 this.disposed = true;
                 if (disposing) {
-                    //If (cacheClient IsNot Nothing) Then
-                    //    cacheClient.Dispose()
-                    //End If
                 }
                 //
                 // cleanup non-managed objects

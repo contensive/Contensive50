@@ -37,7 +37,7 @@ namespace Contensive.Addons.AdminSite {
                 f.Add(AdminUIController.getEditRowLegacy(core, core.siteProperties.getText("POPServerStatus"), "Last Email Retrieve Status", "This is the status of the last POP email retrieval attempted."));
                 //
                 result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Bounced Email Handling", "", AdminUIController.editTable( f.Text ));
-                adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
+                adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

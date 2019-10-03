@@ -54,7 +54,7 @@ namespace Contensive.Addons.Housekeeping {
                 lastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default(DateTime));
                 core.siteProperties.setProperty("housekeep, last check", rightNow);
                 force = core.docProperties.getBoolean("force");
-                serverHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2); ;
+                serverHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2);
                 runDailyTasks = ((rightNow.Date > lastCheckDateTime.Date) && (serverHousekeepHour < rightNow.Hour));
                 yesterday = rightNow.AddDays(-1).Date;
                 aLittleWhileAgo = rightNow.AddDays(-90).Date;

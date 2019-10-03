@@ -4,6 +4,7 @@ using Contensive.Models.Db;
 using Contensive.Processor.Models.Domain;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -32,7 +33,7 @@ namespace Contensive.Processor.Controllers {
                 core.cache.invalidateDbRecord(recordID, tableName);
                 int activityLogOrganizationID = 0;
                 //
-                switch (tableName.ToLower()) {
+                switch (tableName.ToLower(CultureInfo.InvariantCulture)) {
                     case AddonCollectionModel.contentTableNameLowerCase:
                         //
                         // -- if this is an add or delete, manage the collection folders
@@ -309,9 +310,6 @@ namespace Contensive.Processor.Controllers {
             if (!this.disposed) {
                 this.disposed = true;
                 if (disposing) {
-                    //If (cacheClient IsNot Nothing) Then
-                    //    cacheClient.Dispose()
-                    //End If
                 }
                 //
                 // cleanup non-managed objects

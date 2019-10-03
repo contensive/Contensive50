@@ -41,55 +41,53 @@ namespace Contensive.Addons.Housekeeping {
                         LogController.logInfo(core, "Collection.xml root name ok");
                         //
                         {
-                            //If genericController.vbLCase(.name) <> "collectionlist" Then
-                            //    Call AppendClassLog(core,"Server", "", "RegisterAddonFolder, basename was not collectionlist, [" & .name & "].")
-                            //Else
                             int NodeCnt = 0;
                             foreach (XmlNode LocalListNode in Doc.DocumentElement.ChildNodes) {
                                 //
                                 // Get the collection path
                                 //
-                                string CollectionPath = "";
-                                string LocalGuid = "";
-                                string LocalName = "no name found";
-                                DateTime LastChangeDate = default(DateTime);
-                                if (LocalListNode.Name.ToLower().Equals("collection")) {
-                                    LocalGuid = "";
+                                string collectionPath = "";
+                                string localGuid = "";
+                                string localName = "no name found";
+                                DateTime lastChangeDate = default(DateTime);
+                                if (LocalListNode.Name.ToLower(CultureInfo.InvariantCulture).Equals("collection")) {
+                                    localGuid = "";
                                     foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
-                                        switch (CollectionNode.Name.ToLower()) {
+                                        switch (CollectionNode.Name.ToLower(CultureInfo.InvariantCulture)) {
                                             case "name":
                                                 //
-                                                LocalName = CollectionNode.InnerText.ToLower();
+                                                localName = CollectionNode.InnerText.ToLower(CultureInfo.InvariantCulture);
                                                 break;
                                             case "guid":
                                                 //
-                                                LocalGuid = CollectionNode.InnerText.ToLower();
+                                                localGuid = CollectionNode.InnerText.ToLower(CultureInfo.InvariantCulture);
                                                 break;
                                             case "path":
                                                 //
-                                                CollectionPath = CollectionNode.InnerText.ToLower();
+                                                collectionPath = CollectionNode.InnerText.ToLower(CultureInfo.InvariantCulture);
                                                 break;
                                             case "lastchangedate":
-                                                LastChangeDate = GenericController.encodeDate(CollectionNode.InnerText);
+                                                lastChangeDate = GenericController.encodeDate(CollectionNode.InnerText);
                                                 break;
                                             default:
+                                                LogController.logWarn(core, "Collection node contains unrecognized child [" + CollectionNode.Name.ToLower(CultureInfo.InvariantCulture) + "]");
                                                 break;
                                         }
                                     }
                                 }
                                 //
-                                LogController.logInfo(core, "Node[" + NodeCnt + "], LocalName=[" + LocalName + "], LastChangeDate=[" + LastChangeDate + "], CollectionPath=[" + CollectionPath + "], LocalGuid=[" + LocalGuid + "]");
+                                LogController.logInfo(core, "Node[" + NodeCnt + "], LocalName=[" + localName + "], LastChangeDate=[" + lastChangeDate + "], CollectionPath=[" + collectionPath + "], LocalGuid=[" + localGuid + "]");
                                 //
                                 // Go through all subpaths of the collection path, register the version match, unregister all others
                                 //
                                 //fs = New fileSystemClass
-                                if (string.IsNullOrEmpty(CollectionPath)) {
+                                if (string.IsNullOrEmpty(collectionPath)) {
                                     //
                                     LogController.logInfo(core, "no collection path, skipping");
                                     //
                                 } else {
-                                    CollectionPath = GenericController.vbLCase(CollectionPath);
-                                    string CollectionRootPath = CollectionPath;
+                                    collectionPath = GenericController.vbLCase(collectionPath);
+                                    string CollectionRootPath = collectionPath;
                                     int Pos = CollectionRootPath.LastIndexOf("\\") + 1;
                                     if (Pos <= 0) {
                                         //
@@ -119,7 +117,7 @@ namespace Contensive.Addons.Housekeeping {
                                                 }
                                                 //
                                                 // -- preserve folder in use
-                                                if (CollectionRootPath + "\\" + dir.Name == CollectionPath) {
+                                                if (CollectionRootPath + "\\" + dir.Name == collectionPath) {
                                                     LogController.logInfo(core, "....active folder preserved [" + dir.Name + "]");
                                                     continue;
                                                 }

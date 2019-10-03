@@ -125,14 +125,6 @@ namespace Contensive.Processor.Controllers {
             get {
                 if (_requestUrlSource == null) {
                     _requestUrlSource = iisContext.Request.Url.AbsoluteUri;
-                    //_requestUrlSource = "http://";
-                    //if (requestSecure) {
-                    //    _requestUrlSource = "https://";
-                    //}
-                    //_requestUrlSource += requestDomain + requestPathPage;
-                    //if (requestQueryString != "") {
-                    //    _requestUrlSource += "?" + requestQueryString;
-                    //}
                 }
                 return _requestUrlSource;
             }

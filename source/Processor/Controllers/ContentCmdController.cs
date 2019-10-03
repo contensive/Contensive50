@@ -429,19 +429,6 @@ namespace Contensive.Processor.Controllers {
                         //   [ "clear" , { "import": "test.html" },{ "open" : "myfile.txt" }]
                         //
                         cmdCollection = json.Deserialize<List<object>>(cmdSrc);
-                        //List<object> testArray = Newtonsoft.Json.JsonConvert.DeserializeObject<List<object>>(cmdSrc);
-                        //cmdCollection = core.json.Deserialize<Collection<object>>(cmdSrc);
-                        //If True Then
-                        //End If
-                        //If (LCase(TypeName(cmdDictionaryOrCollection)) <> "collection") Then
-                        //    Throw new GenericException("Error parsing JSON command list, expected a command list but parser did not return list, command list [" & cmdSrc & "]")
-                        //    Exit Function
-                        //Else
-                        //    '
-                        //    ' assign command array
-                        //    '
-                        //    cmdCollection = cmdDictionaryOrCollection
-                        //End If
                     } else {
                         //
                         // a single text command without JSON wrapper, like

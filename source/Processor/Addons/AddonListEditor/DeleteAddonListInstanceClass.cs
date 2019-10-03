@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using Contensive.Processor;
@@ -49,14 +50,8 @@ namespace Contensive.Addons.AddonListEditor {
                         errorList = new List<string> { "The parent content could not be determined from the guid [" + request.parentContentGuid + "]" }
                     });
                 }
-                //if (!core.session.isAuthenticatedContentManager(core, metadata)) {
-                //    cp.Response.SetStatus(WebServerController.httpResponseStatus401_Unauthorized);
-                //    return SerializeObject(new DeleteAddonListInstance_ResponseClass() {
-                //        errorList = new List<string> { "Your account does not have permission to edit [" + metadata.name + "]" }
-                //    });
-                //}
                 List<AddonListItemModel> addonList;
-                switch (metadata.name.ToLower()) {
+                switch (metadata.name.ToLower(CultureInfo.InvariantCulture)) {
                     case "page content":
                         var page = DbBaseModel.create<PageContentModel>(core.cpParent, request.parentRecordGuid);
                         if (page == null) {

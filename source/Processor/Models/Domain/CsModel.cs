@@ -11,6 +11,7 @@ using static Contensive.Processor.Constants;
 using static Contensive.Processor.Controllers.GenericController;
 using Contensive.Models;
 using System.Collections.Specialized;
+using System.Globalization;
 //
 namespace Contensive.Processor {
     //
@@ -1072,25 +1073,6 @@ namespace Contensive.Processor {
                         break;
                     case CPContentBaseClass.FieldTypeIdEnum.FileText:
                     case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                    //
-                    //fileNameNoExt = csGetText(CSPointer, FieldNameLc);
-                    ////FieldValue = genericController.encodeText(FieldValueVariantLocal)
-                    //if (string.IsNullOrEmpty(FieldValue)) {
-                    //    if (!string.IsNullOrEmpty(fileNameNoExt)) {
-                    //        core.cdnFiles.deleteFile(fileNameNoExt);
-                    //        //Call publicFiles.DeleteFile(fileNameNoExt)
-                    //        fileNameNoExt = "";
-                    //    }
-                    //} else {
-                    //    if (string.IsNullOrEmpty(fileNameNoExt)) {
-                    //        fileNameNoExt = getFieldFilename(CSPointer, FieldName, "", ContentName, field.fieldTypeId);
-                    //    }
-                    //    core.cdnFiles.saveFile(fileNameNoExt, FieldValue);
-                    //    //Call publicFiles.SaveFile(fileNameNoExt, FieldValue)
-                    //}
-                    //FieldValue = fileNameNoExt;
-                    //SetNeeded = true;
-                    //break;
                     case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                     case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                     case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
@@ -1924,7 +1906,7 @@ namespace Contensive.Processor {
                 //
                 // -- add required fields into select list
                 if ((!string.IsNullOrEmpty(sqlSelectFieldList)) && (sqlSelectFieldList.IndexOf("*", System.StringComparison.OrdinalIgnoreCase) == -1)) {
-                    string testList = ("," + sqlSelectFieldList + ",").ToLower();
+                    string testList = ("," + sqlSelectFieldList + ",").ToLower(CultureInfo.InvariantCulture);
                     if (!testList.Contains(",contentcontrolid,")) { sqlSelectFieldList += ",contentcontrolid"; }
                     if (!testList.Contains(",name,")) { sqlSelectFieldList += ",name"; }
                     if (!testList.Contains(",id,")) { sqlSelectFieldList += ",id"; }

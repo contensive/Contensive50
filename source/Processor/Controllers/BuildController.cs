@@ -1037,9 +1037,6 @@ namespace Contensive.Processor.Controllers {
             //
             // -- determine primary domain
             string primaryDomain = core.appConfig.name;
-            //if (core.appConfig.domainList.Count > 0) {
-            //    primaryDomain = core.appConfig.domainList[0];
-            //}
             var domain = DbBaseModel.createByUniqueName<DomainModel>(core.cpParent, primaryDomain);
             if (DbBaseModel.createByUniqueName<DomainModel>(core.cpParent, primaryDomain) == null) {
                 domain = DomainModel.addDefault<DomainModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, "domains"));

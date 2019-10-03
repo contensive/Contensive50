@@ -265,7 +265,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 string s = AdminUIController.editTable(tabPanel.Text);
                 result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Control Information", "", s);
-                adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
+                adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
                 tabPanel = null;
             } catch (Exception ex) {
                 LogController.logError(core, ex);

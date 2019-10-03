@@ -250,20 +250,6 @@ namespace Contensive.Processor.Models.Domain {
                         }
                         result.name = Collectionname;
                         //
-                        // Load possible DefaultSortMethods
-                        //
-                        //hint = "preload sort methods"
-                        //SortMethodList = vbTab & "By Name" & vbTab & "By Alpha Sort Order Field" & vbTab & "By Date" & vbTab & "By Date Reverse"
-                        //If core.app.csv_IsContentFieldSupported("Sort Methods", "ID") Then
-                        //    CS = core.app.OpenCSContent("Sort Methods", , , , , , , "Name")
-                        //    Do While core.app.IsCSOK(CS)
-                        //        SortMethodList = SortMethodList & vbTab & core.app.cs_getText(CS, "name")
-                        //        core.app.nextCSRecord(CS)
-                        //    Loop
-                        //    Call core.app.closeCS(CS)
-                        //End If
-                        //SortMethodList = SortMethodList & vbTab
-                        //
                         foreach (XmlNode metaData_NodeWithinLoop in srcXmlDom.DocumentElement.ChildNodes) {
                             metaData_Node = metaData_NodeWithinLoop;
                             NodeName = GenericController.vbLCase(metaData_NodeWithinLoop.Name);
@@ -544,23 +530,6 @@ namespace Contensive.Processor.Models.Domain {
                                     break;
                                 case "aggregatefunction":
                                 case "addon":
-                                    //
-                                    // 20181026 - no longer needed -- Aggregate Objects (just make them -- there are not too many
-                                    //
-                                    //Name =XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "Name", "");
-                                    //MiniCollectionModel.miniCollectionAddOnModel addon;
-                                    //if (result.legacyAddOns.ContainsKey(Name.ToLowerInvariant())) {
-                                    //    addon = result.legacyAddOns[Name.ToLowerInvariant()];
-                                    //} else {
-                                    //    addon = new MiniCollectionModel.miniCollectionAddOnModel();
-                                    //    result.legacyAddOns.Add(Name.ToLowerInvariant(), addon);
-                                    //}
-                                    //addon.dataChanged = setAllDataChanged;
-                                    //addon.Link =XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "Link", "");
-                                    //addon.ObjectProgramID =XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "ObjectProgramID", "");
-                                    //addon.ArgumentList =XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "ArgumentList", "");
-                                    //addon.SortOrder =XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "SortOrder", "");
-                                    //addon.Copy =XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "copy", "");
                                     break;
                                 case "style":
                                     //
@@ -593,26 +562,6 @@ namespace Contensive.Processor.Models.Domain {
                                     break;
                                 case "getcollection":
                                 case "importcollection":
-                                    //{
-                                    //    //If Not UpgradeDbOnly Then
-                                    //    //
-                                    //    // Import collections are blocked from the BuildDatabase upgrade b/c the resulting Db must be portable
-                                    //    //
-                                    //    Collectionname = XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "name", "");
-                                    //    CollectionGuid = XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "guid", "");
-                                    //    if (string.IsNullOrEmpty(CollectionGuid)) {
-                                    //        CollectionGuid = metadata_NodeWithinLoop.InnerText;
-                                    //    }
-                                    //    if (string.IsNullOrEmpty(CollectionGuid)) {
-                                    //        status = "The collection you selected [" + Collectionname + "] can not be downloaded because it does not include a valid GUID.";
-                                    //        //core.AppendLog("builderClass.Upgrademetadata_LoadDataToCollection, UserError [" & status & "], The error was [" & Doc.ParseError.reason & "]")
-                                    //    } else {
-                                    //        result.collectionImports.Add(new metadataMiniCollectionModel.ImportCollectionType() {
-                                    //            Name = Collectionname,
-                                    //            Guid = CollectionGuid
-                                    //        });
-                                    //    }
-                                    //}
                                     break;
                                 case "pagetemplate":
                                     //
@@ -1360,69 +1309,6 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     dstCollection.menus.Add(srcKey, srcMenu);
                 }
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Check addons -- yes, this should be done.
-                //-------------------------------------------------------------------------------------------------
-                //
-                //If False Then
-                //    '
-                //    ' remove this for now -- later add ImportCollections to track the collections (not addons)
-                //    '
-                //    '
-                //    '
-                //    For SrcPtr = 0 To srcCollection.AddOnCnt - 1
-                //        SrcContentName = genericController.vbLCase(srcCollection.AddOns[SrcPtr].Name)
-                //        okToUpdateDstFromSrc = False
-                //        '
-                //        ' Search for this name in the Dst
-                //        '
-                //        For DstPtr = 0 To dstCollection.AddOnCnt - 1
-                //            DstName = genericController.vbLCase(dstCollection.AddOns[dstPtr].Name)
-                //            If DstName = SrcContentName Then
-                //                '
-                //                ' found a match between Src and Dst
-                //                '
-                //                If SrcIsUsermetadata Then
-                //                    '
-                //                    ' test for metadata attribute changes
-                //                    '
-                //                    With dstCollection.AddOns[dstPtr]
-                //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.ArgumentList, srcCollection.AddOns[SrcPtr].ArgumentList)
-                //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.Copy, srcCollection.AddOns[SrcPtr].Copy)
-                //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.Link, srcCollection.AddOns[SrcPtr].Link)
-                //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.Name, srcCollection.AddOns[SrcPtr].Name)
-                //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.ObjectProgramID, srcCollection.AddOns[SrcPtr].ObjectProgramID)
-                //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.SortOrder, srcCollection.AddOns[SrcPtr].SortOrder)
-                //                    End With
-                //                End If
-                //                Exit For
-                //            End If
-                //        Next
-                //        If DstPtr = dstCollection.AddOnCnt Then
-                //            '
-                //            ' metadata was not found, add it
-                //            '
-                //            Array.Resize( ref asdf,asdf) // redim preserve  dstCollection.AddOns(dstCollection.AddOnCnt)
-                //            dstCollection.AddOnCnt = DstPtr + 1
-                //            okToUpdateDstFromSrc = True
-                //        End If
-                //        If okToUpdateDstFromSrc Then
-                //            With dstCollection.AddOns[dstPtr]
-                //                '
-                //                ' It okToUpdateDstFromSrc, update the Dst with the Src
-                //                '
-                //                .metadataChanged = True
-                //                .ArgumentList = srcCollection.AddOns[SrcPtr].ArgumentList
-                //                .Copy = srcCollection.AddOns[SrcPtr].Copy
-                //                .Link = srcCollection.AddOns[SrcPtr].Link
-                //                .Name = srcCollection.AddOns[SrcPtr].Name
-                //                .ObjectProgramID = srcCollection.AddOns[SrcPtr].ObjectProgramID
-                //                .SortOrder = srcCollection.AddOns[SrcPtr].SortOrder
-                //            End With
-                //        End If
-                //    Next
-                //End If
                 //
                 //-------------------------------------------------------------------------------------------------
                 // Check styles
