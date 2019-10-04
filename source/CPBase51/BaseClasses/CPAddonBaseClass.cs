@@ -70,7 +70,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="addonName"></param>
         /// <returns></returns>
-        public abstract object ExecuteByUniqueName(string addonName);
+        public abstract string ExecuteByUniqueName(string addonName);
         //
         //====================================================================================================
         /// <summary>
@@ -79,7 +79,7 @@ namespace Contensive.BaseClasses {
         /// <param name="addonName"></param>
         /// <param name="argumentKeyValuePairs"></param>
         /// <returns></returns>
-        public abstract object ExecuteByUniqueName(string addonName, Dictionary<string, string> argumentKeyValuePairs);
+        public abstract string ExecuteByUniqueName(string addonName, Dictionary<string, string> argumentKeyValuePairs);
         //
         //====================================================================================================
         /// <summary>
@@ -88,7 +88,7 @@ namespace Contensive.BaseClasses {
         /// <param name="addonName"></param>
         /// <param name="executeContext"></param>
         /// <returns></returns>
-        public abstract object ExecuteByUniqueName(string addonName, CPUtilsBaseClass.addonExecuteContext executeContext);
+        public abstract string ExecuteByUniqueName(string addonName, CPUtilsBaseClass.addonExecuteContext executeContext);
         //
         //====================================================================================================
         /// <summary>

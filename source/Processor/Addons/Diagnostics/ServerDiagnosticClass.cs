@@ -40,6 +40,9 @@ namespace Contensive.Addons.Diagnostics {
                 }
                 //
                 // -- log files under 1MB
+                if (!core.programDataFiles.pathExists("Logs/")) {
+                    core.programDataFiles.createPath("Logs/");
+                }
                 foreach (var fileDetail in core.programDataFiles.getFileList("Logs/")) {
                     if (fileDetail.Size > 1000000) { return "ERROR, log file size error [" + fileDetail.Name + "], size [" + fileDetail.Size + "]"; }
                 }
@@ -85,6 +88,9 @@ namespace Contensive.Addons.Diagnostics {
                 result.AppendLine("ok, email process running.");
                 //
                 // -- last -- if alarm folder is not empty, fail diagnostic. Last so others can add an alarm entry
+                if(!core.programDataFiles.pathExists("Alarms/")) {
+                    core.programDataFiles.createPath("Alarms/");
+                }
                 foreach (var alarmFile in core.programDataFiles.getFileList("Alarms/")) {
                     return "ERROR, Alarm folder is not empty, [" + core.programDataFiles.readFileText("Alarms/" + alarmFile.Name) + "].";
                 }

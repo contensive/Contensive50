@@ -40,9 +40,6 @@ namespace Contensive.Addons.Diagnostics {
                 if (cp.Site.GetDate("Diagnostics pause until date") > DateTime.Now) {
                     return "ok, diagnostics paused until " + cp.Site.GetDate("Diagnostics pause until date").ToString() + "." + Environment.NewLine + resultList.ToString();
                 }
-                if (cp.User.IsAdmin) {
-                    resultList.Append("ok, ." + Environment.NewLine + resultList.ToString());
-                }
                 foreach (var addon in DbBaseModel.createList<AddonModel>(core.cpParent, "(diagnostic>0)")) {
                     string testResult = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
                     if (string.IsNullOrWhiteSpace(testResult)) { return "ERROR, diagnostic [" + addon.name + "] failed, it returned an empty result." + pauseHint; }

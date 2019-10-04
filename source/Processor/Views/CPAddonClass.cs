@@ -86,13 +86,13 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override object ExecuteByUniqueName(string addonName) {
+        public override string ExecuteByUniqueName(string addonName) {
             return cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, addonName), new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
         }
         //
         //====================================================================================================
         //
-        public override object ExecuteByUniqueName(string addonName, Dictionary<string, string> argumentKeyValuePairs) {
+        public override string ExecuteByUniqueName(string addonName, Dictionary<string, string> argumentKeyValuePairs) {
             return cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, addonName), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                 argumentKeyValuePairs = argumentKeyValuePairs
             });
@@ -100,7 +100,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override object ExecuteByUniqueName(string addonName, CPUtilsBaseClass.addonExecuteContext executeContext) {
+        public override string ExecuteByUniqueName(string addonName, CPUtilsBaseClass.addonExecuteContext executeContext) {
             return cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, addonName), executeContext);
         }
         //

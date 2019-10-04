@@ -1237,6 +1237,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="pathFilename"></param>
         /// <returns></returns>
         public string convertLocalAbsToRelativePath(string pathFilename) {
+            //
+            // -- protect against argument issue
+            if (string.IsNullOrWhiteSpace(pathFilename)) {
+                LogController.logError(core, "convertLocalAbsToRelativePath, pathfilename nullOrWhieSpace not allowed.");
+                return string.Empty;
+            }
+            //
             if (pathFilename.ToLower(CultureInfo.InvariantCulture).IndexOf(localAbsRootPath.ToLower(CultureInfo.InvariantCulture)).Equals(0)) { return pathFilename.Substring(localAbsRootPath.Length); }
             return pathFilename;
         }
@@ -1249,6 +1256,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="pathFilename"></param>
         /// <returns></returns>
         public static string normalizeDosPathFilename(string pathFilename) {
+            //
+            // -- protect against argument issue
+            if(string.IsNullOrWhiteSpace(pathFilename)) {
+                return string.Empty;
+            }
             //
             // -- convert to dos slash and lowercase()
             // no, should not lowercase the filenames, just the path. An uploaded image to S3 must match the link saved for it so any case change must happen before call to fileController.
@@ -1315,6 +1327,12 @@ namespace Contensive.Processor.Controllers {
         /// <param name="returnFilename"></param>
         /// <returns></returns>
         public bool upload(string htmlTagName, string path, ref string returnFilename) {
+            //
+            // -- protect against argument issue
+            if (string.IsNullOrWhiteSpace(htmlTagName)) {
+                LogController.logWarn(core, "upload called with nullOrWhieSpace htmlTagName.");
+                return false;
+            }
             bool success = false;
             returnFilename = "";
             try {
