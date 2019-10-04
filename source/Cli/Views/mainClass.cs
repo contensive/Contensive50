@@ -79,7 +79,21 @@ namespace Contensive.CLI {
                             case "--installfile":
                                 //
                                 // -- install collection to one or all applications
-                                InstallFileCmd.execute(cpServer, appName, System.IO.Directory.GetCurrentDirectory() + "\\" + getNextCmdArg(args, ref argPtr));
+                                string argumentFilename = getNextCmdArg(args, ref argPtr);
+                                if (string.IsNullOrWhiteSpace(argumentFilename)) {
+                                    Console.WriteLine("The installfile requires a filename argument.");
+                                    return;
+                                }
+                                string testFilename = argumentFilename;
+                                if (!System.IO.File.Exists(testFilename)) {
+                                    testFilename = System.IO.Directory.GetCurrentDirectory() + ((argumentFilename.Substring(0,1)=="\\") ? "" : "\\") + argumentFilename;
+                                    if (!System.IO.File.Exists(argumentFilename)) {
+                                        Console.WriteLine("The filename argument could not be found [" + argumentFilename + "].");
+                                        return;
+                                    }
+                                    argumentFilename = testFilename;
+                                }
+                                InstallFileCmd.execute(cpServer, appName, argumentFilename);
                                 break;
                             case "-h":
                             case "--housekeep":

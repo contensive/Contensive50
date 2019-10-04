@@ -861,7 +861,14 @@ namespace Contensive.Processor.Controllers {
                 if (!isLocal) {
                     //
                     // -- remote
-                    return pathExists_remote(path);
+                    if ( !pathExists_remote(path)) { return false;  }
+                    //
+                    // -- if path exists remote, verify local path is a copy of remote (use case is someone deleting local folder)
+                    if (!pathExists_local(path)) {
+                        createPath_local(path);
+                        copyPathRemoteToLocal(path);
+                    }
+                    return true;
                 } else {
                     //
                     // -- local

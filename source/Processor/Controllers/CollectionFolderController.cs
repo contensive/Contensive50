@@ -114,7 +114,6 @@ namespace Contensive.Processor.Controllers {
                     // -- find xml file in temp folder and process it
                     bool CollectionXmlFileFound = false;
                     foreach (FileDetail file in core.privateFiles.getFileList(tmpInstallPath)) {
-                        bool skipCollectionBecauseAlreadyInstalled = false;
                         if (file.Name.Substring(file.Name.Length - 4).ToLower(CultureInfo.InvariantCulture) == ".xml") {
                             //
                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", build collection folder for Collection file [" + file.Name + "]");
@@ -208,61 +207,66 @@ namespace Contensive.Processor.Controllers {
                                                         //
                                                         string ChildWorkingPath = CollectionVersionFolder + "\\" + ChildCollectionGUID + "\\";
                                                         DateTime libraryCollectionLastChangeDate = default(DateTime);
-                                                        //
-                                                        // down an imported collection file
-                                                        //
-                                                        if (!CollectionLibraryController.downloadCollectionFromLibrary(core, ChildWorkingPath, ChildCollectionGUID, ref libraryCollectionLastChangeDate, ref return_ErrorMessage)) {
+                                                        try {
                                                             //
-                                                            // -- did not download correctly
-                                                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, [" + statusMsg + "], downloadCollectionFiles returned error state, message [" + return_ErrorMessage + "]");
-                                                            if (string.IsNullOrEmpty(return_ErrorMessage)) {
-                                                                return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error while downloading the necessary collection file, [" + ChildCollectionGUID + "].";
-                                                            } else {
-                                                                return_ErrorMessage = statusMsg + ". The installation can not continue because there was an error while downloading the necessary collection file, guid [" + ChildCollectionGUID + "]. The error was [" + return_ErrorMessage + "]";
-                                                            }
-                                                        } else {
-                                                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, libraryCollectionLastChangeDate [" + libraryCollectionLastChangeDate.ToString() + "].");
-                                                            bool okToInstall = true;
-                                                            var localCollectionConfig = CollectionFolderModel.getCollectionFolderConfig(core, ChildCollectionGUID);
-                                                            if (localCollectionConfig == null) {
+                                                            // try-finally to delete the working folder
+                                                            if (!CollectionLibraryController.downloadCollectionFromLibrary(core, ChildWorkingPath, ChildCollectionGUID, ref libraryCollectionLastChangeDate, ref return_ErrorMessage)) {
                                                                 //
-                                                                // -- collection not installed, ok to install
-                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, collection");
-                                                            } else {
-                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, localCollectionConfig.lastChangeDate [" + localCollectionConfig.lastChangeDate.ToString() + "].");
-                                                                if (localCollectionConfig.lastChangeDate < libraryCollectionLastChangeDate) {
-                                                                    //
-                                                                    // -- downloaded collection is newer than installed collection, reinstall
-                                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, **** local version is older than library, needs to reinstall.");
+                                                                // -- did not download correctly
+                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, [" + statusMsg + "], downloadCollectionFiles returned error state, message [" + return_ErrorMessage + "]");
+                                                                if (string.IsNullOrEmpty(return_ErrorMessage)) {
+                                                                    return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error while downloading the necessary collection file, [" + ChildCollectionGUID + "].";
                                                                 } else {
-                                                                    //
-                                                                    // -- download is older than installed, skip the rest of the xml file processing
-                                                                    skipCollectionBecauseAlreadyInstalled = true;
-                                                                    okToInstall = false;
-                                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, **** local version is newer or the same as library, can skip install.");
-                                                                    break;
+                                                                    return_ErrorMessage = statusMsg + ". The installation can not continue because there was an error while downloading the necessary collection file, guid [" + ChildCollectionGUID + "]. The error was [" + return_ErrorMessage + "]";
                                                                 }
-                                                            }
-                                                            if (okToInstall) {
-                                                                //
-                                                                // -- install the downloaded file
-                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, collection missing or needs to be updated.");
-                                                                if (!buildCollectionFoldersFromCollectionZips(core, contextLog, ChildWorkingPath, libraryCollectionLastChangeDate, ref collectionsDownloaded, ref return_ErrorMessage, ref collectionsInstalledList, ref collectionsBuildingFolder)) {
-                                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, [" + statusMsg + "], BuildLocalCollectionFolder returned error state, message [" + return_ErrorMessage + "]");
-                                                                    if (string.IsNullOrEmpty(return_ErrorMessage)) {
-                                                                        return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error installing the included collection file, guid [" + ChildCollectionGUID + "].";
+                                                            } else {
+                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, libraryCollectionLastChangeDate [" + libraryCollectionLastChangeDate.ToString() + "].");
+                                                                bool installDependentCollection = true;
+                                                                var localCollectionConfig = CollectionFolderModel.getCollectionFolderConfig(core, ChildCollectionGUID);
+                                                                if (localCollectionConfig == null) {
+                                                                    //
+                                                                    // -- collection not installed, ok to install
+                                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, collection");
+                                                                } else {
+                                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, localCollectionConfig.lastChangeDate [" + localCollectionConfig.lastChangeDate.ToString() + "].");
+                                                                    if (localCollectionConfig.lastChangeDate < libraryCollectionLastChangeDate) {
+                                                                        //
+                                                                        // -- downloaded collection is newer than installed collection, reinstall
+                                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, **** local version is older than library, needs to reinstall.");
                                                                     } else {
-                                                                        return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error installing the included collection file, guid [" + ChildCollectionGUID + "]. The error was [" + return_ErrorMessage + "]";
+                                                                        //
+                                                                        // -- download is older than installed, skip the rest of the xml file processing
+                                                                        installDependentCollection = false;
+                                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, **** local version is newer or the same as library, can skip install.");
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                if (installDependentCollection) {
+                                                                    //
+                                                                    // -- install the downloaded file
+                                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, collection missing or needs to be updated.");
+                                                                    if (!buildCollectionFoldersFromCollectionZips(core, contextLog, ChildWorkingPath, libraryCollectionLastChangeDate, ref collectionsDownloaded, ref return_ErrorMessage, ref collectionsInstalledList, ref collectionsBuildingFolder)) {
+                                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, [" + statusMsg + "], BuildLocalCollectionFolder returned error state, message [" + return_ErrorMessage + "]");
+                                                                        if (string.IsNullOrEmpty(return_ErrorMessage)) {
+                                                                            return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error installing the included collection file, guid [" + ChildCollectionGUID + "].";
+                                                                        } else {
+                                                                            return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error installing the included collection file, guid [" + ChildCollectionGUID + "]. The error was [" + return_ErrorMessage + "]";
+                                                                        }
                                                                     }
                                                                 }
                                                             }
+                                                        } catch (Exception) {
+                                                            //
+                                                            // -- exception in try-finally for folder handling, just rethrow to the catch for hte method
+                                                            throw;
+                                                        } finally {
+                                                            //
+                                                            // -- remove child installation working folder
+                                                            core.privateFiles.deleteFolder(ChildWorkingPath);
+                                                            //
+                                                            // -- no longer building this folder
+                                                            collectionsBuildingFolder.Remove(ChildCollectionGUID);
                                                         }
-                                                        //
-                                                        // -- remove child installation working folder
-                                                        core.privateFiles.deleteFolder(ChildWorkingPath);
-                                                        //
-                                                        // -- no longer building this folder
-                                                        collectionsBuildingFolder.Remove(ChildCollectionGUID);
                                                     }
                                                 }
                                             }
@@ -280,11 +284,9 @@ namespace Contensive.Processor.Controllers {
                                 // -- stop processing xml nodes if error
                                 break;
                             }
-                            if (!skipCollectionBecauseAlreadyInstalled) {
-                                //
-                                // If the collection parsed correctly, update the Collections.xml file
-                                updateCollectionFolderConfig(core, Collectionname, collectionGuid, CollectionLastChangeDate, CollectionVersionFolderName);
-                            }
+                            //
+                            // If the collection parsed correctly, update the Collections.xml file
+                            updateCollectionFolderConfig(core, Collectionname, collectionGuid, CollectionLastChangeDate, CollectionVersionFolderName);
                         }
                         if (!string.IsNullOrEmpty(return_ErrorMessage)) {
                             //

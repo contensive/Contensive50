@@ -143,8 +143,8 @@ namespace Contensive.Processor.Controllers {
                 // -- collection needs to be 
                 if (!collectionsInstalledList.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture))) { collectionsInstalledList.Add(collectionGuid.ToLower(CultureInfo.InvariantCulture)); }
                 //
-                var collectionFolderConfig =  CollectionFolderModel.getCollectionFolderConfig(core, collectionGuid);
-                if (string.IsNullOrEmpty(collectionFolderConfig.path)) {
+                var collectionFolderConfig = CollectionFolderModel.getCollectionFolderConfig(core, collectionGuid);
+                if ((collectionFolderConfig == null) || string.IsNullOrEmpty(collectionFolderConfig.path)) {
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder not found.");
                     return_ErrorMessage += "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>";
                     return false;
@@ -820,7 +820,7 @@ namespace Contensive.Processor.Controllers {
                                                 collection.save(core.cpParent);
                                                 //
                                                 // -- test for diagnostic addon, warn if missing
-                                                if( !collectionIncludesDiagnosticAddon ) {
+                                                if (!collectionIncludesDiagnosticAddon) {
                                                     //
                                                     // -- log warning. This collection does not have an install addon
                                                     LogController.logWarn(core, "Collection does not include a Diagnostic addon, [" + collection.name + "]");
@@ -832,8 +832,8 @@ namespace Contensive.Processor.Controllers {
                                                     // -- log warning. This collection does not have an install addon
                                                     LogController.logWarn(core, "Collection does not include an install addon, [" + collection.name + "]");
                                                 } else {
-                                                //
-                                                // -- install the install addon
+                                                    //
+                                                    // -- install the install addon
                                                     var addon = DbBaseModel.create<AddonModel>(core.cpParent, onInstallAddonGuid);
                                                     if (addon != null) {
                                                         var executeContext = new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
@@ -1429,7 +1429,7 @@ namespace Contensive.Processor.Controllers {
                                             case "diagnostic": {
                                                     bool fieldValue = encodeBoolean(PageInterfaceWithinLoop.InnerText);
                                                     cs.set("diagnostic", fieldValue);
-                                                    collectionIncludesDiagnosticAddons = collectionIncludesDiagnosticAddons ||fieldValue;
+                                                    collectionIncludesDiagnosticAddons = collectionIncludesDiagnosticAddons || fieldValue;
                                                 }
                                                 break;
                                             default:

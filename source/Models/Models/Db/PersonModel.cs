@@ -11,6 +11,7 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         //-- const
+        //public virtual string contentName { get { return "people"; } }
         public const string contentName = "people";
         public const string contentTableNameLowerCase = "ccmembers";
         public const string contentDataSource = "default";

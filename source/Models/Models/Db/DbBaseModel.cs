@@ -166,7 +166,7 @@ namespace Contensive.Models.Db {
         /// <returns></returns>
         public static string derivedTableName(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("contentTableNameLowerCase");
-            if (fieldInfo == null) { throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentTableName]."); }
+            if (fieldInfo == null) { throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentTableNameLowerCase]."); }
             return fieldInfo.GetRawConstantValue().ToString();
         }
         //
