@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Contensive.Processor;
 using static Tests.testConstants;
 using System.Globalization;
+using System.Data;
 
 namespace Contensive.Models.Db.Tests {
     [TestClass()]
@@ -86,9 +87,11 @@ namespace Contensive.Models.Db.Tests {
                 Assert.AreEqual(null, test.processNextRun);
             }
         }
-
+        //
+        //
+        //
         [TestMethod()]
-        public void addDefaultTest1() {
+        public void addDefaultTest_CreatedBy() {
             using (CPClass cp = new CPClass(testAppName)) {
                 string defaultRootUserGuid = "{4445cd14-904f-480f-a7b7-29d70d0c22ca}";
                 var root = PersonModel.create<PersonModel>(cp, defaultRootUserGuid);
@@ -110,215 +113,79 @@ namespace Contensive.Models.Db.Tests {
                 Assert.AreEqual(root.id, test.createdBy);
             }
         }
-
-        //[TestMethod()]
-        //public void addEmptyTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void addEmptyTest1() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createTest1() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createTest2() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createTest3() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createByUniqueNameTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createByUniqueNameTest1() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void saveTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void saveTest1() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void saveTest2() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void deleteTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void deleteTest1() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createListTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createListTest1() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createListTest2() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createListTest3() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createListTest4() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createListTest5() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createFirstOfListTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void getRecordNameTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void getRecordNameTest1() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void getRecordIdTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createEmptyTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createEmptyTest1() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void getSelectSqlTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void getSelectSqlTest1() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void getSelectSqlTest2() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void getSelectSqlTest3() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void getCountSqlTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void deleteRowsTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void containsFieldTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void isParentOfTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void isParentOfTest1() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void isChildOfTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void isChildOfTest1() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void invalidateCacheOfRecordTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void invalidateCacheOfTableTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void createDependencyKeyInvalidateOnChangeTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void getCountTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void isNullableTest() {
-        //    Assert.Fail();
-        //}
-
-        //[TestMethod()]
-        //public void getCountTest1() {
-        //    Assert.Fail();
-        //}
+        //
+        //
+        //
+        [TestMethod()]
+        public void FieldFileTypes_HtmlFieldTypeTest() {
+            using (CPClass cp = new CPClass(testAppName)) {
+                string contentSaved = new string('*', 65535);
+                var pageCreated = PageContentModel.addEmpty<PageContentModel>(cp);
+                pageCreated.copyfilename.content = contentSaved;
+                pageCreated.save(cp);
+                int pageId = pageCreated.id;
+                string pageCreatedFilename = pageCreated.copyfilename.filename;
+                //
+                var pageRead = PageContentModel.create<PageContentModel>(cp, pageId);
+                string pageReadFilename = pageRead.copyfilename.filename;
+                string contentReadFromModel = pageRead.copyfilename.content;
+                //
+                string contentReadFromFile = "";
+                string dbFilename = "";
+                DataTable dbRead = null;
+                using (var cs = cp.CSNew()) {
+                    //
+                    dbRead = cp.Db.ExecuteQuery("select * from " + PageContentModel.tableMetadata.tableNameLower + " where (id=" + pageId + ")");
+                    Assert.IsNotNull(dbRead);
+                    Assert.AreEqual(1, dbRead.Rows.Count);
+                    //
+                    dbFilename = dbRead.Rows[0]["copyFilename"].ToString();
+                    Assert.IsFalse(string.IsNullOrWhiteSpace(dbFilename));
+                    contentReadFromFile = cp.CdnFiles.Read(dbFilename);
+                }
+                //
+                Assert.AreEqual(contentSaved, contentReadFromModel);
+                Assert.AreEqual(contentSaved, contentReadFromFile);
+                //
+                Assert.AreEqual(contentReadFromModel, contentReadFromFile);
+            }
+        }
+        //
+        //
+        //
+        [TestMethod()]
+        public void FieldFileTypes_TextFieldTypeTest() {
+            using (CPClass cp = new CPClass(testAppName)) {
+                string contentSaved = new string('*', 65535);
+                var contentCreated = DownloadModel.addEmpty<DownloadModel>(cp);
+                contentCreated.filename.content = contentSaved;
+                contentCreated.save(cp);
+                int recordId = contentCreated.id;
+                string contentCreatedFilename = contentCreated.filename.filename;
+                //
+                var contentRead = DownloadModel.create<DownloadModel>(cp, recordId);
+                string contentReadFilename = contentRead.filename.filename;
+                string contentReadFromModel = contentRead.filename.content;
+                //
+                string contentReadFromFile = "";
+                string dbFilename = "";
+                DataTable dbRead = null;
+                using (var cs = cp.CSNew()) {
+                    //
+                    dbRead = cp.Db.ExecuteQuery("select * from " + DownloadModel.tableMetadata.tableNameLower + " where (id=" + recordId + ")");
+                    Assert.IsNotNull(dbRead);
+                    Assert.AreEqual(1, dbRead.Rows.Count);
+                    //
+                    dbFilename = dbRead.Rows[0]["filename"].ToString();
+                    Assert.IsFalse(string.IsNullOrWhiteSpace(dbFilename));
+                    contentReadFromFile = cp.CdnFiles.Read(dbFilename);
+                }
+                //
+                Assert.AreEqual(contentSaved, contentReadFromModel);
+                Assert.AreEqual(contentSaved, contentReadFromFile);
+                //
+                Assert.AreEqual(contentReadFromModel, contentReadFromFile);
+            }
+        }
     }
 }

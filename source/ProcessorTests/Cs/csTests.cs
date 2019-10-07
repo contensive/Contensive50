@@ -8,6 +8,7 @@ using Contensive.BaseClasses;
 using Contensive.Processor.Controllers;
 using static Tests.testConstants;
 using Contensive.Models.Db;
+using System.Data;
 
 namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     //
@@ -214,6 +215,92 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // act
                 // assert
             }
+        }
+        //
+        //
+        //
+        public void createAndReadFileField_Util(CPContentClass.FieldTypeIdEnum fieldType, string expectedExtensionLower, string failMessage) {
+            using (CPClass cp = new CPClass(testAppName)) {
+                string testContent = "testContent" + cp.Utils.GetRandomInteger().ToString();
+                string testField = "testField" + cp.Utils.GetRandomInteger().ToString();
+                string contentSaved = new string('*', 65535);
+                //string contentSaved = ""
+                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+                //    + "";
+                //string test = string.
+                string contentRead = "";
+                string fieldFilename = "";
+                DataTable dbRead = null;
+                string fileRead = "";
+                int testContentId = cp.Content.AddContent(testContent);
+                cp.Content.AddContentField(testContent, testField, fieldType);
+                using (var cs = cp.CSNew()) {
+                    if (!cs.Insert(testContent)) {
+                        Assert.Fail("Cannot create record in " + testContent);
+                    }
+                    int recordId = cs.GetInteger("id");
+                    cs.SetField(testField, contentSaved);
+                    cs.Save();
+                    //
+                    if (!cs.Open(testContent, "(id=" + recordId + ")")) {
+                        Assert.Fail("Cannot open new record in " + testContent);
+                    }
+                    contentRead = cs.GetText(testField);
+                    fieldFilename = cs.GetFilename(testField);
+                    //
+                    dbRead = cp.Db.ExecuteQuery("select * from " + testContent + " where (id=" + recordId + ")and(" + testField + "=" + cp.Db.EncodeSQLText(fieldFilename) + ")");
+                    //
+                    fileRead = cp.CdnFiles.Read(fieldFilename);
+                }
+                Assert.AreEqual(contentSaved, contentRead);
+                Assert.AreEqual(expectedExtensionLower, System.IO.Path.GetExtension(fieldFilename).ToLower());
+                Assert.IsNotNull(dbRead);
+                Assert.AreEqual(1, dbRead.Rows.Count);
+                Assert.AreEqual(fieldFilename, dbRead.Rows[0][testField].ToString());
+                Assert.AreEqual(contentSaved, fileRead);
+            }
+        }
+        //
+        //
+        //
+        [TestMethod()]
+        public void createSaveReadHtmlFile_Test() {
+            createAndReadFileField_Util(BaseClasses.CPContentBaseClass.FieldTypeIdEnum.FileHTML, ".html", "Testing Field Type fileHtml");
+        }
+        //
+        //
+        //
+        [TestMethod()]
+        public void createFieldCSSFileTest() {
+            createAndReadFileField_Util(BaseClasses.CPContentBaseClass.FieldTypeIdEnum.FileCSS, ".css", "Testing Field Type FileCSS");
+        }
+        //
+        //
+        //
+        [TestMethod()]
+        public void createFieldJSFileTest() {
+            createAndReadFileField_Util(BaseClasses.CPContentBaseClass.FieldTypeIdEnum.FileJavascript, ".js", "Testing Field Type FileJS");
+        }
+        //
+        //
+        //
+        [TestMethod()]
+        public void createFieldTextFileTest() {
+            createAndReadFileField_Util(BaseClasses.CPContentBaseClass.FieldTypeIdEnum.FileText, ".txt", "Testing Field Type FileText");
+        }
+        //
+        //
+        //
+        [TestMethod()]
+        public void createFieldXmlFileTest() {
+            createAndReadFileField_Util(BaseClasses.CPContentBaseClass.FieldTypeIdEnum.FileXML, ".xml", "Testing Field Type FileText");
         }
 
     }

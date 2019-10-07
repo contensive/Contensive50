@@ -522,6 +522,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         public void encodeDate_testReverse() {
             DateTime in1 = DateTime.MinValue;
             DateTime in2 = DateTime.Now;
+            in2 = new DateTime(in2.Year, in2.Month, in2.Day, in2.Hour, in2.Minute, in2.Second, in2.Kind);
             DateTime in3 = new DateTime(1990, 8, 7, 6, 5, 4);
             // act
             DateTime out1 = GenericController.encodeDate(GenericController.encodeText(in1));
