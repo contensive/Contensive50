@@ -6,14 +6,12 @@ namespace Contensive.Models.Db {
     public class TableModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "tables";
-        public const string contentTableNameLowerCase = "cctables";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("tables", "cctables", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
         public int dataSourceID { get; set; }
         //
         //====================================================================================================

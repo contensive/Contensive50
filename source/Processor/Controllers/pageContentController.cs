@@ -89,7 +89,7 @@ namespace Contensive.Processor.Controllers {
                         cssContainerClass = "",
                         cssContainerId = "",
                         hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                            contentName = PageContentModel.contentName,
+                            contentName = PageContentModel.tableMetadata.contentName,
                             fieldName = "copyfilename",
                             recordId = core.doc.pageController.page.id
                         },
@@ -794,7 +794,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- encode the copy
-                    result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.contactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                    result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.tableMetadata.contentName, PageRecordID, core.doc.pageController.page.contactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                     if (!string.IsNullOrWhiteSpace(result) && !string.IsNullOrWhiteSpace(core.doc.refreshQueryString)) {
                         result = result.Replace("?method=login", "?method=Login&" + core.doc.refreshQueryString);
                     }
@@ -811,15 +811,15 @@ namespace Contensive.Processor.Controllers {
                         //
                     } else {
                         int pageViewings = core.doc.pageController.page.Viewings;
-                        if (core.session.isEditing(PageContentModel.contentName)) {
+                        if (core.session.isEditing(PageContentModel.tableMetadata.contentName)) {
                             //
                             // Link authoring -> do encoding, but no tracking
                             //
-                            result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.contactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                            result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.tableMetadata.contentName, PageRecordID, core.doc.pageController.page.contactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                         } else {
                             //
                             // Live content
-                            result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.contactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                            result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.tableMetadata.contentName, PageRecordID, core.doc.pageController.page.contactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                             core.db.executeQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + core.doc.pageController.page.id);
                         }
                         //
@@ -833,7 +833,7 @@ namespace Contensive.Processor.Controllers {
                             CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                 hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                    contentName = PageContentModel.contentName,
+                                    contentName = PageContentModel.tableMetadata.contentName,
                                     fieldName = "",
                                     recordId = core.doc.pageController.page.id
                                 },
@@ -974,10 +974,10 @@ namespace Contensive.Processor.Controllers {
                 // -- edit wrapper
                 bool isRootPage = (core.doc.pageController.pageToRootList.Count == 1);
                 if (core.session.isAdvancedEditing()) {
-                    result = AdminUIController.getRecordEditAndCutLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage), core.doc.pageController.page.name) + result;
+                    result = AdminUIController.getRecordEditAndCutLink(core, PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id, (!isRootPage), core.doc.pageController.page.name) + result;
                     result = AdminUIController.getEditWrapper(core, result);
-                } else if (core.session.isEditing(PageContentModel.contentName)) {
-                    result = AdminUIController.getRecordEditAndCutLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage), core.doc.pageController.page.name) + result;
+                } else if (core.session.isEditing(PageContentModel.tableMetadata.contentName)) {
+                    result = AdminUIController.getRecordEditAndCutLink(core, PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id, (!isRootPage), core.doc.pageController.page.name) + result;
                     result = AdminUIController.getEditWrapper(core, result);
                 }
                 //
@@ -1055,11 +1055,11 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrWhiteSpace(core.doc.pageController.page.headline)) {
                     resultContent.Append("\r<h1>").Append(HtmlController.encodeHtml(core.doc.pageController.page.headline)).Append("</h1>");
                 }
-                if (core.session.isQuickEditing(PageContentModel.contentName)) {
+                if (core.session.isQuickEditing(PageContentModel.tableMetadata.contentName)) {
                     //
                     // -- drag-drop editor for addonList
                     if (core.siteProperties.getBoolean("Allow AddonList Editor For Quick Editor")) {
-                        core.docProperties.setProperty("contentid", ContentMetadataModel.getContentId(core, PageContentModel.contentName));
+                        core.docProperties.setProperty("contentid", ContentMetadataModel.getContentId(core, PageContentModel.tableMetadata.contentName));
                         core.docProperties.setProperty("recordid", core.doc.pageController.page.id);
                         resultContent.Append(core.addon.execute("{92B75A6A-E84B-4551-BBF3-849E91D084BC}", new CPUtilsBaseClass.addonExecuteContext() {
                             addonType = CPUtilsBaseClass.addonContext.ContextSimple
@@ -1076,7 +1076,7 @@ namespace Contensive.Processor.Controllers {
                     if (string.IsNullOrEmpty(htmlPageContent)) {
                         //
                         // Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
-                        if (core.session.isEditing(PageContentModel.contentName)) {
+                        if (core.session.isEditing(PageContentModel.tableMetadata.contentName)) {
                             htmlPageContent = "\r<p><!-- Empty Content Placeholder --></p>";
                         }
                     }
@@ -1103,7 +1103,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- Page See Also
                 if (core.doc.pageController.page.allowSeeAlso) {
-                    result.Append("\r<div>" + getSeeAlso(core, PageContentModel.contentName, core.doc.pageController.page.id) + "\r</div>");
+                    result.Append("\r<div>" + getSeeAlso(core, PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id) + "\r</div>");
                 }
                 //
                 // -- Allow More Info
@@ -1188,7 +1188,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Do not allow blank message - if still nothing, create default
                 result = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=\"?method=login\" rel=\"nofollow\">Click Here</a>. For more information, please contact the administrator.</p>";
-                copyRecord = DbBaseModel.addDefault<CopyContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, CopyContentModel.contentName));
+                copyRecord = DbBaseModel.addDefault<CopyContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, CopyContentModel.tableMetadata.contentName));
                 copyRecord.name = ContentBlockCopyName;
                 copyRecord.copy = result;
                 copyRecord.save(core.cpParent);
@@ -1304,7 +1304,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.pageController.pageToRootList.Count == 0) {
                     //
                     // -- attempt failed, create default page
-                    core.doc.pageController.page = PageContentModel.addDefault<PageContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PageContentModel.contentName));
+                    core.doc.pageController.page = PageContentModel.addDefault<PageContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PageContentModel.tableMetadata.contentName));
                     core.doc.pageController.page.name = DefaultNewLandingPageName + ", " + domain.name;
                     core.doc.pageController.page.copyfilename.content = landingPageDefaultHtml;
                     core.doc.pageController.page.save(core.cpParent);
@@ -1355,7 +1355,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.doc.pageController.template == null) {
                             //
                             // -- ceate new template named Default
-                            core.doc.pageController.template = DbBaseModel.addDefault<PageTemplateModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PageTemplateModel.contentName));
+                            core.doc.pageController.template = DbBaseModel.addDefault<PageTemplateModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PageTemplateModel.tableMetadata.contentName));
                             core.doc.pageController.template.name = defaultTemplateName;
                             core.doc.pageController.template.bodyHTML = Properties.Resources.DefaultTemplateHtml;
                             core.doc.pageController.template.save(core.cpParent);
@@ -1459,7 +1459,7 @@ namespace Contensive.Processor.Controllers {
                         if (landingPage == null) {
                             //
                             // -- create detault landing page
-                            landingPage = DbBaseModel.addDefault<PageContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PageContentModel.contentName));
+                            landingPage = DbBaseModel.addDefault<PageContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PageContentModel.tableMetadata.contentName));
                             landingPage.name = DefaultNewLandingPageName + ", " + domain.name;
                             landingPage.copyfilename.content = landingPageDefaultHtml;
                             landingPage.save(core.cpParent);
@@ -2210,7 +2210,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 if (string.IsNullOrEmpty(ContentName)) {
-                    ContentName = PageContentModel.contentName;
+                    ContentName = PageContentModel.tableMetadata.contentName;
                 }
                 bool isAuthoring = core.session.isEditing(ContentName);
                 //
@@ -2430,7 +2430,7 @@ namespace Contensive.Processor.Controllers {
             //
             int recordId = (core.docProperties.getInteger("ID"));
             string button = core.docProperties.getText("Button");
-            if ((!string.IsNullOrEmpty(button)) && (recordId != 0) && (core.session.isAuthenticatedContentManager(PageContentModel.contentName))) {
+            if ((!string.IsNullOrEmpty(button)) && (recordId != 0) && (core.session.isAuthenticatedContentManager(PageContentModel.tableMetadata.contentName))) {
                 var pageCdef = Models.Domain.ContentMetadataModel.createByUniqueName(core, "page content");
                 var pageTable = TableModel.createByContentName(core.cpParent, pageCdef.name);
                 WorkflowController.editLockClass editLock = WorkflowController.getEditLock(core, pageTable.id, recordId);

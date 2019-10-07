@@ -866,13 +866,13 @@ namespace Contensive.Processor.Controllers {
                             }
                             int RecordID = 0;
                             using (var csData = new CsModel(core)) {
-                                csData.open(NavigatorEntryModel.contentName, Criteria, "ID", true, 0, "ID", 1);
+                                csData.open(NavigatorEntryModel.tableMetadata.contentName, Criteria, "ID", true, 0, "ID", 1);
                                 if (csData.ok()) {
                                     RecordID = (csData.getInteger("ID"));
                                 }
                                 csData.close();
                                 if (RecordID == 0) {
-                                    csData.insert(NavigatorEntryModel.contentName);
+                                    csData.insert(NavigatorEntryModel.tableMetadata.contentName);
                                     if (csData.ok()) {
                                         RecordID = csData.getInteger("ID");
                                         csData.set("name", recordName);

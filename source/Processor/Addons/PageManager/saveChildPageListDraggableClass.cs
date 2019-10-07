@@ -70,9 +70,9 @@ namespace Contensive.Addons.PageManager {
                                 if (sortMethod == null) {
                                     //
                                     // -- create the required sortMethod
-                                    sortMethod = DbBaseModel.addDefault<SortMethodModel>(core.cpParent, Processor.Models.Domain.ContentMetadataModel.getDefaultValueDict(core, SortMethodModel.contentName));
+                                    sortMethod = DbBaseModel.addDefault<SortMethodModel>(core.cpParent, Processor.Models.Domain.ContentMetadataModel.getDefaultValueDict(core, SortMethodModel.tableMetadata.contentName));
                                     sortMethod.name = "By Alpha Sort Order Field";
-                                    sortMethod.OrderByClause = "sortOrder";
+                                    sortMethod.orderByClause = "sortOrder";
                                     sortMethod.save(core.cpParent);
                                 }
                                 if (parentPage.childListSortMethodID != sortMethod.id) {

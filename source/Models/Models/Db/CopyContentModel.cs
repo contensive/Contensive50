@@ -4,14 +4,13 @@ namespace Contensive.Models.Db {
     public class CopyContentModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "copy content";
-        public const string contentTableNameLowerCase = "cccopycontent";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("Copy Content", "cccopycontent", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
+        //
         public string copy { get; set; }
     }
 }

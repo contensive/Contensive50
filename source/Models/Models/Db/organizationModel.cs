@@ -4,14 +4,12 @@ namespace Contensive.Models.Db {
     public class OrganizationModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "organizations";
-        public const string contentTableNameLowerCase = "organizations";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("organizations", "organizations", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
         public string address1 { get; set; }
         public string address2 { get; set; }
         public string briefFilename { get; set; }

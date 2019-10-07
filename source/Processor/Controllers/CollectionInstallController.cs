@@ -437,7 +437,7 @@ namespace Contensive.Processor.Controllers {
                                                         // ----- remove any current navigator nodes installed by the collection previously
                                                         //
                                                         if (collection.id != 0) {
-                                                            MetadataController.deleteContentRecords(core, NavigatorEntryModel.contentName, "installedbycollectionid=" + collection.id);
+                                                            MetadataController.deleteContentRecords(core, NavigatorEntryModel.tableMetadata.contentName, "installedbycollectionid=" + collection.id);
                                                         }
                                                         collection.save(core.cpParent);
                                                     }
@@ -1095,7 +1095,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     using (var cs = new CsModel(core)) {
                         string Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(addonGuid) + ")";
-                        cs.open(AddonModel.contentName, Criteria, "", false);
+                        cs.open(AddonModel.tableMetadata.contentName, Criteria, "", false);
                         if (cs.ok()) {
                             //
                             // Update the Addon
@@ -1107,7 +1107,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             cs.close();
                             Criteria = "(name=" + DbController.encodeSQLText(addonName) + ")and(" + AddonGuidFieldName + " is null)";
-                            cs.open(AddonModel.contentName, Criteria, "", false);
+                            cs.open(AddonModel.tableMetadata.contentName, Criteria, "", false);
                             if (cs.ok()) {
                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                             }
@@ -1117,7 +1117,7 @@ namespace Contensive.Processor.Controllers {
                             // not found by GUID or by name, Insert a new addon
                             //
                             cs.close();
-                            cs.insert(AddonModel.contentName);
+                            cs.insert(AddonModel.tableMetadata.contentName);
                             if (cs.ok()) {
                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAppFromLocalCollection, Creating new Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                             }
@@ -1482,7 +1482,7 @@ namespace Contensive.Processor.Controllers {
                     string AddOnType = XmlController.GetXMLAttribute(core, IsFound, AddonNode, "type", "");
                     string Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(AOGuid) + ")";
                     using (var csData = new CsModel(core)) {
-                        if (csData.open(AddonModel.contentName, Criteria, "", false)) {
+                        if (csData.open(AddonModel.tableMetadata.contentName, Criteria, "", false)) {
                             //
                             // Update the Addon
                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" + AOName + "], Guid [" + AOGuid + "]");
@@ -1490,7 +1490,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // not found by GUID - search name against name to update legacy Add-ons
                             Criteria = "(name=" + DbController.encodeSQLText(AOName) + ")and(" + AddonGuidFieldName + " is null)";
-                            csData.open(AddonModel.contentName, Criteria, "", false);
+                            csData.open(AddonModel.tableMetadata.contentName, Criteria, "", false);
                         }
                         if (!csData.ok()) {
                             //
@@ -1523,7 +1523,7 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                                 if (!string.IsNullOrEmpty(Criteria)) {
                                                     using (var CS2 = new CsModel(core)) {
-                                                        CS2.open(AddonModel.contentName, Criteria);
+                                                        CS2.open(AddonModel.tableMetadata.contentName, Criteria);
                                                         if (CS2.ok()) {
                                                             IncludeAddonID = CS2.getInteger("ID");
                                                         }

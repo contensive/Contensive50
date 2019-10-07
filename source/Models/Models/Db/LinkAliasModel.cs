@@ -7,14 +7,12 @@ namespace Contensive.Models.Db {
     public class LinkAliasModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "link aliases";
-        public const string contentTableNameLowerCase = "cclinkaliases";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("link aliases", "cclinkaliases", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
         public int pageID { get; set; }
         public string queryStringSuffix { get; set; }
         //

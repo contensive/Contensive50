@@ -4,14 +4,12 @@ namespace Contensive.Models.Db {
     public class SortMethodModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "sort methods";
-        public const string contentTableNameLowerCase = "ccSortMethods";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("sort methods", "ccSortMethods", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
-        public string OrderByClause { get; set; }
+        public string orderByClause { get; set; }
     }
 }

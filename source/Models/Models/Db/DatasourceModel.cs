@@ -9,14 +9,12 @@ namespace Contensive.Models.Db {
     public class DataSourceModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "data sources";
-        public const string contentTableNameLowerCase = "ccdatasources";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("data sources", "ccdatasources", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
         public string connString { get; set; }
         public string endpoint { get; set; }
         public string username { get; set; }

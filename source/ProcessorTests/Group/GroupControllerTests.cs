@@ -116,8 +116,9 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 core.session.verifyUser();
                 DbBaseModel.deleteRows<GroupModel>(cp, "");
                 DbBaseModel.deleteRows<MemberRuleModel>(cp, "");
-                GroupController.add(core, "Group1");
+                GroupController.add(core, "GroupInclude");
                 GroupModel groupToInclude = DbBaseModel.createByUniqueName<GroupModel>(cp, "GroupInclude");
+                GroupController.add(core, "GroupExclude");
                 GroupModel groupToExclude = DbBaseModel.createByUniqueName<GroupModel>(cp, "GroupExclude");
                 PersonModel user = DbBaseModel.addEmpty<PersonModel>(cp);
                 user.name = "User1";
@@ -134,6 +135,12 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // assert
                 List<MemberRuleModel> ruleList = DbBaseModel.createList<MemberRuleModel>(cp, "(groupId=" + groupToInclude.id + ")and(memberid=" + user.id + ")");
                 Assert.AreEqual(1, ruleList.Count);
+                //
+                ruleList = DbBaseModel.createList<MemberRuleModel>(cp, "(groupId=" + groupToExclude.id + ")and(memberid=" + user.id + ")");
+                Assert.AreEqual(1, ruleList.Count);
+                //
+                Assert.AreEqual(true, cp.User.IsInGroup("groupinclude", user.id));
+                Assert.AreEqual(false, cp.User.IsInGroup("GroupExclude", user.id));
             }
         }
         //

@@ -23,7 +23,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="groupName"></param>
         /// <returns></returns>
         public static int add(CoreController core, string groupName, string groupCaption) {
-            var defaultValues = ContentMetadataModel.getDefaultValueDict(core, GroupModel.contentName);
+            var defaultValues = ContentMetadataModel.getDefaultValueDict(core, GroupModel.tableMetadata.contentName);
             return GroupModel.verify(core.cpParent, groupName, groupCaption, 0, defaultValues).id;
         }
         //

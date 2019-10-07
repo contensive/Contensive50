@@ -6,14 +6,12 @@ namespace Contensive.Models.Db {
     public class EmailLogModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "email log";
-        public const string contentTableNameLowerCase = "ccemaillog";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("email log", "ccemaillog", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
         public DateTime? dateBlockExpires { get; set; }
         public int emailDropID { get; set; }
         public int emailID { get; set; }

@@ -420,7 +420,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpAddonID.ToString() + ",") == 0) {
                     using (var csData = new CsModel(cp.core)) {
-                        csData.openRecord(AddonModel.contentName, HelpAddonID);
+                        csData.openRecord(AddonModel.tableMetadata.contentName, HelpAddonID);
                         if (csData.ok()) {
                             FoundAddon = true;
                             AddonName = csData.getText("Name");
@@ -515,7 +515,7 @@ namespace Contensive.Addons.AdminSite {
                     // Add-ons
                     //
                     using (var csData = new CsModel(cp.core)) {
-                        csData.open(AddonModel.contentName, "CollectionID=" + HelpCollectionID, "name");
+                        csData.open(AddonModel.tableMetadata.contentName, "CollectionID=" + HelpCollectionID, "name");
                         while (csData.ok()) {
                             IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(cp, csData.getInteger("ID"), "") + "</div>";
                             csData.goNext();
@@ -1570,9 +1570,9 @@ namespace Contensive.Addons.AdminSite {
                                 } else {
                                     tableName = MetadataController.getContentTablename(cp.core, editRecord.contentControlId_Name).ToLowerInvariant();
                                 }
-                                if (tableName == LinkAliasModel.contentTableNameLowerCase) {
+                                if (tableName == LinkAliasModel.tableMetadata.tableNameLower) {
                                     LinkAliasModel.invalidateCacheOfRecord<LinkAliasModel>(cp, editRecord.id);
-                                } else if (tableName == AddonModel.contentTableNameLowerCase) {
+                                } else if (tableName == AddonModel.tableMetadata.tableNameLower) {
                                     AddonModel.invalidateCacheOfRecord<AddonModel>(cp, editRecord.id);
                                 } else {
                                     LinkAliasModel.invalidateCacheOfRecord<LinkAliasModel>(cp, editRecord.id);

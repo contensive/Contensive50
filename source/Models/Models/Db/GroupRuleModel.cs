@@ -4,14 +4,12 @@ namespace Contensive.Models.Db {
     public class GroupRuleModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "group rules";
-        public const string contentTableNameLowerCase = "ccgrouprules";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("group rules", "ccgrouprules", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
         public bool allowAdd { get; set; }
         public bool allowDelete { get; set; }        
         public int contentID { get; set; }

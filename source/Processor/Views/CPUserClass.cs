@@ -141,50 +141,57 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// return true if the specified user is in the specified group
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public override bool IsInGroup(string groupName, int userId) {
-            bool result = false;
-            //
             try {
                 int groupId = cp.Group.GetId(groupName);
-                if (userId == 0) {
-                    userId = Id;
-                }
                 if (groupId == 0) {
-                    result = false;
-                } else {
-                    result = IsInGroupList(groupId.ToString(), userId);
+                    return false;
                 }
+                return IsInGroupList(groupId.ToString(), userId);
             } catch (Exception ex) {
                 LogController.logError(cp.core,ex);
-                result = false;
+                return false;
             }
-            return result;
         }
         //
-        public override bool IsInGroup(string groupName) => IsInGroup(groupName, cp.User.Id);
+        //====================================================================================================
+        /// <summary>
+        /// return true if the current session user is authenticated and is in the current group
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
+        public override bool IsInGroup(string groupName) {
+            if (!IsAuthenticated) { return false; }
+            return IsInGroup(groupName, Id);
+        }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// return true if the specified user is in the specified group
+        /// </summary>
+        /// <param name="groupIDList"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public override bool IsInGroupList(string groupIDList, int userId) {
-            bool result = false;
-            //
-            try {
-                if (userId == 0) {
-                    userId = Id;
-                }
-                result = GroupController.isInGroupList(cp.core, userId, IsAuthenticated, groupIDList, false);
-            } catch (Exception ex) {
-                LogController.logError(cp.core,ex);
-                result = false;
-            }
-            return result;
-            //
+            return GroupController.isInGroupList(cp.core, userId, true, groupIDList, false);
         }
         //
         //====================================================================================================
-        //
-        public override bool IsInGroupList(string groupIDList) => IsInGroupList(groupIDList, cp.User.Id);
+        /// <summary>
+        /// return true if the current session user is authenticated and is in the current group list
+        /// </summary>
+        /// <param name="groupIDList"></param>
+        /// <returns></returns>
+        public override bool IsInGroupList(string groupIDList) {
+            if (!IsAuthenticated) { return false; }
+            return IsInGroupList(groupIDList, Id);
+        }
         //
         //====================================================================================================
         //

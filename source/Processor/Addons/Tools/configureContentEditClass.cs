@@ -181,7 +181,7 @@ namespace Contensive.Addons.Tools {
                         if (ToolButton == ButtonAdd) {
                             //
                             // ----- Insert a blank Field
-                            var defaultValues = ContentMetadataModel.getDefaultValueDict(core, ContentFieldModel.contentName);
+                            var defaultValues = ContentMetadataModel.getDefaultValueDict(core, ContentFieldModel.tableMetadata.contentName);
                             var field = ContentFieldModel.addDefault<ContentFieldModel>(core.cpParent, defaultValues);
                             field.name = "unnamedField" + field.id.ToString();
                             field.contentID = ContentID;

@@ -4,14 +4,12 @@ namespace Contensive.Models.Db {
     public class NavigatorEntryModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "Navigator Entries";
-        public const string contentTableNameLowerCase = "ccmenuentries";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("Navigator Entries", "ccmenuentries", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
         public int ParentID { get; set; }
         public string NavIconTitle { get; set; }
         public int NavIconType { get; set; }

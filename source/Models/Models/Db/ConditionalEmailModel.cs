@@ -6,11 +6,10 @@ namespace Contensive.Models.Db {
     public class ConditionalEmailModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "conditional email";
-        public const string contentTableNameLowerCase = "ccemail";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("conditional email", "ccemail", "default", false);
         //
         //====================================================================================================
         //

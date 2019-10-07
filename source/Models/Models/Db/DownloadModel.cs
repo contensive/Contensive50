@@ -6,14 +6,15 @@ namespace Contensive.Models.Db {
     public class DownloadModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "downloads";
-        public const string contentTableNameLowerCase = "ccdownloads";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("Downloads", "ccdownloads", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
+        /// <summary>
+        /// 
+        /// </summary>
         public FieldTypeTextFile filename { get; set; }
         public int requestedBy { get; set; }
         public DateTime? dateRequested { get; set; }

@@ -6,16 +6,12 @@ namespace Contensive.Models.Db {
     public class AuthoringControlModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        //
-        public const string contentName = "Authoring Controls";
-        public const string contentTableNameLowerCase = "ccauthoringcontrols";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("Authoring Controls", "ccauthoringcontrols", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
-        //
         /// <summary>
         /// tableId/recordId
         /// </summary>

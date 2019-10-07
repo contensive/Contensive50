@@ -4,14 +4,15 @@ namespace Contensive.Models.Db {
     public class AddonPageRuleModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "add-on page rules";
-        public const string contentTableNameLowerCase = "ccaddonpagerules";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("add-on page rules", "ccaddonpagerules", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
+        /// <summary>
+        /// field properties
+        /// </summary>
         public int addonId { get; set; }
         public int pageId { get; set; }
     }

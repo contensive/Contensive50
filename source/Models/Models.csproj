@@ -38,7 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.1.191004.8\lib\net461\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.1.191007.2\lib\net461\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -69,7 +69,7 @@
     <Compile Include="Models\Db\DatasourceModel.cs" />
     <Compile Include="Models\Db\DbBaseFieldsModel.cs" />
     <Compile Include="Models\Db\DbBaseModel.cs" />
-    <Compile Include="Models\Db\DbGenericModel.cs" />
+    <Compile Include="Models\Db\DbBaseTableMetadataModel.cs" />
     <Compile Include="Models\Db\DomainModel.cs" />
     <Compile Include="Models\Db\DownloadModel.cs" />
     <Compile Include="Models\Db\EmailDropModel.cs" />
@@ -90,13 +90,13 @@
     <Compile Include="Models\Db\MenuModel.cs" />
     <Compile Include="Models\Db\MenuPageRuleModel.cs" />
     <Compile Include="Models\Db\NavigatorEntryModel.cs" />
-    <Compile Include="Models\Db\organizationModel.cs" />
+    <Compile Include="Models\Db\OrganizationModel.cs" />
     <Compile Include="Models\Db\PageContentModel.cs" />
-    <Compile Include="Models\Db\pageTemplateModel.cs" />
+    <Compile Include="Models\Db\PageTemplateModel.cs" />
     <Compile Include="Models\Db\PersonModel.cs" />
     <Compile Include="Models\Db\RemoteQueryModel.cs" />
     <Compile Include="Models\Db\SitePropertyModel.cs" />
-    <Compile Include="Models\Db\sortMethodModel.cs" />
+    <Compile Include="Models\Db\SortMethodModel.cs" />
     <Compile Include="Models\Db\StateModel.cs" />
     <Compile Include="Models\Db\SystemEmailModel.cs" />
     <Compile Include="Models\Db\TableModel.cs" />
@@ -105,7 +105,6 @@
     <Compile Include="Models\Db\ViewingModel.cs" />
     <Compile Include="Models\Db\VisitModel.cs" />
     <Compile Include="Models\Db\visitorModel.cs" />
-    <Compile Include="Models\_blankModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

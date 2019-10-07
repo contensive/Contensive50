@@ -4,14 +4,15 @@ namespace Contensive.Models.Db {
     public class AddonIncludeRuleModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "Add-on Include Rules";
-        public const string contentTableNameLowerCase = "ccaddonincluderules";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("Add-on Include Rules", "ccaddonincluderules", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
+        /// <summary>
+        /// field properties
+        /// </summary>
         public int addonID { get; set; }
         public int includedAddonID { get; set; }
     }

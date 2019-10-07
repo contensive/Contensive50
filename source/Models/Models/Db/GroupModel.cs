@@ -8,14 +8,12 @@ namespace Contensive.Models.Db {
     public class GroupModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "groups";
-        public const string contentTableNameLowerCase = "ccgroups";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("groups", "ccgroups", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
         public bool allowBulkEmail { get; set; }
         public string caption { get; set; }        
         public string copyFilename { get; set; }

@@ -7,11 +7,10 @@ namespace Contensive.Models.Db {
     public class DomainModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "domains";
-        public const string contentTableNameLowerCase = "ccdomains";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("domains", "ccdomains", "default", true);
         //
         //====================================================================================================
         /// <summary>

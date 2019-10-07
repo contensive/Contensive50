@@ -45,10 +45,10 @@ namespace Contensive.Processor.Controllers {
                 core.html.addStyleLink("https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/quickEditor/styles.css", "Quick Editor");
                 //
                 // -- First Active Record - Output Quick Editor form
-                Models.Domain.ContentMetadataModel cdef = Models.Domain.ContentMetadataModel.createByUniqueName(core, PageContentModel.contentName);
+                Models.Domain.ContentMetadataModel cdef = Models.Domain.ContentMetadataModel.createByUniqueName(core, PageContentModel.tableMetadata.contentName);
                 var pageContentTable = DbBaseModel.create<TableModel>(core.cpParent, cdef.id);
                 var editLock = WorkflowController.getEditLock(core, pageContentTable.id, core.doc.pageController.page.id);
-                WorkflowController.recordWorkflowStatusClass authoringStatus = WorkflowController.getWorkflowStatus(core, PageContentModel.contentName, core.doc.pageController.page.id);
+                WorkflowController.recordWorkflowStatusClass authoringStatus = WorkflowController.getWorkflowStatus(core, PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id);
                 PermissionController.UserContentPermissions userContentPermissions = PermissionController.getUserContentPermissions(core, cdef);
                 bool AllowMarkReviewed = DbBaseModel.containsField<PageContentModel>("DateReviewed");
                 string OptionsPanelAuthoringStatus = core.session.getAuthoringStatusMessage(false, editLock.isEditLocked, editLock.editLockByMemberName, encodeDate(editLock.editLockExpiresDate), authoringStatus.isWorkflowApproved, authoringStatus.workflowApprovedMemberName, authoringStatus.isWorkflowSubmitted, authoringStatus.workflowSubmittedMemberName, authoringStatus.isWorkflowDeleted, authoringStatus.isWorkflowInserted, authoringStatus.isWorkflowModified, authoringStatus.workflowModifiedByMemberName);
@@ -92,12 +92,12 @@ namespace Contensive.Processor.Controllers {
                 if (!userContentPermissions.allowSave) {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, "", true, true, rootPageId, !userContentPermissions.allowSave, true, PageContentModel.contentName, false, contactMemberID) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.tableMetadata.contentName, "", true, true, rootPageId, !userContentPermissions.allowSave, true, PageContentModel.tableMetadata.contentName, false, contactMemberID) + "</td>"
                     + "\r</tr>";
                 } else {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, "", true, true, rootPageId, !userContentPermissions.allowSave, true, PageContentModel.contentName, false, contactMemberID) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.tableMetadata.contentName, "", true, true, rootPageId, !userContentPermissions.allowSave, true, PageContentModel.tableMetadata.contentName, false, contactMemberID) + "</td>"
                     + "\r</tr>";
                 }
                 result += "\r<tr>"
@@ -134,7 +134,7 @@ namespace Contensive.Processor.Controllers {
                 CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                     addonType = CPUtilsBaseClass.addonContext.ContextPage,
                     hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                        contentName = PageContentModel.contentName,
+                        contentName = PageContentModel.tableMetadata.contentName,
                         fieldName = "",
                         recordId = core.doc.pageController.page.id
                     },
@@ -143,7 +143,7 @@ namespace Contensive.Processor.Controllers {
                     errorContextMessage = "calling child page addon in quick editing editor"
                 };
                 PageList = core.addon.execute(addon, executeContext);
-                //PageList = core.addon.execute_legacy2(core.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, pageContentModel.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
+                //PageList = core.addon.execute_legacy2(core.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, pageContentModel.tableMetadata.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
                 if (GenericController.vbInstr(1, PageList, "<ul", 1) == 0) {
                     PageList = "(there are no child pages)";
                 }
@@ -163,7 +163,7 @@ namespace Contensive.Processor.Controllers {
                 result += ""
                     + HtmlController.inputHidden("Type", FormTypePageAuthoring)
                     + HtmlController.inputHidden("ID", core.doc.pageController.page.id)
-                    + HtmlController.inputHidden("ContentName", PageContentModel.contentName);
+                    + HtmlController.inputHidden("ContentName", PageContentModel.tableMetadata.contentName);
                 result = HtmlController.formMultipart(core, result, core.webServer.requestQueryString, "", "ccForm");
                 result = "<div class=\"ccCon\">" + result + "</div>";
             } catch (Exception ex) {

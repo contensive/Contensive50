@@ -24,7 +24,7 @@ namespace Contensive.Models.Db.Tests {
 
         [TestMethod()]
         public void derivedNameFieldIsUniqueTest() {
-            Assert.AreEqual(true, DbBaseModel.derivedNameFieldIsUnique(typeof(AddonCollectionModel)));
+            Assert.AreEqual(true, DbBaseModel.derivedNameFieldIsUnique(typeof(AddonModel)));
             Assert.AreEqual(false, DbBaseModel.derivedNameFieldIsUnique(typeof(AddonContentFieldTypeRulesModel)));
         }
 
@@ -89,222 +89,236 @@ namespace Contensive.Models.Db.Tests {
 
         [TestMethod()]
         public void addDefaultTest1() {
-            Assert.Fail();
+            using (CPClass cp = new CPClass(testAppName)) {
+                string defaultRootUserGuid = "{4445cd14-904f-480f-a7b7-29d70d0c22ca}";
+                var root = PersonModel.create<PersonModel>(cp, defaultRootUserGuid);
+                Assert.IsNotNull(root, "Root user not found");
+                //
+                var defaultValues = new Dictionary<string, string> {
+                    //
+                    // -- bool
+                    { "active", "true" },
+                    //
+                    // string
+                    { "name", "1234asdf" }
+                };
+                //
+                //
+                AddonModel test = DbBaseModel.addDefault<AddonModel>(cp, defaultValues, root.id);
+                //
+                //
+                Assert.AreEqual(root.id, test.createdBy);
+            }
         }
 
-        [TestMethod()]
-        public void addDefaultTest2() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void addEmptyTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void addEmptyTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void addEmptyTest1() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void addEmptyTest1() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createTest1() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createTest1() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createTest2() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createTest2() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createTest3() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createTest3() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createByUniqueNameTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createByUniqueNameTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createByUniqueNameTest1() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createByUniqueNameTest1() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void saveTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void saveTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void saveTest1() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void saveTest1() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void saveTest2() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void saveTest2() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void deleteTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void deleteTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void deleteTest1() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void deleteTest1() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createListTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createListTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createListTest1() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createListTest1() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createListTest2() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createListTest2() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createListTest3() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createListTest3() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createListTest4() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createListTest4() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createListTest5() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createListTest5() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createFirstOfListTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createFirstOfListTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void getRecordNameTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void getRecordNameTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void getRecordNameTest1() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void getRecordNameTest1() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void getRecordIdTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void getRecordIdTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createEmptyTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createEmptyTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createEmptyTest1() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createEmptyTest1() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void getSelectSqlTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void getSelectSqlTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void getSelectSqlTest1() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void getSelectSqlTest1() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void getSelectSqlTest2() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void getSelectSqlTest2() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void getSelectSqlTest3() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void getSelectSqlTest3() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void getCountSqlTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void getCountSqlTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void deleteRowsTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void deleteRowsTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void containsFieldTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void containsFieldTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void isParentOfTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void isParentOfTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void isParentOfTest1() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void isParentOfTest1() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void isChildOfTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void isChildOfTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void isChildOfTest1() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void isChildOfTest1() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void invalidateCacheOfRecordTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void invalidateCacheOfRecordTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void invalidateCacheOfTableTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void invalidateCacheOfTableTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void createDependencyKeyInvalidateOnChangeTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void createDependencyKeyInvalidateOnChangeTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void getCountTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void getCountTest() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void isNullableTest() {
+        //    Assert.Fail();
+        //}
 
-        [TestMethod()]
-        public void isNullableTest() {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void getCountTest1() {
-            Assert.Fail();
-        }
+        //[TestMethod()]
+        //public void getCountTest1() {
+        //    Assert.Fail();
+        //}
     }
 }

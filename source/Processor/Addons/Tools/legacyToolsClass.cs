@@ -423,20 +423,20 @@ namespace Contensive.Addons.Tools {
                         core.cache.invalidateAll();
                         core.clearMetaData();
                         ContentID = Processor.Models.Domain.ContentMetadataModel.getContentId(core, ContentName);
-                        ParentNavID = MetadataController.getRecordIdByUniqueName( core,NavigatorEntryModel.contentName, "Manage Site Content");
+                        ParentNavID = MetadataController.getRecordIdByUniqueName( core,NavigatorEntryModel.tableMetadata.contentName, "Manage Site Content");
                         if (ParentNavID != 0) {
                             ParentNavID = 0;
                             using (var csSrc = new CsModel(core)) {
-                                if (csSrc.open(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")")) {
+                                if (csSrc.open(NavigatorEntryModel.tableMetadata.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")")) {
                                     ParentNavID = csSrc.getInteger("ID");
                                 }
                             }
                             if (ParentNavID != 0) {
                                 using (var csDest = new CsModel(core)) {
-                                    csDest.open(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
+                                    csDest.open(NavigatorEntryModel.tableMetadata.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
                                     if (!csDest.ok()) {
                                         csDest.close();
-                                        csDest.insert(NavigatorEntryModel.contentName);
+                                        csDest.insert(NavigatorEntryModel.tableMetadata.contentName);
                                     }
                                     if (csDest.ok()) {
                                         csDest.set("name", ContentName);

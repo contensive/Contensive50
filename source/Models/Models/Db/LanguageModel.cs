@@ -4,14 +4,12 @@ namespace Contensive.Models.Db {
     public class LanguageModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "languages";
-        public const string contentTableNameLowerCase = "cclanguages";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("languages", "cclanguages", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
         public string http_Accept_Language { get; set; }
     }
 }

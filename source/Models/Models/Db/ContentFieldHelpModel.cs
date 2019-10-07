@@ -7,14 +7,13 @@ namespace Contensive.Models.Db {
     public class ContentFieldHelpModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "content field help";
-        public const string contentTableNameLowerCase = "ccfieldhelp";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("content field help", "ccfieldhelp", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
+        //
         public int fieldID { get; set; }
         public string helpCustom { get; set; }
         public string helpDefault { get; set; }

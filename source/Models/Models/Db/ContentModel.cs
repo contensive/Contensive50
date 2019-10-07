@@ -7,14 +7,12 @@ namespace Contensive.Models.Db {
     public class ContentModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "content";
-        public const string contentTableNameLowerCase = "cccontent";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("Content", "cccontent", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
         public bool adminOnly { get; set; }
         public bool allowAdd { get; set; }
         public bool allowContentChildTool { get; set; }

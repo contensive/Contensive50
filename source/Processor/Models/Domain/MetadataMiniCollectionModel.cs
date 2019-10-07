@@ -1412,12 +1412,12 @@ namespace Contensive.Processor.Models.Domain {
                     if (contentMetadata.dataChanged) {
                         //
                         // -- update definition (use SingleRecord as an update flag)
-                        var datasource = DbBaseModel.createByUniqueName<DataSourceModel>(core.cpParent, contentMetadata.dataSourceName);
+                        var datasource = DataSourceModel.createByUniqueName(core.cpParent, contentMetadata.dataSourceName);
                         ContentMetadataModel.verifyContent_returnId(core, contentMetadata);
                     }
                     //
                     // -- update Content Field Records and Content Field Help records
-                    ContentMetadataModel metaDataFieldHelp = ContentMetadataModel.createByUniqueName(core, ContentFieldHelpModel.contentName);
+                    ContentMetadataModel metaDataFieldHelp = ContentMetadataModel.createByUniqueName(core, ContentFieldHelpModel.tableMetadata.contentName);
                     foreach (var nameValuePair in contentMetadata.fields) {
                         ContentFieldMetadataModel fieldMetadata = nameValuePair.Value;
                         if (fieldMetadata.dataChanged) {

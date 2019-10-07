@@ -5,14 +5,15 @@ namespace Contensive.Models.Db {
     public class AddonTemplateRuleModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "add-on template rules";
-        public const string contentTableNameLowerCase = "ccAddontemplaterules";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("add-on template rules", "ccAddontemplaterules", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
+        /// <summary>
+        /// field properties
+        /// </summary>
         public int addonId { get; set; }
         public int templateId { get; set; }
     }

@@ -64,6 +64,11 @@ namespace Contensive.Processor.Controllers {
                         result = "";
                         needLoginForm = false;
                     }
+                } else if (formType == FormTypeSendPassword) {
+                    //
+                    // -- process send password
+                    processSendPasswordForm(core);
+                    result += "<p>If this email was found on the system an email was sent with login instructions.</p>";
                 }
                 if (needLoginForm) {
                     string loginForm;
@@ -94,7 +99,7 @@ namespace Contensive.Processor.Controllers {
                     QueryString = GenericController.modifyQueryString(QueryString, "requestbinary", "", false);
                     loginForm += HtmlController.inputHidden("Type", FormTypeLogin);
                     loginForm += HtmlController.inputHidden("email", core.session.user.email);
-                    result = HtmlController.form(core, loginForm, QueryString);
+                    result += HtmlController.form(core, loginForm, QueryString);
                     //string Panel = errorController.getUserError(core) + "\r<p class=\"ccAdminNormal\">" + usernameMsg + loginForm + "";
                     //
                     // ----- Password Form
@@ -167,24 +172,24 @@ namespace Contensive.Processor.Controllers {
                 string QueryString = null;
                 //
                 if (core.siteProperties.getBoolean("allowPasswordEmail", true)) {
-                    returnResult = Properties.Resources.defaultForgetPassword_html;
+                    returnResult += Properties.Resources.defaultForgetPassword_html;
                     //
                     // write out all of the form input (except state) to hidden fields so they can be read after login
-                    returnResult = ""
-                    + returnResult + HtmlController.inputHidden("Type", FormTypeSendPassword) + "";
-                    foreach (string key in core.docProperties.getKeyList()) {
-                        var tempVar = core.docProperties.getProperty(key);
-                        if (tempVar.propertyType == DocPropertyController.DocPropertyTypesEnum.form) {
-                            switch (GenericController.vbUCase(tempVar.Name)) {
+                    returnResult += HtmlController.inputHidden("Type", FormTypeSendPassword);
+                    foreach (string formKey in core.docProperties.getKeyList()) {
+                        var formValue = core.docProperties.getProperty(formKey);
+                        if (formValue.propertyType == DocPropertyController.DocPropertyTypesEnum.form) {
+                            switch (GenericController.vbUCase(formValue.Name)) {
                                 case "S":
                                 case "MA":
                                 case "MB":
                                 case "USERNAME":
                                 case "PASSWORD":
                                 case "EMAIL":
+                                case "TYPE":
                                     break;
                                 default:
-                                    returnResult = returnResult + HtmlController.inputHidden(tempVar.Name, tempVar.Value);
+                                    returnResult = returnResult + HtmlController.inputHidden(formValue.Name, formValue.Value);
                                     break;
                             }
                         }

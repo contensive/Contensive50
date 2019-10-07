@@ -6,14 +6,12 @@ namespace Contensive.Models.Db {
     public class ContentFieldModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "content fields";
-        public const string contentTableNameLowerCase = "ccfields";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("content fields", "ccfields", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
         public bool adminOnly { get; set; }
         public bool authorable { get; set; }
         public string caption { get; set; }

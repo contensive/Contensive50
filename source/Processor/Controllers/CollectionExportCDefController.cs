@@ -513,7 +513,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 string appName = core.appConfig.name;
-                int MenuContentID = MetadataController.getRecordIdByUniqueName(core, "Content", NavigatorEntryModel.contentName);
+                int MenuContentID = MetadataController.getRecordIdByUniqueName(core, "Content", NavigatorEntryModel.tableMetadata.contentName);
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 using (DataTable dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')")) {
                     if (dt.Rows.Count > 0) {
@@ -564,7 +564,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string appName = core.appConfig.name;
-                int MenuContentID = MetadataController.getRecordIdByUniqueName(core, "Content", NavigatorEntryModel.contentName);
+                int MenuContentID = MetadataController.getRecordIdByUniqueName(core, "Content", NavigatorEntryModel.tableMetadata.contentName);
                 using (DataTable dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')")) {
                     if (DbController.isDataTableOk(dt)) {
                         foreach (DataRow dr in dt.Rows) {

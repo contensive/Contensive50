@@ -218,7 +218,7 @@ namespace Contensive.Processor.Controllers {
         //                            + "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))"
         //                            + "  or(ProcessNextRun<" + SQLNow + ")"
         //                            + " )";
-        //                        int CS = coreApp.db.csOpen(AddonModel.contentName, sqlAddonsCriteria);
+        //                        int CS = coreApp.db.csOpen(AddonModel.tableMetadata.contentName, sqlAddonsCriteria);
         //                        while (coreApp.db.csOk()) {
         //                            int addonProcessInterval = coreApp.db.csGetInteger("ProcessInterval");
         //                            string addonName = coreApp.db.csGetText("name");
@@ -284,7 +284,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 int downloadId = 0;
                 if (!string.IsNullOrEmpty(downloadName)) {
-                    Dictionary<string, string> defaultValues = ContentMetadataModel.getDefaultValueDict(core, DownloadModel.contentName);
+                    Dictionary<string, string> defaultValues = ContentMetadataModel.getDefaultValueDict(core, DownloadModel.tableMetadata.contentName);
                     var download = DbBaseModel.addDefault<DownloadModel>(core.cpParent, defaultValues);
                     download.name = downloadName;
                     download.dateRequested = DateTime.Now;
@@ -292,7 +292,7 @@ namespace Contensive.Processor.Controllers {
                     if (!string.IsNullOrEmpty(downloadFilename)) {
                         //
                         // -- if the donwloadfilename is specified, save it in the download record and force the file to save with a space in content
-                        download.filename.filename = FileController.getVirtualRecordUnixPathFilename(DownloadModel.contentTableNameLowerCase, "filename", download.id, downloadFilename);
+                        download.filename.filename = FileController.getVirtualRecordUnixPathFilename(DownloadModel.tableMetadata.tableNameLower, "filename", download.id, downloadFilename);
                         download.filename.content = " ";
                     }
                     downloadId = download.id;

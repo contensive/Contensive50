@@ -11,6 +11,7 @@ using System.Collections.Specialized;
 
 namespace Contensive.Models.Db {
     //
+    //
     //====================================================================================================
     // db model pattern
     //   new() - empty constructor to allow deserialization
@@ -157,6 +158,19 @@ namespace Contensive.Models.Db {
         /// simple constructor needed for deserialization
         /// </summary>
         public DbBaseModel() { }
+
+        //
+        //====================================================================================================
+        /// <summary>
+        /// get the instance of the static property .tableMetadata for the type provided
+        /// </summary>
+        /// <param name="derivedType"></param>
+        /// <returns></returns>
+        private static DbBaseTableMetadataModel getTableMetadata(Type derivedType) {
+            PropertyInfo tableMetadataProperty = derivedType.GetProperty("tableMetadata");
+            if (tableMetadataProperty == null) { throw new GenericException("Class [" + derivedType.Name + "] must declare [public static DbBaseTableMetadataModel tableMetadata]."); }
+            return (DbBaseTableMetadataModel)tableMetadataProperty.GetValue(null, null);
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -165,9 +179,9 @@ namespace Contensive.Models.Db {
         /// <param name="derivedType"></param>
         /// <returns></returns>
         public static string derivedTableName(Type derivedType) {
-            FieldInfo fieldInfo = derivedType.GetField("contentTableNameLowerCase");
-            if (fieldInfo == null) { throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentTableNameLowerCase]."); }
-            return fieldInfo.GetRawConstantValue().ToString();
+            var tableMetadata = getTableMetadata(derivedType);
+            if (tableMetadata == null) { throw new GenericException("Class [" + derivedType.Name + "], DbBaseTableMetadataModel tableMetadata property cannot be examined. The static constructor may not be declared."); }
+            return tableMetadata.tableNameLower;
         }
         //
         //====================================================================================================
@@ -177,9 +191,9 @@ namespace Contensive.Models.Db {
         /// <param name="derivedType"></param>
         /// <returns></returns>
         public static string derivedDataSourceName(Type derivedType) {
-            FieldInfo fieldInfo = derivedType.GetField("contentDataSource");
-            if (fieldInfo == null) { throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [contentDataSource]."); }
-            return fieldInfo.GetRawConstantValue().ToString();
+            var tableMetadata = getTableMetadata(derivedType);
+            if (tableMetadata == null) { throw new GenericException("Class [" + derivedType.Name + "], DbBaseTableMetadataModel tableMetadata property cannot be examined. The static constructor may not be declared."); }
+            return tableMetadata.dataSourceName;
         }
         //
         //====================================================================================================
@@ -189,9 +203,9 @@ namespace Contensive.Models.Db {
         /// <param name="derivedType"></param>
         /// <returns></returns>
         public static bool derivedNameFieldIsUnique(Type derivedType) {
-            FieldInfo fieldInfo = derivedType.GetField("nameFieldIsUnique");
-            if (fieldInfo == null) { throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [nameFieldIsUnique]."); }
-            return (bool)fieldInfo.GetRawConstantValue();
+            var tableMetadata = getTableMetadata(derivedType);
+            if (tableMetadata == null) { throw new GenericException("Class [" + derivedType.Name + "], DbBaseTableMetadataModel tableMetadata property cannot be examined. The static constructor may not be declared."); }
+            return tableMetadata.nameFieldIsUnique;
         }
         //
         //====================================================================================================

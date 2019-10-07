@@ -6,14 +6,15 @@ namespace Contensive.Models.Db {
     public class AddonCollectionModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "Add-on Collections";
-        public const string contentTableNameLowerCase = "ccaddoncollections";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("Add-on Collections", "ccaddoncollections", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
+        /// <summary>
+        /// field properties
+        /// </summary>
         public bool blockNavigatorNode { get; set; }
         public string contentFileList { get; set; }
         public string dataRecordList { get; set; }

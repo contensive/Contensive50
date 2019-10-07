@@ -8,15 +8,15 @@ namespace Contensive.Models.Db {
     public class AddonModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "add-ons";
-        public const string contentTableNameLowerCase = "ccaggregatefunctions";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("add-ons", "ccaggregatefunctions", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
-        //
+        /// <summary>
+        /// field properties
+        /// </summary>
         public bool admin { get; set; }
         public string argumentList { get; set; }
         public bool asAjax { get; set; }

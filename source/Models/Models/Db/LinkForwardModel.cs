@@ -4,14 +4,12 @@ namespace Contensive.Models.Db {
     public class LinkForwardModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "link forwards";
-        public const string contentTableNameLowerCase = "cclinkforwards";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("link forwards", "cclinkforwards", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
         public string DestinationLink;
         public int GroupID;
         public string SourceLink;

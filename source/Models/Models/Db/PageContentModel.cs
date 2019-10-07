@@ -7,20 +7,12 @@ namespace Contensive.Models.Db {
     public class PageContentModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "page content";
-        public const string contentTableNameLowerCase = "ccpagecontent";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("page content", "ccpagecontent", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
-        /// <summary>
-        /// A structured json that holds the list of addons to run on this page. Each element in this list includes
-        /// - addonGuid
-        /// - instanceId (guid of content, etc)
-        /// - childList
-        /// </summary>
         public string addonList { get; set; }
         public bool allowBrief { get; set; }
         public bool allowChildListDisplay { get; set; }

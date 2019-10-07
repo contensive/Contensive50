@@ -9,14 +9,12 @@ namespace Contensive.Models.Db {
     public class SitePropertyModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "Site Property";
-        public const string contentTableNameLowerCase = "ccsetup";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("Site Property", "ccsetup", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
         public string fieldValue { get; set; }
         //
         //

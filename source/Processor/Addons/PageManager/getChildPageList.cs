@@ -28,7 +28,7 @@ namespace Contensive.Addons.PageManager {
             string result = "";
             try {
                 CoreController core = ((CPClass)cp).core;
-                result = PageContentController.getChildPageList(core, cp.Doc.GetText("List Name"), PageContentModel.contentName, core.doc.pageController.page.id, true);
+                result = PageContentController.getChildPageList(core, cp.Doc.GetText("List Name"), PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id, true);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

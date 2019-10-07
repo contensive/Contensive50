@@ -23,7 +23,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 CoreController core = cp.core;
-                core.db.executeNonQuery("delete from " + Models.Db.LinkAliasModel.contentTableNameLowerCase);
+                core.db.executeNonQuery("delete from " + Models.Db.LinkAliasModel.tableMetadata.tableNameLower);
                 // act
                 LinkAliasController.addLinkAlias(core, "test", 1, "");
                 var linkAliasList = Models.Db.DbBaseModel.createList<Models.Db.LinkAliasModel>(cp, "(name='/test')");
@@ -46,7 +46,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 CoreController core = cp.core;
-                core.db.executeNonQuery("delete from " + Models.Db.LinkAliasModel.contentTableNameLowerCase);
+                core.db.executeNonQuery("delete from " + Models.Db.LinkAliasModel.tableMetadata.tableNameLower);
                 // act
                 LinkAliasController.addLinkAlias(core, "test", 1, "");
                 LinkAliasController.addLinkAlias(core, "test", 2, "");
@@ -68,7 +68,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 CoreController core = cp.core;
-                core.db.executeNonQuery("delete from " + Models.Db.LinkAliasModel.contentTableNameLowerCase);
+                core.db.executeNonQuery("delete from " + Models.Db.LinkAliasModel.tableMetadata.tableNameLower);
                 // act
                 LinkAliasController.addLinkAlias(core, "test", 1, "a=1");
                 LinkAliasController.addLinkAlias(core, "test", 1, "a=2");
@@ -90,7 +90,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 CoreController core = cp.core;
-                core.db.executeNonQuery("delete from " + Models.Db.LinkAliasModel.contentTableNameLowerCase);
+                core.db.executeNonQuery("delete from " + Models.Db.LinkAliasModel.tableMetadata.tableNameLower);
                 // act
                 LinkAliasController.addLinkAlias(core, "test1", 1, "a=1");
                 LinkAliasController.addLinkAlias(core, "test2", 1, "a=2");
@@ -117,7 +117,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 CoreController core = cp.core;
-                core.db.executeNonQuery("delete from " + Models.Db.LinkAliasModel.contentTableNameLowerCase);
+                core.db.executeNonQuery("delete from " + Models.Db.LinkAliasModel.tableMetadata.tableNameLower);
                 // act
                 LinkAliasController.addLinkAlias(core, "test1", 1, "a=1");
                 LinkAliasController.addLinkAlias(core, "test2", 1, "a=1");
@@ -143,7 +143,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 CoreController core = cp.core;
-                core.db.executeNonQuery("delete from " + Models.Db.LinkAliasModel.contentTableNameLowerCase);
+                core.db.executeNonQuery("delete from " + Models.Db.LinkAliasModel.tableMetadata.tableNameLower);
                 // act
                 LinkAliasController.addLinkAlias(core, "test1", 1, "a=1");
                 LinkAliasController.addLinkAlias(core, "test2", 1, "a=1");

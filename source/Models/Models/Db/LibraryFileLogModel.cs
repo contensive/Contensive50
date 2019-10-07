@@ -4,14 +4,12 @@ namespace Contensive.Models.Db {
     public class LibraryFileLogModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "library File log";
-        public const string contentTableNameLowerCase = "cclibrarydownloadlog";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("library File log", "cclibrarydownloadlog", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
         public int fileID { get; set; }
         public int memberID { get; set; }
         public int visitID { get; set; }

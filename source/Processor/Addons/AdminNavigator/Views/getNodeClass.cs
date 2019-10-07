@@ -113,7 +113,7 @@ namespace Contensive.Addons.AdminNavigator {
                             cs2.Close();
                         }
                         cp.Site.TestPoint("adminNavigator, emptyNodeList from db=[" + EmptyNodeList + "]");
-                        cp.Cache.Store(BakeName, EmptyNodeList, NavigatorEntryModel.contentTableNameLowerCase);
+                        cp.Cache.Store(BakeName, EmptyNodeList, NavigatorEntryModel.tableMetadata.tableNameLower);
                     }
                     //string EmptyNodeListInitial = EmptyNodeList;
                     string TopParentNode = ParentNode;
@@ -421,8 +421,8 @@ namespace Contensive.Addons.AdminNavigator {
                                     cp.Db.ExecuteNonQuery(SQL);
                                 }
                                 var dependentList = new List<string> {
-                                    AddonModel.contentTableNameLowerCase,
-                                    AddonCollectionModel.contentTableNameLowerCase
+                                    AddonModel.tableMetadata.tableNameLower,
+                                    AddonCollectionModel.tableMetadata.tableNameLower
                                 };
                                 cp.Cache.Store(cacheName, nodeHtml, dependentList);
                             }
@@ -698,7 +698,7 @@ namespace Contensive.Addons.AdminNavigator {
                     //
                     //
                     //
-                    cp.Cache.Store(BakeName, EmptyNodeList, NavigatorEntryModel.contentTableNameLowerCase);
+                    cp.Cache.Store(BakeName, EmptyNodeList, NavigatorEntryModel.tableMetadata.tableNameLower);
                     returnNav = s;
                 }
             } catch (Exception ex) {

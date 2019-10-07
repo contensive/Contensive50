@@ -9,14 +9,12 @@ namespace Contensive.Models.Db {
     public class VisitModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "visits";
-        public const string contentTableNameLowerCase = "ccvisits";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("visits", "ccvisits", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
         public bool bot { get; set; }
         public string browser { get; set; }
         

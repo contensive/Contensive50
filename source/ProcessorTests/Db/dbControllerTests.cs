@@ -138,7 +138,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 using (CPCSBaseClass cs = cp.CSNew()) {
                     string impossibleName = cp.Utils.CreateGuid();
                     // act
-                    cs.Open(PersonModel.contentName, "(name=" + cp.Db.EncodeSQLText(impossibleName) + ")");
+                    cs.Open(PersonModel.tableMetadata.contentName, "(name=" + cp.Db.EncodeSQLText(impossibleName) + ")");
                     resultNoData = cs.GetRowCount();
                     cs.Close();
                 }

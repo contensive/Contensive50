@@ -6,15 +6,12 @@ namespace Contensive.Models.Db {
     public class RemoteQueryModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "remote queries";
-        public const string contentTableNameLowerCase = "ccremotequeries";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("remote queries", "ccremotequeries", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
-        //
         public bool AllowInactiveRecords { get; set; }
         public int ContentID { get; set; }
         public string Criteria { get; set; }

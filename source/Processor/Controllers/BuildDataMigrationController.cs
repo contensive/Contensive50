@@ -49,7 +49,7 @@ namespace Contensive.Processor.Controllers {
                     core.wwwFiles.unzipFile("cclib.zip");
                     //
                     // -- remove all the old menu entries and leave the navigation entries
-                    var navContent = DbBaseModel.createByUniqueName<ContentModel>(core.cpParent, Contensive.Models.Db.NavigatorEntryModel.contentName);
+                    var navContent = DbBaseModel.createByUniqueName<ContentModel>(core.cpParent, Contensive.Models.Db.NavigatorEntryModel.tableMetadata.contentName);
                     if (navContent != null) {
                         core.db.executeNonQuery("delete from ccMenuEntries where ((contentcontrolid<>0)and(contentcontrolid<>" + navContent.id + ")and(contentcontrolid is not null))");
                     }

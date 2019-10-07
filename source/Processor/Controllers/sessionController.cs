@@ -50,7 +50,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public void verifyUser() {
             if (user.id == 0) {
-                var user = DbBaseModel.addDefault<PersonModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PersonModel.contentName));
+                var user = DbBaseModel.addDefault<PersonModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PersonModel.tableMetadata.contentName));
                 user.createdByVisit = true;
                 user.save(core.cpParent);
                 SessionController session = this;
@@ -97,7 +97,7 @@ namespace Contensive.Processor.Controllers {
                     if (_language == null) {
                         //
                         // -- add english to the table
-                        Dictionary<string, String> defaultValues = ContentMetadataModel.getDefaultValueDict(core, LanguageModel.contentName);
+                        Dictionary<string, String> defaultValues = ContentMetadataModel.getDefaultValueDict(core, LanguageModel.tableMetadata.contentName);
                         _language = LanguageModel.addDefault<LanguageModel>(core.cpParent, defaultValues);
                         _language.name = "English";
                         _language.http_Accept_Language = "en";
@@ -747,7 +747,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 LogController.addSiteActivity(core, "logout", user.id, user.organizationID);
                 //
-                var defaultValues = ContentMetadataModel.getDefaultValueDict(core, PersonModel.contentName);
+                var defaultValues = ContentMetadataModel.getDefaultValueDict(core, PersonModel.tableMetadata.contentName);
                 user = DbBaseModel.addDefault<PersonModel>(core.cpParent, defaultValues);
                 if (user == null) {
                     LogController.logError(core, "logout failed because new user could not be created");

@@ -24,7 +24,7 @@ namespace Contensive.Addons.AdminSite {
                     int fieldId = cp.Doc.GetInteger("fieldId");
                     var help = ContentFieldHelpModel.createByFieldId(cp, fieldId);
                     if (help == null) {
-                        help = DbBaseModel.addDefault<ContentFieldHelpModel>(core.cpParent, Processor.Models.Domain.ContentMetadataModel.getDefaultValueDict(core, ContentFieldHelpModel.contentName));
+                        help = DbBaseModel.addDefault<ContentFieldHelpModel>(core.cpParent, Processor.Models.Domain.ContentMetadataModel.getDefaultValueDict(core, ContentFieldHelpModel.tableMetadata.contentName));
                         help.fieldID = fieldId;
                     }
                     help.helpCustom = cp.Doc.GetText("helpcustom");

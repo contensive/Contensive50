@@ -173,14 +173,14 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //
                                         // Delete any addons from this collection
                                         //
-                                        MetadataController.deleteContentRecords(core, AddonModel.contentName, "collectionid=" + TargetCollectionID);
+                                        MetadataController.deleteContentRecords(core, AddonModel.tableMetadata.contentName, "collectionid=" + TargetCollectionID);
                                         //
                                         // Delete the navigator entry for the collection under 'Add-ons'
                                         //
                                         if (TargetCollectionID > 0) {
                                             AddonNavigatorID = 0;
                                             using (var csData = new CsModel(core)) {
-                                                csData.open(NavigatorEntryModel.contentName, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
+                                                csData.open(NavigatorEntryModel.tableMetadata.contentName, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
                                                 if (csData.ok()) {
                                                     AddonNavigatorID = csData.getInteger("ID");
                                                 }
@@ -195,7 +195,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                             //
                                             // Delete Navigator Entries set as installed by the collection (this may be all that is needed)
                                             //
-                                            MetadataController.deleteContentRecords(core, NavigatorEntryModel.contentName, "installedbycollectionid=" + TargetCollectionID);
+                                            MetadataController.deleteContentRecords(core, NavigatorEntryModel.tableMetadata.contentName, "installedbycollectionid=" + TargetCollectionID);
                                         }
                                     }
                                 }
@@ -209,7 +209,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             if (Cnt > 0) {
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                     if (core.docProperties.getBoolean("ao" + Ptr)) {
-                                        MetadataController.deleteContentRecord(core, AddonModel.contentName, core.docProperties.getInteger("aoID" + Ptr));
+                                        MetadataController.deleteContentRecord(core, AddonModel.tableMetadata.contentName, core.docProperties.getInteger("aoID" + Ptr));
                                     }
                                 }
                             }
@@ -632,9 +632,9 @@ namespace Contensive.Addons.SafeAddonManager {
                 int EntryID = 0;
                 using (var csData = new CsModel(core)) {
                     if (EntryParentID == 0) {
-                        csData.open(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and((parentID is null)or(parentid=0))");
+                        csData.open(NavigatorEntryModel.tableMetadata.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and((parentID is null)or(parentid=0))");
                     } else {
-                        csData.open(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and(parentID=" + DbController.encodeSQLNumber(EntryParentID) + ")");
+                        csData.open(NavigatorEntryModel.tableMetadata.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and(parentID=" + DbController.encodeSQLNumber(EntryParentID) + ")");
                     }
                     if (csData.ok()) {
                         EntryID = csData.getInteger("ID");
@@ -644,14 +644,14 @@ namespace Contensive.Addons.SafeAddonManager {
                 //
                 if (EntryID != 0) {
                     using (var csData = new CsModel(core)) {
-                        csData.open(NavigatorEntryModel.contentName, "(parentID=" + DbController.encodeSQLNumber(EntryID) + ")");
+                        csData.open(NavigatorEntryModel.tableMetadata.contentName, "(parentID=" + DbController.encodeSQLNumber(EntryID) + ")");
                         while (csData.ok()) {
                             GetForm_SafeModeAddonManager_DeleteNavigatorBranch(csData.getText("name"), EntryID);
                             csData.goNext();
                         }
                         csData.close();
                     }
-                    MetadataController.deleteContentRecord(core, NavigatorEntryModel.contentName, EntryID);
+                    MetadataController.deleteContentRecord(core, NavigatorEntryModel.tableMetadata.contentName, EntryID);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

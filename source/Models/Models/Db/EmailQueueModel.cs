@@ -6,14 +6,12 @@ namespace Contensive.Models.Db {
     public class EmailQueueModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "email queue";
-        public const string contentTableNameLowerCase = "ccemailqueue";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("email queue", "ccemailqueue", "default", false);
         //
         //====================================================================================================
-        //
         public string toAddress { get; set; }
         public string subject { get; set; }
         public string content { get; set; }

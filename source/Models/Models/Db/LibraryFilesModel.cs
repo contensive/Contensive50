@@ -4,11 +4,10 @@ namespace Contensive.Models.Db {
     public class LibraryFilesModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "library Files";
-        public const string contentTableNameLowerCase = "cclibraryfiles";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("library Files", "cclibraryfiles", "default", false);
         //
         //====================================================================================================
         // -- instance properties

@@ -6,14 +6,12 @@ namespace Contensive.Models.Db {
     public class EmailModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "email";
-        public const string contentTableNameLowerCase = "ccemail";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = true;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("email", "ccemail", "default", true);
         //
         //====================================================================================================
-        // -- instance properties
         public bool addLinkEID { get; set; }
         public bool allowSpamFooter { get; set; }
         public bool blockSiteStyles { get; set; }

@@ -350,7 +350,7 @@ namespace Contensive.Processor.Controllers {
                 if (email == null) {
                     //
                     // -- create new system email with this name - exposure of possible integer used as name
-                    email = DbBaseModel.addDefault<SystemEmailModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, SystemEmailModel.contentName));
+                    email = DbBaseModel.addDefault<SystemEmailModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, SystemEmailModel.tableMetadata.contentName));
                     email.name = emailName;
                     email.subject = emailName;
                     email.fromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);

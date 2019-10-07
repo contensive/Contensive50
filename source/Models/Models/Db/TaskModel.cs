@@ -7,11 +7,12 @@ namespace Contensive.Models.Db {
     public class TaskModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "tasks";
-        public const string contentTableNameLowerCase = "cctasks";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("tasks", "cctasks", "default", false);
+        //
+        //====================================================================================================
         /// <summary>
         /// enum of all possible commands in task model
         /// </summary>

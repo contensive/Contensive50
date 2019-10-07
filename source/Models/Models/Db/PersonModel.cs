@@ -10,15 +10,12 @@ namespace Contensive.Models.Db {
     public class PersonModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        //public virtual string contentName { get { return "people"; } }
-        public const string contentName = "people";
-        public const string contentTableNameLowerCase = "ccmembers";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("people", "ccmembers", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
         public string address { get; set; }
         public string address2 { get; set; }
         public bool admin { get; set; }

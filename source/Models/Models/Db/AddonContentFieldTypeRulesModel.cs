@@ -6,14 +6,15 @@ namespace Contensive.Models.Db {
     public class AddonContentFieldTypeRulesModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "add-on Content Field Type Rules";
-        public const string contentTableNameLowerCase = "ccaddoncontentfieldtyperules";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("add-on Content Field Type Rules", "ccaddoncontentfieldtyperules", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
+        /// <summary>
+        /// field properties
+        /// </summary>
         public int addonID { get; set; }
         public int contentFieldTypeID { get; set; }
     }

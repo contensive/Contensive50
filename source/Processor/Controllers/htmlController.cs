@@ -1442,7 +1442,7 @@ namespace Contensive.Processor.Controllers {
                             Criteria = Criteria + "and(template<>0)";
                         }
                     }
-                    string AddonContentName = AddonModel.contentName;
+                    string AddonContentName = AddonModel.tableMetadata.contentName;
                     string SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccguid";
                     using (var csData = new CsModel(core)) {
                         if (csData.open(AddonContentName, Criteria, "Name,ID", false, 0, SelectList)) {

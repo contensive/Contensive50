@@ -4,14 +4,12 @@ namespace Contensive.Models.Db {
     public class EmailTemplateModel : DbBaseModel {
         //
         //====================================================================================================
-        //-- const
-        public const string contentName = "email templates";
-        public const string contentTableNameLowerCase = "cctemplates";
-        public const string contentDataSource = "default";
-        public const bool nameFieldIsUnique = false;
+        /// <summary>
+        /// table definition
+        /// </summary>
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("email templates", "cctemplates", "default", false);
         //
         //====================================================================================================
-        // -- instance properties
         public string bodyHTML { get; set; }
         public string source { get; set; }
     }

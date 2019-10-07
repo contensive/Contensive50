@@ -1671,6 +1671,7 @@ namespace Contensive.Processor.Models.Domain {
         public static Dictionary<string, String> getDefaultValueDict(CoreController core, string contentName) {
             var defaultValueDict = new Dictionary<string, String>();
             ContentMetadataModel meta = createByUniqueName(core, contentName);
+            if (meta==null) { return defaultValueDict; }
             foreach (var fieldKvp in meta.fields) {
                 if (!string.IsNullOrWhiteSpace(fieldKvp.Value.defaultValue)) {
                     defaultValueDict.Add(fieldKvp.Key.ToLower(CultureInfo.InvariantCulture), fieldKvp.Value.defaultValue);

@@ -9,7 +9,6 @@ using Contensive.BaseClasses;
 using static Tests.testConstants;
 
 namespace Contensive.ProcessorTests.UnitTests.ViewTests {
-
     [TestClass()]
     public class CpBlockTests {
         //
@@ -222,6 +221,8 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         //
     }
     //
+
+    [TestClass()]
     public class CoreCommonTests {
         //
         [TestMethod]
@@ -245,13 +246,13 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
             // arrange
             // act
             // assert
-            Assert.AreEqual(normalizeRoute("TEST"), "/test");
-            Assert.AreEqual(normalizeRoute("\\TEST"), "/test");
-            Assert.AreEqual(normalizeRoute("\\\\TEST"), "/test");
-            Assert.AreEqual(normalizeRoute("test"), "/test");
-            Assert.AreEqual(normalizeRoute("/test/"), "/test");
-            Assert.AreEqual(normalizeRoute("test/"), "/test");
-            Assert.AreEqual(normalizeRoute("test//"), "/test");
+            Assert.AreEqual("test", normalizeRoute("TEST"));
+            Assert.AreEqual("test", normalizeRoute("\\TEST"));
+            Assert.AreEqual("test", normalizeRoute("\\\\TEST"));
+            Assert.AreEqual("test", normalizeRoute("test"));
+            Assert.AreEqual("test", normalizeRoute("/test/"));
+            Assert.AreEqual("test", normalizeRoute("test/"));
+            Assert.AreEqual("test", normalizeRoute("test//"));
         }
         //
         [TestMethod]

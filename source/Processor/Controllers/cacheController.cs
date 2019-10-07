@@ -419,7 +419,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="content"></param>
         public void storeDbModel<T>(string guid, int recordId, object content) where T : DbBaseModel {
             Type derivedType = this.GetType();
-            FieldInfo fieldInfoTable = derivedType.GetField("contentTableNameLowerCase");
+            FieldInfo fieldInfoTable = derivedType.GetField("tableNameLower");
             if (fieldInfoTable == null) {
                 throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentTableName].");
             } else {
