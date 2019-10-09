@@ -80,7 +80,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- create page menus from section menus
                     using ( var cs = new CsModel(core) ) {
-                        sql = "select m.name as menuName, m.id as menuId, p.name as pageName, p.id as pageId"
+                        sql = "select m.name as menuName, m.id as menuId, p.name as pageName, p.id as pageId, m.*"
                             + " from ccDynamicMenus m"
                             + " left join ccDynamicMenuSectionRules r on r.DynamicMenuID = m.id"
                             + " left join ccSections s on s.id = r.SectionID"
@@ -94,6 +94,23 @@ namespace Contensive.Processor.Controllers {
                                     if (menu == null) {
                                         menu = DbBaseModel.addEmpty<MenuModel>(core.cpParent);
                                         menu.name = menuName;
+                                        try {
+                                            menu.classItemActive = cs.getText("classItemActive");
+                                            menu.classItemFirst = cs.getText("classItemFirst");
+                                            menu.classItemHover = cs.getText("classItemHover");
+                                            menu.classItemLast = cs.getText("classItemLast");
+                                            //menu.classTierAnchor = cs.getText("classTierAnchor");
+                                            menu.classTierItem = cs.getText("classTierItem");
+                                            menu.classTierList = cs.getText("classTierList");
+                                            //menu.classTopAnchor = cs.getText("classTopAnchor");
+                                            menu.classTopItem = cs.getText("classTopItem");
+                                            menu.classTopList = cs.getText("classTopList");
+                                            //menu.classTopParentAnchor = cs.getText("classTopParentAnchor");
+                                            //menu.classTopParentItem = cs.getText("classTopParentItem");
+                                            menu.classTopWrapper = cs.getText("classTopWrapper");
+                                        } catch (Exception ex) {
+                                            LogController.logError(core, ex, "migrateData error populating menu from dynamic menu.");
+                                        }
                                         menu.save(core.cpParent);
                                     }
                                     var menuPageRule = DbBaseModel.addEmpty<MenuPageRuleModel>(core.cpParent);
