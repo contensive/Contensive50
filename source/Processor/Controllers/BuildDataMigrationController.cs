@@ -79,33 +79,35 @@ namespace Contensive.Processor.Controllers {
                     core.db.executeNonQuery(sql);
                     //
                     // -- create page menus from section menus
-                    sql = "select m.name as menuName, m.id as menuId, p.name as pageName, p.id as pageId"
-                        + " from ccDynamicMenus m"
-                        + " left join ccDynamicMenuSectionRules r on r.DynamicMenuID = m.id"
-                        + " left join ccSections s on s.id = r.SectionID"
-                        + " left join ccPageContent p on p.id = s.RootPageID"
-                        + " where p.id is not null";
                     using ( var cs = new CsModel(core) ) {
-                        do {
-                            string menuName = cs.getText("menuName");
-                            if (!string.IsNullOrWhiteSpace(menuName)) {
-                                var menu = DbBaseModel.createByUniqueName<MenuModel>(core.cpParent, menuName);
-                                if (menu == null) {
-                                    menu = DbBaseModel.addEmpty<MenuModel>(core.cpParent);
-                                    menu.name = menuName;
-                                    menu.save(core.cpParent);
+                        sql = "select m.name as menuName, m.id as menuId, p.name as pageName, p.id as pageId"
+                            + " from ccDynamicMenus m"
+                            + " left join ccDynamicMenuSectionRules r on r.DynamicMenuID = m.id"
+                            + " left join ccSections s on s.id = r.SectionID"
+                            + " left join ccPageContent p on p.id = s.RootPageID"
+                            + " where p.id is not null";
+                        if (cs.openSql(sql)) {
+                            do {
+                                string menuName = cs.getText("menuName");
+                                if (!string.IsNullOrWhiteSpace(menuName)) {
+                                    var menu = DbBaseModel.createByUniqueName<MenuModel>(core.cpParent, menuName);
+                                    if (menu == null) {
+                                        menu = DbBaseModel.addEmpty<MenuModel>(core.cpParent);
+                                        menu.name = menuName;
+                                        menu.save(core.cpParent);
+                                    }
+                                    var menuPageRule = DbBaseModel.addEmpty<MenuPageRuleModel>(core.cpParent);
+                                    if (menuPageRule != null) {
+                                        menuPageRule.name = "Created from v4.1 menu sections " + DateTime.Now.ToString();
+                                        menuPageRule.pageId = cs.getInteger("pageId");
+                                        menuPageRule.menuId = menu.id;
+                                        menuPageRule.active = true;
+                                        menuPageRule.save(core.cpParent);
+                                    }
                                 }
-                                var menuPageRule = DbBaseModel.addEmpty<MenuPageRuleModel>(core.cpParent);
-                                if (menuPageRule != null) {
-                                    menuPageRule.name = "Created from v4.1 menu sections " + DateTime.Now.ToString();
-                                    menuPageRule.pageId = cs.getInteger("pageId");
-                                    menuPageRule.menuId = menu.id;
-                                    menuPageRule.active = true;
-                                    menuPageRule.save(core.cpParent);
-                                }
-                            }
-                            cs.goNext();
-                        } while (cs.ok());
+                                cs.goNext();
+                            } while (cs.ok());
+                        }
                     }
                     //
                     core.cpParent.Cache.InvalidateAll();

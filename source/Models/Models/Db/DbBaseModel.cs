@@ -196,6 +196,18 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
+        /// return the name of the content associated to the derived model
+        /// </summary>
+        /// <param name="derivedType"></param>
+        /// <returns></returns>
+        public static string derivedContentName(Type derivedType) {
+            var tableMetadata = getTableMetadata(derivedType);
+            if (tableMetadata == null) { throw new GenericException("Class [" + derivedType.Name + "], DbBaseTableMetadataModel tableMetadata property cannot be examined. The static constructor may not be declared."); }
+            return tableMetadata.contentName;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
         /// return the name of the datasource assocated to the database table assocated to the derived content
         /// </summary>
         /// <param name="derivedType"></param>
@@ -216,6 +228,75 @@ namespace Contensive.Models.Db {
             var tableMetadata = getTableMetadata(derivedType);
             if (tableMetadata == null) { throw new GenericException("Class [" + derivedType.Name + "], DbBaseTableMetadataModel tableMetadata property cannot be examined. The static constructor may not be declared."); }
             return tableMetadata.nameFieldIsUnique;
+        }
+        //
+        public static Dictionary<string, string> getDefaultValues<T>(CPBaseClass cp) where T : DbBaseModel
+            => getDefaultValues<T>(cp, 0);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a dictionary of the non-empty default field values for the derived content
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <returns></returns>
+        public static Dictionary<string, string> getDefaultValues<T>(CPBaseClass cp, int createdModifiedById) where T : DbBaseModel {
+            var defaultValues = new Dictionary<string, string>();
+            var sql = "select f.name,f.defaultValue,f.contentid from cccontent c left join ccfields f on f.contentid=c.id where c.name='" + derivedContentName(typeof(T)) + "'";
+            using (var dt = cp.Db.ExecuteQuery(sql)) {
+                foreach (DataRow row in dt.Rows) {
+                    string fieldName = row[0].ToString().ToLower();
+                    string defaultValue = string.Empty;
+                    string defaultNow = DateTime.Now.ToString();
+                    if (!string.IsNullOrWhiteSpace(fieldName) && !defaultValues.ContainsKey(fieldName)) {
+                        switch (fieldName) {
+                            case ("contentcontrolid"):
+                                defaultValue = row[2].ToString();
+                                break;
+                            case "createdby":
+                            case "modifiedby":
+                                defaultValue = createdModifiedById.ToString();
+                                break;
+                            case "dateadded":
+                            case "modifieddate":
+                                defaultValue = defaultNow;
+                                break;
+                            case "ccguid":
+                                defaultValue = cp.Utils.CreateGuid();
+                                break;
+                            default:
+                                defaultValue = row[1].ToString();
+                                break;
+                        }
+                        if (!string.IsNullOrWhiteSpace(defaultValue)) {
+                            defaultValues.Add(fieldName, defaultValue);
+                        }
+                    }
+                }
+            }
+            return defaultValues;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Add a new record to the db as the system user and open it. 
+        /// Starting a new model with this method will use the default values in Contensive metadata (active, contentcontrolid, etc).
+        /// Default values are loaded from the Content Field table
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <param name="DefaultValues"></param>
+        /// <returns></returns>
+        public static T addDefault<T>(CPBaseClass cp) where T : DbBaseModel {
+            Dictionary<string, string> defaultValues = getDefaultValues<T>(cp);
+            return addDefault<T>(cp, defaultValues, 0);
+        }
+        //
+        //====================================================================================================
+        //
+        public static T addDefault<T>(CPBaseClass cp, int userId) where T : DbBaseModel {
+            Dictionary<string, string> defaultValues = getDefaultValues<T>(cp);
+            return addDefault<T>(cp, defaultValues, userId);
         }
         //
         //====================================================================================================
@@ -716,7 +797,7 @@ namespace Contensive.Models.Db {
                             //
                             // -- get the underlying type if this is nullable
                             bool targetNullable = isNullable(instanceProperty.PropertyType);
-                            if(targetNullable && (instanceProperty.GetValue(this, null) == null)) {
+                            if (targetNullable && (instanceProperty.GetValue(this, null) == null)) {
                                 // property is nullable and the value is null
                                 // set the Db to null value by setting the write cache empty
                                 sqlPairs.Add(instanceProperty.Name, "null");
@@ -1340,7 +1421,7 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         //
-        public static bool isNullable( Type type ) {
+        public static bool isNullable(Type type) {
             return Nullable.GetUnderlyingType(type) != null;
         }
         //
@@ -1350,9 +1431,9 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         //
-        private static Dictionary<string,string> getLowerCaseKey( Dictionary<string,string> source ) {
+        private static Dictionary<string, string> getLowerCaseKey(Dictionary<string, string> source) {
             var result = new Dictionary<string, string>();
-            foreach( var kvp in source ) {
+            foreach (var kvp in source) {
                 if (!result.ContainsKey(kvp.Key.ToLower())) {
                     result.Add(kvp.Key.ToLower(), kvp.Value);
                 }

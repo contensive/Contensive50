@@ -1,6 +1,8 @@
 ﻿
 
 //
+using System.Collections.Generic;
+
 namespace Contensive.Models.Db {
     [System.Serializable]
     public class ContentFieldModel : DbBaseModel {

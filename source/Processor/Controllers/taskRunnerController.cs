@@ -161,7 +161,7 @@ namespace Contensive.Processor.Controllers {
                                     // for now run an sql to get processes, eventually cache in variant cache
                                     string sql = ""
                                         + Environment.NewLine + " BEGIN TRANSACTION"
-                                        + Environment.NewLine + " update cctasks set cmdRunner=" + DbController.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
+                                        + Environment.NewLine + " update cctasks set cmdRunner=" + DbController.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null) order by id)"
                                         + Environment.NewLine + " COMMIT TRANSACTION";
                                     cpApp.core.db.executeNonQuery(sql, ref recordsAffected);
                                     if (recordsAffected == 0) {

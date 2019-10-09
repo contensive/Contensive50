@@ -32,6 +32,27 @@ namespace Contensive.Models.Db.Tests {
         [TestMethod()]
         public void addDefaultTest() {
             using (CPClass cp = new CPClass(testAppName)) {
+                //
+                AddonModel test_withoutUser = DbBaseModel.addDefault<AddonModel>(cp);
+                AddonModel test_withUser = DbBaseModel.addDefault<AddonModel>(cp, 99);
+                //
+                Assert.AreEqual(true, test_withoutUser.active);
+                Assert.AreEqual(0, test_withoutUser.createdBy);
+                Assert.AreEqual(0, test_withoutUser.modifiedBy);
+                Assert.AreNotEqual(0, test_withoutUser.contentControlID);
+                //
+                Assert.AreEqual(true, test_withUser.active);
+                Assert.AreEqual(99, test_withUser.createdBy);
+                Assert.AreEqual(99, test_withUser.modifiedBy);
+                Assert.AreNotEqual(0, test_withUser.contentControlID);
+            }
+        }
+        //
+        //
+        //
+        [TestMethod()]
+        public void addDefaultTest_DefaultValues() {
+            using (CPClass cp = new CPClass(testAppName)) {
                 var defaultValues = new Dictionary<string, string> {
                     //
                     // -- bool

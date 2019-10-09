@@ -87,9 +87,13 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public bool requestSecure {
             get {
-                return (core.webServer.serverEnvironment.ContainsKey("SERVER_PORT_SECURE")) ? encodeBoolean(core.webServer.serverEnvironment["SERVER_PORT_SECURE"]) : false;
+                if(_requestSecure==null) {
+                    _requestSecure = (core.webServer.serverEnvironment.ContainsKey("SERVER_PORT_SECURE")) ? encodeBoolean(core.webServer.serverEnvironment["SERVER_PORT_SECURE"]) : false;
+                }
+                return (bool)_requestSecure;
             }
         }
+        private bool? _requestSecure = null;
         //
         // ====================================================================================================
         /// <summary>
@@ -200,7 +204,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(_requestUrl)) {
                     _requestUrl = requestProtocol
                         + requestDomain
-                        + ((requestPort == 80) ? "" : ":" + requestPort)
+                        + (requestSecure && requestPort.Equals(443) ? "" : ((!requestSecure) && requestPort.Equals(80) ? "" : (":" + requestPort)))
                         + requestPath
                         + requestPage
                         + ((string.IsNullOrWhiteSpace(requestQueryString)) ? "" : "?" + requestQueryString);
