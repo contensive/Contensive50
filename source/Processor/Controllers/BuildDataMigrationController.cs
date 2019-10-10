@@ -25,19 +25,26 @@ namespace Contensive.Processor.Controllers {
                 core.siteProperties.setProperty("StylesheetSerialNumber", (-1).ToString());
                 //
                 // -- 4.1 to 5.1 conversions
-                if(DataBuildVersion.Substring(0,3)=="4.1") {
+                if (DataBuildVersion.Substring(0, 3) == "4.1") {
+                    //
+                    // -- create Data Migration Assets collection
+                    var migrationCollection = DbBaseModel.createByUniqueName<AddonCollectionModel>(core.cpParent, "Data Migration Assets");
+                    if (migrationCollection == null) {
+                        migrationCollection = DbBaseModel.addDefault<AddonCollectionModel>(core.cpParent);
+                        migrationCollection.name = "Data Migration Assets";
+                    }
                     //
                     // -- remove all addon content fieldtype rules
-                    Contensive.Models.Db.DbBaseModel.deleteRows<Contensive.Models.Db.AddonContentFieldTypeRulesModel>(core.cpParent, "");
+                    Contensive.Models.Db.DbBaseModel.deleteRows<Contensive.Models.Db.AddonContentFieldTypeRulesModel>(core.cpParent, "(1=1)");
                     //
                     // -- delete /admin www subfolder
                     core.wwwFiles.deleteFolder("admin");
                     //
                     // -- delete .asp and .php files
-                    foreach ( CPFileSystemClass.FileDetail file in core.wwwFiles.getFileList("")) {
-                        if ( file == null) { continue; }
-                        if ( string.IsNullOrWhiteSpace( file.Name )) { continue;  }
-                        if ( file.Name.Length < 4 ) { continue;  }
+                    foreach (CPFileSystemClass.FileDetail file in core.wwwFiles.getFileList("")) {
+                        if (file == null) { continue; }
+                        if (string.IsNullOrWhiteSpace(file.Name)) { continue; }
+                        if (file.Name.Length < 4) { continue; }
                         string extension = System.IO.Path.GetExtension(file.Name).ToLower(CultureInfo.InvariantCulture);
                         if ((extension == ".php") || (extension == ".asp")) {
                             core.wwwFiles.deleteFile(file.Name);
@@ -79,14 +86,16 @@ namespace Contensive.Processor.Controllers {
                     core.db.executeNonQuery(sql);
                     //
                     // -- create page menus from section menus
-                    using ( var cs = new CsModel(core) ) {
-                        sql = "select m.name as menuName, m.id as menuId, p.name as pageName, p.id as pageId, m.*"
+                    using (var cs = new CsModel(core)) {
+                        sql = "select m.name as menuName, m.id as menuId, p.name as pageName, p.id as pageId, s.name as sectionName, m.*"
                             + " from ccDynamicMenus m"
                             + " left join ccDynamicMenuSectionRules r on r.DynamicMenuID = m.id"
                             + " left join ccSections s on s.id = r.SectionID"
                             + " left join ccPageContent p on p.id = s.RootPageID"
-                            + " where p.id is not null";
+                            + " where p.id is not null"
+                            + " order by m.id, s.sortorder,s.id";
                         if (cs.openSql(sql)) {
+                            int sortOrder = 0;
                             do {
                                 string menuName = cs.getText("menuName");
                                 if (!string.IsNullOrWhiteSpace(menuName)) {
@@ -99,10 +108,10 @@ namespace Contensive.Processor.Controllers {
                                             menu.classItemFirst = cs.getText("classItemFirst");
                                             menu.classItemHover = cs.getText("classItemHover");
                                             menu.classItemLast = cs.getText("classItemLast");
-                                            //menu.classTierAnchor = cs.getText("classTierAnchor");
+                                            menu.classTierAnchor = cs.getText("classTierItem");
                                             menu.classTierItem = cs.getText("classTierItem");
                                             menu.classTierList = cs.getText("classTierList");
-                                            //menu.classTopAnchor = cs.getText("classTopAnchor");
+                                            menu.classTopAnchor = cs.getText("classTopItem");
                                             menu.classTopItem = cs.getText("classTopItem");
                                             menu.classTopList = cs.getText("classTopList");
                                             //menu.classTopParentAnchor = cs.getText("classTopParentAnchor");
@@ -113,17 +122,89 @@ namespace Contensive.Processor.Controllers {
                                         }
                                         menu.save(core.cpParent);
                                     }
-                                    var menuPageRule = DbBaseModel.addEmpty<MenuPageRuleModel>(core.cpParent);
-                                    if (menuPageRule != null) {
-                                        menuPageRule.name = "Created from v4.1 menu sections " + DateTime.Now.ToString();
-                                        menuPageRule.pageId = cs.getInteger("pageId");
-                                        menuPageRule.menuId = menu.id;
-                                        menuPageRule.active = true;
-                                        menuPageRule.save(core.cpParent);
+                                    //
+                                    // -- set the root page's menuHeadline to the section name
+                                    var page = DbBaseModel.create<PageContentModel>(core.cpParent, cs.getInteger("pageId"));
+                                    if (page != null) {
+                                        page.menuHeadline = cs.getText("sectionName");
+                                        page.save(core.cpParent);
+                                        //
+                                        // -- create a menu-page rule to attach this page to the menu in the current order
+                                        var menuPageRule = DbBaseModel.addEmpty<MenuPageRuleModel>(core.cpParent);
+                                        if (menuPageRule != null) {
+                                            menuPageRule.name = "Created from v4.1 menu sections " + DateTime.Now.ToString();
+                                            menuPageRule.pageId = page.id;
+                                            menuPageRule.menuId = menu.id;
+                                            menuPageRule.active = true;
+                                            menuPageRule.sortOrder = sortOrder.ToString().PadLeft(4, '0');
+                                            menuPageRule.save(core.cpParent);
+                                            sortOrder += 10;
+                                        }
                                     }
                                 }
                                 cs.goNext();
                             } while (cs.ok());
+                        }
+                    }
+                    //
+                    // -- create a theme addon for each template for styles and meta content
+                    using (var csTemplate = core.cpParent.CSNew()) {
+                        if (csTemplate.Open("page templates")) {
+                            do {
+                                int templateId = csTemplate.GetInteger("id");
+                                string templateStylePrepend = "";
+                                string templateStyles = csTemplate.GetText("StylesFilename");
+                                //
+                                // -- add shared styles to the template stylesheet
+                                using (var csStyleRule = core.cpParent.CSNew()) {
+                                    if (csStyleRule.Open("shared styles template rules", "(TemplateID=" + templateId + ")")) {
+                                        do {
+                                            int sharedStyleId = csStyleRule.GetInteger("styleid");
+                                            using (var csStyle = core.cpParent.CSNew()) {
+                                                if (csStyleRule.Open("shared styles", "(id=" + sharedStyleId + ")")) {
+                                                    //
+                                                    // -- prepend lines beginning with @ t
+                                                    string styles = csStyleRule.GetText("StyleFilename");
+                                                    if (!string.IsNullOrWhiteSpace(styles)) {
+                                                        //
+                                                        // -- trim off leading spaces, newlines, comments
+                                                        styles = styles.Trim();
+                                                        while (!string.IsNullOrWhiteSpace(styles) && styles.Substring(0, 1).Equals("@")) {
+                                                            if (styles.IndexOf(Environment.NewLine) >= 0) {
+                                                                templateStylePrepend += styles.Substring(0, styles.IndexOf(Environment.NewLine));
+                                                                styles = styles.Substring(styles.IndexOf(Environment.NewLine) + 1).Trim();
+                                                            } else {
+                                                                templateStylePrepend += styles;
+                                                                styles = string.Empty;
+                                                            }
+                                                        };
+                                                        templateStyles += Environment.NewLine + styles;
+                                                    }
+                                                }
+                                            }
+                                            csStyleRule.GoNext();
+                                        } while (csStyleRule.OK());
+                                    }
+                                }
+                                // 
+                                // -- create an addon
+                                var themeAddon = DbBaseModel.addDefault<AddonModel>(core.cpParent);
+                                themeAddon.name = "Theme assets for template " + csTemplate.GetText("name");
+                                themeAddon.otherHeadTags = csTemplate.GetText("otherheadtags");
+                                themeAddon.javaScriptBodyEnd = csTemplate.GetText("jsendbody");
+                                themeAddon.stylesFilename.content = templateStylePrepend + Environment.NewLine + templateStyles;
+                                themeAddon.collectionID = migrationCollection.id;
+                                themeAddon.save(core.cpParent);
+                                // 
+                                // -- create an addon template rule to set dependency
+                                var rule = DbBaseModel.addEmpty<AddonTemplateRuleModel>(core.cpParent);
+                                rule.addonId = themeAddon.id;
+                                rule.templateId = templateId;
+                                rule.save(core.cpParent);
+                                //
+                                csTemplate.GoNext();
+                            } while (csTemplate.OK());
+
                         }
                     }
                     //
@@ -159,8 +240,8 @@ namespace Contensive.Processor.Controllers {
         ~BuildDataMigrationController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
-            
-            
+
+
         }
         //
         //====================================================================================================
