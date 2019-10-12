@@ -10,9 +10,9 @@ namespace Contensive.Models.Db {
         public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("link forwards", "cclinkforwards", "default", true);
         //
         //====================================================================================================
-        public string DestinationLink;
-        public int GroupID;
-        public string SourceLink;
-        public int Viewings;
+        public string DestinationLink { get; set; }
+        public int GroupID { get; set; }
+        public string SourceLink { get; set; }
+        public int Viewings { get; set; }
     }
 }

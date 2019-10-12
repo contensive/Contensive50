@@ -163,7 +163,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Execute a query (returns data) on the default datasource
+        /// Execute a query (returns data) on
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
@@ -235,7 +235,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// execute sql on a the default datasource. 
+        /// execute sql
         /// </summary>
         /// <param name="sql"></param>
         public void executeNonQuery(string sql) {
@@ -543,7 +543,7 @@ namespace Contensive.Processor.Controllers {
                     createSQLTableField(tableName, "ccGuid", CPContentBaseClass.FieldTypeIdEnum.Text);
                     // -- 20171029 - deprecating fields makes migration difficult. add back and figure out future path
                     createSQLTableField(tableName, "createKey", CPContentBaseClass.FieldTypeIdEnum.Integer);
-                    createSQLTableField(tableName, "contentCategoryId", CPContentBaseClass.FieldTypeIdEnum.Integer);
+                    //createSQLTableField(tableName, "contentCategoryId", CPContentBaseClass.FieldTypeIdEnum.Integer);
                     //
                     // ----- setup core indexes
                     //
@@ -617,12 +617,54 @@ namespace Contensive.Processor.Controllers {
         /// Delete a table field from a table
         /// </summary>
         /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="FieldName"></param>
-        public void deleteTableField(string TableName, string FieldName) {
+        /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
+        public void deleteTableField(string tableName, string fieldName, bool deleteIndexesContainingField) {
             try {
-                if (isSQLTableField(TableName, FieldName)) {
-                    executeQuery("ALTER TABLE " + TableName + " DROP COLUMN " + FieldName + ";");
+                if (isSQLTableField(tableName, fieldName)) {
+                    //
+                    // -- this is a valid field in this table/datasource
+                    if (deleteIndexesContainingField) {
+                        //
+                        // -- delete the indexes containing this field
+                        var tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, tableName, dataSourceName);
+                        if (tableSchema != null) {
+                            foreach (Models.Domain.TableSchemaModel.ColumnSchemaModel column in tableSchema.columns) {
+                                if ((column.COLUMN_NAME.ToLowerInvariant() == fieldName.ToLowerInvariant())) {
+                                    //
+                                    LogController.logInfo(core, "dropWorkflowField, dropping conversion required, field [" + column.COLUMN_NAME + "], table [" + tableName + "]");
+                                    //
+                                    // these can be very long queries for big tables 
+                                    int sqlTimeout = core.cpParent.Db.SQLTimeout;
+                                    core.cpParent.Db.SQLTimeout = 1800;
+                                    //
+                                    // drop any indexes that use this field
+                                    foreach (Models.Domain.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
+                                        if (index.indexKeyList.Contains(column.COLUMN_NAME)) {
+                                            //
+                                            LogController.logInfo(core, "dropWorkflowField, dropping index [" + index.index_name + "], because it contains this field");
+                                            //
+                                            try {
+                                                core.db.deleteIndex(tableName, index.index_name);
+                                            } catch (Exception ex) {
+                                                LogController.logWarn(core, "dropWorkflowField, error dropping index, [" + ex.ToString() + "]");
+                                            }
+                                        }
+                                    }
+                                    //
+                                    LogController.logInfo(core, "dropWorkflowField, dropping field");
+                                    //
+                                    try {
+                                        executeQuery("ALTER TABLE " + tableName + " DROP COLUMN " + fieldName + ";");
+                                    } catch (Exception exDrop) {
+                                        LogController.logWarn(core, exDrop, "dropWorkflowField, error dropping field");
+                                    }
+                                    //
+                                    core.cpParent.Db.SQLTimeout = sqlTimeout;
+                                }
+                            }
+                        }
+                    }
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

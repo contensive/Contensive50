@@ -262,6 +262,14 @@ namespace Contensive.Processor.Controllers {
 
                     string htmlBody = encodeEmailHtmlBody(core, isHTML, body, template, subject, recipient, queryStringForLinkAppend);
                     string textBody = encodeEmailTextBody(core, isHTML, body, recipient);
+                    string recipientName = (!string.IsNullOrWhiteSpace(recipient.name) && !recipient.name.ToLower().Equals("guest")) ? recipient.name : string.Empty;
+                    if (string.IsNullOrWhiteSpace(recipientName)) {
+                        recipientName = ""
+                            + ((!string.IsNullOrWhiteSpace(recipient.firstName) && !recipient.firstName.ToLower().Equals("guest")) ? recipient.firstName : string.Empty)
+                            + " "
+                            + ((!string.IsNullOrWhiteSpace(recipient.lastName) && !recipient.lastName.ToLower().Equals("guest")) ? recipient.lastName : string.Empty);
+                    }
+                    recipientName = recipientName.Trim();
                     var email = new EmailClass() {
                         attempts = 0,
                         BounceAddress = bounceAddress,
@@ -271,7 +279,7 @@ namespace Contensive.Processor.Controllers {
                         replyToAddress = replyToAddress,
                         subject = subject,
                         textBody = textBody,
-                        toAddress = recipient.email,
+                        toAddress = (string.IsNullOrWhiteSpace(recipientName)) ? recipient.email : recipientName + " <" + recipient.email.Trim() + ">",
                         toMemberId = recipient.id
                     };
                     if (verifyEmail(core, email, ref userErrorMessage)) {

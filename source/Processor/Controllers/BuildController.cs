@@ -306,7 +306,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // verify Db field schema for fields handled internally (fix datatime2(0) problem -- need at least 3 digits for precision)
-                var tableList = DbBaseModel.createList<TableModel>(core.cpParent, "", "dataSourceId");
+                var tableList = DbBaseModel.createList<TableModel>(core.cpParent, "(1=1)", "dataSourceId");
                 foreach (TableModel table in tableList) {
                     hint = "1";
                     var tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, table.name, "default");

@@ -1,5 +1,6 @@
 ﻿
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
 using System;
 using System.Collections.Generic;
 
@@ -41,6 +42,26 @@ namespace Contensive.Processor.Controllers {
                 }
             }
             return result.ToString();
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// drop editRecordId, editarchive, and editblank and all the indexes that reference them
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="DataBuildVersion"></param>
+        public static void dropLegacyWorkflowField(CoreController core, string fieldName) {
+            try {
+                //
+                // verify Db field schema for fields handled internally (fix datatime2(0) problem -- need at least 3 digits for precision)
+                var tableList = DbBaseModel.createList<TableModel>(core.cpParent, "(1=1)", "dataSourceId");
+                foreach (TableModel table in tableList) {
+                    core.db.deleteTableField(table.name, fieldName, true);
+                }
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
         }
         //
         //====================================================================================================

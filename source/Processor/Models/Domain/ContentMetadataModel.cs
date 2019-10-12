@@ -1303,20 +1303,20 @@ namespace Contensive.Processor.Models.Domain {
                             };
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        // -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
-                        if (!contentMetadata.fields.ContainsKey("ContentCategoryId")) {
-                            ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
-                                nameLc = "contentcategoryid",
-                                active = true,
-                                fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Integer,
-                                editSortPriority = 9999,
-                                authorable = false,
-                                caption = "Content Category",
-                                defaultValue = "",
-                                isBaseField = contentMetadata.isBaseContent
-                            };
-                            contentMetadata.verifyContentField(core, fieldMetadata, true);
-                        }
+                        //// -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
+                        //if (!contentMetadata.fields.ContainsKey("ContentCategoryId")) {
+                        //    ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
+                        //        nameLc = "contentcategoryid",
+                        //        active = true,
+                        //        fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Integer,
+                        //        editSortPriority = 9999,
+                        //        authorable = false,
+                        //        caption = "Content Category",
+                        //        defaultValue = "",
+                        //        isBaseField = contentMetadata.isBaseContent
+                        //    };
+                        //    contentMetadata.verifyContentField(core, fieldMetadata, true);
+                        //}
                     }
                 }
                 //

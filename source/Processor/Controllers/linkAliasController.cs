@@ -79,7 +79,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 LogController.logTrace(core, "addLinkAlias, enter, linkAlias [" + linkAlias + "], pageID [" + pageID + "], queryStringSuffix [" + queryStringSuffix + "], overRideDuplicate [" + overRideDuplicate + "], dupCausesWarning [" + dupCausesWarning + "]");
                 //
-                const string SafeStringLc = "0123456789abcdefghijklmnopqrstuvwxyz-_/";
+                const string SafeStringLc = "0123456789abcdefghijklmnopqrstuvwxyz-_/.";
                 bool AllowLinkAlias = core.siteProperties.getBoolean("allowLinkAlias", true);
                 //
                 string normalizedLinkAlias = linkAlias;

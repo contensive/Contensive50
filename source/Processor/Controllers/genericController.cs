@@ -1620,26 +1620,28 @@ namespace Contensive.Processor.Controllers {
         /// <param name="route"></param>
         /// <returns></returns>
         public static string normalizeRoute(string route) {
-            string normalizedRoute = route.ToLowerInvariant().Trim();
             try {
-                if (string.IsNullOrEmpty(normalizedRoute)) {
-                    normalizedRoute = "";
-                } else {
-                    normalizedRoute = FileController.convertToUnixSlash(normalizedRoute);
-                    while (normalizedRoute.IndexOf("//") >= 0) {
-                        normalizedRoute = normalizedRoute.Replace("//", "/");
-                    }
-                    if (normalizedRoute.Left(1).Equals("/")) {
-                        normalizedRoute = normalizedRoute.Substring(1);
-                    }
-                    if (normalizedRoute.Substring(normalizedRoute.Length - 1, 1) == "/") {
-                        normalizedRoute = normalizedRoute.Left(normalizedRoute.Length - 1);
-                    }
+                if (string.IsNullOrWhiteSpace(route)) {
+                    return string.Empty;
                 }
+                string normalizedRoute = route.ToLowerInvariant().Trim();
+                if (string.IsNullOrEmpty(normalizedRoute)) {
+                    return string.Empty;
+                }
+                normalizedRoute = FileController.convertToUnixSlash(normalizedRoute);
+                while (normalizedRoute.IndexOf("//") >= 0) {
+                    normalizedRoute = normalizedRoute.Replace("//", "/");
+                }
+                if (normalizedRoute.Left(1).Equals("/")) {
+                    normalizedRoute = normalizedRoute.Substring(1);
+                }
+                if (normalizedRoute.Substring(normalizedRoute.Length - 1, 1).Equals("/")) {
+                    normalizedRoute = normalizedRoute.Left(normalizedRoute.Length - 1);
+                }
+                return normalizedRoute;
             } catch (Exception ex) {
                 throw new GenericException("Unexpected exception in normalizeRoute(route=[" + route + "])", ex);
             }
-            return normalizedRoute;
         }
         //
         //========================================================================
