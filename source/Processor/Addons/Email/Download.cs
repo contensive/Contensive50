@@ -52,7 +52,7 @@ namespace Contensive.Addons.Primitives {
                             //
                             // -- and go
                             string link = GenericController.getCdnFileLink(core, file.filename);
-                            return core.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.");
+                            return core.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record..");
                         }
                     }
                 }

@@ -187,7 +187,7 @@ namespace Contensive.Processor.Controllers {
                                 // -- and go
                                 string link = GenericController.getCdnFileLink(core, file.filename);
                                 //string link = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, file.Filename);
-                                return core.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.");
+                                return core.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record.");
                             }
                         }
                     }

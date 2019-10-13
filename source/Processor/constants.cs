@@ -610,7 +610,6 @@ namespace Contensive.Processor {
         internal const string ButtonSpellCheck = " Spell Check ";
         internal const string ButtonLibraryUpload = " Upload ";
         internal const string ButtonCreateReport = " Create Report ";
-        internal const string ButtonClearTrapLog = " Clear Trap Log ";
         internal const string ButtonNewSearch = " New Search ";
         internal const string ButtonSaveandInvalidateCache = " Save and Invalidate Cache ";
         internal const string ButtonImportTemplates = " Import Templates ";

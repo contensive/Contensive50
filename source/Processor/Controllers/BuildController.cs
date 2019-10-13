@@ -174,7 +174,6 @@ namespace Contensive.Processor.Controllers {
                     core.siteProperties.getText("AllowTestPointLogging", "False");
                     core.siteProperties.getText("AllowTestPointPrinting", "False");
                     core.siteProperties.getText("AllowTrapEmail", "True");
-                    core.siteProperties.getText("AllowTrapLog", "True");
                     core.siteProperties.getText("AllowWorkflowAuthoring", "False");
                     core.siteProperties.getText("ArchiveAllowFileClean", "False");
                     core.siteProperties.getText("ArchiveRecordAgeDays", "90");

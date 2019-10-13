@@ -446,14 +446,6 @@ namespace Contensive.Addons.AdminNavigator {
                             Name = "Add-on Collections";
                             s = s + GetNode(cp, env, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeContent, Name, AutoManageAddons, common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, "", ref NodeNavigatorJS, new List<string>());
                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
-                            //
-                            Name = "Aggregate Access";
-                            s = s + GetNode(cp, env, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeContent, Name, AutoManageAddons, common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, "", ref NodeNavigatorJS, new List<string>());
-                            Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
-                            //
-                            Name = "Scripting Modules";
-                            s = s + GetNode(cp, env, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeContent, Name, AutoManageAddons, common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, "", ref NodeNavigatorJS, new List<string>());
-                            Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                             break;
                         case common.NodeIDAddonsNoCollection:
                             //

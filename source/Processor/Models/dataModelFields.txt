@@ -342,33 +342,10 @@ public int ParentID { get; set; }
 
 
 ---------------------------------------------
-NavigatorEntrieModel
+x NavigatorEntrieModel
 
 public int ParentID { get; set; }
 
-
-
-
----------------------------------------------
-ReportRuleModel
-
-public string Address { get; set; }
-public string Browser { get; set; }
-
-
-
-
-
----------------------------------------------
-TrapLogModel
-
-
-public string CopyFilename { get; set; }
-public string Host { get; set; }
-public string Page { get; set; }
-public string Path { get; set; }
-public string Resolution { get; set; }
-public bool Resolved { get; set; }
 
 
 
@@ -378,13 +355,6 @@ SitePropertieModel
 
 
 public string FieldValue { get; set; }
-
-
-
-
----------------------------------------------
-AdminSitePropertieModel
-
 
 
 
@@ -689,13 +659,6 @@ public bool ToAll { get; set; }
 
 
 
----------------------------------------------
-EmailStyleRuleModel
-
-
-public int emailId { get; set; }
-public int sharedStylesId { get; set; }
-
 
 
 
@@ -793,30 +756,6 @@ public string Source { get; set; }
 
 
 ---------------------------------------------
-EmailWizardModel
-
-public bool AllowSpamFooterDefault { get; set; }
-
-public string ContentFormInstructions { get; set; }
-public int DefaultConditionPeriod { get; set; }
-public string DefaultContent { get; set; }
-public int DefaultTemplateID { get; set; }
-public int EmailTypeID { get; set; }
-public string GroupFormInstructions { get; set; }
-public bool IncludeAllowSpamFooter { get; set; }
-public bool IncludeConditionPeriod { get; set; }
-public bool IncludeContentForm { get; set; }
-public bool IncludeGroupForm { get; set; }
-public bool IncludeLinkAuthentication { get; set; }
-public bool IncludeSchedule { get; set; }
-public bool IncludeTemplateForm { get; set; }
-public bool LinkAuthenticationDefault { get; set; }
-public string TemplateFormInstructions { get; set; }
-
-
-
-
----------------------------------------------
 ContentWatchModel
 
 public bool AllowWhatsNew { get; set; }
@@ -848,34 +787,6 @@ public int ContentWatchID { get; set; }
 public int ContentWatchListID { get; set; }
 
 
-
-
----------------------------------------------
-SeeAlsoModel
-
-public string Brief { get; set; }
-
-public int ContentID { get; set; }
-public string Link { get; set; }
-public int RecordID { get; set; }
-
-
-
-
----------------------------------------------
-PathModel
-
-
-
-
-
-
----------------------------------------------
-PathRuleModel
-
-
-public int GroupID { get; set; }
-public int PathID { get; set; }
 
 
 
@@ -941,66 +852,6 @@ public string ContentRecordKey { get; set; }
 public int ControlType { get; set; }
 public DateTime DateExpires { get; set; }
 public int RecordID { get; set; }
-
-
-
-
----------------------------------------------
-SharedStylesIncludeRuleModel
-
-
-public int IncludedStyleID { get; set; }
-public int StyleID { get; set; }
-
-
-
-
----------------------------------------------
-SharedStyleModel
-
-public bool AlwaysInclude { get; set; }
-
-public string Prefix { get; set; }
-public string StyleFilename { get; set; }
-public string Suffix { get; set; }
-
-
-
-
----------------------------------------------
-SharedStylesAdd-onRuleModel
-
-public int AddonID { get; set; }
-
-public int StyleID { get; set; }
-
-
-
-
----------------------------------------------
-ScriptingModuleModel
-
-public string Code { get; set; }
-
-
-
-
-
----------------------------------------------
-ScriptingLanguageModel
-
-
-
-
-
-
----------------------------------------------
-Add-onScriptingModuleRuleModel
-
-public int AddonID { get; set; }
-
-public int ScriptingModuleID { get; set; }
-
 
 
 
@@ -1149,7 +1000,6 @@ public string ObjectProgramID { get; set; }
 Add-onCollectionParentRuleModel
 
 public int ChildID { get; set; }
-
 public int ParentID { get; set; }
 
 
@@ -1159,7 +1009,6 @@ public int ParentID { get; set; }
 Add-onCollectionCDefRuleModel
 
 public int CollectionID { get; set; }
-
 public int ContentID { get; set; }
 
 

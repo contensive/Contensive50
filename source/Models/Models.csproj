@@ -56,6 +56,35 @@
     <Compile Include="Models\Db\AddonContentFieldTypeRulesModel.cs" />
     <Compile Include="Models\Db\AddonIncludeRuleModel.cs" />
     <Compile Include="Models\Db\AddonModel.cs" />
+    <Compile Include="Models\Db\VisitSummaryModel.cs" />
+    <Compile Include="Models\Db\PageViewSummaryModel.cs" />
+    <Compile Include="Models\Db\TopicModel.cs" />
+    <Compile Include="Models\Db\PageContentTopicRuleModel.cs" />
+    <Compile Include="Models\Db\MemberTopicRuleModel.cs" />
+    <Compile Include="Models\Db\TopicHabitModel.cs" />
+    <Compile Include="Models\Db\PageContentBlockRuleModel.cs" />
+    <Compile Include="Models\Db\EmailGroupModel.cs" />
+    <Compile Include="Models\Db\EmailTopicModel.cs" />
+    <Compile Include="Models\Db\ContentWatchModel.cs" />
+    <Compile Include="Models\Db\ContentWatchListModel.cs" />
+    <Compile Include="Models\Db\ContentWatchListRuleModel.cs" />
+    <Compile Include="Models\Db\AddonContentTriggerRuleModel.cs" />
+    <Compile Include="Models\Db\AddonEventModel.cs" />
+    <Compile Include="Models\Db\AddonEventThrowerModel.cs" />
+    <Compile Include="Models\Db\AddonEventCatcherModel.cs" />
+    <Compile Include="Models\Db\AddonCollectionParentRuleModel.cs" />
+    <Compile Include="Models\Db\AddonCollectionCDefRuleModel.cs" />
+    <Compile Include="Models\Db\LibraryFolderModel.cs" />
+    <Compile Include="Models\Db\LibraryFolderRuleModel.cs" />
+    <Compile Include="Models\Db\LibraryFileTypeModel.cs" />
+    <Compile Include="Models\Db\MetaKeywordModel.cs" />
+    <Compile Include="Models\Db\MetaKeywordRuleModel.cs" />
+    <Compile Include="Models\Db\ActivityLogModel.cs" />
+    <Compile Include="Models\Db\SiteWarningModel.cs" />
+    <Compile Include="Models\Db\ImportWizardTaskModel.cs" />
+    <Compile Include="Models\Db\FormSetModel.cs" />
+    <Compile Include="Models\Db\FormFieldModel.cs" />
+    <Compile Include="Models\Db\_blankModel.cs" />
     <Compile Include="Models\Db\AddonPageRuleModel.cs" />
     <Compile Include="Models\Db\AddonTemplateRuleModel.cs" />
     <Compile Include="Models\Db\AuthoringControlModel.cs" />
@@ -104,7 +133,7 @@
     <Compile Include="Models\Db\TemplateDomainRuleModel.cs" />
     <Compile Include="Models\Db\ViewingModel.cs" />
     <Compile Include="Models\Db\VisitModel.cs" />
-    <Compile Include="Models\Db\visitorModel.cs" />
+    <Compile Include="Models\Db\VisitorModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
