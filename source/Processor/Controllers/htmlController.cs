@@ -1759,7 +1759,7 @@ namespace Contensive.Processor.Controllers {
             string returnHtml = "";
             try {
                 var fieldEditorAddonList = EditorController.getFieldEditorAddonList(core);
-                Addons.AdminSite.FieldTypeEditorAddonModel fieldEditor = fieldEditorAddonList.Find(x => x.fieldTypeId == (int)CPContentBaseClass.FieldTypeIdEnum.HTML);
+                Contensive.Addons.AdminSite.FieldTypeEditorAddonModel fieldEditor = fieldEditorAddonList.Find(x => x.fieldTypeId == (int)CPContentBaseClass.FieldTypeIdEnum.HTML);
                 int FieldEditorAddonId = 0;
                 if (fieldEditor != null) {
                     FieldEditorAddonId = fieldEditor.editorAddonId;

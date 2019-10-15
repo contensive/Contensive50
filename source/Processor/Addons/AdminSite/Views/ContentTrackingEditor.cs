@@ -17,7 +17,7 @@ namespace Contensive.Addons.AdminSite {
         public static string get(CoreController core, AdminDataModel adminData) {
             string tempGetForm_Edit_ContentTracking = null;
             try {
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
+                Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                 string HTMLFieldString = null;
                 int RecordCount = 0;
                 int ContentWatchListID = 0;

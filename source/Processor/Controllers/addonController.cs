@@ -1930,7 +1930,7 @@ namespace Contensive.Processor.Controllers {
                     AddonStatusOK = false;
                 }
                 if (!AddonStatusOK) {
-                    Addons.SafeAddonManager.AddonManagerClass AddonMan = new Addons.SafeAddonManager.AddonManagerClass(core);
+                    Contensive.Addons.SafeAddonManager.AddonManagerClass AddonMan = new Contensive.Addons.SafeAddonManager.AddonManagerClass(core);
                     result = AddonMan.getForm_SafeModeAddonManager();
                 }
             } catch (Exception ex) {

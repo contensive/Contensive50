@@ -13,6 +13,7 @@ using Contensive.Processor;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using System.Globalization;
+using Contensive.Processor.Addons.AdminSite.Models;
 //
 namespace Contensive.Addons.AdminSite {
     /// <summary>
@@ -34,7 +35,7 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// the record being edited
         /// </summary>
-        public EditRecordClass editRecord { get; set; }
+        public EditRecordModel editRecord { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -550,7 +551,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // editRecord init
                 //
-                editRecord = new EditRecordClass {
+                editRecord = new EditRecordModel {
                     Loaded = false
                 };
                 requestedRecordId = core.docProperties.getInteger("id");
@@ -836,7 +837,7 @@ namespace Contensive.Addons.AdminSite {
                 string[] lookups = null;
                 int Ptr = 0;
                 string defaultValue = null;
-                EditRecordFieldClass editRecordField = null;
+                EditRecordFieldModel editRecordField = null;
                 ContentFieldMetadataModel field = null;
                 editRecord.active = true;
                 editRecord.contentControlId = adminContent.id;
@@ -847,7 +848,7 @@ namespace Contensive.Addons.AdminSite {
                 foreach (var keyValuePair in adminContent.fields) {
                     field = keyValuePair.Value;
                     if (!(editRecord.fieldsLc.ContainsKey(field.nameLc))) {
-                        editRecordField = new EditRecordFieldClass();
+                        editRecordField = new EditRecordFieldModel();
                         editRecord.fieldsLc.Add(field.nameLc, editRecordField);
                     }
                     defaultValue = field.defaultValue;
@@ -857,24 +858,24 @@ namespace Contensive.Addons.AdminSite {
                             case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
                             case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
                                 //
-                                editRecord.fieldsLc[field.nameLc].value = GenericController.encodeInteger(defaultValue);
+                                editRecord.fieldsLc[field.nameLc].value = encodeInteger(defaultValue);
                                 break;
                             case CPContentBaseClass.FieldTypeIdEnum.Currency:
                             case CPContentBaseClass.FieldTypeIdEnum.Float:
                                 //
-                                editRecord.fieldsLc[field.nameLc].value = GenericController.encodeNumber(defaultValue);
+                                editRecord.fieldsLc[field.nameLc].value = encodeNumber(defaultValue);
                                 break;
                             case CPContentBaseClass.FieldTypeIdEnum.Boolean:
                                 //
-                                editRecord.fieldsLc[field.nameLc].value = GenericController.encodeBoolean(defaultValue);
+                                editRecord.fieldsLc[field.nameLc].value = encodeBoolean(defaultValue);
                                 break;
                             case CPContentBaseClass.FieldTypeIdEnum.Date:
                                 //
-                                editRecord.fieldsLc[field.nameLc].value = GenericController.encodeDate(defaultValue);
+                                editRecord.fieldsLc[field.nameLc].value = encodeDate(defaultValue);
                                 break;
                             case CPContentBaseClass.FieldTypeIdEnum.Lookup:
 
-                                DefaultValueText = GenericController.encodeText(field.defaultValue);
+                                DefaultValueText = encodeText(field.defaultValue);
                                 if (!string.IsNullOrEmpty(DefaultValueText)) {
                                     if (DefaultValueText.IsNumeric()) {
                                         editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
@@ -885,10 +886,10 @@ namespace Contensive.Addons.AdminSite {
                                                 editRecord.fieldsLc[field.nameLc].value = MetadataController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText);
                                             }
                                         } else if (field.lookupList != "") {
-                                            UCaseDefaultValueText = GenericController.vbUCase(DefaultValueText);
+                                            UCaseDefaultValueText = vbUCase(DefaultValueText);
                                             lookups = field.lookupList.Split(',');
                                             for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
-                                                if (UCaseDefaultValueText == GenericController.vbUCase(lookups[Ptr])) {
+                                                if (UCaseDefaultValueText == vbUCase(lookups[Ptr])) {
                                                     editRecord.fieldsLc[field.nameLc].value = Ptr + 1;
                                                     break;
                                                 }
@@ -1069,12 +1070,12 @@ namespace Contensive.Addons.AdminSite {
                             foreach (var keyValuePair in adminContent.fields) {
                                 ContentFieldMetadataModel adminContentcontent = keyValuePair.Value;
                                 string fieldNameLc = adminContentcontent.nameLc;
-                                EditRecordFieldClass editRecordField = null;
+                                EditRecordFieldModel editRecordField = null;
                                 //
                                 // set editRecord.field to editRecordField and set values
                                 //
                                 if (!editRecord.fieldsLc.ContainsKey(fieldNameLc)) {
-                                    editRecordField = new EditRecordFieldClass();
+                                    editRecordField = new EditRecordFieldModel();
                                     editRecord.fieldsLc.Add(fieldNameLc, editRecordField);
                                 } else {
                                     editRecordField = editRecord.fieldsLc[fieldNameLc];

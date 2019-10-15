@@ -14,6 +14,7 @@ using Contensive.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using System.Globalization;
+using Contensive.Processor.Addons.AdminSite.Models;
 
 namespace Contensive.Addons.AdminSite {
     public class GetHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
@@ -982,7 +983,7 @@ namespace Contensive.Addons.AdminSite {
         //   read groups from the edit form and modify Group Rules to match
         //========================================================================
         //
-        private void LoadAndSaveGroupRules(CPClass cp, EditRecordClass editRecord) {
+        private void LoadAndSaveGroupRules(CPClass cp, EditRecordModel editRecord) {
             try {
                 //
                 if (editRecord.id != 0) {
@@ -1123,7 +1124,8 @@ namespace Contensive.Addons.AdminSite {
         private void SaveContentTracking(CPClass cp, AdminDataModel adminData) {
             try {
                 // todo
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
+                
+                Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                 //
                 int ContentID = 0;
                 int ContentWatchID = 0;
@@ -1203,7 +1205,7 @@ namespace Contensive.Addons.AdminSite {
         private void SaveLinkAlias(CPClass cp, AdminDataModel adminData) {
             try {
                 // todo
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
+                Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                 //
                 // --use field ptr to test if the field is supported yet
                 if (cp.core.siteProperties.allowLinkAlias) {
@@ -1256,7 +1258,7 @@ namespace Contensive.Addons.AdminSite {
         private void SaveEditRecord(CPClass cp, AdminDataModel adminData) {
             try {
                 // todo
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
+                Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                 //
                 int SaveCCIDValue = 0;
                 int ActivityLogOrganizationID = -1;
@@ -1310,7 +1312,7 @@ namespace Contensive.Addons.AdminSite {
                             bool fieldChanged = false;
                             foreach (var keyValuePair in adminData.adminContent.fields) {
                                 ContentFieldMetadataModel field = keyValuePair.Value;
-                                EditRecordFieldClass editRecordField = editRecord.fieldsLc[field.nameLc];
+                                EditRecordFieldModel editRecordField = editRecord.fieldsLc[field.nameLc];
                                 object fieldValueObject = editRecordField.value;
                                 string FieldValueText = GenericController.encodeText(fieldValueObject);
                                 string fieldName = field.nameLc;
@@ -1754,7 +1756,7 @@ namespace Contensive.Addons.AdminSite {
         private void ProcessForms(CPClass cp, AdminDataModel adminData) {
             try {
                 // todo
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
+                Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                 //
                 //
                 if (adminData.adminSourceForm != 0) {
@@ -2012,7 +2014,7 @@ namespace Contensive.Addons.AdminSite {
         private void ProcessActionSave(CPClass cp, AdminDataModel adminData, bool UseContentWatchLink) {
             try {
                 // todo
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
+                Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                 //
                 string EditorStyleRulesFilename = null;
                 //

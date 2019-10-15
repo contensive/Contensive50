@@ -94,6 +94,11 @@ namespace Contensive.Addons.Diagnostics {
                 foreach (var alarmFile in core.programDataFiles.getFileList("Alarms/")) {
                     return "ERROR, Alarm folder is not empty, [" + core.programDataFiles.readFileText("Alarms/" + alarmFile.Name) + "].";
                 }
+                // -- verify the default username=root, password=contensive is not present
+                var rootUserList = PersonModel.createList<PersonModel>(cp, "((username='root')and(password='contensive')and(active>0))");
+                if ( rootUserList.Count>0 ) {
+                    return "ERROR, delete or inactive default user root/contensive.";
+                }
                 return "ok, all server diagnostics passed" + Environment.NewLine + result.ToString();
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

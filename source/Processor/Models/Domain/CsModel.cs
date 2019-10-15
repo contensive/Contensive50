@@ -1722,7 +1722,7 @@ namespace Contensive.Processor {
             string result = "";
             try {
                 if (string.IsNullOrEmpty(this.contentName)) { throw new GenericException("getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent."); }
-                foreach (var AddLink in Addons.AdminSite.Controllers.AdminUIController.getRecordAddLink(core, this.contentName, PresetNameValueList, AllowPaste)) { result += AddLink; }
+                foreach (var AddLink in Contensive.Addons.AdminSite.Controllers.AdminUIController.getRecordAddLink(core, this.contentName, PresetNameValueList, AllowPaste)) { result += AddLink; }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

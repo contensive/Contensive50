@@ -17,7 +17,7 @@ namespace Contensive.Addons.AdminSite {
             string s = "";
             try {
                 // todo
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
+                Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                 //
                 //
                 StringBuilderLegacyController f = new StringBuilderLegacyController();

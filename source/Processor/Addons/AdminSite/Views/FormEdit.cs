@@ -464,7 +464,7 @@ namespace Contensive.Addons.AdminSite {
                         ContentFieldMetadataModel field = kvp.Value;
                         string WhyReadOnlyMsg = "";
                         CPContentBaseClass.FieldTypeIdEnum fieldTypeId = field.fieldTypeId;
-                        EditRecordClass editRecord = adminData.editRecord;
+                        Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                         object fieldValueObject = editRecord.fieldsLc[field.nameLc].value;
                         string fieldValue_text = GenericController.encodeText(fieldValueObject);
                         int FieldRows = 1;
