@@ -32,12 +32,12 @@ namespace Contensive.Addons.Primitives {
                 // -- Email click detected
                 EmailDropModel emailDrop = DbBaseModel.create<EmailDropModel>(core.cpParent, core.docProperties.getInteger(rnEmailClickFlag));
                 if (emailDrop != null) {
-                    PersonModel recipient = DbBaseModel.create<PersonModel>(core.cpParent, core.docProperties.getInteger(rnEmailMemberID));
+                    PersonModel recipient = DbBaseModel.create<PersonModel>(core.cpParent, core.docProperties.getInteger(rnEmailMemberId));
                     if (recipient != null) {
                         EmailLogModel log = new EmailLogModel() {
                             name = "User " + recipient.name + " clicked link from email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString(),
-                            emailDropID = emailDrop.id,
-                            memberID = recipient.id,
+                            emailDropId = emailDrop.id,
+                            memberId = recipient.id,
                             logType = EmailLogTypeOpen
                         };
                     }

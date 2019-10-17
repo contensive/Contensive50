@@ -12,13 +12,13 @@ namespace Contensive.Models.Db {
         public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("tables", "cctables", "default", true);
         //
         //====================================================================================================
-        public int dataSourceID { get; set; }
+        public int dataSourceId { get; set; }
         //
         //====================================================================================================
         //
         public static TableModel createByContentName(CPBaseClass cp, string contentName) {
             var content = createByUniqueName<ContentModel>(cp, contentName);
-            if (content != null) { return create<TableModel>(cp, content.contentTableID); }
+            if (content != null) { return create<TableModel>(cp, content.contentTableId); }
             return null;
         }
     }

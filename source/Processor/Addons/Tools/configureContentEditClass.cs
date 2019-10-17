@@ -34,8 +34,8 @@ namespace Contensive.Addons.Tools {
             CoreController core = cp.core;
             try {
                 KeyPtrController Index = new KeyPtrController();
-                int ContentID = cp.Doc.GetInteger(RequestNameToolContentID);
-                var contentMetadata = ContentMetadataModel.create(core, ContentID, true, true);
+                int ContentId = cp.Doc.GetInteger(RequestNameToolContentId);
+                var contentMetadata = ContentMetadataModel.create(core, ContentId, true, true);
                 int RecordCount = 0;
                 int formFieldId = 0;
                 string StatusMessage = "";
@@ -83,7 +83,7 @@ namespace Contensive.Addons.Tools {
                                                             if (CSSource.openRecord("Content Fields", formFieldId)) { CSSource.copyRecord(CSTarget); }
                                                         }
                                                         formFieldId = CSTarget.getInteger("ID");
-                                                        CSTarget.set("ContentID", ContentID);
+                                                        CSTarget.set("ContentID", ContentId);
                                                     }
                                                     CSTarget.close();
                                                 }
@@ -132,8 +132,8 @@ namespace Contensive.Addons.Tools {
                                                         // Field Type changed, must be done manually
                                                         //
                                                         ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + DbBaseModel.getRecordName<ContentFieldTypeModel>(core.cpParent, (int)cdefFieldKvp.Value.fieldTypeId) + "] to [" + DbBaseModel.getRecordName<ContentFieldTypeModel>(core.cpParent, (int)formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
-                                                        int DataSourceTypeID = core.db.getDataSourceType();
-                                                        switch (DataSourceTypeID) {
+                                                        int DataSourceTypeId = core.db.getDataSourceType();
+                                                        switch (DataSourceTypeId) {
                                                             case DataSourceTypeODBCMySQL:
                                                                 SQL = "alter table " + contentMetadata.tableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(formFieldTypeId) + ";";
                                                                 break;
@@ -184,7 +184,7 @@ namespace Contensive.Addons.Tools {
                             var defaultValues = ContentMetadataModel.getDefaultValueDict(core, ContentFieldModel.tableMetadata.contentName);
                             var field = ContentFieldModel.addDefault<ContentFieldModel>(core.cpParent, defaultValues);
                             field.name = "unnamedField" + field.id.ToString();
-                            field.contentID = ContentID;
+                            field.contentId = ContentId;
                             field.editSortPriority = 0;
                             field.save(core.cpParent);
                             ReloadCDef = true;
@@ -236,18 +236,18 @@ namespace Contensive.Addons.Tools {
                     Stream.Add(HtmlController.div("There was a problem saving these changes" + "<UL>" + ErrorMessage + "</UL>", "ccError"));
                 }
                 if (ReloadCDef) {
-                    contentMetadata = Processor.Models.Domain.ContentMetadataModel.create(core, ContentID, true, true);
+                    contentMetadata = Processor.Models.Domain.ContentMetadataModel.create(core, ContentId, true, true);
                 }
                 string ButtonList = ButtonCancel + "," + ButtonSelect;
-                if (ContentID == 0) {
+                if (ContentId == 0) {
                     //
                     // content tables that have edit forms to Configure
                     bool isEmptyList = false;
-                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_lookupContent(core, RequestNameToolContentID, ContentID, ContentMetadataModel.getContentId(core, "Content"), ref isEmptyList)));
+                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_lookupContent(core, RequestNameToolContentId, ContentId, ContentMetadataModel.getContentId(core, "Content"), ref isEmptyList)));
                 } else {
                     //
                     // Configure edit form
-                    Stream.Add(HtmlController.inputHidden(RequestNameToolContentID, ContentID));
+                    Stream.Add(HtmlController.inputHidden(RequestNameToolContentId, ContentId));
                     Stream.Add(core.html.getPanelTop());
                     ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK + "," + ButtonAdd;
                     //
@@ -256,15 +256,15 @@ namespace Contensive.Addons.Tools {
                     Stream.Add(SpanClassAdminNormal + "<P><B>" + contentMetadata.name + "</b></P>");
                     Stream.Add("<table border=\"0\" cellpadding=\"1\" cellspacing=\"1\" width=\"100%\">");
                     //
-                    int ParentContentID = contentMetadata.parentID;
+                    int ParentContentId = contentMetadata.parentId;
                     bool AllowCDefInherit = false;
                     Processor.Models.Domain.ContentMetadataModel ParentCDef = null;
-                    if (ParentContentID == -1) {
+                    if (ParentContentId == -1) {
                         AllowCDefInherit = false;
                     } else {
                         AllowCDefInherit = true;
-                        string ParentContentName = MetadataController.getContentNameByID(core, ParentContentID);
-                        ParentCDef = Processor.Models.Domain.ContentMetadataModel.create(core, ParentContentID, true, true);
+                        string ParentContentName = MetadataController.getContentNameByID(core, ParentContentId);
+                        ParentCDef = Processor.Models.Domain.ContentMetadataModel.create(core, ParentContentId, true, true);
                     }
                     bool NeedFootNote1 = false;
                     bool NeedFootNote2 = false;

@@ -1402,13 +1402,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Create a filename for the virtual directory for field types not associated to upload files
         /// </summary>
-        public static string getVirtualRecordUnixPathFilename(string tableName, string fieldName, int recordID, CPContentClass.FieldTypeIdEnum fieldType) {
+        public static string getVirtualRecordUnixPathFilename(string tableName, string fieldName, int recordId, CPContentClass.FieldTypeIdEnum fieldType) {
             string result = "";
-            string idFilename = recordID.ToString();
-            if (recordID == 0) {
+            string idFilename = recordId.ToString();
+            if (recordId == 0) {
                 idFilename = getGUID().Replace("{", "").Replace("}", "").Replace("-", "");
             } else {
-                idFilename = recordID.ToString().PadLeft(12, '0');
+                idFilename = recordId.ToString().PadLeft(12, '0');
             }
             switch (fieldType) {
                 case CPContentBaseClass.FieldTypeIdEnum.FileCSS:

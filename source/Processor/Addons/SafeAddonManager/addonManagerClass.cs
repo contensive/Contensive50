@@ -81,7 +81,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 string InstallFolder = null;
                 //Dim LibGuids() As String
                 //Dim IISResetRequired As Boolean
-                int AddonNavigatorID = 0;
+                int AddonNavigatorId = 0;
                 string TargetCollectionName = null;
                 string Collectionname = "";
                 string CollectionGuid = "";
@@ -115,7 +115,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 string status = "";
                 bool AllowInstallFromFolder = false;
                 string InstallLibCollectionList = "";
-                int TargetCollectionID = 0;
+                int TargetCollectionId = 0;
                 string privateFilesInstallPath = null;
                 //adminUIController Adminui = new adminUIController(core);
                 List<string> nonCriticalErrorList = new List<string>();
@@ -168,34 +168,34 @@ namespace Contensive.Addons.SafeAddonManager {
                             if (Cnt > 0) {
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                     if (core.docProperties.getBoolean("ac" + Ptr)) {
-                                        TargetCollectionID = core.docProperties.getInteger("acID" + Ptr);
-                                        TargetCollectionName = MetadataController.getRecordName(core, "Add-on Collections", TargetCollectionID);
+                                        TargetCollectionId = core.docProperties.getInteger("acID" + Ptr);
+                                        TargetCollectionName = MetadataController.getRecordName(core, "Add-on Collections", TargetCollectionId);
                                         //
                                         // Delete any addons from this collection
                                         //
-                                        MetadataController.deleteContentRecords(core, AddonModel.tableMetadata.contentName, "collectionid=" + TargetCollectionID);
+                                        MetadataController.deleteContentRecords(core, AddonModel.tableMetadata.contentName, "collectionid=" + TargetCollectionId);
                                         //
                                         // Delete the navigator entry for the collection under 'Add-ons'
                                         //
-                                        if (TargetCollectionID > 0) {
-                                            AddonNavigatorID = 0;
+                                        if (TargetCollectionId > 0) {
+                                            AddonNavigatorId = 0;
                                             using (var csData = new CsModel(core)) {
                                                 csData.open(NavigatorEntryModel.tableMetadata.contentName, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
                                                 if (csData.ok()) {
-                                                    AddonNavigatorID = csData.getInteger("ID");
+                                                    AddonNavigatorId = csData.getInteger("ID");
                                                 }
                                             }
-                                            if (AddonNavigatorID > 0) {
-                                                GetForm_SafeModeAddonManager_DeleteNavigatorBranch(TargetCollectionName, AddonNavigatorID);
+                                            if (AddonNavigatorId > 0) {
+                                                GetForm_SafeModeAddonManager_DeleteNavigatorBranch(TargetCollectionName, AddonNavigatorId);
                                             }
                                             //
                                             // Now delete the Collection record
                                             //
-                                            MetadataController.deleteContentRecord(core, "Add-on Collections", TargetCollectionID);
+                                            MetadataController.deleteContentRecord(core, "Add-on Collections", TargetCollectionId);
                                             //
                                             // Delete Navigator Entries set as installed by the collection (this may be all that is needed)
                                             //
-                                            MetadataController.deleteContentRecords(core, NavigatorEntryModel.tableMetadata.contentName, "installedbycollectionid=" + TargetCollectionID);
+                                            MetadataController.deleteContentRecords(core, NavigatorEntryModel.tableMetadata.contentName, "installedbycollectionid=" + TargetCollectionId);
                                         }
                                     }
                                 }
@@ -722,7 +722,7 @@ namespace Contensive.Addons.SafeAddonManager {
             try {
                 string ParentNameSpace = null;
                 string ParentName = null;
-                int ParentID = 0;
+                int ParentId = 0;
                 int Pos = 0;
                 //
                 tempGetParentIDFromNameSpace = 0;
@@ -745,9 +745,9 @@ namespace Contensive.Addons.SafeAddonManager {
                             csData.close();
                         }
                     } else {
-                        ParentID = getParentIDFromNameSpace(ContentName, ParentNameSpace);
+                        ParentId = getParentIDFromNameSpace(ContentName, ParentNameSpace);
                         using (var csData = new CsModel(core)) {
-                            csData.open(ContentName, "(name=" + DbController.encodeSQLText(ParentName) + ")and(parentid=" + ParentID + ")", "ID", false, 0, "ID");
+                            csData.open(ContentName, "(name=" + DbController.encodeSQLText(ParentName) + ")and(parentid=" + ParentId + ")", "ID", false, 0, "ID");
                             if (csData.ok()) {
                                 tempGetParentIDFromNameSpace = csData.getInteger("ID");
                             }

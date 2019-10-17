@@ -253,7 +253,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         [Obsolete("Deprecated", false)]
-        public override int CollectionID => cp.core.doc.addonModelStack.Peek().collectionID;
+        public override int CollectionID => cp.core.doc.addonModelStack.Peek().collectionId;
         //
         //====================================================================================================
         //
@@ -378,7 +378,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         [Obsolete("Deprecated", false)]
-        public override string ObjectProgramID => cp.core.doc.addonModelStack.Peek().objectProgramID;
+        public override string ObjectProgramID => cp.core.doc.addonModelStack.Peek().objectProgramId;
         //
         //====================================================================================================
         //

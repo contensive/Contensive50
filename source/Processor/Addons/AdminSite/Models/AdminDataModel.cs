@@ -357,7 +357,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="adminContext"></param>
         public void loadContentTrackingResponse(CoreController core) {
             try {
-                int RecordID = 0;
+                int RecordId = 0;
                 contentWatchListIDCount = 0;
                 if ((core.docProperties.getText("WhatsNewResponse") != "") && (adminContent.allowContentTracking)) {
                     //
@@ -371,13 +371,13 @@ namespace Contensive.Addons.AdminSite {
                     using (var csData = new CsModel(core)) {
                         csData.open("Content Watch Lists");
                         while (csData.ok()) {
-                            RecordID = (csData.getInteger("ID"));
-                            if (core.docProperties.getBoolean("ContentWatchList." + RecordID)) {
+                            RecordId = (csData.getInteger("ID"));
+                            if (core.docProperties.getBoolean("ContentWatchList." + RecordId)) {
                                 if (contentWatchListIDCount >= contentWatchListIDSize) {
                                     contentWatchListIDSize = contentWatchListIDSize + 50;
                                     Array.Resize(ref _ContentWatchListID, contentWatchListIDSize);
                                 }
-                                contentWatchListID[contentWatchListIDCount] = RecordID;
+                                contentWatchListID[contentWatchListIDCount] = RecordId;
                                 contentWatchListIDCount = contentWatchListIDCount + 1;
                             }
                             csData.goNext();
@@ -767,7 +767,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     //editRecord.menuHeadline = "";
                     if (editRecord.fieldsLc.ContainsKey("parentid")) {
-                        editRecord.parentID = GenericController.encodeInteger(editRecord.fieldsLc["parentid"].value);
+                        editRecord.parentId = GenericController.encodeInteger(editRecord.fieldsLc["parentid"].value);
                     }
                     //
                     // ----- Set the local global copy of Edit Record Locks
@@ -880,8 +880,8 @@ namespace Contensive.Addons.AdminSite {
                                     if (DefaultValueText.IsNumeric()) {
                                         editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
                                     } else {
-                                        if (field.lookupContentID != 0) {
-                                            LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentID);
+                                        if (field.lookupContentId != 0) {
+                                            LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentId);
                                             if (!string.IsNullOrEmpty(LookupContentName)) {
                                                 editRecord.fieldsLc[field.nameLc].value = MetadataController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText);
                                             }
@@ -1183,7 +1183,7 @@ namespace Contensive.Addons.AdminSite {
                                         editRecord.nameLc = csData.getText(adminContentcontent.nameLc);
                                         break;
                                     case "PARENTID":
-                                        editRecord.parentID = csData.getInteger(adminContentcontent.nameLc);
+                                        editRecord.parentId = csData.getInteger(adminContentcontent.nameLc);
                                         //Case Else
                                         //    EditRecordValuesVariant(FieldPointer) = DBValueVariant
                                         break;
@@ -1539,18 +1539,18 @@ namespace Contensive.Addons.AdminSite {
                             if (field.nameLc == "parentid") {
                                 //
                                 // check circular reference on all parentid fields
-                                int ParentID = GenericController.encodeInteger(ResponseFieldValueText);
+                                int ParentId = GenericController.encodeInteger(ResponseFieldValueText);
                                 int LoopPtr = 0;
                                 string UsedIDs = editRecord.id.ToString();
                                 const int LoopPtrMax = 100;
-                                while ((LoopPtr < LoopPtrMax) && (ParentID != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentID.ToString() + ",") == -1)) {
-                                    UsedIDs = UsedIDs + "," + ParentID.ToString();
+                                while ((LoopPtr < LoopPtrMax) && (ParentId != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentId.ToString() + ",") == -1)) {
+                                    UsedIDs = UsedIDs + "," + ParentId.ToString();
                                     using (var csData = new CsModel(core)) {
-                                        csData.open(adminContent.name, "ID=" + ParentID, "", true, 0, "ParentID");
+                                        csData.open(adminContent.name, "ID=" + ParentId, "", true, 0, "ParentID");
                                         if (!csData.ok()) {
-                                            ParentID = 0;
+                                            ParentId = 0;
                                         } else {
-                                            ParentID = csData.getInteger("ParentID");
+                                            ParentId = csData.getInteger("ParentID");
                                         }
                                     }
                                     LoopPtr = LoopPtr + 1;
@@ -1561,13 +1561,13 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " creates a relationship between records that Is too large. Please limit the depth of this relationship to " + LoopPtrMax + " records.");
                                     ResponseFieldValueIsOKToSave = false;
-                                } else if ((editRecord.id != 0) && (editRecord.id == ParentID)) {
+                                } else if ((editRecord.id != 0) && (editRecord.id == ParentId)) {
                                     //
                                     // Reference to iteslf
                                     //
                                     Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This record points back to itself. This is not allowed.");
                                     ResponseFieldValueIsOKToSave = false;
-                                } else if (ParentID != 0) {
+                                } else if (ParentId != 0) {
                                     //
                                     // Circular reference
                                     //

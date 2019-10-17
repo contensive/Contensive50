@@ -362,9 +362,9 @@ namespace Contensive.Processor.Controllers {
         //
         public string main_GetPageDynamicLink(int PageID, bool UseContentWatchLink) {
             //
-            int CCID = 0;
+            int CCId = 0;
             string DefaultLink = null;
-            int SectionID = 0;
+            int SectionId = 0;
             bool IsRootPage = false;
             int templateId = 0;
             string MenuLinkOverRide = "";
@@ -377,7 +377,7 @@ namespace Contensive.Processor.Controllers {
                 DefaultLink = "/" + core.siteProperties.serverPageDefault;
             }
             //
-            return main_GetPageDynamicLinkWithArgs(CCID, PageID, DefaultLink, IsRootPage, templateId, SectionID, MenuLinkOverRide, UseContentWatchLink);
+            return main_GetPageDynamicLinkWithArgs(CCId, PageID, DefaultLink, IsRootPage, templateId, SectionId, MenuLinkOverRide, UseContentWatchLink);
         }
         //====================================================================================================
         /// <summary>
@@ -546,10 +546,10 @@ namespace Contensive.Processor.Controllers {
                 string Criteria = "(ContentID=" + contentId + ")and(RecordID=" + recordId + ")";
                 string FieldList = "ID,Name,MetaDescription,OtherHeadTags,MetaKeywordList";
                 string keywordList = "";
-                int MetaContentID = 0;
+                int MetaContentId = 0;
                 using (var csData = new CsModel(core)) {
                     if (csData.open("Meta Content", Criteria, "", false, 0, FieldList)) {
-                        MetaContentID = csData.getInteger("ID");
+                        MetaContentId = csData.getInteger("ID");
                         core.html.addTitle(HtmlController.encodeHtml(csData.getText("Name")), "page content");
                         core.html.addMetaDescription(HtmlController.encodeHtml(csData.getText("MetaDescription")), "page content");
                         core.html.addHeadTag(csData.getText("OtherHeadTags"), "page content");
@@ -563,7 +563,7 @@ namespace Contensive.Processor.Controllers {
                     string SQL = "select ccMetaKeywords.Name"
                         + " From ccMetaKeywords"
                         + " LEFT JOIN ccMetaKeywordRules on ccMetaKeywordRules.MetaKeywordID=ccMetaKeywords.ID"
-                        + " Where ccMetaKeywordRules.MetaContentID=" + MetaContentID;
+                        + " Where ccMetaKeywordRules.MetaContentID=" + MetaContentId;
                     csData.openSql(SQL);
                     while (csData.ok()) {
                         keywordList = keywordList + "," + csData.getText("Name");

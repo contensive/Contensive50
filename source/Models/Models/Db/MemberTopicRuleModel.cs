@@ -13,7 +13,7 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// field properties
         /// </summary>
-        public int MemberID { get; set; }
-        public int TopicID { get; set; }
+        public int memberId { get; set; }
+        public int topicId { get; set; }
     }
 }

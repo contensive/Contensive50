@@ -13,7 +13,7 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// field properties
         /// </summary>
-        public int addonID { get; set; }
-        public int includedAddonID { get; set; }
+        public int addonId { get; set; }
+        public int includedAddonId { get; set; }
     }
 }

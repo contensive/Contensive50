@@ -50,15 +50,15 @@ namespace Contensive.Addons.Diagnostics {
                 //
                 // test default data connection
                 try {
-                    int TrapID = 0;
+                    int TrapId = 0;
                     using (var csData = new CsModel(core)) {
                         if (csData.insert("Trap Log")) {
-                            TrapID = csData.getInteger("ID");
+                            TrapId = csData.getInteger("ID");
                         }
-                        if (TrapID == 0) {
+                        if (TrapId == 0) {
                             return "ERROR, Failed to insert record in default data source.";
                         } else {
-                            MetadataController.deleteContentRecord(core, "Trap Log", TrapID);
+                            MetadataController.deleteContentRecord(core, "Trap Log", TrapId);
                         }
                     }
                 } catch (Exception exDb) {

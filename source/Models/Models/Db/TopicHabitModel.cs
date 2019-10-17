@@ -14,9 +14,9 @@ namespace Contensive.Models.Db {
         /// field properties
         /// </summary>
         public string contentRecordKey { get; set; }
-        public int memberID { get; set; }
+        public int memberId { get; set; }
         public int score { get; set; }
-        public int topicID { get; set; }
-        public int visitID { get; set; }
+        public int topicId { get; set; }
+        public int visitId { get; set; }
     }
 }

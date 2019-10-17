@@ -17,7 +17,7 @@ namespace Contensive.Processor.Addons.AdminSite.Models {
         /// <summary>
         /// ParentID field of edit record (Record to be edited)
         /// </summary>
-        public int parentID;
+        public int parentId;
         /// <summary>
         /// name field of edit record
         /// </summary>

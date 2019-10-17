@@ -34,7 +34,7 @@ namespace Contensive.Processor.Controllers {
         //        + " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)"
         //        + " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)"
         //        + " WHERE"
-        //            + " (ccMemberRules.MemberID=" + core.session.user.id + ")"
+        //            + " (ccMemberRules.memberId=" + core.session.user.id + ")"
         //            + " AND(ccGroupRules.Active<>0)"
         //            + " AND(ccContent.Active<>0)"
         //            + " AND(ccMemberRules.Active<>0)";
@@ -42,7 +42,7 @@ namespace Contensive.Processor.Controllers {
         //        int CIDCount = cidDataTable.Rows.Count;
         //        List<int> returnList = new List<int>();
         //        for (int CIDPointer = 0; CIDPointer < CIDCount; CIDPointer++) {
-        //            int ContentID = encodeInteger(cidDataTable.Rows[CIDPointer][0]);
+        //            int ContentId = encodeInteger(cidDataTable.Rows[CIDPointer][0]);
         //            returnList.Add(ContentID);
         //            var metaData = ContentMetadataModel.create(core, ContentID);
         //            if (metaData != null) {
@@ -223,7 +223,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="recordId"></param>
         /// <param name="userId"></param>
         //
-        public static void deleteContentRecord(CoreController core, string contentName, int recordId, int userId = SystemMemberID) {
+        public static void deleteContentRecord(CoreController core, string contentName, int recordId, int userId = SystemMemberId) {
             var meta = ContentMetadataModel.createByUniqueName(core, contentName);
             if (meta == null) { return; }
             using (var db = new DbController(core, meta.dataSourceName)) {

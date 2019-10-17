@@ -319,7 +319,7 @@ namespace Contensive.Processor.Controllers {
                                 LinkAliasModel linkAlias = DbBaseModel.create<LinkAliasModel>(core.cpParent, route.linkAliasId);
                                 if (linkAlias != null) {
                                     // -- set the link alias page number, unless it has been overridden
-                                    if (!core.docProperties.containsKey("bid")) { core.docProperties.setProperty("bid", linkAlias.pageID); }
+                                    if (!core.docProperties.containsKey("bid")) { core.docProperties.setProperty("bid", linkAlias.pageId); }
                                     if (!string.IsNullOrWhiteSpace(linkAlias.queryStringSuffix)) {
                                         string[] keyValuePairs = linkAlias.queryStringSuffix.Split('&');
                                         // -- iterate through all the key=value pairs

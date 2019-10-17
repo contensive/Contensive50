@@ -67,11 +67,11 @@ namespace Contensive.Addons.Email {
                         string BounceAddress = core.siteProperties.getText("EmailBounceAddress", "");
                         string PrimaryLink = "http://" + core.appConfig.domainList[0];
                         while (CSEmail.ok()) {
-                            int emailID = CSEmail.getInteger("ID");
-                            int EmailMemberID = CSEmail.getInteger("ModifiedBy");
-                            int EmailTemplateID = CSEmail.getInteger("EmailTemplateID");
-                            string EmailTemplate = getEmailTemplate(core, EmailTemplateID);
-                            bool EmailAddLinkEID = CSEmail.getBoolean("AddLinkEID");
+                            int emailId = CSEmail.getInteger("ID");
+                            int EmailMemberId = CSEmail.getInteger("ModifiedBy");
+                            int EmailTemplateId = CSEmail.getInteger("EmailTemplateID");
+                            string EmailTemplate = getEmailTemplate(core, EmailTemplateId);
+                            bool EmailAddLinkEid = CSEmail.getBoolean("AddLinkEID");
                             string EmailFrom = CSEmail.getText("FromAddress");
                             string EmailSubject = CSEmail.getText("Subject");
                             //
@@ -80,17 +80,17 @@ namespace Contensive.Addons.Email {
                             CSEmail.save();
                             //
                             // Create Drop Record
-                            int EmailDropID = 0;
+                            int EmailDropId = 0;
                             using (var csDrop = new CsModel(core)) {
                                 csDrop.insert("Email Drops");
                                 if (csDrop.ok()) {
-                                    EmailDropID = csDrop.getInteger("ID");
+                                    EmailDropId = csDrop.getInteger("ID");
                                     DateTime ScheduleDate = CSEmail.getDate("ScheduleDate");
                                     if (ScheduleDate < DateTime.Parse("1/1/2000")) {
                                         ScheduleDate = DateTime.Parse("1/1/2000");
                                     }
-                                    csDrop.set("Name", "Drop " + EmailDropID + " - Scheduled for " + ScheduleDate.ToString("") + " " + ScheduleDate.ToString(""));
-                                    csDrop.set("EmailID", emailID);
+                                    csDrop.set("Name", "Drop " + EmailDropId + " - Scheduled for " + ScheduleDate.ToString("") + " " + ScheduleDate.ToString(""));
+                                    csDrop.set("EmailID", emailId);
                                 }
                                 csDrop.close();
                             }
@@ -102,10 +102,10 @@ namespace Contensive.Addons.Email {
                                 string SQL = "select Distinct ccMembers.id,ccMembers.email, ccMembers.name"
                                     + " From ((((ccemail"
                                     + " left join ccEmailGroups on ccEmailGroups.EmailID=ccEmail.ID)"
-                                    + " left join ccGroups on ccGroups.ID = ccEmailGroups.GroupID)"
-                                    + " left join ccMemberRules on ccGroups.ID = ccMemberRules.GroupID)"
-                                    + " left join ccMembers on ccMembers.ID = ccMemberRules.MemberID)"
-                                    + " Where (ccEmail.ID=" + emailID + ")"
+                                    + " left join ccGroups on ccGroups.Id = ccEmailGroups.GroupID)"
+                                    + " left join ccMemberRules on ccGroups.Id = ccMemberRules.GroupID)"
+                                    + " left join ccMembers on ccMembers.Id = ccMemberRules.memberId)"
+                                    + " Where (ccEmail.ID=" + emailId + ")"
                                     + " and (ccGroups.active<>0)"
                                     + " and (ccGroups.AllowBulkEmail<>0)"
                                     + " and (ccMembers.active<>0)"
@@ -127,7 +127,7 @@ namespace Contensive.Addons.Email {
                                         if (string.IsNullOrEmpty(sendToPersonName)) { sendToPersonName = "user #" + sendToPersonId; }
                                         EmailStatusList = EmailStatusList + "Not Sent to " + sendToPersonName + ", duplicate email address (" + sendToPersonEmail + ")" + BR;
                                     } else {
-                                        EmailStatusList = EmailStatusList + queueEmailRecord(core, "Group Email", sendToPersonId, emailID, DateTime.MinValue, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, EmailCopy, CSEmail.getBoolean("AllowSpamFooter"), CSEmail.getBoolean("AddLinkEID"), "") + BR;
+                                        EmailStatusList = EmailStatusList + queueEmailRecord(core, "Group Email", sendToPersonId, emailId, DateTime.MinValue, EmailDropId, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, EmailCopy, CSEmail.getBoolean("AllowSpamFooter"), CSEmail.getBoolean("AddLinkEID"), "") + BR;
                                     }
                                     LastEmail = sendToPersonEmail;
                                     csPerson.goNext();
@@ -137,8 +137,8 @@ namespace Contensive.Addons.Email {
                             //
                             // Send the confirmation
                             //
-                            int ConfirmationMemberID = CSEmail.getInteger("testmemberid");
-                            queueConfirmationEmail(core, ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, PrimaryLink, EmailSubject, EmailCopy, "", EmailFrom, EmailStatusList, "Group Email");
+                            int ConfirmationMemberId = CSEmail.getInteger("testmemberid");
+                            queueConfirmationEmail(core, ConfirmationMemberId, EmailDropId, EmailTemplate, EmailAddLinkEid, PrimaryLink, EmailSubject, EmailCopy, "", EmailFrom, EmailStatusList, "Group Email");
                             CSEmail.goNext();
                         }
                     }
@@ -179,10 +179,10 @@ namespace Contensive.Addons.Email {
                 using (var csEmailList = new CsModel(core)) {
                     string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID as EmailID,ccMembers.ID AS MemberID, ccMemberRules.DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
                     string SQL = "SELECT Distinct " + FieldList + " FROM ((((ccEmail"
-                        + " LEFT JOIN ccEmailGroups ON ccEmail.ID = ccEmailGroups.EmailID)"
-                        + " LEFT JOIN ccGroups ON ccEmailGroups.GroupID = ccGroups.ID)"
-                        + " LEFT JOIN ccMemberRules ON ccGroups.ID = ccMemberRules.GroupID)"
-                        + " LEFT JOIN ccMembers ON ccMemberRules.MemberID = ccMembers.ID)"
+                        + " LEFT JOIN ccEmailGroups ON ccEmail.Id = ccEmailGroups.EmailID)"
+                        + " LEFT JOIN ccGroups ON ccEmailGroups.GroupId = ccGroups.ID)"
+                        + " LEFT JOIN ccMemberRules ON ccGroups.Id = ccMemberRules.GroupID)"
+                        + " LEFT JOIN ccMembers ON ccMemberRules.memberId = ccMembers.ID)"
                         + " Where (ccEmail.id Is Not Null)"
                         + " and(DATEADD(day, ccEmail.ConditionPeriod, ccMemberRules.dateAdded) < " + SQLDateNow + ")" // dont send before
                         + " and(DATEADD(day, ccEmail.ConditionPeriod+1.0, ccMemberRules.dateAdded) > " + SQLDateNow + ")" // don't send after 1-day (legacy, fall back)
@@ -190,7 +190,7 @@ namespace Contensive.Addons.Email {
                         + " AND (ccEmail.ConditionExpireDate > " + SQLDateNow + " OR ccEmail.ConditionExpireDate IS NULL)"
                         + " AND (ccEmail.ScheduleDate < " + SQLDateNow + " OR ccEmail.ScheduleDate IS NULL)"
                         + " AND (ccEmail.Submitted <> 0)"
-                        + " AND (ccEmail.ConditionID = 2)"
+                        + " AND (ccEmail.ConditionId = 2)"
                         + " AND (ccEmail.ConditionPeriod IS NOT NULL)"
                         + " AND (ccGroups.Active <> 0)"
                         + " AND (ccGroups.AllowBulkEmail <> 0)"
@@ -199,22 +199,22 @@ namespace Contensive.Addons.Email {
                         + " AND (ccMembers.AllowBulkEmail <> 0)";
                     csEmailList.openSql(SQL, "Default");
                     while (csEmailList.ok()) {
-                        int emailID = csEmailList.getInteger("EmailID");
-                        int EmailMemberID = csEmailList.getInteger("MemberID");
+                        int emailId = csEmailList.getInteger("EmailID");
+                        int EmailMemberId = csEmailList.getInteger("MemberID");
                         DateTime EmailDateExpires = csEmailList.getDate("DateExpires");
                         //
                         using (var csEmail = new CsModel(core)) {
-                            csEmail.openRecord("Conditional Email", emailID);
+                            csEmail.openRecord("Conditional Email", emailId);
                             if (csEmail.ok()) {
-                                int EmailTemplateID = csEmail.getInteger("EmailTemplateID");
-                                string EmailTemplate = getEmailTemplate(core, EmailTemplateID);
+                                int EmailTemplateId = csEmail.getInteger("EmailTemplateID");
+                                string EmailTemplate = getEmailTemplate(core, EmailTemplateId);
                                 string FromAddress = csEmail.getText("FromAddress");
-                                int ConfirmationMemberID = csEmail.getInteger("testmemberid");
-                                bool EmailAddLinkEID = csEmail.getBoolean("AddLinkEID");
+                                int ConfirmationMemberId = csEmail.getInteger("testmemberid");
+                                bool EmailAddLinkEid = csEmail.getBoolean("AddLinkEID");
                                 string EmailSubject = csEmail.getText("Subject");
                                 string EmailCopy = csEmail.getText("CopyFilename");
-                                string EmailStatus = queueEmailRecord(core, "Conditional Email", EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, csEmail.getBoolean("AllowSpamFooter"), EmailAddLinkEID, "");
-                                queueConfirmationEmail(core, ConfirmationMemberID, 0, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>", "Conditional Email");
+                                string EmailStatus = queueEmailRecord(core, "Conditional Email", EmailMemberId, emailId, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, csEmail.getBoolean("AllowSpamFooter"), EmailAddLinkEid, "");
+                                queueConfirmationEmail(core, ConfirmationMemberId, 0, EmailTemplate, EmailAddLinkEid, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>", "Conditional Email");
                             }
                             csEmail.close();
                         }
@@ -243,10 +243,10 @@ namespace Contensive.Addons.Email {
                                 + "";
                         }
                         string SQL = "SELECT DISTINCT " + FieldList + " FROM ((((ccEmail"
-                            + " LEFT JOIN ccEmailGroups ON ccEmail.ID = ccEmailGroups.EmailID)"
-                            + " LEFT JOIN ccGroups ON ccEmailGroups.GroupID = ccGroups.ID)"
-                            + " LEFT JOIN ccMemberRules ON ccGroups.ID = ccMemberRules.GroupID)"
-                            + " LEFT JOIN ccMembers ON ccMemberRules.MemberID = ccMembers.ID)"
+                            + " LEFT JOIN ccEmailGroups ON ccEmail.Id = ccEmailGroups.EmailID)"
+                            + " LEFT JOIN ccGroups ON ccEmailGroups.GroupId = ccGroups.ID)"
+                            + " LEFT JOIN ccMemberRules ON ccGroups.Id = ccMemberRules.GroupID)"
+                            + " LEFT JOIN ccMembers ON ccMemberRules.memberId = ccMembers.ID)"
                             + " Where (ccEmail.id Is Not Null)"
                             + " and(DATEADD(day, -ccEmail.ConditionPeriod, ccMemberRules.DateExpires) < " + SQLDateNow + ")" // dont send before
                             + " and(DATEADD(day, -ccEmail.ConditionPeriod-1.0, ccMemberRules.DateExpires) > " + SQLDateNow + ")" // don't send after 1-day
@@ -254,32 +254,32 @@ namespace Contensive.Addons.Email {
                             + " AND (ccEmail.ConditionExpireDate > " + SQLDateNow + " OR ccEmail.ConditionExpireDate IS NULL)"
                             + " AND (ccEmail.ScheduleDate < " + SQLDateNow + " OR ccEmail.ScheduleDate IS NULL)"
                             + " AND (ccEmail.Submitted <> 0)"
-                            + " AND (ccEmail.ConditionID = 1)"
+                            + " AND (ccEmail.ConditionId = 1)"
                             + " AND (ccEmail.ConditionPeriod IS NOT NULL)"
                             + " AND (ccGroups.Active <> 0)"
                             + " AND (ccGroups.AllowBulkEmail <> 0)"
                             + " AND (ccMembers.ID IS NOT NULL)"
                             + " AND (ccMembers.Active <> 0)"
                             + " AND (ccMembers.AllowBulkEmail <> 0)"
-                            + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=ccMembers.ID))";
+                            + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.memberId=ccMembers.ID))";
                         csList.openSql(SQL, "Default");
                         while (csList.ok()) {
-                            int emailID = csList.getInteger("EmailID");
-                            int EmailMemberID = csList.getInteger("MemberID");
+                            int emailId = csList.getInteger("EmailID");
+                            int EmailMemberId = csList.getInteger("MemberID");
                             DateTime EmailDateExpires = csList.getDate("DateExpires");
                             //
                             using (var csEmail = new CsModel(core)) {
-                                csEmail.openRecord("Conditional Email", emailID);
+                                csEmail.openRecord("Conditional Email", emailId);
                                 if (csEmail.ok()) {
-                                    int EmailTemplateID = csEmail.getInteger("EmailTemplateID");
-                                    string EmailTemplate = getEmailTemplate(core, EmailTemplateID);
+                                    int EmailTemplateId = csEmail.getInteger("EmailTemplateID");
+                                    string EmailTemplate = getEmailTemplate(core, EmailTemplateId);
                                     string FromAddress = csEmail.getText("FromAddress");
-                                    int ConfirmationMemberID = csEmail.getInteger("testmemberid");
-                                    bool EmailAddLinkEID = csEmail.getBoolean("AddLinkEID");
+                                    int ConfirmationMemberId = csEmail.getInteger("testmemberid");
+                                    bool EmailAddLinkEid = csEmail.getBoolean("AddLinkEID");
                                     string EmailSubject = csEmail.getText("Subject");
                                     string EmailCopy = csEmail.getText("CopyFilename");
-                                    string EmailStatus = queueEmailRecord(core, "Conditional Email", EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, csEmail.getText("Subject"), csEmail.getText("CopyFilename"), csEmail.getBoolean("AllowSpamFooter"), csEmail.getBoolean("AddLinkEID"), "");
-                                    queueConfirmationEmail(core, ConfirmationMemberID, 0, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>", "Conditional Email");
+                                    string EmailStatus = queueEmailRecord(core, "Conditional Email", EmailMemberId, emailId, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, csEmail.getText("Subject"), csEmail.getText("CopyFilename"), csEmail.getBoolean("AllowSpamFooter"), csEmail.getBoolean("AddLinkEID"), "");
+                                    queueConfirmationEmail(core, ConfirmationMemberId, 0, EmailTemplate, EmailAddLinkEid, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>", "Conditional Email");
                                 }
                                 csEmail.close();
                             }
@@ -503,7 +503,7 @@ namespace Contensive.Addons.Email {
                         + BR + EmailStatusList
                         + "--- end of list ---"
                         + BR;
-                    string queryStringForLinkAppend = rnEmailClickFlag + "=" + EmailDropID + "&" + rnEmailMemberID + "=" + person.id;
+                    string queryStringForLinkAppend = rnEmailClickFlag + "=" + EmailDropID + "&" + rnEmailMemberId + "=" + person.id;
                     string sendStatus = "";
                     EmailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + core.appConfig.domainList[0], ConfirmBody, "", "", true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend, emailContextMessage);
                 }

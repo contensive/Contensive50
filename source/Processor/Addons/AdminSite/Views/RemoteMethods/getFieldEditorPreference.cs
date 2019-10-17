@@ -35,7 +35,7 @@ namespace Contensive.Addons.AdminSite {
                                         + " a.name,a.id"
                                         + " from ccfields f left join ccAggregateFunctions a on a.id=f.editorAddonId"
                                         + " where"
-                                        + " f.ID = " + fieldId + "";
+                                        + " f.Id = " + fieldId + "";
                 DataTable dt = core.db.executeQuery(Sql);
                 if (dt.Rows.Count > 0) {
                     foreach (DataRow rsDr in dt.Rows) {

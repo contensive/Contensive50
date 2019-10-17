@@ -101,9 +101,9 @@ namespace Contensive.Processor.Controllers {
                     // ----- Must test it
                     //
                     string SQL = "SELECT ccGroupRules.ContentID,allowAdd,allowDelete"
-                    + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
+                    + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupId = ccMemberRules.GroupID"
                     + " WHERE ("
-                        + " (ccMemberRules.MemberID=" + DbController.encodeSQLNumber(core.session.user.id) + ")"
+                        + " (ccMemberRules.memberId=" + DbController.encodeSQLNumber(core.session.user.id) + ")"
                         + " AND(ccMemberRules.active<>0)"
                         + " AND(ccGroupRules.active<>0)"
                         + " AND(ccGroupRules.ContentID=" + cdef.id + ")"
@@ -122,8 +122,8 @@ namespace Contensive.Processor.Controllers {
                     if (!result.allowEdit) {
                         //
                         // ----- Not a content manager for this one, check the parent
-                        if (cdef.parentID > 0) {
-                            var parentCdef = ContentMetadataModel.create(core, cdef.parentID);
+                        if (cdef.parentId > 0) {
+                            var parentCdef = ContentMetadataModel.create(core, cdef.parentId);
                             usedContentIdList.Add(cdef.id);
                             getUserAuthoringPermissions_ContentManager(core, cdef, usedContentIdList);
                         }

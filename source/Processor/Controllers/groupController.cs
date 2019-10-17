@@ -51,7 +51,7 @@ namespace Contensive.Processor.Controllers {
                     // -- add new rule
                     var rule = DbBaseModel.addDefault<MemberRuleModel>(core.cpParent, Models.Domain.ContentMetadataModel.getDefaultValueDict(core, "groups")) ;
                     rule.groupId = group.id;
-                    rule.memberID = user.id;
+                    rule.memberId = user.id;
                     rule.dateExpires = dateExpires;
                     rule.save(core.cpParent);
                     return;
@@ -293,13 +293,13 @@ namespace Contensive.Processor.Controllers {
         // ----- Returns true if the visitor is an admin, or authenticated and in the group list
         //========================================================================
         //
-        public static bool isInGroupList(CoreController core, string GroupIDList, int checkMemberID = 0, bool adminReturnsTrue = false) {
+        public static bool isInGroupList(CoreController core, string GroupIDList, int checkMemberId = 0, bool adminReturnsTrue = false) {
             bool result = false;
             try {
-                if (checkMemberID == 0) {
-                    checkMemberID = core.session.user.id;
+                if (checkMemberId == 0) {
+                    checkMemberId = core.session.user.id;
                 }
-                result = isInGroupList(core, checkMemberID, core.session.isAuthenticated, GroupIDList, adminReturnsTrue);
+                result = isInGroupList(core, checkMemberId, core.session.isAuthenticated, GroupIDList, adminReturnsTrue);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

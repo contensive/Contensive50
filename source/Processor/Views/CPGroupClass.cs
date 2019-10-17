@@ -130,13 +130,13 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void RemoveUser(string GroupNameIdOrGuid, int removeUserId) {
-            int groupID = GetId(GroupNameIdOrGuid);
+            int groupId = GetId(GroupNameIdOrGuid);
             int userId = removeUserId;
-            if (groupID != 0) {
+            if (groupId != 0) {
                 if (userId == 0) {
-                    GroupController.removeUser(core, groupID);
+                    GroupController.removeUser(core, groupId);
                 } else {
-                    GroupController.removeUser(core, groupID,userId);
+                    GroupController.removeUser(core, groupId,userId);
                 }
             }
         }

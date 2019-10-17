@@ -124,16 +124,16 @@ namespace Contensive.Processor.Controllers {
         public static string getLoginForm(CoreController core, bool forceDefaultLoginForm = false) {
             string returnHtml = "";
             try {
-                int loginAddonID = 0;
+                int loginAddonId = 0;
                 if (!forceDefaultLoginForm) {
-                    loginAddonID = core.siteProperties.getInteger("Login Page AddonID");
-                    if (loginAddonID != 0) {
+                    loginAddonId = core.siteProperties.getInteger("Login Page AddonID");
+                    if (loginAddonId != 0) {
                         //
                         // -- Custom Login
-                        AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, loginAddonID);
+                        AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, loginAddonId);
                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                            errorContextMessage = "calling login form addon [" + loginAddonID + "] from internal method"
+                            errorContextMessage = "calling login form addon [" + loginAddonId + "] from internal method"
                         };
                         returnHtml = core.addon.execute(addon, executeContext);
                         //returnHtml = core.addon.execute_legacy2(loginAddonID, "", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", False, Nothing)
@@ -148,7 +148,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                if (loginAddonID == 0) {
+                if (loginAddonId == 0) {
                     //
                     // ----- When page loads, set focus on login username
                     //
@@ -217,20 +217,20 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 if ((core.session.visit.loginAttempts < core.siteProperties.maxVisitLoginAttempts) && core.session.visit.cookieSupport) {
-                    int LocalMemberID = core.session.getUserIdForUsernameCredentials(
+                    int LocalMemberId = core.session.getUserIdForUsernameCredentials(
                         core.docProperties.getText("username"),
                         core.docProperties.getText("password")
                     );
-                    if (LocalMemberID == 0) {
+                    if (LocalMemberId == 0) {
                         if ((core.session.isAuthenticated) || (core.session.isRecognized())) { core.session.logout(); }
                         core.session.visit.loginAttempts = core.session.visit.loginAttempts + 1;
                         core.session.visit.save(core.cpParent);
                     } else {
-                        returnResult = core.session.authenticateById(LocalMemberID, core.session);
+                        returnResult = core.session.authenticateById(LocalMemberId, core.session);
                         if (returnResult) {
-                            LogController.addSiteActivity(core, "successful username/password login", core.session.user.id, core.session.user.organizationID);
+                            LogController.addSiteActivity(core, "successful username/password login", core.session.user.id, core.session.user.organizationId);
                         } else {
-                            LogController.addSiteActivity(core, "bad username/password login", core.session.user.id, core.session.user.organizationID);
+                            LogController.addSiteActivity(core, "bad username/password login", core.session.user.id, core.session.user.organizationId);
                         }
                     }
                 }
@@ -302,7 +302,7 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         EMailName = vbMid(workingEmail, 1, atPtr - 1);
                         //
-                        LogController.addSiteActivity(core, "password request for email " + workingEmail, core.session.user.id, core.session.user.organizationID);
+                        LogController.addSiteActivity(core, "password request for email " + workingEmail, core.session.user.id, core.session.user.organizationId);
                         //
                         allowEmailLogin = core.siteProperties.getBoolean("allowEmailLogin", false);
                         recordCnt = 0;

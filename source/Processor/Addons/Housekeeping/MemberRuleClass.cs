@@ -16,7 +16,7 @@ namespace Contensive.Addons.Housekeeping {
                 LogController.logInfo(core, "Deleting Member Rules with bad MemberID.");
                 string sql = "delete ccmemberrules"
                     + " From ccmemberrules"
-                    + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.MemberID"
+                    + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.memberId"
                     + " WHERE (ccmembers.ID is null)";
                 core.db.executeQuery(sql);
                 //

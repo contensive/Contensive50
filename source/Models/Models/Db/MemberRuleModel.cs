@@ -14,6 +14,6 @@ namespace Contensive.Models.Db {
         //====================================================================================================
         public DateTime? dateExpires { get; set; }
         public int groupId { get; set; }
-        public int memberID { get; set; }
+        public int memberId { get; set; }
     }
 }

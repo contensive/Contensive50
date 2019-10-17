@@ -144,7 +144,7 @@ namespace Contensive.Processor {
                 if (cp.core.session.userLanguage == null) {
                     return "";
                 }
-                LanguageModel userLanguage = DbBaseModel.create<LanguageModel>(cp, cp.core.session.user.languageID);
+                LanguageModel userLanguage = DbBaseModel.create<LanguageModel>(cp, cp.core.session.user.languageId);
                 if (userLanguage != null) {
                     return userLanguage.name;
                 }

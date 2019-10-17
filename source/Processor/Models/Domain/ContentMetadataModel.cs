@@ -116,7 +116,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// deprecate - Field Name of the required "id" field
         /// </summary>
-        public string aliasID { get; set; }
+        public string aliasId { get; set; }
         //
         /// <summary>
         /// deprecate - For admin edit page
@@ -196,7 +196,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// deprecate one day - domain model metadata calculates hasChild from this. If hasChild is false, contentcontrolid is ignored and queries are from the whole table
         /// </summary>
-        public int parentID { get; set; }
+        public int parentId { get; set; }
         //
         /// <summary>
         /// consider deprecation - read from xml, used to set parentId
@@ -319,11 +319,11 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     sql += ""
                         + " from ((((ccContent c"
-                        + " left join ccTables AS ContentTable ON c.ContentTableID = ContentTable.ID)"
-                        + " left join ccDataSources AS ContentDataSource ON ContentTable.DataSourceID = ContentDataSource.ID)"
-                        + " left join ccSortMethods ON c.DefaultSortMethodID = ccSortMethods.ID)"
-                        + " left join ccGroups ON c.EditorGroupID = ccGroups.ID)"
-                        + " left join ccAddonCollections ON c.installedByCollectionID = ccAddonCollections.ID"
+                        + " left join ccTables AS ContentTable ON c.ContentTableId = ContentTable.ID)"
+                        + " left join ccDataSources AS ContentDataSource ON ContentTable.DataSourceId = ContentDataSource.ID)"
+                        + " left join ccSortMethods ON c.DefaultSortMethodId = ccSortMethods.ID)"
+                        + " left join ccGroups ON c.EditorGroupId = ccGroups.ID)"
+                        + " left join ccAddonCollections ON c.installedByCollectionId = ccAddonCollections.ID"
                         + " where (c.Active<>0)"
                         + " and(c.id=" + content.id.ToString() + ")";
                     using (DataTable dtContent = core.db.executeQuery(sql)) {
@@ -350,7 +350,7 @@ namespace Contensive.Processor.Models.Domain {
                                 developerOnly = GenericController.encodeBoolean(contentRow[4]),
                                 adminOnly = GenericController.encodeBoolean(contentRow[5]),
                                 allowDelete = GenericController.encodeBoolean(contentRow[6]),
-                                parentID = GenericController.encodeInteger(contentRow[7]),
+                                parentId = GenericController.encodeInteger(contentRow[7]),
                                 dropDownFieldList = GenericController.vbUCase(GenericController.encodeText(contentRow[9])),
                                 tableName = GenericController.encodeText(contentTablename),
                                 dataSourceName = "default",
@@ -360,7 +360,7 @@ namespace Contensive.Processor.Models.Domain {
                                 allowContentTracking = GenericController.encodeBoolean(contentRow[19]),
                                 allowTopicRules = GenericController.encodeBoolean(contentRow[20]),
                                 activeOnly = true,
-                                aliasID = "ID",
+                                aliasId = "ID",
                                 aliasName = "NAME",
                                 installedByCollectionGuid = encodeText(contentRow[21]),
                                 isBaseContent = encodeBoolean(contentRow[22])
@@ -368,12 +368,12 @@ namespace Contensive.Processor.Models.Domain {
                             //
                             // load parent metadata fields first so we can overlay the current metadata field
                             //
-                            if (result.parentID <= 0) {
-                                result.parentID = -1;
+                            if (result.parentId <= 0) {
+                                result.parentId = -1;
                             } else {
-                                Models.Domain.ContentMetadataModel parentMetaData = create(core, result.parentID, loadInvalidFields, forceDbLoad);
+                                Models.Domain.ContentMetadataModel parentMetaData = create(core, result.parentId, loadInvalidFields, forceDbLoad);
                                 if (parentMetaData == null) {
-                                    LogController.logError(core, new GenericException("ContentMetadataModel error, loading content [" + content.id + ", " + content.name + "], parentId [" + result.parentID + "] but no parent content found."));
+                                    LogController.logError(core, new GenericException("ContentMetadataModel error, loading content [" + content.id + ", " + content.name + "], parentId [" + result.parentId + "] but no parent content found."));
                                 } else {
                                     foreach (var keyvaluepair in parentMetaData.fields) {
                                         Models.Domain.ContentFieldMetadataModel parentField = keyvaluepair.Value;
@@ -437,7 +437,7 @@ namespace Contensive.Processor.Models.Domain {
                                 + ",h.helpCustom"
                                 + ""
                                 + " from ((ccFields f"
-                                + " left join ccContent c ON f.ContentID = c.ID)"
+                                + " left join ccContent c ON f.ContentId = c.ID)"
                                 + " left join ccfieldHelp h on h.fieldid=f.id)"
                                 + ""
                                 + " where"
@@ -535,11 +535,11 @@ namespace Contensive.Processor.Models.Domain {
                                             field.installedByCollectionGuid = GenericController.encodeText(fieldRow[39]);
                                             field.isBaseField = GenericController.encodeBoolean(fieldRow[38]);
                                             field.isModifiedSinceInstalled = false;
-                                            field.lookupContentID = GenericController.encodeInteger(fieldRow[18]);
+                                            field.lookupContentId = GenericController.encodeInteger(fieldRow[18]);
                                             //.lookupContentName = ""
                                             field.lookupList = GenericController.encodeText(fieldRow[37]);
-                                            field.manyToManyContentID = GenericController.encodeInteger(fieldRow[28]);
-                                            field.manyToManyRuleContentID = GenericController.encodeInteger(fieldRow[29]);
+                                            field.manyToManyContentId = GenericController.encodeInteger(fieldRow[28]);
+                                            field.manyToManyRuleContentId = GenericController.encodeInteger(fieldRow[29]);
                                             field.manyToManyRulePrimaryField = GenericController.encodeText(fieldRow[30]);
                                             field.manyToManyRuleSecondaryField = GenericController.encodeText(fieldRow[31]);
                                             field.memberSelectGroupId_set(core, GenericController.encodeInteger(fieldRow[36]));
@@ -547,9 +547,9 @@ namespace Contensive.Processor.Models.Domain {
                                             field.notEditable = GenericController.encodeBoolean(fieldRow[26]);
                                             field.password = GenericController.encodeBoolean(fieldRow[3]);
                                             field.readOnly = GenericController.encodeBoolean(fieldRow[17]);
-                                            field.redirectContentID = GenericController.encodeInteger(fieldRow[19]);
+                                            field.redirectContentId = GenericController.encodeInteger(fieldRow[19]);
                                             //.RedirectContentName(core) = ""
-                                            field.redirectID = GenericController.encodeText(fieldRow[21]);
+                                            field.redirectId = GenericController.encodeText(fieldRow[21]);
                                             field.redirectPath = GenericController.encodeText(fieldRow[20]);
                                             field.required = GenericController.encodeBoolean(fieldRow[14]);
                                             field.rssTitleField = GenericController.encodeBoolean(fieldRow[32]);
@@ -581,7 +581,7 @@ namespace Contensive.Processor.Models.Domain {
                             }
                             //
                             // ----- Create the LegacyContentControlCriteria. For compatibility, if support=false, return (1=1)
-                            result.legacyContentControlCriteria = (result.parentID <= 0) ? "(1=1)" : getLegacyContentControlCriteria(core, result.id, result.tableName, result.dataSourceName, new List<int>());
+                            result.legacyContentControlCriteria = (result.parentId <= 0) ? "(1=1)" : getLegacyContentControlCriteria(core, result.id, result.tableName, result.dataSourceName, new List<int>());
                             //
                             create_setAdminColumns(core, result);
                         }
@@ -883,11 +883,11 @@ namespace Contensive.Processor.Models.Domain {
                     using (var db = new DbController(core, dataSourceName)) {
                         //
                         // Get the installedByCollectionId
-                        int InstalledByCollectionID = 0;
+                        int InstalledByCollectionId = 0;
                         if (!string.IsNullOrEmpty(fieldMetadata.installedByCollectionGuid)) {
                             var addonCollection = AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, fieldMetadata.installedByCollectionGuid);
                             if (addonCollection != null) {
-                                InstalledByCollectionID = addonCollection.id;
+                                InstalledByCollectionId = addonCollection.id;
                             }
                         }
                         //
@@ -907,7 +907,7 @@ namespace Contensive.Processor.Models.Domain {
                         // create or update the field
                         var sqlList = new NameValueCollection {
                             { "ACTIVE", DbController.encodeSQLBoolean(fieldMetadata.active) },
-                            { "MODIFIEDBY", DbController.encodeSQLNumber(SystemMemberID) },
+                            { "MODIFIEDBY", DbController.encodeSQLNumber(SystemMemberId) },
                             { "MODIFIEDDATE", DbController.encodeSQLDate(DateTime.Now) },
                             { "TYPE", DbController.encodeSQLNumber((int)fieldMetadata.fieldTypeId) },
                             { "CAPTION", DbController.encodeSQLText(fieldMetadata.caption) },
@@ -926,20 +926,20 @@ namespace Contensive.Processor.Models.Domain {
                             { "INDEXCOLUMN", DbController.encodeSQLNumber(fieldMetadata.indexColumn) },
                             { "INDEXWIDTH", DbController.encodeSQLText(fieldMetadata.indexWidth) },
                             { "INDEXSORTPRIORITY", DbController.encodeSQLNumber(fieldMetadata.indexSortOrder) },
-                            { "REDIRECTID", DbController.encodeSQLText(fieldMetadata.redirectID) },
+                            { "REDIRECTID", DbController.encodeSQLText(fieldMetadata.redirectId) },
                             { "REDIRECTPATH", DbController.encodeSQLText(fieldMetadata.redirectPath) },
                             { "UNIQUENAME", DbController.encodeSQLBoolean(fieldMetadata.uniqueName) },
                             { "RSSTITLEFIELD", DbController.encodeSQLBoolean(fieldMetadata.rssTitleField) },
                             { "RSSDESCRIPTIONFIELD", DbController.encodeSQLBoolean(fieldMetadata.rssDescriptionField) },
                             { "MEMBERSELECTGROUPID", DbController.encodeSQLNumber(fieldMetadata.memberSelectGroupId_get(core)) },
-                            { "installedByCollectionId", DbController.encodeSQLNumber(InstalledByCollectionID) },
+                            { "installedByCollectionId", DbController.encodeSQLNumber(InstalledByCollectionId) },
                             { "EDITTAB", DbController.encodeSQLText(fieldMetadata.editTabName) },
                             { "SCRAMBLE", DbController.encodeSQLBoolean(false) },
                             { "ISBASEFIELD", DbController.encodeSQLBoolean(fieldMetadata.isBaseField) },
                             { "LOOKUPLIST", DbController.encodeSQLText(fieldMetadata.lookupList) }
                         };
-                        int RedirectContentID = 0;
-                        int LookupContentID = 0;
+                        int RedirectContentId = 0;
+                        int LookupContentId = 0;
                         //
                         // -- conditional fields
                         switch (fieldMetadata.fieldTypeId) {
@@ -949,12 +949,12 @@ namespace Contensive.Processor.Models.Domain {
                                 //
                                 string LookupContentName = fieldMetadata.get_lookupContentName(core);
                                 if (!string.IsNullOrEmpty(LookupContentName)) {
-                                    LookupContentID = ContentMetadataModel.getContentId(core, LookupContentName);
-                                    if (LookupContentID <= 0) {
+                                    LookupContentId = ContentMetadataModel.getContentId(core, LookupContentName);
+                                    if (LookupContentId <= 0) {
                                         LogController.logError(core, "Could not create lookup field [" + fieldMetadata.nameLc + "] for content definition [" + name + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
                                     }
                                 }
-                                sqlList.Add("LOOKUPCONTENTID", DbController.encodeSQLNumber(LookupContentID));
+                                sqlList.Add("LOOKUPCONTENTID", DbController.encodeSQLNumber(LookupContentId));
                                 break;
                             case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
                                 //
@@ -962,20 +962,20 @@ namespace Contensive.Processor.Models.Domain {
                                 //
                                 string ManyToManyContent = fieldMetadata.get_manyToManyContentName(core);
                                 if (!string.IsNullOrEmpty(ManyToManyContent)) {
-                                    int ManyToManyContentID = ContentMetadataModel.getContentId(core, ManyToManyContent);
-                                    if (ManyToManyContentID <= 0) {
+                                    int ManyToManyContentId = ContentMetadataModel.getContentId(core, ManyToManyContent);
+                                    if (ManyToManyContentId <= 0) {
                                         LogController.logError(core, "Could not create many-to-many field [" + fieldMetadata.nameLc + "] for [" + name + "] because no content definition was found For many-to-many-content [" + ManyToManyContent + "].");
                                     }
-                                    sqlList.Add("MANYTOMANYCONTENTID", DbController.encodeSQLNumber(ManyToManyContentID));
+                                    sqlList.Add("MANYTOMANYCONTENTID", DbController.encodeSQLNumber(ManyToManyContentId));
                                 }
                                 //
                                 string ManyToManyRuleContent = fieldMetadata.get_manyToManyRuleContentName(core);
                                 if (!string.IsNullOrEmpty(ManyToManyRuleContent)) {
-                                    int ManyToManyRuleContentID = ContentMetadataModel.getContentId(core, ManyToManyRuleContent);
-                                    if (ManyToManyRuleContentID <= 0) {
+                                    int ManyToManyRuleContentId = ContentMetadataModel.getContentId(core, ManyToManyRuleContent);
+                                    if (ManyToManyRuleContentId <= 0) {
                                         LogController.logError(core, "Could not create many-to-many field [" + fieldMetadata.nameLc + "] for [" + name + "] because no content definition was found For many-to-many-rule-content [" + ManyToManyRuleContent + "].");
                                     }
-                                    sqlList.Add("MANYTOMANYRULECONTENTID", DbController.encodeSQLNumber(ManyToManyRuleContentID));
+                                    sqlList.Add("MANYTOMANYRULECONTENTID", DbController.encodeSQLNumber(ManyToManyRuleContentId));
                                 }
                                 sqlList.Add("MANYTOMANYRULEPRIMARYFIELD", DbController.encodeSQLText(fieldMetadata.manyToManyRulePrimaryField));
                                 sqlList.Add("MANYTOMANYRULESECONDARYFIELD", DbController.encodeSQLText(fieldMetadata.manyToManyRuleSecondaryField));
@@ -985,12 +985,12 @@ namespace Contensive.Processor.Models.Domain {
                                 // -- redirect field
                                 string RedirectContentName = fieldMetadata.get_redirectContentName(core);
                                 if (!string.IsNullOrEmpty(RedirectContentName)) {
-                                    RedirectContentID = ContentMetadataModel.getContentId(core, RedirectContentName);
-                                    if (RedirectContentID <= 0) {
+                                    RedirectContentId = ContentMetadataModel.getContentId(core, RedirectContentName);
+                                    if (RedirectContentId <= 0) {
                                         LogController.logError(core, "Could not create redirect field [" + fieldMetadata.nameLc + "] for Content Definition [" + name + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
                                     }
                                 }
-                                sqlList.Add("REDIRECTCONTENTID", DbController.encodeSQLNumber(RedirectContentID));
+                                sqlList.Add("REDIRECTCONTENTID", DbController.encodeSQLNumber(RedirectContentId));
                                 break;
                         }
                         //
@@ -999,7 +999,7 @@ namespace Contensive.Processor.Models.Domain {
                             sqlList.Add("CONTENTID", DbController.encodeSQLNumber(id));
                             sqlList.Add("CREATEKEY", "0");
                             sqlList.Add("DATEADDED", DbController.encodeSQLDate(DateTime.Now));
-                            sqlList.Add("CREATEDBY", DbController.encodeSQLNumber(SystemMemberID));
+                            sqlList.Add("CREATEDBY", DbController.encodeSQLNumber(SystemMemberId));
                             fieldMetadata.id = db.insertGetId("ccFields");
                             //
                             if (!blockCacheClear) {
@@ -1059,9 +1059,9 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     //
                     // get InstalledByCollectionID
-                    int InstalledByCollectionID = 0;
+                    int InstalledByCollectionId = 0;
                     var collection = AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, contentMetadata.installedByCollectionGuid);
-                    if (collection != null) { InstalledByCollectionID = collection.id; }
+                    if (collection != null) { InstalledByCollectionId = collection.id; }
                     //
                     // Get the table object for this content metadata, create one if missing
                     var table = DbBaseModel.createByUniqueName<TableModel>(core.cpParent, contentMetadata.tableName);
@@ -1092,22 +1092,22 @@ namespace Contensive.Processor.Models.Domain {
                             }
                         }
                         table.save(core.cpParent);
-                        content.contentTableID = table.id;
-                        content.authoringTableID = table.id;
+                        content.contentTableId = table.id;
+                        content.authoringTableId = table.id;
                         content.save(core.cpParent);
                     }
                     //
                     // sortmethod - First try lookup by name
-                    int defaultSortMethodID = 0;
+                    int defaultSortMethodId = 0;
                     if (!string.IsNullOrEmpty(contentMetadata.defaultSortMethod)) {
                         var sortMethod = DbBaseModel.createByUniqueName<SortMethodModel>(core.cpParent, contentMetadata.defaultSortMethod);
-                        if (sortMethod != null) { defaultSortMethodID = sortMethod.id; }
+                        if (sortMethod != null) { defaultSortMethodId = sortMethod.id; }
                     }
-                    if (defaultSortMethodID == 0) {
+                    if (defaultSortMethodId == 0) {
                         //
                         // fallback - maybe they put the orderbyclause in (common mistake)
                         var sortMethodList = DbBaseModel.createList<SortMethodModel>(core.cpParent, "(OrderByClause=" + DbController.encodeSQLText(contentMetadata.defaultSortMethod) + ")and(active<>0)", "id");
-                        if (sortMethodList.Count() > 0) { defaultSortMethodID = sortMethodList.First().id; }
+                        if (sortMethodList.Count() > 0) { defaultSortMethodId = sortMethodList.First().id; }
                     }
 
                     //
@@ -1124,13 +1124,13 @@ namespace Contensive.Processor.Models.Domain {
                         { "DeveloperOnly", DbController.encodeSQLBoolean(contentMetadata.developerOnly) },
                         { "AdminOnly", DbController.encodeSQLBoolean(contentMetadata.adminOnly) },
                         { "ParentID", DbController.encodeSQLNumber(parentId) },
-                        { "DefaultSortMethodID", DbController.encodeSQLNumber(defaultSortMethodID) },
+                        { "DefaultSortMethodID", DbController.encodeSQLNumber(defaultSortMethodId) },
                         { "DropDownFieldList", DbController.encodeSQLText(encodeEmpty(contentMetadata.dropDownFieldList, "Name")) },
                         { "ContentTableID", DbController.encodeSQLNumber(table.id) },
                         { "AuthoringTableID", DbController.encodeSQLNumber(table.id) },
                         { "ModifiedDate", DbController.encodeSQLDate(DateTime.Now) },
-                        { "CreatedBy", DbController.encodeSQLNumber(SystemMemberID) },
-                        { "ModifiedBy", DbController.encodeSQLNumber(SystemMemberID) },
+                        { "CreatedBy", DbController.encodeSQLNumber(SystemMemberId) },
+                        { "ModifiedBy", DbController.encodeSQLNumber(SystemMemberId) },
                         { "AllowCalendarEvents", DbController.encodeSQLBoolean(contentMetadata.allowCalendarEvents) },
                         { "AllowContentTracking", DbController.encodeSQLBoolean(contentMetadata.allowContentTracking) },
                         { "AllowTopicRules", DbController.encodeSQLBoolean(contentMetadata.allowTopicRules) },
@@ -1139,7 +1139,7 @@ namespace Contensive.Processor.Models.Domain {
                         { "IconHeight", DbController.encodeSQLNumber(contentMetadata.iconHeight) },
                         { "IconWidth", DbController.encodeSQLNumber(contentMetadata.iconWidth) },
                         { "IconSprites", DbController.encodeSQLNumber(contentMetadata.iconSprites) },
-                        { "installedByCollectionid", DbController.encodeSQLNumber(InstalledByCollectionID) },
+                        { "installedByCollectionid", DbController.encodeSQLNumber(InstalledByCollectionId) },
                         { "isBaseContent", DbController.encodeSQLBoolean(contentMetadata.isBaseContent) }
                     };
                     db.update("ccContent", "ID=" + contentMetadata.id, sqlList);
@@ -1440,7 +1440,7 @@ namespace Contensive.Processor.Models.Domain {
                     result = adminOnly.ToString();
                     break;
                 case "ALIASID":
-                    result = aliasID;
+                    result = aliasId;
                     break;
                 case "ALIASNAME":
                     result = aliasName;
@@ -1474,7 +1474,7 @@ namespace Contensive.Processor.Models.Domain {
                     result = name;
                     break;
                 case "PARENTID":
-                    result = parentID.ToString();
+                    result = parentId.ToString();
                     //Case "SINGLERECORD"
                     //    main_result = Contentdefinition.SingleRecord
                     break;
@@ -1561,13 +1561,13 @@ namespace Contensive.Processor.Models.Domain {
                 if (childContent != null) {
                     //
                     // -- child content already exists
-                    if (childContent.parentID != id) { throw (new GenericException("Can not create Child Content [" + childContentName + "] because this content name is already in use.")); }
+                    if (childContent.parentId != id) { throw (new GenericException("Can not create Child Content [" + childContentName + "] because this content name is already in use.")); }
                     return createByUniqueName(core, childContentName);
                 }
                 //
                 // -- convert this object to a child of the record it was opened with, and save
                 childContent = DbBaseModel.createByUniqueName<ContentModel>(core.cpParent, name);
-                childContent.parentID = childContent.id;
+                childContent.parentId = childContent.id;
                 childContent.name = childContentName;
                 childContent.createdBy = childContent.modifiedBy = memberID;
                 childContent.dateAdded = childContent.modifiedDate = DateTime.Now;

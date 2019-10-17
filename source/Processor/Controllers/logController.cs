@@ -260,7 +260,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Link"></param>
         /// <param name="VisitorID"></param>
         /// <param name="VisitID"></param>
-        public static void addSiteActivity(CoreController core, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
+        public static void addSiteActivity(CoreController core, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorId = 0, int VisitId = 0) {
             try {
                 //
                 if (Message.Length > 255) Message = Message.Substring(0, 255);
@@ -271,8 +271,8 @@ namespace Contensive.Processor.Controllers {
                         csData.set("OrganizationID", SubjectOrganizationID);
                         csData.set("Message", Message);
                         csData.set("Link", Link);
-                        csData.set("VisitorID", VisitorID);
-                        csData.set("VisitID", VisitID);
+                        csData.set("VisitorID", VisitorId);
+                        csData.set("VisitID", VisitId);
                     }
                 }
                 //

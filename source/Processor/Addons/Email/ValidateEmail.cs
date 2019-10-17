@@ -34,14 +34,14 @@ namespace Contensive.Addons.Primitives {
                             EmailController.addToBlockList(core, recipientEmailToBlock);
                             //
                             // -- log entry to track the result of this email drop
-                            int emailDropId = core.docProperties.getInteger(rnEmailBlockRequestDropID);
+                            int emailDropId = core.docProperties.getInteger(rnEmailBlockRequestDropId);
                             if (emailDropId != 0) {
                                 EmailDropModel emailDrop = DbBaseModel.create<EmailDropModel>(cp, emailDropId);
                                 if (emailDrop != null) {
                                     EmailLogModel log = new EmailLogModel() {
                                         name = "User " + recipient.name + " clicked linked spam block from email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString(),
-                                        emailDropID = emailDrop.id,
-                                        memberID = recipient.id,
+                                        emailDropId = emailDrop.id,
+                                        memberId = recipient.id,
                                         logType = EmailLogTypeBlockRequest
                                     };
                                 }

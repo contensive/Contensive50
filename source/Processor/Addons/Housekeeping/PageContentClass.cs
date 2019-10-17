@@ -26,13 +26,13 @@ namespace Contensive.Addons.Housekeeping {
                     using (var csData = new CsModel(core)) {
                         csData.openSql(SQL, "Default");
                         while (csData.ok()) {
-                            int RecordID = csData.getInteger("ID");
-                            int ArchiveParentID = csData.getInteger("ArchiveParentID");
-                            if (ArchiveParentID == 0) {
-                                SQL = "update ccpagecontent set DateArchive=null where (id=" + RecordID + ")";
+                            int RecordId = csData.getInteger("ID");
+                            int ArchiveParentId = csData.getInteger("ArchiveParentID");
+                            if (ArchiveParentId == 0) {
+                                SQL = "update ccpagecontent set DateArchive=null where (id=" + RecordId + ")";
                                 core.db.executeQuery(SQL);
                             } else {
-                                SQL = "update ccpagecontent set ArchiveParentID=null,DateArchive=null,parentid=" + ArchiveParentID + " where (id=" + RecordID + ")";
+                                SQL = "update ccpagecontent set ArchiveParentID=null,DateArchive=null,parentid=" + ArchiveParentId + " where (id=" + RecordId + ")";
                                 core.db.executeQuery(SQL);
                                 NeedToClearCache = true;
                             }
@@ -108,7 +108,7 @@ namespace Contensive.Addons.Housekeeping {
                         DateTime DateEnd = default(DateTime);
                         DateEnd = PeriodDatePtr.AddHours(HourDuration).Date;
                         string PageTitle = "";
-                        int PageID = 0;
+                        int PageId = 0;
                         int PageViews = 0;
                         int AuthenticatedPageViews = 0;
                         int MobilePageViews = 0;
@@ -134,7 +134,7 @@ namespace Contensive.Addons.Housekeeping {
                             if (!csPages.openSql(sql)) {
                                 //
                                 // no hits found - add or update a single record for this day so we know it has been calculated
-                                csPages.open("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")");
+                                csPages.open("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageId + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")");
                                 if (!csPages.ok()) {
                                     csPages.close();
                                     csPages.insert("Page View Summary");
@@ -146,7 +146,7 @@ namespace Contensive.Addons.Housekeeping {
                                     csPages.set("TimeNumber", TimeNumber);
                                     csPages.set("TimeDuration", HourDuration);
                                     csPages.set("PageViews", PageViews);
-                                    csPages.set("PageID", PageID);
+                                    csPages.set("PageID", PageId);
                                     csPages.set("PageTitle", PageTitle);
                                     csPages.set("AuthenticatedPageViews", AuthenticatedPageViews);
                                     csPages.set("NoCookiePageViews", NoCookiePageViews);
@@ -163,10 +163,10 @@ namespace Contensive.Addons.Housekeeping {
                                 // add an entry for each page hit on this day
                                 //
                                 while (csPages.ok()) {
-                                    PageID = csPages.getInteger("recordid");
+                                    PageId = csPages.getInteger("recordid");
                                     PageTitle = csPages.getText("pagetitle");
                                     string baseCriteria = ""
-                                        + " (h.recordid=" + PageID + ")"
+                                        + " (h.recordid=" + PageId + ")"
                                         + " "
                                         + " and(h.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
                                         + " and(h.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
@@ -247,7 +247,7 @@ namespace Contensive.Addons.Housekeeping {
                                     // Add or update the Visit Summary Record
                                     //
                                     using (var csPVS = new CsModel(core)) {
-                                        if (!csPVS.open("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")")) {
+                                        if (!csPVS.open("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageId + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")")) {
                                             csPVS.insert("Page View Summary");
                                         }
                                         //
@@ -255,7 +255,7 @@ namespace Contensive.Addons.Housekeeping {
                                             hint = 11;
                                             string PageName = "";
                                             if (string.IsNullOrEmpty(PageTitle)) {
-                                                PageName = MetadataController.getRecordName(core, "page content", PageID);
+                                                PageName = MetadataController.getRecordName(core, "page content", PageId);
                                                 csPVS.set("name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageName);
                                                 csPVS.set("PageTitle", PageName);
                                             } else {
@@ -266,7 +266,7 @@ namespace Contensive.Addons.Housekeeping {
                                             csPVS.set("TimeNumber", TimeNumber);
                                             csPVS.set("TimeDuration", HourDuration);
                                             csPVS.set("PageViews", PageViews);
-                                            csPVS.set("PageID", PageID);
+                                            csPVS.set("PageID", PageId);
                                             csPVS.set("AuthenticatedPageViews", AuthenticatedPageViews);
                                             csPVS.set("NoCookiePageViews", NoCookiePageViews);
                                             hint = 12;

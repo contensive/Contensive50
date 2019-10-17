@@ -1515,7 +1515,7 @@ namespace Contensive.Processor.Controllers {
                 if (remoteQuery == null) {
                     throw new GenericException("remoteQuery was not found with key [" + remoteQueryKey + "]");
                 } else {
-                    result = executeQuery(remoteQuery.SQLQuery);
+                    result = executeQuery(remoteQuery.sqlQuery);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

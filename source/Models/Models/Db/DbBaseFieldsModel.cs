@@ -30,7 +30,7 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// id of the metadata record in ccContent that controls the display and handing for this record
         /// </summary>
-        public int contentControlID { get; set; }
+        public int contentControlId { get; set; }
         /// <summary>
         /// foreign key to ccmembers table, populated by admin when record added.
         /// </summary>

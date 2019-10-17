@@ -113,7 +113,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- context not configured 
                         LogController.logError(core, new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."));
-                    } else if (!string.IsNullOrEmpty(addon.objectProgramID)) {
+                    } else if (!string.IsNullOrEmpty(addon.objectProgramId)) {
                         //
                         // -- addons with activeX components are deprecated
                         string addonDescription = getAddonDescription(core, addon);
@@ -183,7 +183,7 @@ namespace Contensive.Processor.Controllers {
                             hint = "05";
                             //
                             // -- add instance properties to doc properties
-                            string ContainerCssID = "";
+                            string containerCssId = "";
                             string ContainerCssClass = "";
                             foreach (var kvp in executeContext.argumentKeyValuePairs) {
                                 switch (kvp.Key.ToLowerInvariant()) {
@@ -194,7 +194,7 @@ namespace Contensive.Processor.Controllers {
                                         addon.asAjax = GenericController.encodeBoolean(kvp.Value);
                                         break;
                                     case "css container id":
-                                        ContainerCssID = kvp.Value;
+                                        containerCssId = kvp.Value;
                                         break;
                                     case "css container class":
                                         ContainerCssClass = kvp.Value;
@@ -400,11 +400,11 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- Add Css containers
                                 hint = "22";
-                                if (!string.IsNullOrEmpty(ContainerCssID) || !string.IsNullOrEmpty(ContainerCssClass)) {
+                                if (!string.IsNullOrEmpty(containerCssId) || !string.IsNullOrEmpty(ContainerCssClass)) {
                                     if (addon.isInline) {
-                                        result = "\r<span id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\" style=\"display:inline;\">" + result + "</span>";
+                                        result = "\r<span id=\"" + containerCssId + "\" class=\"" + ContainerCssClass + "\" style=\"display:inline;\">" + result + "</span>";
                                     } else {
-                                        result = "\r<div id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\">" + nop(result) + "\r</div>";
+                                        result = "\r<div id=\"" + containerCssId + "\" class=\"" + ContainerCssClass + "\">" + nop(result) + "\r</div>";
                                     }
                                 }
                                 //
@@ -417,7 +417,7 @@ namespace Contensive.Processor.Controllers {
                                     hint = "14.1";
                                     try {
                                         hint = "14.2";
-                                        if (addon.scriptingLanguageID == (int)ScriptLanguages.Javascript) {
+                                        if (addon.scriptingLanguageId == (int)ScriptLanguages.Javascript) {
                                             hint = "14.3";
                                             result += execute_Script_JScript(ref addon);
                                         } else {
@@ -434,7 +434,7 @@ namespace Contensive.Processor.Controllers {
                                 // -- DotNet
                                 hint = "15";
                                 if (addon.dotNetClass != "") {
-                                    result += execute_dotNetClass(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, addon.collectionID));
+                                    result += execute_dotNetClass(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, addon.collectionId));
                                 }
 
                             }
@@ -942,7 +942,7 @@ namespace Contensive.Processor.Controllers {
                                                                     csData.close();
                                                                     csData.insert("Copy Content");
                                                                     if (csData.ok()) {
-                                                                        int RecordID = csData.getInteger("ID");
+                                                                        int RecordId = csData.getInteger("ID");
                                                                         csData.set("name", FieldName);
                                                                         csData.set("copy", GenericController.encodeText(TabNode.InnerText));
                                                                         csData.save();
@@ -1895,7 +1895,7 @@ namespace Contensive.Processor.Controllers {
             string addonDescription = "[invalid addon]";
             if (addon != null) {
                 string collectionName = "invalid collection or collection not set";
-                AddonCollectionModel collection = AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, addon.collectionID);
+                AddonCollectionModel collection = AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, addon.collectionId);
                 if (collection != null) {
                     collectionName = collection.name;
                 }

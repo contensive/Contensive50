@@ -15,7 +15,7 @@ namespace Contensive.Models.Db {
         public string briefFilename { get; set; }
         public string city { get; set; }
         public int clicks { get; set; }
-        public int contactMemberID { get; set; }
+        public int contactMemberId { get; set; }
         public string copyFilename { get; set; }
         public string country { get; set; }
         public string email { get; set; }

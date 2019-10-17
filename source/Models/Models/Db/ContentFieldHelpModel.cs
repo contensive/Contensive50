@@ -14,7 +14,7 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         //
-        public int fieldID { get; set; }
+        public int fieldId { get; set; }
         public string helpCustom { get; set; }
         public string helpDefault { get; set; }
         //

@@ -11,7 +11,7 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         public string abbreviation { get; set; }
-        public int countryID { get; set; }
+        public int countryId { get; set; }
         public double salesTax { get; set; }
     }
 }

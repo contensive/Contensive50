@@ -38,13 +38,13 @@ namespace Contensive.Addons.AdminSite {
                 }
                 IndexConfigClass IndexConfig = IndexConfigClass.get(core, adminData);
                 int ToolsAction = core.docProperties.getInteger("dta");
-                int TargetFieldID = core.docProperties.getInteger("fi");
+                int TargetFieldId = core.docProperties.getInteger("fi");
                 string TargetFieldName = core.docProperties.getText("FieldName");
                 int ColumnPointer = core.docProperties.getInteger("dtcn");
                 const string RequestNameAddField = "addfield";
                 string FieldNameToAdd = GenericController.vbUCase(core.docProperties.getText(RequestNameAddField));
-                const string RequestNameAddFieldID = "addfieldID";
-                int FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldID);
+                const string RequestNameAddFieldId = "addfieldID";
+                int FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldId);
                 bool normalizeSaveLoad = core.docProperties.getBoolean("NeedToReloadConfig");
                 bool AllowContentAutoLoad = false;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
@@ -66,7 +66,7 @@ namespace Contensive.Addons.AdminSite {
                         AllowContentAutoLoad = (core.siteProperties.getBoolean("AllowContentAutoLoad", true));
                         core.siteProperties.setProperty("AllowContentAutoLoad", false);
                         bool reloadMetadata = false;
-                        int SourceContentID = 0;
+                        int SourceContentId = 0;
                         string SourceName = null;
                         //
                         // Make sure the FieldNameToAdd is not-inherited, if not, create new field
@@ -76,12 +76,12 @@ namespace Contensive.Addons.AdminSite {
                                 ContentFieldMetadataModel field = keyValuePair.Value;
                                 if (field.id == FieldIDToAdd) {
                                     if (field.inherited) {
-                                        SourceContentID = field.contentId;
+                                        SourceContentId = field.contentId;
                                         SourceName = field.nameLc;
                                         //
                                         // -- copy the field
                                         using (var CSSource = new CsModel(core)) {
-                                            if (CSSource.open("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
+                                            if (CSSource.open("Content Fields", "(ContentID=" + SourceContentId + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
                                                 using (var CSTarget = new CsModel(core)) {
                                                     if (CSTarget.insert("Content Fields")) {
                                                         CSSource.copyRecord(CSTarget);
@@ -102,10 +102,10 @@ namespace Contensive.Addons.AdminSite {
                         foreach (var column in IndexConfig.columns) {
                             ContentFieldMetadataModel field = adminContent.fields[column.Name.ToLowerInvariant()];
                             if (field.inherited) {
-                                SourceContentID = field.contentId;
+                                SourceContentId = field.contentId;
                                 SourceName = field.nameLc;
                                 using (var CSSource = new CsModel(core)) {
-                                    if (CSSource.open("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
+                                    if (CSSource.open("Content Fields", "(ContentID=" + SourceContentId + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
                                         using (var CSTarget = new CsModel(core)) {
                                             if (CSTarget.insert("Content Fields")) {
                                                 CSSource.copyRecord(CSTarget);
@@ -407,7 +407,7 @@ namespace Contensive.Addons.AdminSite {
                                 } else {
                                     //
                                     // can be used as column header
-                                    string link = "?" + core.doc.refreshQueryString + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldID + "=" + field.id + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
+                                    string link = "?" + core.doc.refreshQueryString + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldId + "=" + field.id + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
                                     Stream.Add(HtmlController.div(AdminUIController.getPlusLink(link, "&nbsp;" + field.caption)));
                                 }
                             }

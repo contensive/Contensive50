@@ -15,16 +15,16 @@ namespace Contensive.Models.Db {
         public bool excludeFromAnalytics { get; set; }
         public string form { get; set; }
         public string host { get; set; }
-        public int memberID { get; set; }
+        public int memberId { get; set; }
         public string page { get; set; }
         public int pageTime { get; set; }
         public string pageTitle { get; set; }
         public string path { get; set; }
         public string queryString { get; set; }
-        public int recordID { get; set; }
+        public int recordId { get; set; }
         public string referer { get; set; }
         public bool stateOK { get; set; }
-        public int visitID { get; set; }
-        public int visitorID { get; set; }
+        public int visitId { get; set; }
+        public int visitorId { get; set; }
     }
 }

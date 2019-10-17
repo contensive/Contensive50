@@ -337,8 +337,8 @@ namespace Contensive.Processor {
                                         if (string.IsNullOrEmpty(DefaultValueText)) {
                                             DefaultValueText = "null";
                                         } else {
-                                            if (field.lookupContentID != 0) {
-                                                string LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentID);
+                                            if (field.lookupContentId != 0) {
+                                                string LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentId);
                                                 if (!string.IsNullOrEmpty(LookupContentName)) {
                                                     DefaultValueText = MetadataController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText).ToString();
                                                 }
@@ -920,14 +920,14 @@ namespace Contensive.Processor {
                 //
                 // -- many-to-many field, special case, return record id list
                 if (field.fieldTypeId ==  CPContentBaseClass.FieldTypeIdEnum.ManyToMany) {
-                    int RecordID = 0;
+                    int RecordId = 0;
                     string DbTable = null;
                     string ContentName = null;
                     if (this.contentMeta.fields.ContainsKey("id")) {
-                        RecordID = GenericController.encodeInteger(getRawData("id"));
-                        ContentName = MetadataController.getContentNameByID(core, field.manyToManyRuleContentID);
+                        RecordId = GenericController.encodeInteger(getRawData("id"));
+                        ContentName = MetadataController.getContentNameByID(core, field.manyToManyRuleContentId);
                         DbTable = MetadataController.getContentTablename(core, ContentName);
-                        using (DataTable dt = core.db.executeQuery("Select " + field.manyToManyRuleSecondaryField + " from " + DbTable + " where " + field.manyToManyRulePrimaryField + "=" + RecordID)) {
+                        using (DataTable dt = core.db.executeQuery("Select " + field.manyToManyRuleSecondaryField + " from " + DbTable + " where " + field.manyToManyRulePrimaryField + "=" + RecordId)) {
                             if (DbController.isDataTableOk(dt)) {
                                 foreach (DataRow dr in dt.Rows) {
                                     result += "," + dr[0].ToString();
@@ -960,8 +960,8 @@ namespace Contensive.Processor {
                         //
                         // -- Lookup
                         if (!rawData.IsNumeric()) { return string.Empty; }
-                        if (field.lookupContentID > 0) {
-                            string LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentID);
+                        if (field.lookupContentId > 0) {
+                            string LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentId);
                             if (!string.IsNullOrEmpty(LookupContentName)) {
                                 //
                                 // -- First try Lookup Content
@@ -1539,8 +1539,8 @@ namespace Contensive.Processor {
                     //
                     string SQL = "SELECT DISTINCT ccMembers.id"
                         + " FROM (ccMembers"
-                        + " LEFT JOIN ccMemberRules ON ccMembers.ID = ccMemberRules.MemberID)"
-                        + " LEFT JOIN ccGroups ON ccMemberRules.GroupID = ccGroups.ID"
+                        + " LEFT JOIN ccMemberRules ON ccMembers.Id = ccMemberRules.memberId)"
+                        + " LEFT JOIN ccGroups ON ccMemberRules.GroupId = ccGroups.ID"
                         + " WHERE (ccMemberRules.Active<>0)AND(ccGroups.Active<>0)";
                     //
                     if (activeOnly) {
@@ -1791,8 +1791,8 @@ namespace Contensive.Processor {
                     + ",ccContentWatch.RecordID as RecordID"
                     + ",ccContentWatch.ModifiedDate as ModifiedDate"
                     + " FROM (ccContentWatchLists"
-                    + " LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.ID = ccContentWatchListRules.ContentWatchListID)"
-                    + " LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchID = ccContentWatch.ID"
+                    + " LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.Id = ccContentWatchListRules.ContentWatchListID)"
+                    + " LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchId = ccContentWatch.ID"
                     + " WHERE (((ccContentWatchLists.Name)=" + DbController.encodeSQLText(listName) + ")"
                     + "AND ((ccContentWatchLists.Active)<>0)"
                     + "AND ((ccContentWatchListRules.Active)<>0)"

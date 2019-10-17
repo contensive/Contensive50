@@ -11,10 +11,10 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         //
-        public int buttonActionID { get; set; }
+        public int buttonActionId { get; set; }
         public string caption { get; set; }
-        public int contentFieldID { get; set; }
-        public int formID { get; set; }
+        public int contentFieldId { get; set; }
+        public int formId { get; set; }
         public string inputType { get; set; }
         public string replaceText { get; set; }
         public bool required { get; set; }

@@ -19,8 +19,8 @@ namespace Contensive.Addons.AdminSite {
 
                 //
                 core.visitProperty.setProperty("IndexFilterOpen", "1");
-                int ContentID = core.docProperties.getInteger("cid");
-                if (ContentID == 0) {
+                int ContentId = core.docProperties.getInteger("cid");
+                if (ContentId == 0) {
                     result = "No filter is available";
                 } else {
                     result = FormIndex.getForm_IndexFilterContent(core, new AdminDataModel(core));

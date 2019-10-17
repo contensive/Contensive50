@@ -168,11 +168,11 @@ namespace Contensive.Addons.AdminSite {
                         }
                     }
                     int HelpLevel = cp.core.docProperties.getInteger("helplevel");
-                    int HelpAddonID = cp.core.docProperties.getInteger("helpaddonid");
-                    int HelpCollectionID = cp.core.docProperties.getInteger("helpcollectionid");
-                    if (HelpCollectionID == 0) {
-                        HelpCollectionID = cp.core.visitProperty.getInteger("RunOnce HelpCollectionID");
-                        if (HelpCollectionID != 0) {
+                    int HelpAddonId = cp.core.docProperties.getInteger("helpaddonid");
+                    int HelpCollectionId = cp.core.docProperties.getInteger("helpcollectionid");
+                    if (HelpCollectionId == 0) {
+                        HelpCollectionId = cp.core.visitProperty.getInteger("RunOnce HelpCollectionID");
+                        if (HelpCollectionId != 0) {
                             cp.core.visitProperty.setProperty("RunOnce HelpCollectionID", "");
                         }
                     }
@@ -240,18 +240,18 @@ namespace Contensive.Addons.AdminSite {
                         // Use content passed in as an argument
                         //
                         adminBody = forceAdminContent;
-                    } else if (HelpAddonID != 0) {
+                    } else if (HelpAddonId != 0) {
                         //
                         // display Addon Help
                         //
-                        cp.core.doc.addRefreshQueryString("helpaddonid", HelpAddonID.ToString());
-                        adminBody = GetAddonHelp(cp, HelpAddonID, "");
-                    } else if (HelpCollectionID != 0) {
+                        cp.core.doc.addRefreshQueryString("helpaddonid", HelpAddonId.ToString());
+                        adminBody = GetAddonHelp(cp, HelpAddonId, "");
+                    } else if (HelpCollectionId != 0) {
                         //
                         // display Collection Help
                         //
-                        cp.core.doc.addRefreshQueryString("helpcollectionid", HelpCollectionID.ToString());
-                        adminBody = GetCollectionHelp(cp, HelpCollectionID, "");
+                        cp.core.doc.addRefreshQueryString("helpcollectionid", HelpCollectionId.ToString());
+                        adminBody = GetCollectionHelp(cp, HelpCollectionId, "");
                     } else if (adminData.adminForm != 0) {
                         //
                         // -- formindex requires valkid content
@@ -350,12 +350,12 @@ namespace Contensive.Addons.AdminSite {
                                 cp.core.doc.addRefreshQueryString(RequestNameRunAddon, addonId.ToString());
                             }
                             string InstanceOptionString = cp.core.userProperty.getText("Addon [" + AddonName + "] Options", "");
-                            int DefaultWrapperID = -1;
+                            int DefaultWrapperId = -1;
                             adminBody = cp.core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 instanceGuid = adminSiteInstanceId,
                                 argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(cp.core, InstanceOptionString),
-                                wrapperID = DefaultWrapperID,
+                                wrapperID = DefaultWrapperId,
                                 errorContextMessage = executeContextErrorCaption
                             });
                             if (string.IsNullOrEmpty(adminBody)) {
@@ -451,7 +451,7 @@ namespace Contensive.Addons.AdminSite {
                         //SQL = "select IncludedAddonID from ccAddonIncludeRules where AddonID=" + HelpAddonID;
                         //CS = csData.csOpenSql(SQL, "Default");
                         //while (csData.csOk()) {
-                        //    IncludeID = csData.csGetInteger("IncludedAddonID");
+                        //    IncludeId = csData.csGetInteger("IncludedAddonID");
                         //    IncludeHelp = IncludeHelp + GetAddonHelp(cp, IncludeID, HelpAddonID + "," + IncludeID.ToString());
                         //    csData.csGoNext();
                         //}
@@ -564,7 +564,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 string SQL = null;
                 bool Found = false;
-                int ParentID = 0;
+                int ParentId = 0;
                 //
                 Found = false;
                 using (var csData = new CsModel(cp.core)) {
@@ -578,16 +578,16 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 if (!Found) {
-                    ParentID = 0;
+                    ParentId = 0;
                     using (var csData = new CsModel(cp.core)) {
                         SQL = "select parentid from cccontent where id=" + ContentID;
                         csData.openSql(SQL);
                         if (csData.ok()) {
-                            ParentID = csData.getInteger("parentid");
+                            ParentId = csData.getInteger("parentid");
                         }
                     }
-                    if (ParentID != 0) {
-                        getFieldHelpMsgs(cp, ParentID, FieldName, ref return_Default, ref return_Custom);
+                    if (ParentId != 0) {
+                        getFieldHelpMsgs(cp, ParentId, FieldName, ref return_Default, ref return_Custom);
                     }
                 }
                 //
@@ -604,7 +604,7 @@ namespace Contensive.Addons.AdminSite {
         //   when action is complete, replace the action code with one that will refresh
         //
         //   Request Variables
-        //       ID = ID of record to edit
+        //       Id = ID of record to edit
         //       adminContextClass.AdminAction = action to be performed, defined below, required except for very first call to edit
         //   adminContextClass.AdminAction Definitions
         //       edit - edit the record defined by ID, If ID="", edit a new record
@@ -619,9 +619,9 @@ namespace Contensive.Addons.AdminSite {
         //
         private void ProcessActions(CPClass cp, AdminDataModel adminData, bool UseContentWatchLink) {
             try {
-                int RecordID = 0;
+                int RecordId = 0;
                 string ContentName = null;
-                int EmailToConfirmationMemberID = 0;
+                int EmailToConfirmationMemberId = 0;
                 int RowCnt = 0;
                 int RowPtr = 0;
                 //
@@ -655,7 +655,7 @@ namespace Contensive.Addons.AdminSite {
                                     } else {
                                         adminData.loadEditRecord(cp.core);
                                         db.delete(adminData.editRecord.id, adminData.adminContent.tableName);
-                                        ContentController.processAfterSave(cp.core, true, adminData.editRecord.contentControlId_Name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core, true, adminData.editRecord.contentControlId_Name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
                                     }
                                     adminData.admin_Action = Constants.AdminActionNop;
                                     break;
@@ -669,7 +669,7 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.loadEditRecord(cp.core);
                                         adminData.loadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
                                     }
                                     adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                                                                        //
@@ -684,7 +684,7 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.loadEditRecord(cp.core);
                                         adminData.loadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
                                         adminData.editRecord.id = 0;
                                         adminData.editRecord.Loaded = false;
                                     }
@@ -708,7 +708,7 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.loadEditRecord(cp.core);
                                         adminData.loadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
                                         if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                             using (var csData = new CsModel(cp.core)) {
                                                 csData.openRecord("Group Email", adminData.editRecord.id);
@@ -761,7 +761,7 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.loadEditRecord(cp.core);
                                         adminData.loadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
                                         if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                             using (var csData = new CsModel(cp.core)) {
                                                 csData.openRecord("Conditional Email", adminData.editRecord.id);
@@ -790,14 +790,14 @@ namespace Contensive.Addons.AdminSite {
                                         adminData.loadEditRecord(cp.core);
                                         adminData.loadEditRecord_Request(cp.core);
                                         ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
                                         //
                                         if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                             //
-                                            EmailToConfirmationMemberID = 0;
+                                            EmailToConfirmationMemberId = 0;
                                             if (adminData.editRecord.fieldsLc.ContainsKey("testmemberid")) {
-                                                EmailToConfirmationMemberID = GenericController.encodeInteger(adminData.editRecord.fieldsLc["testmemberid"].value);
-                                                EmailController.queueConfirmationTestEmail(cp.core, adminData.editRecord.id, EmailToConfirmationMemberID);
+                                                EmailToConfirmationMemberId = GenericController.encodeInteger(adminData.editRecord.fieldsLc["testmemberid"].value);
+                                                EmailController.queueConfirmationTestEmail(cp.core, adminData.editRecord.id, EmailToConfirmationMemberId);
                                                 //
                                                 if (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
                                                     //
@@ -822,23 +822,23 @@ namespace Contensive.Addons.AdminSite {
                                                 using (var csData = new CsModel(cp.core)) {
                                                     csData.openRecord(adminData.adminContent.name, cp.core.docProperties.getInteger("rowid" + RowPtr));
                                                     if (csData.ok()) {
-                                                        RecordID = csData.getInteger("ID");
+                                                        RecordId = csData.getInteger("ID");
                                                         csData.deleteRecord();
                                                         //
                                                         // non-Workflow Delete
                                                         //
                                                         ContentName = MetadataController.getContentNameByID(cp.core, csData.getInteger("contentControlId"));
-                                                        cp.core.cache.invalidateDbRecord(RecordID, adminData.adminContent.tableName);
-                                                        ContentController.processAfterSave(cp.core, true, ContentName, RecordID, "", 0, UseContentWatchLink);
+                                                        cp.core.cache.invalidateDbRecord(RecordId, adminData.adminContent.tableName);
+                                                        ContentController.processAfterSave(cp.core, true, ContentName, RecordId, "", 0, UseContentWatchLink);
                                                         //
                                                         // Page Content special cases
                                                         //
                                                         if (GenericController.vbLCase(adminData.adminContent.tableName) == "ccpagecontent") {
                                                             //Call cp.core.pages.cache_pageContent_removeRow(RecordID, False, False)
-                                                            if (RecordID == (cp.core.siteProperties.getInteger("PageNotFoundPageID", 0))) {
+                                                            if (RecordId == (cp.core.siteProperties.getInteger("PageNotFoundPageID", 0))) {
                                                                 cp.core.siteProperties.getText("PageNotFoundPageID", "0");
                                                             }
-                                                            if (RecordID == (cp.core.siteProperties.getInteger("LandingPageID", 0))) {
+                                                            if (RecordId == (cp.core.siteProperties.getInteger("LandingPageID", 0))) {
                                                                 cp.core.siteProperties.getText("LandingPageID", "0");
                                                             }
                                                         }
@@ -894,7 +894,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 int ContentCount = 0;
                 int ContentPointer = 0;
-                int ContentID = 0;
+                int ContentId = 0;
                 bool AllowAdd = false;
                 bool AllowDelete = false;
                 bool RecordChanged = false;
@@ -922,7 +922,7 @@ namespace Contensive.Addons.AdminSite {
                     if (ContentCount > 0) {
                         for (ContentPointer = 0; ContentPointer < ContentCount; ContentPointer++) {
                             RuleNeeded = cp.core.docProperties.getBoolean("Content" + ContentPointer);
-                            ContentID = cp.core.docProperties.getInteger("ContentID" + ContentPointer);
+                            ContentId = cp.core.docProperties.getInteger("ContentID" + ContentPointer);
                             AllowAdd = cp.core.docProperties.getBoolean("ContentGroupRuleAllowAdd" + ContentPointer);
                             AllowDelete = cp.core.docProperties.getBoolean("ContentGroupRuleAllowDelete" + ContentPointer);
                             //
@@ -930,7 +930,7 @@ namespace Contensive.Addons.AdminSite {
                             csData.goFirst();
                             if (csData.ok()) {
                                 while (csData.ok()) {
-                                    if (csData.getInteger("ContentID") == ContentID) {
+                                    if (csData.getInteger("ContentID") == ContentId) {
                                         RuleId = csData.getInteger("id");
                                         RuleFound = true;
                                         break;
@@ -943,7 +943,7 @@ namespace Contensive.Addons.AdminSite {
                                     CSNew.insert("Group Rules");
                                     if (CSNew.ok()) {
                                         CSNew.set("GroupID", GroupID);
-                                        CSNew.set("ContentID", ContentID);
+                                        CSNew.set("ContentID", ContentId);
                                         CSNew.set("AllowAdd", AllowAdd);
                                         CSNew.set("AllowDelete", AllowDelete);
                                     }
@@ -1127,8 +1127,8 @@ namespace Contensive.Addons.AdminSite {
                 
                 Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                 //
-                int ContentID = 0;
-                int ContentWatchID = 0;
+                int ContentId = 0;
+                int ContentWatchId = 0;
                 //
                 if (adminData.adminContent.allowContentTracking & (!editRecord.userReadOnly)) {
                     //
@@ -1145,20 +1145,20 @@ namespace Contensive.Addons.AdminSite {
                     }
                     // ----- update/create the content watch record for this content record
                     //
-                    ContentID = (editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId;
+                    ContentId = (editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId;
                     using (var csData = new CsModel(cp.core)) {
-                        csData.open("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")And(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
+                        csData.open("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentId) + ")And(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
                         if (!csData.ok()) {
                             csData.insert("Content Watch");
-                            csData.set("contentid", ContentID);
+                            csData.set("contentid", ContentId);
                             csData.set("recordid", editRecord.id);
-                            csData.set("ContentRecordKey", ContentID + "." + editRecord.id);
+                            csData.set("ContentRecordKey", ContentId + "." + editRecord.id);
                             csData.set("clicks", 0);
                         }
                         if (!csData.ok()) {
                             LogController.logError(cp.core, new GenericException("SaveContentTracking, can Not create New record"));
                         } else {
-                            ContentWatchID = csData.getInteger("ID");
+                            ContentWatchId = csData.getInteger("ID");
                             csData.set("LinkLabel", adminData.contentWatchLinkLabel);
                             csData.set("WhatsNewDateExpires", adminData.contentWatchExpires);
                             csData.set("Link", adminData.contentWatchLink);
@@ -1166,7 +1166,7 @@ namespace Contensive.Addons.AdminSite {
                             // ----- delete all rules for this ContentWatch record
                             //
                             using (var CSPointer = new CsModel(cp.core)) {
-                                CSPointer.open("Content Watch List Rules", "(ContentWatchID=" + ContentWatchID + ")");
+                                CSPointer.open("Content Watch List Rules", "(ContentWatchID=" + ContentWatchId + ")");
                                 while (CSPointer.ok()) {
                                     CSPointer.deleteRecord();
                                     CSPointer.goNext();
@@ -1182,7 +1182,7 @@ namespace Contensive.Addons.AdminSite {
                                     using (var CSRules = new CsModel(cp.core)) {
                                         CSRules.insert("Content Watch List Rules");
                                         if (CSRules.ok()) {
-                                            CSRules.set("ContentWatchID", ContentWatchID);
+                                            CSRules.set("ContentWatchID", ContentWatchId);
                                             CSRules.set("ContentWatchListID", adminData.contentWatchListID[ListPointer]);
                                         }
                                     }
@@ -1261,7 +1261,7 @@ namespace Contensive.Addons.AdminSite {
                 Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                 //
                 int SaveCCIDValue = 0;
-                int ActivityLogOrganizationID = -1;
+                int ActivityLogOrganizationId = -1;
                 if (!cp.core.doc.userErrorList.Count.Equals(0)) {
                     //
                     // -- If There is an error, block the save
@@ -1514,7 +1514,7 @@ namespace Contensive.Addons.AdminSite {
                                         case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
                                                 //
                                                 // Many to Many checklist
-                                                cp.core.html.processCheckList("field" + field.id, MetadataController.getContentNameByID(cp.core, field.contentId), encodeText(editRecord.id), MetadataController.getContentNameByID(cp.core, field.manyToManyContentID), MetadataController.getContentNameByID(cp.core, field.manyToManyRuleContentID), field.manyToManyRulePrimaryField, field.manyToManyRuleSecondaryField);
+                                                cp.core.html.processCheckList("field" + field.id, MetadataController.getContentNameByID(cp.core, field.contentId), encodeText(editRecord.id), MetadataController.getContentNameByID(cp.core, field.manyToManyContentId), MetadataController.getContentNameByID(cp.core, field.manyToManyRuleContentId), field.manyToManyRulePrimaryField, field.manyToManyRuleSecondaryField);
                                                 break;
                                             }
                                         default: {
@@ -1547,13 +1547,13 @@ namespace Contensive.Addons.AdminSite {
                                         switch (GenericController.vbLCase(adminData.adminContent.tableName)) {
                                             case "ccmembers":
                                                 //
-                                                if (ActivityLogOrganizationID < 0) {
+                                                if (ActivityLogOrganizationId < 0) {
                                                     PersonModel person = DbBaseModel.create<PersonModel>(cp, editRecord.id);
                                                     if (person != null) {
-                                                        ActivityLogOrganizationID = person.organizationID;
+                                                        ActivityLogOrganizationId = person.organizationId;
                                                     }
                                                 }
-                                                LogController.addSiteActivity(cp.core, "modifying field " + fieldName, editRecord.id, ActivityLogOrganizationID);
+                                                LogController.addSiteActivity(cp.core, "modifying field " + fieldName, editRecord.id, ActivityLogOrganizationId);
                                                 break;
                                             case "organizations":
                                                 //
@@ -1674,7 +1674,7 @@ namespace Contensive.Addons.AdminSite {
         //            Criteria = Criteria + "AND((DeveloperOnly is null)or(DeveloperOnly=0))"
         //                + "AND(ID in ("
         //                + " SELECT AllowedEntries.ID"
-        //                + " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentID = ccContent.ID"
+        //                + " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentId = ccContent.ID"
         //                + " Where ((ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0)))"
         //                    + "OR(ccContent.ID Is Null)"
         //                + "))";
@@ -1697,7 +1697,7 @@ namespace Contensive.Addons.AdminSite {
         //                + "AND((AdminOnly is null)or(AdminOnly=0))"
         //                + "AND(ID in ("
         //                + " SELECT AllowedEntries.ID"
-        //                + " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentID = ccContent.ID"
+        //                + " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentId = ccContent.ID"
         //                + " Where (" + CMCriteria + "and(ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0))And((ccContent.AdminOnly is null)or(ccContent.AdminOnly=0)))"
         //                    + "OR(ccContent.ID Is Null)"
         //                + "))";
@@ -1721,7 +1721,7 @@ namespace Contensive.Addons.AdminSite {
             string tempGetMenuLink = null;
             try {
                 //
-                int ContentID = 0;
+                int ContentId = 0;
                 //
                 if (!string.IsNullOrEmpty(LinkPage) || (LinkCID != 0)) {
                     tempGetMenuLink = LinkPage;
@@ -1732,9 +1732,9 @@ namespace Contensive.Addons.AdminSite {
                     } else {
                         tempGetMenuLink = "/" + cp.core.appConfig.adminRoute;
                     }
-                    ContentID = GenericController.encodeInteger(LinkCID);
-                    if (ContentID != 0) {
-                        tempGetMenuLink = GenericController.modifyLinkQuery(tempGetMenuLink, "cid", ContentID.ToString(), true);
+                    ContentId = GenericController.encodeInteger(LinkCID);
+                    if (ContentId != 0) {
+                        tempGetMenuLink = GenericController.modifyLinkQuery(tempGetMenuLink, "cid", ContentId.ToString(), true);
                     }
                 }
                 return tempGetMenuLink;
@@ -2197,13 +2197,13 @@ namespace Contensive.Addons.AdminSite {
                 //
                 int GroupCount = 0;
                 int GroupPointer = 0;
-                int GroupID = 0;
+                int GroupId = 0;
                 bool RuleNeeded = false;
                 DateTime DateExpires = default(DateTime);
                 object DateExpiresVariant = null;
                 bool RuleActive = false;
                 DateTime RuleDateExpires = default(DateTime);
-                int MemberRuleID = 0;
+                int MemberRuleId = 0;
                 //
                 // --- create MemberRule records for all selected
                 //
@@ -2213,7 +2213,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // ----- Read Response
                         //
-                        GroupID = cp.core.docProperties.getInteger("MemberRules." + GroupPointer + ".ID");
+                        GroupId = cp.core.docProperties.getInteger("MemberRules." + GroupPointer + ".ID");
                         RuleNeeded = cp.core.docProperties.getBoolean("MemberRules." + GroupPointer);
                         DateExpires = cp.core.docProperties.getDate("MemberRules." + GroupPointer + ".DateExpires");
                         if (DateExpires == DateTime.MinValue) {
@@ -2225,7 +2225,7 @@ namespace Contensive.Addons.AdminSite {
                         // ----- Update Record
                         //
                         using (var csData = new CsModel(cp.core)) {
-                            csData.open("Member Rules", "(MemberID=" + PeopleID + ")and(GroupID=" + GroupID + ")", "", false, 0, "Active,MemberID,GroupID,DateExpires");
+                            csData.open("Member Rules", "(MemberID=" + PeopleID + ")and(GroupID=" + GroupId + ")", "", false, 0, "Active,MemberID,GroupID,DateExpires");
                             if (!csData.ok()) {
                                 //
                                 // No record exists
@@ -2238,7 +2238,7 @@ namespace Contensive.Addons.AdminSite {
                                     if (csData.ok()) {
                                         csData.set("Active", true);
                                         csData.set("MemberID", PeopleID);
-                                        csData.set("GroupID", GroupID);
+                                        csData.set("GroupID", GroupId);
                                         csData.set("DateExpires", DateExpires);
                                     }
                                 }
@@ -2260,8 +2260,8 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // record exists and it is not needed, delete it
                                     //
-                                    MemberRuleID = csData.getInteger("ID");
-                                    cp.core.db.delete(MemberRuleID, "ccMemberRules");
+                                    MemberRuleId = csData.getInteger("ID");
+                                    cp.core.db.delete(MemberRuleId, "ccMemberRules");
                                 }
                             }
                         }
@@ -2281,15 +2281,15 @@ namespace Contensive.Addons.AdminSite {
             try {
                 //
                 bool IsEmptyList = false;
-                int ParentContentID = 0;
+                int ParentContentId = 0;
                 //string ParentContentName = null;
                 string ChildContentName = "";
-                int ChildContentID = 0;
+                int ChildContentId = 0;
                 bool AddAdminMenuEntry = false;
                 StringBuilderLegacyController Content = new StringBuilderLegacyController();
                 string FieldValue = null;
                 bool NewGroup = false;
-                int GroupID = 0;
+                int GroupId = 0;
                 string NewGroupName = "";
                 string Button = null;
                 string Caption = null;
@@ -2315,21 +2315,21 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // Load defaults
                         //
-                        ParentContentID = cp.core.docProperties.getInteger("ParentContentID");
-                        if (ParentContentID == 0) {
-                            ParentContentID = ContentMetadataModel.getContentId(cp.core, "Page Content");
+                        ParentContentId = cp.core.docProperties.getInteger("ParentContentID");
+                        if (ParentContentId == 0) {
+                            ParentContentId = ContentMetadataModel.getContentId(cp.core, "Page Content");
                         }
                         AddAdminMenuEntry = true;
-                        GroupID = 0;
+                        GroupId = 0;
                     } else {
                         //
                         // Process input
                         //
-                        ParentContentID = cp.core.docProperties.getInteger("ParentContentID");
-                        var parentContentMetadata = ContentMetadataModel.create(cp.core, ParentContentID);
+                        ParentContentId = cp.core.docProperties.getInteger("ParentContentID");
+                        var parentContentMetadata = ContentMetadataModel.create(cp.core, ParentContentId);
                         ChildContentName = cp.core.docProperties.getText("ChildContentName");
                         AddAdminMenuEntry = cp.core.docProperties.getBoolean("AddAdminMenuEntry");
-                        GroupID = cp.core.docProperties.getInteger("GroupID");
+                        GroupId = cp.core.docProperties.getInteger("GroupID");
                         NewGroup = cp.core.docProperties.getBoolean("NewGroup");
                         NewGroupName = cp.core.docProperties.getText("NewGroupName");
                         //
@@ -2343,7 +2343,7 @@ namespace Contensive.Addons.AdminSite {
                                 + "<div>Creating content [" + ChildContentName + "] from [" + parentContentMetadata.name + "]</div>";
                             var childContentMetadata = parentContentMetadata.createContentChild(cp.core, ChildContentName, cp.core.session.user.id);
 
-                            ChildContentID = ContentMetadataModel.getContentId(cp.core, ChildContentName);
+                            ChildContentId = ContentMetadataModel.getContentId(cp.core, ChildContentName);
                             //
                             // Create Group and Rule
                             //
@@ -2352,26 +2352,26 @@ namespace Contensive.Addons.AdminSite {
                                     csData.open("Groups", "name=" + DbController.encodeSQLText(NewGroupName));
                                     if (csData.ok()) {
                                         Description = Description + "<div>Group [" + NewGroupName + "] already exists, using existing group.</div>";
-                                        GroupID = csData.getInteger("ID");
+                                        GroupId = csData.getInteger("ID");
                                     } else {
                                         Description = Description + "<div>Creating new group [" + NewGroupName + "]</div>";
                                         csData.close();
                                         csData.insert("Groups");
                                         if (csData.ok()) {
-                                            GroupID = csData.getInteger("ID");
+                                            GroupId = csData.getInteger("ID");
                                             csData.set("Name", NewGroupName);
                                             csData.set("Caption", NewGroupName);
                                         }
                                     }
                                 }
                             }
-                            if (GroupID != 0) {
+                            if (GroupId != 0) {
                                 using (var csData = new CsModel(cp.core)) {
                                     csData.insert("Group Rules");
                                     if (csData.ok()) {
-                                        Description = Description + "<div>Assigning group [" + MetadataController.getRecordName(cp.core, "Groups", GroupID) + "] to edit content [" + ChildContentName + "].</div>";
-                                        csData.set("GroupID", GroupID);
-                                        csData.set("ContentID", ChildContentID);
+                                        Description = Description + "<div>Assigning group [" + MetadataController.getRecordName(cp.core, "Groups", GroupId) + "] to edit content [" + ChildContentName + "].</div>";
+                                        csData.set("GroupID", GroupId);
+                                        csData.set("ContentID", ChildContentId);
                                     }
                                 }
                             }
@@ -2398,7 +2398,7 @@ namespace Contensive.Addons.AdminSite {
                         string tableBody = "";
                         //
                         FieldValue = "<select size=\"1\" name=\"ParentContentID\" ID=\"\"><option value=\"\">Select One</option>";
-                        FieldValue = FieldValue + GetContentChildTool_Options(cp, 0, ParentContentID);
+                        FieldValue = FieldValue + GetContentChildTool_Options(cp, 0, ParentContentId);
                         FieldValue = FieldValue + "</select>";
                         tableBody += AdminUIController.getEditRowLegacy(cp.core, FieldValue, "Parent Content Name", "", false, false, "");
                         //
@@ -2406,7 +2406,7 @@ namespace Contensive.Addons.AdminSite {
                         tableBody += AdminUIController.getEditRowLegacy(cp.core, FieldValue, "New Child Content Name", "", false, false, "");
                         //
                         FieldValue = ""
-                            + cp.core.html.inputRadio("NewGroup", false.ToString(), NewGroup.ToString()) + cp.core.html.selectFromContent("GroupID", GroupID, "Groups", "", "", "", ref IsEmptyList) + "(Select a current group)"
+                            + cp.core.html.inputRadio("NewGroup", false.ToString(), NewGroup.ToString()) + cp.core.html.selectFromContent("GroupID", GroupId, "Groups", "", "", "", ref IsEmptyList) + "(Select a current group)"
                             + "<br>" + cp.core.html.inputRadio("NewGroup", true.ToString(), NewGroup.ToString()) + HtmlController.inputText_Legacy(cp.core, "NewGroupName", NewGroupName) + "(Create a new group)";
                         tableBody += AdminUIController.getEditRowLegacy(cp.core, FieldValue, "Content Manager Group", "", false, false, "");
                         //
@@ -2431,30 +2431,30 @@ namespace Contensive.Addons.AdminSite {
         // Create a child content
         //=============================================================================
         //
-        private string GetContentChildTool_Options(CPClass cp, int ParentID, int DefaultValue) {
+        private string GetContentChildTool_Options(CPClass cp, int ParentId, int DefaultValue) {
             string returnOptions = "";
             try {
                 //
                 string SQL = null;
-                int RecordID = 0;
+                int RecordId = 0;
                 string RecordName = null;
                 //
-                if (ParentID == 0) {
+                if (ParentId == 0) {
                     SQL = "select Name, ID from ccContent where ((ParentID<1)or(Parentid is null)) and (AllowContentChildTool<>0);";
                 } else {
-                    SQL = "select Name, ID from ccContent where ParentID=" + ParentID + " and (AllowContentChildTool<>0) and not (allowcontentchildtool is null);";
+                    SQL = "select Name, ID from ccContent where ParentID=" + ParentId + " and (AllowContentChildTool<>0) and not (allowcontentchildtool is null);";
                 }
                 using (var csData = new CsModel(cp.core)) {
                     csData.openSql(SQL, "Default");
                     while (csData.ok()) {
                         RecordName = csData.getText("Name");
-                        RecordID = csData.getInteger("ID");
-                        if (RecordID == DefaultValue) {
-                            returnOptions = returnOptions + "<option value=\"" + RecordID + "\" selected>" + csData.getText("name") + "</option>";
+                        RecordId = csData.getInteger("ID");
+                        if (RecordId == DefaultValue) {
+                            returnOptions = returnOptions + "<option value=\"" + RecordId + "\" selected>" + csData.getText("name") + "</option>";
                         } else {
-                            returnOptions = returnOptions + "<option value=\"" + RecordID + "\" >" + csData.getText("name") + "</option>";
+                            returnOptions = returnOptions + "<option value=\"" + RecordId + "\" >" + csData.getText("name") + "</option>";
                         }
-                        returnOptions = returnOptions + GetContentChildTool_Options(cp, RecordID, DefaultValue);
+                        returnOptions = returnOptions + GetContentChildTool_Options(cp, RecordId, DefaultValue);
                         csData.goNext();
                     }
                     csData.close();

@@ -11,7 +11,7 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         public string destinationLink { get; set; }
-        public int groupID { get; set; }
+        public int groupId { get; set; }
         public string sourceLink { get; set; }
         public int viewings { get; set; }
     }

@@ -13,10 +13,10 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// group allowed on this page
         /// </summary>
-        public int groupID { get; set; }
+        public int groupId { get; set; }
         /// <summary>
         /// page
         /// </summary>
-        public int recordID { get; set; }
+        public int recordId { get; set; }
     }
 }

@@ -11,9 +11,9 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         //
-        public int joinGroupID { get; set; }
-        public int notificationEmailID { get; set; }
-        public int responseEmailID { get; set; }
+        public int joinGroupId { get; set; }
+        public int notificationEmailId { get; set; }
+        public int responseEmailId { get; set; }
         public string thankYouCopy { get; set; }
     }
 }

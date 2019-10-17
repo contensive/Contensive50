@@ -12,7 +12,7 @@ namespace Contensive.Models.Db {
         //====================================================================================================
         public bool allowAdd { get; set; }
         public bool allowDelete { get; set; }        
-        public int contentID { get; set; }
-        public int groupID { get; set; }
+        public int contentId { get; set; }
+        public int groupId { get; set; }
     }
 }

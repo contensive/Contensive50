@@ -272,7 +272,7 @@ namespace Contensive.Processor.Models.Domain {
                                             DefaultMetaData = new Models.Domain.ContentMetadataModel() {
                                                 active = true,
                                                 activeOnly = true,
-                                                aliasID = "id",
+                                                aliasId = "id",
                                                 aliasName = "name",
                                                 adminOnly = false,
                                                 allowAdd = true,
@@ -316,7 +316,7 @@ namespace Contensive.Processor.Models.Domain {
                                             targetMetaData.activeOnly = true;
                                             //.adminColumns = ?
                                             targetMetaData.adminOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AdminOnly", DefaultMetaData.adminOnly);
-                                            targetMetaData.aliasID = "id";
+                                            targetMetaData.aliasId = "id";
                                             targetMetaData.aliasName = "name";
                                             targetMetaData.allowAdd = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowAdd", DefaultMetaData.allowAdd);
                                             targetMetaData.allowCalendarEvents = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowCalendarEvents", DefaultMetaData.allowCalendarEvents);
@@ -405,7 +405,7 @@ namespace Contensive.Processor.Models.Domain {
                                                     metaDataField.indexColumn = XmlController.GetXMLAttributeInteger(core, Found, MetaDataChildNode, "IndexColumn", DefaultMetaDataField.indexColumn);
                                                     metaDataField.indexWidth = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "IndexWidth", DefaultMetaDataField.indexWidth);
                                                     metaDataField.indexSortOrder = XmlController.GetXMLAttributeInteger(core, Found, MetaDataChildNode, "IndexSortOrder", DefaultMetaDataField.indexSortOrder);
-                                                    metaDataField.redirectID = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "RedirectID", DefaultMetaDataField.redirectID);
+                                                    metaDataField.redirectId = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "RedirectID", DefaultMetaDataField.redirectId);
                                                     metaDataField.redirectPath = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "RedirectPath", DefaultMetaDataField.redirectPath);
                                                     metaDataField.htmlContent = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "HTMLContent", DefaultMetaDataField.htmlContent);
                                                     metaDataField.uniqueName = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "UniqueName", DefaultMetaDataField.uniqueName);
@@ -739,7 +739,7 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.logInfo(core, "metadata Load, stage 7: Verify all field help");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                int FieldHelpCID = MetadataController.getRecordIdByUniqueName(core, "content", "Content Field Help");
+                int FieldHelpCId = MetadataController.getRecordIdByUniqueName(core, "content", "Content Field Help");
                 foreach (var keypairvalue in Collection.metaData) {
                     ContentMetadataModel workingMetaData = keypairvalue.Value;
                     foreach (var fieldKeyValuePair in workingMetaData.fields) {
@@ -754,18 +754,18 @@ namespace Contensive.Processor.Models.Domain {
                             if (fieldId == 0) {
                                 LogController.logWarn(core, "Field help specified for a field that cannot be found, field [" + workingField.nameLc + "], content [" + workingMetaData.name + "]");
                             } else {
-                                int FieldHelpID = 0;
+                                int FieldHelpId = 0;
                                 using (var rs = core.db.executeQuery("select id from ccfieldhelp where fieldid=" + fieldId + " order by id")) {
                                     if (DbController.isDataTableOk(rs)) {
-                                        FieldHelpID = GenericController.encodeInteger(rs.Rows[0]["id"]);
+                                        FieldHelpId = GenericController.encodeInteger(rs.Rows[0]["id"]);
                                     } else {
-                                        FieldHelpID = core.db.insertGetId("ccfieldhelp", 0);
+                                        FieldHelpId = core.db.insertGetId("ccfieldhelp", 0);
                                     }
                                 }
-                                if (FieldHelpID != 0) {
+                                if (FieldHelpId != 0) {
                                     string Copy = workingField.helpCustom;
                                     if (string.IsNullOrEmpty(Copy)) { Copy = workingField.helpDefault; }
-                                    core.db.executeQuery("update ccfieldhelp set active=1,contentcontrolid=" + FieldHelpCID + ",fieldid=" + fieldId + ",helpdefault=" + DbController.encodeSQLText(Copy) + " where id=" + FieldHelpID);
+                                    core.db.executeQuery("update ccfieldhelp set active=1,contentcontrolid=" + FieldHelpCId + ",fieldid=" + fieldId + ",helpdefault=" + DbController.encodeSQLText(Copy) + " where id=" + FieldHelpId);
                                 }
                             }
                         }
@@ -1001,7 +1001,7 @@ namespace Contensive.Processor.Models.Domain {
                             updateDst |= !textMatch(dstMetaData.editorGroupName, srcMetaData.editorGroupName);
                             updateDst |= (dstMetaData.active != srcMetaData.active);
                             updateDst |= (dstMetaData.allowContentChildTool != srcMetaData.allowContentChildTool);
-                            updateDst |= (dstMetaData.parentID != srcMetaData.parentID);
+                            updateDst |= (dstMetaData.parentId != srcMetaData.parentId);
                             updateDst |= !textMatch(dstMetaData.iconLink, srcMetaData.iconLink);
                             updateDst |= (dstMetaData.iconHeight != srcMetaData.iconHeight);
                             updateDst |= (dstMetaData.iconWidth != srcMetaData.iconWidth);
@@ -1017,7 +1017,7 @@ namespace Contensive.Processor.Models.Domain {
                         dstMetaData.active = srcMetaData.active;
                         dstMetaData.activeOnly = srcMetaData.activeOnly;
                         dstMetaData.adminOnly = srcMetaData.adminOnly;
-                        dstMetaData.aliasID = srcMetaData.aliasID;
+                        dstMetaData.aliasId = srcMetaData.aliasId;
                         dstMetaData.aliasName = srcMetaData.aliasName;
                         dstMetaData.allowAdd = srcMetaData.allowAdd;
                         dstMetaData.allowCalendarEvents = srcMetaData.allowCalendarEvents;
@@ -1042,7 +1042,7 @@ namespace Contensive.Processor.Models.Domain {
                         dstMetaData.isBaseContent = srcMetaData.isBaseContent;
                         dstMetaData.isModifiedSinceInstalled = srcMetaData.isModifiedSinceInstalled;
                         dstMetaData.name = srcMetaData.name;
-                        dstMetaData.parentID = srcMetaData.parentID;
+                        dstMetaData.parentId = srcMetaData.parentId;
                         dstMetaData.parentName = srcMetaData.parentName;
                         dstMetaData.selectCommaList = srcMetaData.selectCommaList;
                         dstMetaData.whereClause = srcMetaData.whereClause;
@@ -1089,18 +1089,18 @@ namespace Contensive.Processor.Models.Domain {
                                     updateDst |= (srcMetaDataField.indexSortDirection != dstMetaDataField.indexSortDirection);
                                     updateDst |= (encodeInteger(srcMetaDataField.indexSortOrder) != GenericController.encodeInteger(dstMetaDataField.indexSortOrder));
                                     updateDst |= !textMatch(srcMetaDataField.indexWidth, dstMetaDataField.indexWidth);
-                                    updateDst |= (srcMetaDataField.lookupContentID != dstMetaDataField.lookupContentID);
+                                    updateDst |= (srcMetaDataField.lookupContentId != dstMetaDataField.lookupContentId);
                                     updateDst |= !textMatch(srcMetaDataField.lookupList, dstMetaDataField.lookupList);
-                                    updateDst |= (srcMetaDataField.manyToManyContentID != dstMetaDataField.manyToManyContentID);
-                                    updateDst |= (srcMetaDataField.manyToManyRuleContentID != dstMetaDataField.manyToManyRuleContentID);
+                                    updateDst |= (srcMetaDataField.manyToManyContentId != dstMetaDataField.manyToManyContentId);
+                                    updateDst |= (srcMetaDataField.manyToManyRuleContentId != dstMetaDataField.manyToManyRuleContentId);
                                     updateDst |= !textMatch(srcMetaDataField.manyToManyRulePrimaryField, dstMetaDataField.manyToManyRulePrimaryField);
                                     updateDst |= !textMatch(srcMetaDataField.manyToManyRuleSecondaryField, dstMetaDataField.manyToManyRuleSecondaryField);
                                     updateDst |= (srcMetaDataField.memberSelectGroupId_get(core) != dstMetaDataField.memberSelectGroupId_get(core));
                                     updateDst |= (srcMetaDataField.notEditable != dstMetaDataField.notEditable);
                                     updateDst |= (srcMetaDataField.password != dstMetaDataField.password);
                                     updateDst |= (srcMetaDataField.readOnly != dstMetaDataField.readOnly);
-                                    updateDst |= (srcMetaDataField.redirectContentID != dstMetaDataField.redirectContentID);
-                                    updateDst |= !textMatch(srcMetaDataField.redirectID, dstMetaDataField.redirectID);
+                                    updateDst |= (srcMetaDataField.redirectContentId != dstMetaDataField.redirectContentId);
+                                    updateDst |= !textMatch(srcMetaDataField.redirectId, dstMetaDataField.redirectId);
                                     updateDst |= !textMatch(srcMetaDataField.redirectPath, dstMetaDataField.redirectPath);
                                     updateDst |= (srcMetaDataField.required != dstMetaDataField.required);
                                     updateDst |= (srcMetaDataField.rssDescriptionField != dstMetaDataField.rssDescriptionField);
@@ -1153,10 +1153,10 @@ namespace Contensive.Processor.Models.Domain {
                                 dstMetaDataField.indexSortDirection = srcMetaDataField.indexSortDirection;
                                 dstMetaDataField.indexSortOrder = srcMetaDataField.indexSortOrder;
                                 dstMetaDataField.indexWidth = srcMetaDataField.indexWidth;
-                                dstMetaDataField.lookupContentID = srcMetaDataField.lookupContentID;
+                                dstMetaDataField.lookupContentId = srcMetaDataField.lookupContentId;
                                 dstMetaDataField.lookupList = srcMetaDataField.lookupList;
-                                dstMetaDataField.manyToManyContentID = srcMetaDataField.manyToManyContentID;
-                                dstMetaDataField.manyToManyRuleContentID = srcMetaDataField.manyToManyRuleContentID;
+                                dstMetaDataField.manyToManyContentId = srcMetaDataField.manyToManyContentId;
+                                dstMetaDataField.manyToManyRuleContentId = srcMetaDataField.manyToManyRuleContentId;
                                 dstMetaDataField.manyToManyRulePrimaryField = srcMetaDataField.manyToManyRulePrimaryField;
                                 dstMetaDataField.manyToManyRuleSecondaryField = srcMetaDataField.manyToManyRuleSecondaryField;
                                 dstMetaDataField.memberSelectGroupId_set(core, srcMetaDataField.memberSelectGroupId_get(core));
@@ -1164,8 +1164,8 @@ namespace Contensive.Processor.Models.Domain {
                                 dstMetaDataField.notEditable = srcMetaDataField.notEditable;
                                 dstMetaDataField.password = srcMetaDataField.password;
                                 dstMetaDataField.readOnly = srcMetaDataField.readOnly;
-                                dstMetaDataField.redirectContentID = srcMetaDataField.redirectContentID;
-                                dstMetaDataField.redirectID = srcMetaDataField.redirectID;
+                                dstMetaDataField.redirectContentId = srcMetaDataField.redirectContentId;
+                                dstMetaDataField.redirectId = srcMetaDataField.redirectId;
                                 dstMetaDataField.redirectPath = srcMetaDataField.redirectPath;
                                 dstMetaDataField.required = srcMetaDataField.required;
                                 dstMetaDataField.rssDescriptionField = srcMetaDataField.rssDescriptionField;
@@ -1426,7 +1426,7 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         // -- update content field help records
                         if (fieldMetadata.helpChanged) {
-                            //int FieldHelpID = 0;
+                            //int FieldHelpId = 0;
                             ContentFieldHelpModel fieldHelp = null;
                             var fieldHelpList = DbBaseModel.createList<ContentFieldHelpModel>(core.cpParent, "fieldid=" + fieldMetadata.id);
                             if (fieldHelpList.Count == 0) {

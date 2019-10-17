@@ -27,16 +27,16 @@ namespace Contensive.Models.Db {
         public bool allowReturnLinkDisplay { get; set; }
         public bool allowReviewedFooter { get; set; }
         public bool allowSeeAlso { get; set; }
-        public int archiveParentID { get; set; }
+        public int archiveParentId { get; set; }
         public bool blockContent { get; set; }
         public bool blockPage { get; set; }
-        public int blockSourceID { get; set; }
+        public int blockSourceId { get; set; }
         public string briefFilename { get; set; }
         public string childListInstanceOptions { get; set; }
-        public int childListSortMethodID { get; set; }
+        public int childListSortMethodId { get; set; }
         public bool childPagesFound { get; set; }
         public int clicks { get; set; }
-        public int contactMemberID { get; set; }
+        public int contactMemberId { get; set; }
         public int contentPadding { get; set; }
         public FieldTypeHTMLFile copyfilename { get; set; } = new FieldTypeHTMLFile();
         public string customBlockMessage { get; set; }
@@ -57,18 +57,18 @@ namespace Contensive.Models.Db {
         public string otherHeadTags { get; set; }
         public string pageLink { get; set; }
         public string pageTitle { get; set; }
-        public int parentID { get; set; }
+        public int parentId { get; set; }
         public string parentListName { get; set; }
         public DateTime? pubDate { get; set; }
-        public int RegistrationGroupID { get; set; }
+        public int registrationGroupId { get; set; }
         public int reviewedBy { get; set; }
-        public int TemplateID { get; set; }
-        public int TriggerAddGroupID { get; set; }
-        public int TriggerConditionGroupID { get; set; }
-        public int TriggerConditionID { get; set; }
-        public int TriggerRemoveGroupID { get; set; }
-        public int TriggerSendSystemEmailID { get; set; }
-        public int Viewings { get; set; }
+        public int templateId { get; set; }
+        public int triggerAddGroupId { get; set; }
+        public int triggerConditionGroupId { get; set; }
+        public int triggerConditionId { get; set; }
+        public int triggerRemoveGroupId { get; set; }
+        public int triggerSendSystemEmailId { get; set; }
+        public int viewings { get; set; }
         public string link { get; set; }
         //
         //====================================================================================================

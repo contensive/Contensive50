@@ -114,7 +114,7 @@ namespace Contensive.Processor.Controllers {
                         var person = DbBaseModel.create<PersonModel>(core.cpParent, GenericController.encodeInteger(authoringControlList.First().createdBy));
                         return new editLockClass() {
                             isEditLocked = true,
-                            editLockExpiresDate = authoringControlList.First().DateExpires,
+                            editLockExpiresDate = authoringControlList.First().dateExpires,
                             editLockByMemberId = (person == null) ? 0 : person.id,
                             editLockByMemberName = (person == null) ? "" : person.name
                         };

@@ -36,9 +36,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DefaultWrapperID">optional, if provided and addon is html on a page, the content will be wrapped in the wrapper indicated</param>
         /// <param name="addonContext">Where this addon is being executed, like as a process, or in an email, or on a page. If not provided page context is assumed (adding assets like js and css to document)</param>
         /// <returns></returns>
-        public static string renderHtmlForWeb(CoreController core, string source, string contextContentName = "", int ContextRecordID = 0, int deprecated_ContextContactPeopleID = 0, string ProtocolHostString = "", int DefaultWrapperID = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
+        public static string renderHtmlForWeb(CoreController core, string source, string contextContentName = "", int ContextRecordId = 0, int deprecated_ContextContactPeopleId = 0, string ProtocolHostString = "", int DefaultWrapperId = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
             string result = ContentCmdController.executeContentCommands(core, source, CPUtilsBaseClass.addonContext.ContextAdmin, core.session.user.id, core.session.visit.visitAuthenticated);
-            return encode(core, result, core.session.user.id, contextContentName, ContextRecordID, deprecated_ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.session.isAuthenticated, null, core.session.isEditing());
+            return encode(core, result, core.session.user.id, contextContentName, ContextRecordId, deprecated_ContextContactPeopleId, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperId, "", addonContext, core.session.isAuthenticated, null, core.session.isEditing());
         }
         //
         //====================================================================================================
@@ -107,10 +107,10 @@ namespace Contensive.Processor.Controllers {
                                 string ElementTag = GenericController.vbUCase(KmaHTML.TagName(ElementPointer));
                                 string ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME");
                                 string ACType = "";
-                                int NotUsedID = 0;
+                                int NotUsedId = 0;
                                 string addonOptionString = null;
                                 string AddonOptionStringHTMLEncoded = null;
-                                string ACInstanceID = null;
+                                string ACInstanceId = null;
                                 switch (ElementTag) {
                                     case "INPUT":
                                         if (EncodeNonCachableTags) {
@@ -178,13 +178,13 @@ namespace Contensive.Processor.Controllers {
                                         // ----- decode all AC tags
                                         //
                                         ACType = KmaHTML.ElementAttribute(ElementPointer, "TYPE");
-                                        ACInstanceID = KmaHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
+                                        ACInstanceId = KmaHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
                                         string ACGuid = KmaHTML.ElementAttribute(ElementPointer, "GUID");
                                         switch (ACType.ToUpper()) {
                                             case ACTypeAggregateFunction: {
                                                     //
                                                     // -- Add-on
-                                                    NotUsedID = 0;
+                                                    NotUsedId = 0;
                                                     AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
                                                     addonOptionString = HtmlController.decodeHtml(AddonOptionStringHTMLEncoded);
                                                     if (IsEmailContent) {
@@ -234,7 +234,7 @@ namespace Contensive.Processor.Controllers {
                                                                             recordId = ContextRecordID
                                                                         },
                                                                         argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, AddonOptionStringHTMLEncoded),
-                                                                        instanceGuid = ACInstanceID,
+                                                                        instanceGuid = ACInstanceId,
                                                                         errorContextMessage = "rendering addon found in active content within an email"
                                                                     };
                                                                     AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, ACName);
@@ -365,8 +365,8 @@ namespace Contensive.Processor.Controllers {
                                                             }
                                                             string ACNameCaption = GenericController.vbReplace(ACName, "\"", "");
                                                             ACNameCaption = HtmlController.encodeHtml(ACNameCaption);
-                                                            string IDControlString = "AC," + ACType + "," + NotUsedID + "," + GenericController.encodeNvaArgument(ACName) + "," + ResultOptionListHTMLEncoded + "," + ACGuid;
-                                                            Copy = AddonController.getAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0);
+                                                            string IDControlString = "AC," + ACType + "," + NotUsedId + "," + GenericController.encodeNvaArgument(ACName) + "," + ResultOptionListHTMLEncoded + "," + ACGuid;
+                                                            Copy = AddonController.getAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceId, 0);
                                                         } else if (EncodeNonCachableTags) {
                                                             //
                                                             // Add-on Experiment - move all processing to the Webclient
@@ -378,7 +378,7 @@ namespace Contensive.Processor.Controllers {
                                                             + "<!-- ADDON "
                                                             + "\"" + ACName + "\""
                                                             + ",\"" + AddonOptionStringHTMLEncoded + "\""
-                                                            + ",\"" + ACInstanceID + "\""
+                                                            + ",\"" + ACInstanceId + "\""
                                                             + ",\"" + ACGuid + "\""
                                                             + " -->"
                                                             + "";
@@ -392,11 +392,11 @@ namespace Contensive.Processor.Controllers {
                                                     // ----- Create Template Content
                                                     AddonOptionStringHTMLEncoded = "";
                                                     addonOptionString = "";
-                                                    NotUsedID = 0;
+                                                    NotUsedId = 0;
                                                     if (encodeForWysiwygEditor) {
                                                         //
-                                                        string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                        Copy = AddonController.getAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0);
+                                                        string IconIDControlString = "AC," + ACType + "," + NotUsedId + "," + ACName + "," + AddonOptionStringHTMLEncoded;
+                                                        Copy = AddonController.getAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceId, 0);
                                                         //Copy = IconImg;
                                                     } else if (EncodeNonCachableTags) {
                                                         //
@@ -473,7 +473,7 @@ namespace Contensive.Processor.Controllers {
                                             AttributeCount = DHTML.ElementAttributeCount(ElementPointer);
 
                                             if (AttributeCount > 0) {
-                                                string ImageID = DHTML.ElementAttribute(ElementPointer, "id");
+                                                string ImageId = DHTML.ElementAttribute(ElementPointer, "id");
                                                 string ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src");
                                                 string VirtualFilePathBad = core.appConfig.name + "/files/";
                                                 string serverFilePath = "/" + VirtualFilePathBad;
@@ -500,8 +500,8 @@ namespace Contensive.Processor.Controllers {
                                                 string ACQueryString = "";
                                                 int Ptr = 0;
                                                 string[] ImageIDArray = { };
-                                                if (0 != GenericController.vbInstr(1, ImageID, ",")) {
-                                                    ImageIDArray = ImageID.Split(',');
+                                                if (0 != GenericController.vbInstr(1, ImageId, ",")) {
+                                                    ImageIDArray = ImageId.Split(',');
                                                     ImageIDArrayCount = ImageIDArray.GetUpperBound(0) + 1;
                                                     if (ImageIDArrayCount > 5) {
                                                         for (Ptr = 5; Ptr < ImageIDArrayCount; Ptr++) {
@@ -540,17 +540,17 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                 }
                                                 int Pos = 0;
-                                                int RecordID = 0;
-                                                string ImageStyle = null;
+                                                int recordId = 0;
+                                                string imageStyle = null;
                                                 if (ACIdentifier == "AC") {
                                                     {
                                                         {
                                                             //
                                                             // ----- Process AC Tag
                                                             //
-                                                            string ACInstanceID = DHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
-                                                            if (string.IsNullOrEmpty(ACInstanceID)) {
-                                                                ACInstanceID = GenericController.getGUID();
+                                                            string acInstanceID = DHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
+                                                            if (string.IsNullOrEmpty(acInstanceID)) {
+                                                                acInstanceID = GenericController.getGUID();
                                                             }
                                                             ElementText = "";
                                                             string QueryString = null;
@@ -563,7 +563,7 @@ namespace Contensive.Processor.Controllers {
                                                                     // ----- AC Image, Decode Active Images to Resource Library references
                                                                     //
                                                                     if (ImageIDArrayCount >= 4) {
-                                                                        RecordID = GenericController.encodeInteger(ACInstanceName);
+                                                                        recordId = GenericController.encodeInteger(ACInstanceName);
                                                                         string ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH");
                                                                         string ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT");
                                                                         string ImageAlt = HtmlController.encodeHtml(DHTML.ElementAttribute(ElementPointer, "Alt"));
@@ -572,13 +572,13 @@ namespace Contensive.Processor.Controllers {
                                                                         string ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align");
                                                                         string ImageBorder = DHTML.ElementAttribute(ElementPointer, "BORDER");
                                                                         string ImageLoop = DHTML.ElementAttribute(ElementPointer, "LOOP");
-                                                                        ImageStyle = DHTML.ElementAttribute(ElementPointer, "STYLE");
+                                                                        imageStyle = DHTML.ElementAttribute(ElementPointer, "STYLE");
 
-                                                                        if (!string.IsNullOrEmpty(ImageStyle)) {
+                                                                        if (!string.IsNullOrEmpty(imageStyle)) {
                                                                             //
                                                                             // ----- Process styles, which override attributes
                                                                             //
-                                                                            string[] IMageStyleArray = ImageStyle.Split(';');
+                                                                            string[] IMageStyleArray = imageStyle.Split(';');
                                                                             int ImageStyleArrayCount = IMageStyleArray.GetUpperBound(0) + 1;
                                                                             int ImageStyleArrayPointer = 0;
                                                                             for (ImageStyleArrayPointer = 0; ImageStyleArrayPointer < ImageStyleArrayCount; ImageStyleArrayPointer++) {
@@ -600,7 +600,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 }
                                                                             }
                                                                         }
-                                                                        ElementText = "<AC type=\"IMAGE\" ACInstanceID=\"" + ACInstanceID + "\" RecordID=\"" + RecordID + "\" Style=\"" + ImageStyle + "\" Width=\"" + ImageWidthText + "\" Height=\"" + ImageHeightText + "\" VSpace=\"" + ImageVSpace + "\" HSpace=\"" + ImageHSpace + "\" Alt=\"" + ImageAlt + "\" Align=\"" + ImageAlign + "\" Border=\"" + ImageBorder + "\" Loop=\"" + ImageLoop + "\">";
+                                                                        ElementText = "<AC type=\"IMAGE\" ACInstanceID=\"" + acInstanceID + "\" RecordID=\"" + recordId + "\" Style=\"" + imageStyle + "\" Width=\"" + ImageWidthText + "\" Height=\"" + ImageHeightText + "\" VSpace=\"" + ImageVSpace + "\" HSpace=\"" + ImageHSpace + "\" Alt=\"" + ImageAlt + "\" Align=\"" + ImageAlign + "\" Border=\"" + ImageBorder + "\" Loop=\"" + ImageLoop + "\">";
                                                                     }
                                                                     break;
                                                                 case ACTypeAggregateFunction:
@@ -625,7 +625,7 @@ namespace Contensive.Processor.Controllers {
                                                                         }
                                                                         QueryString = string.Join("&", QSSplit);
                                                                     }
-                                                                    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\" querystring=\"" + QueryString + "\" guid=\"" + ACGuid + "\">";
+                                                                    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + acInstanceID + "\" querystring=\"" + QueryString + "\" guid=\"" + ACGuid + "\">";
                                                                     break;
                                                                 case ACTypeTemplateContent:
                                                                 case ACTypeTemplateText:
@@ -642,7 +642,7 @@ namespace Contensive.Processor.Controllers {
                                                                         QueryString = string.Join("&", QSSplit);
 
                                                                     }
-                                                                    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\" querystring=\"" + QueryString + "\">";
+                                                                    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + acInstanceID + "\" querystring=\"" + QueryString + "\">";
                                                                     break;
                                                                 default:
                                                                     //
@@ -658,7 +658,7 @@ namespace Contensive.Processor.Controllers {
                                                                         }
                                                                         QueryString = string.Join("&", QSSplit);
                                                                     }
-                                                                    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\" field=\"" + ACFieldName + "\" querystring=\"" + QueryString + "\">";
+                                                                    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + acInstanceID + "\" field=\"" + ACFieldName + "\" querystring=\"" + QueryString + "\">";
                                                                     break;
                                                             }
                                                         }
@@ -675,8 +675,8 @@ namespace Contensive.Processor.Controllers {
                                                             string[] Paths = ImageVirtualFilename.Split('/');
                                                             if (Paths.GetUpperBound(0) > 2) {
                                                                 if (GenericController.vbLCase(Paths[1]) == "filename") {
-                                                                    RecordID = GenericController.encodeInteger(Paths[2]);
-                                                                    if (RecordID != 0) {
+                                                                    recordId = GenericController.encodeInteger(Paths[2]);
+                                                                    if (recordId != 0) {
                                                                         string ImageFilename = Paths[3];
                                                                         string ImageVirtualFilePath = GenericController.vbReplace(ImageVirtualFilename, ImageFilename, "");
                                                                         Pos = ImageFilename.LastIndexOf(".") + 1;
@@ -711,11 +711,11 @@ namespace Contensive.Processor.Controllers {
                                                                                 //
                                                                                 // Determine ImageWidth and ImageHeight
                                                                                 //
-                                                                                ImageStyle = DHTML.ElementAttribute(ElementPointer, "style");
+                                                                                imageStyle = DHTML.ElementAttribute(ElementPointer, "style");
                                                                                 int ImageWidth = GenericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "width"));
                                                                                 int ImageHeight = GenericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "height"));
-                                                                                if (!string.IsNullOrEmpty(ImageStyle)) {
-                                                                                    string[] Styles = ImageStyle.Split(';');
+                                                                                if (!string.IsNullOrEmpty(imageStyle)) {
+                                                                                    string[] Styles = imageStyle.Split(';');
                                                                                     for (Ptr = 0; Ptr <= Styles.GetUpperBound(0); Ptr++) {
                                                                                         string[] Style = Styles[Ptr].Split(':');
                                                                                         if (Style.GetUpperBound(0) > 0) {
@@ -743,7 +743,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 //
                                                                                 // Get the record values
                                                                                 //
-                                                                                LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, RecordID);
+                                                                                LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, recordId);
                                                                                 if (file != null) {
                                                                                     string RecordVirtualFilename = file.filename;
                                                                                     int RecordWidth = file.width;
@@ -1018,8 +1018,7 @@ namespace Contensive.Processor.Controllers {
                     // -- Do Plain Text Conversion
                     hint = "40";
                     if (convertHtmlToText) {
-                        NUglify.Html.HtmlToTextOptions options = NUglify.Html.HtmlToTextOptions.KeepFormatting;
-                        result = NUglify.Uglify.HtmlToText(result, options).Code; // htmlToTextControllers.convert(core, result);
+                        result = HtmlController.convertHtmlToText(core, result);
                     }
                     //
                     // Process Addons
@@ -1053,7 +1052,7 @@ namespace Contensive.Processor.Controllers {
                                     hint = "53";
                                     string AddonName = "";
                                     string addonOptionString = "";
-                                    string ACInstanceID = "";
+                                    string ACInstanceId = "";
                                     string AddonGuid = "";
                                     int copyLength = LineEnd - LineStart - 11;
                                     if (copyLength <= 0) {
@@ -1074,7 +1073,7 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                                 if (ArgCnt > 2) {
                                                     if (!string.IsNullOrEmpty(ArgSplit[2])) {
-                                                        ACInstanceID = ArgSplit[2].Substring(1, ArgSplit[2].Length - 2);
+                                                        ACInstanceId = ArgSplit[2].Substring(1, ArgSplit[2].Length - 2);
                                                     }
                                                     if (ArgCnt > 3) {
                                                         if (!string.IsNullOrEmpty(ArgSplit[3])) {
@@ -1094,7 +1093,7 @@ namespace Contensive.Processor.Controllers {
                                                     fieldName = "",
                                                     recordId = ContextRecordID
                                                 },
-                                                instanceGuid = ACInstanceID,
+                                                instanceGuid = ACInstanceId,
                                                 argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, addonOptionString),
                                                 errorContextMessage = "rendering active content with guid [" + AddonGuid + "] or name [" + AddonName + "]"
                                             };
@@ -1209,9 +1208,9 @@ namespace Contensive.Processor.Controllers {
                         string htmlContentSegment_file = htmlContentSegment.Substring(0, posQuote);
                         string[] libraryFileSplit = htmlContentSegment_file.Split('/');
                         if (libraryFileSplit.GetUpperBound(0) > 2) {
-                            int libraryRecordID = encodeInteger(libraryFileSplit[2]);
-                            if ((libraryFileSplit[0].ToLower(CultureInfo.InvariantCulture) == "cclibraryfiles") && (libraryFileSplit[1].ToLower(CultureInfo.InvariantCulture) == "filename") && (libraryRecordID != 0)) {
-                                LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, libraryRecordID);
+                            int libraryRecordId = encodeInteger(libraryFileSplit[2]);
+                            if ((libraryFileSplit[0].ToLower(CultureInfo.InvariantCulture) == "cclibraryfiles") && (libraryFileSplit[1].ToLower(CultureInfo.InvariantCulture) == "filename") && (libraryRecordId != 0)) {
+                                LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, libraryRecordId);
                                 if ((file != null) && (htmlContentSegment_file != file.filename)) { htmlContentSegment_file = file.filename; }
                             }
                         }

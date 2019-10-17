@@ -20,7 +20,7 @@ namespace Contensive.Addons.AdminSite {
                 Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                 string HTMLFieldString = null;
                 int RecordCount = 0;
-                int ContentWatchListID = 0;
+                int ContentWatchListId = 0;
                 StringBuilderLegacyController FastString = null;
                 //
                 if (adminData.adminContent.allowContentTracking) {
@@ -53,11 +53,11 @@ namespace Contensive.Addons.AdminSite {
                             //
                             RecordCount = 0;
                             while (CSLists.ok()) {
-                                ContentWatchListID = CSLists.getInteger("id");
+                                ContentWatchListId = CSLists.getInteger("id");
                                 //
                                 if (adminData.contentWatchRecordID != 0) {
                                     using (var CSRules = new CsModel(core)) {
-                                        CSRules.open("Content Watch List Rules", "(ContentWatchID=" + adminData.contentWatchRecordID + ")AND(ContentWatchListID=" + ContentWatchListID + ")");
+                                        CSRules.open("Content Watch List Rules", "(ContentWatchID=" + adminData.contentWatchRecordID + ")AND(ContentWatchListID=" + ContentWatchListId + ")");
                                         if (editRecord.userReadOnly) {
                                             HTMLFieldString = GenericController.encodeText(CSRules.ok());
                                         } else {

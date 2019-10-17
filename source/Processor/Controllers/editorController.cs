@@ -148,9 +148,9 @@ namespace Contensive.Processor.Controllers {
                         + " where (t.active<>0)and(a.active<>0) order by t.id";
                     DataTable dt = core.db.executeQuery(sql);
                     foreach (DataRow dr in dt.Rows) {
-                        int fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
+                        int fieldTypeId = GenericController.encodeInteger(dr["contentfieldtypeid"]);
                         result.Add(new FieldTypeEditorAddonModel() {
-                            fieldTypeId = fieldTypeID,
+                            fieldTypeId = fieldTypeId,
                             editorAddonId = GenericController.encodeInteger(dr["editorAddonId"])
                         });
                     }

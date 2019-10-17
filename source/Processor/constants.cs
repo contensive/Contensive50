@@ -165,7 +165,7 @@ namespace Contensive.Processor {
         //
         internal const string sfImageExtList = "jpg,jpeg,gif,png";
         //
-        internal const string PageChildListInstanceID = "{ChildPageList}";
+        internal const string PageChildListInstanceId = "{ChildPageList}";
         //
         internal const string unixNewLine = "\n";
         internal const string macNewLine = "\r";
@@ -220,7 +220,7 @@ namespace Contensive.Processor {
         internal const string UserErrorHeadline = "<h3 class=\"ccError\">There was an issue.</h3>";
         //
         //   System MemberID - when the system does an update, it uses this member
-        internal const int SystemMemberID = 0;
+        internal const int SystemMemberId = 0;
         //
         // ----- old (OptionKeys for available Options)
         internal const int OptionKeyProductionLicense = 0;
@@ -424,7 +424,7 @@ namespace Contensive.Processor {
         //   DataSource constants
         //-----------------------------------------------------------------------
         //
-        internal const int DefaultDataSourceID = -1;
+        internal const int DefaultDataSourceId = -1;
         //
         //-----------------------------------------------------------------------
         // ----- Type compatibility between databases
@@ -619,7 +619,7 @@ namespace Contensive.Processor {
         internal const string ButtonRegister = " Register ";
         internal const string ButtonBegin = "Begin";
         internal const string ButtonAbort = "Abort";
-        internal const string ButtonCreateGUID = " Create GUID ";
+        internal const string ButtonCreateGUId = " Create GUID ";
         internal const string ButtonEnable = " Enable ";
         internal const string ButtonDisable = " Disable ";
         internal const string ButtonMarkReviewed = " Mark Reviewed ";
@@ -833,14 +833,14 @@ namespace Contensive.Processor {
         internal const string RequestNameTitleExtension = "tx";
         //
         //
-        internal const string RequestNameDynamicFormID = "dformid";
+        internal const string RequestNameDynamicFormId = "dformid";
         //
         internal const string RequestNameRunAddon = "addonid";
         internal const string RequestNameEditReferer = "EditReferer";
         internal const string RequestNameCatalogOrder = "CatalogOrderID";
-        internal const string RequestNameCatalogCategoryID = "CatalogCatID";
+        internal const string RequestNameCatalogCategoryId = "CatalogCatID";
         internal const string RequestNameCatalogForm = "CatalogFormID";
-        internal const string RequestNameCatalogItemID = "CatalogItemID";
+        internal const string RequestNameCatalogItemId = "CatalogItemID";
         internal const string RequestNameCatalogItemAge = "CatalogItemAge";
         internal const string RequestNameCatalogRecordTop = "CatalogTop";
         internal const string RequestNameCatalogFeatured = "CatalogFeatured";
@@ -855,7 +855,7 @@ namespace Contensive.Processor {
         internal const string RequestNameLibraryDescription = "LibraryDescription";
 
         internal const string RequestNameRootPage = "RootPageName";
-        internal const string RequestNameRootPageID = "RootPageID";
+        internal const string RequestNameRootPageId = "RootPageID";
         internal const string RequestNameContent = "ContentName";
         internal const string RequestNameOrderByClause = "OrderByClause";
         internal const string RequestNameAllowChildPageList = "AllowChildPageList";
@@ -871,12 +871,12 @@ namespace Contensive.Processor {
         //
         internal const string RequestNameReportForm = "rid";
         //
-        internal const string RequestNameToolContentID = "ContentID";
+        internal const string RequestNameToolContentId = "ContentID";
         //
         internal const string RequestNameCut = "a904o2pa0cut";
         internal const string RequestNamePaste = "dp29a7dsa6paste";
-        internal const string RequestNamePasteParentContentID = "dp29a7dsa6cid";
-        internal const string RequestNamePasteParentRecordID = "dp29a7dsa6rid";
+        internal const string RequestNamePasteParentContentId = "dp29a7dsa6cid";
+        internal const string RequestNamePasteParentRecordId = "dp29a7dsa6rid";
         internal const string RequestNamePasteFieldList = "dp29a7dsa6key";
         internal const string RequestNameCutClear = "dp29a7dsa6clear";
         //
@@ -884,17 +884,17 @@ namespace Contensive.Processor {
         internal const string RequestNameJSForm = "RequestJSForm";
         internal const string RequestNameJSProcess = "ProcessJSForm";
         //
-        internal const string RequestNameFolderID = "FolderID";
+        internal const string RequestNameFolderId = "FolderID";
         //
-        internal const string rnEmailMemberID = "emi8s9Kj";
+        internal const string rnEmailMemberId = "emi8s9Kj";
         internal const string rnEmailOpenFlag = "eof9as88";
         internal const string rnEmailOpenCssFlag = "8aa41pM3";
         internal const string rnEmailClickFlag = "ecf34Msi";
         internal const string rnEmailBlockRecipientEmail = "9dq8Nh61";
-        internal const string rnEmailBlockRequestDropID = "BlockEmailRequest";
+        internal const string rnEmailBlockRequestDropId = "BlockEmailRequest";
         internal const string RequestNameVisitTracking = "s9lD1088";
         internal const string RequestNameBlockContentTracking = "BlockContentTracking";
-        internal const string RequestNameCookieDetectVisitID = "f92vo2a8d";
+        internal const string RequestNameCookieDetectVisitId = "f92vo2a8d";
 
         internal const string RequestNamePageNumber = "PageNumber";
         internal const string RequestNamePageSize = "PageSize";

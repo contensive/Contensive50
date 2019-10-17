@@ -626,15 +626,15 @@ namespace Contensive.Processor.Controllers {
 				//
 				int styleId = 0;
 				string fieldType = null;
-				int fieldTypeID = 0;
-				int TriggerContentID = 0;
+				int fieldTypeId = 0;
+				int TriggerContentId = 0;
 				string StylesTest = null;
 				bool BlockEditTools = false;
 				string NavType = null;
 				string Styles = null;
 				string NodeInnerText = null;
-				int IncludedAddonID = 0;
-				int ScriptingModuleID = 0;
+				int IncludedAddonId = 0;
+				int ScriptingModuleId = 0;
 				string Guid = null;
 				string addonName = null;
 				bool processRunOnce = false;
@@ -682,8 +682,8 @@ namespace Contensive.Processor.Controllers {
 					NodeInnerText = "";
 					CS2.Open("Add-on Include Rules", "addonid=" + addonid);
 					while (CS2.OK()) {
-						IncludedAddonID = CS2.GetInteger("IncludedAddonID");
-						CS3.Open("Add-ons", "ID=" + IncludedAddonID);
+						IncludedAddonId = CS2.GetInteger("IncludedAddonID");
+						CS3.Open("Add-ons", "ID=" + IncludedAddonId);
 						if (CS3.OK()) {
 							Guid = CS3.GetText("ccGuid");
 							if (string.IsNullOrEmpty(Guid)) {
@@ -763,8 +763,8 @@ namespace Contensive.Processor.Controllers {
 					}
 					CS2.Open("Add-on Scripting Module Rules", "addonid=" + addonid);
 					while (CS2.OK()) {
-						ScriptingModuleID = CS2.GetInteger("ScriptingModuleID");
-						CS3.Open("Scripting Modules", "ID=" + ScriptingModuleID);
+						ScriptingModuleId = CS2.GetInteger("ScriptingModuleID");
+						CS3.Open("Scripting Modules", "ID=" + ScriptingModuleId);
 						if (CS3.OK()) {
 							Guid = CS3.GetText("ccGuid");
 							if (string.IsNullOrEmpty(Guid)) {
@@ -809,8 +809,8 @@ namespace Contensive.Processor.Controllers {
 					NodeInnerText = "";
 					CS2.Open("Add-on Content Trigger Rules", "addonid=" + addonid);
 					while (CS2.OK()) {
-						TriggerContentID = CS2.GetInteger("ContentID");
-						CS3.Open("content", "ID=" + TriggerContentID);
+						TriggerContentId = CS2.GetInteger("ContentID");
+						CS3.Open("content", "ID=" + TriggerContentId);
 						if (CS3.OK()) {
 							Guid = CS3.GetText("ccGuid");
 							if (string.IsNullOrEmpty(Guid)) {
@@ -833,8 +833,8 @@ namespace Contensive.Processor.Controllers {
 						NodeInnerText = "";
 						CS2.Open("Add-on Content Field Type Rules", "addonid=" + addonid);
 						while (CS2.OK()) {
-							fieldTypeID = CS2.GetInteger("contentFieldTypeID");
-							fieldType = cp.Content.GetRecordName("Content Field Types", fieldTypeID);
+							fieldTypeId = CS2.GetInteger("contentFieldTypeID");
+							fieldType = cp.Content.GetRecordName("Content Field Types", fieldTypeId);
 							if (!string.IsNullOrEmpty(fieldType)) {
 								NodeInnerText = NodeInnerText + Environment.NewLine + "\t" + "\t" + "<type>" + fieldType + "</type>";
 							}

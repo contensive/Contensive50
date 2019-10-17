@@ -40,7 +40,7 @@ namespace Contensive.Addons.AdminSite {
                 int FieldMatchOption = 0;
                 string[] FieldLookupContentName = { };
                 string[] FieldLookupList = { };
-                int ContentID = 0;
+                int ContentId = 0;
                 int FieldCnt = 0;
                 int FieldSize = 0;
                 int RowPointer = 0;
@@ -159,9 +159,9 @@ namespace Contensive.Addons.AdminSite {
                     fieldId[FieldPtr] = field.id;
                     fieldTypeId[FieldPtr] = field.fieldTypeId;
                     if (fieldTypeId[FieldPtr] == CPContentBaseClass.FieldTypeIdEnum.Lookup) {
-                        ContentID = field.lookupContentID;
-                        if (ContentID > 0) {
-                            FieldLookupContentName[FieldPtr] = MetadataController.getContentNameByID(core, ContentID);
+                        ContentId = field.lookupContentId;
+                        if (ContentId > 0) {
+                            FieldLookupContentName[FieldPtr] = MetadataController.getContentNameByID(core, ContentId);
                         }
                         FieldLookupList[FieldPtr] = field.lookupList;
                     }

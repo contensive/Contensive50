@@ -99,7 +99,7 @@ namespace Contensive.Addons.Primitives {
                             data = new AuthenticateResponseData()
                         };
                     } else {
-                        LogController.addSiteActivity(core, errorPrefix + " successful", core.session.user.id, core.session.user.organizationID);
+                        LogController.addSiteActivity(core, errorPrefix + " successful", core.session.user.id, core.session.user.organizationId);
                         return new AuthenticateResponse() {
                             errors = new List<string>(),
                             data = new AuthenticateResponseData() {
