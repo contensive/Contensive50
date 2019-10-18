@@ -162,12 +162,12 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 } else if (propertyCache[1, Ptr] != propertyValue) {
                     propertyCache[1, Ptr] = propertyValue;
-                    int RecordID = GenericController.encodeInteger(propertyCache[2, Ptr]);
+                    int RecordId = GenericController.encodeInteger(propertyCache[2, Ptr]);
                     string SQLNow = DbController.encodeSQLDate(DateTime.Now);
                     //
                     // save the value in the property that was found
                     //
-                    core.db.executeQuery("update ccProperties set FieldValue=" + DbController.encodeSQLText(propertyValue) + ",ModifiedDate=" + SQLNow + " where id=" + RecordID);
+                    core.db.executeQuery("update ccProperties set FieldValue=" + DbController.encodeSQLText(propertyValue) + ",ModifiedDate=" + SQLNow + " where id=" + RecordId);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

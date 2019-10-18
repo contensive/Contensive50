@@ -851,10 +851,10 @@ namespace Contensive.Processor.Controllers {
                                     // If visit tracking, save the viewing record
                                     //
                                     string ViewingName = ((string)(session.visit.id + "." + session.visit.pageVisits)).Left(10);
-                                    int PageID = 0;
+                                    int PageId = 0;
                                     if (_doc != null) {
                                         if (doc.pageController.page != null) {
-                                            PageID = doc.pageController.page.id;
+                                            PageId = doc.pageController.page.id;
                                         }
                                     }
                                     //
@@ -880,7 +880,7 @@ namespace Contensive.Processor.Controllers {
                                         + "," + DbController.encodeSQLBoolean(session.visitStateOk)
                                         + "," + doc.appStopWatch.ElapsedMilliseconds.ToString()
                                         + ",1"
-                                        + "," + PageID.ToString()
+                                        + "," + PageId.ToString()
                                         + "," + DbController.encodeSQLBoolean(webServer.pageExcludeFromAnalytics)
                                         + "," + DbController.encodeSQLText(pagetitle);
                                     SQL += ");";

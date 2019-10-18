@@ -88,10 +88,10 @@ namespace Contensive.Addons.AdminSite {
                 {
                     if (GenericController.vbUCase(adminData.adminContent.tableName) == GenericController.vbUCase("ccMembers")) {
                         string htmlId = "fieldGuid";
-                        bool AllowEID = (core.siteProperties.getBoolean("AllowLinkLogin", true)) || (core.siteProperties.getBoolean("AllowLinkRecognize", true));
+                        bool AllowEId = (core.siteProperties.getBoolean("AllowLinkLogin", true)) || (core.siteProperties.getBoolean("AllowLinkRecognize", true));
                         string fieldHelp = "";
                         string fieldEditor = "";
-                        if (!AllowEID) {
+                        if (!AllowEId) {
                             fieldEditor = "(link login and link recognize are disabled in security preferences)";
                         } else if (adminData.editRecord.id == 0) {
                             fieldEditor = "(available after save)";
@@ -128,17 +128,17 @@ namespace Contensive.Addons.AdminSite {
                         } else {
                             string RecordContentName = adminData.editRecord.contentControlId_Name;
                             string TableName2 = MetadataController.getContentTablename(core, RecordContentName);
-                            int TableID = MetadataController.getRecordIdByUniqueName(core, "Tables", TableName2);
+                            int TableId = MetadataController.getRecordIdByUniqueName(core, "Tables", TableName2);
                             //
                             // Test for parentid
-                            int ParentID = 0;
-                            bool ContentSupportsParentID = false;
+                            int ParentId = 0;
+                            bool ContentSupportsParentId = false;
                             if (adminData.editRecord.id > 0) {
                                 using (var csData = new CsModel(core)) {
                                     if (csData.openRecord(RecordContentName, adminData.editRecord.id)) {
-                                        ContentSupportsParentID = csData.isFieldSupported("ParentID");
-                                        if (ContentSupportsParentID) {
-                                            ParentID = csData.getInteger("ParentID");
+                                        ContentSupportsParentId = csData.isFieldSupported("ParentID");
+                                        if (ContentSupportsParentId) {
+                                            ParentId = csData.getInteger("ParentID");
                                         }
                                     }
                                 }
@@ -147,9 +147,9 @@ namespace Contensive.Addons.AdminSite {
                             if (core.session.isAuthenticatedAdmin()) {
                                 //
                                 // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
-                                string sqlFilter = "(ContentTableID=" + TableID + ")";
-                                int contentCID = MetadataController.getRecordIdByUniqueName(core, ContentModel.tableMetadata.contentName, ContentModel.tableMetadata.contentName);
-                                HTMLFieldString += AdminUIController.getDefaultEditor_lookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, adminData.editRecord.userReadOnly, "", "", true, sqlFilter);
+                                string sqlFilter = "(ContentTableID=" + TableId + ")";
+                                int contentCId = MetadataController.getRecordIdByUniqueName(core, ContentModel.tableMetadata.contentName, ContentModel.tableMetadata.contentName);
+                                HTMLFieldString += AdminUIController.getDefaultEditor_lookupContent(core, "contentcontrolid", FieldValueInteger, contentCId, ref IsEmptyList, adminData.editRecord.userReadOnly, "", "", true, sqlFilter);
                                 FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)";
                             }
                         }

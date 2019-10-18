@@ -25,13 +25,13 @@ namespace Contensive.Addons.AdminSite {
                     var help = ContentFieldHelpModel.createByFieldId(cp, fieldId);
                     if (help == null) {
                         help = DbBaseModel.addDefault<ContentFieldHelpModel>(core.cpParent, Processor.Models.Domain.ContentMetadataModel.getDefaultValueDict(core, ContentFieldHelpModel.tableMetadata.contentName));
-                        help.fieldID = fieldId;
+                        help.fieldId = fieldId;
                     }
                     help.helpCustom = cp.Doc.GetText("helpcustom");
                     help.save(cp);
                     ContentFieldModel contentField = DbBaseModel.create<ContentFieldModel>(core.cpParent, fieldId);
                     if (contentField != null) {
-                        ContentMetadataModel.invalidateCache(core, contentField.contentID);
+                        ContentMetadataModel.invalidateCache(core, contentField.contentId);
                     }
                 }
             } catch (Exception ex) {

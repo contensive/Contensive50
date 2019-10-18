@@ -549,7 +549,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.blockExceptionReporting = false;
                     //
                     //   javascript cookie detect on page1 of all visits
-                    string CookieDetectKey = core.docProperties.getText(RequestNameCookieDetectVisitID);
+                    string CookieDetectKey = core.docProperties.getText(RequestNameCookieDetectVisitId);
                     if (!string.IsNullOrEmpty(CookieDetectKey)) {
                         //
                         SecurityController.TokenData visitToken = SecurityController.decodeToken(core, CookieDetectKey);
@@ -1207,21 +1207,21 @@ namespace Contensive.Processor.Controllers {
         public static bool redirectByRecord_ReturnStatus(CoreController core, string contentName, int recordId, string fieldName = "") {
             bool result = false;
             int contentId = 0;
-            int HostRecordID = 0;
+            int HostRecordId = 0;
             bool BlockRedirect = false;
             string iContentName = null;
-            int iRecordID = 0;
+            int iRecordId = 0;
             string iFieldName = null;
             string LinkPrefix = "";
             string EncodedLink = null;
             string NonEncodedLink = "";
             //
             iContentName = GenericController.encodeText(contentName);
-            iRecordID = GenericController.encodeInteger(recordId);
+            iRecordId = GenericController.encodeInteger(recordId);
             iFieldName = GenericController.encodeEmpty(fieldName, "link");
             BlockRedirect = false;
             using (var csData = new CsModel(core)) {
-                if (csData.open(iContentName, "ID=" + iRecordID)) {
+                if (csData.open(iContentName, "ID=" + iRecordId)) {
                     //
                     // Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
                     EncodedLink = encodeText(csData.getText(iFieldName)).Trim(' ');
@@ -1250,8 +1250,8 @@ namespace Contensive.Processor.Controllers {
                                     BlockRedirect = true;
                                     csData.set("active", 0);
                                 } else {
-                                    HostRecordID = (csData.getInteger("RecordID"));
-                                    if (HostRecordID == 0) {
+                                    HostRecordId = (csData.getInteger("RecordID"));
+                                    if (HostRecordId == 0) {
                                         //
                                         // ----- Content Watch with a bad iRecordID, mark inactive
                                         //
@@ -1259,7 +1259,7 @@ namespace Contensive.Processor.Controllers {
                                         csData.set("active", 0);
                                     } else {
                                         using (var CSHost = new CsModel(core)) {
-                                            CSHost.open(contentMeta.name, "ID=" + HostRecordID);
+                                            CSHost.open(contentMeta.name, "ID=" + HostRecordId);
                                             if (!CSHost.ok()) {
                                                 //
                                                 // ----- Content Watch host record not found, mark inactive
@@ -1274,7 +1274,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // ----- if a content watch record is blocked, delete the content tracking
                                     //
-                                    MetadataController.deleteContentRules(core, contentMeta, HostRecordID);
+                                    MetadataController.deleteContentRules(core, contentMeta, HostRecordId);
                                 }
                                 break;
                         }

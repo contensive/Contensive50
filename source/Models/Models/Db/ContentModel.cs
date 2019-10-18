@@ -20,19 +20,19 @@ namespace Contensive.Models.Db {
         public bool allowDelete { get; set; }
         public bool allowTopicRules { get; set; }
         public bool allowWorkflowAuthoring { get; set; }
-        public int authoringTableID { get; set; }
-        public int contentTableID { get; set; }
-        public int defaultSortMethodID { get; set; }
+        public int authoringTableId { get; set; }
+        public int contentTableId { get; set; }
+        public int defaultSortMethodId { get; set; }
         public bool developerOnly { get; set; }
         public string dropDownFieldList { get; set; }
-        public int editorGroupID { get; set; }
+        public int editorGroupId { get; set; }
         public int iconHeight { get; set; }
         public string iconLink { get; set; }
         public int iconSprites { get; set; }
         public int iconWidth { get; set; }
-        public int installedByCollectionID { get; set; }
+        public int installedByCollectionId { get; set; }
         public bool isBaseContent { get; set; }
-        public int parentID { get; set; }
+        public int parentId { get; set; }
         //
         //====================================================================================================
         /// <summary>

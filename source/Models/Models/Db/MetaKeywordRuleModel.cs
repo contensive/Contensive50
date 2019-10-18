@@ -11,7 +11,7 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         //
-        public int metaContentID { get; set; }
-        public int metaKeywordID { get; set; }
+        public int metaContentId { get; set; }
+        public int metaKeywordId { get; set; }
     }
 }

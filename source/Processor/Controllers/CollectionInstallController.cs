@@ -213,7 +213,7 @@ namespace Contensive.Processor.Controllers {
                                             bool CollectionUpdatable_fileValueOK = false;
                                             //												Dim CollectionblockNavigatorNode_fileValueOK As Boolean
                                             bool CollectionSystem = GenericController.encodeBoolean(XmlController.GetXMLAttribute(core, CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
-                                            int Parent_NavID = BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
+                                            int Parent_NavId = BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
                                                 Guid = addonGuidManageAddon,
                                                 name = "Manage Add-ons",
                                                 AdminOnly = false,
@@ -331,19 +331,19 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 bool Found = false;
                                                                 string ChildCollectionName = XmlController.GetXMLAttribute(core, Found, MetaDataSection, "name", "");
-                                                                string ChildCollectionGUID = XmlController.GetXMLAttribute(core, Found, MetaDataSection, "guid", MetaDataSection.InnerText);
-                                                                if (string.IsNullOrEmpty(ChildCollectionGUID)) {
-                                                                    ChildCollectionGUID = MetaDataSection.InnerText;
+                                                                string ChildCollectionGUId = XmlController.GetXMLAttribute(core, Found, MetaDataSection, "guid", MetaDataSection.InnerText);
+                                                                if (string.IsNullOrEmpty(ChildCollectionGUId)) {
+                                                                    ChildCollectionGUId = MetaDataSection.InnerText;
                                                                 }
-                                                                if (collectionsInstalledList.Contains(ChildCollectionGUID.ToLower(CultureInfo.InvariantCulture))) {
+                                                                if (collectionsInstalledList.Contains(ChildCollectionGUId.ToLower(CultureInfo.InvariantCulture))) {
                                                                     //
                                                                     // circular import detected, this collection is already imported
                                                                     //
-                                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1. The collection to be imported is [" + ChildCollectionName + "], GUID [" + ChildCollectionGUID + "]");
+                                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1. The collection to be imported is [" + ChildCollectionName + "], GUID [" + ChildCollectionGUId + "]");
                                                                 } else {
                                                                     //
                                                                     // -- all included collections should already be installed, because buildfolder is called before call
-                                                                    installCollectionFromCollectionFolder(core, contextLog, ChildCollectionGUID, ref return_ErrorMessage, IsNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, false, ref collectionsDownloaded);
+                                                                    installCollectionFromCollectionFolder(core, contextLog, ChildCollectionGUId, ref return_ErrorMessage, IsNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, false, ref collectionsDownloaded);
                                                                 }
                                                                 break;
                                                             }
@@ -504,12 +504,12 @@ namespace Contensive.Processor.Controllers {
                                                                             //
                                                                             // setup metadata rule
                                                                             //
-                                                                            int ContentID = ContentMetadataModel.getContentId(core, ContentName);
-                                                                            if (ContentID > 0) {
+                                                                            int ContentId = ContentMetadataModel.getContentId(core, ContentName);
+                                                                            if (ContentId > 0) {
                                                                                 using (var csData = new CsModel(core)) {
                                                                                     csData.insert("Add-on Collection CDef Rules");
                                                                                     if (csData.ok()) {
-                                                                                        csData.set("Contentid", ContentID);
+                                                                                        csData.set("Contentid", ContentId);
                                                                                         csData.set("CollectionID", collection.id);
                                                                                     }
                                                                                 }
@@ -627,23 +627,23 @@ namespace Contensive.Processor.Controllers {
                                                                 // processed, but add rule for collection record
                                                                 bool Found = false;
                                                                 string ChildCollectionName = XmlController.GetXMLAttribute(core, Found, metaDataSection, "name", "");
-                                                                string ChildCollectionGUID = XmlController.GetXMLAttribute(core, Found, metaDataSection, "guid", metaDataSection.InnerText);
-                                                                if (string.IsNullOrEmpty(ChildCollectionGUID)) {
-                                                                    ChildCollectionGUID = metaDataSection.InnerText;
+                                                                string ChildCollectionGUId = XmlController.GetXMLAttribute(core, Found, metaDataSection, "guid", metaDataSection.InnerText);
+                                                                if (string.IsNullOrEmpty(ChildCollectionGUId)) {
+                                                                    ChildCollectionGUId = metaDataSection.InnerText;
                                                                 }
-                                                                if (!string.IsNullOrEmpty(ChildCollectionGUID)) {
-                                                                    int ChildCollectionID = 0;
+                                                                if (!string.IsNullOrEmpty(ChildCollectionGUId)) {
+                                                                    int ChildCollectionId = 0;
                                                                     using (var csData = new CsModel(core)) {
-                                                                        csData.open("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUID));
+                                                                        csData.open("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUId));
                                                                         if (csData.ok()) {
-                                                                            ChildCollectionID = csData.getInteger("id");
+                                                                            ChildCollectionId = csData.getInteger("id");
                                                                         }
                                                                         csData.close();
-                                                                        if (ChildCollectionID != 0) {
+                                                                        if (ChildCollectionId != 0) {
                                                                             csData.insert("Add-on Collection Parent Rules");
                                                                             if (csData.ok()) {
                                                                                 csData.set("ParentID", collection.id);
-                                                                                csData.set("ChildID", ChildCollectionID);
+                                                                                csData.set("ChildID", ChildCollectionId);
                                                                             }
                                                                             csData.close();
                                                                         }
@@ -741,12 +741,12 @@ namespace Contensive.Processor.Controllers {
                                                                                                 bool IsFieldFound = false;
                                                                                                 string FieldName = XmlController.GetXMLAttribute(core, IsFound, FieldNode, "name", "").ToLowerInvariant();
                                                                                                 CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
-                                                                                                int FieldLookupContentID = -1;
+                                                                                                int FieldLookupContentId = -1;
                                                                                                 foreach (var keyValuePair in metaData.fields) {
                                                                                                     Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
                                                                                                     if (GenericController.vbLCase(field.nameLc) == FieldName) {
                                                                                                         fieldTypeId = field.fieldTypeId;
-                                                                                                        FieldLookupContentID = field.lookupContentID;
+                                                                                                        FieldLookupContentId = field.lookupContentId;
                                                                                                         IsFieldFound = true;
                                                                                                         break;
                                                                                                     }
@@ -764,8 +764,8 @@ namespace Contensive.Processor.Controllers {
                                                                                                                 //
                                                                                                                 // read in text value, if a guid, use it, otherwise assume name
                                                                                                                 if (!string.IsNullOrWhiteSpace(fieldValue)) {
-                                                                                                                    if (FieldLookupContentID != 0) {
-                                                                                                                        var lookupContentMetadata = ContentMetadataModel.create(core, FieldLookupContentID);
+                                                                                                                    if (FieldLookupContentId != 0) {
+                                                                                                                        var lookupContentMetadata = ContentMetadataModel.create(core, FieldLookupContentId);
                                                                                                                         if (lookupContentMetadata != null) {
                                                                                                                             int fieldLookupId = lookupContentMetadata.getRecordId(core, fieldValue);
                                                                                                                             if (fieldLookupId <= 0) {
@@ -1165,22 +1165,22 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
                                                     //
-                                                    int fieldTypeID = 0;
+                                                    int fieldTypeId = 0;
                                                     string fieldType = null;
                                                     switch (GenericController.vbLCase(TriggerNode.Name)) {
                                                         case "type":
                                                             fieldType = TriggerNode.InnerText;
-                                                            fieldTypeID = MetadataController.getRecordIdByUniqueName(core, "Content Field Types", fieldType);
-                                                            if (fieldTypeID > 0) {
+                                                            fieldTypeId = MetadataController.getRecordIdByUniqueName(core, "Content Field Types", fieldType);
+                                                            if (fieldTypeId > 0) {
                                                                 using (var CS2 = new CsModel(core)) {
-                                                                    Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeID + ")";
+                                                                    Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeId + ")";
                                                                     CS2.open("Add-on Content Field Type Rules", Criteria);
                                                                     if (!CS2.ok()) {
                                                                         CS2.insert("Add-on Content Field Type Rules");
                                                                     }
                                                                     if (CS2.ok()) {
                                                                         CS2.set("addonid", addonId);
-                                                                        CS2.set("contentfieldTypeID", fieldTypeID);
+                                                                        CS2.set("contentfieldTypeID", fieldTypeId);
                                                                     }
                                                                 }
                                                             }
@@ -1193,11 +1193,11 @@ namespace Contensive.Processor.Controllers {
                                                 // list of events that trigger a process run for this addon
                                                 //
                                                 foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
-                                                    int TriggerContentID = 0;
+                                                    int TriggerContentId = 0;
                                                     string ContentNameorGuid = null;
                                                     switch (GenericController.vbLCase(TriggerNode.Name)) {
                                                         case "contentchange":
-                                                            TriggerContentID = 0;
+                                                            TriggerContentId = 0;
                                                             ContentNameorGuid = TriggerNode.InnerText;
                                                             if (string.IsNullOrEmpty(ContentNameorGuid)) {
                                                                 ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "guid", "");
@@ -1213,18 +1213,18 @@ namespace Contensive.Processor.Controllers {
                                                                     CS2.open("content", Criteria);
                                                                 }
                                                                 if (CS2.ok()) {
-                                                                    TriggerContentID = CS2.getInteger("ID");
+                                                                    TriggerContentId = CS2.getInteger("ID");
                                                                 }
                                                             }
-                                                            if (TriggerContentID != 0) {
+                                                            if (TriggerContentId != 0) {
                                                                 using (var CS2 = new CsModel(core)) {
-                                                                    Criteria = "(addonid=" + addonId + ")and(contentid=" + TriggerContentID + ")";
+                                                                    Criteria = "(addonid=" + addonId + ")and(contentid=" + TriggerContentId + ")";
                                                                     CS2.open("Add-on Content Trigger Rules", Criteria);
                                                                     if (!CS2.ok()) {
                                                                         CS2.insert("Add-on Content Trigger Rules");
                                                                         if (CS2.ok()) {
                                                                             CS2.set("addonid", addonId);
-                                                                            CS2.set("contentid", TriggerContentID);
+                                                                            CS2.set("contentid", TriggerContentId);
                                                                         }
                                                                     }
                                                                     CS2.close();
@@ -1511,7 +1511,7 @@ namespace Contensive.Processor.Controllers {
                                             {
                                                 string IncludeAddonName = XmlController.GetXMLAttribute(core, IsFound, PageInterface, "name", "");
                                                 string IncludeAddonGuid = XmlController.GetXMLAttribute(core, IsFound, PageInterface, "guid", IncludeAddonName);
-                                                int IncludeAddonID = 0;
+                                                int IncludeAddonId = 0;
                                                 Criteria = "";
                                                 if (!string.IsNullOrEmpty(IncludeAddonGuid)) {
                                                     Criteria = AddonGuidFieldName + "=" + DbController.encodeSQLText(IncludeAddonGuid);
@@ -1525,18 +1525,18 @@ namespace Contensive.Processor.Controllers {
                                                     using (var CS2 = new CsModel(core)) {
                                                         CS2.open(AddonModel.tableMetadata.contentName, Criteria);
                                                         if (CS2.ok()) {
-                                                            IncludeAddonID = CS2.getInteger("ID");
+                                                            IncludeAddonId = CS2.getInteger("ID");
                                                         }
                                                     }
                                                     bool AddRule = false;
-                                                    if (IncludeAddonID == 0) {
+                                                    if (IncludeAddonId == 0) {
                                                         string UserError = "The include add-on [" + IncludeAddonName + "] could not be added because it was not found. If it is in the collection being installed, it must appear before any add-ons that include it.";
                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" + UserError + "]");
                                                         ReturnUpgradeOK = false;
                                                         ReturnErrorMessage = ReturnErrorMessage + "<P>The collection was not installed because the add-on [" + AOName + "] requires an included add-on [" + IncludeAddonName + "] which could not be found. If it is in the collection being installed, it must appear before any add-ons that include it.</P>";
                                                     } else {
                                                         using (var cs3 = new CsModel(core)) {
-                                                            AddRule = !cs3.openSql("select ID from ccAddonIncludeRules where Addonid=" + csData.getInteger("id") + " and IncludedAddonID=" + IncludeAddonID);
+                                                            AddRule = !cs3.openSql("select ID from ccAddonIncludeRules where Addonid=" + csData.getInteger("id") + " and IncludedAddonID=" + IncludeAddonId);
                                                         }
                                                     }
                                                     if (AddRule) {
@@ -1544,7 +1544,7 @@ namespace Contensive.Processor.Controllers {
                                                             cs3.insert("Add-on Include Rules");
                                                             if (cs3.ok()) {
                                                                 cs3.set("Addonid", csData.getInteger("id"));
-                                                                cs3.set("IncludedAddonID", IncludeAddonID);
+                                                                cs3.set("IncludedAddonID", IncludeAddonId);
                                                             }
                                                         }
                                                     }

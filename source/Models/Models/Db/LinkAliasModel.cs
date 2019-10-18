@@ -13,7 +13,7 @@ namespace Contensive.Models.Db {
         public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("link aliases", "cclinkaliases", "default", true);
         //
         //====================================================================================================
-        public int pageID { get; set; }
+        public int pageId { get; set; }
         public string queryStringSuffix { get; set; }
         //
         //====================================================================================================

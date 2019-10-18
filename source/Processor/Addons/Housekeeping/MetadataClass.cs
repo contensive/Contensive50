@@ -16,20 +16,20 @@ namespace Contensive.Addons.Housekeeping {
                 // block duplicate redirect fields (match contentid+fieldtype+caption)
                 //
                 LogController.logInfo(core, "Inactivate duplicate redirect fields");
-                int FieldContentID = 0;
+                int FieldContentId = 0;
                 string FieldLast = null;
                 string FieldNew = null;
-                int FieldRecordID = 0;
+                int FieldRecordId = 0;
                 using (var csData = new CsModel(core)) {
                     csData.openSql("Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" + (int)CPContentBaseClass.FieldTypeIdEnum.Redirect + ") Order By ContentID, Caption, ID");
                     FieldLast = "";
                     while (csData.ok()) {
-                        FieldContentID = csData.getInteger("Contentid");
+                        FieldContentId = csData.getInteger("Contentid");
                         string FieldCaption = csData.getText("Caption");
-                        FieldNew = FieldContentID + FieldCaption;
+                        FieldNew = FieldContentId + FieldCaption;
                         if (FieldNew == FieldLast) {
-                            FieldRecordID = csData.getInteger("ID");
-                            core.db.executeNonQuery("Update ccFields set active=0 where ID=" + FieldRecordID + ";");
+                            FieldRecordId = csData.getInteger("ID");
+                            core.db.executeNonQuery("Update ccFields set active=0 where ID=" + FieldRecordId + ";");
                         }
                         FieldLast = FieldNew;
                         csData.goNext();
@@ -49,7 +49,7 @@ namespace Contensive.Addons.Housekeeping {
                     LogController.logInfo(core, "Content TextFile types with no controlling record.");
                     using (var csData = new CsModel(core)) {
                         sql = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName"
-                            + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID"
+                            + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentId = ccContent.ID) LEFT JOIN ccTables ON ccContent.ContentTableId = ccTables.ID"
                             + " Where (((ccFields.Type) = 10))"
                             + " ORDER BY ccTables.Name";
                         csData.openSql(sql);

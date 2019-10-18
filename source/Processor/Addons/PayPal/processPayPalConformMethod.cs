@@ -31,7 +31,7 @@
 //                coreClass core = processor.core;
 //                //
 //                // -- Should be a remote method in commerce
-//                int ConfirmOrderID = core.docProperties.getInteger("item_name");
+//                int ConfirmOrderId = core.docProperties.getInteger("item_name");
 //                if (ConfirmOrderID != 0) {
 //                    //
 //                    // Confirm the order

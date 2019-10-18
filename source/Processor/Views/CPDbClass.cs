@@ -91,9 +91,9 @@ namespace Contensive.Processor {
                     }
                     if (cs.Insert("Remote Queries")) {
                         returnKey = GenericController.getGUIDNaked();
-                        int dataSourceID = cp.Content.GetRecordID("Data Sources", "");
+                        int dataSourceId = cp.Content.GetRecordID("Data Sources", "");
                         cs.SetField("remotekey", returnKey);
-                        cs.SetField("datasourceid", dataSourceID.ToString());
+                        cs.SetField("datasourceid", dataSourceId.ToString());
                         cs.SetField("sqlquery", sql);
                         cs.SetField("maxRows", pageSize.ToString());
                         cs.SetField("dateexpires", DateTime.Now.AddDays(1).ToString());
@@ -353,9 +353,9 @@ namespace Contensive.Processor {
                     }
                     if (cs.Insert("Remote Queries")) {
                         returnKey = GenericController.getGUIDNaked();
-                        int dataSourceID = cp.Content.GetRecordID("Data Sources", db.dataSourceName);
+                        int dataSourceId = cp.Content.GetRecordID("Data Sources", db.dataSourceName);
                         cs.SetField("remotekey", returnKey);
-                        cs.SetField("datasourceid", dataSourceID.ToString());
+                        cs.SetField("datasourceid", dataSourceId.ToString());
                         cs.SetField("sqlquery", sql);
                         cs.SetField("maxRows", pageSize.ToString());
                         cs.SetField("dateexpires", DateTime.Now.AddDays(1).ToString());

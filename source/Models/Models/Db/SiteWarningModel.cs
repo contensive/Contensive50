@@ -18,7 +18,7 @@ namespace Contensive.Models.Db {
         public string description { get; set; }
         public string generalKey { get; set; }
         public string location { get; set; }
-        public int pageID { get; set; }
+        public int pageId { get; set; }
         public string shortDescription { get; set; }
         public string specificKey { get; set; }
     }

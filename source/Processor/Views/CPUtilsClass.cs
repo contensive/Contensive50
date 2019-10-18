@@ -43,7 +43,7 @@ namespace Contensive.Processor {
         /// <param name="source"></param>
         /// <returns></returns>
         public override string ConvertHTML2Text(string source) {
-            return NUglify.Uglify.HtmlToText(source).Code;
+            return HtmlController.convertHtmlToText(cp.core, source);
         }
         //
         // ====================================================================================================
@@ -53,7 +53,7 @@ namespace Contensive.Processor {
         /// <param name="source"></param>
         /// <returns></returns>
         public override string ConvertText2HTML(string source) {
-            return cp.core.html.convertTextToHtml(source);
+            return HtmlController.convertTextToHtml(source);
         }
         //
         // ====================================================================================================
@@ -67,8 +67,8 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string EncodeContentForWeb(string Source, string ContextContentName = "", int ContextRecordID = 0, int WrapperID = 0) {
-            return ActiveContentController.renderHtmlForWeb(cp.core, Source, ContextContentName, ContextRecordID, 0, "", WrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+        public override string EncodeContentForWeb(string Source, string ContextContentName = "", int ContextRecordId = 0, int WrapperId = 0) {
+            return ActiveContentController.renderHtmlForWeb(cp.core, Source, ContextContentName, ContextRecordId, 0, "", WrapperId, CPUtilsBaseClass.addonContext.ContextPage);
         }
         //
         // ====================================================================================================

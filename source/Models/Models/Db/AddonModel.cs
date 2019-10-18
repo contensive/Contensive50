@@ -21,7 +21,7 @@ namespace Contensive.Models.Db {
         public string argumentList { get; set; }
         public bool asAjax { get; set; }
         public bool blockEditTools { get; set; }
-        public int collectionID { get; set; }
+        public int collectionId { get; set; }
         public bool content { get; set; }
         public string copy { get; set; }
         public string copyText { get; set; }
@@ -44,8 +44,8 @@ namespace Contensive.Models.Db {
         public string link { get; set; }
         public string metaDescription { get; set; }
         public string metaKeywordList { get; set; }
-        public int navTypeID { get; set; }
-        public string objectProgramID { get; set; }
+        public int navTypeId { get; set; }
+        public string objectProgramId { get; set; }
         public bool onBodyEnd { get; set; }
         public bool onBodyStart { get; set; }
         public bool onNewVisitEvent { get; set; }
@@ -63,7 +63,7 @@ namespace Contensive.Models.Db {
         public string robotsTxt { get; set; }
         public string scriptingCode { get; set; }
         public string scriptingEntryPoint { get; set; }
-        public int scriptingLanguageID { get; set; }
+        public int scriptingLanguageId { get; set; }
         public string scriptingTimeout { get; set; }
         public FieldTypeCSSFile stylesFilename { get; set; }
         public string stylesLinkHref { get; set; }

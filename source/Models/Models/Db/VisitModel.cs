@@ -25,7 +25,7 @@ namespace Contensive.Models.Db {
         public string http_via { get; set; }
         public DateTime? lastVisitTime { get; set; }
         public int loginAttempts { get; set; }
-        public int memberID { get; set; }
+        public int memberId { get; set; }
         public bool memberNew { get; set; }
         public bool mobile { get; set; }
         public int pageVisits { get; set; }
@@ -38,7 +38,7 @@ namespace Contensive.Models.Db {
         public int timeToLastHit { get; set; }
         public bool verboseReporting { get; set; }
         public bool visitAuthenticated { get; set; }
-        public int visitorID { get; set; }
+        public int visitorId { get; set; }
         public bool visitorNew { get; set; }
         //
         //====================================================================================================

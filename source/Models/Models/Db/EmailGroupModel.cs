@@ -13,8 +13,8 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// field properties
         /// </summary>
-        public int emailID { get; set; }
-        public int groupID { get; set; }
+        public int emailId { get; set; }
+        public int groupId { get; set; }
 
     }
 }

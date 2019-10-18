@@ -91,7 +91,7 @@ namespace Contensive.Processor.Controllers {
                         root.username = defaultRootUserUsername;
                         root.password = defaultRootUserPassword;
                         root.developer = true;
-                        root.contentControlID = ContentMetadataModel.getContentId(core, "people");
+                        root.contentControlId = ContentMetadataModel.getContentId(core, "people");
                         try {
                             root.save(core.cpParent);
                         } catch (Exception) {
@@ -122,7 +122,7 @@ namespace Contensive.Processor.Controllers {
                         if (memberRuleList.Count() == 0) {
                             var memberRule = DbBaseModel.addEmpty<MemberRuleModel>(core.cpParent);
                             memberRule.groupId = group.id;
-                            memberRule.memberID = root.id;
+                            memberRule.memberId = root.id;
                             memberRule.save(core.cpParent);
                         }
                     }
@@ -246,8 +246,8 @@ namespace Contensive.Processor.Controllers {
                     for (var rowptr = 0; rowptr < dt.Rows.Count; rowptr++) {
                         string FieldNew = GenericController.encodeText(dt.Rows[rowptr]["name"]) + "." + GenericController.encodeText(dt.Rows[rowptr]["parentid"]);
                         if (FieldNew == FieldLast) {
-                            int FieldRecordID = GenericController.encodeInteger(dt.Rows[rowptr]["ID"]);
-                            core.db.executeQuery("Update ccMenuEntries set active=0 where ID=" + FieldRecordID + ";");
+                            int FieldRecordId = GenericController.encodeInteger(dt.Rows[rowptr]["ID"]);
+                            core.db.executeQuery("Update ccMenuEntries set active=0 where ID=" + FieldRecordId + ";");
                         }
                         FieldLast = FieldNew;
                     }
@@ -508,7 +508,7 @@ namespace Contensive.Processor.Controllers {
                 state.abbreviation = Abbreviation;
                 state.name = Name;
                 state.salesTax = SaleTax;
-                state.countryID = CountryID;
+                state.countryId = CountryID;
                 state.save(core.cpParent, 0, true);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -658,8 +658,8 @@ namespace Contensive.Processor.Controllers {
             try {
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups");
                 //
-                int GroupID = GroupController.add(core, "Site Managers");
-                string SQL = "Update ccContent Set EditorGroupID=" + DbController.encodeSQLNumber(GroupID) + " where EditorGroupID is null;";
+                int GroupId = GroupController.add(core, "Site Managers");
+                string SQL = "Update ccContent Set EditorGroupID=" + DbController.encodeSQLNumber(GroupId) + " where EditorGroupID is null;";
                 core.db.executeQuery(SQL);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -813,26 +813,26 @@ namespace Contensive.Processor.Controllers {
                     if (entryList.Count == 0) {
                         entry = DbBaseModel.addEmpty<NavigatorEntryModel>(core.cpParent);
                         entry.name = menu.name.Trim();
-                        entry.ParentID = parentId;
+                        entry.parentId = parentId;
                     } else {
                         entry = entryList.First();
                     }
                     if (contentId <= 0) {
-                        entry.ContentID = 0;
+                        entry.contentId = 0;
                     } else {
-                        entry.ContentID = contentId;
+                        entry.contentId = contentId;
                     }
-                    entry.LinkPage = menu.LinkPage;
+                    entry.linkPage = menu.LinkPage;
                     entry.sortOrder = menu.SortOrder;
-                    entry.AdminOnly = menu.AdminOnly;
-                    entry.DeveloperOnly = menu.DeveloperOnly;
-                    entry.NewWindow = menu.NewWindow;
+                    entry.adminOnly = menu.AdminOnly;
+                    entry.developerOnly = menu.DeveloperOnly;
+                    entry.newWindow = menu.NewWindow;
                     entry.active = menu.Active;
-                    entry.AddonID = (addon == null) ? 0 : addon.id;
+                    entry.addonId = (addon == null) ? 0 : addon.id;
                     entry.ccguid = menu.Guid;
-                    entry.NavIconTitle = menu.NavIconTitle;
-                    entry.NavIconType = GetListIndex(menu.NavIconType, NavIconTypeList);
-                    entry.InstalledByCollectionID = InstalledByCollectionID;
+                    entry.navIconTitle = menu.NavIconTitle;
+                    entry.navIconType = GetListIndex(menu.NavIconType, NavIconTypeList);
+                    entry.installedByCollectionId = InstalledByCollectionID;
                     entry.save(core.cpParent);
                     returnEntry = entry.id;
                 }
@@ -863,23 +863,23 @@ namespace Contensive.Processor.Controllers {
                             } else {
                                 Criteria += "and(Parentid=" + parentRecordId + ")";
                             }
-                            int RecordID = 0;
+                            int RecordId = 0;
                             using (var csData = new CsModel(core)) {
                                 csData.open(NavigatorEntryModel.tableMetadata.contentName, Criteria, "ID", true, 0, "ID", 1);
                                 if (csData.ok()) {
-                                    RecordID = (csData.getInteger("ID"));
+                                    RecordId = (csData.getInteger("ID"));
                                 }
                                 csData.close();
-                                if (RecordID == 0) {
+                                if (RecordId == 0) {
                                     csData.insert(NavigatorEntryModel.tableMetadata.contentName);
                                     if (csData.ok()) {
-                                        RecordID = csData.getInteger("ID");
+                                        RecordId = csData.getInteger("ID");
                                         csData.set("name", recordName);
                                         csData.set("parentID", parentRecordId);
                                     }
                                 }
                             }
-                            parentRecordId = RecordID;
+                            parentRecordId = RecordId;
                         }
                     }
                 }
@@ -986,15 +986,15 @@ namespace Contensive.Processor.Controllers {
                 //
                 int RowsNeeded = Enum.GetNames(typeof(CPContentBaseClass.FieldTypeIdEnum)).Length - RowsFound;
                 if (RowsNeeded > 0) {
-                    int CID = ContentMetadataModel.getContentId(core, "Content Field Types");
-                    if (CID <= 0) {
+                    int CId = ContentMetadataModel.getContentId(core, "Content Field Types");
+                    if (CId <= 0) {
                         //
                         // Problem
                         //
                         LogController.logError(core, new GenericException("Content Field Types content definition was not found"));
                     } else {
                         while (RowsNeeded > 0) {
-                            core.db.executeQuery("Insert into ccFieldTypes (active,contentcontrolid)values(1," + CID + ")");
+                            core.db.executeQuery("Insert into ccFieldTypes (active,contentcontrolid)values(1," + CId + ")");
                             RowsNeeded = RowsNeeded - 1;
                         }
                     }
@@ -1088,7 +1088,7 @@ namespace Contensive.Processor.Controllers {
             domain.visited = false;
             domain.save(core.cpParent);
             //
-            landingPage.TemplateID = defaultTemplate.id;
+            landingPage.templateId = defaultTemplate.id;
             landingPage.copyfilename.content = Constants.defaultLandingPageHtml;
             landingPage.save(core.cpParent);
             //

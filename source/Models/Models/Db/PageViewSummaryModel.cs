@@ -12,7 +12,6 @@ namespace Contensive.Models.Db {
         //====================================================================================================
         /// <summary>
         /// field properties
-        /// </summary>
-        public int asdf { get; set; }
+        /// </summary>}
     }
 }

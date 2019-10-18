@@ -15,7 +15,7 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// field properties
         /// </summary>
-        public int addonID { get; set; }
-        public int contentFieldTypeID { get; set; }
+        public int addonId { get; set; }
+        public int contentFieldTypeId { get; set; }
     }
 }

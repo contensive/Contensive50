@@ -99,7 +99,7 @@ namespace Contensive.Addons.AdminSite {
                     // landing page case
                     if (core.siteProperties.landingPageID != 0) {
                         IsLandingPage = (adminData.editRecord.id == core.siteProperties.landingPageID);
-                        IsRootPage = IsPageContentTable && (adminData.editRecord.parentID == 0);
+                        IsRootPage = IsPageContentTable && (adminData.editRecord.parentId == 0);
                     }
                 }
                 if (IsTemplateTable) {
@@ -335,7 +335,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Page Content
                     //
-                    int TableID = MetadataController.getRecordIdByUniqueName(core, "Tables", "ccPageContent");
+                    int TableId = MetadataController.getRecordIdByUniqueName(core, "Tables", "ccPageContent");
                     string EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
                         allowAdd = (allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd),
@@ -464,7 +464,7 @@ namespace Contensive.Addons.AdminSite {
                         ContentFieldMetadataModel field = kvp.Value;
                         string WhyReadOnlyMsg = "";
                         CPContentBaseClass.FieldTypeIdEnum fieldTypeId = field.fieldTypeId;
-                        EditRecordClass editRecord = adminData.editRecord;
+                        Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                         object fieldValueObject = editRecord.fieldsLc[field.nameLc].value;
                         string fieldValue_text = GenericController.encodeText(fieldValueObject);
                         int FieldRows = 1;
@@ -621,9 +621,9 @@ namespace Contensive.Addons.AdminSite {
                                 if (field.redirectPath != "") {
                                     RedirectPath = field.redirectPath;
                                 }
-                                RedirectPath = RedirectPath + "?" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(" For " + editRecord.nameLc + adminData.titleExtension) + "&" + RequestNameAdminDepth + "=" + (adminData.ignore_legacyMenuDepth + 1) + "&wl0=" + field.redirectID + "&wr0=" + editRecord.id;
-                                if (field.redirectContentID != 0) {
-                                    RedirectPath = RedirectPath + "&cid=" + field.redirectContentID;
+                                RedirectPath = RedirectPath + "?" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(" For " + editRecord.nameLc + adminData.titleExtension) + "&" + RequestNameAdminDepth + "=" + (adminData.ignore_legacyMenuDepth + 1) + "&wl0=" + field.redirectId + "&wr0=" + editRecord.id;
+                                if (field.redirectContentId != 0) {
+                                    RedirectPath = RedirectPath + "&cid=" + field.redirectContentId;
                                 } else {
                                     RedirectPath = RedirectPath + "&cid=" + ((editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId);
                                 }
@@ -664,8 +664,8 @@ namespace Contensive.Addons.AdminSite {
                                     case CPContentBaseClass.FieldTypeIdEnum.Lookup:
                                         //
                                         // ----- Lookup, readonly
-                                        if (field.lookupContentID != 0) {
-                                            EditorString = AdminUIController.getDefaultEditor_lookupContent(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupContentID, ref IsEmptyList, editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                        if (field.lookupContentId != 0) {
+                                            EditorString = AdminUIController.getDefaultEditor_lookupContent(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
                                             return_NewFieldList += "," + field.nameLc;
                                         } else if (field.lookupList != "") {
                                             EditorString = AdminUIController.getDefaultEditor_lookupList(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(','), editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
@@ -823,8 +823,8 @@ namespace Contensive.Addons.AdminSite {
                                     case CPContentBaseClass.FieldTypeIdEnum.Lookup:
                                         //
                                         // ----- Lookup
-                                        if (field.lookupContentID != 0) {
-                                            EditorString = AdminUIController.getDefaultEditor_lookupContent(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupContentID, ref IsEmptyList, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                        if (field.lookupContentId != 0) {
+                                            EditorString = AdminUIController.getDefaultEditor_lookupContent(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
                                             return_NewFieldList += "," + field.nameLc;
                                         } else if (field.lookupList != "") {
                                             EditorString = AdminUIController.getDefaultEditor_lookupList(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(','), field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
@@ -1028,12 +1028,12 @@ namespace Contensive.Addons.AdminSite {
                             HelpMsgClosed = HelpMsgClosed.Left(100) + "...";
                         }
                         //
-                        string HelpID = "helpId" + field.id;
-                        string HelpEditorID = "helpEditorId" + field.id;
+                        string HelpId = "helpId" + field.id;
+                        string HelpEditorId = "helpEditorId" + field.id;
                         string HelpOpenedReadID = "HelpOpenedReadID" + field.id;
-                        string HelpOpenedEditID = "HelpOpenedEditID" + field.id;
-                        string HelpClosedID = "helpClosedId" + field.id;
-                        string HelpClosedContentID = "helpClosedContentId" + field.id;
+                        string HelpOpenedEditId = "HelpOpenedEditID" + field.id;
+                        string HelpClosedId = "helpClosedId" + field.id;
+                        string HelpClosedContentId = "helpClosedContentId" + field.id;
                         //
                         // editor preferences form - a fancybox popup that interfaces with a hardcoded ajax function in init() to set a member property
                         int editorAddonId = (editorAddon == null) ? 0 : editorAddon.id;
@@ -1067,19 +1067,19 @@ namespace Contensive.Addons.AdminSite {
                                 HelpMsgDefault = "Admin: No default help is available for this field.";
                             }
                             HelpMsgOpenedRead = ""
-                                    + "<!-- close icon --><div class=\"\" style=\"float:right\"><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedID + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"close\"></a></div>"
+                                    + "<!-- close icon --><div class=\"\" style=\"float:right\"><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedId + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"close\"></a></div>"
                                     + "<div class=\"header\">Default Help</div>"
                                     + "<div class=\"body\">" + HelpMsgDefault + "</div>"
                                     + "<div class=\"header\">Custom Help</div>"
                                     + "<div class=\"body\">" + HelpMsgCustom + "</div>"
                                 + "";
-                            string jsUpdate = "updateFieldHelp('" + field.id + "','" + HelpEditorID + "','" + HelpClosedContentID + "');cj.hide('" + HelpOpenedEditID + "');cj.show('" + HelpClosedID + "');return false";
-                            string jsCancel = "cj.hide('" + HelpOpenedEditID + "');cj.show('" + HelpClosedID + "');return false";
+                            string jsUpdate = "updateFieldHelp('" + field.id + "','" + HelpEditorId + "','" + HelpClosedContentId + "');cj.hide('" + HelpOpenedEditId + "');cj.show('" + HelpClosedId + "');return false";
+                            string jsCancel = "cj.hide('" + HelpOpenedEditId + "');cj.show('" + HelpClosedId + "');return false";
                             HelpMsgOpenedEdit = ""
                                     + "<div class=\"header\">Default Help</div>"
                                     + "<div class=\"body\">" + HelpMsgDefault + "</div>"
                                     + "<div class=\"header\">Custom Help</div>"
-                                    + "<div class=\"body\"><textarea id=\"" + HelpEditorID + "\" ROWS=\"10\" style=\"width:100%;\">" + HelpMsgCustom + "</TEXTAREA></div>"
+                                    + "<div class=\"body\"><textarea id=\"" + HelpEditorId + "\" ROWS=\"10\" style=\"width:100%;\">" + HelpMsgCustom + "</TEXTAREA></div>"
                                     + "<div class=\"\">"
                                         + AdminUIController.getButtonPrimary("Update", jsUpdate)
                                         + AdminUIController.getButtonPrimary("Cancel", jsCancel)
@@ -1089,35 +1089,35 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // Long help, closed gets MoreHelpIcon (opens to HelpMsgOpenedRead) and HelpEditIcon (opens to readonly default copy plus editor with custom copy)
                                 HelpMsgClosed = ""
-                                        + "<!-- open read icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedReadID + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"more help\"></a></div>"
-                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedEditID + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
-                                        + "<div id=\"" + HelpClosedContentID + "\">" + HelpMsgClosed + "</div>"
+                                        + "<!-- open read icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedReadID + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"more help\"></a></div>"
+                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedEditId + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
+                                        + "<div id=\"" + HelpClosedContentId + "\">" + HelpMsgClosed + "</div>"
                                     + "";
                             } else if (!IsEmptyHelp) {
                                 //
                                 // short help, closed gets helpmsgclosed + HelpEditIcon (opens to readonly default copy plus editor with custom copy)
                                 HelpMsgClosed = ""
-                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedEditID + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
-                                        + "<div id=\"" + HelpClosedContentID + "\">" + HelpMsgClosed + "</div>"
+                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedEditId + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
+                                        + "<div id=\"" + HelpClosedContentId + "\">" + HelpMsgClosed + "</div>"
                                     + "";
                             } else {
                                 //
                                 // Empty help, closed gets helpmsgclosed + HelpEditIcon (opens to readonly default copy plus editor with custom copy)
                                 HelpMsgClosed = ""
-                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedEditID + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
-                                        + "<div id=\"" + HelpClosedContentID + "\">" + HelpMsgClosed + "</div>"
+                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedEditId + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
+                                        + "<div id=\"" + HelpClosedContentId + "\">" + HelpMsgClosed + "</div>"
                                     + "";
                             }
                             EditorHelp = EditorHelp + "<div id=\"" + HelpOpenedReadID + "\" class=\"opened\">" + HelpMsgOpenedRead + "</div>"
-                                + "<div id=\"" + HelpOpenedEditID + "\" class=\"opened\">" + HelpMsgOpenedEdit + "</div>"
-                                + "<div id=\"" + HelpClosedID + "\" class=\"closed\">" + HelpMsgClosed + "</div>"
+                                + "<div id=\"" + HelpOpenedEditId + "\" class=\"opened\">" + HelpMsgOpenedEdit + "</div>"
+                                + "<div id=\"" + HelpClosedId + "\" class=\"closed\">" + HelpMsgClosed + "</div>"
                                 + "";
                         } else {
                             //
                             // Non-admin view
                             HelpMsgOpenedRead = ""
                                     + "<div class=\"body\">"
-                                    + "<!-- close icon --><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedID + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right\" title=\"close\"></a>"
+                                    + "<!-- close icon --><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedId + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right\" title=\"close\"></a>"
                                     + HelpMsg + "</div>"
                                 + "";
                             HelpMsgOpenedEdit = ""
@@ -1127,7 +1127,7 @@ namespace Contensive.Addons.AdminSite {
                                 // Long help
                                 HelpMsgClosed = ""
                                     + "<div class=\"body\">"
-                                    + "<!-- open read icon --><a href=\"javascript:cj.hide('" + HelpClosedID + "');cj.show('" + HelpOpenedReadID + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right;\" title=\"more help\"></a>"
+                                    + "<!-- open read icon --><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedReadID + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right;\" title=\"more help\"></a>"
                                     + HelpMsgClosed + "</div>"
                                     + "";
                             } else if (!IsEmptyHelp) {
@@ -1144,7 +1144,7 @@ namespace Contensive.Addons.AdminSite {
                                     + "";
                             }
                             EditorHelp = EditorHelp + "<div id=\"" + HelpOpenedReadID + "\" class=\"opened\">" + HelpMsgOpenedRead + "</div>"
-                                + "<div id=\"" + HelpClosedID + "\" class=\"closed\">" + HelpMsgClosed + "</div>"
+                                + "<div id=\"" + HelpClosedId + "\" class=\"closed\">" + HelpMsgClosed + "</div>"
                                 + "";
                         }
                         //
@@ -1228,9 +1228,9 @@ namespace Contensive.Addons.AdminSite {
                     int HelpPtr = 0;
                     for (HelpPtr = 0; HelpPtr < HelpCnt; HelpPtr++) {
                         fieldId = GenericController.encodeInteger(fieldHelpArray[0, HelpPtr]);
-                        int LastFieldID = 0;
-                        if (fieldId != LastFieldID) {
-                            LastFieldID = fieldId;
+                        int LastFieldId = 0;
+                        if (fieldId != LastFieldId) {
+                            LastFieldId = fieldId;
                             HelpIDCache[HelpPtr] = fieldId;
                             helpIdIndex.setPtr(fieldId.ToString(), HelpPtr);
                             helpDefaultCache[HelpPtr] = GenericController.encodeText(fieldHelpArray[1, HelpPtr]);

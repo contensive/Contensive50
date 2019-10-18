@@ -47,12 +47,12 @@ namespace Contensive.Models.Db {
         public string fax { get; set; }
         public string firstName { get; set; }
         public string imageFilename { get; set; }
-        public int languageID { get; set; }
+        public int languageId { get; set; }
         public string lastName { get; set; }
-        public DateTime? LastVisit { get; set; }
+        public DateTime? lastVisit { get; set; }
         public string nickName { get; set; }
         public string notesFilename { get; set; }
-        public int organizationID { get; set; }
+        public int organizationId { get; set; }
         public string password { get; set; }
         public string phone { get; set; }
         public string resumeFilename { get; set; }

@@ -13,7 +13,7 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// field properties
         /// </summary>
-        public int contentWatchID { get; set; }
-        public int contentWatchListID { get; set; }
+        public int contentWatchId { get; set; }
+        public int contentWatchListId { get; set; }
     }
 }

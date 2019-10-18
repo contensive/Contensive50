@@ -115,10 +115,10 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     // -- link forwards
                     foreach (var linkForward in DbBaseModel.createList<LinkForwardModel>(core.cpParent, "name Is Not null")) {
-                        string route = GenericController.normalizeRoute(linkForward.SourceLink);
+                        string route = GenericController.normalizeRoute(linkForward.sourceLink);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.routeDictionary.ContainsKey(route)) {
-                                LogController.logError( core,new GenericException("Link Foward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
+                                LogController.logError( core,new GenericException("Link Forward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
                             } else {
                                 result.routeDictionary.Add(route, new RouteClass() {
                                     physicalRoute = physicalFile,

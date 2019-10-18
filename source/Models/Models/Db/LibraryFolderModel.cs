@@ -11,7 +11,7 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         //
-        public string Description { get; set; }
-        public int ParentID { get; set; }
+        public string description { get; set; }
+        public int parentId { get; set; }
     }
 }

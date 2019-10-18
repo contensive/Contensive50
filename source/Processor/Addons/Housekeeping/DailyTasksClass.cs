@@ -46,7 +46,6 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 // -- logs
                 ActivityLogClass.housekeep(core, env);
-                LogFolderClass.housekeep(core, env);
                 //
                 // -- people
                 PersonClass.housekeep(core, env);

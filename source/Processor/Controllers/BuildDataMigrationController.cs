@@ -113,7 +113,7 @@ namespace Contensive.Processor.Controllers {
                     using (var cs = new CsModel(core)) {
                         sql = "select m.name as menuName, m.id as menuId, p.name as pageName, p.id as pageId, s.name as sectionName, m.*"
                             + " from ccDynamicMenus m"
-                            + " left join ccDynamicMenuSectionRules r on r.DynamicMenuID = m.id"
+                            + " left join ccDynamicMenuSectionRules r on r.DynamicMenuId = m.id"
                             + " left join ccSections s on s.id = r.SectionID"
                             + " left join ccPageContent p on p.id = s.RootPageID"
                             + " where (p.id is not null)and(s.active>0)"
@@ -217,7 +217,7 @@ namespace Contensive.Processor.Controllers {
                                 themeAddon.otherHeadTags = csTemplate.GetText("otherheadtags");
                                 themeAddon.javaScriptBodyEnd = csTemplate.GetText("jsendbody");
                                 themeAddon.stylesFilename.content = templateStylePrepend + Environment.NewLine + templateStyles;
-                                themeAddon.collectionID = migrationCollection.id;
+                                themeAddon.collectionId = migrationCollection.id;
                                 themeAddon.save(cp);
                                 // 
                                 // -- create an addon template rule to set dependency

@@ -160,8 +160,8 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void LogActivity(string message, int userID, int organizationID) {
-            LogController.addSiteActivity(cp.core, message, 0, userID, organizationID);
+        public override void LogActivity(string message, int userID, int organizationId) {
+            LogController.addSiteActivity(cp.core, message, 0, userID, organizationId);
         }
         //
         //====================================================================================================

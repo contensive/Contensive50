@@ -14,6 +14,6 @@ namespace Contensive.Models.Db {
         //====================================================================================================
         // -- instance properties (must be properties not fields)
         //
-        public string SQLQuery { get; set; }
+        public string sqlQuery { get; set; }
     }
 }

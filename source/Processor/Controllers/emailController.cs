@@ -424,7 +424,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(BounceAddress)) {
                     BounceAddress = email.fromAddress;
                 }
-                EmailTemplateModel emailTemplate = DbBaseModel.create<EmailTemplateModel>(core.cpParent, email.emailTemplateID);
+                EmailTemplateModel emailTemplate = DbBaseModel.create<EmailTemplateModel>(core.cpParent, email.emailTemplateId);
                 string EmailTemplateSource = "";
                 if (emailTemplate != null) {
                     EmailTemplateSource = emailTemplate.bodyHTML;
@@ -445,11 +445,10 @@ namespace Contensive.Processor.Controllers {
                 string confirmationMessage = "";
                 //
                 // --- collect values needed for send
-                int EmailRecordID = email.id;
+                int emailRecordId = email.id;
                 string EmailSubjectSource = email.subject;
-                // 20180703 -- textFilename fields when configured in the model as a text are read with .getText() which populates the property with the content, not the filename
                 string EmailBodySource = email.copyFilename.content + appendedCopy;
-                bool EmailAllowLinkEID = email.addLinkEID;
+                bool emailAllowLinkEId = email.addLinkEId;
                 //
                 // --- Send message to the additional member
                 if (additionalMemberID != 0) {
@@ -463,7 +462,7 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             string EmailStatus = "";
                             string queryStringForLinkAppend = "";
-                            queuePersonEmail(core, person, email.fromAddress, EmailSubjectSource, EmailBodySource, "", "", false, true, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID, ref EmailStatus, queryStringForLinkAppend, "System Email");
+                            queuePersonEmail(core, person, email.fromAddress, EmailSubjectSource, EmailBodySource, "", "", false, true, emailRecordId, EmailTemplateSource, emailAllowLinkEId, ref EmailStatus, queryStringForLinkAppend, "System Email");
                             confirmationMessage += "&nbsp;&nbsp;Sent to " + person.name + " at " + person.email + ", Status = " + EmailStatus + BR;
                         }
                     }
@@ -472,7 +471,7 @@ namespace Contensive.Processor.Controllers {
                 // --- Send message to everyone selected
                 //
                 confirmationMessage += BR + "Recipients in selected System Email groups:" + BR;
-                List<int> peopleIdList = PersonModel.createidListForEmail(core.cpParent, EmailRecordID);
+                List<int> peopleIdList = PersonModel.createidListForEmail(core.cpParent, emailRecordId);
                 foreach (var personId in peopleIdList) {
                     var person = DbBaseModel.create<PersonModel>(core.cpParent, personId);
                     if (person == null) {
@@ -483,12 +482,12 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             string EmailStatus = "";
                             string queryStringForLinkAppend = "";
-                            queuePersonEmail(core, person, email.fromAddress, EmailSubjectSource, EmailBodySource, "", "", false, true, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID, ref EmailStatus, queryStringForLinkAppend, "System Email");
+                            queuePersonEmail(core, person, email.fromAddress, EmailSubjectSource, EmailBodySource, "", "", false, true, emailRecordId, EmailTemplateSource, emailAllowLinkEId, ref EmailStatus, queryStringForLinkAppend, "System Email");
                             confirmationMessage += "&nbsp;&nbsp;Sent to " + person.name + " at " + person.email + ", Status = " + EmailStatus + BR;
                         }
                     }
                 }
-                int emailConfirmationMemberId = email.testMemberID;
+                int emailConfirmationMemberId = email.testMemberId;
                 //
                 // --- Send the completion message to the administrator
                 //
@@ -514,7 +513,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         string EmailStatus = "";
                         string queryStringForLinkAppend = "";
-                        queuePersonEmail(core, person, email.fromAddress, "System Email confirmation from " + core.appConfig.domainList[0], ConfirmBody, "", "", false, true, EmailRecordID, "", false, ref EmailStatus, queryStringForLinkAppend, "System Email");
+                        queuePersonEmail(core, person, email.fromAddress, "System Email confirmation from " + core.appConfig.domainList[0], ConfirmBody, "", "", false, true, emailRecordId, "", false, ref EmailStatus, queryStringForLinkAppend, "System Email");
                     }
                 }
             } catch (Exception ex) {
@@ -543,8 +542,8 @@ namespace Contensive.Processor.Controllers {
         /// send the confirmation email as a test. 
         /// </summary>
         /// <param name="EmailID"></param>
-        /// <param name="ConfirmationMemberID"></param>
-        public static void queueConfirmationTestEmail(CoreController core, int EmailID, int ConfirmationMemberID) {
+        /// <param name="confirmationMemberId"></param>
+        public static void queueConfirmationTestEmail(CoreController core, int EmailID, int confirmationMemberId) {
             try {
                 //
                 using (var csData = new CsModel(core)) {
@@ -558,10 +557,10 @@ namespace Contensive.Processor.Controllers {
                     //
                     // merge in template
                     string EmailTemplate = "";
-                    int EMailTemplateID = csData.getInteger("EmailTemplateID");
-                    if (EMailTemplateID != 0) {
+                    int EMailTemplateId = csData.getInteger("EmailTemplateID");
+                    if (EMailTemplateId != 0) {
                         using (var CSTemplate = new CsModel(core)) {
-                            CSTemplate.openRecord("Email Templates", EMailTemplateID, "BodyHTML");
+                            CSTemplate.openRecord("Email Templates", EMailTemplateId, "BodyHTML");
                             if (csData.ok()) {
                                 EmailTemplate = CSTemplate.getText("BodyHTML");
                             }
@@ -598,9 +597,9 @@ namespace Contensive.Processor.Controllers {
                             var person = DbBaseModel.create<PersonModel>(core.cpParent, personId);
                             string Emailtext = person.email;
                             string EMailName = person.name;
-                            int EmailMemberID = person.id;
+                            int emailMemberId = person.id;
                             if (string.IsNullOrEmpty(EMailName)) {
-                                EMailName = "no name (member id " + EmailMemberID + ")";
+                                EMailName = "no name (member id " + emailMemberId + ")";
                             }
                             string EmailLine = Emailtext + " for " + EMailName;
                             string LastEmail = null;
@@ -668,10 +667,10 @@ namespace Contensive.Processor.Controllers {
                         ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">There are " + TotalCnt + " recipients<div style=\"margin:20px;\">" + TotalList + "</div></div>";
                     }
                     //
-                    if (ConfirmationMemberID == 0) {
+                    if (confirmationMemberId == 0) {
                         ErrorController.addUserError(core, "No confirmation email was send because a Confirmation member is not selected");
                     } else {
-                        PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, ConfirmationMemberID);
+                        PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, confirmationMemberId);
                         if (person == null) {
                             ErrorController.addUserError(core, "No confirmation email was send because a Confirmation member is not selected");
                         } else {
@@ -889,8 +888,8 @@ namespace Contensive.Processor.Controllers {
                         log.body = email.htmlBody;
                         log.sendStatus = "ok";
                         log.logType = EmailLogTypeImmediateSend;
-                        log.emailID = email.emailId;
-                        log.memberID = email.toMemberId;
+                        log.emailId = email.emailId;
+                        log.memberId = email.toMemberId;
                         log.save(core.cpParent);
                         LogController.logInfo(core, "sendEmailInQueue, send successful, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "]");
                     } else {
@@ -907,8 +906,8 @@ namespace Contensive.Processor.Controllers {
                             log.body = email.htmlBody;
                             log.sendStatus = "failed after 3 retries, reason [" + reasonForFail + "]";
                             log.logType = EmailLogTypeImmediateSend;
-                            log.emailID = email.emailId;
-                            log.memberID = email.toMemberId;
+                            log.emailId = email.emailId;
+                            log.memberId = email.toMemberId;
                             log.save(core.cpParent);
                             LogController.logInfo(core, "sendEmailInQueue, send FAILED [" + reasonForFail + "], NOT resent because too many retries, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "], attempts [" + email.attempts + "]");
                         } else {
@@ -925,8 +924,8 @@ namespace Contensive.Processor.Controllers {
                             log.body = email.htmlBody;
                             log.sendStatus = sendStatus;
                             log.logType = EmailLogTypeImmediateSend;
-                            log.emailID = email.emailId;
-                            log.memberID = email.toMemberId;
+                            log.emailId = email.emailId;
+                            log.memberId = email.toMemberId;
                             log.save(core.cpParent);
                             queueEmail(core, false, queueRecord.name, email);
                             LogController.logInfo(core, "sendEmailInQueue, failed attempt (" + email.attempts.ToString() + " of 3), reason [" + reasonForFail + "], added to end of queue, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "], attempts [" + email.attempts + "]");
@@ -961,7 +960,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- isHtml, if the body includes an html tag, this is the entire body, just send it
                 try {
-                    return NUglify.Uglify.HtmlToText(body).Code.Trim();
+                    return HtmlController.convertHtmlToText( core,body);
                 } catch (Exception ex) {
                     LogController.logError(core, ex, "Nuglify error while creating text body from full html.");
                     return string.Empty;
@@ -970,7 +969,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- isHtml but no body tag, add an html wrapper
                 try {
-                    return NUglify.Uglify.HtmlToText("<body>" + body + "</body>").Code.Trim();
+                    return HtmlController.convertHtmlToText( core,"<body>" + body + "</body>");
                 } catch (Exception ex) {
                     LogController.logError(core, ex, "Nuglify error while creating text body from html body.");
                     return string.Empty;
@@ -1002,7 +1001,7 @@ namespace Contensive.Processor.Controllers {
                 subject = ActiveContentController.renderHtmlForEmail(core, subject, recipientId, queryStringForLinkAppend);
                 subject = GenericController.convertLinksToAbsolute(subject, rootUrl);
                 try {
-                    subject = NUglify.Uglify.HtmlToText("<body>" + subject + "</body>").Code;
+                    subject = HtmlController.convertHtmlToText( core,"<body>" + subject + "</body>");
                 } catch (Exception ex) {
                     LogController.logError(core, ex, "Nuglify error while creating text subject line.");
                     subject = string.Empty;
@@ -1035,7 +1034,7 @@ namespace Contensive.Processor.Controllers {
             if (!isHTML) {
                 //
                 // -- non html email, return a text version of the finished document
-                return core.html.convertTextToHtml(body);
+                return HtmlController.convertTextToHtml(body);
             }
             if (body.ToLower(CultureInfo.InvariantCulture).IndexOf("<html") >= 0) {
                 //

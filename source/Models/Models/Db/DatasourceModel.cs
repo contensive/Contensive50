@@ -112,7 +112,7 @@ namespace Contensive.Models.Db {
                     active = true,
                     ccguid = "",
                     connString = "",
-                    contentControlID = 0,
+                    contentControlId = 0,
                     createdBy = 0,
                     createKey = 0,
                     dateAdded = DateTime.MinValue,

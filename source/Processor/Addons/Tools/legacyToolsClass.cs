@@ -61,15 +61,15 @@ namespace Contensive.Addons.Tools {
         private const int FieldCaption = 2; // The caption for displaying the field
         private const int FieldValue = 3; // The value carried to and from the database
         private const int FieldReadOnly = 4; // If true, this field can not be written back to the database
-        private const int FieldLookupContentID = 5; // If TYPELOOKUP, (for Db controled sites) this is the content ID of the source table
+        private const int FieldLookupContentId = 5; // If TYPELOOKUP, (for Db controled sites) this is the content ID of the source table
         private const int FieldRequired = 7; // if true, this field must be entered
         private const int FieldDefaultVariant = 8; // default value on a new record
         private const int FieldHelpMessage = 9; // explaination of this field
         private const int FieldUniqueName = 10; // not supported -- must change name anyway
         private const int FieldTextBuffered = 11; // if true, the input is run through RemoveControlCharacters()
         private const int FieldPassword = 12; // for text boxes, sets the password attribute
-        private const int FieldRedirectContentID = 13; // If TYPEREDIRECT, this is new contentID
-        private const int FieldRedirectID = 14; // If TYPEREDIRECT, this is the field that must match ID of this record
+        private const int FieldRedirectContentId = 13; // If TYPEREDIRECT, this is new contentID
+        private const int FieldRedirectId = 14; // If TYPEREDIRECT, this is the field that must match ID of this record
         private const int FieldRedirectPath = 15; // New Field, If TYPEREDIRECT, this is the path to the next page (if blank, current page is used)
         private const int fieldId = 16; // the ID in the ccContentFields Table that this came from
         private const int FieldBlockAccess = 17; // do not send field out to user because they do not have access rights
@@ -158,8 +158,8 @@ namespace Contensive.Addons.Tools {
             string tempGetForm = null;
             try {
                 //
-                int MenuEntryID = 0;
-                int MenuHeaderID = 0;
+                int MenuEntryId = 0;
+                int MenuHeaderId = 0;
                 int MenuDirection = 0;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 //
@@ -187,8 +187,8 @@ namespace Contensive.Addons.Tools {
                     ToolsContentName = core.docProperties.getText("ContentName");
                     ToolsQuery = core.docProperties.getText("dtq");
                     ToolsDataSource = core.docProperties.getText("dtds");
-                    MenuEntryID = core.docProperties.getInteger("dtei");
-                    MenuHeaderID = core.docProperties.getInteger("dthi");
+                    MenuEntryId = core.docProperties.getInteger("dtei");
+                    MenuHeaderId = core.docProperties.getInteger("dthi");
                     MenuDirection = core.docProperties.getInteger("dtmd");
                     DefaultReadOnly = core.docProperties.getBoolean("dtdreadonly");
                     DefaultActive = core.docProperties.getBoolean("dtdactive");
@@ -387,15 +387,15 @@ namespace Contensive.Addons.Tools {
             string result = "";
             try {
                 //
-                int ContentID = 0;
+                int ContentId = 0;
                 string TableName = "";
                 string ContentName = "";
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList = null;
                 string Description = null;
                 string Caption = null;
-                int NavID = 0;
-                int ParentNavID = 0;
+                int NavId = 0;
+                int ParentNavId = 0;
                 DataSourceModel datasource = DataSourceModel.create(core.cpParent, core.docProperties.getInteger("DataSourceID"));
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
@@ -422,32 +422,32 @@ namespace Contensive.Addons.Tools {
                         ContentMetadataModel.createFromSQLTable(core,datasource, TableName, ContentName);
                         core.cache.invalidateAll();
                         core.clearMetaData();
-                        ContentID = Processor.Models.Domain.ContentMetadataModel.getContentId(core, ContentName);
-                        ParentNavID = MetadataController.getRecordIdByUniqueName( core,NavigatorEntryModel.tableMetadata.contentName, "Manage Site Content");
-                        if (ParentNavID != 0) {
-                            ParentNavID = 0;
+                        ContentId = Processor.Models.Domain.ContentMetadataModel.getContentId(core, ContentName);
+                        ParentNavId = MetadataController.getRecordIdByUniqueName( core,NavigatorEntryModel.tableMetadata.contentName, "Manage Site Content");
+                        if (ParentNavId != 0) {
+                            ParentNavId = 0;
                             using (var csSrc = new CsModel(core)) {
-                                if (csSrc.open(NavigatorEntryModel.tableMetadata.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")")) {
-                                    ParentNavID = csSrc.getInteger("ID");
+                                if (csSrc.open(NavigatorEntryModel.tableMetadata.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavId + ")")) {
+                                    ParentNavId = csSrc.getInteger("ID");
                                 }
                             }
-                            if (ParentNavID != 0) {
+                            if (ParentNavId != 0) {
                                 using (var csDest = new CsModel(core)) {
-                                    csDest.open(NavigatorEntryModel.tableMetadata.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
+                                    csDest.open(NavigatorEntryModel.tableMetadata.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavId + ")");
                                     if (!csDest.ok()) {
                                         csDest.close();
                                         csDest.insert(NavigatorEntryModel.tableMetadata.contentName);
                                     }
                                     if (csDest.ok()) {
                                         csDest.set("name", ContentName);
-                                        csDest.set("parentid", ParentNavID);
-                                        csDest.set("contentid", ContentID);
+                                        csDest.set("parentid", ParentNavId);
+                                        csDest.set("contentid", ContentId);
                                     }
                                 }
                             }
                         }
-                        ContentID = ContentMetadataModel.getContentId(core, ContentName);
-                        Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=\"?af=105&ContentID=" + ContentID + "\">Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>");
+                        ContentId = ContentMetadataModel.getContentId(core, ContentName);
+                        Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=\"?af=105&ContentID=" + ContentId + "\">Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>");
                     } else {
                         Stream.Add("<P>Error, a required field is missing. Content not created.</P>");
                     }
@@ -480,16 +480,16 @@ namespace Contensive.Addons.Tools {
             try {
                 //
                 const string RequestNameAddField = "addfield";
-                const string RequestNameAddFieldID = "addfieldID";
+                const string RequestNameAddFieldId = "addfieldID";
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 Stream.Add(AdminUIController.getHeaderTitleDescription("Configure Admin Listing", "Configure the Administration Content Listing Page."));
                 //
                 //   Load Request
                 ToolsAction = core.docProperties.getInteger("dta");
                 int TargetFieldID = core.docProperties.getInteger("fi");
-                int ContentID = core.docProperties.getInteger(RequestNameToolContentID);
+                int ContentId = core.docProperties.getInteger(RequestNameToolContentId);
                 string FieldNameToAdd = GenericController.vbUCase(core.docProperties.getText(RequestNameAddField));
-                int FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldID);
+                int FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldId);
                 string ButtonList = ButtonCancel + "," + ButtonSelect;
                 bool ReloadCDef = core.docProperties.getBoolean("ReloadCDef");
                 bool AllowContentAutoLoad = false;
@@ -498,10 +498,10 @@ namespace Contensive.Addons.Tools {
                 // Process actions
                 //--------------------------------------------------------------------------------
                 //
-                if (ContentID != 0) {
+                if (ContentId != 0) {
                     ButtonList = ButtonCancel + "," + ButtonSaveandInvalidateCache;
-                    string ContentName = Local_GetContentNameByID(ContentID);
-                    Processor.Models.Domain.ContentMetadataModel CDef = Processor.Models.Domain.ContentMetadataModel.create(core, ContentID, false, true);
+                    string ContentName = Local_GetContentNameByID(ContentId);
+                    Processor.Models.Domain.ContentMetadataModel CDef = Processor.Models.Domain.ContentMetadataModel.create(core, ContentId, false, true);
                     string FieldName = null;
                     int ColumnWidthTotal = 0;
                     int fieldId = 0;
@@ -511,7 +511,7 @@ namespace Contensive.Addons.Tools {
                         //
                         AllowContentAutoLoad = (core.siteProperties.getBoolean("AllowContentAutoLoad", true));
                         core.siteProperties.setProperty("AllowContentAutoLoad", false);
-                        int SourceContentID = 0;
+                        int SourceContentId = 0;
                         string SourceName = null;
                         //
                         // Make sure the FieldNameToAdd is not-inherited, if not, create new field
@@ -521,16 +521,16 @@ namespace Contensive.Addons.Tools {
                                 Processor.Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
                                 if (field.id == FieldIDToAdd) {
                                     if (field.inherited) {
-                                        SourceContentID = field.contentId;
+                                        SourceContentId = field.contentId;
                                         SourceName = field.nameLc;
                                         using (var CSSource = new CsModel(core)) {
-                                            CSSource.open("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
+                                            CSSource.open("Content Fields", "(ContentID=" + SourceContentId + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
                                             if (CSSource.ok()) {
                                                 using (var CSTarget = new CsModel(core)) {
                                                     CSTarget.insert("Content Fields");
                                                     if (CSTarget.ok()) {
                                                         CSSource.copyRecord(CSTarget);
-                                                        CSTarget.set("ContentID", ContentID);
+                                                        CSTarget.set("ContentID", ContentId);
                                                         ReloadCDef = true;
                                                     }
                                                 }
@@ -549,14 +549,14 @@ namespace Contensive.Addons.Tools {
                             Processor.Models.Domain.ContentMetadataModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
                             Processor.Models.Domain.ContentFieldMetadataModel field = CDef.fields[adminColumn.Name];
                             if (field.inherited) {
-                                SourceContentID = field.contentId;
+                                SourceContentId = field.contentId;
                                 SourceName = field.nameLc;
                                 using (var CSSource = new CsModel(core)) {
-                                    if (CSSource.open("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
+                                    if (CSSource.open("Content Fields", "(ContentID=" + SourceContentId + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
                                         using (var CSTarget = new CsModel(core)) {
                                             if (CSTarget.insert("Content Fields")) {
                                                 CSSource.copyRecord(CSTarget);
-                                                CSTarget.set("ContentID", ContentID);
+                                                CSTarget.set("ContentID", ContentId);
                                                 ReloadCDef = true;
                                             }
                                         }
@@ -713,12 +713,12 @@ namespace Contensive.Addons.Tools {
                         //
                         // Get a new copy of the content definition
                         //
-                        CDef = Processor.Models.Domain.ContentMetadataModel.create(core, ContentID, false, true);
+                        CDef = Processor.Models.Domain.ContentMetadataModel.create(core, ContentId, false, true);
                     }
                     if (Button == ButtonSaveandInvalidateCache) {
                         core.cache.invalidateAll();
                         core.clearMetaData();
-                        return core.webServer.redirect("?af=" + AdminFormToolConfigureListing + "&ContentID=" + ContentID, "Tools-ConfigureListing, Save and Invalidate Cache, Go to back ConfigureListing tools");
+                        return core.webServer.redirect("?af=" + AdminFormToolConfigureListing + "&ContentID=" + ContentId, "Tools-ConfigureListing, Save and Invalidate Cache, Go to back ConfigureListing tools");
                     }
                     //
                     //--------------------------------------------------------------------------------
@@ -787,7 +787,7 @@ namespace Contensive.Addons.Tools {
                                     Caption = Caption + "*";
                                     InheritedFieldCount = InheritedFieldCount + 1;
                                 }
-                                string AStart = "<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentID + "=" + ContentID + "&af=" + AdminFormToolConfigureListing + "&fi=" + fieldId + "&dtcn=" + ColumnCount;
+                                string AStart = "<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentId + "=" + ContentId + "&af=" + AdminFormToolConfigureListing + "&fi=" + fieldId + "&dtcn=" + ColumnCount;
                                 Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br>");
                                 Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.GIF\" width=\"100%\" height=\"1\">");
                                 Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
@@ -876,7 +876,7 @@ namespace Contensive.Addons.Tools {
                                     //
                                     // can be used as column header
                                     //
-                                    Stream.Add("<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentID + "=" + ContentID + "&af=" + AdminFormToolConfigureListing + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldID + "=" + field.id + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/LibButtonAddUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A> " + field.caption + "<br>");
+                                    Stream.Add("<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentId + "=" + ContentId + "&af=" + AdminFormToolConfigureListing + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldId + "=" + field.id + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/LibButtonAddUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A> " + field.caption + "<br>");
                                 }
                             }
                         }
@@ -888,7 +888,7 @@ namespace Contensive.Addons.Tools {
                 //--------------------------------------------------------------------------------
                 //
                 string FormPanel = SpanClassAdminNormal + "Select a Content Definition to Configure its Listing Page<br>";
-                FormPanel = FormPanel + core.html.selectFromContent("ContentID", ContentID, "Content");
+                FormPanel = FormPanel + core.html.selectFromContent("ContentID", ContentId, "Content");
                 Stream.Add(core.html.getPanel(FormPanel));
                 core.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
                 Stream.Add(HtmlController.inputHidden("ReloadCDef", ReloadCDef));
@@ -1025,7 +1025,7 @@ namespace Contensive.Addons.Tools {
         private string GetForm_CreateChildContent() {
             string result = "";
             try {
-                int ParentContentID = 0;
+                int ParentContentId = 0;
                 //string ParentContentName = null;
                 string ChildContentName = "";
                 bool AddAdminMenuEntry = false;
@@ -1039,8 +1039,8 @@ namespace Contensive.Addons.Tools {
                     //
                     // Process input
                     //
-                    ParentContentID = core.docProperties.getInteger("ParentContentID");
-                    var parentContentMetadata = ContentMetadataModel.create(core, ParentContentID);
+                    ParentContentId = core.docProperties.getInteger("ParentContentID");
+                    var parentContentMetadata = ContentMetadataModel.create(core, ParentContentId);
                     //ParentContentName = Local_GetContentNameByID(ParentContentID);
                     ChildContentName = core.docProperties.getText("ChildContentName");
                     AddAdminMenuEntry = core.docProperties.getBoolean("AddAdminMenuEntry");
@@ -1065,7 +1065,7 @@ namespace Contensive.Addons.Tools {
                 Stream.Add(SpanClassAdminNormal);
                 //
                 Stream.Add("Parent Content Name<br>");
-                Stream.Add(core.html.selectFromContent("ParentContentID", ParentContentID, "Content", ""));
+                Stream.Add(core.html.selectFromContent("ParentContentID", ParentContentId, "Content", ""));
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Child Content Name<br>");
@@ -1428,17 +1428,17 @@ namespace Contensive.Addons.Tools {
         //=============================================================================
         //
         private int Local_GetContentID(string ContentName) {
-            int tempLocal_GetContentID = 0;
+            int tempLocal_GetContentId = 0;
             try {
-                tempLocal_GetContentID = 0;
+                tempLocal_GetContentId = 0;
                 DataTable dt = core.db.executeQuery("Select ID from ccContent where name=" + DbController.encodeSQLText(ContentName));
                 if (dt.Rows.Count > 0) {
-                    tempLocal_GetContentID = GenericController.encodeInteger(dt.Rows[0][0]);
+                    tempLocal_GetContentId = GenericController.encodeInteger(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
-            return tempLocal_GetContentID;
+            return tempLocal_GetContentId;
         }
         //
         //=============================================================================
@@ -1446,20 +1446,20 @@ namespace Contensive.Addons.Tools {
         //=============================================================================
         //
         private string Local_GetContentNameByID(int ContentID) {
-            string tempLocal_GetContentNameByID = null;
+            string tempLocal_GetContentNameById = null;
             try {
                 //
                 DataTable dt = null;
                 //
-                tempLocal_GetContentNameByID = "";
+                tempLocal_GetContentNameById = "";
                 dt = core.db.executeQuery("Select name from ccContent where id=" + ContentID);
                 if (dt.Rows.Count > 0) {
-                    tempLocal_GetContentNameByID = GenericController.encodeText(dt.Rows[0][0]);
+                    tempLocal_GetContentNameById = GenericController.encodeText(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
-            return tempLocal_GetContentNameByID;
+            return tempLocal_GetContentNameById;
         }
         //
         //=============================================================================
@@ -1751,7 +1751,7 @@ namespace Contensive.Addons.Tools {
                 //
                 int Count = 0;
                 int Pointer = 0;
-                int TableID = 0;
+                int TableId = 0;
                 string TableName = "";
                 string FieldName = null;
                 string IndexName = null;
@@ -1772,12 +1772,12 @@ namespace Contensive.Addons.Tools {
                 // Process Input
                 //
                 Button = core.docProperties.getText("Button");
-                TableID = core.docProperties.getInteger("TableID");
+                TableId = core.docProperties.getInteger("TableID");
                 //
                 // Get Tablename and DataSource
                 //
                 using (var csData = new CsModel(core)) {
-                    csData.openRecord("Tables", TableID, "Name,DataSourceID");
+                    csData.openRecord("Tables", TableId, "Name,DataSourceID");
                     if (csData.ok()) {
                         TableName = csData.getText("name");
                         DataSource = csData.getText("DataSourceID");
@@ -1785,7 +1785,7 @@ namespace Contensive.Addons.Tools {
                 }
                 using( var db = new DbController( core, DataSource )) {
                     //
-                    if ((TableID != 0) && (TableID == core.docProperties.getInteger("previoustableid")) && (!string.IsNullOrEmpty(Button))) {
+                    if ((TableId != 0) && (TableId == core.docProperties.getInteger("previoustableid")) && (!string.IsNullOrEmpty(Button))) {
                         //
                         // Drop Indexes
                         //
@@ -1823,12 +1823,12 @@ namespace Contensive.Addons.Tools {
                     // Select Table Form
                     //
                     result += HtmlController.tableRow("<br><br><B>Select table to index</b>", TableColSpan, false);
-                    result += HtmlController.tableRow(core.html.selectFromContent("TableID", TableID, "Tables", "", "Select a SQL table to start"), TableColSpan, false);
-                    if (TableID != 0) {
+                    result += HtmlController.tableRow(core.html.selectFromContent("TableID", TableId, "Tables", "", "Select a SQL table to start"), TableColSpan, false);
+                    if (TableId != 0) {
                         //
                         // Add/Drop Indexes form
                         //
-                        result += HtmlController.inputHidden("PreviousTableID", TableID);
+                        result += HtmlController.inputHidden("PreviousTableID", TableId);
                         //
                         // Drop Indexes
                         //
@@ -1929,7 +1929,7 @@ namespace Contensive.Addons.Tools {
                 TableColSpan = 3;
                 result += HtmlController.tableStart(2, 0, 0);
                 SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName, ccFieldTypes.Name as FieldType"
-                        + " FROM ((ccContent LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID) LEFT JOIN ccFields ON ccContent.ID = ccFields.ContentID) LEFT JOIN ccFieldTypes ON ccFields.Type = ccFieldTypes.ID"
+                        + " FROM ((ccContent LEFT JOIN ccTables ON ccContent.ContentTableId = ccTables.ID) LEFT JOIN ccFields ON ccContent.Id = ccFields.ContentID) LEFT JOIN ccFieldTypes ON ccFields.Type = ccFieldTypes.ID"
                         + " ORDER BY ccTables.Name, ccFields.Name;";
                 using (var csData = new CsModel(core)) {
                     csData.openSql(SQL, "Default");
@@ -2344,7 +2344,7 @@ namespace Contensive.Addons.Tools {
                 string TopHalf = "";
                 string BottomHalf = "";
                 int RowPtr = 0;
-                int RecordID = 0;
+                int RecordId = 0;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 // Dim runAtServer As New runAtServerClass(core)
                 string CDefList = "";
@@ -2424,7 +2424,7 @@ namespace Contensive.Addons.Tools {
                         RecordName = csData.getText("Name");
                         lcName = GenericController.vbLCase(RecordName);
                         if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
-                            RecordID = csData.getInteger("ID");
+                            RecordId = csData.getInteger("ID");
                             if (GenericController.vbInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
                                 TopHalf = TopHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, true) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csData.getText( "Name") + "</div>";
                             } else {
@@ -2502,7 +2502,7 @@ namespace Contensive.Addons.Tools {
                 s.Add(HtmlController.inputText_Legacy( core,"GUID", GenericController.getGUID(), 1, 80));
                 //
                 // Display form
-                result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonCreateGUID);
+                result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonCreateGUId);
                 //result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonCreateGUID);
             } catch (Exception ex) {
                 LogController.logError( core,ex);

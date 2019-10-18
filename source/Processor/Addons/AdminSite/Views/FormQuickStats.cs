@@ -105,7 +105,7 @@ namespace Contensive.Addons.AdminSite {
                     Stream.Add("<h2>Current Visits</h2>");
                     using (var csData = new CsModel(core)) {
                         sql = "SELECT ccVisits.HTTP_REFERER as referer,ccVisits.remote_addr as Remote_Addr, ccVisits.LastVisitTime as LastVisitTime, ccVisits.PageVisits as PageVisits, ccMembers.Name as MemberName, ccVisits.ID as VisitID, ccMembers.ID as MemberID"
-                            + " FROM ccVisits LEFT JOIN ccMembers ON ccVisits.MemberID = ccMembers.ID"
+                            + " FROM ccVisits LEFT JOIN ccMembers ON ccVisits.memberId = ccMembers.ID"
                             + " WHERE (((ccVisits.LastVisitTime)>" + DbController.encodeSQLDate(core.doc.profileStartTime.AddHours(-1)) + "))"
                             + " ORDER BY ccVisits.LastVisitTime DESC;";
                         csData.openSql(sql);

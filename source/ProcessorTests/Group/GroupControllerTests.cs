@@ -147,7 +147,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_Group_AddUser_Group_Person() {
+        public void controllers_Group_AddUser_Group_Person() {
             using (CPClass cp = new CPClass(testAppName)) {
                 //
                 // arrange

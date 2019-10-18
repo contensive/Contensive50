@@ -12,6 +12,7 @@ using Contensive.Processor;
 using Contensive.Models;
 using Contensive.Models.Db;
 using System.Globalization;
+using Contensive.Processor.Addons.AdminSite.Models;
 
 namespace Contensive.Addons.AdminSite.Controllers {
     //
@@ -78,84 +79,6 @@ namespace Contensive.Addons.AdminSite.Controllers {
             public bool isDelete = false;
             public bool isClose = false;
             public bool isAdd = false;
-        }
-        /// <summary>
-        /// Storage for current EditRecord, loaded in LoadEditRecord
-        /// </summary>
-        public class EditRecordFieldClass {
-            public object dbValue;
-            public object value;
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        public class EditRecordClass {
-            public Dictionary<string, EditRecordFieldClass> fieldsLc = new Dictionary<string, EditRecordFieldClass>();
-            /// <summary>
-            /// ID field of edit record (Record to be edited)
-            /// </summary>
-            public int id;
-            /// <summary>
-            /// ParentID field of edit record (Record to be edited)
-            /// </summary>
-            public int parentID;
-            /// <summary>
-            /// name field of edit record
-            /// </summary>
-            public string nameLc;
-            /// <summary>
-            /// active field of the edit record
-            /// </summary>
-            public bool active;
-            /// <summary>
-            /// ContentControlID of the edit record
-            /// </summary>
-            public int contentControlId;
-            /// <summary>
-            /// denormalized name from contentControlId property
-            /// </summary>
-            public string contentControlId_Name;
-            /// <summary>
-            /// Used for Content Watch Link Label if default
-            /// </summary>
-            public string menuHeadline;
-            /// <summary>
-            /// Used for control section display
-            /// </summary>
-            public DateTime modifiedDate;
-            public PersonModel modifiedBy;
-            public DateTime dateAdded;
-            public PersonModel createdBy;
-            public bool Loaded; // true/false - set true when the field array values are loaded
-            public bool Saved; // true if edit record was saved during this page
-            public bool userReadOnly; // set if this record can not be edited, for various reasons
-            public bool IsDeleted; // true means the edit record has been deleted
-            public bool IsInserted; // set if Workflow authoring insert
-            public bool IsModified; // record has been modified since last published
-            public string LockModifiedName; // member who first edited the record
-            public DateTime LockModifiedDate; // Date when member modified record
-            public bool SubmitLock; // set if a submit Lock, even if the current user is admin
-            public string SubmittedName; // member who submitted the record
-            public DateTime SubmittedDate; // Date when record was submitted
-            public bool ApproveLock; // set if an approve Lock
-            public string ApprovedName; // member who approved the record
-            public DateTime ApprovedDate; // Date when record was approved
-            /// <summary>
-            /// This user can add records to this content
-            /// </summary>
-            public bool AllowUserAdd;
-            /// <summary>
-            /// This user can save the current record
-            /// </summary>
-            public bool AllowUserSave;
-            /// <summary>
-            /// This user can delete the current record
-            /// </summary>
-            public bool AllowUserDelete;
-            /// <summary>
-            /// set if an edit Lock by anyone else besides the current user
-            /// </summary>
-            public WorkflowController.editLockClass EditLock;
         }
         //
         //====================================================================================================
@@ -860,7 +783,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="core"></param>
         /// <param name="headerInfo"></param>
         /// <returns></returns>
-        public static string getEditForm_TitleBarDetails(CoreController core, RecordEditHeaderInfoClass headerInfo, EditRecordClass editRecord) {
+        public static string getEditForm_TitleBarDetails(CoreController core, RecordEditHeaderInfoClass headerInfo, EditRecordModel editRecord) {
             string result = "";
             bool alt = true;
             if (alt) {
@@ -1198,7 +1121,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         EditorString += getDefaultEditor_text(core, htmlName + "-readonly-fpo", "(deleted)", readOnly, htmlId);
                     } else {
                         EditorString += getDefaultEditor_text(core, htmlName + "-readonly-fpo", (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : HtmlController.encodeHtml(selectedUser.name), readOnly, htmlId);
-                        EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\" target=\"_blank\">View details in new window</a>]");
+                        EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlId.ToString() + "&id=" + selectedRecordId.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                     }
                 }
                 EditorString += WhyReadOnlyMsg;
@@ -1212,7 +1135,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         EditorString += "Deleted";
                     } else {
                         string recordName = (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : HtmlController.encodeHtml(selectedUser.name);
-                        EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\">" + HtmlController.encodeHtml(recordName) + "</a>]";
+                        EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlId.ToString() + "&id=" + selectedRecordId.ToString() + "\">" + HtmlController.encodeHtml(recordName) + "</a>]";
                     }
                 }
                 EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + ContentMetadataModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
@@ -1226,8 +1149,8 @@ namespace Contensive.Addons.AdminSite.Controllers {
             string result = "";
             //
             string MTMContent0 = MetadataController.getContentNameByID(core, field.contentId);
-            string MTMContent1 = MetadataController.getContentNameByID(core, field.manyToManyContentID);
-            string MTMRuleContent = MetadataController.getContentNameByID(core, field.manyToManyRuleContentID);
+            string MTMContent1 = MetadataController.getContentNameByID(core, field.manyToManyContentId);
+            string MTMRuleContent = MetadataController.getContentNameByID(core, field.manyToManyRuleContentId);
             string MTMRuleField0 = field.manyToManyRulePrimaryField;
             string MTMRuleField1 = field.manyToManyRuleSecondaryField;
             result += core.html.getCheckList(htmlName, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", readOnly, false, currentValueCommaList);
@@ -1661,10 +1584,10 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 if (Position == 0) { return result; }
                 string[] ClipBoardArray = ClipBoard.Split('.');
                 if (ClipBoardArray.GetUpperBound(0) == 0) { return result; }
-                int ClipboardContentID = GenericController.encodeInteger(ClipBoardArray[0]);
-                int ClipChildRecordID = GenericController.encodeInteger(ClipBoardArray[1]);
-                if (content.isParentOf<ContentModel>(core.cpParent, ClipboardContentID)) {
-                    int ParentID = 0;
+                int ClipboardContentId = GenericController.encodeInteger(ClipBoardArray[0]);
+                int ClipChildRecordId = GenericController.encodeInteger(ClipBoardArray[1]);
+                if (content.isParentOf<ContentModel>(core.cpParent, ClipboardContentId)) {
+                    int ParentId = 0;
                     if (GenericController.vbInstr(1, presetNameValueList, "PARENTID=", 1) != 0) {
                         //
                         // must test for main_IsChildRecord
@@ -1673,15 +1596,15 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         BufferString = BufferString.Replace("(", "");
                         BufferString = BufferString.Replace(")", "");
                         BufferString = BufferString.Replace(",", "&");
-                        ParentID = encodeInteger(GenericController.main_GetNameValue_Internal(core, BufferString, "Parentid"));
+                        ParentId = encodeInteger(GenericController.main_GetNameValue_Internal(core, BufferString, "Parentid"));
                     }
-                    if ((ParentID != 0) && (!DbBaseModel.isChildOf<PageContentModel>(core.cpParent, ParentID, 0, new List<int>()))) {
+                    if ((ParentId != 0) && (!DbBaseModel.isChildOf<PageContentModel>(core.cpParent, ParentId, 0, new List<int>()))) {
                         //
                         // Can not paste as child of itself
                         string PasteLink = core.webServer.requestPage + "?" + core.doc.refreshQueryString;
                         PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePaste, "1", true);
-                        PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, content.id.ToString(), true);
-                        PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, ParentID.ToString(), true);
+                        PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentId, content.id.ToString(), true);
+                        PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordId, ParentId.ToString(), true);
                         PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteFieldList, presetNameValueList, true);
                         //result.Add(HtmlController.div(HtmlController.a(iconContentPaste_Green, PasteLink, "ccRecordPasteLink", "", "-1"), "ccRecordLinkCon"));
                         string pasteLinkAnchor = HtmlController.a(iconContentPaste_Green + "&nbsp;Paste Record", PasteLink, "ccRecordPasteLink", "", "-1");
@@ -1742,7 +1665,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                                     + " LEFT JOIN ccGroupRules ON ccGroupRules.ContentID=ccContent.ID)"
                                     + " LEFT JOIN ccgroups ON ccGroupRules.GroupID=ccgroups.ID)"
                                     + " LEFT JOIN ccMemberRules ON ccgroups.ID=ccMemberRules.GroupID)"
-                                    + " LEFT JOIN ccMembers ON ccMemberRules.MemberID=ccMembers.ID"
+                                    + " LEFT JOIN ccMembers ON ccMemberRules.memberId=ccMembers.ID"
                                 + " WHERE ("
                                 + " (ccContent.id=" + content.id + ")"
                                 + " AND(ccContent.active<>0)"

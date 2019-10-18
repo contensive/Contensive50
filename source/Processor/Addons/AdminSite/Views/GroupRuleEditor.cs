@@ -54,7 +54,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // ----- read in all the groups, sorted by ContentName
                     string SQL2 = "SELECT ccGroups.ID AS ID, ccContent.Name AS SectionName, ccGroups.Caption AS GroupCaption, ccGroups.name AS GroupName, ccGroups.SortOrder"
-                        + " FROM ccGroups LEFT JOIN ccContent ON ccGroups.ContentControlID = ccContent.ID"
+                        + " FROM ccGroups LEFT JOIN ccContent ON ccGroups.ContentControlId = ccContent.ID"
                         + " Where (((ccGroups.Active) <> " + SQLFalse + ") And ((ccContent.Active) <> " + SQLFalse + "))";
                     SQL2 += ""
                         + " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Caption, ccGroups.name, ccGroups.SortOrder"

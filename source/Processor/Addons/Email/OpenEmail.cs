@@ -34,12 +34,12 @@ namespace Contensive.Addons.Primitives {
                     // -- Email open detected. Log it and redirect to a 1x1 spacer
                     EmailDropModel emailDrop = DbBaseModel.create<EmailDropModel>(core.cpParent, emailDropId);
                     if (emailDrop != null) {
-                        PersonModel recipient = DbBaseModel.create<PersonModel>(core.cpParent, core.docProperties.getInteger(rnEmailMemberID));
+                        PersonModel recipient = DbBaseModel.create<PersonModel>(core.cpParent, core.docProperties.getInteger(rnEmailMemberId));
                         if (recipient != null) {
                            EmailLogModel log = new EmailLogModel() {
                                 name = "User " + recipient.name + " opened email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString(),
-                                emailDropID = emailDrop.id,
-                                memberID = recipient.id,
+                                emailDropId = emailDrop.id,
+                                memberId = recipient.id,
                                 logType = EmailLogTypeOpen
                             };
                         }

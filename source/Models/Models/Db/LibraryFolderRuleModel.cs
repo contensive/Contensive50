@@ -11,7 +11,7 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         //
-        public int folderID { get; set; }
-        public int groupID { get; set; }
+        public int folderId { get; set; }
+        public int groupId { get; set; }
     }
 }

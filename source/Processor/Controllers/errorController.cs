@@ -40,7 +40,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.errorList != null) {
                     if (core.doc.errorList.Count > 0) {
                         foreach (string exMsg in core.doc.errorList) {
-                            returnHtmlList += cr2 + "<li class=\"ccExceptionListRow\">" + cr3 + core.html.convertTextToHtml(exMsg) + cr2 + "</li>";
+                            returnHtmlList += cr2 + "<li class=\"ccExceptionListRow\">" + cr3 + HtmlController.convertTextToHtml(exMsg) + cr2 + "</li>";
                         }
                         returnHtmlList = "\r<ul class=\"ccExceptionList\">" + returnHtmlList + "\r</ul>";
                     }

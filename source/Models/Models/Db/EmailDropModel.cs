@@ -11,6 +11,6 @@ namespace Contensive.Models.Db {
         public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("Email Drops", "ccemaildrops", "default", false);
         //
         //====================================================================================================
-        public int emailID { get; set; }
+        public int emailId { get; set; }
     }
 }

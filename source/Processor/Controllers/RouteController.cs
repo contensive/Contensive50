@@ -67,52 +67,52 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // moved to Addons.AdminSite
                                 core.doc.continueProcessing = false;
-                                return (new Addons.AdminSite.GetFieldEditorPreference()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.AdminSite.GetFieldEditorPreference()).Execute(core.cpParent).ToString();
                             case AjaxGetDefaultAddonOptionString:
                                 //
                                 // moved to Addons.AdminSite
                                 core.doc.continueProcessing = false;
-                                return (new Addons.AdminSite.GetAjaxDefaultAddonOptionStringClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.AdminSite.GetAjaxDefaultAddonOptionStringClass()).Execute(core.cpParent).ToString();
                             case AjaxSetVisitProperty:
                                 //
                                 // moved to Addons.AdminSite
                                 core.doc.continueProcessing = false;
-                                return (new Addons.AdminSite.SetAjaxVisitPropertyClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.AdminSite.SetAjaxVisitPropertyClass()).Execute(core.cpParent).ToString();
                             case AjaxGetVisitProperty:
                                 //
                                 // moved to Addons.AdminSite
                                 core.doc.continueProcessing = false;
-                                return (new Addons.AdminSite.GetAjaxVisitPropertyClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.AdminSite.GetAjaxVisitPropertyClass()).Execute(core.cpParent).ToString();
                             case AjaxData:
                                 //
                                 // moved to Addons.AdminSite
                                 core.doc.continueProcessing = false;
-                                return (new Addons.AdminSite.ProcessAjaxDataClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.AdminSite.ProcessAjaxDataClass()).Execute(core.cpParent).ToString();
                             case AjaxPing:
                                 //
                                 // moved to Addons.AdminSite
                                 core.doc.continueProcessing = false;
-                                return (new Addons.AdminSite.GetOKClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.AdminSite.GetOKClass()).Execute(core.cpParent).ToString();
                             case AjaxOpenIndexFilter:
                                 //
                                 // moved to Addons.AdminSite
                                 core.doc.continueProcessing = false;
-                                return (new Addons.AdminSite.OpenAjaxIndexFilterClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.AdminSite.OpenAjaxIndexFilterClass()).Execute(core.cpParent).ToString();
                             case AjaxOpenIndexFilterGetContent:
                                 //
                                 // moved to Addons.AdminSite
                                 core.doc.continueProcessing = false;
-                                return (new Addons.AdminSite.OpenAjaxIndexFilterGetContentClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.AdminSite.OpenAjaxIndexFilterGetContentClass()).Execute(core.cpParent).ToString();
                             case AjaxCloseIndexFilter:
                                 //
                                 // moved to Addons.AdminSite
                                 core.doc.continueProcessing = false;
-                                return (new Addons.AdminSite.CloseAjaxIndexFilterClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.AdminSite.CloseAjaxIndexFilterClass()).Execute(core.cpParent).ToString();
                             case AjaxOpenAdminNav:
                                 //
                                 // moved to Addons.AdminSite
                                 core.doc.continueProcessing = false;
-                                return (new Addons.AdminSite.OpenAjaxAdminNavClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.AdminSite.OpenAjaxAdminNavClass()).Execute(core.cpParent).ToString();
                             default:
                                 //
                                 // -- unknown method, log warning
@@ -126,19 +126,19 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- Process Email Open
                         core.doc.continueProcessing = false;
-                        return (new Addons.Primitives.OpenEmailClass()).Execute(core.cpParent).ToString();
+                        return (new Contensive.Addons.Primitives.OpenEmailClass()).Execute(core.cpParent).ToString();
                     }
                     if (core.docProperties.getInteger(rnEmailClickFlag) > 0) {
                         //
                         // -- Process Email click
                         core.doc.continueProcessing = false;
-                        return (new Addons.Primitives.ClickEmailClass()).Execute(core.cpParent).ToString();
+                        return (new Contensive.Addons.Primitives.ClickEmailClass()).Execute(core.cpParent).ToString();
                     }
                     if (core.docProperties.getInteger(rnEmailBlockRecipientEmail) > 0) {
                         //
                         // -- Process Email block
                         core.doc.continueProcessing = false;
-                        return (new Addons.Primitives.BlockEmailClass()).Execute(core.cpParent).ToString();
+                        return (new Contensive.Addons.Primitives.BlockEmailClass()).Execute(core.cpParent).ToString();
                     }
                     //
                     // -- legacy form process methods 
@@ -149,44 +149,44 @@ namespace Contensive.Processor.Controllers {
                         switch (formType) {
                             case FormTypeAddonStyleEditor:
                                 //
-                                result = (new Addons.Primitives.ProcessAddonStyleEditorClass()).Execute(core.cpParent).ToString();
+                                result = (new Contensive.Addons.Primitives.ProcessAddonStyleEditorClass()).Execute(core.cpParent).ToString();
                                 break;
                             case FormTypeAddonSettingsEditor:
                                 //
-                                result = (new Addons.Primitives.ProcessAddonSettingsEditorClass()).Execute(core.cpParent).ToString();
+                                result = (new Contensive.Addons.Primitives.ProcessAddonSettingsEditorClass()).Execute(core.cpParent).ToString();
                                 break;
                             case FormTypeSendPassword:
                                 //
-                                result = (new Addons.Primitives.processSendPasswordFormClass()).Execute(core.cpParent).ToString();
+                                result = (new Contensive.Addons.Primitives.processSendPasswordFormClass()).Execute(core.cpParent).ToString();
                                 break;
                             case FormTypeLogin:
                             case "l09H58a195":
                                 //
-                                result = (new Addons.Primitives.ProcessLoginDefaultClass()).Execute(core.cpParent).ToString();
+                                result = (new Contensive.Addons.Primitives.ProcessLoginDefaultClass()).Execute(core.cpParent).ToString();
                                 break;
                             case FormTypeToolsPanel:
                                 //
-                                result = (new Addons.Primitives.processFormToolsPanelClass()).Execute(core.cpParent).ToString();
+                                result = (new Contensive.Addons.Primitives.processFormToolsPanelClass()).Execute(core.cpParent).ToString();
                                 break;
                             case FormTypePageAuthoring:
                                 //
-                                result = (new Addons.Primitives.processFormQuickEditingClass()).Execute(core.cpParent).ToString();
+                                result = (new Contensive.Addons.Primitives.processFormQuickEditingClass()).Execute(core.cpParent).ToString();
                                 break;
                             case FormTypeActiveEditor:
                                 //
-                                result = (new Addons.Primitives.ProcessActiveEditorClass()).Execute(core.cpParent).ToString();
+                                result = (new Contensive.Addons.Primitives.ProcessActiveEditorClass()).Execute(core.cpParent).ToString();
                                 break;
                             case FormTypeSiteStyleEditor:
                                 //
-                                result = (new Addons.Primitives.processSiteStyleEditorClass()).Execute(core.cpParent).ToString();
+                                result = (new Contensive.Addons.Primitives.processSiteStyleEditorClass()).Execute(core.cpParent).ToString();
                                 break;
                             case FormTypeHelpBubbleEditor:
                                 //
-                                result = (new Addons.Primitives.processHelpBubbleEditorClass()).Execute(core.cpParent).ToString();
+                                result = (new Contensive.Addons.Primitives.processHelpBubbleEditorClass()).Execute(core.cpParent).ToString();
                                 break;
                             case FormTypeJoin:
                                 //
-                                result = (new Addons.Primitives.processJoinFormClass()).Execute(core.cpParent).ToString();
+                                result = (new Contensive.Addons.Primitives.processJoinFormClass()).Execute(core.cpParent).ToString();
                                 break;
                         }
                     }
@@ -198,7 +198,7 @@ namespace Contensive.Processor.Controllers {
                             case HardCodedPageLogout: {
                                     //
                                     // -- logout intercept
-                                    (new Addons.Primitives.ProcessLogoutMethodClass()).Execute(core.cpParent);
+                                    (new Contensive.Addons.Primitives.ProcessLogoutMethodClass()).Execute(core.cpParent);
                                     //
                                     // -- redirect to the route without the method
                                     string routeWithoutQuery = modifyLinkQuery(core.webServer.requestUrlSource, "method", "", false);
@@ -207,10 +207,10 @@ namespace Contensive.Processor.Controllers {
                                 }
                             case HardCodedPageSendPassword:
                                 //
-                                return (new Addons.Primitives.ProcessSendPasswordMethodClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.Primitives.ProcessSendPasswordMethodClass()).Execute(core.cpParent).ToString();
                             case HardCodedPageResourceLibrary:
                                 //
-                                return (new Addons.Primitives.ProcessResourceLibraryMethodClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.Primitives.ProcessResourceLibraryMethodClass()).Execute(core.cpParent).ToString();
                             case HardCodedPageLoginDefault:
                                 //
                                 if (core.session.isAuthenticated) {
@@ -222,7 +222,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 //
                                 // -- process the login method, or return the login form
-                                return (new Addons.Primitives.ProcessLoginDefaultMethodClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.Primitives.ProcessLoginDefaultMethodClass()).Execute(core.cpParent).ToString();
                             case HardCodedPageLogin:
                                 //
                                 if (core.session.isAuthenticated) {
@@ -234,22 +234,22 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 //
                                 // -- process the login method, or return the login form
-                                return (new Addons.Primitives.ProcessLoginMethodClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.Primitives.ProcessLoginMethodClass()).Execute(core.cpParent).ToString();
                             case HardCodedPageLogoutLogin:
                                 //
-                                return (new Addons.Primitives.ProcessLogoutLoginMethodClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.Primitives.ProcessLogoutLoginMethodClass()).Execute(core.cpParent).ToString();
                             case HardCodedPageSiteExplorer:
                                 //
-                                return (new Addons.Primitives.ProcessSiteExplorerMethodClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.Primitives.ProcessSiteExplorerMethodClass()).Execute(core.cpParent).ToString();
                             case HardCodedPageStatus:
                                 //
-                                return (new Addons.Diagnostics.StatusClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.Diagnostics.StatusClass()).Execute(core.cpParent).ToString();
                             case HardCodedPageRedirect:
                                 //
-                                return (new Addons.Primitives.ProcessRedirectMethodClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.Primitives.ProcessRedirectMethodClass()).Execute(core.cpParent).ToString();
                             case HardCodedPageExportAscii:
                                 //
-                                return (new Addons.Primitives.ProcessExportAsciiMethodClass()).Execute(core.cpParent).ToString();
+                                return (new Contensive.Addons.Primitives.ProcessExportAsciiMethodClass()).Execute(core.cpParent).ToString();
                         }
                     }
                     //
@@ -319,7 +319,7 @@ namespace Contensive.Processor.Controllers {
                                 LinkAliasModel linkAlias = DbBaseModel.create<LinkAliasModel>(core.cpParent, route.linkAliasId);
                                 if (linkAlias != null) {
                                     // -- set the link alias page number, unless it has been overridden
-                                    if (!core.docProperties.containsKey("bid")) { core.docProperties.setProperty("bid", linkAlias.pageID); }
+                                    if (!core.docProperties.containsKey("bid")) { core.docProperties.setProperty("bid", linkAlias.pageId); }
                                     if (!string.IsNullOrWhiteSpace(linkAlias.queryStringSuffix)) {
                                         string[] keyValuePairs = linkAlias.queryStringSuffix.Split('&');
                                         // -- iterate through all the key=value pairs
@@ -343,7 +343,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- link forward
                                 LinkForwardModel linkForward = DbBaseModel.create<LinkForwardModel>(core.cpParent, route.linkForwardId);
-                                return core.webServer.redirect(linkForward.DestinationLink, "Link Forward #" + linkForward.id + ", " + linkForward.name);
+                                return core.webServer.redirect(linkForward.destinationLink, "Link Forward #" + linkForward.id + ", " + linkForward.name);
                         }
                     }
                     //

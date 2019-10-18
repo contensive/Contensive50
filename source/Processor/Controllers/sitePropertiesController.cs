@@ -120,10 +120,10 @@ namespace Contensive.Processor.Controllers {
         //
         internal int landingPageID {
             get {
-                return integerPropertyBase("LandingPageID", 0, ref _landingPageID);
+                return integerPropertyBase("LandingPageID", 0, ref _landingPageId);
             }
         }
-        private int? _landingPageID = null;
+        private int? _landingPageId = null;
         //
         //====================================================================================================
         //
@@ -197,10 +197,10 @@ namespace Contensive.Processor.Controllers {
         //
         internal int defaultWrapperID {
             get {
-                return integerPropertyBase("DefaultWrapperID", 0, ref _defaultWrapperID);
+                return integerPropertyBase("DefaultWrapperID", 0, ref _defaultWrapperId);
             }
         }
-        private int? _defaultWrapperID = null;
+        private int? _defaultWrapperId = null;
         //
         //====================================================================================================
         /// <summary>

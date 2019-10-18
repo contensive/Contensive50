@@ -13,11 +13,11 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// The page associated to this topic. Add to track users interested in this topic and to provide navigation to this topic.
         /// </summary>
-        public int pageID { get; set; }
+        public int pageId { get; set; }
         /// <summary>
         /// The topic 
         /// </summary>
-        public int topicID { get; set; }
+        public int topicId { get; set; }
 
     }
 }

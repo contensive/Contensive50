@@ -128,23 +128,23 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="isDelete"></param>
         /// <param name="contentName"></param>
-        /// <param name="recordID"></param>
+        /// <param name="recordId"></param>
         /// <param name="recordName"></param>
         /// <param name="recordParentID"></param>
         /// <param name="useContentWatchLink"></param>
-        public static void processAfterSave(CoreController core, bool isDelete, string contentName, int recordID, string recordName, int recordParentID, bool useContentWatchLink) {
+        public static void processAfterSave(CoreController core, bool isDelete, string contentName, int recordId, string recordName, int recordParentID, bool useContentWatchLink) {
             try {
-                PageContentModel.markReviewed(core.cpParent, recordID);
+                PageContentModel.markReviewed(core.cpParent, recordId);
                 string tableName = MetadataController.getContentTablename(core, contentName);
                 //
                 // -- invalidate the specific cache for this record
-                core.cache.invalidateDbRecord(recordID, tableName);
+                core.cache.invalidateDbRecord(recordId, tableName);
                 //
                 string tableNameLower = tableName.ToLower(CultureInfo.InvariantCulture);
                 if (tableNameLower == AddonCollectionModel.tableMetadata.tableNameLower) {
                     //
                     // -- addon collection
-                    processAfterSave_AddonCollection(core, isDelete, contentName, recordID, recordName, recordParentID, useContentWatchLink);
+                    processAfterSave_AddonCollection(core, isDelete, contentName, recordId, recordName, recordParentID, useContentWatchLink);
                 } else if (tableNameLower == LinkForwardModel.tableMetadata.tableNameLower) {
                     //
                     // -- link forward
@@ -160,21 +160,21 @@ namespace Contensive.Processor.Controllers {
                 } else if (tableNameLower == PersonModel.tableMetadata.tableNameLower) {
                     //
                     // -- PersonModel
-                    var person = PersonModel.create<PersonModel>(core.cpParent, recordID);
+                    var person = PersonModel.create<PersonModel>(core.cpParent, recordId);
                     if(person != null ) {
                         if (isDelete) {
-                            LogController.addSiteActivity(core, "deleting user #" + recordID + " (" + recordName + ")", recordID, person.organizationID);
+                            LogController.addSiteActivity(core, "deleting user #" + recordId + " (" + recordName + ")", recordId, person.organizationId);
                         } else {
-                            LogController.addSiteActivity(core, "saving changes to user #" + recordID + " (" + recordName + ")", recordID, person.organizationID);
+                            LogController.addSiteActivity(core, "saving changes to user #" + recordId + " (" + recordName + ")", recordId, person.organizationId);
                         }
                     }
                 } else if (tableNameLower == OrganizationModel.tableMetadata.tableNameLower) {
                     //
                     // -- Log Activity for changes to people and organizattions
                     if (isDelete) {
-                        LogController.addSiteActivity(core, "deleting organization #" + recordID + " (" + recordName + ")", 0, recordID);
+                        LogController.addSiteActivity(core, "deleting organization #" + recordId + " (" + recordName + ")", 0, recordId);
                     } else {
-                        LogController.addSiteActivity(core, "saving changes to organization #" + recordID + " (" + recordName + ")", 0, recordID);
+                        LogController.addSiteActivity(core, "saving changes to organization #" + recordId + " (" + recordName + ")", 0, recordId);
                     }
                 } else if (tableNameLower == SitePropertyModel.tableMetadata.tableNameLower) {
                     //
@@ -202,21 +202,21 @@ namespace Contensive.Processor.Controllers {
                     if (isDelete) {
                         //
                         // Clear the Landing page and page not found site properties
-                        if (recordID == GenericController.encodeInteger(core.siteProperties.getText("PageNotFoundPageID", "0"))) {
+                        if (recordId == GenericController.encodeInteger(core.siteProperties.getText("PageNotFoundPageID", "0"))) {
                             core.siteProperties.setProperty("PageNotFoundPageID", "0");
                         }
-                        if (recordID == core.siteProperties.landingPageID) {
+                        if (recordId == core.siteProperties.landingPageID) {
                             core.siteProperties.setProperty("landingPageId", "0");
                         }
                         //
                         // Delete Link Alias entries with this PageID
-                        core.db.executeQuery("delete from cclinkAliases where PageID=" + recordID);
+                        core.db.executeQuery("delete from cclinkAliases where PageID=" + recordId);
                     }
-                    DbBaseModel.invalidateCacheOfRecord<PageContentModel>(core.cpParent, recordID);
+                    DbBaseModel.invalidateCacheOfRecord<PageContentModel>(core.cpParent, recordId);
                 } else if (tableNameLower == LibraryFilesModel.tableMetadata.tableNameLower) {
                     //
                     // -- 
-                    processAfterSave_LibraryFiles(core, isDelete, contentName, recordID, recordName, recordParentID, useContentWatchLink);
+                    processAfterSave_LibraryFiles(core, isDelete, contentName, recordId, recordName, recordParentID, useContentWatchLink);
                 }
                 //
                 // Process Addons marked to trigger a process call on content change
@@ -224,29 +224,29 @@ namespace Contensive.Processor.Controllers {
                 Dictionary<string, string> instanceArguments;
                 bool onChangeAddonsAsync = core.siteProperties.getBoolean("execute oncontentchange addons async", false);
                 using (var csData = new CsModel(core)) {
-                    int contentID = ContentMetadataModel.getContentId(core, contentName);
-                    csData.open("Add-on Content Trigger Rules", "ContentID=" + contentID, "", false, 0, "addonid");
+                    int contentId = ContentMetadataModel.getContentId(core, contentName);
+                    csData.open("Add-on Content Trigger Rules", "ContentID=" + contentId, "", false, 0, "addonid");
                     string Option_String = null;
                     if (isDelete) {
                         instanceArguments = new Dictionary<string, string>() {
                             {"action","contentdelete"},
-                            {"contentid",contentID.ToString()},
-                            {"recordid",recordID.ToString()}
+                            {"contentid",contentId.ToString()},
+                            {"recordid",recordId.ToString()}
                         };
                         Option_String = ""
                             + Environment.NewLine + "action=contentdelete"
-                            + Environment.NewLine + "contentid=" + contentID
-                            + Environment.NewLine + "recordid=" + recordID + "";
+                            + Environment.NewLine + "contentid=" + contentId
+                            + Environment.NewLine + "recordid=" + recordId + "";
                     } else {
                         instanceArguments = new Dictionary<string, string>() {
                             {"action","contentchange"},
-                            {"contentid",contentID.ToString()},
-                            {"recordid",recordID.ToString()}
+                            {"contentid",contentId.ToString()},
+                            {"recordid",recordId.ToString()}
                         };
                         Option_String = ""
                             + Environment.NewLine + "action=contentchange"
-                            + Environment.NewLine + "contentid=" + contentID
-                            + Environment.NewLine + "recordid=" + recordID + "";
+                            + Environment.NewLine + "contentid=" + contentId
+                            + Environment.NewLine + "recordid=" + recordId + "";
                     }
                     while (csData.ok()) {
                         var addon = DbBaseModel.create<AddonModel>(core.cpParent, csData.getInteger("Addonid"));

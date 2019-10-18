@@ -14,7 +14,7 @@ namespace Contensive.Addons.AdminSite {
             string tempGetForm_Edit_LinkAliases = null;
             try {
                 // todo
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
+                Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                 int LinkCnt = 0;
                 string LinkList = "";
                 StringBuilderLegacyController f = new StringBuilderLegacyController();

@@ -43,16 +43,16 @@ namespace Contensive.Processor.Models.Domain {
                 indexWidth = "",
                 installedByCollectionGuid = "",
                 isBaseField = false,
-                lookupContentID = 0,
+                lookupContentId = 0,
                 lookupList = "",
-                manyToManyContentID = 0,
-                manyToManyRuleContentID = 0,
+                manyToManyContentId = 0,
+                manyToManyRuleContentId = 0,
                 manyToManyRulePrimaryField = "",
                 manyToManyRuleSecondaryField = "",
                 password = false,
                 readOnly = false,
-                redirectContentID = 0,
-                redirectID = "",
+                redirectContentId = 0,
+                redirectId = "",
                 redirectPath = "",
                 required = false,
                 scramble = false,
@@ -143,7 +143,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// if type is REDIRECT, edit form creates a link, this is the field name that must match ID of this record. The edit screen will show a link 
         /// </summary>
-        public string redirectID { get; set; }
+        public string redirectId { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -318,12 +318,12 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// For redirect types, the content id where the field will redirect.
         /// </summary>
-        public int redirectContentID { get; set; } // If TYPEREDIRECT, this is new contentID
+        public int redirectContentId { get; set; } // If TYPEREDIRECT, this is new contentID
         public string get_redirectContentName(CoreController core) {
             if (_redirectContentName == null) {
-                if (redirectContentID > 0) {
+                if (redirectContentId > 0) {
                     _redirectContentName = "";
-                    DataTable dt = core.db.executeQuery("select name from cccontent where id=" + redirectContentID.ToString());
+                    DataTable dt = core.db.executeQuery("select name from cccontent where id=" + redirectContentId.ToString());
                     if (dt.Rows.Count > 0) {
                         _redirectContentName = GenericController.encodeText(dt.Rows[0][0]);
                     }
@@ -343,12 +343,12 @@ namespace Contensive.Processor.Models.Domain {
         /// Secondary content is the data table the primary is being connected to.
         /// Rule content is the table that has two foreign keys, one for the primary and one for the secondary
         /// </summary>
-        public int manyToManyContentID { get; set; } // Content containing Secondary Records
+        public int manyToManyContentId { get; set; } // Content containing Secondary Records
         public string get_manyToManyContentName(CoreController core) {
             if (_manyToManyRuleContentName == null) {
-                if (manyToManyContentID > 0) {
+                if (manyToManyContentId > 0) {
                     _manyToManyRuleContentName = "";
-                    DataTable dt = core.db.executeQuery("select name from cccontent where id=" + manyToManyContentID.ToString());
+                    DataTable dt = core.db.executeQuery("select name from cccontent where id=" + manyToManyContentId.ToString());
                     if (dt.Rows.Count > 0) {
                         _manyToManyContentName = GenericController.encodeText(dt.Rows[0][0]);
                     }
@@ -368,12 +368,12 @@ namespace Contensive.Processor.Models.Domain {
         /// Secondary content is the data table the primary is being connected to.
         /// Rule content is the table that has two foreign keys, one for the primary and one for the secondary
         /// </summary>
-        public int manyToManyRuleContentID { get; set; }
+        public int manyToManyRuleContentId { get; set; }
         public string get_manyToManyRuleContentName(CoreController core) {
             if (_manyToManyRuleContentName == null) {
-                if (manyToManyRuleContentID > 0) {
+                if (manyToManyRuleContentId > 0) {
                     _manyToManyRuleContentName = "";
-                    DataTable dt = core.db.executeQuery("select name from cccontent where id=" + manyToManyRuleContentID.ToString());
+                    DataTable dt = core.db.executeQuery("select name from cccontent where id=" + manyToManyRuleContentId.ToString());
                     if (dt.Rows.Count > 0) {
                         _manyToManyRuleContentName = GenericController.encodeText(dt.Rows[0][0]);
                     }
@@ -390,11 +390,11 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// For lookup types, this is the contentid for the connected table. This represents a foreignKey in this content
         /// </summary>
-        public int lookupContentID { get; set; }
+        public int lookupContentId { get; set; }
         public string get_lookupContentName(CoreController core) {
-            if ((_lookupContentName == null) && (lookupContentID>0)) {
+            if ((_lookupContentName == null) && (lookupContentId>0)) {
                 _lookupContentName = "";
-                var content = ContentModel.create<ContentModel>(core.cpParent, lookupContentID);
+                var content = ContentModel.create<ContentModel>(core.cpParent, lookupContentId);
                 if (content != null) { _lookupContentName = content.name; }
             }
             return _lookupContentName;

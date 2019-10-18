@@ -30,10 +30,10 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                     core: cp.core,
                     source: source,
                     contextContentName: "",
-                    ContextRecordID: 0,
-                    deprecated_ContextContactPeopleID: 0,
+                    ContextRecordId: 0,
+                    deprecated_ContextContactPeopleId: 0,
                     ProtocolHostString: "",
-                    DefaultWrapperID: 0,
+                    DefaultWrapperId: 0,
                     addonContext: CPUtilsBaseClass.addonContext.ContextPage
                 );
                 // assert

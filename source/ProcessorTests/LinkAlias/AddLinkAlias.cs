@@ -31,7 +31,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // assert
                 Assert.AreEqual(1, linkAliasList.Count);
                 Assert.AreEqual("/test", linkAliasList[0].name);
-                Assert.AreEqual(1, linkAliasList[0].pageID);
+                Assert.AreEqual(1, linkAliasList[0].pageId);
                 Assert.AreEqual("", linkAliasList[0].queryStringSuffix);
 
             }
@@ -54,7 +54,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // assert
                 Assert.AreEqual(1, linkAliasList.Count);
                 Assert.AreEqual("/test", linkAliasList[0].name);
-                Assert.AreEqual(2, linkAliasList[0].pageID);
+                Assert.AreEqual(2, linkAliasList[0].pageId);
                 Assert.AreEqual("", linkAliasList[0].queryStringSuffix);
             }
         }
@@ -76,7 +76,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // assert
                 Assert.AreEqual(1, linkAliasList.Count);
                 Assert.AreEqual("/test", linkAliasList[0].name);
-                Assert.AreEqual(1, linkAliasList[0].pageID);
+                Assert.AreEqual(1, linkAliasList[0].pageId);
                 Assert.AreEqual("a=2", linkAliasList[0].queryStringSuffix);
             }
         }
@@ -99,11 +99,11 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 Assert.AreEqual(2, linkAliasList.Count);
                 //
                 Assert.AreEqual("/test1", linkAliasList[0].name);
-                Assert.AreEqual(1, linkAliasList[0].pageID);
+                Assert.AreEqual(1, linkAliasList[0].pageId);
                 Assert.AreEqual("a=1", linkAliasList[0].queryStringSuffix);
                 //
                 Assert.AreEqual("/test2", linkAliasList[1].name);
-                Assert.AreEqual(1, linkAliasList[1].pageID);
+                Assert.AreEqual(1, linkAliasList[1].pageId);
                 Assert.AreEqual("a=2", linkAliasList[1].queryStringSuffix);
             }
         }
@@ -125,11 +125,11 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // assert
                 Assert.AreEqual(2, linkAliasList.Count);
                 Assert.AreEqual("/test1", linkAliasList[0].name);
-                Assert.AreEqual(1, linkAliasList[0].pageID);
+                Assert.AreEqual(1, linkAliasList[0].pageId);
                 Assert.AreEqual("a=1", linkAliasList[0].queryStringSuffix);
                 //
                 Assert.AreEqual("/test2", linkAliasList[1].name);
-                Assert.AreEqual(1, linkAliasList[1].pageID);
+                Assert.AreEqual(1, linkAliasList[1].pageId);
                 Assert.AreEqual("a=1", linkAliasList[1].queryStringSuffix);
             }
         }
@@ -153,11 +153,11 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 Assert.AreEqual(2, linkAliasList.Count);
                 //
                 Assert.AreEqual("/test2", linkAliasList[0].name);
-                Assert.AreEqual(1, linkAliasList[0].pageID);
+                Assert.AreEqual(1, linkAliasList[0].pageId);
                 Assert.AreEqual("a=1", linkAliasList[0].queryStringSuffix);
                 //
                 Assert.AreEqual("/test1", linkAliasList[1].name);
-                Assert.AreEqual(1, linkAliasList[1].pageID);
+                Assert.AreEqual(1, linkAliasList[1].pageId);
                 Assert.AreEqual("a=1", linkAliasList[1].queryStringSuffix);
             }
         }

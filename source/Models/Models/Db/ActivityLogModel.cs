@@ -12,10 +12,10 @@ namespace Contensive.Models.Db {
         //====================================================================================================
         //
         public string link { get; set; }
-        public int memberID { get; set; }
+        public int memberId { get; set; }
         public string message { get; set; }
-        public int organizationID { get; set; }
-        public int visitID { get; set; }
-        public int visitorID { get; set; }
+        public int organizationId { get; set; }
+        public int visitId { get; set; }
+        public int visitorId { get; set; }
     }
 }

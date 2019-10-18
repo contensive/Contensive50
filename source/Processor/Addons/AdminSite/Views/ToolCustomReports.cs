@@ -36,7 +36,7 @@ namespace Contensive.Addons.AdminSite {
                 string AdminURL = null;
                 int RowCnt = 0;
                 int RowPtr = 0;
-                int ContentID = 0;
+                int ContentId = 0;
                 string Format = null;
                 //string Filename = null;
                 string Name = null;
@@ -55,7 +55,7 @@ namespace Contensive.Addons.AdminSite {
                 const int ColumnCnt = 4;
                 //
                 Button = core.docProperties.getText(RequestNameButton);
-                ContentID = core.docProperties.getInteger("ContentID");
+                ContentId = core.docProperties.getInteger("ContentID");
                 Format = core.docProperties.getText("Format");
                 //
                 title = "Custom Report Manager";
@@ -257,7 +257,7 @@ namespace Contensive.Addons.AdminSite {
                     LogController.logError(core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
                 } else {
                     var docProperties = new Dictionary<string, string> {
-                                                { "sql", customReport.SQLQuery },
+                                                { "sql", customReport.sqlQuery },
                                                 { "datasource", "default" }
                                             };
                     var cmdDetail = new TaskModel.CmdDetailClass() {

@@ -33,7 +33,7 @@ namespace Contensive.Addons.AdminSite {
                     ButtonListRight = "";
                     Content = Content + AdminUIController.getFormBodyAdminOnly();
                 } else {
-                    int ContentID = core.docProperties.getInteger("ContentID");
+                    int ContentId = core.docProperties.getInteger("ContentID");
                     string Format = core.docProperties.getText("Format");
                     //
                     // Process Requests

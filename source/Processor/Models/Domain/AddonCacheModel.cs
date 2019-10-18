@@ -45,8 +45,8 @@ namespace Contensive.Processor.Models.Domain {
                 add(core, addon);
             }
             foreach (var includeRule in AddonIncludeRuleModel.createList<AddonIncludeRuleModel>(core.cpParent, "", "addonId,includedAddonID")) {
-                if (!dependencyDictionary.ContainsKey(includeRule.addonID)) dependencyDictionary.Add(includeRule.addonID, new List<int>());
-                dependencyDictionary[includeRule.addonID].Add(includeRule.includedAddonID);
+                if (!dependencyDictionary.ContainsKey(includeRule.addonId)) dependencyDictionary.Add(includeRule.addonId, new List<int>());
+                dependencyDictionary[includeRule.addonId].Add(includeRule.includedAddonId);
             }
         }
         //

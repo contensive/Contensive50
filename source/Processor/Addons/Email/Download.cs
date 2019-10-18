@@ -43,10 +43,10 @@ namespace Contensive.Addons.Primitives {
                             LibraryFileLogModel log = LibraryFileLogModel.addEmpty<LibraryFileLogModel>(core.cpParent);
                             if (log != null) {
                                 log.name = DateTime.Now.ToString() + " user [#" + core.session.user.name + ", " + core.session.user.name + "]";
-                                log.fileID = file.id;
-                                log.visitID = core.session.visit.id;
-                                log.memberID = core.session.user.id;
-                                log.FromUrl = core.webServer.requestPageReferer;
+                                log.fileId = file.id;
+                                log.visitId = core.session.visit.id;
+                                log.memberId = core.session.user.id;
+                                log.fromUrl = core.webServer.requestPageReferer;
                                 log.save(core.cpParent);
                             }
                             //

@@ -50,15 +50,15 @@ namespace Contensive.Addons.Diagnostics {
                 //
                 // test default data connection
                 try {
-                    int TrapID = 0;
+                    int TrapId = 0;
                     using (var csData = new CsModel(core)) {
                         if (csData.insert("Trap Log")) {
-                            TrapID = csData.getInteger("ID");
+                            TrapId = csData.getInteger("ID");
                         }
-                        if (TrapID == 0) {
+                        if (TrapId == 0) {
                             return "ERROR, Failed to insert record in default data source.";
                         } else {
-                            MetadataController.deleteContentRecord(core, "Trap Log", TrapID);
+                            MetadataController.deleteContentRecord(core, "Trap Log", TrapId);
                         }
                     }
                 } catch (Exception exDb) {
@@ -93,6 +93,11 @@ namespace Contensive.Addons.Diagnostics {
                 }
                 foreach (var alarmFile in core.programDataFiles.getFileList("Alarms/")) {
                     return "ERROR, Alarm folder is not empty, [" + core.programDataFiles.readFileText("Alarms/" + alarmFile.Name) + "].";
+                }
+                // -- verify the default username=root, password=contensive is not present
+                var rootUserList = PersonModel.createList<PersonModel>(cp, "((username='root')and(password='contensive')and(active>0))");
+                if ( rootUserList.Count>0 ) {
+                    return "ERROR, delete or inactive default user root/contensive.";
                 }
                 return "ok, all server diagnostics passed" + Environment.NewLine + result.ToString();
             } catch (Exception ex) {

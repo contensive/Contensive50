@@ -39,12 +39,12 @@ namespace Contensive.Models.Db.Tests {
                 Assert.AreEqual(true, test_withoutUser.active);
                 Assert.AreEqual(0, test_withoutUser.createdBy);
                 Assert.AreEqual(0, test_withoutUser.modifiedBy);
-                Assert.AreNotEqual(0, test_withoutUser.contentControlID);
+                Assert.AreNotEqual(0, test_withoutUser.contentControlId);
                 //
                 Assert.AreEqual(true, test_withUser.active);
                 Assert.AreEqual(99, test_withUser.createdBy);
                 Assert.AreEqual(99, test_withUser.modifiedBy);
-                Assert.AreNotEqual(0, test_withUser.contentControlID);
+                Assert.AreNotEqual(0, test_withUser.contentControlId);
             }
         }
         //
@@ -93,8 +93,8 @@ namespace Contensive.Models.Db.Tests {
                 Assert.AreEqual(false, test.onPageStartEvent);
                 Assert.AreEqual(false, test.onPageEndEvent);
                 //
-                Assert.AreEqual(1, test.navTypeID);
-                Assert.AreEqual(0, test.scriptingLanguageID);
+                Assert.AreEqual(1, test.navTypeId);
+                Assert.AreEqual(0, test.scriptingLanguageId);
                 //
                 Assert.AreEqual(null, test.processInterval);
                 //

@@ -30,13 +30,13 @@ namespace Contensive.Processor {
         public override bool ForceBrowserMobile {
             get {
                 // FBM==1, sets visit to mobile, FBM==2, sets visit to non-mobile, else mobile determined by browser string
-                return (cp.core.session.visitor.ForceBrowserMobile == 1);
+                return (cp.core.session.visitor.forceBrowserMobile == 1);
             }
             set {
                 if (value) {
-                    cp.core.session.visitor.ForceBrowserMobile = 1;
+                    cp.core.session.visitor.forceBrowserMobile = 1;
                 } else {
-                    cp.core.session.visitor.ForceBrowserMobile = 2;
+                    cp.core.session.visitor.forceBrowserMobile = 2;
                 };
             }
         }
@@ -251,7 +251,7 @@ namespace Contensive.Processor {
         /// </summary>
         public override int UserId {
             get {
-                return cp.core.session.visitor.MemberID;
+                return cp.core.session.visitor.memberId;
             }
         }
         //

@@ -316,7 +316,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // --- Print out the records
                                     while ((csData.ok()) && (RecordPointer < RecordLast)) {
-                                        int RecordID = csData.getInteger("ID");
+                                        int RecordId = csData.getInteger("ID");
                                         if (RowColor == "class=\"ccAdminListRowOdd\"") {
                                             RowColor = "class=\"ccAdminListRowEven\"";
                                         } else {
@@ -326,7 +326,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // --- Edit button column
                                         DataTableRows.Append("<td align=center " + RowColor + ">");
-                                        string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + Constants.AdminActionNop + "&cid=" + adminData.adminContent.id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.titleExtension) + "&ad=" + adminData.ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminData.adminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
+                                        string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + Constants.AdminActionNop + "&cid=" + adminData.adminContent.id + "&id=" + RecordId + "&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.titleExtension) + "&ad=" + adminData.ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminData.adminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
                                         if (adminData.wherePairCount > 0) {
                                             for (int WhereCount = 0; WhereCount < adminData.wherePairCount; WhereCount++) {
                                                 URI = URI + "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[1, WhereCount]);
@@ -340,9 +340,9 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // --- Delete Checkbox Columns
                                         if (AllowDelete) {
-                                            DataTableRows.Append("<td align=center " + RowColor + "><input TYPE=CheckBox NAME=row" + RecordPointer + " VALUE=1 ID=\"DelCheck\"><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>");
+                                            DataTableRows.Append("<td align=center " + RowColor + "><input TYPE=CheckBox NAME=row" + RecordPointer + " VALUE=1 ID=\"DelCheck\"><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordId + "></span></td>");
                                         } else {
-                                            DataTableRows.Append("<td align=center " + RowColor + "><input TYPE=CheckBox disabled=\"disabled\" NAME=row" + RecordPointer + " VALUE=1><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>");
+                                            DataTableRows.Append("<td align=center " + RowColor + "><input TYPE=CheckBox disabled=\"disabled\" NAME=row" + RecordPointer + " VALUE=1><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordId + "></span></td>");
                                         }
                                         //
                                         // --- field columns
@@ -954,7 +954,7 @@ namespace Contensive.Addons.AdminSite {
                             IncludedInColumns = false;
                             break;
                     }
-                    if ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.MemberSelect) || ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Lookup) && (field.lookupContentID != 0))) {
+                    if ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.MemberSelect) || ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Lookup) && (field.lookupContentId != 0))) {
                         //
                         // This is a lookup field -- test if IncludedInLeftJoins
                         IncludedInLeftJoin = IncludedInColumns;
@@ -981,7 +981,7 @@ namespace Contensive.Addons.AdminSite {
                             if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.MemberSelect) {
                                 lookupContentMetadata = ContentMetadataModel.createByUniqueName(core, "people");
                             } else {
-                                lookupContentMetadata = ContentMetadataModel.create(core, field.lookupContentID);
+                                lookupContentMetadata = ContentMetadataModel.create(core, field.lookupContentId);
                             }
                             if (lookupContentMetadata != null) {
                                 FieldUsedInColumns[field.nameLc] = true;
@@ -1021,7 +1021,7 @@ namespace Contensive.Addons.AdminSite {
                                 }
                                 string groupTableAlias = "GroupFilter" + Ptr;
                                 return_SQLWhere += "AND(" + groupTableAlias + ".GroupID=" + GroupID + ")and((" + groupTableAlias + ".dateExpires is null)or(" + groupTableAlias + ".dateExpires>" + sqlRightNow + "))";
-                                return_sqlFrom = "(" + return_sqlFrom + " INNER JOIN ccMemberRules AS GroupFilter" + Ptr + " ON GroupFilter" + Ptr + ".MemberID=ccMembers.ID)";
+                                return_sqlFrom = "(" + return_sqlFrom + " INNER JOIN ccMemberRules AS GroupFilter" + Ptr + " ON GroupFilter" + Ptr + ".memberId=ccMembers.ID)";
                             }
                         }
                     }
@@ -1051,12 +1051,12 @@ namespace Contensive.Addons.AdminSite {
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                 int Pos = GenericController.vbInstr(1, ListSplit[Ptr], ")");
                                 if (Pos > 0) {
-                                    int ContentID = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
-                                    if (ContentID > 0 && (ContentID != adminData.adminContent.id) & AdminDataModel.userHasContentAccess(core, ContentID)) {
-                                        SubQuery = SubQuery + "OR(" + adminData.adminContent.tableName + ".ContentControlID=" + ContentID + ")";
-                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + MetadataController.getContentNameByID(core, ContentID) + "</a>'";
+                                    int ContentId = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
+                                    if (ContentId > 0 && (ContentId != adminData.adminContent.id) & AdminDataModel.userHasContentAccess(core, ContentId)) {
+                                        SubQuery = SubQuery + "OR(" + adminData.adminContent.tableName + ".ContentControlID=" + ContentId + ")";
+                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentId + "\">" + MetadataController.getContentNameByID(core, ContentId) + "</a>'";
                                         string SubContactList = "";
-                                        SubContactList += "," + ContentID;
+                                        SubContactList += "," + ContentId;
                                         SubContentCnt = SubContentCnt + 1;
                                     }
                                 }
@@ -1576,12 +1576,12 @@ namespace Contensive.Addons.AdminSite {
                                 }
                             }
                             if (Ptr == IndexConfig.groupListCnt) {
-                                int RecordID = csData.getInteger("ID");
+                                int RecordId = csData.getInteger("ID");
                                 Caption = csData.getText("Caption");
                                 if (string.IsNullOrEmpty(Caption)) {
                                     Caption = Name;
                                     if (string.IsNullOrEmpty(Caption)) {
-                                        Caption = "Group " + RecordID;
+                                        Caption = "Group " + RecordId;
                                     }
                                 }
                                 if (Caption.Length > 30) {
@@ -1592,7 +1592,7 @@ namespace Contensive.Addons.AdminSite {
                                 if (!string.IsNullOrEmpty(Name.Trim(' '))) {
                                     QS = GenericController.modifyQueryString(QS, "IndexFilterAddGroup", Name, true);
                                 } else {
-                                    QS = GenericController.modifyQueryString(QS, "IndexFilterAddGroup", RecordID.ToString(), true);
+                                    QS = GenericController.modifyQueryString(QS, "IndexFilterAddGroup", RecordId.ToString(), true);
                                 }
                                 Link = "/" + core.appConfig.adminRoute + "?" + QS;
                                 SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";

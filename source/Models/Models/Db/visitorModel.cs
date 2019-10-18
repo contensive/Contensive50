@@ -10,7 +10,7 @@ namespace Contensive.Models.Db {
         public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("visitors", "ccvisitors", "default", false);
         //
         //====================================================================================================
-        public int MemberID { get; set; }
-        public int ForceBrowserMobile { get; set; }
+        public int memberId { get; set; }
+        public int forceBrowserMobile { get; set; }
     }
 }

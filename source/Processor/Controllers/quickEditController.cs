@@ -39,8 +39,8 @@ namespace Contensive.Processor.Controllers {
         internal static string getQuickEditing(CoreController core) {
             string result = "";
             try {
-                int childListSortMethodId = core.doc.pageController.page.childListSortMethodID;
-                int contactMemberID = core.doc.pageController.page.contactMemberID;
+                int childListSortMethodId = core.doc.pageController.page.childListSortMethodId;
+                int contactMemberId = core.doc.pageController.page.contactMemberId;
                 int rootPageId = core.doc.pageController.pageToRootList.Last().id;
                 core.html.addStyleLink("https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/quickEditor/styles.css", "Quick Editor");
                 //
@@ -72,8 +72,8 @@ namespace Contensive.Processor.Controllers {
                 if (userContentPermissions.allowAdd) {
                     leftButtonCommaList = leftButtonCommaList + "," + ButtonAddChildPage;
                 }
-                int page_ParentID = 0;
-                if ((page_ParentID != 0) && userContentPermissions.allowAdd) {
+                int page_ParentId = 0;
+                if ((page_ParentId != 0) && userContentPermissions.allowAdd) {
                     leftButtonCommaList = leftButtonCommaList + "," + ButtonAddSiblingPage;
                 }
                 if (AllowMarkReviewed) {
@@ -92,12 +92,12 @@ namespace Contensive.Processor.Controllers {
                 if (!userContentPermissions.allowSave) {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.tableMetadata.contentName, "", true, true, rootPageId, !userContentPermissions.allowSave, true, PageContentModel.tableMetadata.contentName, false, contactMemberID) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.tableMetadata.contentName, "", true, true, rootPageId, !userContentPermissions.allowSave, true, PageContentModel.tableMetadata.contentName, false, contactMemberId) + "</td>"
                     + "\r</tr>";
                 } else {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.tableMetadata.contentName, "", true, true, rootPageId, !userContentPermissions.allowSave, true, PageContentModel.tableMetadata.contentName, false, contactMemberID) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.tableMetadata.contentName, "", true, true, rootPageId, !userContentPermissions.allowSave, true, PageContentModel.tableMetadata.contentName, false, contactMemberId) + "</td>"
                     + "\r</tr>";
                 }
                 result += "\r<tr>"
@@ -139,7 +139,7 @@ namespace Contensive.Processor.Controllers {
                         recordId = core.doc.pageController.page.id
                     },
                     argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, core.doc.pageController.page.childListInstanceOptions),
-                    instanceGuid = PageChildListInstanceID,
+                    instanceGuid = PageChildListInstanceId,
                     errorContextMessage = "calling child page addon in quick editing editor"
                 };
                 PageList = core.addon.execute(addon, executeContext);

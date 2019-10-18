@@ -240,7 +240,7 @@ namespace Contensive.Processor {
         //
         public override int LanguageID {
             get {
-                return cp.core.session.user.languageID;
+                return cp.core.session.user.languageId;
             }
         }
         //
@@ -309,7 +309,7 @@ namespace Contensive.Processor {
         //
         public override int OrganizationID {
             get {
-                return cp.core.session.user.organizationID;
+                return cp.core.session.user.organizationId;
             }
         }
         //
