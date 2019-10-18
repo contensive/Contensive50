@@ -1270,13 +1270,6 @@ public string Copy { get; set; }
 
 
 
----------------------------------------------
-UserFormResponseModel
-
-
-public string Copy { get; set; }
-public int VisitID { get; set; }
-
 
 
 
