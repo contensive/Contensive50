@@ -98,7 +98,8 @@ if errorlevel 1 (
 )
 rem no local nuget package folder - xcopy "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" "%NuGetLocalPackagesPath%" /Y
 move /y "Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" "%deploymentFolderRoot%%deploymentNumber%\"
-pause
+rem copy this package to the local package source so the next project builds all upgrade the assembly
+xcopy "%deploymentFolderRoot%%deploymentNumber%\Contensive.CPBaseClass.5.1.%deploymentNumber%.nupkg" "%NuGetLocalPackagesPath%" /Y
 cd ..\..\scripts
 
 rem ==============================================================
@@ -107,10 +108,12 @@ rem update models nuget packages
 rem
 
 cd ..\source\Models
-nuget update Models.csproj -noninteractive
+nuget update Models.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesPath%
 cd ..\ModelTests
-nuget update ModelTests.csproj -noninteractive
+nuget update ModelTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesPath%
 cd ..\..\scripts
+
+pause
 
 rem ==============================================================
 rem
@@ -144,6 +147,8 @@ if errorlevel 1 (
 )
 rem xcopy no local nuget package folder - "Contensive.DbModels.5.1.%deploymentNumber%.nupkg" "%NuGetLocalPackagesPath%" /Y
 move /y "Contensive.DbModels.5.1.%deploymentNumber%.nupkg" "%deploymentFolderRoot%%deploymentNumber%\"
+rem copy this package to the local package source so the next project builds all upgrade the assembly
+xcopy "%deploymentFolderRoot%%deploymentNumber%\Contensive.DbModels.5.1.%deploymentNumber%.nupkg" "%NuGetLocalPackagesPath%" /Y
 cd ..\..\scripts
 
 rem ==============================================================
@@ -151,9 +156,9 @@ rem
 rem update processor nuget packages  
 rem
 cd ..\source\Processor
-nuget update Processor.csproj -noninteractive
+nuget update Processor.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesPath%
 cd ..\ProcessorTests
-nuget update ProcessorTests.csproj -noninteractive
+nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesPath%
 cd ..\..\scripts
 
 rem ==============================================================
@@ -185,6 +190,8 @@ if errorlevel 1 (
 )
 rem xcopy no local nuget package folder - "Contensive.Processor.5.1.%deploymentNumber%.nupkg" "%NuGetLocalPackagesPath%" /Y
 move /y "Contensive.Processor.5.1.%deploymentNumber%.nupkg" "%deploymentFolderRoot%%deploymentNumber%\"
+rem copy this package to the local package source so the next project builds all upgrade the assembly
+xcopy "%deploymentFolderRoot%%deploymentNumber%\Contensive.Processor.5.1.%deploymentNumber%.nupkg" "%NuGetLocalPackagesPath%" /Y
 cd ..\..\scripts
 
 rem ==============================================================
@@ -192,9 +199,9 @@ rem
 rem update cli, taskservice nuget packages 
 rem
 cd ..\source\cli
-nuget update cli.csproj -noninteractive
+nuget update cli.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesPath%
 cd ..\taskservice
-nuget update taskservice.csproj -noninteractive
+nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesPath%
 cd ..\..\scripts
 
 rem ==============================================================
@@ -215,7 +222,7 @@ rem
 rem update aspx site nuget packages 
 rem
 cd ..\source\iisdefaultsite
-nuget update iisdefaultsite.vbproj -noninteractive
+nuget update iisdefaultsite.vbproj -noninteractive -source nuget.org -source %NuGetLocalPackagesPath%
 cd ..\..\scripts
 
 rem ==============================================================

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Contensive.CPBaseClass</id>
-    <version>5.1.191004.2</version>
+    <version>5.1.000000.0</version>
     <title>Contensive Addon API Base Classes</title>
     <authors>Contensive</authors>
     <owners>Contensive</owners>
@@ -18,7 +18,11 @@
     <tags></tags>
   </metadata>
     <files>
-        <file src="bin\Debug\CPBase.dll" target="lib\net461\CPBase.dll" />
-		<file src="Install.ps1" target="tools" />
+        <file src="bin\Debug\CPBase.dll" target="lib\net472\CPBase.dll" />
+		  <!-- 
+				need to block copyLocal property when used by add-ons
+				but include it when used by Processor
+		  <file src="Install.ps1" target="tools" /> 
+		  -->
     </files>
 </package>
