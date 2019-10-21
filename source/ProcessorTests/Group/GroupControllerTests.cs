@@ -21,7 +21,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_Group_blank() {
+        public void controllers_Group_blank() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 CoreController core = ((CPClass)cp).core;
@@ -36,7 +36,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_Group_Add_StringString() {
+        public void controllers_Group_Add_StringString() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 CoreController core = ((CPClass)cp).core;
@@ -59,7 +59,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_Group_Add_String() {
+        public void controllers_Group_Add_String() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 CoreController core = ((CPClass)cp).core;
@@ -82,7 +82,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_Group_AddUser_String() {
+        public void controllers_Group_AddUser_String() {
             using (CPClass cp = new CPClass(testAppName)) {
                 //
                 // arrange
@@ -107,7 +107,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_Group_AddUser_Group_Person_Date() {
+        public void controllers_Group_AddUser_Group_Person_Date() {
             using (CPClass cp = new CPClass(testAppName)) {
                 //
                 // arrange

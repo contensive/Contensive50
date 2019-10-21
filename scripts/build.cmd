@@ -113,8 +113,6 @@ cd ..\ModelTests
 nuget update ModelTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesPath%
 cd ..\..\scripts
 
-pause
-
 rem ==============================================================
 rem
 rem build Models

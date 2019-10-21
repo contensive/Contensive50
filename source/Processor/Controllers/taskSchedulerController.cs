@@ -150,18 +150,20 @@ namespace Contensive.Processor.Controllers {
                                 var addonList = DbBaseModel.createList<AddonModel>(cpApp, sqlAddonsCriteria);
                                 foreach (var addon in addonList) {
                                     //
-                                    // -- calculate next run if processInternal is not null and > 0
-                                    DateTime nextRun = DateTime.MinValue;
-                                    if (encodeInteger(addon.processInterval) > 0) {
-                                        nextRun = RightNow.AddMinutes(encodeInteger(addon.processInterval));
+                                    int addonProcessInterval = encodeInteger(addon.processInterval);
+                                    if (addon.processRunOnce)  {
+                                        //
+                                        // -- run once checked 
+                                        addon.processNextRun = RightNow;
+                                        addon.processRunOnce = false;
+                                    } else if ((addon.processNextRun == null) && (addonProcessInterval > 0)) {
+                                        //
+                                        // -- processInterval set but everything else blank )
+                                        addon.processNextRun = RightNow.AddMinutes(addonProcessInterval);
                                     }
-                                    if ((addon.processNextRun < RightNow) || (addon.processRunOnce)) {
+                                    if (addon.processNextRun <= RightNow) {
                                         //
                                         LogController.logInfo(cpApp.core, "scheduleTasks, addon [" + addon.name + "], add task, addonProcessRunOnce [" + addon.processRunOnce + "], addonProcessNextRun [" + addon.processNextRun + "]");
-                                        //
-                                        // -- resolve triggering state
-                                        addon.processRunOnce = false;
-                                        if (addon.processNextRun < RightNow) { addon.processNextRun = nextRun; }
                                         //
                                         // -- add task to queue for runner
                                         addTaskToQueue(cpApp.core, new TaskModel.CmdDetailClass {
@@ -169,12 +171,15 @@ namespace Contensive.Processor.Controllers {
                                             addonName = addon.name,
                                             args = GenericController.convertAddonArgumentstoDocPropertiesList(cpApp.core, addon.argumentList)
                                         }, false);
-                                    } else if (addon.processNextRun == DateTime.MinValue) {
-                                        //
-                                        LogController.logInfo(cpApp.core, "scheduleTasks, addon [" + addon.name + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
-                                        //
-                                        // -- Interval is OK but NextRun is 0, just set next run
-                                        addon.processNextRun = nextRun;
+                                        if (addonProcessInterval > 0) {
+                                            //
+                                            // -- interval set, update the next run
+                                            addon.processNextRun = RightNow.AddMinutes(addonProcessInterval);
+                                        } else {
+                                            //
+                                            // -- no interval, no next run
+                                            addon.processNextRun = null;
+                                        }
                                     }
                                     addon.save(cpApp);
                                 }

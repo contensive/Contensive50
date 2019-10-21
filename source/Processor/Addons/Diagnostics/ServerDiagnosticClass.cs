@@ -7,6 +7,7 @@ using System.IO;
 using Contensive.Processor.Controllers;
 using Contensive.Models.Db;
 using System.Globalization;
+using System.Data;
 //
 namespace Contensive.Addons.Diagnostics {
     //
@@ -50,15 +51,15 @@ namespace Contensive.Addons.Diagnostics {
                 //
                 // test default data connection
                 try {
-                    int TrapId = 0;
                     using (var csData = new CsModel(core)) {
-                        if (csData.insert("Trap Log")) {
-                            TrapId = csData.getInteger("ID");
+                        int recordId = 0;
+                        if (csData.insert("Properties")) {
+                            recordId = csData.getInteger("ID");
                         }
-                        if (TrapId == 0) {
+                        if (recordId == 0) {
                             return "ERROR, Failed to insert record in default data source.";
                         } else {
-                            MetadataController.deleteContentRecord(core, "Trap Log", TrapId);
+                            MetadataController.deleteContentRecord(core, "Properties", recordId);
                         }
                     }
                 } catch (Exception exDb) {
@@ -98,6 +99,44 @@ namespace Contensive.Addons.Diagnostics {
                 var rootUserList = PersonModel.createList<PersonModel>(cp, "((username='root')and(password='contensive')and(active>0))");
                 if ( rootUserList.Count>0 ) {
                     return "ERROR, delete or inactive default user root/contensive.";
+                }
+                //
+                // -- meta data test- lookup field without lookup set
+                string sql = "select c.id as contentid, c.name as contentName, f.* from ccfields f left join ccContent c on c.id = f.LookupContentID where f.Type = 7 and c.id is null and f.LookupContentID > 0 and f.Active > 0 and f.Authorable > 0";
+                using ( DataTable dt = core.db.executeQuery(sql)) {
+                    if ( !dt.Rows.Count.Equals(0)) {
+                        string badFieldList = "";
+                        foreach (DataRow row in dt.Rows) {
+                            badFieldList += "," + row["contentName"].ToString() + "." + row["fieldName"].ToString();
+                        }
+                        return "ERROR, the following field(s) are configured as lookup, but the field's lookup-content is not set [" + badFieldList.Substring(1) + "].";
+                    }
+                }
+                //
+                // -- metadata test - many to many setup
+                sql = "select f.id,f.name as fieldName,f.ManyToManyContentID, f.ManyToManyRuleContentID, f.ManyToManyRulePrimaryField, f.ManyToManyRuleSecondaryField"
+                    + " ,pc.name as primaryContentName"
+                    + " , sc.name as secondaryContentName"
+                    + " , r.name as ruleContentName"
+                    + " , rp.name as PrimaryContentField"
+                    + " , rs.name as SecondaryContentField"
+                    + " from ccfields f"
+                    + " left join cccontent sc on sc.id = f.ManyToManyContentID"
+                    + " left join cccontent pc on pc.id = f.contentid"
+                    + " left join cccontent r on r.id = f.ManyToManyRuleContentID"
+                    + " left join ccfields rp on (rp.name = f.ManyToManyRulePrimaryField)and(rp.ContentID = r.id)"
+                    + " left join ccfields rs on(rs.name = f.ManyToManyRuleSecondaryField)and(rs.ContentID = r.id)"
+                    + " where"
+                    + " (f.type = 14)and(f.Authorable > 0)and(f.active > 0)"
+                    + " and((1 = 0)or(sc.id is null)or(pc.id is null)or(r.id is null)or(rp.id is null)or(rs.id is null))";
+                using (DataTable dt = core.db.executeQuery(sql)) {
+                    if (!dt.Rows.Count.Equals(0)) {
+                        string badFieldList = "";
+                        foreach (DataRow row in dt.Rows) {
+                            badFieldList += "," + row["contentName"].ToString() + "." + row["fieldName"].ToString();
+                        }
+                        return "ERROR, the following field(s) are configured as lookup, but the field's lookup-content is not set [" + badFieldList.Substring(1) + "].";
+                    }
                 }
                 return "ok, all server diagnostics passed" + Environment.NewLine + result.ToString();
             } catch (Exception ex) {
