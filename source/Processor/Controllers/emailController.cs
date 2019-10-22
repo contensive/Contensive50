@@ -348,25 +348,35 @@ namespace Contensive.Processor.Controllers {
         /// <param name="additionalMemberID"></param>
         /// <returns>Admin message if something went wrong (email addresses checked, etc.</returns>
         public static bool queueSystemEmail(CoreController core, string emailName, string appendedCopy, int additionalMemberID, ref string userErrorMessage) {
-            SystemEmailModel email = DbBaseModel.createByUniqueName<SystemEmailModel>(core.cpParent, emailName);
-            if (email == null) {
-                if (emailName.IsNumeric()) {
-                    //
-                    // -- compatibility for really ugly legacy nonsense where old interface has argument "EmailIdOrName".
-                    email = DbBaseModel.create<SystemEmailModel>(core.cpParent, GenericController.encodeInteger(emailName));
+            if (!String.IsNullOrEmpty(emailName))
+            {
+                SystemEmailModel email = DbBaseModel.createByUniqueName<SystemEmailModel>(core.cpParent, emailName);
+                if (email == null)
+                {
+                    if (emailName.IsNumeric())
+                    {
+                        //
+                        // -- compatibility for really ugly legacy nonsense where old interface has argument "EmailIdOrName".
+                        email = DbBaseModel.create<SystemEmailModel>(core.cpParent, GenericController.encodeInteger(emailName));
+                    }
+                    if (email == null)
+                    {
+                        //
+                        // -- create new system email with this name - exposure of possible integer used as name
+                        email = DbBaseModel.addDefault<SystemEmailModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, SystemEmailModel.tableMetadata.contentName));
+                        email.name = emailName;
+                        email.subject = emailName;
+                        email.fromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
+                        email.save(core.cpParent);
+                        LogController.logError(core, new GenericException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
+                    }
                 }
-                if (email == null) {
-                    //
-                    // -- create new system email with this name - exposure of possible integer used as name
-                    email = DbBaseModel.addDefault<SystemEmailModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, SystemEmailModel.tableMetadata.contentName));
-                    email.name = emailName;
-                    email.subject = emailName;
-                    email.fromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
-                    email.save(core.cpParent);
-                    LogController.logError(core, new GenericException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
-                }
+                return queueSystemEmail(core, email, appendedCopy, additionalMemberID, ref userErrorMessage);
             }
-            return queueSystemEmail(core, email, appendedCopy, additionalMemberID, ref userErrorMessage);
+            else
+            {
+                return false;
+            }
         }
         //
         public static bool queueSystemEmail(CoreController core, string emailName, string appendedCopy, int additionalMemberID) {
