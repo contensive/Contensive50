@@ -52,5 +52,9 @@ namespace Contensive.Models.Db {
         /// datetime when the task completes
         /// </summary>
         public DateTime? dateCompleted { get; set; }
+        /// <summary>
+        /// Timeout in sections for the task. zero means no timeout.
+        /// </summary>
+        public int timeout { get; set; }
     }
 }

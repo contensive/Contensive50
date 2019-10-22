@@ -1254,13 +1254,12 @@ namespace Contensive.Processor.Controllers {
                             entryPoint = entryPoint.Substring(0, pos);
                         }
                     }
-                } else {
-                    //
-                    // -- etnry point provided, remove "()" if included and add to code
-                    int pos = entryPoint.IndexOf("(");
-                    if (pos > 0) {
-                        entryPoint = entryPoint.Substring(0, pos);
-                    }
+                }
+                //
+                // -- verify entry point ends in "()"
+                int posClose = entryPoint.IndexOf("(");
+                if (posClose < 0) {
+                    entryPoint = entryPoint.Trim() + "()";
                 }
                 try {
                     mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(core);
@@ -1277,7 +1276,9 @@ namespace Contensive.Processor.Controllers {
                     engine.Execute(WorkingCode);
                     object returnObj = engine.Evaluate(entryPoint);
                     if (returnObj != null) {
-                        returnText = returnObj.ToString();
+                        if (returnObj.GetType() == typeof(String)) {
+                            returnText = (String)returnObj;
+                        }
                     }
                 } catch (Exception ex) {
                     string addonDescription = getAddonDescription(core, addon);

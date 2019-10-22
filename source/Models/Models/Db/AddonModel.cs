@@ -68,6 +68,10 @@ namespace Contensive.Models.Db {
         public FieldTypeCSSFile stylesFilename { get; set; }
         public string stylesLinkHref { get; set; }
         public bool template { get; set; }
+        /// <summary>
+        /// The time in seconds for this addon if run the background
+        /// </summary>
+        public int? processTimeout { get; set; }
         //
         // -- deprecated, but for leave for now and log error
         public string javaScriptBodyEnd { get; set; }
