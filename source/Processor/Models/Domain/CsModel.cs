@@ -1176,6 +1176,13 @@ namespace Contensive.Processor {
                             }
                         }
                         break;
+                    case CPContentBaseClass.FieldTypeIdEnum.Lookup:
+                    //
+                    // -- Lookup, compare the integer value read with the getInteger from the read cache.
+                    if (GenericController.encodeInteger(rawValueForDb) != getInteger(field.nameLc)) {
+                        SetNeeded = true;
+                    }
+                    break;
                     default:
                         //
                         // Set if text of value changes
