@@ -282,7 +282,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
-        public void executeNonQueryAsync(string sql) {
+        public async void executeNonQueryAsync(string sql) {
             try {
                 if (!dbEnabled) { return; }
                 Stopwatch sw = Stopwatch.StartNew();
@@ -292,7 +292,7 @@ namespace Contensive.Processor.Controllers {
                         cmdSQL.CommandType = CommandType.Text;
                         cmdSQL.CommandText = sql;
                         cmdSQL.Connection = connSQL;
-                        cmdSQL.ExecuteNonQueryAsync();
+                        await cmdSQL.ExecuteNonQueryAsync();
                     }
                 }
                 dbVerified = true;
