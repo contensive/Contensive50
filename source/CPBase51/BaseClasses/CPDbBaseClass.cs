@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Specialized;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace Contensive.BaseClasses {
     /// <summary>
@@ -182,10 +183,10 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Execute an sql command on a specific datasource, returning immediately.
+        /// Execute an sql command on a specific datasource, dotnet async task pattern.
         /// </summary>
         /// <param name="sql"></param>
-        public abstract void ExecuteNonQueryAsync(string sql);
+        public abstract Task<int> ExecuteNonQueryAsync(string sql);
         //
         //====================================================================================================
         /// <summary>

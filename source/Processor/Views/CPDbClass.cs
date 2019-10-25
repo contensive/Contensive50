@@ -5,6 +5,7 @@ using Contensive.Processor.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Models;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 
 namespace Contensive.Processor {
     //
@@ -166,8 +167,8 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void ExecuteNonQueryAsync(string sql) {
-            db.executeNonQueryAsync(sql);
+        public override async Task<int> ExecuteNonQueryAsync(string sql) {
+            return await db.executeNonQueryAsync(sql);
         }
         //
         //====================================================================================================

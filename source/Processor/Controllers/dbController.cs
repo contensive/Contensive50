@@ -13,6 +13,7 @@ using Contensive.BaseClasses;
 using Contensive.Models;
 using Contensive.Models.Db;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -57,6 +58,11 @@ namespace Contensive.Processor.Controllers {
         /// above this threshold, queries are logged as slow
         /// </summary>
         public int sqlSlowThreshholdMsec { get; set; } = 1000;
+        //
+        /// <summary>
+        /// above this threshold, queries are logged as slow
+        /// </summary>
+        public int sqlAsyncSlowThreshholdMsec { get; set; } = 10000;
         //
         /// <summary>
         /// timeout in seconds
@@ -282,9 +288,10 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
-        public async void executeNonQueryAsync(string sql) {
+        public async Task<int> executeNonQueryAsync(string sql) {
             try {
-                if (!dbEnabled) { return; }
+                int result = 0;
+                if (!dbEnabled) { return result; }
                 Stopwatch sw = Stopwatch.StartNew();
                 using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET(core.appConfig.name))) {
                     connSQL.Open();
@@ -292,16 +299,17 @@ namespace Contensive.Processor.Controllers {
                         cmdSQL.CommandType = CommandType.Text;
                         cmdSQL.CommandText = sql;
                         cmdSQL.Connection = connSQL;
-                        await cmdSQL.ExecuteNonQueryAsync();
+                        result = await cmdSQL.ExecuteNonQueryAsync();
                     }
                 }
                 dbVerified = true;
-                string logMsg = "duration [" + sw.ElapsedMilliseconds + "ms], recordsAffected [n/a], sql [" + sql.Replace("\r", "").Replace("\n", "") + "]";
-                if (sw.ElapsedMilliseconds > sqlSlowThreshholdMsec) {
+                string logMsg = "async duration [" + sw.ElapsedMilliseconds + "ms], recordsAffected [n/a], sql [" + sql.Replace("\r", "").Replace("\n", "") + "]";
+                if (sw.ElapsedMilliseconds > sqlAsyncSlowThreshholdMsec) {
                     LogController.logWarn(core, "Slow Query " + logMsg);
                 } else {
                     LogController.logDebug(core, logMsg);
                 }
+                return result;
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "]", ex));
                 throw;

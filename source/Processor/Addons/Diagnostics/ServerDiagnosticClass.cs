@@ -107,7 +107,7 @@ namespace Contensive.Addons.Diagnostics {
                     if ( !dt.Rows.Count.Equals(0)) {
                         string badFieldList = "";
                         foreach (DataRow row in dt.Rows) {
-                            badFieldList += "," + row["contentName"].ToString() + "." + row["fieldName"].ToString();
+                            badFieldList += "," + row["contentName"].ToString() + "." + row["name"].ToString();
                         }
                         return "ERROR, the following field(s) are configured as lookup, but the field's lookup-content is not set [" + badFieldList.Substring(1) + "].";
                     }
@@ -133,9 +133,9 @@ namespace Contensive.Addons.Diagnostics {
                     if (!dt.Rows.Count.Equals(0)) {
                         string badFieldList = "";
                         foreach (DataRow row in dt.Rows) {
-                            badFieldList += "," + row["contentName"].ToString() + "." + row["fieldName"].ToString();
+                            badFieldList += "," + row["primaryContentName"].ToString() + "." + row["fieldName"].ToString();
                         }
-                        return "ERROR, the following field(s) are configured as lookup, but the field's lookup-content is not set [" + badFieldList.Substring(1) + "].";
+                        return "ERROR, the following field(s) are configured as many-to-many, but the field's many-to-many metadata is not set [" + badFieldList.Substring(1) + "].";
                     }
                 }
                 return "ok, all server diagnostics passed" + Environment.NewLine + result.ToString();

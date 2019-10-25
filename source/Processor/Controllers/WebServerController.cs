@@ -453,6 +453,7 @@ namespace Contensive.Processor.Controllers {
                     System.Collections.Specialized.NameValueCollection nameValues = iisContext.Request.Headers;
                     for (int i = 0; i < nameValues.Count; i++) {
                         string key = nameValues.GetKey(i);
+                        if (string.IsNullOrWhiteSpace(key)) continue;
                         if (requestHeaders.ContainsKey(key)) { requestForm.Remove(key); }
                         requestHeaders.Add(key, nameValues.Get(i));
                         core.docProperties.setProperty(key, nameValues.Get(i), DocPropertyController.DocPropertyTypesEnum.header);
@@ -464,6 +465,7 @@ namespace Contensive.Processor.Controllers {
                     if (iisContext.Request.QueryString.Count > 0) {
                         requestQueryString = "";
                         foreach (string key in iisContext.Request.QueryString) {
+                            if (string.IsNullOrWhiteSpace(key)) continue;
                             string keyValue = iisContext.Request.QueryString[key];
                             if (requestQuery.ContainsKey(key)) { requestQuery.Remove(key); }
                             requestQuery.Add(key, keyValue);
@@ -476,6 +478,7 @@ namespace Contensive.Processor.Controllers {
                 // -- form
                 {
                     foreach (string key in iisContext.Request.Form.Keys) {
+                        if (string.IsNullOrWhiteSpace(key)) continue;
                         string keyValue = iisContext.Request.Form[key];
                         if (requestForm.ContainsKey(key)) { requestForm.Remove(key); }
                         requestForm.Add(key, keyValue);
@@ -487,14 +490,15 @@ namespace Contensive.Processor.Controllers {
                 {
                     int filePtr = 0;
                     string instanceId = GenericController.getGUIDNaked();
-                    foreach (string formName in iisContext.Request.Files.AllKeys) {
-                        System.Web.HttpPostedFile file = iisContext.Request.Files[formName];
+                    foreach (string key in iisContext.Request.Files.AllKeys) {
+                        if (string.IsNullOrWhiteSpace(key)) continue;
+                        System.Web.HttpPostedFile file = iisContext.Request.Files[key];
                         if (file != null) {
                             if ((file.ContentLength > 0) && (!string.IsNullOrEmpty(file.FileName))) {
                                 DocPropertiesClass prop = new DocPropertiesClass {
-                                    Name = formName,
+                                    Name = key,
                                     Value = file.FileName,
-                                    NameValue = encodeRequestVariable(formName) + "=" + encodeRequestVariable(file.FileName),
+                                    NameValue = encodeRequestVariable(key) + "=" + encodeRequestVariable(file.FileName),
                                     tempfilename = instanceId + "-" + filePtr.ToString() + ".bin",
                                     propertyType = DocPropertyController.DocPropertyTypesEnum.file
                                 };
@@ -502,7 +506,7 @@ namespace Contensive.Processor.Controllers {
                                 file.SaveAs(core.tempFiles.joinPath(core.tempFiles.localAbsRootPath, prop.tempfilename));
                                 core.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename);
                                 prop.FileSize = encodeInteger(file.ContentLength);
-                                core.docProperties.setProperty(formName, prop);
+                                core.docProperties.setProperty(key, prop);
                                 filePtr += 1;
                             }
                         }
@@ -512,6 +516,7 @@ namespace Contensive.Processor.Controllers {
                 // -- cookies
                 {
                     foreach (string key in iisContext.Request.Cookies) {
+                        if (string.IsNullOrWhiteSpace(key)) continue;
                         string keyValue = iisContext.Request.Cookies[key].Value;
                         keyValue = decodeResponseVariable(keyValue);
                         addRequestCookie(key, keyValue);

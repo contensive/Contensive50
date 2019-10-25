@@ -9,7 +9,7 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// table definition
         /// </summary>
-        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("Import Wizard Tasks", "ccImportWizardTasks", "default", false);
+        public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("Import Wizard Tasks", "importWizardTasks", "default", false);
         //
         //====================================================================================================
         //

@@ -1012,13 +1012,20 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Radio. checked when htmlValue=currentValue. Value always included
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="CurrentValue"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="htmlClass"></param>
+        /// <returns></returns>
         public string inputRadio(string htmlName, string htmlValue, string CurrentValue, string htmlId, string htmlClass) {
-            string result = "<input type=radio name=\"" + htmlName + "\"";
-            result += (string.IsNullOrEmpty(htmlValue)) ? "" : " value=\"" + htmlValue + "\"";
+            string result = "<input type=radio name=\"" + htmlName + "\" value=\"" + htmlValue + "\"";
             result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
             result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
-            result += (htmlValue != CurrentValue) ? "" : " checked";
+            result += (htmlValue.ToLower().Equals(CurrentValue.ToLower())) ? " checked" : "";
             return result + ">";
         }
         //
