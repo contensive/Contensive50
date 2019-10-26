@@ -16,7 +16,7 @@ namespace Contensive.Addons.Housekeeping {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="env"></param>
-        public static void summarizeDaily(CoreController core, HouseKeepEnvironmentModel env) {
+        public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 bool NewHour = (env.rightNow.Hour != env.lastCheckDateTime.Hour);
                 if (env.force || NewHour) {

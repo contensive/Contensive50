@@ -8,6 +8,7 @@ using Contensive.Processor.Models.Domain;
 using Microsoft.Web.Administration;
 using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
+using System.Threading.Tasks;
 //
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -559,7 +560,8 @@ namespace Contensive.Processor.Controllers {
                         //
                         SecurityController.TokenData visitToken = SecurityController.decodeToken(core, CookieDetectKey);
                         if (visitToken.id != 0) {
-                            core.db.executeNonQueryAsync("update ccvisits set CookieSupport=1 where id=" + visitToken.id);
+                            string sql = "update ccvisits set CookieSupport=1 where id=" + visitToken.id;
+                            Task.Run(() => core.db.executeNonQueryAsync(sql));
                             core.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
                             return core.doc.continueProcessing;
                         }
@@ -961,7 +963,9 @@ namespace Contensive.Processor.Controllers {
                         //
                         LogController.addSiteWarning(core, "Page Not Found Redirect", "Page Not Found Redirect", "", 0, "Page Not Found Redirect [" + requestUrlSource + "]", "Page Not Found Redirect", "Page Not Found Redirect");
                         if (!string.IsNullOrEmpty(ShortLink)) {
-                            core.db.executeNonQueryAsync("Update ccContentWatch set link=null where link=" + DbController.encodeSQLText(ShortLink));
+                            //core.db.executeNonQueryAsync("Update ccContentWatch set link=null where link=" + DbController.encodeSQLText(ShortLink));
+                            string sql = "Update ccContentWatch set link=null where link=" + DbController.encodeSQLText(ShortLink);
+                            Task.Run(() => core.db.executeNonQueryAsync(sql));
                         }
                         //
                         if (allowDebugMessage && core.doc.visitPropertyAllowDebugging) {

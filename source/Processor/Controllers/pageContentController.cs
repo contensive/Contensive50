@@ -12,6 +12,7 @@ using static Contensive.Processor.Constants;
 using System.Text;
 using Contensive.Processor.Models.Domain;
 using Contensive.Models.Db;
+using System.Threading.Tasks;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -231,7 +232,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     string linkAliasTest2 = linkAliasTest1 + "/";
-                    string Sql = "";
+                    string sql = "";
                     if ((!IsPageNotFound) && (core.webServer.requestPathPage != "")) {
                         //
                         // build link variations needed later
@@ -277,9 +278,9 @@ namespace Contensive.Processor.Controllers {
                             + "or(SourceLink=" + DbController.encodeSQLText(LinkFullPath) + ")"
                             + "or(SourceLink=" + DbController.encodeSQLText(LinkFullPathNoSlash) + ")"
                             + ")";
-                        Sql = core.db.getSQLSelect("ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", "", 1);
+                        sql = core.db.getSQLSelect("ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", "", 1);
                         using (var csData = new CsModel(core)) {
-                            csData.openSql(Sql);
+                            csData.openSql(sql);
                             if (csData.ok()) {
                                 //
                                 // Link Forward found - update count
@@ -290,8 +291,8 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 IsInLinkForwardTable = true;
                                 int Viewings = csData.getInteger("Viewings") + 1;
-                                Sql = "update ccLinkForwards set Viewings=" + Viewings + " where ID=" + csData.getInteger("ID");
-                                core.db.executeNonQueryAsync(Sql);
+                                sql = "update ccLinkForwards set Viewings=" + Viewings + " where ID=" + csData.getInteger("ID");
+                                Task.Run(() => core.db.executeNonQueryAsync(sql));
                                 tmpLink = csData.getText("DestinationLink");
                                 if (!string.IsNullOrEmpty(tmpLink)) {
                                     //
@@ -422,8 +423,8 @@ namespace Contensive.Processor.Controllers {
                     // -- if endpoint is just domain -> the template is automatically compatible by default (domain determined the landing page)
                     // -- if endpoint is domain + route (link alias), the route determines the page, which may determine the core.doc.pageController.template. If this template is not allowed for this domain, redirect to the domain's landingcore.doc.pageController.page.
                     //
-                    Sql = "(domainId=" + core.doc.domain.id + ")";
-                    List<TemplateDomainRuleModel> allowTemplateRuleList = DbBaseModel.createList<TemplateDomainRuleModel>(core.cpParent, Sql);
+                    sql = "(domainId=" + core.doc.domain.id + ")";
+                    List<TemplateDomainRuleModel> allowTemplateRuleList = DbBaseModel.createList<TemplateDomainRuleModel>(core.cpParent, sql);
                     if (allowTemplateRuleList.Count == 0) {
                         //
                         // -- current template has no domain preference, use current

@@ -12,6 +12,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using Contensive.Models;
 using System.Collections.Specialized;
 using System.Globalization;
+using System.Threading.Tasks;
 //
 namespace Contensive.Processor {
     //
@@ -1447,11 +1448,11 @@ namespace Contensive.Processor {
                         // ----- update live table (non-workflowauthoring and non-authorable fields)
                         //
                         if (!string.IsNullOrEmpty(sqlUpdate)) {
-                            string SQLUpdate = "update " + this.contentMeta.tableName + " set " + sqlUpdate + " where id=" + id + ";";
+                            string sql = "update " + this.contentMeta.tableName + " set " + sqlUpdate + " where id=" + id + ";";
                             if (asyncSave) {
-                                db.executeNonQueryAsync(SQLUpdate);
+                                Task.Run(() => db.executeNonQueryAsync(sql));
                             } else {
-                                db.executeNonQuery(SQLUpdate);
+                                db.executeNonQuery(sql);
                             }
                             //
                             // -- invalidate the special cache name used to detect a change in any record

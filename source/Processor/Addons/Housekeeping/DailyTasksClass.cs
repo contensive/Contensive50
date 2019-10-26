@@ -39,10 +39,13 @@ namespace Contensive.Addons.Housekeeping {
                 VisitorPropertyClass.housekeep(core);
                 //
                 // -- visits, visitors, viewings
-                VisitSummaryClass.summarizeDaily(core, env);
                 VisitClass.housekeep(core, env);
                 VisitorClass.housekeep(core, env);
                 ViewingsClass.housekeep(core, env);
+                //
+                // -- summary
+                VisitSummaryClass.housekeep(core, env);
+                ViewingSummaryClass.housekeep(core, env);
                 //
                 // -- logs
                 ActivityLogClass.housekeep(core, env);

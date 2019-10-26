@@ -12,6 +12,7 @@ using System.Security.Policy;
 using NLog;
 using Contensive.Models.Db;
 using Contensive.BaseModels;
+using System.Threading.Tasks;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -864,7 +865,7 @@ namespace Contensive.Processor.Controllers {
                                     if (!doc.htmlMetaContent_TitleList.Count.Equals(0)) {
                                         pagetitle = doc.htmlMetaContent_TitleList[0].content;
                                     }
-                                    string SQL = "insert into ccviewings ("
+                                    string sql = "insert into ccviewings ("
                                         + "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,pagetime,Active,RecordID,ExcludeFromAnalytics,pagetitle"
                                         + ")values("
                                         + " " + DbController.encodeSQLText(ViewingName)
@@ -883,8 +884,8 @@ namespace Contensive.Processor.Controllers {
                                         + "," + PageId.ToString()
                                         + "," + DbController.encodeSQLBoolean(webServer.pageExcludeFromAnalytics)
                                         + "," + DbController.encodeSQLText(pagetitle);
-                                    SQL += ");";
-                                    db.executeNonQueryAsync(SQL);
+                                    sql += ");";
+                                    Task.Run(() => db.executeNonQueryAsync(sql));
                                 }
                             }
                         }

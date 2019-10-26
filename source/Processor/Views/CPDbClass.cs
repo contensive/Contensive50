@@ -388,7 +388,7 @@ namespace Contensive.Processor {
         //
         [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override void ExecuteNonQueryAsync(string sql, string ignoreDataSourceName) {
-            db.executeNonQueryAsync(sql);
+            Task.Run(() => cp.core.db.executeNonQueryAsync(sql));
         }
         //
         [Obsolete("Deprecated. Use methods with FieldTypeIdEnum.", false)]
