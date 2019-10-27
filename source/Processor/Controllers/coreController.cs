@@ -742,7 +742,7 @@ namespace Contensive.Processor.Controllers {
             Assembly myAssembly = Assembly.GetAssembly(myType);
             AssemblyName myAssemblyname = myAssembly.GetName();
             Version myVersion = myAssemblyname.Version;
-            return myVersion.Major.ToString("0") + "." + myVersion.Minor.ToString("00") + "." + myVersion.Build.ToString("00000000");
+            return myVersion.Major.ToString("0") + "." + myVersion.Minor.ToString("00") + "." + myVersion.Build.ToString("0000") + "." + myVersion.Revision.ToString("00");
         }
         //
         //====================================================================================================
