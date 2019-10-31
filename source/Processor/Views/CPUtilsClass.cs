@@ -168,14 +168,94 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string ModifyLinkQueryString(string Link, string QueryName, string QueryValue, bool AddIfMissing = true) {
-            return GenericController.modifyLinkQuery(Link, QueryName, QueryValue, AddIfMissing);
+        //public override string ModifyLinkQueryString(string Link, string QueryName, string QueryValue, bool AddIfMissing = true) {
+        //    return GenericController.modifyLinkQuery(Link, QueryName, QueryValue, AddIfMissing);
+        //}
+        //
+        public override string ModifyLinkQueryString(string url, string key, string value, bool addIfMissing) {
+            return GenericController.modifyLinkQuery(url, key, value, addIfMissing);
         }
-        //
-        // ====================================================================================================
-        //
-        public override string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true) {
+
+        public override string ModifyLinkQueryString(string url, string key, string value) {
+            return GenericController.modifyLinkQuery(url, key, value, true);
+        }
+
+        public override string ModifyLinkQueryString(string url, string key, int value) {
+            return GenericController.modifyLinkQuery(url, key, value.ToString(), true);
+        }
+
+        public override string ModifyLinkQueryString(string url, string key, int value, bool addIfMissing) {
+            return GenericController.modifyLinkQuery(url, key, value.ToString(), addIfMissing);
+        }
+
+        public override string ModifyLinkQueryString(string url, string key, double value) {
+            return GenericController.modifyLinkQuery(url, key, value.ToString(), true);
+        }
+
+        public override string ModifyLinkQueryString(string url, string key, double value, bool addIfMissing) {
+            return GenericController.modifyLinkQuery(url, key, value.ToString(), addIfMissing);
+        }
+
+        public override string ModifyLinkQueryString(string url, string key, bool value) {
+            return GenericController.modifyLinkQuery(url, key, value.ToString(), true);
+        }
+
+        public override string ModifyLinkQueryString(string url, string key, bool value, bool addIfMissing) {
+            return GenericController.modifyLinkQuery(url, key, value.ToString(), addIfMissing);
+        }
+
+        public override string ModifyLinkQueryString(string url, string key, DateTime value) {
+            return GenericController.modifyLinkQuery(url, key, value.ToString(), true);
+        }
+
+        public override string ModifyLinkQueryString(string url, string key, DateTime value, bool addIfMissing) {
+            return GenericController.modifyLinkQuery(url, key, value.ToString(), addIfMissing);
+        }
+        ////
+        //// ====================================================================================================
+        ////
+        //public override string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true) {
+        //    return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing);
+        //}
+
+        public override string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing) {
             return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing);
+        }
+
+        public override string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue) {
+            return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue, true);
+        }
+
+        public override string ModifyQueryString(string WorkingQuery, string QueryName, int QueryValue) {
+            return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue, true);
+        }
+
+        public override string ModifyQueryString(string WorkingQuery, string QueryName, int QueryValue, bool AddIfMissing) {
+            return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing);
+        }
+
+        public override string ModifyQueryString(string WorkingQuery, string QueryName, double QueryValue) {
+            return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue.ToString(), true);
+        }
+
+        public override string ModifyQueryString(string WorkingQuery, string QueryName, double QueryValue, bool AddIfMissing) {
+            return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue.ToString(), AddIfMissing);
+        }
+
+        public override string ModifyQueryString(string WorkingQuery, string QueryName, bool QueryValue) {
+            return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue, true);
+        }
+
+        public override string ModifyQueryString(string WorkingQuery, string QueryName, bool QueryValue, bool AddIfMissing) {
+            return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing);
+        }
+
+        public override string ModifyQueryString(string WorkingQuery, string QueryName, DateTime QueryValue) {
+            return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue.ToString(), true);
+        }
+
+        public override string ModifyQueryString(string WorkingQuery, string QueryName, DateTime QueryValue, bool AddIfMissing) {
+            return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue.ToString(), AddIfMissing);
         }
         //
         // ====================================================================================================

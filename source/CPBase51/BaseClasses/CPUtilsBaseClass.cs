@@ -360,7 +360,25 @@ namespace Contensive.BaseClasses {
         /// <param name="value"></param>
         /// <param name="addIfMissing"></param>
         /// <returns></returns>
-        public abstract string ModifyLinkQueryString(string url, string key, string value, bool addIfMissing = true);
+        public abstract string ModifyLinkQueryString(string url, string key, string value);
+        //
+        public abstract string ModifyLinkQueryString(string url, string key, string value, bool addIfMissing);
+        //
+        public abstract string ModifyLinkQueryString(string url, string key, int value);
+        //
+        public abstract string ModifyLinkQueryString(string url, string key, int value, bool addIfMissing);
+        //
+        public abstract string ModifyLinkQueryString(string url, string key, double value);
+        //
+        public abstract string ModifyLinkQueryString(string url, string key, double value, bool addIfMissing);
+        //
+        public abstract string ModifyLinkQueryString(string url, string key, bool value);
+        //
+        public abstract string ModifyLinkQueryString(string url, string key, bool value, bool addIfMissing);
+        //
+        public abstract string ModifyLinkQueryString(string url, string key, DateTime value);
+        //
+        public abstract string ModifyLinkQueryString(string url, string key, DateTime value, bool addIfMissing);
         //
         //====================================================================================================
         /// <summary>
@@ -371,7 +389,25 @@ namespace Contensive.BaseClasses {
         /// <param name="QueryValue"></param>
         /// <param name="AddIfMissing"></param>
         /// <returns></returns>
-        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true);
+        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue);
+        //
+        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing);
+        //
+        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, int QueryValue);
+        //
+        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, int QueryValue, bool AddIfMissing);
+        //
+        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, double QueryValue);
+        //
+        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, double QueryValue, bool AddIfMissing);
+        //
+        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, bool QueryValue);
+        //
+        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, bool QueryValue, bool AddIfMissing);
+        //
+        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, DateTime QueryValue);
+        //
+        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, DateTime QueryValue, bool AddIfMissing);
         //
         //====================================================================================================
         /// <summary>

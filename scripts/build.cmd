@@ -215,6 +215,9 @@ rem
 rem build cli and task server 
 rem
 cd ..\source
+copy "cli\properties\assemblyinfo-src.cs" "cli\properties\assemblyinfo.cs"
+cscript ..\scripts\replace.vbs "cli\properties\assemblyinfo.cs" "0.0.0.0" "%versionNumber%"
+
 "%msbuildLocation%msbuild.exe" contensiveCli.sln
 if errorlevel 1 (
    echo failure building processor.dll

@@ -179,6 +179,12 @@ namespace Contensive.BaseClasses {
         public abstract string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria);
         public abstract string SelectContent(string htmlName, string htmlValue, string contentName);
         //
+        public abstract string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass, string htmlId);
+        public abstract string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass);
+        public abstract string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption);
+        public abstract string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria);
+        public abstract string SelectContent(string htmlName, int htmlValue, string contentName);
+        //
         public abstract string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption, string htmlClass, string htmlId);
         public abstract string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption, string htmlClass);
         public abstract string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption);

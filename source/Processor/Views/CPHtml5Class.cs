@@ -337,6 +337,23 @@ namespace Contensive.Processor {
         public override string SelectContent(string htmlName, string htmlValue, string contentName)
             => SelectContent(htmlName, htmlValue, contentName, "", "", "", "");
         //
+        //
+        //
+        public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass, string htmlId)
+            => SelectContent(htmlName, htmlValue.ToString(), contentName, sqlCriteria, noneCaption, htmlClass, htmlId);
+        //
+        public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass)
+            => SelectContent(htmlName, htmlValue.ToString(), contentName, sqlCriteria, noneCaption, htmlClass, "");
+        //
+        public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption)
+            => SelectContent(htmlName, htmlValue.ToString(), contentName, sqlCriteria, noneCaption, "", "");
+        //
+        public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria)
+            => SelectContent(htmlName, htmlValue.ToString(), contentName, sqlCriteria, "", "", "");
+        //
+        public override string SelectContent(string htmlName, int htmlValue, string contentName)
+            => SelectContent(htmlName, htmlValue.ToString(), contentName, "", "", "", "");
+        //
         // ==========================================================================================
         //
         public override string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption, string htmlClass, string htmlId) {

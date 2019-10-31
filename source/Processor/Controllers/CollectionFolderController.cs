@@ -285,8 +285,9 @@ namespace Contensive.Processor.Controllers {
                                 break;
                             }
                             //
-                            // If the collection parsed correctly, update the Collections.xml file
+                            // If the collection parsed correctly, update the Collections.xml file and exit loop
                             updateCollectionFolderConfig(core, Collectionname, collectionGuid, CollectionLastChangeDate, CollectionVersionFolderName);
+                            break;
                         }
                         if (!string.IsNullOrEmpty(return_ErrorMessage)) {
                             //
