@@ -68,65 +68,67 @@ namespace Contensive.Processor.Controllers {
                     context.Push("NewAppController.upgrade call installbasecollection, repair [" + repair.ToString() + "]");
                     CollectionInstallController.installBaseCollection(core, context, isNewBuild, repair, ref nonCriticalErrorList, logPrefix);
                     //
-                    // -- verify iis configuration
-                    LogController.logInfo(core, logPrefix + ", verify iis configuration");
-                    Controllers.WebServerController.verifySite(core, core.appConfig.name, primaryDomain, core.appConfig.localWwwPath, "default.aspx");
-                    //
-                    // -- verify root developer
-                    LogController.logInfo(core, logPrefix + ", verify developer user");
-                    var root = DbBaseModel.create<PersonModel>(core.cpParent, defaultRootUserGuid);
-                    if (root == null) {
-                        LogController.logInfo(core, logPrefix + ", root user guid not found, test for root username");
-                        var rootList = DbBaseModel.createList<PersonModel>(core.cpParent, "(username='root')");
-                        if (rootList.Count > 0) {
-                            LogController.logInfo(core, logPrefix + ", root username found");
-                            root = rootList.First();
-                        }
-                    }
-                    if (root == null) {
-                        LogController.logInfo(core, logPrefix + ", root user not found, adding root/contensive");
-                        root = DbBaseModel.addEmpty<PersonModel>(core.cpParent);
-                        root.name = defaultRootUserName;
-                        root.firstName = defaultRootUserName;
-                        root.username = defaultRootUserUsername;
-                        root.password = defaultRootUserPassword;
-                        root.developer = true;
-                        root.contentControlId = ContentMetadataModel.getContentId(core, "people");
-                        try {
-                            root.save(core.cpParent);
-                        } catch (Exception) {
-                            LogController.logInfo(core, logPrefix + ", error prevented root user update");
-                        }
-                    }
-                    //
-                    // -- verify site managers group
-                    LogController.logInfo(core, logPrefix + ", verify site managers groups");
-                    var group = DbBaseModel.create<GroupModel>(core.cpParent, defaultSiteManagerGuid);
-                    if (group == null) {
-                        LogController.logInfo(core, logPrefix + ", verify site manager group");
-                        group = DbBaseModel.addEmpty<GroupModel>(core.cpParent);
-                        group.name = defaultSiteManagerName;
-                        group.caption = defaultSiteManagerName;
-                        group.allowBulkEmail = true;
-                        group.ccguid = defaultSiteManagerGuid;
-                        try {
-                            group.save(core.cpParent);
-                        } catch (Exception) {
-                            LogController.logInfo(core, logPrefix + ", error creating site managers group");
-                        }
-                    }
-                    if ((root != null) && (group != null)) {
-                        //
-                        // -- verify root is in site managers
-                        var memberRuleList = DbBaseModel.createList<MemberRuleModel>(core.cpParent, "(groupid=" + group.id.ToString() + ")and(MemberID=" + root.id.ToString() + ")");
-                        if (memberRuleList.Count() == 0) {
-                            var memberRule = DbBaseModel.addEmpty<MemberRuleModel>(core.cpParent);
-                            memberRule.groupId = group.id;
-                            memberRule.memberId = root.id;
-                            memberRule.save(core.cpParent);
-                        }
-                    }
+                    // -- upgrade work only for the first build, not upgrades of version 5+
                     if (isNewBuild) {
+                        //
+                        // -- verify iis configuration
+                        LogController.logInfo(core, logPrefix + ", verify iis configuration");
+                        Controllers.WebServerController.verifySite(core, core.appConfig.name, primaryDomain, core.appConfig.localWwwPath, "default.aspx");
+                        //
+                        // -- verify root developer
+                        LogController.logInfo(core, logPrefix + ", verify developer user");
+                        var root = DbBaseModel.create<PersonModel>(core.cpParent, defaultRootUserGuid);
+                        if (root == null) {
+                            LogController.logInfo(core, logPrefix + ", root user guid not found, test for root username");
+                            var rootList = DbBaseModel.createList<PersonModel>(core.cpParent, "(username='root')");
+                            if (rootList.Count > 0) {
+                                LogController.logInfo(core, logPrefix + ", root username found");
+                                root = rootList.First();
+                            }
+                        }
+                        if (root == null) {
+                            LogController.logInfo(core, logPrefix + ", root user not found, adding root/contensive");
+                            root = DbBaseModel.addEmpty<PersonModel>(core.cpParent);
+                            root.name = defaultRootUserName;
+                            root.firstName = defaultRootUserName;
+                            root.username = defaultRootUserUsername;
+                            root.password = defaultRootUserPassword;
+                            root.developer = true;
+                            root.contentControlId = ContentMetadataModel.getContentId(core, "people");
+                            try {
+                                root.save(core.cpParent);
+                            } catch (Exception) {
+                                LogController.logInfo(core, logPrefix + ", error prevented root user update");
+                            }
+                        }
+                        //
+                        // -- verify site managers group
+                        LogController.logInfo(core, logPrefix + ", verify site managers groups");
+                        var group = DbBaseModel.create<GroupModel>(core.cpParent, defaultSiteManagerGuid);
+                        if (group == null) {
+                            LogController.logInfo(core, logPrefix + ", verify site manager group");
+                            group = DbBaseModel.addEmpty<GroupModel>(core.cpParent);
+                            group.name = defaultSiteManagerName;
+                            group.caption = defaultSiteManagerName;
+                            group.allowBulkEmail = true;
+                            group.ccguid = defaultSiteManagerGuid;
+                            try {
+                                group.save(core.cpParent);
+                            } catch (Exception) {
+                                LogController.logInfo(core, logPrefix + ", error creating site managers group");
+                            }
+                        }
+                        if ((root != null) && (group != null)) {
+                            //
+                            // -- verify root is in site managers
+                            var memberRuleList = DbBaseModel.createList<MemberRuleModel>(core.cpParent, "(groupid=" + group.id.ToString() + ")and(MemberID=" + root.id.ToString() + ")");
+                            if (memberRuleList.Count() == 0) {
+                                var memberRule = DbBaseModel.addEmpty<MemberRuleModel>(core.cpParent);
+                                memberRule.groupId = group.id;
+                                memberRule.memberId = root.id;
+                                memberRule.save(core.cpParent);
+                            }
+                        }
                         //
                         // -- set build version so a scratch build will not go through data conversion
                         DataBuildVersion = core.codeVersion();

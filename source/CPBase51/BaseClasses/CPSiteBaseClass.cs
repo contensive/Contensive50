@@ -246,8 +246,9 @@ namespace Contensive.BaseClasses {
         [Obsolete("Deprecated.", false)]
         public abstract bool IsTesting();
         //
-        [Obsolete("Use uppercase method", false)]
-        public abstract void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "");
+        // removed because VB doesnt see upper/lowecase. 2 replacement methods cover both cases, and case will be corrected in C#
+        //[Obsolete("Use uppercase method", false)]
+        //public abstract void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "");
         //
         [Obsolete("Use CP.Utils.ExportCsv()", false)]
         public abstract void RequestTask(string command, string SQL, string exportName, string filename);

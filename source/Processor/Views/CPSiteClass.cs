@@ -201,9 +201,9 @@ namespace Contensive.Processor {
         //====================================================================================================
         // Deprecated
         //
-        //
-        [Obsolete("Use AddLinkAlias()", false)]
-        public override void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "") => LinkAliasController.addLinkAlias(cp.core, linkAlias, pageId, queryStringSuffix);
+        // - removed because two new methods (without optional) replace this. They are uppercase
+        //[Obsolete("Use AddLinkAlias()", false)]
+        //public override void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "") => LinkAliasController.addLinkAlias(cp.core, linkAlias, pageId, queryStringSuffix);
         //
         [Obsolete("Deprecated.", false)]
         public override bool MultiDomainMode { get { return false; } }
