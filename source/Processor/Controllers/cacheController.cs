@@ -173,8 +173,14 @@ namespace Contensive.Processor.Controllers {
                         result = default(TData);
                     } else {
                         //
-                        // -- all worked
-                        result = (TData)cacheDocument.content;
+                        // -- all worked, but if the class is unavailable let it return default like a miss
+                        try {
+                            result = (TData)cacheDocument.content;
+                        } catch (Exception ex) {
+                            //
+                            // -- object value did not match. return as miss
+                            LogController.logWarn(core, "cache getObject failed to cast value as type, key [" + key + "], type requested [" +  typeof(TData).FullName + "], ex [" + ex.ToString() + "]");
+                        }
                     }
                 }
                 return result;

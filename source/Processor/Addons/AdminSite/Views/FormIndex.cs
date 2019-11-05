@@ -67,14 +67,14 @@ namespace Contensive.Addons.AdminSite {
                     if (SubForm != 0) {
                         switch (SubForm) {
                             case AdminFormIndex_SubFormExport:
-                                Copy = FormIndexExport.get(core, adminData);
-                                break;
+                            Copy = FormIndexExport.get(core, adminData);
+                            break;
                             case AdminFormIndex_SubFormSetColumns:
-                                Copy = FormIndexSetColumnsClass.get(cp, core, adminData);
-                                break;
+                            Copy = FormIndexSetColumnsClass.get(cp, core, adminData);
+                            break;
                             case AdminFormIndex_SubFormAdvancedSearch:
-                                Copy = FormIndexAdvancedSearchClass.get(cp, core, adminData);
-                                break;
+                            Copy = FormIndexAdvancedSearchClass.get(cp, core, adminData);
+                            break;
                         }
                     }
                     Stream.Add(Copy);
@@ -258,13 +258,13 @@ namespace Contensive.Addons.AdminSite {
                                 } else {
                                     switch (IndexConfig.sorts[FieldName].direction) {
                                         case 1:
-                                            ButtonHref += "&SetSortDirection=2";
-                                            break;
+                                        ButtonHref += "&SetSortDirection=2";
+                                        break;
                                         case 2:
-                                            ButtonHref += "&SetSortDirection=0";
-                                            break;
+                                        ButtonHref += "&SetSortDirection=0";
+                                        break;
                                         default:
-                                            break;
+                                        break;
                                     }
                                 }
                                 //
@@ -286,13 +286,13 @@ namespace Contensive.Addons.AdminSite {
                                     string sortSuffix = ((IndexConfig.sorts.Count < 2) ? "" : IndexConfig.sorts[FieldName].order.ToString());
                                     switch (IndexConfig.sorts[FieldName].direction) {
                                         case 1:
-                                            ButtonFace = iconArrowDown + sortSuffix + "&nbsp;" + ButtonFace;
-                                            SortTitle = "Sort Z-A";
-                                            break;
+                                        ButtonFace = iconArrowDown + sortSuffix + "&nbsp;" + ButtonFace;
+                                        SortTitle = "Sort Z-A";
+                                        break;
                                         case 2:
-                                            ButtonFace = iconArrowUp + sortSuffix + "&nbsp;" + ButtonFace;
-                                            SortTitle = "Remove Sort";
-                                            break;
+                                        ButtonFace = iconArrowUp + sortSuffix + "&nbsp;" + ButtonFace;
+                                        SortTitle = "Remove Sort";
+                                        break;
                                     }
                                 }
                                 //ButtonObject = "Button" + ButtonObjectCount;
@@ -510,29 +510,29 @@ namespace Contensive.Addons.AdminSite {
                         string FieldCaption = fieldMeta.caption;
                         switch (findWord.MatchOption) {
                             case FindWordMatchEnum.MatchEmpty:
-                                filterLine += ", " + FieldCaption + " is empty";
-                                break;
+                            filterLine += ", " + FieldCaption + " is empty";
+                            break;
                             case FindWordMatchEnum.MatchEquals:
-                                filterLine += ", " + FieldCaption + " = '" + findWord.Value + "'";
-                                break;
+                            filterLine += ", " + FieldCaption + " = '" + findWord.Value + "'";
+                            break;
                             case FindWordMatchEnum.MatchFalse:
-                                filterLine += ", " + FieldCaption + " is false";
-                                break;
+                            filterLine += ", " + FieldCaption + " is false";
+                            break;
                             case FindWordMatchEnum.MatchGreaterThan:
-                                filterLine += ", " + FieldCaption + " &gt; '" + findWord.Value + "'";
-                                break;
+                            filterLine += ", " + FieldCaption + " &gt; '" + findWord.Value + "'";
+                            break;
                             case FindWordMatchEnum.matchincludes:
-                                filterLine += ", " + FieldCaption + " includes '" + findWord.Value + "'";
-                                break;
+                            filterLine += ", " + FieldCaption + " includes '" + findWord.Value + "'";
+                            break;
                             case FindWordMatchEnum.MatchLessThan:
-                                filterLine += ", " + FieldCaption + " &lt; '" + findWord.Value + "'";
-                                break;
+                            filterLine += ", " + FieldCaption + " &lt; '" + findWord.Value + "'";
+                            break;
                             case FindWordMatchEnum.MatchNotEmpty:
-                                filterLine += ", " + FieldCaption + " is not empty";
-                                break;
+                            filterLine += ", " + FieldCaption + " is not empty";
+                            break;
                             case FindWordMatchEnum.MatchTrue:
-                                filterLine += ", " + FieldCaption + " is true";
-                                break;
+                            filterLine += ", " + FieldCaption + " is true";
+                            break;
                         }
 
                     }
@@ -659,87 +659,87 @@ namespace Contensive.Addons.AdminSite {
                     if (!string.IsNullOrEmpty(Button)) {
                         switch (adminData.requestButton) {
                             case ButtonFirst:
-                                //
-                                // Force to first page
-                                //
-                                IndexConfig.pageNumber = 1;
-                                IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
-                                break;
+                            //
+                            // Force to first page
+                            //
+                            IndexConfig.pageNumber = 1;
+                            IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
+                            break;
                             case ButtonNext:
-                                //
-                                // Go to next page
-                                //
-                                IndexConfig.pageNumber = IndexConfig.pageNumber + 1;
-                                IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
-                                break;
+                            //
+                            // Go to next page
+                            //
+                            IndexConfig.pageNumber = IndexConfig.pageNumber + 1;
+                            IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
+                            break;
                             case ButtonPrevious:
-                                //
-                                // Go to previous page
-                                //
-                                IndexConfig.pageNumber = IndexConfig.pageNumber - 1;
-                                if (IndexConfig.pageNumber <= 0) {
-                                    IndexConfig.pageNumber = 1;
-                                }
-                                IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
-                                break;
-                            case ButtonFind:
-                                //
-                                // Find (change search criteria and go to first page)
-                                //
+                            //
+                            // Go to previous page
+                            //
+                            IndexConfig.pageNumber = IndexConfig.pageNumber - 1;
+                            if (IndexConfig.pageNumber <= 0) {
                                 IndexConfig.pageNumber = 1;
-                                IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
-                                ColumnCnt = core.docProperties.getInteger("ColumnCnt");
-                                if (ColumnCnt > 0) {
-                                    for (ColumnPtr = 0; ColumnPtr < ColumnCnt; ColumnPtr++) {
-                                        FindName = core.docProperties.getText("FindName" + ColumnPtr).ToLowerInvariant();
-                                        if (!string.IsNullOrEmpty(FindName)) {
-                                            if (adminData.adminContent.fields.ContainsKey(FindName.ToLowerInvariant())) {
-                                                FindValue = encodeText(core.docProperties.getText("FindValue" + ColumnPtr)).Trim(' ');
-                                                if (string.IsNullOrEmpty(FindValue)) {
-                                                    //
-                                                    // -- find blank, if name in list, remove it
-                                                    if (IndexConfig.findWords.ContainsKey(FindName)) {
-                                                        IndexConfig.findWords.Remove(FindName);
-                                                    }
+                            }
+                            IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
+                            break;
+                            case ButtonFind:
+                            //
+                            // Find (change search criteria and go to first page)
+                            //
+                            IndexConfig.pageNumber = 1;
+                            IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
+                            ColumnCnt = core.docProperties.getInteger("ColumnCnt");
+                            if (ColumnCnt > 0) {
+                                for (ColumnPtr = 0; ColumnPtr < ColumnCnt; ColumnPtr++) {
+                                    FindName = core.docProperties.getText("FindName" + ColumnPtr).ToLowerInvariant();
+                                    if (!string.IsNullOrEmpty(FindName)) {
+                                        if (adminData.adminContent.fields.ContainsKey(FindName.ToLowerInvariant())) {
+                                            FindValue = encodeText(core.docProperties.getText("FindValue" + ColumnPtr)).Trim(' ');
+                                            if (string.IsNullOrEmpty(FindValue)) {
+                                                //
+                                                // -- find blank, if name in list, remove it
+                                                if (IndexConfig.findWords.ContainsKey(FindName)) {
+                                                    IndexConfig.findWords.Remove(FindName);
+                                                }
+                                            } else {
+                                                //
+                                                // -- nonblank find, store it
+                                                if (IndexConfig.findWords.ContainsKey(FindName)) {
+                                                    IndexConfig.findWords[FindName].Value = FindValue;
                                                 } else {
-                                                    //
-                                                    // -- nonblank find, store it
-                                                    if (IndexConfig.findWords.ContainsKey(FindName)) {
-                                                        IndexConfig.findWords[FindName].Value = FindValue;
-                                                    } else {
-                                                        ContentFieldMetadataModel field = adminData.adminContent.fields[FindName.ToLowerInvariant()];
-                                                        var findWord = new IndexConfigClass.IndexConfigFindWordClass {
-                                                            Name = FindName,
-                                                            Value = FindValue
-                                                        };
-                                                        switch (field.fieldTypeId) {
-                                                            case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
-                                                            case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                                                            case CPContentBaseClass.FieldTypeIdEnum.Float:
-                                                            case CPContentBaseClass.FieldTypeIdEnum.Integer:
-                                                            case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
-                                                            case CPContentBaseClass.FieldTypeIdEnum.Date:
-                                                                findWord.MatchOption = FindWordMatchEnum.MatchEquals;
-                                                                break;
-                                                            case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                                                                if (encodeBoolean(FindValue)) {
-                                                                    findWord.MatchOption = FindWordMatchEnum.MatchTrue;
-                                                                } else {
-                                                                    findWord.MatchOption = FindWordMatchEnum.MatchFalse;
-                                                                }
-                                                                break;
-                                                            default:
-                                                                findWord.MatchOption = FindWordMatchEnum.matchincludes;
-                                                                break;
+                                                    ContentFieldMetadataModel field = adminData.adminContent.fields[FindName.ToLowerInvariant()];
+                                                    var findWord = new IndexConfigClass.IndexConfigFindWordClass {
+                                                        Name = FindName,
+                                                        Value = FindValue
+                                                    };
+                                                    switch (field.fieldTypeId) {
+                                                        case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
+                                                        case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                                                        case CPContentBaseClass.FieldTypeIdEnum.Float:
+                                                        case CPContentBaseClass.FieldTypeIdEnum.Integer:
+                                                        case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
+                                                        case CPContentBaseClass.FieldTypeIdEnum.Date:
+                                                        findWord.MatchOption = FindWordMatchEnum.MatchEquals;
+                                                        break;
+                                                        case CPContentBaseClass.FieldTypeIdEnum.Boolean:
+                                                        if (encodeBoolean(FindValue)) {
+                                                            findWord.MatchOption = FindWordMatchEnum.MatchTrue;
+                                                        } else {
+                                                            findWord.MatchOption = FindWordMatchEnum.MatchFalse;
                                                         }
-                                                        IndexConfig.findWords.Add(FindName, findWord);
+                                                        break;
+                                                        default:
+                                                        findWord.MatchOption = FindWordMatchEnum.matchincludes;
+                                                        break;
                                                     }
+                                                    IndexConfig.findWords.Add(FindName, findWord);
                                                 }
                                             }
                                         }
                                     }
                                 }
-                                break;
+                            }
+                            break;
                         }
                     }
                 }
@@ -951,8 +951,8 @@ namespace Contensive.Addons.AdminSite {
                         case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                         case CPContentBaseClass.FieldTypeIdEnum.HTML:
                         case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                            IncludedInColumns = false;
-                            break;
+                        IncludedInColumns = false;
+                        break;
                     }
                     if ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.MemberSelect) || ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Lookup) && (field.lookupContentId != 0))) {
                         //
@@ -1145,187 +1145,187 @@ namespace Contensive.Addons.AdminSite {
                                         switch (field.fieldTypeId) {
                                             case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
                                             case CPContentBaseClass.FieldTypeIdEnum.Integer:
-                                                //
-                                                // integer
-                                                //
-                                                int FindWordValueInteger = GenericController.encodeInteger(FindWordValue);
-                                                switch (FindMatchOption) {
-                                                    case (int)FindWordMatchEnum.MatchEmpty:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchEquals:
-                                                    case (int)FindWordMatchEnum.matchincludes:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchGreaterThan:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchLessThan:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
-                                                        break;
-                                                }
-                                                goto ExitLabel1;
+                                            //
+                                            // integer
+                                            //
+                                            int FindWordValueInteger = GenericController.encodeInteger(FindWordValue);
+                                            switch (FindMatchOption) {
+                                                case (int)FindWordMatchEnum.MatchEmpty:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchEquals:
+                                                case (int)FindWordMatchEnum.matchincludes:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchGreaterThan:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchLessThan:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                break;
+                                            }
+                                            goto ExitLabel1;
 
                                             case CPContentBaseClass.FieldTypeIdEnum.Currency:
                                             case CPContentBaseClass.FieldTypeIdEnum.Float:
-                                                //
-                                                // double
-                                                double FindWordValueDouble = GenericController.encodeNumber(FindWordValue);
-                                                switch (FindMatchOption) {
-                                                    case (int)FindWordMatchEnum.MatchEmpty:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchEquals:
-                                                    case (int)FindWordMatchEnum.matchincludes:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchGreaterThan:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchLessThan:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
-                                                        break;
-                                                }
-                                                goto ExitLabel1;
+                                            //
+                                            // double
+                                            double FindWordValueDouble = GenericController.encodeNumber(FindWordValue);
+                                            switch (FindMatchOption) {
+                                                case (int)FindWordMatchEnum.MatchEmpty:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchEquals:
+                                                case (int)FindWordMatchEnum.matchincludes:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchGreaterThan:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchLessThan:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                break;
+                                            }
+                                            goto ExitLabel1;
                                             case CPContentBaseClass.FieldTypeIdEnum.File:
                                             case CPContentBaseClass.FieldTypeIdEnum.FileImage:
-                                                //
-                                                // Date
-                                                switch (FindMatchOption) {
-                                                    case (int)FindWordMatchEnum.MatchEmpty:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
-                                                        break;
-                                                }
-                                                goto ExitLabel1;
+                                            //
+                                            // Date
+                                            switch (FindMatchOption) {
+                                                case (int)FindWordMatchEnum.MatchEmpty:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
+                                                break;
+                                            }
+                                            goto ExitLabel1;
                                             case CPContentBaseClass.FieldTypeIdEnum.Date:
-                                                //
-                                                // Date
-                                                DateTime findDate = DateTime.MinValue;
-                                                if (GenericController.IsDate(FindWordValue)) {
-                                                    findDate = DateTime.Parse(FindWordValue);
-                                                }
-                                                switch (FindMatchOption) {
-                                                    case (int)FindWordMatchEnum.MatchEmpty:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchEquals:
-                                                    case (int)FindWordMatchEnum.matchincludes:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLDate(findDate) + ")";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchGreaterThan:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + DbController.encodeSQLDate(findDate) + ")";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchLessThan:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLDate(findDate) + ")";
-                                                        break;
-                                                }
-                                                goto ExitLabel1;
+                                            //
+                                            // Date
+                                            DateTime findDate = DateTime.MinValue;
+                                            if (GenericController.IsDate(FindWordValue)) {
+                                                findDate = DateTime.Parse(FindWordValue);
+                                            }
+                                            switch (FindMatchOption) {
+                                                case (int)FindWordMatchEnum.MatchEmpty:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchEquals:
+                                                case (int)FindWordMatchEnum.matchincludes:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLDate(findDate) + ")";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchGreaterThan:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + DbController.encodeSQLDate(findDate) + ")";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchLessThan:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLDate(findDate) + ")";
+                                                break;
+                                            }
+                                            goto ExitLabel1;
                                             case CPContentBaseClass.FieldTypeIdEnum.Lookup:
                                             case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
+                                            //
+                                            // Lookup
+                                            if (IsLookupFieldValid[field.nameLc]) {
                                                 //
-                                                // Lookup
-                                                if (IsLookupFieldValid[field.nameLc]) {
-                                                    //
-                                                    // Content Lookup
-                                                    switch (FindMatchOption) {
-                                                        case (int)FindWordMatchEnum.MatchEmpty:
-                                                            return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is null)";
-                                                            break;
-                                                        case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                            return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is not null)";
-                                                            break;
-                                                        case (int)FindWordMatchEnum.MatchEquals:
-                                                            return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name=" + DbController.encodeSQLText(FindWordValue) + ")";
-                                                            break;
-                                                        case (int)FindWordMatchEnum.matchincludes:
-                                                            return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name LIKE " + DbController.encodeSQLText("%" + FindWordValue + "%") + ")";
-                                                            break;
-                                                    }
-                                                } else if (field.lookupList != "") {
-                                                    string LookupQuery = null;
-                                                    //
-                                                    int LookupPtr = 0;
-                                                    string[] lookups = null;
-                                                    //
-                                                    // LookupList
-                                                    switch (FindMatchOption) {
-                                                        case (int)FindWordMatchEnum.MatchEmpty:
-                                                            return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
-                                                            break;
-                                                        case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                            return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
-                                                            break;
-                                                        case (int)FindWordMatchEnum.MatchEquals:
-                                                        case (int)FindWordMatchEnum.matchincludes:
-                                                            lookups = field.lookupList.ToLower(CultureInfo.InvariantCulture).Split(',');
-                                                            LookupQuery = "(1=0)";
-                                                            for (LookupPtr = 0; LookupPtr <= lookups.GetUpperBound(0); LookupPtr++) {
-                                                                if (lookups[LookupPtr].Contains(FindWordValue.ToLower(CultureInfo.InvariantCulture))) {
-                                                                    LookupQuery = LookupQuery + "OR(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(LookupPtr + 1) + ")";
-                                                                }
-                                                            }
-                                                            if (!string.IsNullOrEmpty(LookupQuery)) {
-                                                                return_SQLWhere += "AND(" + LookupQuery + ")";
-                                                            }
-                                                            break;
-                                                    }
-                                                }
-                                                goto ExitLabel1;
-                                            case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                                                //
-                                                // Boolean
-                                                switch (FindMatchOption) {
-                                                    case (int)FindWordMatchEnum.matchincludes:
-                                                        if (GenericController.encodeBoolean(FindWordValue)) {
-                                                            return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<>0)";
-                                                        } else {
-                                                            return_SQLWhere += "AND((" + adminData.adminContent.tableName + "." + FindWordName + "=0)or(" + adminData.adminContent.tableName + "." + FindWordName + " is null))";
-                                                        }
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchTrue:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<>0)";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.MatchFalse:
-                                                        return_SQLWhere += "AND((" + adminData.adminContent.tableName + "." + FindWordName + "=0)or(" + adminData.adminContent.tableName + "." + FindWordName + " is null))";
-                                                        break;
-                                                }
-                                                goto ExitLabel1;
-                                            default:
-                                                //
-                                                // Text (and the rest)
+                                                // Content Lookup
                                                 switch (FindMatchOption) {
                                                     case (int)FindWordMatchEnum.MatchEmpty:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
-                                                        break;
+                                                    return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is null)";
+                                                    break;
                                                     case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
-                                                        break;
-                                                    case (int)FindWordMatchEnum.matchincludes:
-                                                        FindWordValue = DbController.encodeSQLText(FindWordValue);
-                                                        FindWordValue = FindWordValue.Substring(1, FindWordValue.Length - 2);
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " LIKE '%" + FindWordValue + "%')";
-                                                        break;
+                                                    return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is not null)";
+                                                    break;
                                                     case (int)FindWordMatchEnum.MatchEquals:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLText(FindWordValue) + ")";
-                                                        break;
+                                                    return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name=" + DbController.encodeSQLText(FindWordValue) + ")";
+                                                    break;
+                                                    case (int)FindWordMatchEnum.matchincludes:
+                                                    return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name LIKE " + DbController.encodeSQLText("%" + FindWordValue + "%") + ")";
+                                                    break;
                                                 }
-                                                goto ExitLabel1;
+                                            } else if (field.lookupList != "") {
+                                                string LookupQuery = null;
+                                                //
+                                                int LookupPtr = 0;
+                                                string[] lookups = null;
+                                                //
+                                                // LookupList
+                                                switch (FindMatchOption) {
+                                                    case (int)FindWordMatchEnum.MatchEmpty:
+                                                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
+                                                    break;
+                                                    case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
+                                                    break;
+                                                    case (int)FindWordMatchEnum.MatchEquals:
+                                                    case (int)FindWordMatchEnum.matchincludes:
+                                                    lookups = field.lookupList.ToLower(CultureInfo.InvariantCulture).Split(',');
+                                                    LookupQuery = "(1=0)";
+                                                    for (LookupPtr = 0; LookupPtr <= lookups.GetUpperBound(0); LookupPtr++) {
+                                                        if (lookups[LookupPtr].Contains(FindWordValue.ToLower(CultureInfo.InvariantCulture))) {
+                                                            LookupQuery = LookupQuery + "OR(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(LookupPtr + 1) + ")";
+                                                        }
+                                                    }
+                                                    if (!string.IsNullOrEmpty(LookupQuery)) {
+                                                        return_SQLWhere += "AND(" + LookupQuery + ")";
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                            goto ExitLabel1;
+                                            case CPContentBaseClass.FieldTypeIdEnum.Boolean:
+                                            //
+                                            // Boolean
+                                            switch (FindMatchOption) {
+                                                case (int)FindWordMatchEnum.matchincludes:
+                                                if (GenericController.encodeBoolean(FindWordValue)) {
+                                                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<>0)";
+                                                } else {
+                                                    return_SQLWhere += "AND((" + adminData.adminContent.tableName + "." + FindWordName + "=0)or(" + adminData.adminContent.tableName + "." + FindWordName + " is null))";
+                                                }
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchTrue:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<>0)";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchFalse:
+                                                return_SQLWhere += "AND((" + adminData.adminContent.tableName + "." + FindWordName + "=0)or(" + adminData.adminContent.tableName + "." + FindWordName + " is null))";
+                                                break;
+                                            }
+                                            goto ExitLabel1;
+                                            default:
+                                            //
+                                            // Text (and the rest)
+                                            switch (FindMatchOption) {
+                                                case (int)FindWordMatchEnum.MatchEmpty:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
+                                                break;
+                                                case (int)FindWordMatchEnum.matchincludes:
+                                                FindWordValue = DbController.encodeSQLText(FindWordValue);
+                                                FindWordValue = FindWordValue.Substring(1, FindWordValue.Length - 2);
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " LIKE '%" + FindWordValue + "%')";
+                                                break;
+                                                case (int)FindWordMatchEnum.MatchEquals:
+                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLText(FindWordValue) + ")";
+                                                break;
+                                            }
+                                            goto ExitLabel1;
                                         }
                                     }
                                 }
-                                ExitLabel1:;
+                            ExitLabel1:;
                             }
                         }
                     }
@@ -1477,29 +1477,29 @@ namespace Contensive.Addons.AdminSite {
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         switch (findWord.MatchOption) {
                             case FindWordMatchEnum.matchincludes:
-                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;includes&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
-                                break;
+                            returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;includes&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                            break;
                             case FindWordMatchEnum.MatchEmpty:
-                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;empty", "ccFilterIndent");
-                                break;
+                            returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;empty", "ccFilterIndent");
+                            break;
                             case FindWordMatchEnum.MatchEquals:
-                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;=&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
-                                break;
+                            returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;=&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                            break;
                             case FindWordMatchEnum.MatchFalse:
-                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;false", "ccFilterIndent");
-                                break;
+                            returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;false", "ccFilterIndent");
+                            break;
                             case FindWordMatchEnum.MatchGreaterThan:
-                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;&gt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
-                                break;
+                            returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;&gt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                            break;
                             case FindWordMatchEnum.MatchLessThan:
-                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;&lt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
-                                break;
+                            returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;&lt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                            break;
                             case FindWordMatchEnum.MatchNotEmpty:
-                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;not&nbsp;empty", "ccFilterIndent");
-                                break;
+                            returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;not&nbsp;empty", "ccFilterIndent");
+                            break;
                             case FindWordMatchEnum.MatchTrue:
-                                returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;true", "ccFilterIndent");
-                                break;
+                            returnContent += HtmlController.div(getDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;true", "ccFilterIndent");
+                            break;
                         }
                     }
                     //
@@ -1677,103 +1677,116 @@ namespace Contensive.Addons.AdminSite {
         /// <returns></returns>
         public static string getForm_Index_GetCell(CoreController core, AdminDataModel adminData, string fieldName, CsModel csData, bool IsLookupFieldValid, bool IsEmailContent) {
             try {
-                var field = adminData.adminContent.fields[fieldName.ToLowerInvariant()];
-                int lookupTableCnt = field.id;
-                string FieldText = null;
-                string Filename = null;
                 var Stream = new StringBuilderLegacyController();
-                int Pos = 0;
-                switch (field.fieldTypeId) {
-                    case CPContentBaseClass.FieldTypeIdEnum.File:
-                    case CPContentBaseClass.FieldTypeIdEnum.FileImage:
-                        Filename = csData.getText(field.nameLc);
-                        Filename = GenericController.vbReplace(Filename, "\\", "/");
-                        Pos = Filename.LastIndexOf("/") + 1;
-                        if (Pos != 0) {
-                            Filename = Filename.Substring(Pos);
-                        }
-                        Stream.Add(Filename);
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                        if (IsLookupFieldValid) {
-                            Stream.Add(csData.getText("LookupTable" + lookupTableCnt + "Name"));
-                            lookupTableCnt += 1;
-                        } else if (field.lookupList != "") {
-                            string[] lookups = field.lookupList.Split(',');
-                            int LookupPtr = csData.getInteger(field.nameLc) - 1;
-                            if (LookupPtr <= lookups.GetUpperBound(0)) {
-                                if (LookupPtr < 0) {
-                                    //Stream.Add( "-1")
-                                } else {
-                                    Stream.Add(lookups[LookupPtr]);
+                var field = adminData.adminContent.fields[fieldName.ToLowerInvariant()];
+                if (field.password) {
+                    //
+                    // -- do not list password fields
+                    Stream.Add("****");
+                } else {
+                    int Pos = 0;
+                    switch (field.fieldTypeId) {
+                        case CPContentBaseClass.FieldTypeIdEnum.File:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
+                                string filename = csData.getText(field.nameLc);
+                                filename = GenericController.vbReplace(filename, "\\", "/");
+                                Pos = filename.LastIndexOf("/") + 1;
+                                if (Pos != 0) {
+                                    filename = filename.Substring(Pos);
                                 }
+                                Stream.Add(filename);
+                                break;
                             }
-                        } else {
-                            Stream.Add(" ");
-                        }
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
-                        if (IsLookupFieldValid) {
-                            Stream.Add(csData.getText("LookupTable" + lookupTableCnt + "Name"));
-                            lookupTableCnt += 1;
-                        } else {
-                            Stream.Add(csData.getText(field.nameLc));
-                        }
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                        if (csData.getBoolean(field.nameLc)) {
-                            Stream.Add("yes");
-                        } else {
-                            Stream.Add("no");
-                        }
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                        Stream.Add(string.Format("{0:C}", csData.getNumber(field.nameLc)));
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                    case CPContentBaseClass.FieldTypeIdEnum.HTML:
-                        FieldText = csData.getText(field.nameLc);
-                        if (FieldText.Length > 50) {
-                            FieldText = FieldText.Left(50) + "[more]";
-                        }
-                        Stream.Add(FieldText);
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.FileText:
-                    case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
-                    case CPContentBaseClass.FieldTypeIdEnum.FileXML:
-                    case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                        // rw( "n/a" )
-                        Filename = csData.getText(field.nameLc);
-                        if (!string.IsNullOrEmpty(Filename)) {
-                            string Copy = core.cdnFiles.readFileText(Filename);
-                            Stream.Add(Copy);
-                        }
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Redirect:
-                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                        Stream.Add("n/a");
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Date:
-                        //
-                        // -- if minvalue, use blank, if no time-part, do short-date
-                        DateTime cellValueDate = csData.getDate(field.nameLc);
-                        if (cellValueDate.Equals(DateTime.MinValue)) {
-                            Stream.Add("");
-                        } else if (cellValueDate.Equals(cellValueDate.Date)) {
-                            Stream.Add(cellValueDate.ToShortDateString());
-                        } else {
-                            Stream.Add(cellValueDate.ToString());
-                        }
-                        break;
-
-                    default:
-                        if (field.password) {
-                            Stream.Add("****");
-                        } else {
-                            Stream.Add(csData.getText(field.nameLc));
-                        }
-                        break;
+                        case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
+                                if (IsLookupFieldValid) {
+                                    Stream.Add(csData.getText("LookupTable" + field.id.ToString() + "Name"));
+                                } else if (field.lookupList != "") {
+                                    string[] lookups = field.lookupList.Split(',');
+                                    int LookupPtr = csData.getInteger(field.nameLc) - 1;
+                                    if (LookupPtr <= lookups.GetUpperBound(0)) {
+                                        if (LookupPtr >= 0) {
+                                            Stream.Add(lookups[LookupPtr]);
+                                        }
+                                    }
+                                } else {
+                                    Stream.Add(" ");
+                                }
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
+                                if (IsLookupFieldValid) {
+                                    Stream.Add(csData.getText("LookupTable" + field.id.ToString() + "Name"));
+                                } else {
+                                    Stream.Add(csData.getText(field.nameLc));
+                                }
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                                if (csData.getBoolean(field.nameLc)) {
+                                    Stream.Add("yes");
+                                } else {
+                                    Stream.Add("no");
+                                }
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.Currency: {
+                                string fieldValueText = csData.getText(field.nameLc);
+                                if (string.IsNullOrWhiteSpace(fieldValueText)) {
+                                    Stream.Add(fieldValueText);
+                                    break;
+                                }
+                                Stream.Add(string.Format("{0:C}", csData.getNumber(field.nameLc)));
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.LongText:
+                        case CPContentBaseClass.FieldTypeIdEnum.HTML: {
+                                string fieldValueText = csData.getText(field.nameLc);
+                                if (fieldValueText.Length > 50) {
+                                    fieldValueText = fieldValueText.Left(50) + "[more]";
+                                }
+                                Stream.Add(fieldValueText);
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.FileText:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileXML:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                                string filename = csData.getText(field.nameLc);
+                                if (!string.IsNullOrEmpty(filename)) {
+                                    string Copy = core.cdnFiles.readFileText(filename);
+                                    Stream.Add(Copy);
+                                }
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.Redirect:
+                        case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                                Stream.Add("n/a");
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                                //
+                                // -- if minvalue, use blank, if no time-part, do short-date
+                                DateTime cellValueDate = csData.getDate(field.nameLc);
+                                if (cellValueDate.Equals(DateTime.MinValue)) {
+                                    Stream.Add("");
+                                } else if (cellValueDate.Equals(cellValueDate.Date)) {
+                                    Stream.Add(cellValueDate.ToShortDateString());
+                                } else {
+                                    Stream.Add(cellValueDate.ToString());
+                                }
+                                break;
+                            }
+                        default: {
+                                string valueString = csData.getText(field.nameLc);
+                                if (string.IsNullOrWhiteSpace(valueString)) {
+                                    Stream.Add(valueString);
+                                    break;
+                                }
+                                Stream.Add(csData.getText(field.nameLc));
+                                break;
+                            }
+                    }
                 }
                 return HtmlController.encodeHtml(Stream.Text);
             } catch (Exception ex) {

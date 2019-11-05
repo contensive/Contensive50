@@ -65,12 +65,12 @@
     <Reference Include="ClearScript, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ClearScript.5.6.0\lib\net45\ClearScript.dll</HintPath>
     </Reference>
-    <Reference Include="ContensiveDbModels, Version=5.1.7244.23549, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.5.19.1101.1\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.1.7248.19517, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.5.19.1105.1\lib\net461\ContensiveDbModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1101.1\lib\net472\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1105.1\lib\net472\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -92,8 +92,9 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.6.7\lib\net45\NLog.dll</HintPath>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c">
+      <HintPath>..\packages\NLog.4.6.8\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="NLog.AWS.Logger, Version=1.5.1.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
       <HintPath>..\packages\AWS.Logger.NLog.1.5.1\lib\net45\NLog.AWS.Logger.dll</HintPath>
@@ -105,8 +106,8 @@
     <Reference Include="Nustache.Core, Version=1.16.0.10, Culture=neutral, PublicKeyToken=efd6f3d8f76ecd9f, processorArchitecture=MSIL">
       <HintPath>..\packages\Nustache.1.16.0.10\lib\net20\Nustache.Core.dll</HintPath>
     </Reference>
-    <Reference Include="processor, Version=5.19.1101.1, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Contensive.Processor.5.19.1101.1\lib\net472\Processor.dll</HintPath>
+    <Reference Include="processor, Version=5.19.1105.1, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Contensive.Processor.5.19.1105.1\lib\net472\Processor.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

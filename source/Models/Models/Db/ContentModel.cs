@@ -33,6 +33,10 @@ namespace Contensive.Models.Db {
         public int installedByCollectionId { get; set; }
         public bool isBaseContent { get; set; }
         public int parentId { get; set; }
+        /// <summary>
+        /// html to be used for the icon. The icon is for the dashboard and addon manager, etc
+        /// </summary>
+        public string iconHtml { get; set; }
         //
         //====================================================================================================
         /// <summary>

@@ -53,24 +53,14 @@ namespace Contensive.Addons.AdminSite {
                     }
                     //
                     // ----- read in all the groups, sorted by ContentName
-                    string SQL2 = "SELECT ccGroups.ID AS ID, ccContent.Name AS SectionName, ccGroups.Caption AS GroupCaption, ccGroups.name AS GroupName, ccGroups.SortOrder"
-                        + " FROM ccGroups LEFT JOIN ccContent ON ccGroups.ContentControlId = ccContent.ID"
-                        + " Where (((ccGroups.Active) <> " + SQLFalse + ") And ((ccContent.Active) <> " + SQLFalse + "))";
-                    SQL2 += ""
-                        + " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Caption, ccGroups.name, ccGroups.SortOrder"
-                        + " ORDER BY ccGroups.Caption";
-
-                    using (var csData = new CsModel(core)) {
-                        //
-                        // Output all the groups, with the active and dateexpires from those joined
-                        //body.Add(adminUIController.EditTableOpen);
-                        bool CanSeeHiddenGroups = core.session.isAuthenticatedDeveloper();
-                        csData.openSql(SQL2, "Default");
-                        while (csData.ok()) {
-                            string GroupName = csData.getText("GroupName");
-                            if ((GroupName.Left(1) != "_") || CanSeeHiddenGroups) {
-                                string GroupCaption = csData.getText("GroupCaption");
-                                int GroupID = csData.getInteger("ID");
+                    using (var csGroups = new CsModel(core)) {
+                        bool canSeeHiddenGroups = core.session.isAuthenticatedDeveloper();
+                        csGroups.openSql("select id,name as groupName,caption as groupCaption from ccgroups where (active>0) order by caption,name,id");
+                        while (csGroups.ok()) {
+                            string GroupName = csGroups.getText("GroupName");
+                            if ((GroupName.Left(1) != "_") || canSeeHiddenGroups) {
+                                string GroupCaption = csGroups.getText("GroupCaption");
+                                int GroupID = csGroups.getInteger("ID");
                                 if (string.IsNullOrEmpty(GroupCaption)) {
                                     GroupCaption = GroupName;
                                     if (string.IsNullOrEmpty(GroupCaption)) {
@@ -104,7 +94,7 @@ namespace Contensive.Addons.AdminSite {
                                 groupRuleEditor.rowList.Add(row);
                                 GroupCount += 1;
                             }
-                            csData.goNext();
+                            csGroups.goNext();
                         }
                     }
                 }

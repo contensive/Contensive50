@@ -32,10 +32,6 @@ namespace Contensive.Models.Db {
         public string formXML { get; set; }
         public string help { get; set; }
         public string helpLink { get; set; }
-        public string iconFilename { get; set; }
-        public int? iconHeight { get; set; }
-        public int? iconSprites { get; set; }
-        public int? iconWidth { get; set; }
         public bool inFrame { get; set; }
         public bool isInline { get; set; }
         public bool javascriptForceHead { get; set; }
@@ -76,6 +72,26 @@ namespace Contensive.Models.Db {
         // -- deprecated, but for leave for now and log error
         public string javaScriptBodyEnd { get; set; }
         public string jsBodyScriptSrc { get; set; }
+        /// <summary>
+        /// html to be used for the icon. The icon is for the dashboard and addon manager, etc
+        /// </summary>
+        public string iconHtml { get; set; }
+        /// <summary>
+        /// if iconHtml is null or whitespace, this image url has the icon to use
+        /// </summary>
+        public string iconFilename { get; set; }
+        /// <summary>
+        /// the height of the icon filename
+        /// </summary>
+        public int? iconHeight { get; set; }
+        /// <summary>
+        /// the width of the icon filename
+        /// </summary>
+        public int? iconWidth { get; set; }
+        /// <summary>
+        /// the number of sprites in the icon
+        /// </summary>
+        public int? iconSprites { get; set; }
         //
         // -- deprecated
         // -Public Property JavaScriptOnLoad As String
