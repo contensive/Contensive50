@@ -40,6 +40,7 @@ namespace Contensive.Addons.Primitives {
                             memberId = recipient.id,
                             logType = EmailLogTypeOpen
                         };
+                        log.save(cp);
                     }
                 }
             } catch (Exception ex) {

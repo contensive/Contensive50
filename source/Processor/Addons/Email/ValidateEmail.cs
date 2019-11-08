@@ -44,6 +44,7 @@ namespace Contensive.Addons.Primitives {
                                         memberId = recipient.id,
                                         logType = EmailLogTypeBlockRequest
                                     };
+                                    log.save(cp);
                                 }
                             }
                             return core.webServer.redirect(core.webServer.requestProtocol + core.webServer.requestDomain + "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.");

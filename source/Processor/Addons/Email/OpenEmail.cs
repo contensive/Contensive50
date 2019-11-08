@@ -42,6 +42,7 @@ namespace Contensive.Addons.Primitives {
                                 memberId = recipient.id,
                                 logType = EmailLogTypeOpen
                             };
+                            log.save(cp);
                         }
                         core.webServer.redirect(NonEncodedLink: core.webServer.requestProtocol + core.webServer.requestDomain + "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif", RedirectReason: "Group Email Open hit, redirecting to a dummy image", IsPageNotFound: false, allowDebugMessage: false);
                     }
