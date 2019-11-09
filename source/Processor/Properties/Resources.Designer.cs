@@ -75,6 +75,24 @@ namespace Contensive.Processor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 
+        ///&lt;html&gt;
+        ///&lt;head&gt;
+        ///    &lt;title&gt;Future emails have been blocked&lt;/title&gt;
+        ///&lt;/head&gt;
+        ///&lt;body&gt;
+        ///    &lt;div styles=&quot;width:400px;margin:100px auto&quot;&gt;&lt;p&gt;You have blocked all future emails from our site.&lt;/p&gt;&lt;/div&gt;
+        ///&lt;/body&gt;
+        ///&lt;/html&gt;
+        ///.
+        /// </summary>
+        public static string defaultEmailBlockedResponsePage {
+            get {
+                return ResourceManager.GetString("defaultEmailBlockedResponsePage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
         ///	&lt;h4 class=&quot;form-signin-heading&quot;&gt;Forget Your Password&lt;/h4&gt;
         ///	&lt;!--&lt;p&gt;If you are a member of the system and cannot remember your password, enter your email address below and we will email your matching username(s) and password(s).&lt;/p&gt;--&gt;
@@ -246,7 +264,13 @@ namespace Contensive.Processor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CREATE TRIGGER ccManyManyRuleDelete_{ruleTable}_{ruleField}
+        ///   Looks up a localized string similar to IF EXISTS (SELECT * FROM sys.objects WHERE [name] = N&apos;ccManyManyRuleDelete_{ruleTable}_{ruleField}&apos; AND [type] = &apos;TR&apos;)
+        ///BEGIN
+        ///      DROP TRIGGER [dbo].[ccManyManyRuleDelete_{ruleTable}_{ruleField}];
+        ///END
+        ///GO
+        ///DROP TRIGGER IF EXISTS ccManyManyRuleDelete_{ruleTable}_{ruleField}
+        ///CREATE TRIGGER ccManyManyRuleDelete_{ruleTable}_{ruleField}
         ///ON {joinTable}
         ///AFTER UPDATE,DELETE
         ///AS
@@ -254,14 +278,7 @@ namespace Contensive.Processor.Properties {
         ///from {ruleTable} r 
         ///left join {joinTable} a on a.{joinField}=r.{ruleField} where a.id is null
         ///
-        ///--sample
-        ///--CREATE TRIGGER ccManyManyRuleDelete_ccAddonContentFieldTypeRules_addonId
-        ///--ON ccAggregateFunctions
-        ///--AFTER  UPDATE,DELETE
-        ///--AS
-        ///--delete  from ccAddonContentFieldTypeRules 
-        ///--from ccAddonContentFieldTypeRules r 
-        ///--left join ccAggregateFunctions a on a.id=r.addonid wher [rest of string was truncated]&quot;;.
+        ///--sampl [rest of string was truncated]&quot;;.
         /// </summary>
         public static string sqlTriggerManyManyRule {
             get {

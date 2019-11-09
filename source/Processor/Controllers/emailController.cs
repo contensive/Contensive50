@@ -238,13 +238,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="body"></param>
         /// <param name="Immediate"></param>
         /// <param name="isHTML"></param>
-        /// <param name="emailIdOrZeroForLog"></param>
+        /// <param name="emailId"></param>
         /// <param name="template"></param>
         /// <param name="EmailAllowLinkEID"></param>
         /// <param name="queryStringForLinkAppend"></param>
         /// <param name="emailContextMessage">Brief description for the log entry (Conditional Email, etc)</param>
         /// <returns> returns ok if send is successful, otherwise returns the principle issue as a user error</returns>
-        public static bool queuePersonEmail(CoreController core, PersonModel recipient, string fromAddress, string subject, string body, string bounceAddress, string replyToAddress, bool Immediate, bool isHTML, int emailIdOrZeroForLog, string template, bool EmailAllowLinkEID, ref string userErrorMessage, string queryStringForLinkAppend, string emailContextMessage) {
+        public static bool queuePersonEmail(CoreController core, PersonModel recipient, string fromAddress, string subject, string body, string bounceAddress, string replyToAddress, bool Immediate, bool isHTML, int emailId, string template, bool EmailAllowLinkEID, ref string userErrorMessage, string queryStringForLinkAppend, string emailContextMessage) {
             bool result = false;
             try {
                 if (recipient == null) {
@@ -273,7 +273,7 @@ namespace Contensive.Processor.Controllers {
                     var email = new EmailClass() {
                         attempts = 0,
                         BounceAddress = bounceAddress,
-                        emailId = 0,
+                        emailId = emailId,
                         fromAddress = fromAddress,
                         htmlBody = htmlBody,
                         replyToAddress = replyToAddress,
@@ -907,7 +907,7 @@ namespace Contensive.Processor.Controllers {
                     if (sendSuccess) {
                         //
                         // -- success, log the send
-                        var log = EmailLogModel.addEmpty<EmailLogModel>(core.cpParent);
+                        var log = EmailLogModel.addDefault<EmailLogModel>(core.cpParent);
                         log.name = "Successfully sent: " + queueRecord.name;
                         log.toAddress = emailData.toAddress;
                         log.fromAddress = emailData.fromAddress;
@@ -926,7 +926,7 @@ namespace Contensive.Processor.Controllers {
                         if (emailData.attempts >= 3) {
                             //
                             // -- too many retries, log error
-                            var log = EmailLogModel.addEmpty<EmailLogModel>(core.cpParent);
+                            var log = EmailLogModel.addDefault<EmailLogModel>(core.cpParent);
                             log.name = "Aborting unsuccessful send: " + queueRecord.name;
                             log.toAddress = emailData.toAddress;
                             log.fromAddress = emailData.fromAddress;
@@ -944,7 +944,7 @@ namespace Contensive.Processor.Controllers {
                             string sendStatus = "Retrying unsuccessful send (" + emailData.attempts.ToString() + " of 3), reason [" + reasonForFail + "]";
                             sendStatus = sendStatus.Substring(0, (sendStatus.Length > 254) ? 254 : sendStatus.Length);
                             emailData.attempts += 1;
-                            var log = EmailLogModel.addEmpty<EmailLogModel>(core.cpParent);
+                            var log = EmailLogModel.addDefault<EmailLogModel>(core.cpParent);
                             log.name = "Failed send queued for retry: " + queueRecord.name;
                             log.toAddress = emailData.toAddress;
                             log.fromAddress = emailData.fromAddress;
@@ -1064,6 +1064,18 @@ namespace Contensive.Processor.Controllers {
                 // -- non html email, return a text version of the finished document
                 return HtmlController.convertTextToHtml(body);
             }
+            //
+            // -- Spam Footer under template, remove the marker for any other place in the email then add it as needed
+            bool AllowSpamFooter = true;
+            if (AllowSpamFooter) {
+                string protocolHostLink = "http://" + core.appConfig.domainList[0];
+                string urlProtocolDomainSlash = protocolHostLink + "/";
+                string defaultPage = core.siteProperties.serverPageDefault;
+                //
+                // non-authorable, default true - leave it as an option in case there is an important exception
+                body += "<div style=\"padding:10px;\">" + GenericController.csv_GetLinkedText("<a href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailBlockRecipientEmail + "=" + recipientEmail + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+            }
+
             if (body.ToLower(CultureInfo.InvariantCulture).IndexOf("<html") >= 0) {
                 //
                 // -- isHtml and the document includes an html tag -- return as-is

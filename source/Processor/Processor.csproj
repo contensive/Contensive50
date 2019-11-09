@@ -64,12 +64,12 @@
     <Reference Include="ClearScript, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ClearScript.5.6.0\lib\net45\ClearScript.dll</HintPath>
     </Reference>
-    <Reference Include="ContensiveDbModels, Version=5.1.7251.18835, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.5.19.1108.2\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.1.7251.29307, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.5.19.1108.4\lib\net461\ContensiveDbModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1108.2\lib\net472\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1108.4\lib\net472\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -139,7 +139,7 @@
     <Compile Include="Addons\Authentication\GetLoginButtonFormClass.cs" />
     <Compile Include="Addons\Authentication\Authenticate.cs" />
     <Compile Include="Addons\Diagnostics\ServerDiagnosticClass.cs" />
-    <Compile Include="Addons\Email\ValidateEmail.cs" />
+    <Compile Include="Addons\Email\BlockEmail.cs" />
     <Compile Include="Addons\Housekeeping\MetadataClass.cs" />
     <Compile Include="Addons\Housekeeping\ActivityLogClass.cs" />
     <Compile Include="Addons\Housekeeping\MemberRuleClass.cs" />
@@ -236,7 +236,7 @@
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\ProcessAjaxDataClass.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\SetAdminSiteFieldHelp.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\SetAjaxVisitPropertyClass.cs" />
-    <Compile Include="Addons\Email\BlockEmail.cs" />
+    <Compile Include="Addons\Email\ValicateEmail2.cs" />
     <Compile Include="Addons\Email\ClickEmail.cs" />
     <Compile Include="Addons\FaviconIco\faviconIco.cs" />
     <Compile Include="Addons\Email\OpenEmail.cs" />
@@ -384,6 +384,7 @@
     <Content Include="Models\dataModelFields.txt" />
     <Content Include="Resources\adminNavBarHtml.txt" />
     <Content Include="Resources\adminTemplateHtml.txt" />
+    <Content Include="Resources\defaultEmailBlockedResponsePage.html" />
     <Content Include="Resources\defaultLogin_email_html.txt" />
     <Content Include="Resources\defaultForgetPassword_html.txt" />
     <Content Include="Resources\defaultLogin_email_autoLogin_html.txt" />

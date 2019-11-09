@@ -317,9 +317,27 @@ namespace Contensive.Addons.Email {
         /// <returns>OK if successful, else returns user error.</returns>
         private string queueEmailRecord(CoreController core, string emailContextMessage, int sendToPersonId, int emailID, DateTime DateBlockExpires, int emailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
             PersonModel recipient = DbBaseModel.create<PersonModel>(core.cpParent, sendToPersonId);
-
             string returnStatus = "";
-            if (EmailController.queuePersonEmail(core, recipient, FromAddress, EmailSubject, EmailBody, BounceAddress, ReplyToAddress, false, true, emailID, EmailTemplate, EmailAllowLinkEID, ref returnStatus, "", emailContextMessage)) {
+            //
+            // -- open detect
+            if (emailDropID != 0) {
+                string protocolHostLink = "http://" + core.appConfig.domainList[0];
+                string urlProtocolDomainSlash = protocolHostLink + "/";
+                string defaultPage = core.siteProperties.serverPageDefault;
+                switch (core.siteProperties.getInteger("GroupEmailOpenTriggerMethod", 0)) {
+                    case 1:
+                    EmailBody += "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailOpenCssFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId + "\">";
+                    break;
+                    default:
+                    EmailBody += "<img src=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailOpenFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId + "\">";
+                    break;
+                }
+            }
+            //
+            // -- click detect
+            string queryStringForLinkAppend = rnEmailClickFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId;
+            //
+            if (EmailController.queuePersonEmail(core, recipient, FromAddress, EmailSubject, EmailBody, BounceAddress, ReplyToAddress, false, true, emailID, EmailTemplate, EmailAllowLinkEID, ref returnStatus, queryStringForLinkAppend, emailContextMessage)) {
                 returnStatus = "Added to queue, email for " + recipient.name + " at " + recipient.email;
             }
 

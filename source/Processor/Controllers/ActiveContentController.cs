@@ -75,7 +75,7 @@ namespace Contensive.Processor.Controllers {
                 // Fixup Anchor Query (additional AddonOptionString pairs to add to the end)
                 string AnchorQuery = "";
                 if (addLinkAuthenticationToAllLinks && (deprecated_personalizationPeopleId != 0)) {
-                    AnchorQuery += "&eid=" + SecurityController.encodeToken(core, deprecated_personalizationPeopleId, DateTime.Now);
+                    AnchorQuery += "&eid=" + encodeURL(SecurityController.encodeToken(core, deprecated_personalizationPeopleId, DateTime.Now));
                 }
                 //
                 if (!string.IsNullOrEmpty(queryStringToAppendToAllLinks)) {
@@ -128,46 +128,47 @@ namespace Contensive.Processor.Controllers {
                                             if (AttributeCount > 0) {
                                                 Copy = "<A ";
                                                 for (int AttributePointer = 0; AttributePointer < AttributeCount; AttributePointer++) {
-                                                    string Name = KmaHTML.ElementAttributeName(ElementPointer, AttributePointer);
-                                                    string Value = KmaHTML.ElementAttributeValue(ElementPointer, AttributePointer);
-                                                    if (GenericController.vbUCase(Name) == "HREF") {
-                                                        string Link = Value;
-                                                        int Pos = GenericController.vbInstr(1, Link, "://");
+                                                    string attrName = KmaHTML.ElementAttributeName(ElementPointer, AttributePointer);
+                                                    string attrValue = KmaHTML.ElementAttributeValue(ElementPointer, AttributePointer);
+                                                    if (attrName.ToLower() == "href") {
+                                                        string linkDomain= "";
+                                                        int Pos = GenericController.vbInstr(1, attrValue, "://");
                                                         if (Pos > 0) {
-                                                            Link = Link.Substring(Pos + 2);
-                                                            Pos = GenericController.vbInstr(1, Link, "/");
+                                                            linkDomain = attrValue;
+                                                            linkDomain = linkDomain.Substring(Pos + 2);
+                                                            Pos = GenericController.vbInstr(1, linkDomain, "/");
                                                             if (Pos > 0) {
-                                                                Link = Link.Left(Pos - 1);
+                                                                linkDomain = linkDomain.Left(Pos - 1);
                                                             }
                                                         }
-                                                        if ((string.IsNullOrEmpty(Link)) || (("," + core.appConfig.domainList[0] + ",").IndexOf("," + Link + ",", System.StringComparison.OrdinalIgnoreCase) != -1)) {
+                                                        if ((string.IsNullOrEmpty(linkDomain)) || (("," + core.appConfig.domainList[0] + ",").IndexOf("," + linkDomain + ",", System.StringComparison.OrdinalIgnoreCase) != -1)) {
                                                             //
                                                             // ----- link is for this site
                                                             //
-                                                            if (Value.Substring(Value.Length - 1) == "?") {
+                                                            if (attrValue.Substring(attrValue.Length - 1) == "?") {
                                                                 //
                                                                 // Ends in a questionmark, must be Dwayne (?)
                                                                 //
-                                                                Value = Value + AnchorQuery;
-                                                            } else if (GenericController.vbInstr(1, Value, "mailto:", 1) != 0) {
+                                                                attrValue = attrValue + AnchorQuery;
+                                                            } else if (GenericController.vbInstr(1, attrValue, "mailto:", 1) != 0) {
                                                                 //
                                                                 // catch mailto
                                                                 //
                                                                 //Value = Value & AnchorQuery
-                                                            } else if (GenericController.vbInstr(1, Value, "?") == 0) {
+                                                            } else if (GenericController.vbInstr(1, attrValue, "?") == 0) {
                                                                 //
                                                                 // No questionmark there, add it
                                                                 //
-                                                                Value = Value + "?" + AnchorQuery;
+                                                                attrValue = attrValue + "?" + AnchorQuery;
                                                             } else {
                                                                 //
                                                                 // Questionmark somewhere, add new value with amp;
                                                                 //
-                                                                Value = Value + "&" + AnchorQuery;
+                                                                attrValue = attrValue + "&" + AnchorQuery;
                                                             }
                                                         }
                                                     }
-                                                    Copy += " " + Name + "=\"" + Value + "\"";
+                                                    Copy += " " + attrName + "=\"" + attrValue + "\"";
                                                 }
                                                 Copy += ">";
                                             }

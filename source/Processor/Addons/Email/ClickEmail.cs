@@ -34,12 +34,13 @@ namespace Contensive.Addons.Primitives {
                 if (emailDrop != null) {
                     PersonModel recipient = DbBaseModel.create<PersonModel>(core.cpParent, core.docProperties.getInteger(rnEmailMemberId));
                     if (recipient != null) {
-                        EmailLogModel log = new EmailLogModel() {
-                            name = "User " + recipient.name + " clicked link from email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString(),
-                            emailDropId = emailDrop.id,
-                            memberId = recipient.id,
-                            logType = EmailLogTypeOpen
-                        };
+                        EmailLogModel log = DbBaseModel.addDefault<EmailLogModel>(core.cpParent);
+                        log.name = "User " + recipient.name + " clicked link from email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString();
+                        log.emailDropId = emailDrop.id;
+                        log.emailId = emailDrop.emailId;
+                        log.memberId = recipient.id;
+                        log.logType = EmailLogTypeOpen;
+                        log.visitId = cp.Visit.Id;
                         log.save(cp);
                     }
                 }

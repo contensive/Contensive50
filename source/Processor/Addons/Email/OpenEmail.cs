@@ -36,15 +36,16 @@ namespace Contensive.Addons.Primitives {
                     if (emailDrop != null) {
                         PersonModel recipient = DbBaseModel.create<PersonModel>(core.cpParent, core.docProperties.getInteger(rnEmailMemberId));
                         if (recipient != null) {
-                           EmailLogModel log = new EmailLogModel() {
-                                name = "User " + recipient.name + " opened email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString(),
-                                emailDropId = emailDrop.id,
-                                memberId = recipient.id,
-                                logType = EmailLogTypeOpen
-                            };
+                            EmailLogModel log = DbBaseModel.addDefault<EmailLogModel>(core.cpParent);
+                            log.name = "User " + recipient.name + " opened email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString();
+                            log.emailDropId = emailDrop.id;
+                            log.emailId = emailDrop.emailId;
+                            log.memberId = recipient.id;
+                            log.logType = EmailLogTypeOpen;
+                            log.visitId = cp.Visit.Id;
                             log.save(cp);
                         }
-                        core.webServer.redirect(NonEncodedLink: core.webServer.requestProtocol + core.webServer.requestDomain + "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif", RedirectReason: "Group Email Open hit, redirecting to a dummy image", IsPageNotFound: false, allowDebugMessage: false);
+                        core.webServer.redirect(NonEncodedLink: "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif", RedirectReason: "Group Email Open hit, redirecting to a dummy image", IsPageNotFound: false, allowDebugMessage: false);
                     }
                 }
             } catch (Exception ex) {
