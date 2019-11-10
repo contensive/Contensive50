@@ -20,8 +20,9 @@ Public Class Global_asax
     ''' <param name="e"></param>
     Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
         Try
-            Application("asdf") = ""
-            LogController.logLocalOnly("Global.asax, Application_Start [" & ConfigurationClass.getAppName() & "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+            '
+            LogController.logLocalOnly("Global.asax, Application_Start [" & ConfigurationClass.getAppName() & "]", BaseClasses.CPLogBaseClass.LogLevel.Info)
+            '
             Using cp As New Contensive.Processor.CPClass(ConfigurationClass.getAppName())
                 DefaultSite.ConfigurationClass.loadRouteMap(cp)
             End Using
@@ -37,7 +38,9 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Session_Start(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logLocalOnly("Global.asax, Session_Start [" + e.ToString() + "]", Contensive.BaseClasses.CPLogBaseClass.LogLevel.Trace)
+        '
+        LogController.logLocalOnly("Global.asax, Session_Start [" + e.ToString() + "]", Contensive.BaseClasses.CPLogBaseClass.LogLevel.Info)
+        '
     End Sub
     '
     '====================================================================================================
@@ -47,14 +50,9 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_BeginRequest(ByVal sender As Object, ByVal e As EventArgs)
-        If (ConfigurationClass.routeMapDateInvalid) Then
-            LogController.logLocalOnly("Global.asax, Application_BeginRequest and  routeMapDateInvalid", BaseClasses.CPLogBaseClass.LogLevel.Trace)
-            Using cp As New Contensive.Processor.CPClass(ConfigurationClass.getAppName())
-                DefaultSite.ConfigurationClass.loadRouteMap(cp)
-            End Using
-        End If
-
-        LogController.logLocalOnly("Global.asax, Application_BeginRequest [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+        '
+        LogController.logLocalOnly("Global.asax, Application_BeginRequest [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Info)
+        '
     End Sub
     '
     '====================================================================================================
@@ -64,7 +62,9 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_AuthenticateRequest(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logLocalOnly("Global.asax, Application_AuthenticateRequest [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+        '
+        LogController.logLocalOnly("Global.asax, Application_AuthenticateRequest [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Info)
+        '
     End Sub
     '
     '====================================================================================================
@@ -75,22 +75,13 @@ Public Class Global_asax
     ''' <param name="e"></param>
     Sub Application_Error(ByVal sender As Object, ByVal e As EventArgs)
         If (sender IsNot Nothing) Then
-            Dim lastException As Exception = Server.GetLastError()
+            '
             LogController.logLocalOnly("Global.asax, Application_Error, Server.GetLastError() [" + Server.GetLastError().ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error)
+            '
             Dim innerException As Exception = Server.GetLastError().InnerException
             If (innerException IsNot Nothing) Then
                 LogController.logLocalOnly("Global.asax, Application_Error, Server.GetLastError().InnerException [" + Server.GetLastError().InnerException.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error)
             End If
-            '
-            ' -- working on this
-            'If (TypeOf sender Is Global_asax) Then
-            '    Dim senderGlobalAsax As Global_asax = DirectCast(sender, Global_asax)
-            '    LogController.logLocalOnly("Global.asax, Application_Error, Error in Global_asax", BaseClasses.CPLogBaseClass.LogLevel.Error)
-            '    If (senderGlobalAsax IsNot Nothing) Then
-            '        senderGlobalAsax.
-            '    End If
-            '    LogController.logLocalOnly("Global.asax, Application_Error, Server.GetLastError().InnerException [" + Server.GetLastError().InnerException.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error)
-            'End If
         End If
 
     End Sub
@@ -102,7 +93,9 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Session_End(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logLocalOnly("Global.asax, Session_End [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+        '
+        LogController.logLocalOnly("Global.asax, Session_End [" + e.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Info)
+        '
     End Sub
     '
     '====================================================================================================
@@ -112,9 +105,9 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_End(ByVal sender As Object, ByVal e As EventArgs)
-        LogController.logLocalOnly("Global.asax, Application_End [" + e.ToString() + "," + getShutdownDetail() + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
-
-
+        '
+        LogController.logLocalOnly("Global.asax, Application_End [" + e.ToString() + "," + getShutdownDetail() + "]", BaseClasses.CPLogBaseClass.LogLevel.Info)
+        '
     End Sub
     '
     '====================================================================================================

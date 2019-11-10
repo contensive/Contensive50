@@ -31,19 +31,25 @@ namespace Contensive.Processor.Controllers {
                     if (!string.IsNullOrWhiteSpace(table.name)) {
                         //
                         // -- read table primary key field
-                        string sql = "" 
+                        string sql = ""
                             + " SELECT Col.Column_Name"
                             + " from INFORMATION_SCHEMA.TABLE_CONSTRAINTS Tab, INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE Col"
                             + " WHERE (Col.Constraint_Name = Tab.Constraint_Name) AND (Col.Table_Name = Tab.Table_Name) AND (Constraint_Type = 'PRIMARY KEY') AND (Col.Table_Name = '" + table.name + "')";
                         bool idFound = false;
-                        foreach ( DataRow dr in core.db.executeQuery(sql).Rows ) {
-                            if ( GenericController.encodeText( dr["Column_Name"]).ToLower().Equals("id") ) {
+                        foreach (DataRow dr in core.db.executeQuery(sql).Rows) {
+                            if (GenericController.encodeText(dr["Column_Name"]).ToLower().Equals("id")) {
                                 idFound = true;
                                 break;
                             }
                         }
-                        if(!idFound) {
-                            core.db.executeNonQuery("alter table " + table.name + " add primary key (ID)");
+                        if (!idFound) {
+                            try {
+                                core.db.executeNonQuery("ALTER TABLE " + table.name + " ADD ID INT IDENTITY(1,1) NOT NULL");
+                                core.db.executeNonQuery("alter table " + table.name + " add primary key (ID)");
+                            } catch (Exception ex) {
+                                LogController.logError(core, ex, "Content Table [" + table.name + "] does not include column ID. Exception happened while adding column and setting it primarykey.");
+                                //throw;
+                            }
                         }
                     }
                 }

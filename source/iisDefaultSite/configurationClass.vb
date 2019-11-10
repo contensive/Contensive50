@@ -80,35 +80,49 @@ Public Class ConfigurationClass
         Return serverConfig
     End Function
     '
-    Public Shared Sub loadRouteMap(cp As CPClass)
+    ' ====================================================================================================
+    ''' <summary>
+    ''' verify the routemap is not stale. This was the legacy reload process that reloads without an application load.
+    ''' </summary>
+    ''' <param name="cp"></param>
+    Public Shared Sub verifyRouteMap(cp As CPClass)
         '
         ' -- if application var does not equal routemap.datecreated rebuild
         If (routeMapDateInvalid() OrElse (cp.routeMap.dateCreated <> CDate(HttpContext.Current.Application("RouteMapDateCreated")))) Then
-            '
             If routeMapDateInvalid() Then
                 LogController.logLocalOnly("configurationClass, loadRouteMap, [" + cp.Site.Name + "], rebuild because HttpContext.Current.Application(RouteMapDateCreated) is not valid", BaseClasses.CPLogBaseClass.LogLevel.Info)
             Else
                 LogController.logLocalOnly("configurationClass, loadRouteMap, [" + cp.Site.Name + "], rebuild because not equal, cp.routeMap.dateCreated [" + cp.routeMap.dateCreated.ToString() + "], HttpContext.Current.Application(RouteMapDateCreated) [" + HttpContext.Current.Application("RouteMapDateCreated").ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Info)
             End If
+            loadRouteMap(cp)
+        End If
+    End Sub
+    '
+    ' ====================================================================================================
+    ''' <summary>
+    ''' load the routemap
+    ''' </summary>
+    ''' <param name="cp"></param>
+    Public Shared Sub loadRouteMap(cp As CPClass)
+        SyncLock RouteTable.Routes
+            '
+            LogController.logLocalOnly("configurationClass, loadRouteMap enter, [" + cp.Site.Name + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
             '
             HttpContext.Current.Application("routeMapDateCreated") = cp.routeMap.dateCreated
-            SyncLock RouteTable.Routes
-                ' 20180307, added clear to resolve error 
-                RouteTable.Routes.Clear()
-                For Each newRouteKeyValuePair In cp.routeMap.routeDictionary
-                    Try
-                        '
-                        LogController.logLocalOnly("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRouteKeyValuePair.Value.virtualRoute + "], [" + newRouteKeyValuePair.Value.physicalRoute + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
-                        '
-                        RouteTable.Routes.Remove(RouteTable.Routes(newRouteKeyValuePair.Key))
-                        RouteTable.Routes.MapPageRoute(newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.physicalRoute)
-                    Catch ex As Exception
-                        cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & newRouteKeyValuePair.Key & "]")
-                    End Try
-                Next
-            End SyncLock
-            LogController.logLocalOnly("configurationClass, loadRouteMap, [" + cp.Site.Name + "] done", BaseClasses.CPLogBaseClass.LogLevel.Info)
-        End If
+            '
+            RouteTable.Routes.Clear()
+            For Each newRouteKeyValuePair In cp.routeMap.routeDictionary
+                Try
+                    RouteTable.Routes.Remove(RouteTable.Routes(newRouteKeyValuePair.Key))
+                    RouteTable.Routes.MapPageRoute(newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.physicalRoute)
+                Catch ex As Exception
+                    cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & newRouteKeyValuePair.Key & "]")
+                End Try
+            Next
+        End SyncLock
+        '
+        LogController.logLocalOnly("configurationClass, loadRouteMap exit, [" + cp.Site.Name + "]", BaseClasses.CPLogBaseClass.LogLevel.Info)
+        '
     End Sub
 End Class
 

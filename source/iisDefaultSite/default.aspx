@@ -11,14 +11,18 @@
                 Dim serverConfig As Contensive.Processor.Models.Domain.ServerConfigModel = DefaultSite.ConfigurationClass.getServerConfig()
                 Using cp As New Contensive.Processor.CPClass(serverConfig.apps(0).name, serverConfig, HttpContext.Current)
                     Response.Write(cp.executeRoute())
-                    DefaultSite.ConfigurationClass.loadRouteMap(cp)
+                    If (DefaultSite.ConfigurationClass.routeMapDateInvalid() OrElse (cp.routeMap.dateCreated <> CDate(HttpContext.Current.Application("RouteMapDateCreated")))) Then
+                        HttpRuntime.UnloadAppDomain()
+                    End If
                 End Using
             Else
                 '
                 ' -- initialize with contensive c:\programdata\contensive\serverConfig.json (use same settings as cli and services)
-                Using cp As New Contensive.Processor.CPClass(DefaultSite.configurationClass.getAppName(), HttpContext.Current)
+                Using cp As New Contensive.Processor.CPClass(DefaultSite.ConfigurationClass.getAppName(), HttpContext.Current)
                     Response.Write(cp.executeRoute())
-                    DefaultSite.ConfigurationClass.loadRouteMap(cp)
+                    If (DefaultSite.ConfigurationClass.routeMapDateInvalid() OrElse (cp.routeMap.dateCreated <> CDate(HttpContext.Current.Application("RouteMapDateCreated")))) Then
+                        HttpRuntime.UnloadAppDomain()
+                    End If
                 End Using
             End If
         Catch ex As Exception
