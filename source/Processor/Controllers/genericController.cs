@@ -302,14 +302,14 @@ namespace Contensive.Processor.Controllers {
 
             switch (ApplicationStatus) {
                 case AppConfigModel.AppStatusEnum.ok:
-                    tempGetApplicationStatusMessage = "Application OK";
-                    break;
+                tempGetApplicationStatusMessage = "Application OK";
+                break;
                 case AppConfigModel.AppStatusEnum.maintenance:
-                    tempGetApplicationStatusMessage = "Application building";
-                    break;
+                tempGetApplicationStatusMessage = "Application building";
+                break;
                 default:
-                    tempGetApplicationStatusMessage = "Unknown status code [" + ApplicationStatus + "], see trace log for details";
-                    break;
+                tempGetApplicationStatusMessage = "Unknown status code [" + ApplicationStatus + "], see trace log for details";
+                break;
             }
             return tempGetApplicationStatusMessage;
         }
@@ -540,15 +540,15 @@ namespace Contensive.Processor.Controllers {
                 //
                 switch (vbUCase(iURLProtocol)) {
                     case "FTP://":
-                        iURLPort = "21";
-                        break;
+                    iURLPort = "21";
+                    break;
                     case "HTTP://":
                     case "HTTPS://":
-                        iURLPort = "80";
-                        break;
+                    iURLPort = "80";
+                    break;
                     default:
-                        iURLPort = "80";
-                        break;
+                    iURLPort = "80";
+                    break;
                 }
             } else {
                 iURLPort = iURLHost.Substring(Position);
@@ -1286,8 +1286,8 @@ namespace Contensive.Processor.Controllers {
                     case "on":
                     case "yes":
                     case "true":
-                        tempEncodeBoolean = true;
-                        break;
+                    tempEncodeBoolean = true;
+                    break;
                 }
             }
             return tempEncodeBoolean;
@@ -1631,6 +1631,9 @@ namespace Contensive.Processor.Controllers {
                 normalizedRoute = FileController.convertToUnixSlash(normalizedRoute);
                 while (normalizedRoute.IndexOf("//") >= 0) {
                     normalizedRoute = normalizedRoute.Replace("//", "/");
+                }
+                if (route.Equals("/")) {
+                    return string.Empty;
                 }
                 if (normalizedRoute.Left(1).Equals("/")) {
                     normalizedRoute = normalizedRoute.Substring(1);

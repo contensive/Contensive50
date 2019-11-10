@@ -492,6 +492,9 @@ namespace Contensive.Processor.Controllers {
         public void invalidate(string key, int recursionLimit = 5) {
             try {
                 Controllers.LogController.logTrace(core, "invalidate, key [" + key + "], recursionLimit [" + recursionLimit + "]");
+                if (key== "RouteMapModel") {
+                    string name = "hit";
+                }
                 //
                 if ((recursionLimit > 0) && (!string.IsNullOrWhiteSpace(key.Trim()))) {
                     key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");

@@ -107,6 +107,7 @@ Public Class ConfigurationClass
                     End Try
                 Next
             End SyncLock
+            LogController.logLocalOnly("configurationClass, loadRouteMap, [" + cp.Site.Name + "] done", BaseClasses.CPLogBaseClass.LogLevel.Info)
         End If
     End Sub
 End Class
