@@ -26,29 +26,39 @@ namespace Contensive.Processor.Controllers {
                 // -- Roll the style sheet cache if it is setup
                 core.siteProperties.setProperty("StylesheetSerialNumber", (-1).ToString());
                 //
-                // -- verify ID is primary key on all tables
+                // -- verify ID is primary key on all tables with an id
                 foreach (TableModel table in DbBaseModel.createList<TableModel>(cp)) {
                     if (!string.IsNullOrWhiteSpace(table.name)) {
-                        //
-                        // -- read table primary key field
-                        string sql = ""
-                            + " SELECT Col.Column_Name"
-                            + " from INFORMATION_SCHEMA.TABLE_CONSTRAINTS Tab, INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE Col"
-                            + " WHERE (Col.Constraint_Name = Tab.Constraint_Name) AND (Col.Table_Name = Tab.Table_Name) AND (Constraint_Type = 'PRIMARY KEY') AND (Col.Table_Name = '" + table.name + "')";
-                        bool idFound = false;
-                        foreach (DataRow dr in core.db.executeQuery(sql).Rows) {
-                            if (GenericController.encodeText(dr["Column_Name"]).ToLower().Equals("id")) {
-                                idFound = true;
-                                break;
+                        bool tableHasId = false;
+                        {
+                            //
+                            // -- verify table as an id field
+                            string sql = "SELECT name FROM sys.columns WHERE Name = N'ID' AND Object_ID = Object_ID(N'ccmembers')";
+                            DataTable dt = cp.Db.ExecuteQuery(sql);
+                            if(dt!=null) {
+                                tableHasId = !dt.Rows.Equals(0);
                             }
                         }
-                        if (!idFound) {
-                            try {
-                                core.db.executeNonQuery("ALTER TABLE " + table.name + " ADD ID INT IDENTITY(1,1) NOT NULL");
-                                core.db.executeNonQuery("alter table " + table.name + " add primary key (ID)");
-                            } catch (Exception ex) {
-                                LogController.logError(core, ex, "Content Table [" + table.name + "] does not include column ID. Exception happened while adding column and setting it primarykey.");
-                                //throw;
+                        if (tableHasId) {
+                            //
+                            // -- table has id field, make sure it is primary key
+                            string sql = ""
+                                + " select Col.Column_Name"
+                                + " from INFORMATION_SCHEMA.TABLE_CONSTRAINTS Tab, INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE Col"
+                                + " where (Col.Constraint_Name = Tab.Constraint_Name) AND (Col.Table_Name = Tab.Table_Name) AND (Constraint_Type = 'PRIMARY KEY') AND (Col.Table_Name = '" + table.name + "')";
+                            bool idPrimaryKeyFound = false;
+                            foreach (DataRow dr in core.db.executeQuery(sql).Rows) {
+                                 if (GenericController.encodeText(dr["Column_Name"]).ToLower().Equals("id")) {
+                                    idPrimaryKeyFound = true;
+                                    break;
+                                }
+                            }
+                            if (!idPrimaryKeyFound) {
+                                try {
+                                    core.db.executeNonQuery("alter table " + table.name + " add primary key (ID)");
+                                } catch (Exception ex) {
+                                    LogController.logError(core, ex, "Content Table [" + table.name + "] does not include column ID. Exception happened while adding column and setting it primarykey.");
+                                }
                             }
                         }
                     }

@@ -147,6 +147,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // Make sure there is one here for this
                             //
+                            bool flushLinkAliasCache = false;
                             int linkAliasId = 0;
                             using (var csData = new CsModel(core)) {
                                 csData.open("Link Aliases", "name=" + DbController.encodeSQLText(normalizedLinkAlias), "", false, 0, "Name,PageID,QueryStringSuffix");
@@ -162,17 +163,19 @@ namespace Contensive.Processor.Controllers {
                                         csData.set("Name", normalizedLinkAlias);
                                         csData.set("Pageid", pageId);
                                         csData.set("QueryStringSuffix", queryStringSuffix);
+                                        flushLinkAliasCache = true;
                                     }
                                 } else {
+                                    int recordPageId = csData.getInteger("pageID");
+                                    string recordQss = csData.getText("QueryStringSuffix").ToLowerInvariant();
                                     //
-                                    LogController.logTrace(core, "addLinkAlias, this linkalias found by its name...");
+                                    LogController.logTrace(core, "addLinkAlias, linkalias record found by its name, record recordPageId [" + recordPageId + "], record QueryStringSuffix [" + recordQss + "]");
                                     //
                                     // Alias found, verify the pageid & QueryStringSuffix
                                     //
                                     int CurrentLinkAliasId = 0;
                                     bool resaveLinkAlias = false;
-                                    int LinkAliasPageId = csData.getInteger("pageID");
-                                    if ((csData.getText("QueryStringSuffix").ToLowerInvariant() == queryStringSuffix.ToLowerInvariant()) && (pageId == LinkAliasPageId)) {
+                                    if ((recordQss == queryStringSuffix.ToLowerInvariant()) && (pageId == recordPageId)) {
                                         CurrentLinkAliasId = csData.getInteger("id");
                                         //
                                         LogController.logTrace(core, "addLinkAlias, linkalias matches name, pageid, and querystring of linkalias [" + CurrentLinkAliasId + "]");
@@ -180,7 +183,7 @@ namespace Contensive.Processor.Controllers {
                                         // it maches a current entry for this link alias, if the current entry is not the highest number id,
                                         //   remove it and add this one
                                         //
-                                        string sql = "select top 1 id from ccLinkAliases where (pageid=" + LinkAliasPageId + ")and(QueryStringSuffix=" + DbController.encodeSQLText(queryStringSuffix) + ") order by id desc";
+                                        string sql = "select top 1 id from ccLinkAliases where (pageid=" + recordPageId + ")and(QueryStringSuffix=" + DbController.encodeSQLText(queryStringSuffix) + ") order by id desc";
                                         using (var CS3 = new CsModel(core)) {
                                             CS3.openSql(sql);
                                             if (CS3.ok()) {
@@ -203,29 +206,32 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     } else {
                                         //
+                                        LogController.logTrace(core, "addLinkAlias, linkalias matches name, but pageid and querystring are different. Add this a newest linkalias");
+                                        //
                                         // link alias matches, but id/qs does not -- this is either a change, or a duplicate that needs to be blocked
                                         //
                                         if (overRideDuplicate) {
                                             //
+                                            LogController.logTrace(core, "addLinkAlias, overRideDuplicate true, change the Link Alias to the new link");
+                                            //
                                             // change the Link Alias to the new link
                                             csData.set("Pageid", pageId);
                                             csData.set("QueryStringSuffix", queryStringSuffix);
-                                        } else if (AllowLinkAlias) {
+                                            flushLinkAliasCache = true;
+                                        } else if (dupCausesWarning) {
                                             //
-                                            // This alias points to a different link, and link aliasing is in use, call it an error (but save record anyway)
+                                            LogController.logTrace(core, "addLinkAlias, overRideDuplicate false, dupCausesWarning true, just return user warning if this is from admin");
                                             //
-                                            if (dupCausesWarning) {
-                                                if (LinkAliasPageId == 0) {
-                                                    int PageContentCId = Models.Domain.ContentMetadataModel.getContentId(core, "Page Content");
-                                                    return_WarningMessage = ""
-                                                        + "This page has been saved, but the Link Alias could not be created (" + normalizedLinkAlias + ") because it is already in use for another page."
-                                                        + " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique on this site. To set or change the Link Alias, clicke the Link Alias tab and select a name not used by another page or a folder in your website.";
-                                                } else {
-                                                    int PageContentCid = Models.Domain.ContentMetadataModel.getContentId(core, "Page Content");
-                                                    return_WarningMessage = ""
-                                                        + "This page has been saved, but the Link Alias could not be created (" + normalizedLinkAlias + ") because it is already in use for another page (<a href=\"?af=4&cid=" + PageContentCid + "&id=" + LinkAliasPageId + "\">edit</a>)."
-                                                        + " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique. To set or change the Link Alias, click the Link Alias tab and select a name not used by another page or a folder in your website.";
-                                                }
+                                            if (recordPageId == 0) {
+                                                int PageContentCId = Models.Domain.ContentMetadataModel.getContentId(core, "Page Content");
+                                                return_WarningMessage = ""
+                                                    + "This page has been saved, but the Link Alias could not be created (" + normalizedLinkAlias + ") because it is already in use for another page."
+                                                    + " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique on this site. To set or change the Link Alias, clicke the Link Alias tab and select a name not used by another page or a folder in your website.";
+                                            } else {
+                                                int PageContentCid = Models.Domain.ContentMetadataModel.getContentId(core, "Page Content");
+                                                return_WarningMessage = ""
+                                                    + "This page has been saved, but the Link Alias could not be created (" + normalizedLinkAlias + ") because it is already in use for another page (<a href=\"?af=4&cid=" + PageContentCid + "&id=" + recordPageId + "\">edit</a>)."
+                                                    + " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique. To set or change the Link Alias, click the Link Alias tab and select a name not used by another page or a folder in your website.";
                                             }
                                         }
                                     }
@@ -233,11 +239,15 @@ namespace Contensive.Processor.Controllers {
                                 linkAliasId = csData.getInteger("id");
                                 csData.close();
                             }
-                            core.cache.invalidateDbRecord(linkAliasId, LinkAliasModel.tableMetadata.tableNameLower);
-                            //
-                            // -- force route reload if this is a webserver page
-                            Models.Domain.RouteMapModel.invalidateCache(core);
-                            core.routeMapCacheClear();
+                            if (flushLinkAliasCache) {
+                                //
+                                // -- invalidate all linkAlias
+                                core.cache.invalidateDbRecord(linkAliasId, LinkAliasModel.tableMetadata.tableNameLower);
+                                //
+                                // -- invalidate routemap
+                                Models.Domain.RouteMapModel.invalidateCache(core);
+                                core.routeMapCacheClear();
+                            }
                         }
                     }
                 }
