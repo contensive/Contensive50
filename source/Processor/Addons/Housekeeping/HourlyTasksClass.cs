@@ -2,7 +2,7 @@
 using Contensive.Processor.Controllers;
 using System;
 
-namespace Contensive.Addons.Housekeeping {
+namespace Contensive.Processor.Addons.Housekeeping {
     //
     public static class HourlyTasksClass {
         //

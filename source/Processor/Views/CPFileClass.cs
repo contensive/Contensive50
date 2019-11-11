@@ -225,13 +225,13 @@ namespace Contensive.Processor {
             string result = "";
             if (core.wwwFiles.isinLocalAbsDosPath(pathFolderName)) {
                 List<FileDetail> fi = core.wwwFiles.getFileList(core.wwwFiles.convertLocalAbsToRelativePath(pathFolderName));
-                result = UpgradeController.Upgrade51ConvertFileInfoArrayToParseString(fi);
+                result = UpgradeController.upgrade51ConvertFileInfoArrayToParseString(fi);
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
                 List<FileDetail> fi = core.privateFiles.getFileList(core.privateFiles.convertLocalAbsToRelativePath(pathFolderName));
-                result = UpgradeController.Upgrade51ConvertFileInfoArrayToParseString(fi);
+                result = UpgradeController.upgrade51ConvertFileInfoArrayToParseString(fi);
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
                 List<FileDetail> fi = core.cdnFiles.getFileList(core.cdnFiles.convertLocalAbsToRelativePath(pathFolderName));
-                result = UpgradeController.Upgrade51ConvertFileInfoArrayToParseString(fi);
+                result = UpgradeController.upgrade51ConvertFileInfoArrayToParseString(fi);
             } else {
                 throw (new GenericException("Application cannot access this path [" + pathFolderName + "]"));
             }
@@ -259,13 +259,13 @@ namespace Contensive.Processor {
             string result = "";
             if (core.wwwFiles.isinLocalAbsDosPath(pathFolderName)) {
                 List<FolderDetail> fi = core.wwwFiles.getFolderList(core.wwwFiles.convertLocalAbsToRelativePath(pathFolderName));
-                result = UpgradeController.Upgrade51ConvertDirectoryInfoArrayToParseString(fi);
+                result = UpgradeController.upgrade51ConvertDirectoryInfoArrayToParseString(fi);
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
                 List<FolderDetail> fi = core.privateFiles.getFolderList(core.privateFiles.convertLocalAbsToRelativePath(pathFolderName));
-                result = UpgradeController.Upgrade51ConvertDirectoryInfoArrayToParseString(fi);
+                result = UpgradeController.upgrade51ConvertDirectoryInfoArrayToParseString(fi);
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
                 List<FolderDetail> fi = core.cdnFiles.getFolderList(core.cdnFiles.convertLocalAbsToRelativePath(pathFolderName));
-                result = UpgradeController.Upgrade51ConvertDirectoryInfoArrayToParseString(fi);
+                result = UpgradeController.upgrade51ConvertDirectoryInfoArrayToParseString(fi);
             } else {
                 throw (new GenericException("Application cannot access this path [" + pathFolderName + "]"));
             }

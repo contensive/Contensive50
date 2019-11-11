@@ -6,7 +6,7 @@ using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
 using Contensive.Models.Db;
 
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     //
     public class SetAdminSiteFieldHelpClass : Contensive.BaseClasses.AddonBaseClass {
         //

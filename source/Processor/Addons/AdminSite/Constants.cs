@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     public static class Constants {
         //
         internal const int ToolsActionMenuMove = 1;

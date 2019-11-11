@@ -9,7 +9,7 @@ using Contensive.Models.Db;
 using System.Globalization;
 using System.Data;
 //
-namespace Contensive.Addons.Diagnostics {
+namespace Contensive.Processor.Addons.Diagnostics {
     //
     public class ServerDiagnosticClass : Contensive.BaseClasses.AddonBaseClass {
         //

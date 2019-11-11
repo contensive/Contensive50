@@ -6,7 +6,7 @@ using static Contensive.Processor.Constants;
 using System.Xml;
 using Contensive.Processor;
 
-namespace Contensive.Addons.Housekeeping {
+namespace Contensive.Processor.Addons.Housekeeping {
     //
     public static class VisitSummaryClass {
         //

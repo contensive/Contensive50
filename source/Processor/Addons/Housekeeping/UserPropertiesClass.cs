@@ -5,7 +5,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 
-namespace Contensive.Addons.Housekeeping {
+namespace Contensive.Processor.Addons.Housekeeping {
     //
     public static class UserProperyClass {
 

@@ -1,7 +1,7 @@
 ﻿
 using Contensive.Processor;
 //
-namespace Contensive.Addons.Personalization {
+namespace Contensive.Processor.Addons.Personalization {
     //
     public class CompanyClass : Contensive.BaseClasses.AddonBaseClass {
         //

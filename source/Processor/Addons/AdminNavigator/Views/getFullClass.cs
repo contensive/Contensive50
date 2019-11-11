@@ -5,7 +5,7 @@ using System.Text;
 using Contensive.BaseClasses;
 using Contensive.Processor.Controllers;
 
-namespace Contensive.Addons.AdminNavigator {
+namespace Contensive.Processor.Addons.AdminNavigator {
 	//
 	public class getFullClass : AddonBaseClass {
 		//

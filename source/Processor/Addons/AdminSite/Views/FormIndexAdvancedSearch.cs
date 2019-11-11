@@ -6,11 +6,11 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
-using Contensive.Addons.AdminSite.Controllers;
+using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     public class FormIndexAdvancedSearchClass {
         //
         //=================================================================================

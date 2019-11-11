@@ -15,7 +15,7 @@
 //using static Contensive.Processor.constants;
 //using Contensive.Processor.Models.Complex;
 ////
-//namespace Contensive.Addons.Primitives {
+//namespace Contensive.Processor.Addons.Primitives {
 //    public class processPayPalConformMethodClass : Contensive.BaseClasses.AddonBaseClass {
 //        //
 //        //====================================================================================================

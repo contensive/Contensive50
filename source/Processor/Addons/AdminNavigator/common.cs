@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Contensive.Addons.AdminNavigator {
+namespace Contensive.Processor.Addons.AdminNavigator {
     static class common {
         //
         internal const string IconAdvanced = "<img src=\"/cclib/images/NavAdv.gif\" class=\"ccImgA\" title=\"{title}\">";

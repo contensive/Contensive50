@@ -5,11 +5,11 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
 using static Contensive.Processor.Constants;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using System.Net;
 using Contensive.Models.Db;
 
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     public class ControlEditor {
         //
         //========================================================================

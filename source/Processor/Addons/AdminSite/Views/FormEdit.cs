@@ -7,14 +7,14 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
+using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Processor;
 using Contensive.Models.Db;
 
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     public static class FormEdit {
         //
         // ====================================================================================================

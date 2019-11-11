@@ -8,7 +8,7 @@ using System.Text;
 using Contensive.Models.Db;
 using System.Globalization;
 //
-namespace Contensive.Addons.Primitives {
+namespace Contensive.Processor.Addons.Primitives {
     public class AuthenticateClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================

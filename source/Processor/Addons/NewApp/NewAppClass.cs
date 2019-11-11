@@ -21,7 +21,7 @@ using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
 //
-namespace Contensive.Addons.NewApp {
+namespace Contensive.Processor.Addons.NewApp {
     //
     public class NewAppClass : Contensive.BaseClasses.AddonBaseClass {
         //

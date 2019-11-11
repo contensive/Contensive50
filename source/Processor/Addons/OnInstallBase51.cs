@@ -5,7 +5,7 @@ using Contensive.Processor;
 using System.Text;
 using Contensive.Models.Db;
 //
-namespace Contensive.Addons.Base {
+namespace Contensive.Processor.Addons.Base {
     //
     public class OnInstallClass : Contensive.BaseClasses.AddonBaseClass {
         //

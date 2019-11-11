@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
+using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
 //
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     public class IndexConfigClass {
         public bool loaded { get; set; }
         public int contentID { get; set; }

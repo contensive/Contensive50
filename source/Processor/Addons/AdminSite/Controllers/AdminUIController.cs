@@ -14,7 +14,7 @@ using Contensive.Models.Db;
 using System.Globalization;
 using Contensive.Processor.Addons.AdminSite.Models;
 
-namespace Contensive.Addons.AdminSite.Controllers {
+namespace Contensive.Processor.Addons.AdminSite.Controllers {
     //
     //====================================================================================================
     /// <summary>

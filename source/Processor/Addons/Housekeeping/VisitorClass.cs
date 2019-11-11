@@ -4,7 +4,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 
-namespace Contensive.Addons.Housekeeping {
+namespace Contensive.Processor.Addons.Housekeeping {
     //
     public static class VisitorClass {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {

@@ -11,7 +11,7 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
 //
-namespace Contensive.Addons.AddonListEditor {
+namespace Contensive.Processor.Addons.AddonListEditor {
     public class SetSampleAddonListClass : AddonBaseClass {
         // 
         // ====================================================================================================

@@ -4,7 +4,7 @@ using Contensive.Processor.Controllers;
 using System;
 using System.Data;
 //
-namespace Contensive.Addons.ExportSql {
+namespace Contensive.Processor.Addons.ExportSql {
     //
     public class ExportCsvClass : Contensive.BaseClasses.AddonBaseClass {
         //

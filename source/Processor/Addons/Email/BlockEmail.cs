@@ -7,7 +7,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Models.Db;
 using Contensive.Processor.Properties;
 //
-namespace Contensive.Addons.Primitives {
+namespace Contensive.Processor.Addons.Primitives {
     public class BlockEmailClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================

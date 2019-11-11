@@ -3,7 +3,7 @@ using System;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
 //
-namespace Contensive.Addons.Primitives {
+namespace Contensive.Processor.Addons.Primitives {
     public class ValidateEmailClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================

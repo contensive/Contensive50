@@ -899,12 +899,13 @@ namespace Contensive.Processor.Controllers {
         private static void verifySortMethod(CoreController core, string Name, string OrderByCriteria) {
             try {
                 //
-                NameValueCollection sqlList = new NameValueCollection();
-                sqlList.Add("name", DbController.encodeSQLText(Name));
-                sqlList.Add("CreatedBy", "0");
-                sqlList.Add("OrderByClause", DbController.encodeSQLText(OrderByCriteria));
-                sqlList.Add("active", SQLTrue);
-                sqlList.Add("contentControlId", ContentMetadataModel.getContentId(core, "Sort Methods").ToString());
+                NameValueCollection sqlList = new NameValueCollection {
+                    { "name", DbController.encodeSQLText(Name) },
+                    { "CreatedBy", "0" },
+                    { "OrderByClause", DbController.encodeSQLText(OrderByCriteria) },
+                    { "active", SQLTrue },
+                    { "contentControlId", ContentMetadataModel.getContentId(core, "Sort Methods").ToString() }
+                };
                 //
                 DataTable dt = core.db.openTable("ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1, 1);
                 if (dt.Rows.Count > 0) {

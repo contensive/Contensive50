@@ -1,5 +1,5 @@
 ﻿
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     //
     public class GetOKClass : Contensive.BaseClasses.AddonBaseClass {
         //

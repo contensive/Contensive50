@@ -7,7 +7,7 @@ using Contensive.Processor;
 using Contensive.BaseClasses;
 using System.Collections.Generic;
 
-namespace Contensive.Addons.Housekeeping {
+namespace Contensive.Processor.Addons.Housekeeping {
     //
     public static class MetadataClass {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {

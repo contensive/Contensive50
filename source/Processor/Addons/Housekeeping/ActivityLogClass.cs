@@ -5,7 +5,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor;
 
-namespace Contensive.Addons.Housekeeping {
+namespace Contensive.Processor.Addons.Housekeeping {
     //
     public static class ActivityLogClass {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {

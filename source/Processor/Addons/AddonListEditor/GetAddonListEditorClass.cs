@@ -9,7 +9,7 @@ using Contensive.Processor.Controllers;
 
 using Contensive.Processor.Models.Domain;
 //
-namespace Contensive.Addons.AddonListEditor {
+namespace Contensive.Processor.Addons.AddonListEditor {
     public class GetAddonListEditorClass : AddonBaseClass {
         // 
         // ====================================================================================================

@@ -7,10 +7,10 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     public class FormIndexSetColumnsClass {
         //
         //=============================================================================

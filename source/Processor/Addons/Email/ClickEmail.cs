@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Models.Db;
 //
-namespace Contensive.Addons.Primitives {
+namespace Contensive.Processor.Addons.Primitives {
     public class ClickEmailClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================

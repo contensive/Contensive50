@@ -355,7 +355,7 @@ namespace Contensive.Processor {
         /// <param name="FileInfo"></param>
         /// <returns></returns>
         public override string Upgrade51ConvertFileInfoArrayToParseString(List<CPFileSystemBaseClass.FileDetail> FileInfo) {
-            return UpgradeController.Upgrade51ConvertFileInfoArrayToParseString(FileInfo);
+            return UpgradeController.upgrade51ConvertFileInfoArrayToParseString(FileInfo);
         }
         //
         //==============================================================================================================
@@ -365,7 +365,7 @@ namespace Contensive.Processor {
         /// <param name="DirectoryInfo"></param>
         /// <returns></returns>
         public override string Upgrade51ConvertDirectoryInfoArrayToParseString(List<CPFileSystemBaseClass.FolderDetail> DirectoryInfo) {
-            return UpgradeController.Upgrade51ConvertDirectoryInfoArrayToParseString(DirectoryInfo);
+            return UpgradeController.upgrade51ConvertDirectoryInfoArrayToParseString(DirectoryInfo);
         }
         //
         //====================================================================================================

@@ -16,12 +16,12 @@ using static Contensive.Processor.Constants;
 //
 using System.Threading;
 using Contensive.Processor.Exceptions;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 //
-namespace Contensive.Addons.Tools {
+namespace Contensive.Processor.Addons.Tools {
     public class LegacyToolsClass {
         //
         // ----- global scope variables
@@ -2111,7 +2111,7 @@ namespace Contensive.Addons.Tools {
                     //
                     // Files
                     //
-                    SourceFolders = UpgradeController.Upgrade51ConvertFileInfoArrayToParseString(core.wwwFiles.getFileList(StartPath + CurrentPath));
+                    SourceFolders = UpgradeController.upgrade51ConvertFileInfoArrayToParseString(core.wwwFiles.getFileList(StartPath + CurrentPath));
                     if (string.IsNullOrEmpty(SourceFolders)) {
                         FileSize = "";
                         FileDate = "";

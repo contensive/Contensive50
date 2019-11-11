@@ -18,7 +18,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="FileInfo"></param>
         /// <returns></returns>
-        public static string Upgrade51ConvertFileInfoArrayToParseString(List<CPFileSystemBaseClass.FileDetail> FileInfo) {
+        public static string upgrade51ConvertFileInfoArrayToParseString(List<CPFileSystemBaseClass.FileDetail> FileInfo) {
             var result = new System.Text.StringBuilder();
             if (FileInfo.Count > 0) {
                 foreach (CPFileSystemBaseClass.FileDetail fi in FileInfo) {
@@ -34,7 +34,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="DirectoryInfo"></param>
         /// <returns></returns>
-        public static string Upgrade51ConvertDirectoryInfoArrayToParseString(List<CPFileSystemBaseClass.FolderDetail> DirectoryInfo) {
+        public static string upgrade51ConvertDirectoryInfoArrayToParseString(List<CPFileSystemBaseClass.FolderDetail> DirectoryInfo) {
             var result = new System.Text.StringBuilder();
             if (DirectoryInfo.Count > 0) {
                 foreach (CPFileSystemBaseClass.FolderDetail di in DirectoryInfo) {

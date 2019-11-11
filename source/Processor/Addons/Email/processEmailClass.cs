@@ -10,7 +10,7 @@ using Contensive.BaseClasses;
 using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
 //
-namespace Contensive.Addons.Email {
+namespace Contensive.Processor.Addons.Email {
     public class ProcessEmailClass : AddonBaseClass {
         //
         //====================================================================================================

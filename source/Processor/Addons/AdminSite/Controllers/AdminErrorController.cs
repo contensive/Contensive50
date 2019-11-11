@@ -14,10 +14,10 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using Contensive.Addons.Tools;
-using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
+using Contensive.Processor.Addons.Tools;
+using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
 //
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     public static class AdminErrorController {
         //
         //===========================================================================

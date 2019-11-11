@@ -17,7 +17,7 @@ using System.Text;
 using Contensive.Models.Db;
 using System.Globalization;
 //
-namespace Contensive.Addons.Diagnostics {
+namespace Contensive.Processor.Addons.Diagnostics {
     //
     public class StatusClass : Contensive.BaseClasses.AddonBaseClass {
         //

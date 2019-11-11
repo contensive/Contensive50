@@ -9,7 +9,7 @@ using Contensive.Processor;
 using Contensive.Processor.Controllers;
 
 
-namespace Contensive.Addons.AdminNavigator {
+namespace Contensive.Processor.Addons.AdminNavigator {
     public class GetNodeClass : AddonBaseClass {
         //
         public struct NavigatorEnvironment {

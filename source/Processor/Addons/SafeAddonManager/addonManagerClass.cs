@@ -14,11 +14,11 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
 using Contensive.Models.Db;
 //
-namespace Contensive.Addons.SafeAddonManager {
+namespace Contensive.Processor.Addons.SafeAddonManager {
     public class AddonManagerClass {
         //
         // constructor sets cp from argument for use in calls to other objects, then core because cp cannot be uses since that would be a circular depenancy

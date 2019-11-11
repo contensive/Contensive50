@@ -16,7 +16,7 @@ using static Contensive.Processor.Constants;
 //
 using Contensive.BaseClasses;
 //
-namespace Contensive.Addons.Primitives {
+namespace Contensive.Processor.Addons.Primitives {
     public class ProcessLoginDefaultMethodClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================

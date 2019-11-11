@@ -53,7 +53,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 string ResultLogFilename = "";
                 // act
                 EmailController.queueAdHocEmail(cp.core, "Unit Test", 0, "to@kma.net", "from@kma.net", "subject", body, "bounce@kma.net", "replyTo@kma.net", ResultLogFilename, true, true, 0, ref sendStatus);
-                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.ProcessEmailClass();
+                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Processor.Addons.Email.ProcessEmailClass();
                 addon.Execute(cp);
                 // assert
                 Assert.AreEqual(1, cp.core.mockEmailList.Count);
@@ -83,7 +83,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 string sendStatus = "";
                 // act
                 Assert.IsTrue(EmailController.queuePersonEmail(cp.core, "Function Test", toPerson, "from@kma.net", "subject", body, "bounce@kma.net", "replyTo@kma.net", true, true, 0, "", true, ref sendStatus));
-                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.ProcessEmailClass();
+                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Processor.Addons.Email.ProcessEmailClass();
                 addon.Execute(cp);
                 // assert
                 Assert.AreEqual(1, cp.core.mockEmailList.Count);
@@ -156,7 +156,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 int additionalMemberId = 0;
                 string appendedCopy = "";
                 Assert.IsTrue(EmailController.queueSystemEmail(cp.core, systemEmail.name, appendedCopy, additionalMemberId, ref userErrorMessage));
-                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.ProcessEmailClass();
+                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Processor.Addons.Email.ProcessEmailClass();
                 addon.Execute(cp);
                 //
                 // assert 2 emails, first the to-address, second the confirmation

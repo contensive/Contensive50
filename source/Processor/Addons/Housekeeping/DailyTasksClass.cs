@@ -6,7 +6,7 @@ using Contensive.Processor.Controllers;
 using System;
 using Contensive.Processor.Models.Domain;
 
-namespace Contensive.Addons.Housekeeping {
+namespace Contensive.Processor.Addons.Housekeeping {
     //
     public static class DailyTasksClass {
         //====================================================================================================

@@ -7,16 +7,16 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using Contensive.Addons.Tools;
-using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
+using Contensive.Processor.Addons.Tools;
+using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using System.Globalization;
 using Contensive.Processor.Addons.AdminSite.Models;
 
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     public class GetHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
         ////
         //private CPClass cp;
@@ -264,7 +264,7 @@ namespace Contensive.Addons.AdminSite {
                         } else if (adminData.adminForm == AdminFormSecurityControl) {
                             AddonGuid = Constants.AddonGuidPreferences;
                         } else if (adminData.adminForm == AdminFormMetaKeywordTool) {
-                            adminBody = (new Contensive.Addons.Tools.MetakeywordToolClass()).Execute(cp) as string;
+                            adminBody = (new Contensive.Processor.Addons.Tools.MetakeywordToolClass()).Execute(cp) as string;
                         } else if ((adminData.adminForm == AdminFormMobileBrowserControl) || (adminData.adminForm == AdminFormPageControl) || (adminData.adminForm == AdminFormEmailControl)) {
                             adminBody = cp.core.addon.execute(Constants.AddonGuidPreferences, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,

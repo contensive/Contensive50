@@ -6,7 +6,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using System.Threading.Tasks;
 
-namespace Contensive.Addons.Housekeeping {
+namespace Contensive.Processor.Addons.Housekeeping {
     //
     public static class VisitorPropertyClass {
 

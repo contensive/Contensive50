@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Models.Db;
 //
-namespace Contensive.Addons.PageManager {
+namespace Contensive.Processor.Addons.PageManager {
     public class getChildPageList : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================

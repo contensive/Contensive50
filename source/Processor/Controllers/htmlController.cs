@@ -10,7 +10,7 @@ using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Models;
 using Contensive.Models.Db;
 using System.Globalization;
@@ -1777,7 +1777,7 @@ namespace Contensive.Processor.Controllers {
             string returnHtml = "";
             try {
                 var fieldEditorAddonList = EditorController.getFieldEditorAddonList(core);
-                Contensive.Addons.AdminSite.FieldTypeEditorAddonModel fieldEditor = fieldEditorAddonList.Find(x => x.fieldTypeId == (int)CPContentBaseClass.FieldTypeIdEnum.HTML);
+                Contensive.Processor.Addons.AdminSite.FieldTypeEditorAddonModel fieldEditor = fieldEditorAddonList.Find(x => x.fieldTypeId == (int)CPContentBaseClass.FieldTypeIdEnum.HTML);
                 int FieldEditorAddonId = 0;
                 if (fieldEditor != null) {
                     FieldEditorAddonId = fieldEditor.editorAddonId;

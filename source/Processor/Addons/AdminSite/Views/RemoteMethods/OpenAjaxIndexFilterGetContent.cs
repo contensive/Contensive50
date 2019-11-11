@@ -3,7 +3,7 @@ using System;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
 
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     public class OpenAjaxIndexFilterGetContentClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================

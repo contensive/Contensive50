@@ -4,12 +4,12 @@ using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Processor.Exceptions;
 using System.Collections.Generic;
 using Contensive.Models.Db;
 
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     public class ToolCustomReports {
         //
         //========================================================================

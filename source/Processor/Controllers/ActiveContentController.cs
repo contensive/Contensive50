@@ -5,7 +5,7 @@ using Contensive.BaseClasses;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using System.Collections.Generic;
 using System.Linq;
 using Contensive.Models.Db;

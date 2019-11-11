@@ -1,10 +1,10 @@
 ﻿
 using System;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
 
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     public class ContentTrackingEditor {
         //
         //========================================================================

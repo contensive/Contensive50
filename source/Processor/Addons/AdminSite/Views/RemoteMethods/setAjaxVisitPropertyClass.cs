@@ -5,7 +5,7 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Constants;
 
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     //
     public class SetAjaxVisitPropertyClass : Contensive.BaseClasses.AddonBaseClass {
         //

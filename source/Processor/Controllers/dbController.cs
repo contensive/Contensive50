@@ -376,15 +376,16 @@ namespace Contensive.Processor.Controllers {
             try {
                 string sqlGuid = encodeSQLText(GenericController.getGUID());
                 string sqlDateAdded = encodeSQLDate(DateTime.Now);
-                NameValueCollection sqlList = new NameValueCollection();
-                sqlList.Add("ccGuid", sqlGuid);
-                sqlList.Add("dateadded", sqlDateAdded);
-                sqlList.Add("createdby", encodeSQLNumber(memberId));
-                sqlList.Add("ModifiedDate", sqlDateAdded);
-                sqlList.Add("ModifiedBy", encodeSQLNumber(memberId));
-                sqlList.Add("contentControlId", encodeSQLNumber(0));
-                sqlList.Add("Name", encodeSQLText(""));
-                sqlList.Add("Active", encodeSQLNumber(1));
+                NameValueCollection sqlList = new NameValueCollection {
+                    { "ccGuid", sqlGuid },
+                    { "dateadded", sqlDateAdded },
+                    { "createdby", encodeSQLNumber(memberId) },
+                    { "ModifiedDate", sqlDateAdded },
+                    { "ModifiedBy", encodeSQLNumber(memberId) },
+                    { "contentControlId", encodeSQLNumber(0) },
+                    { "Name", encodeSQLText("") },
+                    { "Active", encodeSQLNumber(1) }
+                };
                 //
                 insert(tableName, sqlList);
                 return openTable(tableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1, 1);

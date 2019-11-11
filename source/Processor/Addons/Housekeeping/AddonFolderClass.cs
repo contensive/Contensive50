@@ -9,7 +9,7 @@ using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using Contensive.Exceptions;
 using System.Globalization;
 
-namespace Contensive.Addons.Housekeeping {
+namespace Contensive.Processor.Addons.Housekeeping {
     //
     public static class AddonFolderClass {
         //====================================================================================================

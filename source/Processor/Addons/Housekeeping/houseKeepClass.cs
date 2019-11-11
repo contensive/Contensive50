@@ -20,7 +20,7 @@ using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor.Models.Domain;
 //
-namespace Contensive.Addons.Housekeeping {
+namespace Contensive.Processor.Addons.Housekeeping {
     /// <summary>
     /// support for housekeeping functions
     /// </summary>

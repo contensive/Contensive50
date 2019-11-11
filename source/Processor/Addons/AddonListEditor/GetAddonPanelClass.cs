@@ -11,7 +11,7 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
 //
-namespace Contensive.Addons.AddonListEditor {
+namespace Contensive.Processor.Addons.AddonListEditor {
     public class GetAddonPanelClass : AddonBaseClass {
         //
         public const string guidDesignBlockFourColumn = "{a9915665-3287-4c14-8fb5-039cc4c115de}";

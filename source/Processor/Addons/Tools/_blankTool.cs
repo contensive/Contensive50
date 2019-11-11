@@ -14,9 +14,9 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 //
-namespace Contensive.Addons.Tools {
+namespace Contensive.Processor.Addons.Tools {
     //
     public class _blankToolClass : Contensive.BaseClasses.AddonBaseClass {
         //

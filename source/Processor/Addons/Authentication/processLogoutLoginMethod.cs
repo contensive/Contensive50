@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 //
-namespace Contensive.Addons.Primitives {
+namespace Contensive.Processor.Addons.Primitives {
     public class ProcessLogoutLoginMethodClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================

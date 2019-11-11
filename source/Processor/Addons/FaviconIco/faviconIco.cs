@@ -14,7 +14,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
-namespace Contensive.Addons.FaviconIco {
+namespace Contensive.Processor.Addons.FaviconIco {
     public class FaviconIcoClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================

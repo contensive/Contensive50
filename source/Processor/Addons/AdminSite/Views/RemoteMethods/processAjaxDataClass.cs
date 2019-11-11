@@ -4,7 +4,7 @@ using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Exceptions;
 
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Processor.Addons.AdminSite {
     //
     public class ProcessAjaxDataClass : Contensive.BaseClasses.AddonBaseClass {
         //

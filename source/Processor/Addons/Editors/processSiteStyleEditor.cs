@@ -14,7 +14,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
-namespace Contensive.Addons.Primitives {
+namespace Contensive.Processor.Addons.Primitives {
     public class processSiteStyleEditorClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================

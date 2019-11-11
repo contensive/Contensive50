@@ -8,11 +8,11 @@ using Contensive.Processor.Models;
 
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 //
-namespace Contensive.Addons.Tools {
+namespace Contensive.Processor.Addons.Tools {
     //
     public class ConfigureContentEditClass : Contensive.BaseClasses.AddonBaseClass {
         //

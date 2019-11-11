@@ -11,7 +11,7 @@ using System.IO;
 using System.Data;
 using System.Linq;
 using Contensive.Processor.Exceptions;
-using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
 using Contensive.Models.Db;
@@ -1931,7 +1931,7 @@ namespace Contensive.Processor.Controllers {
                     AddonStatusOK = false;
                 }
                 if (!AddonStatusOK) {
-                    Contensive.Addons.SafeAddonManager.AddonManagerClass AddonMan = new Contensive.Addons.SafeAddonManager.AddonManagerClass(core);
+                    Contensive.Processor.Addons.SafeAddonManager.AddonManagerClass AddonMan = new Contensive.Processor.Addons.SafeAddonManager.AddonManagerClass(core);
                     result = AddonMan.getForm_SafeModeAddonManager();
                 }
             } catch (Exception ex) {

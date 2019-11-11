@@ -7,7 +7,7 @@ using Contensive.Processor;
 using System.Xml;
 using Contensive.Exceptions;
 
-namespace Contensive.Addons.Housekeeping {
+namespace Contensive.Processor.Addons.Housekeeping {
     //
     public static class PageContentClass {
 
