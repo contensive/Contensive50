@@ -237,26 +237,35 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// Returns true of the type is in this DbModels. Returns false if the type is a derived type outside this project.
+        /// Determine if the record can be cached.
+        /// If the call comes from within Contensive.DbModels or Contensive.Processor, allow record caching. Otherwise block record caching.
+        /// 
+        /// Returns true of the type is within this DLLin this DbModels. Returns false if the type is a derived type outside this project.
         /// Used to block cache reads and writes for derived classes because those objects are corrupting the cache (failing deserialization into base types).
         /// Need a better fix -- maybe cache the base objects in one key and the derived class's properties in an 'extended' (or 'derived' cache).
         /// </summary>
         /// <param name="sourceType"></param>
         /// <param name="stackDepth"></param>
         /// <returns></returns>
-        private static bool isBaseType(Type sourceType) {
+        private static bool allowRecordCaching(Type sourceType) {
             //
             var stackTrace = new StackTrace();
+            //
+            // -- return false if the type is a subsclass outside of this project.
             bool isModelLocal = sourceType.Namespace.ToLower().Equals("contensive.models.db");
             if(!isModelLocal) { return false;  }
             for (int stackPtr = 2; stackPtr <= stackTrace.FrameCount-1; stackPtr++) {
-                var methodBase = stackTrace.GetFrame(stackPtr).GetMethod();
-                var Class = methodBase.ReflectedType;
-                var Namespace = Class.Namespace;
-                bool namespaceNotProcess = Namespace.ToLower().Substring(0, 20).Equals("contensive.processor");
-                if(namespaceNotProcess) { return true; }
+                MethodBase stackMethod = stackTrace.GetFrame(stackPtr).GetMethod();
+                Type stackClass = stackMethod.ReflectedType;
+                string stackNamespace = stackClass.Namespace.ToLowerInvariant();
+                //
+                // -- return false if calling method is outside of dbmodels and processor
+                bool namespaceWithinDbModels = (stackNamespace.Length>=20) && stackNamespace.Substring(0, 20).Equals("contensive.models.db");
+                bool namespaceWithinProcessor = (stackNamespace.Length >= 20) && stackNamespace.Substring(0, 20).Equals("contensive.processor");
+                if (!namespaceWithinProcessor && !namespaceWithinDbModels) { return false; }
+                if (namespaceWithinProcessor) { return true; }
             }
-            return false;
+            return true;
             //
             //return sourceType.Namespace.ToLower().Equals("contensive.models.db");
         }
@@ -525,7 +534,7 @@ namespace Contensive.Models.Db {
                 T result = default(T);
                 if (isAppInvalid(cp)) { return result; }
                 if (recordId <= 0) { return result; }
-                result = (isBaseType(typeof(T))) ? readRecordCache<T>(cp, recordId) : null;
+                result = (allowRecordCaching(typeof(T))) ? readRecordCache<T>(cp, recordId) : null;
                 if (result == null) {
                     using (var dt = cp.Db.ExecuteQuery(getSelectSql<T>(cp, null, "(id=" + recordId + ")", ""))) {
                         if (dt != null) {
@@ -592,7 +601,7 @@ namespace Contensive.Models.Db {
                 T result = default(T);
                 if (isAppInvalid(cp)) { return result; }
                 if (string.IsNullOrEmpty(recordGuid)) { return result; }
-                result = (isBaseType(typeof(T))) ? readRecordCacheByGuidPtr<T>(cp, recordGuid) : null;
+                result = (allowRecordCaching(typeof(T))) ? readRecordCacheByGuidPtr<T>(cp, recordGuid) : null;
                 if (result != null) { return result; }
                 using (var dt = cp.Db.ExecuteQuery(getSelectSql<T>(cp, null, "(ccGuid=" + cp.Db.EncodeSQLText(recordGuid) + ")", ""))) {
                     if (dt != null) {
@@ -633,7 +642,7 @@ namespace Contensive.Models.Db {
                 if (!string.IsNullOrEmpty(recordName)) {
                     //
                     // -- if allowCache, then this subclass is for a content that has a unique name. read the name pointer
-                    result = (isBaseType(typeof(T)) && derivedNameFieldIsUnique(typeof(T))) ? readRecordCacheByUniqueNamePtr<T>(cp, recordName) : null;
+                    result = (allowRecordCaching(typeof(T)) && derivedNameFieldIsUnique(typeof(T))) ? readRecordCacheByUniqueNamePtr<T>(cp, recordName) : null;
                     if (result == null) {
                         using (var dt = cp.Db.ExecuteQuery(getSelectSql<T>(cp, null, "(name=" + cp.Db.EncodeSQLText(recordName) + ")", ""))) {
                             if (dt != null) {
@@ -751,7 +760,7 @@ namespace Contensive.Models.Db {
                         }
                     }
 
-                    if ((isBaseType(typeof(T))) && (instance != null)) {
+                    if ((allowRecordCaching(typeof(T))) && (instance != null)) {
                         //
                         // -- set primary cache to the object created
                         // -- set secondary caches to the primary cache
@@ -926,7 +935,7 @@ namespace Contensive.Models.Db {
                     if (id == 0) { id = cp.Db.Add(tableName, userId); }
                     cp.Db.Update(tableName, "(id=" + id.ToString() + ")", sqlPairs, asyncSave);
                 }
-                if (!isBaseType(this.GetType())) {
+                if (!allowRecordCaching(this.GetType())) {
                     //
                     // -- the object being saved is a derived type and cannot be saved to the base object's cache. Clear the cache
                     cp.Cache.Invalidate(cp.Cache.CreateKeyForDbRecord(id, tableName, datasourceName));
@@ -1379,7 +1388,7 @@ namespace Contensive.Models.Db {
         /// <param name="recordId"></param>
         /// <returns></returns>
         private static T readRecordCache<T>(CPBaseClass cp, int recordId) where T : DbBaseModel {
-            if (!isBaseType(typeof(T))) return null;
+            if (!allowRecordCaching(typeof(T))) return null;
             T result = cp.Cache.GetObject<T>(cp.Cache.CreateKeyForDbRecord(recordId, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
             restoreCacheDataObjects(cp, result);
             return result;
@@ -1394,7 +1403,7 @@ namespace Contensive.Models.Db {
         /// <param name="ccGuid"></param>
         /// <returns></returns>
         private static T readRecordCacheByGuidPtr<T>(CPBaseClass cp, string ccGuid) where T : DbBaseModel {
-            if (!isBaseType(typeof(T))) return null;
+            if (!allowRecordCaching(typeof(T))) return null;
             T result = cp.Cache.GetObject<T>(cp.Cache.CreatePtrKeyforDbRecordGuid(ccGuid, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
             restoreCacheDataObjects(cp, result);
             return result;
@@ -1409,7 +1418,7 @@ namespace Contensive.Models.Db {
         /// <param name="uniqueName"></param>
         /// <returns></returns>
         private static T readRecordCacheByUniqueNamePtr<T>(CPBaseClass cp, string uniqueName) where T : DbBaseModel {
-            if (!isBaseType(typeof(T))) return null;
+            if (!allowRecordCaching(typeof(T))) return null;
             T result = cp.Cache.GetObject<T>(cp.Cache.CreatePtrKeyforDbRecordUniqueName(uniqueName, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
             restoreCacheDataObjects(cp, result);
             return result;
@@ -1421,7 +1430,7 @@ namespace Contensive.Models.Db {
         /// </summary>
         private static void restoreCacheDataObjects<T>(CPBaseClass cp, T restoredInstance) {
             if (restoredInstance == null) { return; }
-            if (!isBaseType(typeof(T))) { return; }
+            if (!allowRecordCaching(typeof(T))) { return; }
             foreach (PropertyInfo instanceProperty in restoredInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                 // todo change test to is-subsclass-of-fieldCdnFile
                 switch (instanceProperty.PropertyType.Name) {

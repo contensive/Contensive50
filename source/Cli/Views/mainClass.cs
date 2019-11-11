@@ -67,9 +67,15 @@ namespace Contensive.CLI {
                                 }
                                 Console.WriteLine("Set application to [" + appName + "].");
                                 break;
-                            case "--flushcache":
-                                FlushCacheCmd.execute(cpServer, appName);
-                                break;
+                            case "--flushcache": {
+                                    FlushCacheCmd.execute(cpServer, appName);
+                                    break;
+                                }
+                            case "--getcache": {
+                                    string key = getNextCmdArg(args, ref argPtr);
+                                    GetCacheCmd.execute(cpServer, appName, key );
+                                    break;
+                                }
                             case "-i":
                             case "--install":
                                 //

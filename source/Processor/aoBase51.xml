@@ -2806,12 +2806,14 @@
     <DotNetClass>Contensive.Processor.Addons.NewApp.NewAppClass</DotNetClass>
   </Addon>
   <Addon name="Page Content Review" guid="{6A54A051-6CF6-4D8C-823D-C37741DD072A}" type="Tool">
-    <ArgumentList><![CDATA[
+    <ArgumentList>
+      <![CDATA[
       Review after this many days=90
-      Rows per page=50
-]]></ArgumentList>
+      Rows per page=50]]>
+    </ArgumentList>
     <Admin>Yes</Admin>
-    <Styles><![CDATA[.pageReview { margin:0; padding:20px; background-color: white; }
+    <Styles>
+      <![CDATA[.pageReview { margin:0; padding:20px; background-color: white; }
       .pageReview .prTable{ border:1px solid #e0e0e0;width:100%}
       .pageReview .prRowHead{ background-color: white;}
       .pageReview .prRowEven{ background-color: #f8f8f8;}
@@ -2820,7 +2822,8 @@
       .pageReview .prColReviewed {width:200px; text-align:center; padding:4px;}
       .pageReview .prColModified {width:200px; text-align:center; padding:4px;}
       .pageReview .prColName {text-align:left; padding:4px;}
-      ]]></Styles>
+      ]]>
+    </Styles>
     <Scripting Language="VBScript" EntryPoint="" Timeout="5000">
       <Code>
         <![CDATA[function s()
@@ -2875,6 +2878,12 @@
       </Code>
     </Scripting>
   </Addon>
+
+  <Addon name="Cache Tool" guid="{7B5B8150-62BE-40F4-A66A-7CC74D99BA76}" type="Tool">
+    <DotNetClass>Contensive.Processor.Addons.Tools.CacheToolClass</DotNetClass>
+    <Admin>Yes</Admin>
+  </Addon>
+
   <SQLIndex IndexName="ccContentContentTableID" DataSourceName="Default" TableName="ccContent" FieldNameList="ContentTableID"  />
   <SQLIndex IndexName="ccGroupRulesGroupID" DataSourceName="Default" TableName="ccGroupRules" FieldNameList="GroupID"  />
   <SQLIndex IndexName="ccGroupRulesContentID" DataSourceName="Default" TableName="ccGroupRules" FieldNameList="ContentID"  />

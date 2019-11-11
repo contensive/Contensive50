@@ -180,6 +180,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- object value did not match. return as miss
                             LogController.logWarn(core, "cache getObject failed to cast value as type, key [" + key + "], type requested [" +  typeof(TData).FullName + "], ex [" + ex.ToString() + "]");
+                            result = default(TData);
                         }
                     }
                 }
