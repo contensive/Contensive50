@@ -472,7 +472,7 @@ namespace Contensive.Processor.Controllers {
                             string Copy = ""
                                 + Environment.NewLine + "<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" width=\"100%\">"
                                 + Environment.NewLine + "{{REPEATSTART}}<tr><td align=right style=\"height:22px;\">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}"
-                                + Environment.NewLine + "<tr><td align=right><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=135 height=1></td><td width=\"100%\">&nbsp;</td></tr>"
+                                + Environment.NewLine + "<tr><td align=right><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" width=135 height=1></td><td width=\"100%\">&nbsp;</td></tr>"
                                 + Environment.NewLine + "<tr><td colspan=2>&nbsp;<br>" + core.html.getPanelButtons(ButtonRegister) + "</td></tr>"
                                 + Environment.NewLine + "</table>";
                             csData.set("Body", Copy);

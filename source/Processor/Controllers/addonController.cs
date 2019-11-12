@@ -2029,12 +2029,12 @@ namespace Contensive.Processor.Controllers {
                     //
                     // No icon given, use the default
                     if (IconIsInline) {
-                        IconFilename = "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/IconAddonInlineDefault.png";
+                        IconFilename = "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/IconAddonInlineDefault.png";
                         IconWidth = 62;
                         IconHeight = 17;
                         IconSprites = 0;
                     } else {
-                        IconFilename = "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/IconAddonBlockDefault.png";
+                        IconFilename = "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/IconAddonBlockDefault.png";
                         IconWidth = 57;
                         IconHeight = 59;
                         IconSprites = 4;
@@ -2109,7 +2109,7 @@ namespace Contensive.Processor.Controllers {
                     + " onDblClick=\"" + onDblClick + "\""
                     + " alt=\"" + IconAlt + "\""
                     + " title=\"" + IconTitle + "\""
-                    + " src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\"";
+                    + " src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\"";
                 string ImgStyle = "background:url(" + IconSrc + ") " + (-1 * SpriteColumn * IconWidth) + "px 0px no-repeat;";
                 ImgStyle += "width:" + IconWidth + "px;";
                 ImgStyle = ImgStyle + "height:" + IconHeight + "px;";

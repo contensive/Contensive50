@@ -1508,3 +1508,40 @@ div.ccDialogPageNotFound {
 .ccEditWrapper .ccChildList li {
     border: 1px dashed #262;
 }
+/*
+* Content and Addon Icons
+*/ 
+.iconDefault {
+    display: inline-block;
+    font-size: 30px;
+    line-height: 60px;
+    background-color: #54b752;
+    color: white ! important;
+    width: 60px;
+    height: 60px;
+    border-radius: 6px; 
+    box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.15);
+}
+.iconContentDefault {
+    display: inline-block;
+    font-size: 30px;
+    line-height: 60px;
+    background-color: #54b752;
+    color: white ! important;
+    width: 60px;
+    height: 60px;
+    border-radius: 6px; 
+    box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.15);
+}
+.iconAddonDefault {
+    display: inline-block;
+    font-size: 30px;
+    line-height: 60px;
+    background-color: #54b752;
+    color: white ! important;
+    width: 60px;
+    height: 60px;
+    border-radius: 6px; 
+    box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.15);
+    }
+    

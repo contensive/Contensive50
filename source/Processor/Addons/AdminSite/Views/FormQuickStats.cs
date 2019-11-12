@@ -42,9 +42,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                 Stream.Add("<h2>Visits Today</h2>");
                 Stream.Add("<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\" style=\"background-color:white;border-top:1px solid #888;\">");
                 //Stream.Add( "<tr"">")
-                //Stream.Add( "<td width=""150""><img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=""140"" height=""1"" ></td>")
-                //Stream.Add( "<td width=""150""><img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=""140"" height=""1"" ></td>")
-                //Stream.Add( "<td width=""100%""><img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=""100%"" height=""1"" ></td>")
+                //Stream.Add( "<td width=""150""><img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif"" width=""140"" height=""1"" ></td>")
+                //Stream.Add( "<td width=""150""><img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif"" width=""140"" height=""1"" ></td>")
+                //Stream.Add( "<td width=""100%""><img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif"" width=""100%"" height=""1"" ></td>")
                 //Stream.Add( "</tr>")
                 //
                 // ----- All Visits Today

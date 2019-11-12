@@ -623,6 +623,7 @@ namespace Contensive.Processor {
         internal const string ButtonEnable = " Enable ";
         internal const string ButtonDisable = " Disable ";
         internal const string ButtonMarkReviewed = " Mark Reviewed ";
+        internal const string ButtonModifyEditForm = " Modify Form ";
         //
         //------------------------------------------------------------------------
         //   member actions

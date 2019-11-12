@@ -397,7 +397,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType + "," + NotUsedId + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                        Copy = AddonController.getAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceId, 0);
+                                                        Copy = AddonController.getAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceId, 0);
                                                         //Copy = IconImg;
                                                     } else if (EncodeNonCachableTags) {
                                                         //

@@ -183,7 +183,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                             allowSend = false,
                             allowSendTest = false,
                             hasChildRecords = false,
-                            isPageContent = false
+                            isPageContent = false,
+                            contentId = adminData.editRecord.contentControlId
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -234,7 +235,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                             allowSend = false,
                             allowSendTest = ((!EmailSubmitted) && (!EmailSent)),
                             hasChildRecords = false,
-                            isPageContent = false
+                            isPageContent = false,
+                            contentId = adminData.editRecord.contentControlId
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -263,7 +265,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                             allowSend = false,
                             allowSendTest = !EmailSubmitted,
                             hasChildRecords = false,
-                            isPageContent = false
+                            isPageContent = false,
+                            contentId = adminData.editRecord.contentControlId
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -291,7 +294,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                             allowSend = !EmailSubmitted & ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest),
                             allowSendTest = !EmailSubmitted,
                             hasChildRecords = false,
-                            isPageContent = false
+                            isPageContent = false,
+                            contentId = adminData.editRecord.contentControlId
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -319,7 +323,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                             allowSend = false,
                             allowSendTest = false,
                             hasChildRecords = false,
-                            isPageContent = false
+                            isPageContent = false,
+                            contentId = adminData.editRecord.contentControlId
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -348,7 +353,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                         allowSend = false,
                         allowSendTest = false,
                         hasChildRecords = false,
-                        isPageContent = false
+                        isPageContent = false,
+                        contentId = adminData.editRecord.contentControlId
                     });
                     Stream.Add(EditSectionButtonBar);
                     Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -378,7 +384,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                         allowSend = false,
                         allowSendTest = false,
                         hasChildRecords = HasChildRecords,
-                        isPageContent = pageContentMetadata.isParentOf(core, adminData.adminContent.id)
+                        isPageContent = pageContentMetadata.isParentOf(core, adminData.adminContent.id),
+                        contentId = adminData.editRecord.contentControlId
                     });
                     Stream.Add(EditSectionButtonBar);
                     Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -896,15 +903,15 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         //
                                         return_NewFieldList += "," + field.nameLc;
                                         EditorString = ""
-                                            + HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
-                                            + "&nbsp;<a href=\"#\" onClick=\"OpenSiteExplorerWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/PageLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a page\" title=\"Link to a page\"></a>";
+                                            + HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
+                                            + "&nbsp;<a href=\"#\" onClick=\"OpenSiteExplorerWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/PageLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a page\" title=\"Link to a page\"></a>";
                                         break;
                                     case CPContentBaseClass.FieldTypeIdEnum.ResourceLink:
                                         //
                                         // ----- Resource Link (src value)
                                         //
                                         return_NewFieldList += "," + field.nameLc;
-                                        EditorString = HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
+                                        EditorString = HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
                                         break;
                                     case CPContentBaseClass.FieldTypeIdEnum.HTML:
                                     case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
@@ -1049,9 +1056,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                             + "'onStart':function(){cj.ajax.qs('" + AjaxQS + "','','" + fancyBoxContentId + "')}"
                             + "});";
                         EditorHelp = EditorHelp + "\r<div style=\"float:right;\">"
-                            + cr2 + "<a id=\"" + fancyBoxLinkId + "\" href=\"#" + fancyBoxContentId + "\" title=\"select an alternate editor for this field.\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAltEditor.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"select an alternate editor for this field.\"></a>"
+                            + cr2 + "<a id=\"" + fancyBoxLinkId + "\" href=\"#" + fancyBoxContentId + "\" title=\"select an alternate editor for this field.\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/NavAltEditor.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"select an alternate editor for this field.\"></a>"
                             + cr2 + "<div style=\"display:none;\">"
-                            + cr3 + "<div class=\"ccEditorPreferenceCon\" id=\"" + fancyBoxContentId + "\"><div style=\"margin:20px auto auto auto;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ajax-loader-big.gif\" width=\"32\" height=\"32\"></div></div>"
+                            + cr3 + "<div class=\"ccEditorPreferenceCon\" id=\"" + fancyBoxContentId + "\"><div style=\"margin:20px auto auto auto;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/ajax-loader-big.gif\" width=\"32\" height=\"32\"></div></div>"
                             + cr2 + "</div>"
                             + "\r</div>"
                             + "";
@@ -1067,7 +1074,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 HelpMsgDefault = "Admin: No default help is available for this field.";
                             }
                             HelpMsgOpenedRead = ""
-                                    + "<!-- close icon --><div class=\"\" style=\"float:right\"><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedId + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"close\"></a></div>"
+                                    + "<!-- close icon --><div class=\"\" style=\"float:right\"><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedId + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"close\"></a></div>"
                                     + "<div class=\"header\">Default Help</div>"
                                     + "<div class=\"body\">" + HelpMsgDefault + "</div>"
                                     + "<div class=\"header\">Custom Help</div>"
@@ -1089,22 +1096,22 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // Long help, closed gets MoreHelpIcon (opens to HelpMsgOpenedRead) and HelpEditIcon (opens to readonly default copy plus editor with custom copy)
                                 HelpMsgClosed = ""
-                                        + "<!-- open read icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedReadID + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"more help\"></a></div>"
-                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedEditId + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
+                                        + "<!-- open read icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedReadID + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"more help\"></a></div>"
+                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedEditId + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
                                         + "<div id=\"" + HelpClosedContentId + "\">" + HelpMsgClosed + "</div>"
                                     + "";
                             } else if (!IsEmptyHelp) {
                                 //
                                 // short help, closed gets helpmsgclosed + HelpEditIcon (opens to readonly default copy plus editor with custom copy)
                                 HelpMsgClosed = ""
-                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedEditId + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
+                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedEditId + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
                                         + "<div id=\"" + HelpClosedContentId + "\">" + HelpMsgClosed + "</div>"
                                     + "";
                             } else {
                                 //
                                 // Empty help, closed gets helpmsgclosed + HelpEditIcon (opens to readonly default copy plus editor with custom copy)
                                 HelpMsgClosed = ""
-                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedEditId + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
+                                        + "<!-- open edit icon --><div style=\"float:right;\"><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedEditId + "');\" tabindex=\"-1\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/NavHelpEdit.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;\" title=\"edit help\"></a></div>"
                                         + "<div id=\"" + HelpClosedContentId + "\">" + HelpMsgClosed + "</div>"
                                     + "";
                             }
@@ -1117,7 +1124,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             // Non-admin view
                             HelpMsgOpenedRead = ""
                                     + "<div class=\"body\">"
-                                    + "<!-- close icon --><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedId + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right\" title=\"close\"></a>"
+                                    + "<!-- close icon --><a href=\"javascript:cj.hide('" + HelpOpenedReadID + "');cj.show('" + HelpClosedId + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right\" title=\"close\"></a>"
                                     + HelpMsg + "</div>"
                                 + "";
                             HelpMsgOpenedEdit = ""
@@ -1127,7 +1134,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // Long help
                                 HelpMsgClosed = ""
                                     + "<div class=\"body\">"
-                                    + "<!-- open read icon --><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedReadID + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right;\" title=\"more help\"></a>"
+                                    + "<!-- open read icon --><a href=\"javascript:cj.hide('" + HelpClosedId + "');cj.show('" + HelpOpenedReadID + "');\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/NavHelp.gif\" width=18 height=18 border=0 style=\"vertical-align:middle;float:right;\" title=\"more help\"></a>"
                                     + HelpMsgClosed + "</div>"
                                     + "";
                             } else if (!IsEmptyHelp) {

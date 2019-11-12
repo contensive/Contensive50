@@ -322,7 +322,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Height"></param>
         /// <returns></returns>
         public static string nop2(int Width, int Height) {
-            return "<!-- removed spacer -->"; // "<img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=\"" + Width + "\" height=\"" + Height + "\" border=\"0\">";
+            return "<!-- removed spacer -->"; // "<img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" width=\"" + Width + "\" height=\"" + Height + "\" border=\"0\">";
         }
         //
         //========================================================================================================

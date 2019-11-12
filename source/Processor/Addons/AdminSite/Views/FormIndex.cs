@@ -174,7 +174,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     + "";
                                 IndexFilterContent = ""
                                     + Environment.NewLine + "<div class=\"ccContentCon\">"
-                                    + Environment.NewLine + "<div id=\"IndexFilterContentOpened\" class=\"opened\">" + getForm_IndexFilterContent(core, adminData) + "<img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
+                                    + Environment.NewLine + "<div id=\"IndexFilterContentOpened\" class=\"opened\">" + getForm_IndexFilterContent(core, adminData) + "<img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
                                     + Environment.NewLine + "<div id=\"IndexFilterContentClosed\" class=\"closed\" style=\"display:none;\">" + adminIndexFilterClosedLabel + "</div>"
                                     + Environment.NewLine + "</div>";
                                 IndexFilterJS = ""
@@ -201,9 +201,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     + "";
                                 IndexFilterContent = ""
                                     + Environment.NewLine + "<div class=\"ccContentCon\">"
-                                    + Environment.NewLine + "<div id=\"IndexFilterContentOpened\" class=\"opened\" style=\"display:none;\"><div style=\"text-align:center;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ajax-loader-small.gif\" width=16 height=16></div></div>"
+                                    + Environment.NewLine + "<div id=\"IndexFilterContentOpened\" class=\"opened\" style=\"display:none;\"><div style=\"text-align:center;\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/ajax-loader-small.gif\" width=16 height=16></div></div>"
                                     + Environment.NewLine + "<div id=\"IndexFilterContentClosed\" class=\"closed\">" + adminIndexFilterClosedLabel + "</div>"
-                                    + Environment.NewLine + "<div id=\"IndexFilterContentMinWidth\" style=\"display:none;\"><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
+                                    + Environment.NewLine + "<div id=\"IndexFilterContentMinWidth\" style=\"display:none;\"><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
                                     + Environment.NewLine + "</div>";
                                 string AjaxQS = GenericController.modifyQueryString(core.doc.refreshQueryString, RequestNameAjaxFunction, AjaxOpenIndexFilterGetContent);
                                 IndexFilterJS = ""
@@ -453,7 +453,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             Stream.Add(AdminUIController.getSectionHeader(core, "", titleRow));
                             Stream.Add(formContent);
                             Stream.Add(ButtonBar);
-                            //Stream.Add(core.html.getPanel("<img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" width=\"1\", height=\"10\" >"));
+                            //Stream.Add(core.html.getPanel("<img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" width=\"1\", height=\"10\" >"));
                             Stream.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormIndex));
                             Stream.Add(HtmlController.inputHidden("cid", adminData.adminContent.id));
                             Stream.Add(HtmlController.inputHidden("indexGoToPage", ""));

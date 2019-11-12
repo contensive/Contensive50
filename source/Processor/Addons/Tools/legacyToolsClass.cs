@@ -366,7 +366,7 @@ namespace Contensive.Processor.Addons.Tools {
                 tempGetForm_RootRow = tempGetForm_RootRow + SpanClassAdminNormal + "<P class=\"ccAdminNormal\"><A href=\"" + core.webServer.requestPage + "?af=" + AdminFormToolId.ToString() + "\"><B>" + Caption + "</b></SPAN></A></p>";
                 tempGetForm_RootRow = tempGetForm_RootRow + "</td></tr>";
                 if (!string.IsNullOrEmpty(Description)) {
-                    tempGetForm_RootRow = tempGetForm_RootRow + "<tr><td width=\"30\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" height=\"1\" width=\"30\"></td>";
+                    tempGetForm_RootRow = tempGetForm_RootRow + "<tr><td width=\"30\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" height=\"1\" width=\"30\"></td>";
                     tempGetForm_RootRow = tempGetForm_RootRow + "<td width=\"100%\"><P class=\"ccAdminsmall\">" + Description + "</p></td></tr>";
                 }
                 return tempGetForm_RootRow;
@@ -744,17 +744,17 @@ namespace Contensive.Processor.Addons.Tools {
                     Stream.Add("</tr></TABLE>");
                     //
                     Stream.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
                     Stream.Add("</tr></TABLE>");
                     //
                     // print the column headers
@@ -789,14 +789,14 @@ namespace Contensive.Processor.Addons.Tools {
                                 }
                                 string AStart = "<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentId + "=" + ContentId + "&af=" + AdminFormToolConfigureListing + "&fi=" + fieldId + "&dtcn=" + ColumnCount;
                                 Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br>");
-                                Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/black.GIF\" width=\"100%\" height=\"1\">");
-                                Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionSetAZ + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/LibButtonSortazUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionSetZA + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/LibButtonSortzaUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionExpand + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionContract + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A>");
+                                Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.GIF\" width=\"100%\" height=\"1\">");
+                                Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.Add(AStart + "&dta=" + ToolsActionSetAZ + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonSortazUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.Add(AStart + "&dta=" + ToolsActionSetZA + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonSortzaUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.Add(AStart + "&dta=" + ToolsActionExpand + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.Add(AStart + "&dta=" + ToolsActionContract + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A>");
                                 Stream.Add("</SPAN></td>");
                                 ColumnCount += 1;
                             }
@@ -841,42 +841,42 @@ namespace Contensive.Processor.Addons.Tools {
                                     //
                                     // text filename can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (text file field)<br>");
+                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (text file field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileCSS) {
                                     //
                                     // text filename can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (css file field)<br>");
+                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (css file field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileXML) {
                                     //
                                     // text filename can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (xml file field)<br>");
+                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (xml file field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileJavascript) {
                                     //
                                     // text filename can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (javascript file field)<br>");
+                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (javascript file field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.LongText) {
                                     //
                                     // long text can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (long text field)<br>");
+                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (long text field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileImage) {
                                     //
                                     // long text can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (image field)<br>");
+                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (image field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Redirect) {
                                     //
                                     // long text can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (redirect field)<br>");
+                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (redirect field)<br>");
                                 } else {
                                     //
                                     // can be used as column header
                                     //
-                                    Stream.Add("<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentId + "=" + ContentId + "&af=" + AdminFormToolConfigureListing + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldId + "=" + field.id + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/LibButtonAddUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A> " + field.caption + "<br>");
+                                    Stream.Add("<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentId + "=" + ContentId + "&af=" + AdminFormToolConfigureListing + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldId + "=" + field.id + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonAddUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A> " + field.caption + "<br>");
                                 }
                             }
                         }
@@ -2037,16 +2037,16 @@ namespace Contensive.Processor.Addons.Tools {
                 string QueryString = null;
                 //
                 const string GetTableStart = "<table border=\"1\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><TD><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr>"
-                    + "<td width=\"23\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" height=\"1\" width=\"23\"></td>"
-                    + "<td width=\"60%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
-                    + "<td width=\"20%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
-                    + "<td width=\"20%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
+                    + "<td width=\"23\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" height=\"1\" width=\"23\"></td>"
+                    + "<td width=\"60%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
+                    + "<td width=\"20%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
+                    + "<td width=\"20%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
                     + "</tr>";
                 const string GetTableEnd = "</table></td></tr></table>";
                 //
-                const string SpacerImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/spacer.gif\" width=\"23\" height=\"22\" border=\"0\">";
-                const string FolderOpenImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/iconfolderopen.gif\" width=\"23\" height=\"22\" border=\"0\">";
-                const string FolderClosedImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Images/iconfolderclosed.gif\" width=\"23\" height=\"22\" border=\"0\">";
+                const string SpacerImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"23\" height=\"22\" border=\"0\">";
+                const string FolderOpenImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/iconfolderopen.gif\" width=\"23\" height=\"22\" border=\"0\">";
+                const string FolderClosedImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/iconfolderclosed.gif\" width=\"23\" height=\"22\" border=\"0\">";
                 //
                 // StartPath is the root - the top of the directory, it ends in the folder name (no slash)
                 //
@@ -2464,7 +2464,7 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     //
                     LogController.logDebug(core, "Restarting IIS");
-                    core.webServer.redirect("https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Popup/WaitForIISReset.htm", "Redirect to iis reset");
+                    core.webServer.redirect("https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Popup/WaitForIISReset.htm", "Redirect to iis reset");
                     Thread.Sleep(2000);
                     var cmdDetail = new TaskModel.CmdDetailClass {
                         addonId = 0,
