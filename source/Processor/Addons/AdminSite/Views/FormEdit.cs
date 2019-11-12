@@ -184,7 +184,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             allowSendTest = false,
                             hasChildRecords = false,
                             isPageContent = false,
-                            contentId = adminData.editRecord.contentControlId
+                            contentId = adminData.adminContent.id
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -236,7 +236,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             allowSendTest = ((!EmailSubmitted) && (!EmailSent)),
                             hasChildRecords = false,
                             isPageContent = false,
-                            contentId = adminData.editRecord.contentControlId
+                            contentId = adminData.adminContent.id
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -266,7 +266,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             allowSendTest = !EmailSubmitted,
                             hasChildRecords = false,
                             isPageContent = false,
-                            contentId = adminData.editRecord.contentControlId
+                            contentId = adminData.adminContent.id
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -295,7 +295,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             allowSendTest = !EmailSubmitted,
                             hasChildRecords = false,
                             isPageContent = false,
-                            contentId = adminData.editRecord.contentControlId
+                            contentId = adminData.adminContent.id
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -324,7 +324,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             allowSendTest = false,
                             hasChildRecords = false,
                             isPageContent = false,
-                            contentId = adminData.editRecord.contentControlId
+                            contentId = adminData.adminContent.id
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -354,7 +354,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         allowSendTest = false,
                         hasChildRecords = false,
                         isPageContent = false,
-                        contentId = adminData.editRecord.contentControlId
+                        contentId = adminData.adminContent.id
                     });
                     Stream.Add(EditSectionButtonBar);
                     Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
@@ -385,7 +385,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         allowSendTest = false,
                         hasChildRecords = HasChildRecords,
                         isPageContent = pageContentMetadata.isParentOf(core, adminData.adminContent.id),
-                        contentId = adminData.editRecord.contentControlId
+                        contentId = adminData.adminContent.id
                     });
                     Stream.Add(EditSectionButtonBar);
                     Stream.Add(AdminUIController.getSectionHeader(core, "", titleBarDetails));

@@ -135,7 +135,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 }
                 buttonsRight += getButtonDanger(ButtonDelete, JSOnClick, !info.allowDelete);
                 if(core.session.user.admin) {
-                    buttonsRight += getButtonDanger(ButtonModifyEditForm, "windown.location='?af=105&button=select&contentid=" + info.contentId + "';return false;", !info.contentId.Equals(0));
+                    buttonsRight += getButtonDanger(ButtonModifyEditForm, "window.location='?af=105&button=select&contentid=" + info.contentId + "';return false;", info.contentId.Equals(0));
                 }
                 //
                 LogController.logTrace(core, "getButtonBarForEdit, exit");

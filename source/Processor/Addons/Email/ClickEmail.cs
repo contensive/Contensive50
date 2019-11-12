@@ -39,7 +39,7 @@ namespace Contensive.Processor.Addons.Primitives {
                         log.emailDropId = emailDrop.id;
                         log.emailId = emailDrop.emailId;
                         log.memberId = recipient.id;
-                        log.logType = EmailLogTypeOpen;
+                        log.logType = EmailLogTypeClick;
                         log.visitId = cp.Visit.Id;
                         log.save(cp);
                     }
