@@ -39,7 +39,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 // convert FieldTypeLongText + htmlContent to FieldTypeHTML
                 LogController.logInfo(core, "convert FieldTypeLongText + htmlContent to FieldTypeHTML.");
                 string sql = "update ccfields set type=" + (int)CPContentBaseClass.FieldTypeIdEnum.HTML + " where type=" + (int)CPContentBaseClass.FieldTypeIdEnum.LongText + " and ( htmlcontent<>0 )";
-                core.db.executeQuery(sql);
+                core.db.executeNonQuery(sql);
                 //
                 // Content TextFile types with no controlling record
                 //
@@ -62,7 +62,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                             string PathName = TableName + "\\" + FieldName;
                             List<CPFileSystemBaseClass.FileDetail> FileList = core.cdnFiles.getFileList(PathName);
                             if (FileList.Count > 0) {
-                                core.db.executeQuery("CREATE INDEX temp" + FieldName + " ON " + TableName + " (" + FieldName + ")");
+                                core.db.executeNonQuery("CREATE INDEX temp" + FieldName + " ON " + TableName + " (" + FieldName + ")");
                                 foreach (CPFileSystemBaseClass.FileDetail file in FileList) {
                                     string Filename = file.Name;
                                     string VirtualFileName = PathName + "\\" + Filename;
@@ -70,7 +70,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                     long FileSize = file.Size;
                                     if (FileSize == 0) {
                                         sql = "update " + TableName + " set " + FieldName + "=null where (" + FieldName + "=" + DbController.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + DbController.encodeSQLText(VirtualLink) + ")";
-                                        core.db.executeQuery(sql);
+                                        core.db.executeNonQuery(sql);
                                         core.cdnFiles.deleteFile(VirtualFileName);
                                     } else {
                                         using (var csTest = new CsModel(core)) {
@@ -91,7 +91,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                     // mysql
                                     sql = "ALTER TABLE " + TableName + " DROP INDEX temp" + FieldName;
                                 }
-                                core.db.executeQuery(sql);
+                                core.db.executeNonQuery(sql);
                             }
                             csData.goNext();
                         }

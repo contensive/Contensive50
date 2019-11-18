@@ -1398,7 +1398,7 @@ namespace Contensive.Processor.Models.Domain {
                                 } else {
                                     //
                                     // -- touch field so upgrade does not delete it
-                                    core.db.executeQuery("update ccFields Set CreateKey=0 where (Contentid=" + contentMetadata.id + ") And (name = " + DbController.encodeSQLText(UcaseTableColumnName) + ")");
+                                    core.db.executeNonQuery("update ccFields Set CreateKey=0 where (Contentid=" + contentMetadata.id + ") And (name = " + DbController.encodeSQLText(UcaseTableColumnName) + ")");
                                 }
                             }
                         }
@@ -1602,7 +1602,7 @@ namespace Contensive.Processor.Models.Domain {
             core.db.executeNonQuery("update " + tableName + " set contentcontrolid=" + newContentControlID + " where id=" + recordId);
             //
             // -- fix content watch
-            core.db.executeQuery("update ccContentWatch set ContentID=" + newContentControlID + ", ContentRecordKey='" + newContentControlID + "." + recordId + "' where ContentID=" + id + " and RecordID=" + recordId);
+            core.db.executeNonQuery("update ccContentWatch set ContentID=" + newContentControlID + ", ContentRecordKey='" + newContentControlID + "." + recordId + "' where ContentID=" + id + " and RecordID=" + recordId);
             //
             // -- if content includes a parentId field (like page content), update all child records to this meta.id
             if (fields.ContainsKey("parentid")) {

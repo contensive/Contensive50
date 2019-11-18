@@ -23,7 +23,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                         + " where r.id=v.visitorid"
                         + " and(v.CookieSupport=0)and(v.LastVisitTime<" + env.sqlDateMidnightTwoDaysAgo + ")";
                     try {
-                        core.db.executeQuery(sql);
+                        core.db.executeNonQuery(sql);
                     } catch (Exception) {
                     }
                 }

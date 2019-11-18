@@ -14,7 +14,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 // -- delete dups
                 LogController.logInfo(core, "Delete duplicate Link Alias");
                 string sql = "delete from ccLinkAliases where id in ( select b.id from cclinkaliases a,cclinkaliases b where a.id<b.id and a.name=b.name )";
-                core.db.executeQuery(sql);
+                core.db.executeNonQuery(sql);
 
             } catch (Exception ex) {
                 LogController.logError(core, ex);

@@ -75,7 +75,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- Special Case - must install base collection metadata first because it builds the system that the system needs to do everything else
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installBaseCollection, install metadata first to verify system requirements");
-                    MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, true, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
+
+                    MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, reinstallDependencies, true, ref nonCriticalErrorList, logPrefix);
                 }
                 {
                     //
@@ -478,7 +479,7 @@ namespace Contensive.Processor.Controllers {
                                                         if (!string.IsNullOrEmpty(metaDataMiniCollection)) {
                                                             //
                                                             // -- Use the upgrade code to import this part
-                                                            metaDataMiniCollection = "<" + CollectionFileRootNode + ">" + metaDataMiniCollection + "</" + CollectionFileRootNode + ">";
+                                                            metaDataMiniCollection = "<" + CollectionFileRootNode + " name=\"" + CollectionName + "\" guid=\"" + collectionGuid + "\">" + metaDataMiniCollection + "</" + CollectionFileRootNode + ">";
                                                             MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(false, core, metaDataMiniCollection, IsNewBuild, reinstallDependencies, isBaseCollection, ref nonCriticalErrorList, logPrefix);
                                                             //
                                                             // -- Process nodes to save Collection data
@@ -808,8 +809,7 @@ namespace Contensive.Processor.Controllers {
                                                     //----------------------------------------------------------------------------------------------------------------------
                                                     //
                                                     //var emptyList = new List<string>();
-                                                    var defaultMiniCollection = new MetadataMiniCollectionModel();
-                                                    MetadataMiniCollectionModel Collection = MetadataMiniCollectionModel.loadXML(core, collectionFileContent, isBaseCollection, false, IsNewBuild, defaultMiniCollection, "");
+                                                    MetadataMiniCollectionModel Collection = MetadataMiniCollectionModel.loadXML(core, collectionFileContent, isBaseCollection, false, IsNewBuild, "");
                                                     foreach (var kvp in Collection.menus) {
                                                         BuildController.verifyNavigatorEntry(core, kvp.Value, 0);
                                                     }

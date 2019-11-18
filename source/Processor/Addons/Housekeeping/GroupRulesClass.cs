@@ -33,7 +33,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     + " From ccGroupRules"
                     + " LEFT JOIN ccgroups on ccgroups.ID=ccGroupRules.GroupID"
                     + " WHERE (ccgroups.ID is null)";
-                core.db.executeQuery(sql);
+                core.db.executeNonQuery(sql);
 
             } catch (Exception ex) {
                 LogController.logError(core, ex);

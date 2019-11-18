@@ -18,7 +18,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     + " From ccContentWatchListRules"
                     + " LEFT JOIN ccContentWatch on ccContentWatch.ID=ccContentWatchListRules.ContentWatchID"
                     + " WHERE (ccContentWatch.ID is null)";
-                core.db.executeQuery(sql);
+                core.db.executeNonQuery(sql);
                 //
                 // ContentWatchListRules with bad ContentWatchListID
                 //
@@ -27,7 +27,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     + " From ccContentWatchListRules"
                     + " LEFT JOIN ccContentWatchLists on ccContentWatchLists.ID=ccContentWatchListRules.ContentWatchListID"
                     + " WHERE (ccContentWatchLists.ID is null)";
-                core.db.executeQuery(sql);
+                core.db.executeNonQuery(sql);
 
             } catch (Exception ex) {
                 LogController.logError(core, ex);

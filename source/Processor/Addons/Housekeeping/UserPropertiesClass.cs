@@ -27,7 +27,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     + " From ccProperties LEFT JOIN ccmembers on ccmembers.ID=ccProperties.KeyID"
                     + " WHERE (ccProperties.TypeID=0)"
                     + " AND (ccmembers.ID is null)";
-                core.db.executeQuery(sql);
+                core.db.executeNonQuery(sql);
 
             } catch (Exception ex) {
                 LogController.logError(core, ex);

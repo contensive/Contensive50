@@ -162,23 +162,28 @@ namespace Contensive.Processor.Models.Domain {
         //
         internal static void installMetaDataMiniCollectionFromXml(bool quick, CoreController core, string srcXml, bool isNewBuild, bool reinstallDependencies, bool isBaseCollection, ref List<string> nonCriticalErrorList, string logPrefix) {
             try {
-                if (quick) {
-                    //
-                    LogController.logInfo(core, "installmetadataMiniCollectionFromXML");
-                    // 
-                    // -- method 1, just install
-                    MetadataMiniCollectionModel baseCollection = loadXML(core, srcXml, true, true, isNewBuild, new MetadataMiniCollectionModel(), logPrefix);
-                    
-                    installMetaDataMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
-                } else {
-                    //
-                    // -- method 2, merge with application collection and install
-                    //
-                    MetadataMiniCollectionModel miniCollectionWorking = getApplicationMetaDataMiniCollection(core, isNewBuild, logPrefix);
-                    MetadataMiniCollectionModel miniCollectionToAdd = loadXML(core, srcXml, isBaseCollection, false, isNewBuild, miniCollectionWorking, logPrefix);
-                    addMiniCollectionSrcToDst(core, ref miniCollectionWorking, miniCollectionToAdd);
-                    installMetaDataMiniCollection_BuildDb(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
+                {
+                    MetadataMiniCollectionModel newCollection = loadXML(core, srcXml, isBaseCollection, true, isNewBuild, logPrefix);
+                    installMetaDataMiniCollection_BuildDb(core, isBaseCollection, newCollection, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
+                    return;
                 }
+                //if (quick) {
+                //    //
+                //    LogController.logInfo(core, "installmetadataMiniCollectionFromXML");
+                //    // 
+                //    // -- method 1, just install
+                //    MetadataMiniCollectionModel baseCollection = loadXML(core, srcXml, true, true, isNewBuild, new MetadataMiniCollectionModel(), logPrefix);
+
+                //    installMetaDataMiniCollection_BuildDb(core, baseCollection, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
+                //} else {
+                //    //
+                //    // -- method 2, merge with application collection and install
+                //    //
+                //    MetadataMiniCollectionModel miniCollectionWorking = getApplicationMetaDataMiniCollection(core, isNewBuild, logPrefix);
+                //    MetadataMiniCollectionModel miniCollectionToAdd = loadXML(core, srcXml, isBaseCollection, false, isNewBuild, miniCollectionWorking, logPrefix);
+                //    addMiniCollectionSrcToDst(core, ref miniCollectionWorking, miniCollectionToAdd);
+                //    installMetaDataMiniCollection_BuildDb(core, miniCollectionWorking, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
+                //}
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -189,41 +194,19 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// create a collection class from a collection xml file, metadata are added to the metadatas in the application collection
         /// </summary>
-        public static MetadataMiniCollectionModel loadXML(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, MetadataMiniCollectionModel defaultCollection, string logPrefix) {
+        public static MetadataMiniCollectionModel loadXML(CoreController core, string srcCollecionXml, bool isBaseCollection, bool setAllDataChanged, bool IsNewBuild, string logPrefix) {
             MetadataMiniCollectionModel result = null;
             try {
-                ContentMetadataModel DefaultMetaData = null;
-                ContentFieldMetadataModel DefaultMetaDataField = null;
-                string contentNameLc = null;
-                string Collectionname = null;
-                string ContentTableName = null;
-                bool IsNavigator = false;
-                string ActiveText = null;
-                string Name = "";
-                string MenuName = null;
-                string IndexName = null;
-                string TableName = null;
-                int Ptr = 0;
-                string FieldName = null;
-                string ContentName = null;
-                bool Found = false;
-                string menuNameSpace = null;
-                string MenuGuid = null;
-
-                XmlNode metaData_Node = null;
-                string DataSourceName = null;
-                XmlDocument srcXmlDom = new XmlDocument();
-                string NodeName = null;
                 //
                 LogController.logInfo(core, "Application: " + core.appConfig.name + ", Upgrademetadata_LoadDataToCollection");
                 //
                 result = new MetadataMiniCollectionModel();
-                //
                 if (string.IsNullOrEmpty(srcCollecionXml)) {
                     //
                     // -- empty collection is an error
                     throw (new GenericException("Upgrademetadata_LoadDataToCollection, srcCollectionXml is blank or null"));
                 } else {
+                    XmlDocument srcXmlDom = new XmlDocument();
                     try {
                         srcXmlDom.LoadXml(srcCollecionXml);
                     } catch (Exception ex) {
@@ -237,12 +220,13 @@ namespace Contensive.Processor.Models.Domain {
                         // -- root node must be collection (or legacy contensivemetadata)
                         LogController.logError(core, new GenericException("the archive file has a syntax error. Application name must be the first node."));
                     } else {
-                        result.isBaseCollection = IsccBaseFile;
+                        result.isBaseCollection = isBaseCollection;
+                        bool Found = false;
                         //
                         // Get Collection Name for logs
                         //
                         //hint = "get collection name"
-                        Collectionname = XmlController.GetXMLAttribute(core, Found, srcXmlDom.DocumentElement, "name", "");
+                        string Collectionname = XmlController.GetXMLAttribute(core, Found, srcXmlDom.DocumentElement, "name", "");
                         if (string.IsNullOrEmpty(Collectionname)) {
                             LogController.logInfo(core, "Upgrademetadata_LoadDataToCollection, Application: " + core.appConfig.name + ", Collection has no name");
                         } else {
@@ -251,358 +235,360 @@ namespace Contensive.Processor.Models.Domain {
                         result.name = Collectionname;
                         //
                         foreach (XmlNode metaData_NodeWithinLoop in srcXmlDom.DocumentElement.ChildNodes) {
-                            metaData_Node = metaData_NodeWithinLoop;
-                            NodeName = GenericController.vbLCase(metaData_NodeWithinLoop.Name);
+                            XmlNode metaData_Node = metaData_NodeWithinLoop;
+                            string NodeName = GenericController.vbLCase(metaData_NodeWithinLoop.Name);
+                            bool IsNavigator = false;
+                            string Name = "";
+                            string MenuName = null;
+                            string IndexName = null;
+                            string TableName = null;
+                            int Ptr = 0;
+                            string menuNameSpace = null;
+                            string MenuGuid = null;
+                            string DataSourceName = null;
+                            string ActiveText = null;
                             switch (NodeName) {
                                 case "cdef":
+                                //
+                                // Content Definitions
+                                //
+                                string contentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "name", "");
+                                if (string.IsNullOrEmpty(contentName)) {
+                                    throw (new GenericException("Collection xml file load includes a content metadata node with no name."));
+                                }
+                                string contentGuid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", "");
+                                ContentMetadataModel DefaultMetaData = null;
+                                if (!isBaseCollection) {
                                     //
-                                    // Content Definitions
-                                    //
-                                    ContentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "name", "");
-                                    contentNameLc = GenericController.vbLCase(ContentName);
-                                    if (string.IsNullOrEmpty(ContentName)) {
-                                        throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "collection file contains a metadata node with no name attribute. This is not allowed.", "dll", "builderClass", "Upgrademetadata_LoadDataToCollection", 0, "", "", False, True, "")
+                                    // -- if base collection loaded, attmpt load. Some cases during startup happen before content is available so exceptions should be skipped
+                                    if (!string.IsNullOrWhiteSpace(contentGuid)) {
+                                        DefaultMetaData = ContentMetadataModel.create(core, contentGuid);
                                     } else {
-                                        //
-                                        // setup a metadata from the application collection to use as a default for missing attributes (for inherited metadata)
-                                        //
-                                        if (defaultCollection.metaData.ContainsKey(contentNameLc)) {
-                                            DefaultMetaData = defaultCollection.metaData[contentNameLc];
-                                        } else {
-                                            DefaultMetaData = new Models.Domain.ContentMetadataModel() {
-                                                active = true,
-                                                activeOnly = true,
-                                                aliasId = "id",
-                                                aliasName = "name",
-                                                adminOnly = false,
-                                                allowAdd = true,
-                                                allowDelete = false,
-                                                dataSourceName = "",
-                                                dataSourceId = 0,
-                                                developerOnly = false,
-                                                dropDownFieldList = "name",
-                                                isBaseContent = IsccBaseFile
-                                            };
-                                        }
-                                        //
-                                        ContentTableName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentTableName", DefaultMetaData.tableName);
-                                        if (!string.IsNullOrEmpty(ContentTableName)) {
-                                            //
-                                            // These two fields are needed to import the row
-                                            //
-                                            DataSourceName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "dataSource", DefaultMetaData.dataSourceName);
-                                            if (string.IsNullOrEmpty(DataSourceName)) {
-                                                DataSourceName = "Default";
-                                            }
-                                            //
-                                            // ----- Add metadata if not already there
-                                            //
-                                            if (!result.metaData.ContainsKey(ContentName.ToLowerInvariant())) {
-                                                result.metaData.Add(ContentName.ToLowerInvariant(), new Models.Domain.ContentMetadataModel());
-                                            }
-                                            //
-                                            // Get metadata attributes
-                                            //
-                                            Models.Domain.ContentMetadataModel targetMetaData = result.metaData[ContentName.ToLowerInvariant()];
-                                            string activeDefaultText = "1";
-                                            if (!(DefaultMetaData.active)) {
-                                                activeDefaultText = "0";
-                                            }
-                                            ActiveText = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Active", activeDefaultText);
-                                            if (string.IsNullOrEmpty(ActiveText)) {
-                                                ActiveText = "1";
-                                            }
-                                            targetMetaData.active = GenericController.encodeBoolean(ActiveText);
-                                            targetMetaData.activeOnly = true;
-                                            //.adminColumns = ?
-                                            targetMetaData.adminOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AdminOnly", DefaultMetaData.adminOnly);
-                                            targetMetaData.aliasId = "id";
-                                            targetMetaData.aliasName = "name";
-                                            targetMetaData.allowAdd = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowAdd", DefaultMetaData.allowAdd);
-                                            targetMetaData.allowCalendarEvents = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowCalendarEvents", DefaultMetaData.allowCalendarEvents);
-                                            targetMetaData.allowContentChildTool = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowContentChildTool", DefaultMetaData.allowContentChildTool);
-                                            targetMetaData.allowContentTracking = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowContentTracking", DefaultMetaData.allowContentTracking);
-                                            targetMetaData.allowDelete = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowDelete", DefaultMetaData.allowDelete);
-                                            targetMetaData.allowTopicRules = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowTopicRules", DefaultMetaData.allowTopicRules);
-                                            targetMetaData.guid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", DefaultMetaData.guid);
-                                            targetMetaData.dataChanged = setAllDataChanged;
-                                            targetMetaData.legacyContentControlCriteria = "";
-                                            targetMetaData.dataSourceName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentDataSourceName", DefaultMetaData.dataSourceName);
-                                            targetMetaData.tableName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentTableName", DefaultMetaData.tableName);
-                                            targetMetaData.dataSourceId = 0;
-                                            targetMetaData.defaultSortMethod = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "DefaultSortMethod", DefaultMetaData.defaultSortMethod);
-                                            if ((targetMetaData.defaultSortMethod == "") || (targetMetaData.defaultSortMethod.ToLowerInvariant() == "name")) {
-                                                targetMetaData.defaultSortMethod = "By Name";
-                                            } else if (GenericController.vbLCase(targetMetaData.defaultSortMethod) == "sortorder") {
-                                                targetMetaData.defaultSortMethod = "By Alpha Sort Order Field";
-                                            } else if (GenericController.vbLCase(targetMetaData.defaultSortMethod) == "date") {
-                                                targetMetaData.defaultSortMethod = "By Date";
-                                            }
-                                            targetMetaData.developerOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "DeveloperOnly", DefaultMetaData.developerOnly);
-                                            targetMetaData.dropDownFieldList = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "DropDownFieldList", DefaultMetaData.dropDownFieldList);
-                                            targetMetaData.editorGroupName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "EditorGroupName", DefaultMetaData.editorGroupName);
-                                            targetMetaData.fields = new Dictionary<string, Models.Domain.ContentFieldMetadataModel>();
-                                            targetMetaData.iconLink = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "IconLink", DefaultMetaData.iconLink);
-                                            targetMetaData.iconHeight = XmlController.GetXMLAttributeInteger(core, Found, metaData_NodeWithinLoop, "IconHeight", DefaultMetaData.iconHeight);
-                                            targetMetaData.iconWidth = XmlController.GetXMLAttributeInteger(core, Found, metaData_NodeWithinLoop, "IconWidth", DefaultMetaData.iconWidth);
-                                            targetMetaData.iconSprites = XmlController.GetXMLAttributeInteger(core, Found, metaData_NodeWithinLoop, "IconSprites", DefaultMetaData.iconSprites);
-                                            targetMetaData.includesAFieldChange = false;
-                                            targetMetaData.installedByCollectionGuid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "installedByCollection", DefaultMetaData.installedByCollectionGuid);
-                                            targetMetaData.isBaseContent = IsccBaseFile || XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "IsBaseContent", false);
-                                            targetMetaData.isModifiedSinceInstalled = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "IsModified", DefaultMetaData.isModifiedSinceInstalled);
-                                            targetMetaData.name = ContentName;
-                                            targetMetaData.parentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Parent", DefaultMetaData.parentName);
-                                            targetMetaData.whereClause = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "WhereClause", DefaultMetaData.whereClause);
-                                            //
-                                            // -- determine id
-                                            targetMetaData.id = DbController.getContentId(core, ContentName);
-                                            //
-                                            // Get metadata field nodes
-                                            //
-                                            foreach (XmlNode MetaDataChildNode in metaData_NodeWithinLoop.ChildNodes) {
-                                                //
-                                                // ----- process metadata Field
-                                                //
-                                                if (textMatch(MetaDataChildNode.Name, "field")) {
-                                                    FieldName = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "Name", "");
-                                                    if (FieldName.ToLowerInvariant() == "middlename") {
-                                                        //FieldName = FieldName;
-                                                    }
-                                                    //
-                                                    // try to find field in the defaultmetadata
-                                                    //
-                                                    if (DefaultMetaData.fields.ContainsKey(FieldName)) {
-                                                        DefaultMetaDataField = DefaultMetaData.fields[FieldName];
-                                                    } else {
-                                                        DefaultMetaDataField = new Models.Domain.ContentFieldMetadataModel();
-                                                    }
-                                                    //
-                                                    if (!(result.metaData[ContentName.ToLowerInvariant()].fields.ContainsKey(FieldName.ToLowerInvariant()))) {
-                                                        result.metaData[ContentName.ToLowerInvariant()].fields.Add(FieldName.ToLowerInvariant(), new Models.Domain.ContentFieldMetadataModel());
-                                                    }
-                                                    var metaDataField = result.metaData[ContentName.ToLowerInvariant()].fields[FieldName.ToLowerInvariant()];
-                                                    metaDataField.nameLc = FieldName.ToLowerInvariant();
-                                                    ActiveText = "0";
-                                                    if (DefaultMetaDataField.active) {
-                                                        ActiveText = "1";
-                                                    }
-                                                    ActiveText = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "Active", ActiveText);
-                                                    if (string.IsNullOrEmpty(ActiveText)) {
-                                                        ActiveText = "1";
-                                                    }
-                                                    metaDataField.active = GenericController.encodeBoolean(ActiveText);
-                                                    //
-                                                    // Convert Field Descriptor (text) to field type (integer)
-                                                    //
-                                                    string defaultFieldTypeName = ContentFieldMetadataModel.getFieldTypeNameFromFieldTypeId(core, DefaultMetaDataField.fieldTypeId);
-                                                    string fieldTypeName = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "FieldType", defaultFieldTypeName);
-                                                    metaDataField.fieldTypeId = core.db.getFieldTypeIdFromFieldTypeName(fieldTypeName);
-                                                    metaDataField.editSortPriority = XmlController.GetXMLAttributeInteger(core, Found, MetaDataChildNode, "EditSortPriority", DefaultMetaDataField.editSortPriority);
-                                                    metaDataField.authorable = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Authorable", DefaultMetaDataField.authorable);
-                                                    metaDataField.caption = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "Caption", DefaultMetaDataField.caption);
-                                                    metaDataField.defaultValue = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "DefaultValue", DefaultMetaDataField.defaultValue);
-                                                    metaDataField.notEditable = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "NotEditable", DefaultMetaDataField.notEditable);
-                                                    metaDataField.indexColumn = XmlController.GetXMLAttributeInteger(core, Found, MetaDataChildNode, "IndexColumn", DefaultMetaDataField.indexColumn);
-                                                    metaDataField.indexWidth = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "IndexWidth", DefaultMetaDataField.indexWidth);
-                                                    metaDataField.indexSortOrder = XmlController.GetXMLAttributeInteger(core, Found, MetaDataChildNode, "IndexSortOrder", DefaultMetaDataField.indexSortOrder);
-                                                    metaDataField.redirectId = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "RedirectID", DefaultMetaDataField.redirectId);
-                                                    metaDataField.redirectPath = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "RedirectPath", DefaultMetaDataField.redirectPath);
-                                                    metaDataField.htmlContent = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "HTMLContent", DefaultMetaDataField.htmlContent);
-                                                    metaDataField.uniqueName = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "UniqueName", DefaultMetaDataField.uniqueName);
-                                                    metaDataField.password = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Password", DefaultMetaDataField.password);
-                                                    metaDataField.adminOnly = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "AdminOnly", DefaultMetaDataField.adminOnly);
-                                                    metaDataField.developerOnly = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "DeveloperOnly", DefaultMetaDataField.developerOnly);
-                                                    metaDataField.readOnly = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "ReadOnly", DefaultMetaDataField.readOnly);
-                                                    metaDataField.required = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Required", DefaultMetaDataField.required);
-                                                    metaDataField.rssTitleField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "RSSTitle", DefaultMetaDataField.rssTitleField);
-                                                    metaDataField.rssDescriptionField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "RSSDescriptionField", DefaultMetaDataField.rssDescriptionField);
-                                                    metaDataField.memberSelectGroupName_set(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "MemberSelectGroup", ""));
-                                                    metaDataField.editTabName = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "EditTab", DefaultMetaDataField.editTabName);
-                                                    metaDataField.scramble = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Scramble", DefaultMetaDataField.scramble);
-                                                    metaDataField.lookupList = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "LookupList", DefaultMetaDataField.lookupList);
-                                                    metaDataField.manyToManyRulePrimaryField = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRulePrimaryField", DefaultMetaDataField.manyToManyRulePrimaryField);
-                                                    metaDataField.manyToManyRuleSecondaryField = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRuleSecondaryField", DefaultMetaDataField.manyToManyRuleSecondaryField);
-                                                    metaDataField.set_lookupContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "LookupContent", DefaultMetaDataField.get_lookupContentName(core)));
-                                                    // isbase should be set if the base file is loading, regardless of the state of any isBaseField attribute -- which will be removed later
-                                                    // case 1 - when the application collection is loaded from the exported xml file, isbasefield must follow the export file although the data is not the base collection
-                                                    // case 2 - when the base file is loaded, all fields must include the attribute
-                                                    metaDataField.isBaseField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "IsBaseField", false) || IsccBaseFile;
-                                                    metaDataField.set_redirectContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "RedirectContent", DefaultMetaDataField.get_redirectContentName(core)));
-                                                    metaDataField.set_manyToManyContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyContent", DefaultMetaDataField.get_manyToManyContentName(core)));
-                                                    metaDataField.set_manyToManyRuleContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRuleContent", DefaultMetaDataField.get_manyToManyRuleContentName(core)));
-                                                    metaDataField.isModifiedSinceInstalled = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "IsModified", DefaultMetaDataField.isModifiedSinceInstalled);
-                                                    metaDataField.installedByCollectionGuid = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "installedByCollectionId", DefaultMetaDataField.installedByCollectionGuid);
-                                                    metaDataField.id = DbController.getContentFieldId( core, targetMetaData.id, metaDataField.nameLc);
-                                                    metaDataField.dataChanged = setAllDataChanged;
-                                                    //
-                                                    // ----- handle child nodes (help node)
-                                                    //
-                                                    metaDataField.helpCustom = "";
-                                                    metaDataField.helpDefault = "";
-                                                    foreach (XmlNode FieldChildNode in MetaDataChildNode.ChildNodes) {
-                                                        //
-                                                        // ----- process metadata Field
-                                                        //
-                                                        if (textMatch(FieldChildNode.Name, "HelpDefault")) {
-                                                            metaDataField.helpDefault = FieldChildNode.InnerText;
-                                                        }
-                                                        if (textMatch(FieldChildNode.Name, "HelpCustom")) {
-                                                            metaDataField.helpCustom = FieldChildNode.InnerText;
-                                                        }
-                                                        metaDataField.helpChanged = setAllDataChanged;
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        DefaultMetaData = ContentMetadataModel.createByUniqueName(core, contentName);
                                     }
-                                    break;
-                                case "sqlindex":
-                                    //
-                                    // SQL Indexes
-                                    //
-                                    IndexName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "indexname", "");
-                                    TableName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "tableName", "");
-                                    DataSourceName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "DataSourceName", "");
-                                    if (string.IsNullOrEmpty(DataSourceName)) {
-                                        DataSourceName = "default";
-                                    }
-                                    bool removeDup = false;
-                                    MetadataMiniCollectionModel.MiniCollectionSQLIndexModel dupToRemove = new MetadataMiniCollectionModel.MiniCollectionSQLIndexModel();
-                                    foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel index in result.sqlIndexes) {
-                                        if (textMatch(index.IndexName, IndexName) & textMatch(index.TableName, TableName) & textMatch(index.DataSourceName, DataSourceName)) {
-                                            dupToRemove = index;
-                                            removeDup = true;
-                                            break;
-                                        }
-                                    }
-                                    if (removeDup) {
-                                        result.sqlIndexes.Remove(dupToRemove);
-                                    }
-                                    MetadataMiniCollectionModel.MiniCollectionSQLIndexModel newIndex = new MetadataMiniCollectionModel.MiniCollectionSQLIndexModel {
-                                        IndexName = IndexName,
-                                        TableName = TableName,
-                                        DataSourceName = DataSourceName,
-                                        FieldNameList = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "FieldNameList", "")
+                                }
+                                if (DefaultMetaData == null) {
+                                    DefaultMetaData = new ContentMetadataModel() {
+                                        guid = contentGuid,
+                                        name = contentName,
+                                        active = true
                                     };
-                                    result.sqlIndexes.Add(newIndex);
-                                    break;
-                                case "adminmenu":
-                                case "menuentry":
-                                case "navigatorentry":
+                                }
+                                //
+                                // These two fields are needed to import the row
+                                //
+                                DataSourceName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "dataSource", DefaultMetaData.dataSourceName);
+                                if (string.IsNullOrEmpty(DataSourceName)) {
+                                    DataSourceName = "Default";
+                                }
+                                //
+                                // ----- Add metadata if not already there
+                                //
+                                if (!result.metaData.ContainsKey(contentName.ToLowerInvariant())) {
+                                    result.metaData.Add(contentName.ToLowerInvariant(), new Models.Domain.ContentMetadataModel());
+                                }
+                                //
+                                // Get metadata attributes
+                                //
+                                ContentMetadataModel targetMetaData = result.metaData[contentName.ToLowerInvariant()];
+                                string activeDefaultText = "1";
+                                if (!(DefaultMetaData.active)) {
+                                    activeDefaultText = "0";
+                                }
+                                ActiveText = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Active", activeDefaultText);
+                                if (string.IsNullOrEmpty(ActiveText)) {
+                                    ActiveText = "1";
+                                }
+                                targetMetaData.active = GenericController.encodeBoolean(ActiveText);
+                                targetMetaData.activeOnly = true;
+                                //.adminColumns = ?
+                                targetMetaData.adminOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AdminOnly", DefaultMetaData.adminOnly);
+                                targetMetaData.aliasId = "id";
+                                targetMetaData.aliasName = "name";
+                                targetMetaData.allowAdd = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowAdd", DefaultMetaData.allowAdd);
+                                targetMetaData.allowCalendarEvents = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowCalendarEvents", DefaultMetaData.allowCalendarEvents);
+                                targetMetaData.allowContentChildTool = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowContentChildTool", DefaultMetaData.allowContentChildTool);
+                                targetMetaData.allowContentTracking = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowContentTracking", DefaultMetaData.allowContentTracking);
+                                targetMetaData.allowDelete = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowDelete", DefaultMetaData.allowDelete);
+                                targetMetaData.allowTopicRules = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowTopicRules", DefaultMetaData.allowTopicRules);
+                                targetMetaData.guid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", DefaultMetaData.guid);
+                                targetMetaData.dataChanged = setAllDataChanged;
+                                targetMetaData.legacyContentControlCriteria = "";
+                                targetMetaData.dataSourceName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentDataSourceName", DefaultMetaData.dataSourceName);
+                                targetMetaData.tableName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentTableName", DefaultMetaData.tableName);
+                                targetMetaData.dataSourceId = 0;
+                                targetMetaData.defaultSortMethod = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "DefaultSortMethod", DefaultMetaData.defaultSortMethod);
+                                if ((targetMetaData.defaultSortMethod == null) || (targetMetaData.defaultSortMethod == "") || (targetMetaData.defaultSortMethod.ToLowerInvariant() == "name")) {
+                                    targetMetaData.defaultSortMethod = "By Name";
+                                } else if (GenericController.vbLCase(targetMetaData.defaultSortMethod) == "sortorder") {
+                                    targetMetaData.defaultSortMethod = "By Alpha Sort Order Field";
+                                } else if (GenericController.vbLCase(targetMetaData.defaultSortMethod) == "date") {
+                                    targetMetaData.defaultSortMethod = "By Date";
+                                }
+                                targetMetaData.developerOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "DeveloperOnly", DefaultMetaData.developerOnly);
+                                targetMetaData.dropDownFieldList = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "DropDownFieldList", DefaultMetaData.dropDownFieldList);
+                                targetMetaData.editorGroupName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "EditorGroupName", DefaultMetaData.editorGroupName);
+                                targetMetaData.fields = new Dictionary<string, Models.Domain.ContentFieldMetadataModel>();
+                                targetMetaData.iconLink = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "IconLink", DefaultMetaData.iconLink);
+                                targetMetaData.iconHeight = XmlController.GetXMLAttributeInteger(core, Found, metaData_NodeWithinLoop, "IconHeight", DefaultMetaData.iconHeight);
+                                targetMetaData.iconWidth = XmlController.GetXMLAttributeInteger(core, Found, metaData_NodeWithinLoop, "IconWidth", DefaultMetaData.iconWidth);
+                                targetMetaData.iconSprites = XmlController.GetXMLAttributeInteger(core, Found, metaData_NodeWithinLoop, "IconSprites", DefaultMetaData.iconSprites);
+                                targetMetaData.includesAFieldChange = false;
+                                targetMetaData.installedByCollectionGuid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "installedByCollection", DefaultMetaData.installedByCollectionGuid);
+                                targetMetaData.isBaseContent = isBaseCollection || XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "IsBaseContent", false);
+                                targetMetaData.isModifiedSinceInstalled = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "IsModified", DefaultMetaData.isModifiedSinceInstalled);
+                                targetMetaData.name = contentName;
+                                targetMetaData.parentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Parent", DefaultMetaData.parentName);
+                                targetMetaData.whereClause = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "WhereClause", DefaultMetaData.whereClause);
+                                //
+                                // -- determine id
+                                targetMetaData.id = DbController.getContentId(core, contentName);
+                                //
+                                // Get metadata field nodes
+                                //
+                                foreach (XmlNode MetaDataChildNode in metaData_NodeWithinLoop.ChildNodes) {
                                     //
-                                    // Admin Menus / Navigator Entries
-                                    MenuName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
-                                    menuNameSpace = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NameSpace", "");
-                                    MenuGuid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", "");
-                                    IsNavigator = (NodeName == "navigatorentry");
-                                    string MenuKey = null;
-                                    if (!IsNavigator) {
-                                        MenuKey = GenericController.vbLCase(MenuName);
-                                    } else {
-                                        MenuKey = MenuGuid;
-                                    }
-                                    if (!result.menus.ContainsKey(MenuKey)) {
-                                        ActiveText = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Active", "1");
+                                    // ----- process metadata Field
+                                    //
+                                    if (textMatch(MetaDataChildNode.Name, "field")) {
+                                        string FieldName = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "Name", "");
+                                        if (FieldName.ToLowerInvariant() == "middlename") {
+                                            //FieldName = FieldName;
+                                        }
+                                        ContentFieldMetadataModel DefaultMetaDataField = null;
+                                        //
+                                        // try to find field in the defaultmetadata
+                                        //
+                                        if (DefaultMetaData.fields.ContainsKey(FieldName)) {
+                                            DefaultMetaDataField = DefaultMetaData.fields[FieldName];
+                                        } else {
+                                            DefaultMetaDataField = new Models.Domain.ContentFieldMetadataModel();
+                                        }
+                                        //
+                                        if (!(result.metaData[contentName.ToLowerInvariant()].fields.ContainsKey(FieldName.ToLowerInvariant()))) {
+                                            result.metaData[contentName.ToLowerInvariant()].fields.Add(FieldName.ToLowerInvariant(), new Models.Domain.ContentFieldMetadataModel());
+                                        }
+                                        var metaDataField = result.metaData[contentName.ToLowerInvariant()].fields[FieldName.ToLowerInvariant()];
+                                        metaDataField.nameLc = FieldName.ToLowerInvariant();
+                                        ActiveText = "0";
+                                        if (DefaultMetaDataField.active) {
+                                            ActiveText = "1";
+                                        }
+                                        ActiveText = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "Active", ActiveText);
                                         if (string.IsNullOrEmpty(ActiveText)) {
                                             ActiveText = "1";
                                         }
-                                        result.menus.Add(MenuKey, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
-                                            dataChanged = setAllDataChanged,
-                                            name = MenuName,
-                                            Guid = MenuGuid,
-                                            Key = MenuKey,
-                                            Active = GenericController.encodeBoolean(ActiveText),
-                                            menuNameSpace = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NameSpace", ""),
-                                            ParentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ParentName", ""),
-                                            ContentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentName", ""),
-                                            LinkPage = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "LinkPage", ""),
-                                            SortOrder = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "SortOrder", ""),
-                                            AdminOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AdminOnly", false),
-                                            DeveloperOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "DeveloperOnly", false),
-                                            NewWindow = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "NewWindow", false),
-                                            AddonName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "AddonName", ""),
-                                            AddonGuid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "AddonGuid", ""),
-                                            NavIconType = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NavIconType", ""),
-                                            NavIconTitle = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NavIconTitle", ""),
-                                            IsNavigator = IsNavigator
-                                        });
+                                        metaDataField.active = GenericController.encodeBoolean(ActiveText);
+                                        //
+                                        // Convert Field Descriptor (text) to field type (integer)
+                                        //
+                                        string defaultFieldTypeName = ContentFieldMetadataModel.getFieldTypeNameFromFieldTypeId(core, DefaultMetaDataField.fieldTypeId);
+                                        string fieldTypeName = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "FieldType", defaultFieldTypeName);
+                                        metaDataField.fieldTypeId = core.db.getFieldTypeIdFromFieldTypeName(fieldTypeName);
+                                        metaDataField.editSortPriority = XmlController.GetXMLAttributeInteger(core, Found, MetaDataChildNode, "EditSortPriority", DefaultMetaDataField.editSortPriority);
+                                        metaDataField.authorable = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Authorable", DefaultMetaDataField.authorable);
+                                        metaDataField.caption = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "Caption", DefaultMetaDataField.caption);
+                                        metaDataField.defaultValue = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "DefaultValue", DefaultMetaDataField.defaultValue);
+                                        metaDataField.notEditable = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "NotEditable", DefaultMetaDataField.notEditable);
+                                        metaDataField.indexColumn = XmlController.GetXMLAttributeInteger(core, Found, MetaDataChildNode, "IndexColumn", DefaultMetaDataField.indexColumn);
+                                        metaDataField.indexWidth = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "IndexWidth", DefaultMetaDataField.indexWidth);
+                                        metaDataField.indexSortOrder = XmlController.GetXMLAttributeInteger(core, Found, MetaDataChildNode, "IndexSortOrder", DefaultMetaDataField.indexSortOrder);
+                                        metaDataField.redirectId = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "RedirectID", DefaultMetaDataField.redirectId);
+                                        metaDataField.redirectPath = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "RedirectPath", DefaultMetaDataField.redirectPath);
+                                        metaDataField.htmlContent = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "HTMLContent", DefaultMetaDataField.htmlContent);
+                                        metaDataField.uniqueName = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "UniqueName", DefaultMetaDataField.uniqueName);
+                                        metaDataField.password = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Password", DefaultMetaDataField.password);
+                                        metaDataField.adminOnly = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "AdminOnly", DefaultMetaDataField.adminOnly);
+                                        metaDataField.developerOnly = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "DeveloperOnly", DefaultMetaDataField.developerOnly);
+                                        metaDataField.readOnly = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "ReadOnly", DefaultMetaDataField.readOnly);
+                                        metaDataField.required = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Required", DefaultMetaDataField.required);
+                                        metaDataField.rssTitleField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "RSSTitle", DefaultMetaDataField.rssTitleField);
+                                        metaDataField.rssDescriptionField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "RSSDescriptionField", DefaultMetaDataField.rssDescriptionField);
+                                        metaDataField.memberSelectGroupName_set(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "MemberSelectGroup", ""));
+                                        metaDataField.editTabName = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "EditTab", DefaultMetaDataField.editTabName);
+                                        metaDataField.scramble = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Scramble", DefaultMetaDataField.scramble);
+                                        metaDataField.lookupList = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "LookupList", DefaultMetaDataField.lookupList);
+                                        metaDataField.manyToManyRulePrimaryField = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRulePrimaryField", DefaultMetaDataField.manyToManyRulePrimaryField);
+                                        metaDataField.manyToManyRuleSecondaryField = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRuleSecondaryField", DefaultMetaDataField.manyToManyRuleSecondaryField);
+                                        metaDataField.set_lookupContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "LookupContent", DefaultMetaDataField.get_lookupContentName(core)));
+                                        // isbase should be set if the base file is loading, regardless of the state of any isBaseField attribute -- which will be removed later
+                                        // case 1 - when the application collection is loaded from the exported xml file, isbasefield must follow the export file although the data is not the base collection
+                                        // case 2 - when the base file is loaded, all fields must include the attribute
+                                        metaDataField.isBaseField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "IsBaseField", false) || isBaseCollection;
+                                        metaDataField.set_redirectContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "RedirectContent", DefaultMetaDataField.get_redirectContentName(core)));
+                                        metaDataField.set_manyToManyContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyContent", DefaultMetaDataField.get_manyToManyContentName(core)));
+                                        metaDataField.set_manyToManyRuleContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRuleContent", DefaultMetaDataField.get_manyToManyRuleContentName(core)));
+                                        metaDataField.isModifiedSinceInstalled = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "IsModified", DefaultMetaDataField.isModifiedSinceInstalled);
+                                        metaDataField.installedByCollectionGuid = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "installedByCollectionId", DefaultMetaDataField.installedByCollectionGuid);
+                                        metaDataField.id = DbController.getContentFieldId(core, targetMetaData.id, metaDataField.nameLc);
+                                        metaDataField.dataChanged = setAllDataChanged;
+                                        //
+                                        // ----- handle child nodes (help node)
+                                        //
+                                        metaDataField.helpCustom = "";
+                                        metaDataField.helpDefault = "";
+                                        foreach (XmlNode FieldChildNode in MetaDataChildNode.ChildNodes) {
+                                            //
+                                            // ----- process metadata Field
+                                            //
+                                            if (textMatch(FieldChildNode.Name, "HelpDefault")) {
+                                                metaDataField.helpDefault = FieldChildNode.InnerText;
+                                            }
+                                            if (textMatch(FieldChildNode.Name, "HelpCustom")) {
+                                                metaDataField.helpCustom = FieldChildNode.InnerText;
+                                            }
+                                            metaDataField.helpChanged = setAllDataChanged;
+                                        }
                                     }
-                                    break;
+                                }
+                                break;
+                                case "sqlindex":
+                                //
+                                // SQL Indexes
+                                //
+                                IndexName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "indexname", "");
+                                TableName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "tableName", "");
+                                DataSourceName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "DataSourceName", "");
+                                if (string.IsNullOrEmpty(DataSourceName)) {
+                                    DataSourceName = "default";
+                                }
+                                bool removeDup = false;
+                                MetadataMiniCollectionModel.MiniCollectionSQLIndexModel dupToRemove = new MetadataMiniCollectionModel.MiniCollectionSQLIndexModel();
+                                foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel index in result.sqlIndexes) {
+                                    if (textMatch(index.IndexName, IndexName) & textMatch(index.TableName, TableName) & textMatch(index.DataSourceName, DataSourceName)) {
+                                        dupToRemove = index;
+                                        removeDup = true;
+                                        break;
+                                    }
+                                }
+                                if (removeDup) {
+                                    result.sqlIndexes.Remove(dupToRemove);
+                                }
+                                MetadataMiniCollectionModel.MiniCollectionSQLIndexModel newIndex = new MetadataMiniCollectionModel.MiniCollectionSQLIndexModel {
+                                    IndexName = IndexName,
+                                    TableName = TableName,
+                                    DataSourceName = DataSourceName,
+                                    FieldNameList = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "FieldNameList", "")
+                                };
+                                result.sqlIndexes.Add(newIndex);
+                                break;
+                                case "adminmenu":
+                                case "menuentry":
+                                case "navigatorentry":
+                                //
+                                // Admin Menus / Navigator Entries
+                                MenuName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
+                                menuNameSpace = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NameSpace", "");
+                                MenuGuid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", "");
+                                IsNavigator = (NodeName == "navigatorentry");
+                                string MenuKey = null;
+                                if (!IsNavigator) {
+                                    MenuKey = GenericController.vbLCase(MenuName);
+                                } else {
+                                    MenuKey = MenuGuid;
+                                }
+                                if (!result.menus.ContainsKey(MenuKey)) {
+                                    ActiveText = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Active", "1");
+                                    if (string.IsNullOrEmpty(ActiveText)) {
+                                        ActiveText = "1";
+                                    }
+                                    result.menus.Add(MenuKey, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
+                                        dataChanged = setAllDataChanged,
+                                        name = MenuName,
+                                        Guid = MenuGuid,
+                                        Key = MenuKey,
+                                        Active = GenericController.encodeBoolean(ActiveText),
+                                        menuNameSpace = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NameSpace", ""),
+                                        ParentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ParentName", ""),
+                                        ContentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentName", ""),
+                                        LinkPage = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "LinkPage", ""),
+                                        SortOrder = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "SortOrder", ""),
+                                        AdminOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AdminOnly", false),
+                                        DeveloperOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "DeveloperOnly", false),
+                                        NewWindow = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "NewWindow", false),
+                                        AddonName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "AddonName", ""),
+                                        AddonGuid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "AddonGuid", ""),
+                                        NavIconType = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NavIconType", ""),
+                                        NavIconTitle = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NavIconTitle", ""),
+                                        IsNavigator = IsNavigator
+                                    });
+                                }
+                                break;
                                 case "aggregatefunction":
                                 case "addon":
-                                    break;
+                                break;
                                 case "style":
-                                    //
-                                    // style sheet entries
-                                    //
-                                    Name = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
-                                    if (result.styleCnt > 0) {
-                                        for (Ptr = 0; Ptr < result.styleCnt; Ptr++) {
-                                            if (textMatch(result.styles[Ptr].Name, Name)) {
-                                                break;
-                                            }
+                                //
+                                // style sheet entries
+                                //
+                                Name = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
+                                if (result.styleCnt > 0) {
+                                    for (Ptr = 0; Ptr < result.styleCnt; Ptr++) {
+                                        if (textMatch(result.styles[Ptr].Name, Name)) {
+                                            break;
                                         }
                                     }
-                                    if (Ptr >= result.styleCnt) {
-                                        Ptr = result.styleCnt;
-                                        result.styleCnt = result.styleCnt + 1;
-                                        Array.Resize(ref result.styles, Ptr);
-                                        result.styles[Ptr].Name = Name;
-                                    }
-                                    var tempVar5 = result.styles[Ptr];
-                                    tempVar5.dataChanged = setAllDataChanged;
-                                    tempVar5.Overwrite = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "Overwrite", false);
-                                    tempVar5.Copy = metaData_NodeWithinLoop.InnerText;
-                                    break;
+                                }
+                                if (Ptr >= result.styleCnt) {
+                                    Ptr = result.styleCnt;
+                                    result.styleCnt = result.styleCnt + 1;
+                                    Array.Resize(ref result.styles, Ptr);
+                                    result.styles[Ptr].Name = Name;
+                                }
+                                var tempVar5 = result.styles[Ptr];
+                                tempVar5.dataChanged = setAllDataChanged;
+                                tempVar5.Overwrite = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "Overwrite", false);
+                                tempVar5.Copy = metaData_NodeWithinLoop.InnerText;
+                                break;
                                 case "stylesheet":
-                                    //
-                                    // style sheet in one entry
-                                    //
-                                    result.styleSheet = metaData_NodeWithinLoop.InnerText;
-                                    break;
+                                //
+                                // style sheet in one entry
+                                //
+                                result.styleSheet = metaData_NodeWithinLoop.InnerText;
+                                break;
                                 case "getcollection":
                                 case "importcollection":
-                                    break;
+                                break;
                                 case "pagetemplate":
-                                    //
-                                    //-------------------------------------------------------------------------------------------------
-                                    // Page Templates
-                                    //-------------------------------------------------------------------------------------------------
-                                    // *********************************************************************************
-                                    // Page Template - started, but Return_Collection and LoadDataTometadata are all that is done do far
-                                    //
-                                    if (result.pageTemplateCnt > 0) {
-                                        for (Ptr = 0; Ptr < result.pageTemplateCnt; Ptr++) {
-                                            if (textMatch(result.pageTemplates[Ptr].Name, Name)) {
-                                                break;
-                                            }
+                                //
+                                //-------------------------------------------------------------------------------------------------
+                                // Page Templates
+                                //-------------------------------------------------------------------------------------------------
+                                // *********************************************************************************
+                                // Page Template - started, but Return_Collection and LoadDataTometadata are all that is done do far
+                                //
+                                if (result.pageTemplateCnt > 0) {
+                                    for (Ptr = 0; Ptr < result.pageTemplateCnt; Ptr++) {
+                                        if (textMatch(result.pageTemplates[Ptr].Name, Name)) {
+                                            break;
                                         }
                                     }
-                                    if (Ptr >= result.pageTemplateCnt) {
-                                        Ptr = result.pageTemplateCnt;
-                                        result.pageTemplateCnt = result.pageTemplateCnt + 1;
-                                        Array.Resize(ref result.pageTemplates, Ptr);
-                                        result.pageTemplates[Ptr].Name = Name;
-                                    }
-                                    var tempVar6 = result.pageTemplates[Ptr];
-                                    tempVar6.Copy = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Copy", "");
-                                    tempVar6.Guid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", "");
-                                    tempVar6.Style = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "style", "");
-                                    break;
+                                }
+                                if (Ptr >= result.pageTemplateCnt) {
+                                    Ptr = result.pageTemplateCnt;
+                                    result.pageTemplateCnt = result.pageTemplateCnt + 1;
+                                    Array.Resize(ref result.pageTemplates, Ptr);
+                                    result.pageTemplates[Ptr].Name = Name;
+                                }
+                                var tempVar6 = result.pageTemplates[Ptr];
+                                tempVar6.Copy = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Copy", "");
+                                tempVar6.Guid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", "");
+                                tempVar6.Style = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "style", "");
+                                break;
                                 case "pagecontent":
-                                    //
-                                    //-------------------------------------------------------------------------------------------------
-                                    // Page Content
-                                    //-------------------------------------------------------------------------------------------------
-                                    //
-                                    break;
+                                //
+                                //-------------------------------------------------------------------------------------------------
+                                // Page Content
+                                //-------------------------------------------------------------------------------------------------
+                                //
+                                break;
                                 case "copycontent":
-                                    //
-                                    //-------------------------------------------------------------------------------------------------
-                                    // Copy Content
-                                    //-------------------------------------------------------------------------------------------------
-                                    //
-                                    break;
+                                //
+                                //-------------------------------------------------------------------------------------------------
+                                // Copy Content
+                                //-------------------------------------------------------------------------------------------------
+                                //
+                                break;
                             }
                         }
                         //hint = "nodes done"
@@ -628,47 +614,75 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Verify ccContent and ccFields records from the metadata nodes of a a collection file. This is the last step of loading teh metadata nodes of a collection file. ParentId field is set based on ParentName node.
         /// </summary>
-        private static void installMetaDataMiniCollection_BuildDb(CoreController core, MetadataMiniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix) {
+        private static void installMetaDataMiniCollection_BuildDb(CoreController core, bool isBaseCollection, MetadataMiniCollectionModel Collection, bool isNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix) {
             try {
                 //
                 logPrefix += ", installCollection_BuildDbFromMiniCollection";
                 LogController.logInfo(core, "Application: " + core.appConfig.name + ", Upgrademetadata_BuildDbFromCollection");
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "metadata Load, stage 1: verify core sql tables");
+                //LogController.logInfo(core, "metadata Load, stage 1: verify core sql tables");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                BuildController.verifyBasicTables(core, logPrefix);
+                //BuildController.verifyBasicTables(core, logPrefix);
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "metadata Load, stage 2: create SQL tables in default datasource");
+                LogController.logInfo(core, "metadata Load, stage 1: create SQL tables in default datasource");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 {
-                    string UsedTables = "";
-                    foreach (var keypairvalue in Collection.metaData) {
-                        ContentMetadataModel contentMetaData = keypairvalue.Value;
-                        if (contentMetaData.dataChanged) {
-                            LogController.logInfo(core, "creating sql table [" + contentMetaData.tableName + "], datasource [" + contentMetaData.dataSourceName + "]");
-                            using (var db = new DbController(core, contentMetaData.dataSourceName)) {
-                                if (GenericController.vbLCase(contentMetaData.dataSourceName) == "default" || contentMetaData.dataSourceName == "") {
-                                    if (GenericController.vbInstr(1, "," + UsedTables + ",", "," + contentMetaData.tableName + ",", 1) != 0) {
-                                        //TableName = TableName;
-                                    } else {
-                                        UsedTables = UsedTables + "," + contentMetaData.tableName;
-                                        db.createSQLTable(contentMetaData.tableName);
-                                    }
-                                    foreach (var fieldNvp in contentMetaData.fields) {
-                                        ContentFieldMetadataModel field = fieldNvp.Value;
-                                        db.createSQLTableField(contentMetaData.tableName, field.nameLc, field.fieldTypeId);
-                                    }
-                                }
+                    foreach (KeyValuePair<string, ContentMetadataModel> metaKvp in Collection.metaData) {
+                        if(string.IsNullOrWhiteSpace(metaKvp.Value.tableName)) {
+                            LogController.logWarn(core, "Content [" + metaKvp.Value.name + "] in collection [" + Collection.name + "] cannot be added because the content tablename is empty.");
+                            continue;
+                        }
+                        core.db.createSQLTable(metaKvp.Value.tableName);
+                        foreach (KeyValuePair<string, ContentFieldMetadataModel> fieldKvp in metaKvp.Value.fields) {
+                            if (string.IsNullOrWhiteSpace(fieldKvp.Value.nameLc)) {
+                                LogController.logWarn(core, "Field [# " + fieldKvp.Value.id  + "] in content [" + metaKvp.Value.name + "] in collection [" + Collection.name + "] cannot be added because the content tablename is empty.");
+                                continue;
                             }
+                            core.db.createSQLTableField(metaKvp.Value.tableName, fieldKvp.Value.nameLc, fieldKvp.Value.fieldTypeId);
                         }
                     }
                     core.clearMetaData();
                     core.cache.invalidateAll();
                 }
+                //
+                //----------------------------------------------------------------------------------------------------------------------
+                LogController.logInfo(core, "metadata Load, stage 2: if baseCollection, reset isBaseContent and isBaseField");
+                //----------------------------------------------------------------------------------------------------------------------
+                //
+                if (isBaseCollection) {
+                    core.db.executeNonQuery("update ccfields set isBaseField=0");
+                    core.db.executeNonQuery("update ccContent set isBaseContent=0");
+                }
+                //
+                //{
+                //    string UsedTables = "";
+                //    foreach (var keypairvalue in Collection.metaData) {
+                //        ContentMetadataModel contentMetaData = keypairvalue.Value;
+                //        if (contentMetaData.dataChanged) {
+                //            LogController.logInfo(core, "creating sql table [" + contentMetaData.tableName + "], datasource [" + contentMetaData.dataSourceName + "]");
+                //            using (var db = new DbController(core, contentMetaData.dataSourceName)) {
+                //                if (GenericController.vbLCase(contentMetaData.dataSourceName) == "default" || contentMetaData.dataSourceName == "") {
+                //                    if (GenericController.vbInstr(1, "," + UsedTables + ",", "," + contentMetaData.tableName + ",", 1) != 0) {
+                //                        //TableName = TableName;
+                //                    } else {
+                //                        UsedTables = UsedTables + "," + contentMetaData.tableName;
+                //                        db.createSQLTable(contentMetaData.tableName);
+                //                    }
+                //                    foreach (var fieldNvp in contentMetaData.fields) {
+                //                        ContentFieldMetadataModel field = fieldNvp.Value;
+                //                        db.createSQLTableField(contentMetaData.tableName, field.nameLc, field.fieldTypeId);
+                //                    }
+                //                }
+                //            }
+                //        }
+                //    }
+                //    core.clearMetaData();
+                //    core.cache.invalidateAll();
+                //}
                 //
                 //----------------------------------------------------------------------------------------------------------------------
                 LogController.logInfo(core, "metadata Load, stage 3: Verify all metadata names in ccContent so GetContentID calls will succeed");
@@ -685,7 +699,7 @@ namespace Contensive.Processor.Models.Domain {
                     if (keypairvalue.Value.dataChanged) {
                         LogController.logInfo(core, "adding metadata name [" + keypairvalue.Value.name + "]");
                         if (!installedContentList.Contains(keypairvalue.Value.name.ToLowerInvariant())) {
-                            core.db.executeQuery("Insert into ccContent (name,ccguid,active,createkey)values(" + DbController.encodeSQLText(keypairvalue.Value.name) + "," + DbController.encodeSQLText(keypairvalue.Value.guid) + ",1,0);");
+                            core.db.executeNonQuery("Insert into ccContent (name,ccguid,active,createkey)values(" + DbController.encodeSQLText(keypairvalue.Value.name) + "," + DbController.encodeSQLText(keypairvalue.Value.guid) + ",1,0);");
                             installedContentList.Add(keypairvalue.Value.name.ToLowerInvariant());
                         }
                     }
@@ -708,7 +722,7 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 foreach (var keypairvalue in Collection.metaData) {
                     if (keypairvalue.Value.name.ToLowerInvariant() == "content") {
-                        installMetaDataMiniCollection_buildDb_saveMetaDataToDb(core, keypairvalue.Value, BuildVersion);
+                        installMetaDataMiniCollection_buildDb_saveMetaDataToDb(core, keypairvalue.Value);
                         break;
                     }
                 }
@@ -729,7 +743,7 @@ namespace Contensive.Processor.Models.Domain {
                         }
                     }
                     if ((fieldChanged || metaData.dataChanged) && (metaData.name.ToLowerInvariant() != "content")) {
-                        installMetaDataMiniCollection_buildDb_saveMetaDataToDb(core, metaData, BuildVersion);
+                        installMetaDataMiniCollection_buildDb_saveMetaDataToDb(core, metaData);
                     }
                 }
                 core.clearMetaData();
@@ -765,7 +779,7 @@ namespace Contensive.Processor.Models.Domain {
                                 if (FieldHelpId != 0) {
                                     string Copy = workingField.helpCustom;
                                     if (string.IsNullOrEmpty(Copy)) { Copy = workingField.helpDefault; }
-                                    core.db.executeQuery("update ccfieldhelp set active=1,contentcontrolid=" + FieldHelpCId + ",fieldid=" + fieldId + ",helpdefault=" + DbController.encodeSQLText(Copy) + " where id=" + FieldHelpId);
+                                    core.db.executeNonQuery("update ccfieldhelp set active=1,contentcontrolid=" + FieldHelpCId + ",fieldid=" + fieldId + ",helpdefault=" + DbController.encodeSQLText(Copy) + " where id=" + FieldHelpId);
                                 }
                             }
                         }
@@ -1389,7 +1403,7 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     // if this is not an empty database, get the application collection, else return empty
                     string applicationMetaDataMiniCollectionXml = CollectionExportCDefController.get(core, true);
-                    result = MetadataMiniCollectionModel.loadXML(core, applicationMetaDataMiniCollectionXml, false, false, isNewBuild, new MetadataMiniCollectionModel(), logPrefix);
+                    result = MetadataMiniCollectionModel.loadXML(core, applicationMetaDataMiniCollectionXml, false, false, isNewBuild, logPrefix);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1402,7 +1416,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Update a table from a collection metadata node
         /// </summary>
-        internal static void installMetaDataMiniCollection_buildDb_saveMetaDataToDb(CoreController core, ContentMetadataModel contentMetadata, string BuildVersion) {
+        internal static void installMetaDataMiniCollection_buildDb_saveMetaDataToDb(CoreController core, ContentMetadataModel contentMetadata) {
             try {
                 //
                 LogController.logInfo(core, "Update db metadata [" + contentMetadata.name + "]");

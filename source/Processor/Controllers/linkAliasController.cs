@@ -194,7 +194,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             LogController.logTrace(core, "addLinkAlias, another link alias matches this pageId and QS. Move this to the top position");
                                             //
-                                            core.db.executeQuery("delete from ccLinkAliases where id=" + CurrentLinkAliasId);
+                                            core.db.executeNonQuery("delete from ccLinkAliases where id=" + CurrentLinkAliasId);
                                             using (var CS3 = new CsModel(core)) {
                                                 CS3.insert("Link Aliases");
                                                 if (CS3.ok()) {

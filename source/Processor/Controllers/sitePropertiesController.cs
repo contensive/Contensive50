@@ -323,7 +323,7 @@ namespace Contensive.Processor.Controllers {
                             if (recordsAffected == 0) {
                                 SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES("
                             + SQLTrue + "," + DbController.encodeSQLNumber(ContentMetadataModel.getContentId(core, "site properties")) + "," + DbController.encodeSQLText(propertyName.ToUpper()) + "," + DbController.encodeSQLText(Value) + "," + SQLNow + "," + SQLNow + ");";
-                                core.db.executeQuery(SQL);
+                                core.db.executeNonQuery(SQL);
                             }
                             //
                             // -- set simple lazy cache

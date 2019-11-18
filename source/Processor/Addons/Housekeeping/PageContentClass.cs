@@ -30,10 +30,10 @@ namespace Contensive.Processor.Addons.Housekeeping {
                             int ArchiveParentId = csData.getInteger("ArchiveParentID");
                             if (ArchiveParentId == 0) {
                                 SQL = "update ccpagecontent set DateArchive=null where (id=" + RecordId + ")";
-                                core.db.executeQuery(SQL);
+                                core.db.executeNonQuery(SQL);
                             } else {
                                 SQL = "update ccpagecontent set ArchiveParentID=null,DateArchive=null,parentid=" + ArchiveParentId + " where (id=" + RecordId + ")";
-                                core.db.executeQuery(SQL);
+                                core.db.executeNonQuery(SQL);
                                 NeedToClearCache = true;
                             }
                             csData.goNext();

@@ -511,9 +511,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="allowAutoIncrement"></param>
         public void createSQLTable(string tableName, bool allowAutoIncrement = true) {
             try {
-                //
-                LogController.logTrace(core, "createSqlTable, DataSourceName [" + dataSourceName + "], TableName [" + tableName + "]");
-                //
                 if (string.IsNullOrEmpty(tableName)) {
                     //
                     // tablename required
@@ -531,10 +528,13 @@ namespace Contensive.Processor.Controllers {
                     if (Models.Domain.TableSchemaModel.getTableSchema(core, tableName, dataSourceName) == null) {
                         if (!allowAutoIncrement) {
                             string SQL = "Create Table " + tableName + "(ID " + getSQLAlterColumnType(CPContentBaseClass.FieldTypeIdEnum.Integer) + ");";
-                            executeQuery(SQL).Dispose();
+                            executeNonQuery(SQL);
                         } else {
+                            //
+                            LogController.logInfo(core, "creating sql table [" + tableName + "], datasource [" + dataSourceName + "]");
+                            //
                             string SQL = "Create Table " + tableName + "(ID " + getSQLAlterColumnType(CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement) + ");";
-                            executeQuery(SQL).Dispose();
+                            executeNonQuery(SQL);
                         }
                     }
                     //
@@ -590,6 +590,9 @@ namespace Contensive.Processor.Controllers {
                 if (GenericController.vbInstr(1, tableName, ".") != 0) { throw new ArgumentException("Table name cannot include a period(.)"); }
                 if (string.IsNullOrEmpty(fieldName)) { throw new ArgumentException("Field name cannot be blank"); }
                 if (!isSQLTableField(tableName, fieldName)) {
+                    //
+                    LogController.logInfo(core, "creating sql table field [" + fieldName + "],table [" + tableName + "], datasource [" + dataSourceName + "]");
+                    //
                     executeNonQuery("ALTER TABLE " + tableName + " ADD " + fieldName + " " + getSQLAlterColumnType(fieldType));
                     TableSchemaModel.tableSchemaListClear(core);
                     //
@@ -612,7 +615,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="TableName"></param>
         public void deleteTable(string TableName) {
             try {
-                executeQuery("DROP TABLE " + TableName).Dispose();
+                executeNonQuery("DROP TABLE " + TableName);
                 core.cache.invalidateAll();
                 core.clearMetaData();
             } catch (Exception ex) {
@@ -664,7 +667,7 @@ namespace Contensive.Processor.Controllers {
                                     LogController.logInfo(core, "dropWorkflowField, dropping field");
                                     //
                                     try {
-                                        executeQuery("ALTER TABLE " + tableName + " DROP COLUMN " + fieldName + ";");
+                                        executeNonQuery("ALTER TABLE " + tableName + " DROP COLUMN " + fieldName + ";");
                                     } catch (Exception exDrop) {
                                         LogController.logWarn(core, exDrop, "dropWorkflowField, error dropping field");
                                     }
@@ -696,7 +699,7 @@ namespace Contensive.Processor.Controllers {
                     TableSchemaModel ts = TableSchemaModel.getTableSchema(core, TableName, dataSourceName);
                     if (ts != null) {
                         if (null == ts.indexes.Find(x => x.index_name.ToLowerInvariant() == IndexName.ToLowerInvariant())) {
-                            executeQuery("CREATE INDEX [" + IndexName + "] ON [" + TableName + "]( " + FieldNames + " );");
+                            executeNonQuery("CREATE INDEX [" + IndexName + "] ON [" + TableName + "]( " + FieldNames + " );");
                             if (clearMetaCache) {
                                 core.cache.invalidateAll();
                                 core.clearMetaData();
@@ -839,7 +842,7 @@ namespace Contensive.Processor.Controllers {
                             sql = "DROP INDEX [" + TableName + "].[" + IndexName + "];";
                             break;
                         }
-                        executeQuery(sql);
+                        executeNonQuery(sql);
                         core.cache.invalidateAll();
                         core.clearMetaData();
                     }
@@ -1184,7 +1187,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 if (string.IsNullOrEmpty(tableName)) { throw new ArgumentException("TableName cannot be blank"); }
                 if (string.IsNullOrEmpty(criteria)) { throw new ArgumentException("Criteria cannot be blank"); }
-                executeQuery("delete from " + tableName + " where " + criteria);
+                executeNonQuery("delete from " + tableName + " where " + criteria);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -1439,7 +1442,7 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         SQL = "delete from " + TableName + " where id in (select top " + iChunkSize + " ID from " + TableName + " where " + Criteria + ")";
                     }
-                    executeQuery(SQL);
+                    executeNonQuery(SQL);
                     PreviousCount = CurrentCount;
                     SQL = "select count(*) as RecordCount from " + TableName + " where " + Criteria;
                     dt = executeQuery(SQL);

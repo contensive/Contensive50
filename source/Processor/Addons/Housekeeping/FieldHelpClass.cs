@@ -20,7 +20,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     + " from ccfieldhelp h"
                     + " left join ccfields f on f.id=h.fieldid where f.id is null"
                     + ")";
-                core.db.executeQuery(sql);
+                core.db.executeNonQuery(sql);
                 //
                 // Field help duplicates - messy, but I am not sure where they are coming from, and this patchs the edit page performance problem
                 //
@@ -31,7 +31,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     + " from ccfieldhelp a"
                     + " left join ccfieldhelp b on a.fieldid=b.fieldid where a.id< b.id"
                     + ")";
-                core.db.executeQuery(sql);
+                core.db.executeNonQuery(sql);
 
             } catch (Exception ex) {
                 LogController.logError(core, ex);

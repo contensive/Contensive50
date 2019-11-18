@@ -12,7 +12,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
             try {
                 //
                 //addon editor rules with no addon
-                core.db.executeQuery("delete from ccAddonContentFieldTypeRules where id in (select r.id from ccAddonContentFieldTypeRules r left join ccaggregatefunctions a on a.id=r.addonid where a.Id Is Null)");
+                core.db.executeNonQuery("delete from ccAddonContentFieldTypeRules where id in (select r.id from ccAddonContentFieldTypeRules r left join ccaggregatefunctions a on a.id=r.addonid where a.Id Is Null)");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

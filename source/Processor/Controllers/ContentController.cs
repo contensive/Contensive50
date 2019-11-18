@@ -196,7 +196,7 @@ namespace Contensive.Processor.Controllers {
                     // -- set ChildPagesFound true for parent page
                     if (recordParentID > 0) {
                         if (!isDelete) {
-                            core.db.executeQuery("update ccpagecontent set ChildPagesfound=1 where ID=" + recordParentID);
+                            core.db.executeNonQuery("update ccpagecontent set ChildPagesfound=1 where ID=" + recordParentID);
                         }
                     }
                     if (isDelete) {
@@ -210,7 +210,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // Delete Link Alias entries with this PageID
-                        core.db.executeQuery("delete from cclinkAliases where PageID=" + recordId);
+                        core.db.executeNonQuery("delete from cclinkAliases where PageID=" + recordId);
                     }
                     DbBaseModel.invalidateCacheOfRecord<PageContentModel>(core.cpParent, recordId);
                 } else if (tableNameLower == LibraryFilesModel.tableMetadata.tableNameLower) {

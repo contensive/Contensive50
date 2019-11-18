@@ -9,7 +9,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
     public static class RemoveVisitsClass {
         //====================================================================================================
         //
-        public static void HouseKeep_App_Daily_RemoveVisitRecords(CoreController core, DateTime DeleteBeforeDate) {
+        public static void houseKeep_App_Daily_RemoveVisitRecords(CoreController core, DateTime DeleteBeforeDate) {
             try {
                 //
                 int TimeoutSave = 0;
@@ -43,7 +43,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 SQL = "delete ccVisitors"
                     + " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID"
                     + " where ccVisits.ID is null";
-                core.db.executeQuery(SQL);
+                core.db.executeNonQuery(SQL);
                 //
                 // restore sved timeout
                 //

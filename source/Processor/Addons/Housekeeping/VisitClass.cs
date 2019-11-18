@@ -61,7 +61,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                         DateTime SingleDate = default(DateTime);
                         SingleDate = OldestVisitDate;
                         do {
-                            RemoveVisitsClass.HouseKeep_App_Daily_RemoveVisitRecords(core, SingleDate);
+                            RemoveVisitsClass.houseKeep_App_Daily_RemoveVisitRecords(core, SingleDate);
                             SingleDate = SingleDate.AddDays(1);
                         } while (SingleDate < ArchiveDate);
                     }

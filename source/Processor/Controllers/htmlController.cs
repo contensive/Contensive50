@@ -1965,7 +1965,7 @@ namespace Contensive.Processor.Controllers {
                         }
 
                     }
-                    core.db.executeQuery("update ccpagecontent set ChildListInstanceOptions=" + DbController.encodeSQLText(addonOption_String) + " where id=" + RecordID);
+                    core.db.executeNonQuery("update ccpagecontent set ChildListInstanceOptions=" + DbController.encodeSQLText(addonOption_String) + " where id=" + RecordID);
                     needToClearCache = true;
                 }
             } else if ((ACInstanceId == "-2") && (!string.IsNullOrEmpty(FieldName))) {
@@ -2232,7 +2232,7 @@ namespace Contensive.Processor.Controllers {
                             HelpCaption = core.docProperties.getText("helpcaption");
                             HelpMessage = core.docProperties.getText("helptext");
                             SQL = "update ccfields set caption=" + DbController.encodeSQLText(HelpCaption) + ",HelpMessage=" + DbController.encodeSQLText(HelpMessage) + " where id=" + RecordID;
-                            core.db.executeQuery(SQL);
+                            core.db.executeNonQuery(SQL);
                             core.cache.invalidateAll();
                             core.clearMetaData();
                         }
@@ -3251,7 +3251,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Record exists and is needed, update the rule copy
                         SQL = "update " + rulesTablename + " set rulecopy=" + DbController.encodeSQLText(RuleCopy) + " where id=" + RuleId;
-                        core.db.executeQuery(SQL);
+                        core.db.executeNonQuery(SQL);
                     } else if (RuleNeeded && (!RuleFound)) {
                         //
                         // No record exists, and one is needed                        
@@ -3271,7 +3271,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Record exists and it is not needed
                         SQL = "delete from " + rulesTablename + " where id=" + RuleId;
-                        core.db.executeQuery(SQL);
+                        core.db.executeNonQuery(SQL);
                         RuleContentChanged = true;
                     }
                 }
@@ -3279,7 +3279,7 @@ namespace Contensive.Processor.Controllers {
                 // delete dups
                 if (!string.IsNullOrEmpty(dupRuleIdList)) {
                     SQL = "delete from " + rulesTablename + " where id in (" + dupRuleIdList.Substring(1) + ")";
-                    core.db.executeQuery(SQL);
+                    core.db.executeNonQuery(SQL);
                     RuleContentChanged = true;
                 }
             }

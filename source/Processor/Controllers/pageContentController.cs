@@ -821,7 +821,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // Live content
                             result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.tableMetadata.contentName, PageRecordId, core.doc.pageController.page.contactMemberId, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
-                            core.db.executeQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + core.doc.pageController.page.id);
+                            core.db.executeNonQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + core.doc.pageController.page.id);
                         }
                         //
                         // ----- Child pages

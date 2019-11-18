@@ -347,7 +347,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                             + " and d.TimeDuration=24"
                             + " and f.id<d.id"
                             + ")";
-                        core.db.executeQuery(SQL);
+                        core.db.executeNonQuery(SQL);
                         //
                         // Find missing daily summaries, summarize that date
                         //

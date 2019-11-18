@@ -17,7 +17,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 string sql = "delete ccactivitylog"
                     + " From ccactivitylog LEFT JOIN ccmembers on ccmembers.ID=ccactivitylog.memberid"
                     + " WHERE (ccmembers.ID is null)";
-                core.db.executeQuery(sql);
+                core.db.executeNonQuery(sql);
 
             } catch (Exception ex) {
                 LogController.logError(core, ex);

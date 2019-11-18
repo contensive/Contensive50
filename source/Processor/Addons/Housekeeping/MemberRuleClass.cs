@@ -18,7 +18,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     + " From ccmemberrules"
                     + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.memberId"
                     + " WHERE (ccmembers.ID is null)";
-                core.db.executeQuery(sql);
+                core.db.executeNonQuery(sql);
                 //
                 // MemberRules with bad GroupID
                 //
@@ -27,7 +27,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     + " From ccmemberrules"
                     + " LEFT JOIN ccgroups on ccgroups.ID=ccmemberrules.GroupID"
                     + " WHERE (ccgroups.ID is null)";
-                core.db.executeQuery(sql);
+                core.db.executeNonQuery(sql);
 
             } catch (Exception ex) {
                 LogController.logError(core, ex);

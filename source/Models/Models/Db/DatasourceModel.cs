@@ -52,7 +52,7 @@ namespace Contensive.Models.Db {
         /// <param name="recordName"></param>
         /// <returns></returns>
         public static DataSourceModel createByUniqueName(CPBaseClass cp, string recordName) {
-            return (string.IsNullOrWhiteSpace(recordName) | (recordName.ToLowerInvariant() == "default")) ? getDefaultDatasource(cp) : createByUniqueName<DataSourceModel>(cp, recordName);
+            return (string.IsNullOrWhiteSpace(recordName) || (recordName.ToLowerInvariant() == "default")) ? getDefaultDatasource(cp) : createByUniqueName<DataSourceModel>(cp, recordName);
         }
         //
         //====================================================================================================

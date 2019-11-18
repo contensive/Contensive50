@@ -167,7 +167,7 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     // save the value in the property that was found
                     //
-                    core.db.executeQuery("update ccProperties set FieldValue=" + DbController.encodeSQLText(propertyValue) + ",ModifiedDate=" + SQLNow + " where id=" + RecordId);
+                    core.db.executeNonQuery("update ccProperties set FieldValue=" + DbController.encodeSQLText(propertyValue) + ",ModifiedDate=" + SQLNow + " where id=" + RecordId);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

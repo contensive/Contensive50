@@ -1107,7 +1107,7 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     Stream.Add("<br>");
                     Stream.Add("<br>Clearing Content Watch Link field...");
-                    core.db.executeQuery("update ccContentWatch set Link=null;");
+                    core.db.executeNonQuery("update ccContentWatch set Link=null;");
                     Stream.Add("<br>Content Watch Link field cleared.");
                 }
                 Stream.Add("</span>");

@@ -249,7 +249,7 @@ namespace Contensive.Processor.Controllers {
                         string FieldNew = GenericController.encodeText(dt.Rows[rowptr]["name"]) + "." + GenericController.encodeText(dt.Rows[rowptr]["parentid"]);
                         if (FieldNew == FieldLast) {
                             int FieldRecordId = GenericController.encodeInteger(dt.Rows[rowptr]["ID"]);
-                            core.db.executeQuery("Update ccMenuEntries set active=0 where ID=" + FieldRecordId + ";");
+                            core.db.executeNonQuery("Update ccMenuEntries set active=0 where ID=" + FieldRecordId + ";");
                         }
                         FieldLast = FieldNew;
                     }
@@ -282,7 +282,7 @@ namespace Contensive.Processor.Controllers {
                         sql1 += "," + sqlName;
                         sql2 += "," + sqlValue;
                     }
-                    core.db.executeQuery(sql1 + sql2 + sql3);
+                    core.db.executeNonQuery(sql1 + sql2 + sql3);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -662,7 +662,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 int GroupId = GroupController.add(core, "Site Managers");
                 string SQL = "Update ccContent Set EditorGroupID=" + DbController.encodeSQLNumber(GroupId) + " where EditorGroupID is null;";
-                core.db.executeQuery(SQL);
+                core.db.executeNonQuery(SQL);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -997,7 +997,7 @@ namespace Contensive.Processor.Controllers {
                         LogController.logError(core, new GenericException("Content Field Types content definition was not found"));
                     } else {
                         while (RowsNeeded > 0) {
-                            core.db.executeQuery("Insert into ccFieldTypes (active,contentcontrolid)values(1," + CId + ")");
+                            core.db.executeNonQuery("Insert into ccFieldTypes (active,contentcontrolid)values(1," + CId + ")");
                             RowsNeeded = RowsNeeded - 1;
                         }
                     }
@@ -1005,28 +1005,28 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Update the Names of each row
                 //
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Integer' where ID=1;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Text' where ID=2;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='LongText' where ID=3;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Boolean' where ID=4;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Date' where ID=5;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='File' where ID=6;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Lookup' where ID=7;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Redirect' where ID=8;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Currency' where ID=9;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='TextFile' where ID=10;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Image' where ID=11;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Float' where ID=12;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='AutoIncrement' where ID=13;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='ManyToMany' where ID=14;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Member Select' where ID=15;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='CSS File' where ID=16;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='XML File' where ID=17;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Javascript File' where ID=18;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Link' where ID=19;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Resource Link' where ID=20;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='HTML' where ID=21;");
-                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='HTML File' where ID=22;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Integer' where ID=1;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Text' where ID=2;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='LongText' where ID=3;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Boolean' where ID=4;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Date' where ID=5;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='File' where ID=6;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Lookup' where ID=7;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Redirect' where ID=8;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Currency' where ID=9;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='TextFile' where ID=10;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Image' where ID=11;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Float' where ID=12;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='AutoIncrement' where ID=13;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='ManyToMany' where ID=14;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Member Select' where ID=15;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='CSS File' where ID=16;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='XML File' where ID=17;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Javascript File' where ID=18;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Link' where ID=19;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Resource Link' where ID=20;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='HTML' where ID=21;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='HTML File' where ID=22;");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

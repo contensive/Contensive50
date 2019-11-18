@@ -141,7 +141,7 @@ namespace Contensive.Processor.Addons.Tools {
                                                                 SQL = "alter table " + contentMetadata.tableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(formFieldTypeId) + ";";
                                                                 break;
                                                         }
-                                                        core.db.executeQuery(SQL);
+                                                        core.db.executeNonQuery(SQL);
                                                     }
                                                     SQL = "Update ccFields"
                                                         + " Set name=" + DbController.encodeSQLText(formFieldName)
@@ -166,7 +166,7 @@ namespace Contensive.Processor.Addons.Tools {
                                                         SQL += ",DeveloperOnly=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." + RecordPointer));
                                                     }
                                                     SQL += " where ID=" + formFieldId;
-                                                    core.db.executeQuery(SQL);
+                                                    core.db.executeNonQuery(SQL);
                                                     ReloadCDef = true;
                                                 }
                                             }

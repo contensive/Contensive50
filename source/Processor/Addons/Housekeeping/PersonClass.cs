@@ -11,7 +11,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
             try {
                 //
                 // Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)
-                core.db.executeQuery("update ccmembers set CreatedByVisit=0 where createdbyvisit is null");
+                core.db.executeNonQuery("update ccmembers set CreatedByVisit=0 where createdbyvisit is null");
                 //
                 // delete members from the non-cookie visits
                 // legacy records without createdbyvisit will have to be corrected by hand (or upgrade)
@@ -25,7 +25,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     + " and(m.email is null)"
                     + " and(v.CookieSupport=0)and(v.LastVisitTime<" + env.sqlDateMidnightTwoDaysAgo + ")";
                 try {
-                    core.db.executeQuery(sql);
+                    core.db.executeNonQuery(sql);
                 } catch (Exception) {
                 }
                 //

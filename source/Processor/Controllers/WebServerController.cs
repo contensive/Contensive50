@@ -656,7 +656,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // set visited true
                         //
-                        core.db.executeQuery("update ccdomains set visited=1 where name=" + DbController.encodeSQLText(requestDomain));
+                        core.db.executeNonQuery("update ccdomains set visited=1 where name=" + DbController.encodeSQLText(requestDomain));
                         core.cache.invalidate("domainContentList");
                     }
                     if (core.domain.typeId == 1) {

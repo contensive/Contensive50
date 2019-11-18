@@ -12,8 +12,8 @@ namespace Contensive.Processor.Addons.Housekeeping {
             try {
                 //
                 // -- addon trigger rules
-                core.db.executeQuery("delete from ccAddonContentTriggerRules where id in (select r.id from ccAddonContentTriggerRules r left join ccaggregatefunctions a on a.id = r.addonid where a.Id Is Null)");
-                core.db.executeQuery("delete from ccAddonContentTriggerRules where id in (select r.id from ccAddonContentTriggerRules r left join cccontent c on c.id = r.contentid where c.id is null)");
+                core.db.executeNonQuery("delete from ccAddonContentTriggerRules where id in (select r.id from ccAddonContentTriggerRules r left join ccaggregatefunctions a on a.id = r.addonid where a.Id Is Null)");
+                core.db.executeNonQuery("delete from ccAddonContentTriggerRules where id in (select r.id from ccAddonContentTriggerRules r left join cccontent c on c.id = r.contentid where c.id is null)");
 
             } catch (Exception ex) {
                 LogController.logError(core, ex);
