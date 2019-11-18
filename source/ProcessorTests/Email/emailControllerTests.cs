@@ -159,17 +159,31 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Processor.Addons.Email.ProcessEmailClass();
                 addon.Execute(cp);
                 //
-                // assert 2 emails, first the to-address, second the confirmation
+                // assert 2 emails, first the confirmation, then to-address
                 Assert.AreEqual(2, cp.core.mockEmailList.Count);
-                MockEmailClass sentEmail = cp.core.mockEmailList.First();
-                Assert.IsTrue(string.IsNullOrEmpty(sentEmail.AttachmentFilename));
-                Assert.AreEqual(confirmPerson.email, getEmailPart(sentEmail.email.toAddress));
-                Assert.AreEqual(systemEmail.fromAddress, getEmailPart(sentEmail.email.fromAddress));
-                Assert.AreEqual("", getEmailPart(sentEmail.email.BounceAddress));
-                Assert.AreEqual("", getEmailPart(sentEmail.email.replyToAddress));
-                Assert.AreEqual(systemEmail.subject, sentEmail.email.subject);
-                Assert.AreEqual(htmlBody, sentEmail.email.htmlBody);
-                Assert.AreEqual(textBody, sentEmail.email.textBody);
+                {
+                    //
+                    // -- the confirmationl
+                    MockEmailClass sentEmail = cp.core.mockEmailList[0];
+                    Assert.AreEqual(confirmPerson.email, getEmailPart(sentEmail.email.toAddress));
+                    Assert.AreEqual(systemEmail.fromAddress, getEmailPart(sentEmail.email.fromAddress));
+                    Assert.AreNotEqual(-1, sentEmail.email.htmlBody.IndexOf(htmlBody));
+                    Assert.IsTrue(string.IsNullOrEmpty(sentEmail.AttachmentFilename));
+                    Assert.AreEqual("", getEmailPart(sentEmail.email.BounceAddress));
+                    Assert.AreEqual("", getEmailPart(sentEmail.email.replyToAddress));
+                }
+                {
+                    //
+                    // -- the to-email
+                    MockEmailClass sentEmail = cp.core.mockEmailList[1];
+                    Assert.IsTrue(string.IsNullOrEmpty(sentEmail.AttachmentFilename));
+                    Assert.AreEqual(toPerson.email, getEmailPart(sentEmail.email.toAddress));
+                    Assert.AreEqual(systemEmail.fromAddress, getEmailPart(sentEmail.email.fromAddress));
+                    Assert.AreEqual(systemEmail.subject, sentEmail.email.subject);
+                    Assert.AreNotEqual(-1, sentEmail.email.htmlBody.IndexOf(htmlBody));
+                    Assert.AreEqual("", getEmailPart(sentEmail.email.BounceAddress));
+                    Assert.AreEqual("", getEmailPart(sentEmail.email.replyToAddress));
+                }
             }
         }
     }

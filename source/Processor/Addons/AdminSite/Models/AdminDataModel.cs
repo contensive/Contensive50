@@ -810,9 +810,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                     }
                     //
-                    // -- set read only for email.submitted
-                    editRecord.userReadOnly |= (adminContent.name.ToLower(CultureInfo.InvariantCulture).Equals("conditional email")) ? encodeBoolean(editRecord.fieldsLc["submitted"].value) : false;
-                    //
                     // ----- Now make sure this record is locked from anyone else
                     //
                     if (!(editRecord.userReadOnly)) {

@@ -5,11 +5,46 @@ using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Tests.testConstants;
+using Contensive.Models.Db;
 
 namespace Contensive.ProcessorTests.UnitTests.ViewTests {
 
     [TestClass()]
     public class CpCacheTests {
+        //====================================================================================================
+        /// <summary>
+        /// table-invalidation-key invalidates all record-cache from a table.
+        /// add it as a dependency on all record-cache from a table
+        /// invalidate it causes all record-cache before the invalidation to be invalidated
+        /// </summary>
+        [TestMethod]
+        public void views_cpCache_TableInvalidationKey() {
+            using (CPClass cp = new CPClass(testAppName)) {
+                // arrange
+                cp.core.siteProperties.setProperty("AllowBake", true);
+                //
+                // save a new record using model
+                //
+                PersonModel original = DbBaseModel.addDefault<PersonModel>(cp);
+                original.save(cp);
+                //
+                // read the cache key for the record and verify it is empty
+                //
+                PersonModel cacheBeforeInvalidate = cp.Cache.GetObject<PersonModel>(cp.Cache.CreateKeyForDbRecord(original.id, PersonModel.tableMetadata.tableNameLower));
+                //
+                // invalidate the table
+                //
+                cp.Cache.InvalidateTable(PersonModel.tableMetadata.tableNameLower);
+                //
+                // read the cache key for the record and verify it is empty
+                //
+                PersonModel cacheAFterInvalidate = cp.Cache.GetObject<PersonModel>(cp.Cache.CreateKeyForDbRecord(original.id, PersonModel.tableMetadata.tableNameLower));
+                //
+                Assert.IsNotNull(cacheBeforeInvalidate);
+                Assert.AreEqual(original, cacheBeforeInvalidate);
+                Assert.IsNull(cacheAFterInvalidate);
+            }
+        }
         //====================================================================================================
         /// <summary>
         /// cp.cache save read

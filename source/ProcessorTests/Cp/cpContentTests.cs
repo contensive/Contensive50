@@ -179,7 +179,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         [TestMethod]
         public void views_cpContent_AddContentFieldTest() {
             // arrange
-            using (CPClass cp = new CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) { 
                 using (CPCSBaseClass cs = cp.CSNew()) {
                     int recordId = 0;
                     string contentName1 = "testContent" + cp.Utils.GetRandomInteger().ToString();

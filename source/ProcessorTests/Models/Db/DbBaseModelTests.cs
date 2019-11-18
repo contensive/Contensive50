@@ -116,7 +116,12 @@ namespace Contensive.Models.Db.Tests {
             using (CPClass cp = new CPClass(testAppName)) {
                 string defaultRootUserGuid = "{4445cd14-904f-480f-a7b7-29d70d0c22ca}";
                 var root = PersonModel.create<PersonModel>(cp, defaultRootUserGuid);
-                Assert.IsNotNull(root, "Root user not found");
+                if(root == null ) {
+                    root = DbBaseModel.addDefault<PersonModel>(cp);
+                    root.ccguid = defaultRootUserGuid;
+                    root.name = "root";
+                    root.save(cp);
+                }
                 //
                 var defaultValues = new Dictionary<string, string> {
                     //

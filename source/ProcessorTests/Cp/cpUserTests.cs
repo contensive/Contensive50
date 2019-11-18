@@ -73,10 +73,15 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
                 bool inGroupBeforeAddTest = cp.User.IsInGroup(groupName);
                 // act
                 cp.Group.AddUser(groupName);
-                bool inGroupAfterTest = cp.User.IsInGroup(groupName);
+                bool inGroupAfterTestBeforeAuth = cp.User.IsInGroup(groupName);
+                //
+                cp.User.LoginByID(cp.User.Id);
+                bool inGroupAfterTestAfterAuth = cp.User.IsInGroup(groupName);
+
                 // assert
                 Assert.AreEqual(false, inGroupBeforeAddTest);
-                Assert.AreEqual(true, inGroupAfterTest);
+                Assert.AreEqual(false, inGroupAfterTestBeforeAuth);
+                Assert.AreEqual(true, inGroupAfterTestAfterAuth);
 
             }
         }

@@ -40,8 +40,10 @@ namespace Contensive.Processor.Controllers {
     ///    
     /// 3 using dependent keys to track groups of record
     /// -- "table-objects-invalidate-date" key
-    ///      this cache object contains a date before which all cache objects from this table are considered invalid
-    ///      to update it, use the DbModel method DbModel.()
+    ///      use only as a dependency in other cache
+    ///         - any cache with this as the dependency will be invalidated if it's save-date is after this table-invalidation-date
+    ///      use to trigger a clear of all record-cache from one table
+    ///      this key is updated when non-specific changes are made to the table, like 'delete all records matching an odd criteria'
     ///      updating this key invalidates all cache objects with data from that table saved before this date
     ///      when you run a query that updates misc records, invalidate this key
     ///      when you save an object that includes a table record, make it dependent on this key so it will be cleared if it's save date is before this date

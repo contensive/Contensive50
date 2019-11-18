@@ -941,9 +941,10 @@ namespace Contensive.Models.Db {
                     cp.Cache.Invalidate(cp.Cache.CreateKeyForDbRecord(id, tableName, datasourceName));
                 } else {
                     //
-                    // -- store the cache object referenced by id
+                    // -- store the cache object referenced by id, invalidated if the table-key is invalidated
                     string cacheKey = cp.Cache.CreateKeyForDbRecord(id, tableName, datasourceName);
-                    cp.Cache.Store(cacheKey, this);
+                    string tableKey = cp.Cache.CreateDependencyKeyInvalidateOnChange(tableName, datasourceName);
+                    cp.Cache.Store(cacheKey, this, tableKey);
                     //
                     // -- store the cache object ptr so this object can be referenced from its guid (as well as id)
                     cp.Cache.StorePtr(cp.Cache.CreatePtrKeyforDbRecordGuid(ccguid, tableName, datasourceName), cacheKey);
@@ -1230,6 +1231,7 @@ namespace Contensive.Models.Db {
                 if (isAppInvalid(cp)) { return; }
                 if (string.IsNullOrEmpty(sqlCriteria)) { return; }
                 cp.Db.DeleteRows(derivedTableName(typeof(T)), sqlCriteria);
+                invalidateCacheOfTable<T>(cp);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
                 throw;
