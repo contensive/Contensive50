@@ -134,7 +134,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                     JSOnClick = "if(!DeleteCheckWithChildren())return false;";
                 }
                 buttonsRight += getButtonDanger(ButtonDelete, JSOnClick, !info.allowDelete);
-                if(core.session.user.admin) {
+                if(core.session.isAuthenticatedAdmin()) {
                     buttonsRight += getButtonDanger(ButtonModifyEditForm, "window.location='?af=105&button=select&contentid=" + info.contentId + "';return false;", info.contentId.Equals(0));
                 }
                 //
