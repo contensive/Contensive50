@@ -10,7 +10,7 @@ using System.Net;
 using Contensive.Models.Db;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public class ControlEditor {
+    public class FormEditTabControlInfo {
         //
         //========================================================================
         /// <summary>

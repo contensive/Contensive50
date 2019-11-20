@@ -176,7 +176,7 @@ namespace Contensive.Models.Db {
             PropertyInfo tableMetadataProperty = derivedType.GetProperty("tableMetadata");
 
             if (tableMetadataProperty == null) {
-                if (derivedType.BaseType == null) { throw new GenericException("Class must declare [public static DbBaseTableMetadataModel tableMetadata]."); }
+                if (derivedType.BaseType == null) { throw new GenericException("Class must declare [C#, public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel(...)], [VB, Public Shared ReadOnly Property tableMetadata As DbBaseTableMetadataModel = New DbBaseTableMetadataModel(...)]."); }
                 return getTableMetadata(derivedType.BaseType);
             }
 

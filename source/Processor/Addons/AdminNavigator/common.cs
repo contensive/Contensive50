@@ -2,7 +2,7 @@
 
 
 namespace Contensive.Processor.Addons.AdminNavigator {
-    static class common {
+    static class Common {
         //
         internal const string IconAdvanced = "<img src=\"/cclib/images/NavAdv.gif\" class=\"ccImgA\" title=\"{title}\">";
         internal const string IconAdvancedClosed = "<img src=\"/cclib/images/NavAdvClosed.gif\" class=\"ccImgA\" title=\"{title}\">";

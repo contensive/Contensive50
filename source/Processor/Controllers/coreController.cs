@@ -162,9 +162,10 @@ namespace Contensive.Processor.Controllers {
             }
         }
         public void assemblyList_AddonsFound_save() {
-            var dependentKeyList = new List<string>();
-            dependentKeyList.Add(CacheController.createCacheKey_LastRecordModifiedDate(AddonModel.tableMetadata.tableNameLower));
-            dependentKeyList.Add(CacheController.createCacheKey_LastRecordModifiedDate(AddonCollectionModel.tableMetadata.tableNameLower));
+            var dependentKeyList = new List<string> {
+                CacheController.createCacheKey_LastRecordModifiedDate(AddonModel.tableMetadata.tableNameLower),
+                CacheController.createCacheKey_LastRecordModifiedDate(AddonCollectionModel.tableMetadata.tableNameLower)
+            };
             cache.storeObject(AssemblyFileDictCacheName, _assemblyFileDict, dependentKeyList);
         }
         private Dictionary<string, AssemblyFileDetails> _assemblyFileDict;

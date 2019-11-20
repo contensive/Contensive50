@@ -142,7 +142,7 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                     string Link = null;
                     string Criteria = null;
                     bool BlockSubNodes = false;
-                    common.NodeTypeEnum NodeType = 0;
+                    Common.NodeTypeEnum NodeType = 0;
                     int NavIconType = 0;
                     string NavIconTitle = null;
                     string NavIconTitleHtmlEncoded = null;
@@ -170,19 +170,19 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                         //       Add-ons = 'a'+AddonID
                         //       CDefs = 'd'+ContentID
                         //
-                        case common.NodeIDManageAddons:
+                        case Common.NodeIDManageAddons:
                             //
                             // Special Case: clicked on Manage Add-ons ("manageaddons")
                             // Link to Add-on Manager
                             //
                             NodeIDString = "";
                             addonid = cp.Content.GetRecordID("Add-ons", "Add-on Manager");
-                            s = s + GetNode(cp, env, 0, 0, 0, 0, 0, "?addonguid=" + common.AddonManagerGuid, addonid, 0, "Add-on Manager", LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeAddon, "Add-on Manager", AutoManageAddons, common.NodeTypeEnum.NodeTypeAddon, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
+                            s = s + GetNode(cp, env, 0, 0, 0, 0, 0, "?addonguid=" + Common.AddonManagerGuid, addonid, 0, "Add-on Manager", LegacyMenuControlID, EmptyNodeList, "", Common.NavIconTypeAddon, "Add-on Manager", AutoManageAddons, Common.NodeTypeEnum.NodeTypeAddon, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                             //
                             // List Collections
                             //
-                            FieldList = "Name,0 as id,ccaddoncollections.id as collectionid,0 as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," + common.NavIconTypeFolder + " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid,blockNavigatorNode,system";
+                            FieldList = "Name,0 as id,ccaddoncollections.id as collectionid,0 as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," + Common.NavIconTypeFolder + " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid,blockNavigatorNode,system";
                             //FieldList = "Name,id as collectionid,0 as ID,0 as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," & NavIconTypeFolder & " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid"
                             Criteria = "((system=0)or(system is null))";
                             if (!env.isDeveloper) {
@@ -192,14 +192,14 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                 }
                             }
                             CPCSBaseClass cs3 = cp.CSNew();
-                            NodeType = common.NodeTypeEnum.NodeTypeCollection;
+                            NodeType = Common.NodeTypeEnum.NodeTypeCollection;
                             BlockSubNodes = false;
                             if (cs3.Open("Add-on Collections", Criteria, "name", true, FieldList, Constants.sqlPageSizeDefault, 1)) {
                                 do {
                                     Name = Convert.ToString(cs3.GetText("name")).Trim(' ');
                                     NavIconTitle = Name;
                                     CollectionID = cs3.GetInteger("collectionid");
-                                    NodeIDString = common.NodeIDManageAddonsCollectionPrefix + "." + CollectionID;
+                                    NodeIDString = Common.NodeIDManageAddonsCollectionPrefix + "." + CollectionID;
                                     NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode(NavIconTitle);
                                     linkSuffixList = new List<string>();
                                     if (env.isDeveloper) {
@@ -212,7 +212,7 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                         }
                                         //linkSuffixList = "&nbsp;(" + linkSuffixList + ")";
                                     }
-                                    s = s + GetNode(cp, env, CollectionID, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, common.NodeTypeEnum.NodeTypeCollection, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, linkSuffixList);
+                                    s = s + GetNode(cp, env, CollectionID, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", Common.NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, Common.NodeTypeEnum.NodeTypeCollection, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, linkSuffixList);
                                     Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                                     cs3.GoNext();
                                 }
@@ -236,11 +236,11 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                             //
                             // Advanced folder to contain edit links to create addons and collections
                             //
-                            NodeIDString = common.NodeIDManageAddonsAdvanced.ToString();
-                            s = s + GetNode(cp, env, 0, 0, 0, 0, 0, "", 0, 0, "Advanced", LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeFolder, "Add-ons With No Collection", AutoManageAddons, common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
+                            NodeIDString = Common.NodeIDManageAddonsAdvanced.ToString();
+                            s = s + GetNode(cp, env, 0, 0, 0, 0, 0, "", 0, 0, "Advanced", LegacyMenuControlID, EmptyNodeList, "", Common.NavIconTypeFolder, "Add-ons With No Collection", AutoManageAddons, Common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                             break;
-                        case common.NodeIDManageAddonsCollectionPrefix:
+                        case Common.NodeIDManageAddonsCollectionPrefix:
                             //
                             // Special Case: clicked on Manage Add-ons.collection
                             // ParentNode(1) is the id of the collection they clicked on
@@ -255,7 +255,7 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                             if (parentNodeStack.Count > 0) {
                                 CollectionID = cp.Utils.EncodeInteger(parentNodeStack[1]);
                             }
-                            cacheName = "addonNav." + common.NodeIDManageAddonsCollectionPrefix + "." + CollectionID + "." + cp.User.Id.ToString();
+                            cacheName = "addonNav." + Common.NodeIDManageAddonsCollectionPrefix + "." + CollectionID + "." + cp.User.Id.ToString();
                             nodeHtml = cp.Cache.GetText(cacheName);
                             if (string.IsNullOrEmpty(nodeHtml)) {
                                 //
@@ -264,7 +264,7 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                 Name = "Help";
                                 NodeIDString = "";
                                 NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode(NavIconTitle);
-                                nodeHtml += GetNode(cp, env, 0, 0, CollectionID, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeHelp, NavIconTitleHtmlEncoded, AutoManageAddons, common.NodeTypeEnum.NodeTypeEntry, false, true, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
+                                nodeHtml += GetNode(cp, env, 0, 0, CollectionID, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", Common.NavIconTypeHelp, NavIconTitleHtmlEncoded, AutoManageAddons, Common.NodeTypeEnum.NodeTypeEntry, false, true, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
                                 Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                                 //
                                 // List out add-ons in this collection
@@ -293,19 +293,19 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                         ContentControlID = cs4.GetInteger("contentControlId");
                                         switch (cs4.GetInteger("navtypeid")) {
                                             case 2:
-                                                NavIconType = common.NavIconTypeReport;
+                                                NavIconType = Common.NavIconTypeReport;
                                                 break;
                                             case 3:
-                                                NavIconType = common.NavIconTypeSetting;
+                                                NavIconType = Common.NavIconTypeSetting;
                                                 break;
                                             case 4:
-                                                NavIconType = common.NavIconTypeTool;
+                                                NavIconType = Common.NavIconTypeTool;
                                                 break;
                                             default:
-                                                NavIconType = common.NavIconTypeAddon;
+                                                NavIconType = Common.NavIconTypeAddon;
                                                 break;
                                         }
-                                        nodeHtml += GetNode(cp, env, 0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, "", NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, common.NodeTypeEnum.NodeTypeAddon, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, linkSuffixList);
+                                        nodeHtml += GetNode(cp, env, 0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, "", NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, Common.NodeTypeEnum.NodeTypeAddon, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, linkSuffixList);
                                         Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                                         cs4.GoNext();
                                     }
@@ -347,7 +347,7 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                             }
                                             NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode(Name);
                                             ContentControlID = cs7.GetInteger("contentControlId");
-                                            nodeHtml += GetNode(cp, env, 0, ContentControlID, 0, 0, ContentId, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeContent, NavIconTitleHtmlEncoded, AutoManageAddons, common.NodeTypeEnum.NodeTypeContent, false, true, OpenNodeList, NodeIDString, ref NodeNavigatorJS, linkSuffixList);
+                                            nodeHtml += GetNode(cp, env, 0, ContentControlID, 0, 0, ContentId, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", Common.NavIconTypeContent, NavIconTitleHtmlEncoded, AutoManageAddons, Common.NodeTypeEnum.NodeTypeContent, false, true, OpenNodeList, NodeIDString, ref NodeNavigatorJS, linkSuffixList);
                                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                                         }
                                         LastContentId = ContentId;
@@ -398,11 +398,11 @@ namespace Contensive.Processor.Addons.AdminNavigator {
 
 
                                                         NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode("Edit '" + dataRecordName + "' in '" + dataRecordCdefName + "'");
-                                                        IconNoSubNodes = common.IconRecord;
+                                                        IconNoSubNodes = Common.IconRecord;
                                                         IconNoSubNodes = IconNoSubNodes.Replace("{title}", NavIconTitleHtmlEncoded);
                                                         Link = "?id=" + cs7.GetInteger("id").ToString() + "&cid=" + dataRecordCdefId.ToString() + "&af=4";
                                                         ATag = "<a href=\"" + Link + "\" title=\"" + NavIconTitleHtmlEncoded + "\">";
-                                                        nodeHtml += common.cr + "<div class=\"ccNavLink ccNavLinkEmpty\">" + ATag + IconNoSubNodes + "</a>&nbsp;" + ATag + dataRecordCdefName + ":" + dataRecordName + "</a></div>";
+                                                        nodeHtml += Common.cr + "<div class=\"ccNavLink ccNavLinkEmpty\">" + ATag + IconNoSubNodes + "</a>&nbsp;" + ATag + dataRecordCdefName + ":" + dataRecordName + "</a></div>";
                                                         //nodeHtml &= GetNode(cp, env, 0, 0, 0, 0, 0, "/admin?af=4&cid=" & dataRecordCdefID.ToString & "&id=" & cs7.GetInteger("id"), 0, 0, dataRecordCdefName & ":" & cs7.GetText("name"), LegacyMenuControlID, EmptyNodeList, "", NavIconTypeContent, "Data", AutoManageAddons, NodeTypeEnum.NodeTypeContent, False, True, OpenNodeList, NodeIDString, NodeNavigatorJS, "")
                                                         cs7.GoNext();
                                                     }
@@ -428,37 +428,37 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                             }
                             s += nodeHtml;
                             break;
-                        case common.NodeIDManageAddonsAdvanced:
+                        case Common.NodeIDManageAddonsAdvanced:
                             //
                             // Special Case: clicked on Manage Add-ons.advanced
                             //   edit links for Add-ons, Add-on Collections
                             //
                             // Folder to Add-ons without Collections
                             //
-                            NodeIDString = common.NodeIDAddonsNoCollection.ToString();
-                            s = s + GetNode(cp, env, 0, 0, 0, 0, 0, "", 0, 0, "Add-ons With No Collection", LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeAddon, "Add-ons With No Collection", AutoManageAddons, common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
+                            NodeIDString = Common.NodeIDAddonsNoCollection.ToString();
+                            s = s + GetNode(cp, env, 0, 0, 0, 0, 0, "", 0, 0, "Add-ons With No Collection", LegacyMenuControlID, EmptyNodeList, "", Common.NavIconTypeAddon, "Add-ons With No Collection", AutoManageAddons, Common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                             //
                             Name = "Add-ons";
-                            s = s + GetNode(cp, env, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeContent, Name, AutoManageAddons, common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, "", ref NodeNavigatorJS, new List<string>());
+                            s = s + GetNode(cp, env, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", Common.NavIconTypeContent, Name, AutoManageAddons, Common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, "", ref NodeNavigatorJS, new List<string>());
                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                             //
                             Name = "Add-on Collections";
-                            s = s + GetNode(cp, env, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeContent, Name, AutoManageAddons, common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, "", ref NodeNavigatorJS, new List<string>());
+                            s = s + GetNode(cp, env, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", Common.NavIconTypeContent, Name, AutoManageAddons, Common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, "", ref NodeNavigatorJS, new List<string>());
                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                             break;
-                        case common.NodeIDAddonsNoCollection:
+                        case Common.NodeIDAddonsNoCollection:
                             //
                             // special case: Add-on List that do not have collections
                             //
                             CollectionID = 0;
-                            FieldList = "0 as ContentControlID,A.Name as Name,A.ID as ID,A.ID as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," + common.NavIconTypeAddon + " as NavIconType,A.Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as collectionid";
+                            FieldList = "0 as ContentControlID,A.Name as Name,A.ID as ID,A.ID as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," + Common.NavIconTypeAddon + " as NavIconType,A.Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as collectionid";
                             SQL = "select"
                             + " " + FieldList + " from ccAggregateFunctions A"
                             + " left join ccAddonCollections C on C.ID=A.CollectionID"
                             + " where C.ID is null"
                             + " order by A.Name";
-                            NodeType = common.NodeTypeEnum.NodeTypeAddon;
+                            NodeType = Common.NodeTypeEnum.NodeTypeAddon;
                             BlockSubNodes = true;
                             NodeIDString = "";
                             CPCSBaseClass cs5 = cp.CSNew();
@@ -468,7 +468,7 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                     addonid = cs5.GetInteger("AddonID");
                                     NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode(Name);
                                     ContentControlID = cs5.GetInteger("contentControlId");
-                                    s = s + GetNode(cp, env, 0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, common.NodeTypeEnum.NodeTypeAddon, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
+                                    s = s + GetNode(cp, env, 0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, "", Common.NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, Common.NodeTypeEnum.NodeTypeAddon, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
                                     Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                                     cs5.GoNext();
                                 }
@@ -476,12 +476,12 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                             }
                             cs5.Close();
                             break;
-                        case common.NodeIDLegacyMenu:
+                        case Common.NodeIDLegacyMenu:
                             //
                             // Special Case: build old top menus under this Navigator entry
                             //
                             BlockSubNodes = false;
-                            SQL = GetMenuSQL(cp, "(parentid=0)or(parentid is null)", common.LegacyMenuContentName);
+                            SQL = GetMenuSQL(cp, "(parentid=0)or(parentid is null)", Common.LegacyMenuContentName);
                             if (!csChildList.OpenSQL(SQL)) {
                                 //
                                 // Empty list, add to EmptyNodeList
@@ -489,28 +489,28 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                 EmptyNodeList.Add(TopParentNode);
                             }
                             break;
-                        case common.NodeIDAllContentList:
+                        case Common.NodeIDAllContentList:
                             //
                             // special case: all content
                             //
-                            FieldList = "Name,ID,0 as AddonID,0 as NewWindow,ID as ContentID,'' as LinkPage," + common.NavIconTypeContent + " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid,0 as collectionid";
+                            FieldList = "Name,ID,0 as AddonID,0 as NewWindow,ID as ContentID,'' as LinkPage," + Common.NavIconTypeContent + " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid,0 as collectionid";
                             SQL = "select " + FieldList + " from cccontent order by name";
                             csChildList.OpenSQL(SQL);
-                            NodeType = common.NodeTypeEnum.NodeTypeContent;
+                            NodeType = Common.NodeTypeEnum.NodeTypeContent;
                             BlockSubNodes = true;
                             break;
                         case "":
                             //
                             // Navigator Entries, list home(s) plus all roots
                             //
-                            NodeType = common.NodeTypeEnum.NodeTypeEntry;
+                            NodeType = Common.NodeTypeEnum.NodeTypeEntry;
                             BlockSubNodes = false;
                             Link = System.Net.WebUtility.HtmlEncode("http://" + cp.Site.Domain);
-                            s = s + "<div class=ccNavLink><A href=\"" + Link + "\">" + common.IconPublicHome + "</A>&nbsp;<A href=\"" + Link + "\">Public Home</A></div>";
+                            s = s + "<div class=ccNavLink><A href=\"" + Link + "\">" + Common.IconPublicHome + "</A>&nbsp;<A href=\"" + Link + "\">Public Home</A></div>";
                             Link = System.Net.WebUtility.HtmlEncode(cp.Site.GetText("adminUrl"));
-                            s = s + "<div class=ccNavLink><A href=\"" + Link + "\">" + common.IconAdminHome + "</A>&nbsp;<A href=\"" + Link + "\">Admin Home</A></div>";
+                            s = s + "<div class=ccNavLink><A href=\"" + Link + "\">" + Common.IconAdminHome + "</A>&nbsp;<A href=\"" + Link + "\">Admin Home</A></div>";
                             CPCSBaseClass cs8 = cp.CSNew();
-                            if (cs8.OpenSQL(GetMenuSQL(cp, "((Parentid=0)or(Parentid is null))", common.NavigatorContentName))) {
+                            if (cs8.OpenSQL(GetMenuSQL(cp, "((Parentid=0)or(Parentid is null))", Common.NavigatorContentName))) {
                                 do {
                                     Name = Convert.ToString(cs8.GetText("name")).Trim(' ');
                                     NavigatorID = cs8.GetInteger("ID").ToString();
@@ -522,20 +522,20 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                         //
                                         switch (Name.ToLower(CultureInfo.InvariantCulture)) {
                                             case "manage add-ons":
-                                                NodeIDString = common.NodeIDManageAddons.ToString();
+                                                NodeIDString = Common.NodeIDManageAddons.ToString();
                                                 break;
                                             case "settings":
-                                                NodeIDString = common.NodeIDSettings.ToString();
+                                                NodeIDString = Common.NodeIDSettings.ToString();
                                                 break;
                                             case "tools":
-                                                NodeIDString = common.NodeIDTools.ToString();
+                                                NodeIDString = Common.NodeIDTools.ToString();
                                                 break;
                                             case "reports":
-                                                NodeIDString = common.NodeIDReports.ToString();
+                                                NodeIDString = Common.NodeIDReports.ToString();
                                                 break;
                                         }
                                     }
-                                    s = s + GetNode(cp, env, 0, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, NavigatorID, common.NavIconTypeFolder, NavIconTitleHtmlEncoded, AutoManageAddons, common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
+                                    s = s + GetNode(cp, env, 0, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, NavigatorID, Common.NavIconTypeFolder, NavIconTitleHtmlEncoded, AutoManageAddons, Common.NodeTypeEnum.NodeTypeEntry, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
                                     Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                                     cs8.GoNext();
                                 }
@@ -548,28 +548,28 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                             if (cp.Utils.EncodeBoolean(cp.Site.GetText("AllowNavigatorLegacyEntry", "0"))) {
                                 Name = "Legacy Menu";
                                 NavIconTitleHtmlEncoded = "Legacy Menu";
-                                NodeIDString = common.NodeIDLegacyMenu.ToString();
-                                s = s + GetNode(cp, env, 0, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeFolder, NavIconTitleHtmlEncoded, AutoManageAddons, common.NodeTypeEnum.NodeTypeEntry, false, BlockSubNodes, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
+                                NodeIDString = Common.NodeIDLegacyMenu.ToString();
+                                s = s + GetNode(cp, env, 0, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", Common.NavIconTypeFolder, NavIconTitleHtmlEncoded, AutoManageAddons, Common.NodeTypeEnum.NodeTypeEntry, false, BlockSubNodes, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
                                 Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                             }
                             break;
-                        case common.NodeIDSettings:
+                        case Common.NodeIDSettings:
                             //
                             // list setting nodes, includes menu nodes with setting parents, and addons with type=setting sorted in
                             //
-                            s = s + getNodeListMixed(cp, env, EmptyNodeList, TopParentNode, LegacyMenuControlID, AutoManageAddons, NodeType, OpenNodeList, 3, cp.Content.GetRecordID("navigator entries", "settings"), common.NavIconTypeSetting, ref NodeNavigatorJS);
+                            s = s + getNodeListMixed(cp, env, EmptyNodeList, TopParentNode, LegacyMenuControlID, AutoManageAddons, NodeType, OpenNodeList, 3, cp.Content.GetRecordID("navigator entries", "settings"), Common.NavIconTypeSetting, ref NodeNavigatorJS);
                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                             break;
-                        case common.NodeIDTools:
+                        case Common.NodeIDTools:
                             //
                             // list setting nodes, includes menu nodes with setting parents, and addons with type=setting sorted in
-                            s = s + getNodeListMixed(cp, env, EmptyNodeList, TopParentNode, LegacyMenuControlID, AutoManageAddons, NodeType, OpenNodeList, 4, cp.Content.GetRecordID("navigator entries", "tools"), common.NavIconTypeTool, ref NodeNavigatorJS);
+                            s = s + getNodeListMixed(cp, env, EmptyNodeList, TopParentNode, LegacyMenuControlID, AutoManageAddons, NodeType, OpenNodeList, 4, cp.Content.GetRecordID("navigator entries", "tools"), Common.NavIconTypeTool, ref NodeNavigatorJS);
                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                             break;
-                        case common.NodeIDReports:
+                        case Common.NodeIDReports:
                             //
                             // list setting nodes, includes menu nodes with setting parents, and addons with type=setting sorted in
-                            s = s + getNodeListMixed(cp, env, EmptyNodeList, TopParentNode, LegacyMenuControlID, AutoManageAddons, NodeType, OpenNodeList, 2, cp.Content.GetRecordID("navigator entries", "reports"), common.NavIconTypeReport, ref NodeNavigatorJS);
+                            s = s + getNodeListMixed(cp, env, EmptyNodeList, TopParentNode, LegacyMenuControlID, AutoManageAddons, NodeType, OpenNodeList, 2, cp.Content.GetRecordID("navigator entries", "reports"), Common.NavIconTypeReport, ref NodeNavigatorJS);
                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                             break;
                         default:
@@ -593,14 +593,14 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                     //
                     // ----- List Navigator Nodes, if not already displayed
                     //
-                    if ((!csChildList.OK()) && (NodeType == common.NodeTypeEnum.NodeTypeEntry)) {
+                    if ((!csChildList.OK()) && (NodeType == Common.NodeTypeEnum.NodeTypeEntry)) {
                         //
                         // No child nodes, if this node includes a CID, list the first 20 content records with a 'more'
                         //
                         ContentId = 0;
                         if (TopParentNode.IsNumeric()) {
                             csChildList.Close();
-                            if (csChildList.Open(common.NavigatorContentName, "id=" + TopParentNode)) {
+                            if (csChildList.Open(Common.NavigatorContentName, "id=" + TopParentNode)) {
                                 ContentId = csChildList.GetInteger("ContentID");
                             }
                             if (ContentId != 0) {
@@ -624,7 +624,7 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                                 RecordName = RecordName.Substring(0, 25) + "..." + RecordName.Substring(RecordName.Length - 25);
                                             }
                                             NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode("Edit '" + RecordName + "' in '" + ContentName + "'");
-                                            IconNoSubNodes = common.IconRecord;
+                                            IconNoSubNodes = Common.IconRecord;
                                             IconNoSubNodes = IconNoSubNodes.Replace("{title}", NavIconTitleHtmlEncoded);
                                             Link = "?id=" + NavigatorID + "&cid=" + csChildList.GetInteger("contentControlId") + "&af=4";
                                             ATag = "<a href=\"" + Link + "\" title=\"" + NavIconTitleHtmlEncoded + "\">";
@@ -634,7 +634,7 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                         }
                                         while (csChildList.OK() && Ptr < 20);
                                         if (Ptr == 20) {
-                                            NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode("Open All '" + common.NavigatorContentName + "'");
+                                            NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode("Open All '" + Common.NavigatorContentName + "'");
                                             Link = "?cid=" + ContentId;
                                             string IconClosed = null;
                                             s = s + "<div class=\"ccNavLink ccNavLinkEmpty\">" + IconClosed + "&nbsp;<a href=\"" + Link + "\" title=\"" + NavIconTitleHtmlEncoded + "\">more...</a></div>";
@@ -670,7 +670,7 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                 //
                                 // special case: any Navigator Entry named 'all content' returns the content list
                                 //
-                                NodeIDString = common.NodeIDAllContentList;
+                                NodeIDString = Common.NodeIDAllContentList;
                             } else {
                                 NodeIDString = NavigatorID.ToString();
                             }
@@ -701,11 +701,11 @@ namespace Contensive.Processor.Addons.AdminNavigator {
         //
         //====================================================================================================
         //
-        internal string getNodeListMixed(CPBaseClass cp, NavigatorEnvironment env, List<string> EmptyNodeList, string TopParentNode, int LegacyMenuControlID, bool AutoManageAddons, common.NodeTypeEnum NodeType, List<string> OpenNodeList, int AddonNavTypeId, int MenuParentNodeID, int AdminNavIconTypeSetting, ref string Return_DraggableJS) {
+        internal string getNodeListMixed(CPBaseClass cp, NavigatorEnvironment env, List<string> EmptyNodeList, string TopParentNode, int LegacyMenuControlID, bool AutoManageAddons, Common.NodeTypeEnum NodeType, List<string> OpenNodeList, int AddonNavTypeId, int MenuParentNodeID, int AdminNavIconTypeSetting, ref string Return_DraggableJS) {
             string returnNav = "";
             try {
                 string NodeDraggableJS = null;
-                var SortNodes = new List<common.SortNodeType>();
+                var SortNodes = new List<Common.SortNodeType>();
                 int SortPtr = 0;
                 string NodeIDString = null;
                 string SQL = null;
@@ -737,7 +737,7 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                     CPCSBaseClass cs10 = cp.CSNew();
                     if (cs10.Open("add-ons", Criteria, "name")) {
                         do {
-                            SortNodes.Add(new common.SortNodeType() {
+                            SortNodes.Add(new Common.SortNodeType() {
                                 Name = Convert.ToString(cs10.GetText("name")).Trim(' '),
                                 addonid = cs10.GetInteger("ID"),
                                 navIconTitle = SortNodes[SortPtr].Name,
@@ -764,9 +764,9 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                 //
                                 // special case: any Navigator Entry named 'all content' returns the content list
                                 //
-                                NodeIDString = common.NodeIDAllContentList;
+                                NodeIDString = Common.NodeIDAllContentList;
                             }
-                            SortNodes.Add(new common.SortNodeType() {
+                            SortNodes.Add(new Common.SortNodeType() {
                                 Name = name,
                                 navigatorId = cs11.GetInteger("ID").ToString(),
                                 collectionId = cs11.GetInteger("CollectionID"),
@@ -808,7 +808,7 @@ namespace Contensive.Processor.Addons.AdminNavigator {
         //
         //====================================================================================================
         //
-        private string GetNode(CPBaseClass cp, NavigatorEnvironment env, int CollectionID, int ContentControlId, int helpCollectionID, int HelpAddonID, int ContentID, string Link, int addonid, int ignore, string Name, int LegacyMenuControlID, List<string> EmptyNodeList, string NavigatorID, int NavIconType, string NavIconTitleHtmlEncoded, bool AutoManageAddons, common.NodeTypeEnum NodeType, bool NewWindow, bool BlockSubNodes, List<string> OpenNodeList, string nodeId, ref string Return_NavigatorJS, List<string> linkSuffixList) {
+        private string GetNode(CPBaseClass cp, NavigatorEnvironment env, int CollectionID, int ContentControlId, int helpCollectionID, int HelpAddonID, int ContentID, string Link, int addonid, int ignore, string Name, int LegacyMenuControlID, List<string> EmptyNodeList, string NavigatorID, int NavIconType, string NavIconTitleHtmlEncoded, bool AutoManageAddons, Common.NodeTypeEnum NodeType, bool NewWindow, bool BlockSubNodes, List<string> OpenNodeList, string nodeId, ref string Return_NavigatorJS, List<string> linkSuffixList) {
             string result = "";
             try {
                 bool BlockNode= false;
@@ -834,66 +834,66 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                     // Setup Icons
                     //
                     switch (NavIconType) {
-                        case common.NavIconTypeCustom:
+                        case Common.NavIconTypeCustom:
                             //
                             // reserved for future addition of a custom Icon field
                             // not done now because there is no facility now to import files during collection build
                             //
                             break;
-                        case common.NavIconTypeAdvanced:
-                            IconOpened = common.IconAdvancedOpened;
-                            IconClosed = common.IconAdvancedClosed;
-                            IconNoSubNodes = common.IconAdvanced;
+                        case Common.NavIconTypeAdvanced:
+                            IconOpened = Common.IconAdvancedOpened;
+                            IconClosed = Common.IconAdvancedClosed;
+                            IconNoSubNodes = Common.IconAdvanced;
                             break;
-                        case common.NavIconTypeContent:
-                            IconOpened = common.IconContentOpened;
-                            IconClosed = common.IconContentClosed;
-                            IconNoSubNodes = common.IconContent;
+                        case Common.NavIconTypeContent:
+                            IconOpened = Common.IconContentOpened;
+                            IconClosed = Common.IconContentClosed;
+                            IconNoSubNodes = Common.IconContent;
                             break;
-                        case common.NavIconTypeEmail:
-                            IconOpened = common.IconEmailOpened;
-                            IconClosed = common.IconEmailClosed;
-                            IconNoSubNodes = common.IconEmail;
+                        case Common.NavIconTypeEmail:
+                            IconOpened = Common.IconEmailOpened;
+                            IconClosed = Common.IconEmailClosed;
+                            IconNoSubNodes = Common.IconEmail;
                             break;
-                        case common.NavIconTypeUser:
-                            IconOpened = common.IconUsersOpened;
-                            IconClosed = common.IconUsersClosed;
-                            IconNoSubNodes = common.IconUsers;
+                        case Common.NavIconTypeUser:
+                            IconOpened = Common.IconUsersOpened;
+                            IconClosed = Common.IconUsersClosed;
+                            IconNoSubNodes = Common.IconUsers;
                             break;
-                        case common.NavIconTypeReport:
-                            IconOpened = common.IconReportsOpened;
-                            IconClosed = common.IconReportsClosed;
-                            IconNoSubNodes = common.IconReports;
+                        case Common.NavIconTypeReport:
+                            IconOpened = Common.IconReportsOpened;
+                            IconClosed = Common.IconReportsClosed;
+                            IconNoSubNodes = Common.IconReports;
                             break;
-                        case common.NavIconTypeSetting:
-                            IconOpened = common.IconSettingsOpened;
-                            IconClosed = common.IconSettingsClosed;
-                            IconNoSubNodes = common.IconSettings;
+                        case Common.NavIconTypeSetting:
+                            IconOpened = Common.IconSettingsOpened;
+                            IconClosed = Common.IconSettingsClosed;
+                            IconNoSubNodes = Common.IconSettings;
                             break;
-                        case common.NavIconTypeTool:
-                            IconOpened = common.IconToolsOpened;
-                            IconClosed = common.IconToolsClosed;
-                            IconNoSubNodes = common.IconTools;
+                        case Common.NavIconTypeTool:
+                            IconOpened = Common.IconToolsOpened;
+                            IconClosed = Common.IconToolsClosed;
+                            IconNoSubNodes = Common.IconTools;
                             break;
-                        case common.NavIconTypeRecord:
-                            IconOpened = common.IconRecordOpened;
-                            IconClosed = common.IconRecordClosed;
-                            IconNoSubNodes = common.IconRecord;
+                        case Common.NavIconTypeRecord:
+                            IconOpened = Common.IconRecordOpened;
+                            IconClosed = Common.IconRecordClosed;
+                            IconNoSubNodes = Common.IconRecord;
                             break;
-                        case common.NavIconTypeAddon:
-                            IconOpened = common.IconAddonsOpened;
-                            IconClosed = common.IconAddonsClosed;
-                            IconNoSubNodes = common.IconAddons;
+                        case Common.NavIconTypeAddon:
+                            IconOpened = Common.IconAddonsOpened;
+                            IconClosed = Common.IconAddonsClosed;
+                            IconNoSubNodes = Common.IconAddons;
                             break;
-                        case common.NavIconTypeHelp:
-                            IconOpened = common.IconHelp;
-                            IconClosed = common.IconHelp;
-                            IconNoSubNodes = common.IconHelp;
+                        case Common.NavIconTypeHelp:
+                            IconOpened = Common.IconHelp;
+                            IconClosed = Common.IconHelp;
+                            IconNoSubNodes = Common.IconHelp;
                             break;
                         default: //NavIconTypeFolder
-                            IconOpened = common.IconFolderOpened;
-                            IconClosed = common.IconFolderClosed;
-                            IconNoSubNodes = common.IconFolderNoSubNodes;
+                            IconOpened = Common.IconFolderOpened;
+                            IconClosed = Common.IconFolderClosed;
+                            IconNoSubNodes = Common.IconFolderNoSubNodes;
                             break;
                     }
                     IconOpened = IconOpened.Replace("{title}", "Close " + NavIconTitleHtmlEncoded);
@@ -943,21 +943,21 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                 // This entry is made from a navigator entry record
                                 //
                                 switch (NodeType) {
-                                    case common.NodeTypeEnum.NodeTypeAddon:
+                                    case Common.NodeTypeEnum.NodeTypeAddon:
                                         //
                                         // List of Addons
                                         //
                                         //NodeIDString = ""
                                         DivIDBase = "a" + NavigatorID;
                                         break;
-                                    case common.NodeTypeEnum.NodeTypeCollection:
+                                    case Common.NodeTypeEnum.NodeTypeCollection:
                                         //
                                         // List of Collections
                                         //
                                         //NodeIDString = "collection." & CollectionID
                                         DivIDBase = "c" + CollectionID;
                                         break;
-                                    case common.NodeTypeEnum.NodeTypeContent:
+                                    case Common.NodeTypeEnum.NodeTypeContent:
                                         //
                                         // List of content
                                         //
@@ -1010,7 +1010,7 @@ namespace Contensive.Processor.Addons.AdminNavigator {
                                 string AddonName = cs12.GetText("name");
                                 if (cs12.GetBoolean("remotemethod")) {
                                     NewWindow = true;
-                                    addonLink = cp.Site.GetText("adminUrl") + "?" + common.RequestNameRemoteMethodAddon + "=" + cp.Utils.EncodeRequestVariable(AddonName);
+                                    addonLink = cp.Site.GetText("adminUrl") + "?" + Common.RequestNameRemoteMethodAddon + "=" + cp.Utils.EncodeRequestVariable(AddonName);
                                 }
 
                             }

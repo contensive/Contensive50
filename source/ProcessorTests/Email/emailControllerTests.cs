@@ -10,10 +10,10 @@ using Contensive.Models.Db;
 
 namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     [TestClass]
-    public class emailControllerTests {
+    public class EmailControllerTests {
         //
         [TestMethod]
-        public void Controllers_Email_GetBlockedList_test1() {
+        public void controllers_Email_GetBlockedList_test1() {
             using (CPClass cp = new CPClass(testAppName)) {
                 cp.core.mockEmail = true;
                 // arrange
@@ -29,7 +29,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_Email_VerifyEmailAddress_test1() {
+        public void controllers_Email_VerifyEmailAddress_test1() {
             using (CPClass cp = new CPClass(testAppName)) {
                 cp.core.mockEmail = true;
                 // arrange
@@ -44,7 +44,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_Email_queueAdHocEmail_test1() {
+        public void controllers_Email_queueAdHocEmail_test1() {
             using (CPClass cp = new CPClass(testAppName)) {
                 cp.core.mockEmail = true;
                 // arrange
@@ -109,12 +109,12 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_Email_queueSystemEmail_test1() {
+        public void controllers_Email_queueSystemEmail_test1() {
             using (CPClass cp = new CPClass(testAppName)) {
                 cp.core.mockEmail = true;
                 // arrange
                 string htmlBody = "a<b>1</b><br>2<p>3</p><div>4</div>";
-                string textBody = "a1\n2\n3\n4";
+                //string textBody = "a1\n2\n3\n4";
                 //
                 var confirmPerson = DbBaseModel.addDefault<PersonModel>(cp);
                 Assert.IsNotNull(confirmPerson);

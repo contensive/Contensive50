@@ -137,6 +137,7 @@
     <Compile Include="Addons\AdminSite\Models\EditRecordModel.cs" />
     <Compile Include="Addons\AdminSite\Models\FieldTypeEditorAddonModel.cs" />
     <Compile Include="Addons\AdminSite\Models\FieldEditorAddonModel.cs" />
+    <Compile Include="Addons\AdminSite\Views\FormEditTabs.cs" />
     <Compile Include="Addons\Authentication\GetLoginButtonFormClass.cs" />
     <Compile Include="Addons\Authentication\Authenticate.cs" />
     <Compile Include="Addons\Diagnostics\ServerDiagnosticClass.cs" />
@@ -196,7 +197,7 @@
     <Compile Include="Controllers\EmailHippoController.cs" />
     <Compile Include="Controllers\BuildDataMigrationController.cs" />
     <Compile Include="Exceptions\Exceptions.cs" />
-    <Compile Include="Addons\AdminSite\Views\ControlEditor.cs" />
+    <Compile Include="Addons\AdminSite\Views\FormEditTabControlInfo.cs" />
     <Compile Include="Addons\AdminSite\Views\EmailBounceEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\LinkAliasEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\ContentTrackingEditor.cs" />
