@@ -2290,11 +2290,14 @@ namespace Contensive.Processor.Controllers {
                     //
                     int PrimaryContentId = ContentMetadataModel.getContentId(core, PrimaryContentName);
                     ContentMetadataModel SecondaryMetaData = ContentMetadataModel.createByUniqueName(core, SecondaryContentName);
-                    string SecondaryTablename = SecondaryMetaData.tableName;
-                    int SecondaryContentId = SecondaryMetaData.id;
-                    List<int> ContentIDList = new List<int>();
-                    ContentIDList.Add(SecondaryContentId);
-                    ContentIDList.AddRange(SecondaryMetaData.childIdList(core));
+                    List<int> ContentControlIdList = new List<int>();
+                    if(SecondaryMetaData.parentId<=0) {
+                        //
+                        // -- if content has no parent, include all contentcontrolid==0
+                        ContentControlIdList.Add(0);
+                    }
+                    ContentControlIdList.Add(SecondaryMetaData.id);
+                    ContentControlIdList.AddRange(SecondaryMetaData.childIdList(core));
                     //
                     //
                     //
@@ -2304,7 +2307,7 @@ namespace Contensive.Processor.Controllers {
                     int main_MemberShipCount = 0;
                     int main_MemberShipSize = 0;
                     returnHtml = "";
-                    if ((!string.IsNullOrEmpty(SecondaryTablename)) && (!string.IsNullOrEmpty(rulesTablename))) {
+                    if ((!string.IsNullOrEmpty(SecondaryMetaData.tableName)) && (!string.IsNullOrEmpty(rulesTablename))) {
                         string OldFolderVar = "OldFolder" + core.doc.checkListCnt;
                         string javaScriptRequired = "";
                         javaScriptRequired += "var " + OldFolderVar + ";";
@@ -2339,14 +2342,14 @@ namespace Contensive.Processor.Controllers {
                             // ----- (exclude new record issue ID=0)
                             //
                             using (var csData = new CsModel(core)) {
-                                SQL = "SELECT " + SecondaryTablename + ".ID AS ID,'' as RuleCopy";
+                                SQL = "SELECT " + SecondaryMetaData.tableName + ".ID AS ID,'' as RuleCopy";
                                 SQL += ""
-                                    + " FROM " + SecondaryTablename + " LEFT JOIN"
-                                    + " " + rulesTablename + " ON " + SecondaryTablename + ".Id = " + rulesTablename + "." + RulesSecondaryFieldName + " WHERE "
+                                    + " FROM " + SecondaryMetaData.tableName + " LEFT JOIN"
+                                    + " " + rulesTablename + " ON " + SecondaryMetaData.tableName + ".Id = " + rulesTablename + "." + RulesSecondaryFieldName + " WHERE "
                                     + " (" + rulesTablename + "." + RulesPrimaryFieldname + "=" + PrimaryRecordID + ")"
                                     + " AND (" + rulesTablename + ".Active<>0)"
-                                    + " AND (" + SecondaryTablename + ".Active<>0)"
-                                    + " And (" + SecondaryTablename + ".ContentControlID IN (" + string.Join(",", ContentIDList) + "))";
+                                    + " AND (" + SecondaryMetaData.tableName + ".Active<>0)"
+                                    + " And (" + SecondaryMetaData.tableName + ".ContentControlID IN (" + string.Join(",", ContentControlIdList) + "))";
                                 if (!string.IsNullOrEmpty(SecondaryContentSelectCriteria)) {
                                     SQL += "AND(" + SecondaryContentSelectCriteria + ")";
                                 }
@@ -2374,15 +2377,15 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Gather all the Secondary Records, sorted by ContentName
                         //
-                        SQL = "SELECT " + SecondaryTablename + ".ID AS ID, " + SecondaryTablename + "." + CaptionFieldName + " AS OptionCaption, " + SecondaryTablename + ".name AS OptionName, " + SecondaryTablename + ".SortOrder";
+                        SQL = "SELECT " + SecondaryMetaData.tableName + ".ID AS ID, " + SecondaryMetaData.tableName + "." + CaptionFieldName + " AS OptionCaption, " + SecondaryMetaData.tableName + ".name AS OptionName, " + SecondaryMetaData.tableName + ".SortOrder";
                         SQL += ",0 as AllowRuleCopy,'' as RuleCopyCaption";
-                        SQL += " from " + SecondaryTablename + " where (1=1)";
+                        SQL += " from " + SecondaryMetaData.tableName + " where (1=1)";
                         if (!string.IsNullOrEmpty(SecondaryContentSelectCriteria)) {
                             SQL += "AND(" + SecondaryContentSelectCriteria + ")";
                         }
-                        SQL += " GROUP BY " + SecondaryTablename + ".ID, " + SecondaryTablename + "." + CaptionFieldName + ", " + SecondaryTablename + ".name, " + SecondaryTablename + ".SortOrder";
+                        SQL += " GROUP BY " + SecondaryMetaData.tableName + ".ID, " + SecondaryMetaData.tableName + "." + CaptionFieldName + ", " + SecondaryMetaData.tableName + ".name, " + SecondaryMetaData.tableName + ".SortOrder";
                         SQL += " ORDER BY ";
-                        SQL += SecondaryTablename + "." + CaptionFieldName;
+                        SQL += SecondaryMetaData.tableName + "." + CaptionFieldName;
                         using (var csData = new CsModel(core)) {
                             if (!csData.openSql(SQL)) {
                                 returnHtml = "(No choices are available.)";
