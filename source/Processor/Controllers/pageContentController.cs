@@ -1094,8 +1094,8 @@ namespace Contensive.Processor.Controllers {
                             } else {
                                 //
                                 // -- execute PageBuilder RenderAddonList
-                                core.siteProperties.setProperty("addonList", core.doc.pageController.page.addonList);
-                                htmlPageContent += core.addon.execute(addonGuidAddonManager, new CPUtilsBaseClass.addonExecuteContext() {
+                                core.docProperties.setProperty("addonList", core.doc.pageController.page.addonList);
+                                htmlPageContent += core.addon.execute(addonListRender, new CPUtilsBaseClass.addonExecuteContext() {
                                     addonType = CPUtilsBaseClass.addonContext.ContextPage
                                 });
                             }
