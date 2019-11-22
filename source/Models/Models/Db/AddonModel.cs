@@ -68,14 +68,14 @@ namespace Contensive.Models.Db {
         /// The time in seconds for this addon if run the background
         /// </summary>
         public int? processTimeout { get; set; }
-        //
-        // -- deprecated, but for leave for now and log error
-        public string javaScriptBodyEnd { get; set; }
-        public string jsBodyScriptSrc { get; set; }
         /// <summary>
         /// html to be used for the icon. The icon is for the dashboard and addon manager, etc
         /// </summary>
         public string iconHtml { get; set; }
+        /// <summary>
+        /// When this addon is rendered in Page Builder, use this html if the addon's actual rendering is not acceptable
+        /// </summary>
+        public string editPlaceholderHtml { get; set; }
         /// <summary>
         /// if iconHtml is null or whitespace, this image url has the icon to use
         /// </summary>
@@ -92,6 +92,10 @@ namespace Contensive.Models.Db {
         /// the number of sprites in the icon
         /// </summary>
         public int? iconSprites { get; set; }
+        //
+        // -- deprecated, but for leave for now and log error
+        public string javaScriptBodyEnd { get; set; }
+        public string jsBodyScriptSrc { get; set; }
         //
         // -- deprecated
         // -Public Property JavaScriptOnLoad As String

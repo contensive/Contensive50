@@ -1086,7 +1086,7 @@ namespace Contensive.Processor.Controllers {
                     // -- addonList
                     if (!string.IsNullOrWhiteSpace(core.doc.pageController.page.addonList)) {
                         try {
-                            AddonModel addonListRender = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidAddonManager);
+                            AddonModel addonListRender = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidRenderAddonList);
                             if ( addonListRender==null) {
                                 //
                                 // -- not installed

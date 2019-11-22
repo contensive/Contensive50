@@ -145,6 +145,7 @@ namespace Contensive.Processor {
         internal const string addonGuidPageManager = "{3a01572e-0f08-4feb-b189-18371752a3c3}";
         internal const string addonGuidExportCSV = "{5C25F35D-A2A8-4791-B510-B1FFE0645004}";
         internal const string addonGuidExportXML = "{DC7EF1EE-20EE-4468-BEB1-0DC30AC8DAD6}";
+        internal const string addonGuidRenderAddonList = "{A94419A3-5554-471A-A7C8-385124E8374A}";
         //
         internal const int addonRecursionLimit = 5;
         //
