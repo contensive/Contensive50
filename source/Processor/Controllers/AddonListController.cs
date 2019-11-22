@@ -1,5 +1,6 @@
 ﻿
 using Contensive.BaseClasses;
+using Contensive.BaseModels;
 using Contensive.Models.Db;
 using Contensive.Processor.Models.Domain;
 using System;

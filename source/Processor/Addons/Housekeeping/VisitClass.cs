@@ -18,7 +18,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
                 // Visits with no visitor
                 //
-                LogController.logInfo(core, "Deleting visits with no DateAdded");
+                LogController.logInfo(core, "Deleting visits with no visitor");
                 core.db.deleteTableRecordChunks("ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000);
                 //
                 // delete nocookie visits

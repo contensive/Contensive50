@@ -2767,32 +2767,6 @@
     <Email>Yes</Email>
     <IsInline>Yes</IsInline>
   </Addon>
-  <Addon name="AddonListEditor" guid="{92B75A6A-E84B-4551-BBF3-849E91D084BC}" type="Add-on">
-    <DotNetClass>Contensive.Processor.Addons.AddonListEditor.GetAddonListEditorClass</DotNetClass>
-    <CopyText><![CDATA[<app-root></app-root>]]></CopyText>
-    <Content>No</Content>
-    <Template>No</Template>
-    <BlockEditTools>Yes</BlockEditTools>
-    <jsheadscriptsrc>https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/addonListEditor/merge.js</jsheadscriptsrc>
-    <styleslinkhref>https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/addonListEditor/styles.css</styleslinkhref>
-    <OtherHeadTags></OtherHeadTags>
-  </Addon>
-  <Addon name="GetAddonList" guid="{CE950C26-A1BB-4827-80A4-A665BBEAF936}" type="Add-on">
-    <DotNetClass>Contensive.Processor.Addons.AddonListEditor.GetAddonListClass</DotNetClass>
-    <RemoteMethod>Yes</RemoteMethod>
-  </Addon>
-  <Addon name="SetAddonList" guid="{373C873F-322F-4998-89EA-BBD6121EA6C9}" type="Add-on">
-    <DotNetClass>Contensive.Processor.Addons.AddonListEditor.SetAddonListClass</DotNetClass>
-    <RemoteMethod>Yes</RemoteMethod>
-  </Addon>
-  <Addon name="GetAddonPanelList" guid="{5B506283-22E4-4A3C-A009-64D6D6275A5D}" type="Add-on">
-    <DotNetClass>Contensive.Processor.Addons.AddonListEditor.GetAddonPanelClass</DotNetClass>
-    <RemoteMethod>Yes</RemoteMethod>
-  </Addon>
-  <Addon name="DeleteAddonListInstance" guid="{15614548-2749-45C1-AAFE-17018F5F0D1B}" type="Add-on">
-    <DotNetClass>Contensive.Processor.Addons.AddonListEditor.DeleteAddonListInstanceClass</DotNetClass>
-    <RemoteMethod>Yes</RemoteMethod>
-  </Addon>
   <Addon name="Status" guid="{6444B5C9-36DD-43FF-978C-26650EB2333F}" type="Add-on">
     <DotNetClass>Contensive.Processor.Addons.Diagnostics.StatusClass</DotNetClass>
     <RemoteMethod>Yes</RemoteMethod>
@@ -3097,4 +3071,5 @@
   <ImportCollection name="Tool Panel">{374E2B8C-B29D-470B-BD1B-41CAA5BCEDCB}</ImportCollection>
   <ImportCollection name="Add-on Manager51">{A3E58089-74FC-4FB3-B847-0AD22B51AA72}</ImportCollection>
   <ImportCollection name="Reporting Basics">{d5b7ba7f-6b78-4625-8b23-232ac6574130}</ImportCollection>
+  <ImportCollection name="Page Builder">{1dcce948-64a0-4baf-abcd-395ca3d8959a}</ImportCollection>
 </Collection>

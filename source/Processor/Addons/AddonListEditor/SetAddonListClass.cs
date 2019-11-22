@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Contensive.BaseClasses;
+using Contensive.BaseModels;
 using Contensive.Models.Db;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;

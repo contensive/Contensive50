@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using Contensive.BaseClasses;
 using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor {
@@ -22,6 +24,16 @@ namespace Contensive.Processor {
         public CPDocClass(CPClass cpParent) : base() {
             cp = cpParent;
         }
+        //
+        public override List<HtmlAssetClass> HtmlAssetList {
+            get{
+                if (_htmlAssetList == null) {
+                    _htmlAssetList = new List<HtmlAssetClass>();
+                }
+                return _htmlAssetList;
+            }
+        }
+        private List<HtmlAssetClass> _htmlAssetList = null;
         //
         //====================================================================================================
         /// <summary>

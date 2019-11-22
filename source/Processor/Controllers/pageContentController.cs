@@ -13,6 +13,7 @@ using System.Text;
 using Contensive.Processor.Models.Domain;
 using Contensive.Models.Db;
 using System.Threading.Tasks;
+using Contensive.BaseModels;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -1085,11 +1086,19 @@ namespace Contensive.Processor.Controllers {
                     // -- addonList
                     if (!string.IsNullOrWhiteSpace(core.doc.pageController.page.addonList)) {
                         try {
-                            List<AddonListItemModel> addonList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<AddonListItemModel>>(core.doc.pageController.page.addonList);
-                            if (addonList == null) {
-                                LogController.logWarn(core, "The addonList for page [" + core.doc.pageController.page.id + ", " + core.doc.pageController.page.name + "] was not empty, but deserialized to null, addonList '" + core.doc.pageController.page.addonList + "'");
+                            AddonModel addonListRender = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidAddonManager);
+                            if ( addonListRender==null) {
+                                //
+                                // -- not installed
+                                htmlPageContent += "<!-- Page Builder AddonList Render not available -->";
+                            } else {
+                                //
+                                // -- execute PageBuilder RenderAddonList
+                                core.siteProperties.setProperty("addonList", core.doc.pageController.page.addonList);
+                                htmlPageContent += core.addon.execute(addonGuidAddonManager, new CPUtilsBaseClass.addonExecuteContext() {
+                                    addonType = CPUtilsBaseClass.addonContext.ContextPage
+                                });
                             }
-                            htmlPageContent += AddonListController.render(core.cpParent, addonList);
                         } catch (Exception) {
                             LogController.logWarn(core, "The addonList for page [" + core.doc.pageController.page.id + ", " + core.doc.pageController.page.name + "] was not empty, but deserialized to null, addonList '" + core.doc.pageController.page.addonList + "'");
                         }
