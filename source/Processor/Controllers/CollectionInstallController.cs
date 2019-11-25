@@ -1139,9 +1139,9 @@ namespace Contensive.Processor.Controllers {
                             string ArgumentList = "";
                             string StyleSheet = "";
                             if (AddonNode.ChildNodes.Count > 0) {
-                                foreach (XmlNode PageInterfaceWithinLoop in AddonNode.ChildNodes) {
-                                    if (!(PageInterfaceWithinLoop is XmlComment)) {
-                                        XmlNode PageInterface = PageInterfaceWithinLoop;
+                                foreach (XmlNode Addonfield in AddonNode.ChildNodes) {
+                                    if (!(Addonfield is XmlComment)) {
+                                        XmlNode PageInterface = Addonfield;
                                         string test = null;
                                         int scriptinglanguageid = 0;
                                         string ScriptingCode = null;
@@ -1153,7 +1153,7 @@ namespace Contensive.Processor.Controllers {
                                         string ScriptingEntryPoint = null;
                                         int ScriptingTimeout = 0;
                                         string ScriptingLanguage = null;
-                                        switch (GenericController.vbLCase(PageInterfaceWithinLoop.Name)) {
+                                        switch (GenericController.vbLCase(Addonfield.Name)) {
                                             case "activexdll":
                                                 //
                                                 // This is handled in BuildLocalCollectionFolder
@@ -1163,7 +1163,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // list of editors
                                                 //
-                                                foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
+                                                foreach (XmlNode TriggerNode in Addonfield.ChildNodes) {
                                                     //
                                                     int fieldTypeId = 0;
                                                     string fieldType = null;
@@ -1192,7 +1192,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // list of events that trigger a process run for this addon
                                                 //
-                                                foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
+                                                foreach (XmlNode TriggerNode in Addonfield.ChildNodes) {
                                                     int TriggerContentId = 0;
                                                     string ContentNameorGuid = null;
                                                     switch (GenericController.vbLCase(TriggerNode.Name)) {
@@ -1239,19 +1239,19 @@ namespace Contensive.Processor.Controllers {
                                                 // include add-ons - NOTE - import collections must be run before interfaces
                                                 // when importing a collectin that will be used for an include
                                                 //
-                                                ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "language", "");
+                                                ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "language", "");
                                                 if (ScriptingLanguage.ToLower(CultureInfo.InvariantCulture) == "jscript") {
                                                     scriptinglanguageid = (int)AddonController.ScriptLanguages.Javascript;
                                                 } else {
                                                     scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
                                                 }
                                                 cs.set("scriptinglanguageid", scriptinglanguageid);
-                                                ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "entrypoint", "");
+                                                ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "entrypoint", "");
                                                 cs.set("ScriptingEntryPoint", ScriptingEntryPoint);
-                                                ScriptingTimeout = GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "timeout", "5000"));
+                                                ScriptingTimeout = GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "timeout", "5000"));
                                                 cs.set("ScriptingTimeout", ScriptingTimeout);
                                                 ScriptingCode = "";
-                                                foreach (XmlNode ScriptingNode in PageInterfaceWithinLoop.ChildNodes) {
+                                                foreach (XmlNode ScriptingNode in Addonfield.ChildNodes) {
                                                     switch (GenericController.vbLCase(ScriptingNode.Name)) {
                                                         case "code":
                                                             ScriptingCode += ScriptingNode.InnerText;
@@ -1264,7 +1264,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // save program id
                                                 //
-                                                FieldValue = PageInterfaceWithinLoop.InnerText;
+                                                FieldValue = Addonfield.InnerText;
                                                 cs.set("ObjectProgramID", FieldValue);
                                                 break;
                                             case "navigator":
@@ -1272,9 +1272,9 @@ namespace Contensive.Processor.Controllers {
                                                 // create a navigator entry with a parent set to this
                                                 //
                                                 cs.save();
-                                                menuNameSpace = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "NameSpace", "");
+                                                menuNameSpace = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "NameSpace", "");
                                                 if (!string.IsNullOrEmpty(menuNameSpace)) {
-                                                    string NavIconTypeString = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "type", "");
+                                                    string NavIconTypeString = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "type", "");
                                                     if (string.IsNullOrEmpty(NavIconTypeString)) {
                                                         NavIconTypeString = "Addon";
                                                     }
@@ -1297,7 +1297,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // multiple argumentlist elements are concatinated with crlf
                                                 //
-                                                NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
+                                                NewValue = encodeText(Addonfield.InnerText).Trim(' ');
                                                 if (!string.IsNullOrEmpty(NewValue)) {
                                                     if (string.IsNullOrEmpty(ArgumentList)) {
                                                         ArgumentList = NewValue;
@@ -1310,8 +1310,8 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // import exclusive style
                                                 //
-                                                NodeName = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "name", "");
-                                                NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
+                                                NodeName = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "name", "");
+                                                NewValue = encodeText(Addonfield.InnerText).Trim(' ');
                                                 if (NewValue.Left(1) != "{") {
                                                     NewValue = "{" + NewValue;
                                                 }
@@ -1325,13 +1325,13 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // import exclusive stylesheet if more then whitespace
                                                 //
-                                                test = PageInterfaceWithinLoop.InnerText;
+                                                test = Addonfield.InnerText;
                                                 test = GenericController.vbReplace(test, " ", "");
                                                 test = GenericController.vbReplace(test, "\r", "");
                                                 test = GenericController.vbReplace(test, "\n", "");
                                                 test = GenericController.vbReplace(test, "\t", "");
                                                 if (!string.IsNullOrEmpty(test)) {
-                                                    StyleSheet = StyleSheet + Environment.NewLine + PageInterfaceWithinLoop.InnerText;
+                                                    StyleSheet = StyleSheet + Environment.NewLine + Addonfield.InnerText;
                                                 }
                                                 break;
                                             case "template":
@@ -1340,15 +1340,15 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // these add-ons will be "non-developer only" in navigation
                                                 //
-                                                fieldName = PageInterfaceWithinLoop.Name;
-                                                FieldValue = PageInterfaceWithinLoop.InnerText;
+                                                fieldName = Addonfield.Name;
+                                                FieldValue = Addonfield.InnerText;
                                                 if (!cs.isFieldSupported(fieldName)) {
                                                     //
                                                     // Bad field name - need to report it somehow
                                                     //
                                                 } else {
                                                     cs.set(fieldName, FieldValue);
-                                                    if (GenericController.encodeBoolean(PageInterfaceWithinLoop.InnerText)) {
+                                                    if (GenericController.encodeBoolean(Addonfield.InnerText)) {
                                                         //
                                                         // if template, admin or content - let non-developers have navigator entry
                                                         //
@@ -1359,7 +1359,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // icon
                                                 //
-                                                FieldValue = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "link", "");
+                                                FieldValue = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "link", "");
                                                 if (!string.IsNullOrEmpty(FieldValue)) {
                                                     //
                                                     // Icons can be either in the root of the website or in content files
@@ -1385,9 +1385,9 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                     cs.set("IconFilename", FieldValue);
                                                     {
-                                                        cs.set("IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "width", "0")));
-                                                        cs.set("IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "height", "0")));
-                                                        cs.set("IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "sprites", "0")));
+                                                        cs.set("IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "width", "0")));
+                                                        cs.set("IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "height", "0")));
+                                                        cs.set("IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "sprites", "0")));
                                                     }
                                                 }
                                                 break;
@@ -1407,7 +1407,7 @@ namespace Contensive.Processor.Controllers {
                                                 //   this removes the ccsettingpages and settingcollectionrules, etc.
                                                 //
                                                 {
-                                                    cs.set("formxml", PageInterfaceWithinLoop.InnerXml);
+                                                    cs.set("formxml", Addonfield.InnerXml);
                                                 }
                                                 break;
                                             case "javascript":
@@ -1416,7 +1416,7 @@ namespace Contensive.Processor.Controllers {
                                                 // these all translate to JSFilename
                                                 //
                                                 fieldName = "jsfilename";
-                                                cs.set(fieldName, PageInterfaceWithinLoop.InnerText);
+                                                cs.set(fieldName, Addonfield.InnerText);
 
                                                 break;
                                             case "iniframe":
@@ -1424,20 +1424,33 @@ namespace Contensive.Processor.Controllers {
                                                 // typo - field is inframe
                                                 //
                                                 fieldName = "inframe";
-                                                cs.set(fieldName, PageInterfaceWithinLoop.InnerText);
+                                                cs.set(fieldName, Addonfield.InnerText);
                                                 break;
                                             case "diagnostic": {
-                                                    bool fieldValue = encodeBoolean(PageInterfaceWithinLoop.InnerText);
+                                                    bool fieldValue = encodeBoolean(Addonfield.InnerText);
                                                     cs.set("diagnostic", fieldValue);
                                                     collectionIncludesDiagnosticAddons = collectionIncludesDiagnosticAddons || fieldValue;
+                                                }
+                                                break;
+                                            case "category": {
+                                                    string fieldValue = Addonfield.InnerText;
+                                                    if(!string.IsNullOrWhiteSpace(fieldValue)) {
+                                                        AddonCategoryModel category = DbBaseModel.createByUniqueName<AddonCategoryModel>(core.cpParent, fieldValue);
+                                                        if(category == null) {
+                                                            category = DbBaseModel.addDefault<AddonCategoryModel>(core.cpParent);
+                                                            category.name = fieldValue;
+                                                            category.save(core.cpParent);
+                                                        }
+                                                        cs.set("addonCategoryId", category.id);
+                                                    }
                                                 }
                                                 break;
                                             default:
                                                 //
                                                 // All the other fields should match the Db fields
                                                 //
-                                                fieldName = PageInterfaceWithinLoop.Name;
-                                                FieldValue = PageInterfaceWithinLoop.InnerText;
+                                                fieldName = Addonfield.Name;
+                                                FieldValue = Addonfield.InnerText;
                                                 if (!cs.isFieldSupported(fieldName)) {
                                                     //
                                                     // Bad field name - need to report it somehow

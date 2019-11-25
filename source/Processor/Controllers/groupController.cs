@@ -399,7 +399,7 @@ namespace Contensive.Processor.Controllers {
                             + " left join ccMemberRules r on r.Memberid=m.id"
                             + " where" + Criteria;
                         using (var csData = new CsModel(core)) {
-                            csData.openSql(sql, "Default");
+                            csData.openSql(sql);
                             returnREsult = csData.ok();
                         }
                     }

@@ -1932,7 +1932,7 @@ namespace Contensive.Processor.Addons.Tools {
                         + " FROM ((ccContent LEFT JOIN ccTables ON ccContent.ContentTableId = ccTables.ID) LEFT JOIN ccFields ON ccContent.Id = ccFields.ContentID) LEFT JOIN ccFieldTypes ON ccFields.Type = ccFieldTypes.ID"
                         + " ORDER BY ccTables.Name, ccFields.Name;";
                 using (var csData = new CsModel(core)) {
-                    csData.openSql(SQL, "Default");
+                    csData.openSql(SQL);
                     TableName = "";
                     while (csData.ok()) {
                         if (TableName != csData.getText( "TableName")) {

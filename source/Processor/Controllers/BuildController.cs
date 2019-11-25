@@ -1046,30 +1046,31 @@ namespace Contensive.Processor.Controllers {
             }
             //
             // -- Landing Page
-            PageContentModel landingPage = DbBaseModel.create<PageContentModel>(core.cpParent, DefaultLandingPageGuid);
+            PageContentModel landingPage = DbBaseModel.create<PageContentModel>(core.cpParent, defaultLandingPageGuid);
             if (landingPage == null) {
                 landingPage = PageContentModel.addDefault<PageContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict( core, "page content"));
                 landingPage.name = "Home";
-                landingPage.ccguid = DefaultLandingPageGuid;
+                landingPage.ccguid = defaultLandingPageGuid;
             }
             //
             // -- default template
-            PageTemplateModel defaultTemplate = DbBaseModel.create<PageTemplateModel>(core.cpParent, guidBootstrapStarterTemplate);
+            PageTemplateModel defaultTemplate = DbBaseModel.create<PageTemplateModel>(core.cpParent, defaultTemplateGuid);
             if (defaultTemplate == null) {
                 // -- did not install correctly, build a placeholder
-                defaultTemplate = DbBaseModel.addDefault<PageTemplateModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, "page templates"));
-                defaultTemplate.name = "Default";
-                defaultTemplate.ccguid = guidBootstrapStarterTemplate;
+                // -- create content, never update content
+                core.doc.pageController.template = DbBaseModel.addDefault<PageTemplateModel>(core.cpParent);
+                core.doc.pageController.template.bodyHTML = Properties.Resources.DefaultTemplateHtml;
+                core.doc.pageController.template.name = defaultTemplateName;
+                core.doc.pageController.template.ccguid = defaultTemplateGuid;
+                core.doc.pageController.template.save(core.cpParent);
             }
-            defaultTemplate.bodyHTML = Properties.Resources.DefaultTemplateHtml;
-            defaultTemplate.save(core.cpParent);
             //
             // -- verify menu record
-            var menu = MenuModel.create<MenuModel>(core.cpParent, "Home Top Nav");
+            var menu = MenuModel.create<MenuModel>(core.cpParent, "Header Nav Menu");
             if(menu == null ) {
                 menu = MenuModel.addDefault<MenuModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, "Menus"));
-                menu.ccguid = "Home Top Nav";
-                menu.name = "Home Top Nav";
+                menu.ccguid = "Header Nav Menu";
+                menu.name = "Header Nav Menu";
                 menu.save(core.cpParent);
             }
             //

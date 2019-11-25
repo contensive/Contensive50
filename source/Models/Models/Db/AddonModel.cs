@@ -92,6 +92,10 @@ namespace Contensive.Models.Db {
         /// the number of sprites in the icon
         /// </summary>
         public int? iconSprites { get; set; }
+        /// <summary>
+        /// The category for the addon. Use categories to make selecting addons easier in lists.
+        /// </summary>
+        public int addonCategoryId { get; set; }
         //
         // -- deprecated, but for leave for now and log error
         public string javaScriptBodyEnd { get; set; }

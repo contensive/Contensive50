@@ -113,7 +113,7 @@ namespace Contensive.Processor.Addons.Email {
                                     + " and (ccMembers.email<>'')"
                                     + " and ((ccMemberRules.DateExpires is null)or(ccMemberRules.DateExpires>" + SQLDateNow + "))"
                                     + " order by ccMembers.email,ccMembers.id";
-                                csPerson.openSql(SQL, "Default");
+                                csPerson.openSql(SQL);
                                 //
                                 // Send the email to all selected people
                                 //
@@ -197,7 +197,7 @@ namespace Contensive.Processor.Addons.Email {
                         + " AND (ccMembers.ID IS NOT NULL)"
                         + " AND (ccMembers.Active <> 0)"
                         + " AND (ccMembers.AllowBulkEmail <> 0)";
-                    csEmailList.openSql(SQL, "Default");
+                    csEmailList.openSql(SQL);
                     while (csEmailList.ok()) {
                         int emailId = csEmailList.getInteger("EmailID");
                         int EmailMemberId = csEmailList.getInteger("MemberID");
@@ -262,7 +262,7 @@ namespace Contensive.Processor.Addons.Email {
                             + " AND (ccMembers.Active <> 0)"
                             + " AND (ccMembers.AllowBulkEmail <> 0)"
                             + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.memberId=ccMembers.ID))";
-                        csList.openSql(SQL, "Default");
+                        csList.openSql(SQL);
                         while (csList.ok()) {
                             int emailId = csList.getInteger("EmailID");
                             int EmailMemberId = csList.getInteger("MemberID");

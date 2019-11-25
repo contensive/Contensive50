@@ -777,7 +777,7 @@ namespace Contensive.Processor.Models.Domain {
             int contentId = ContentMetadataModel.getContentId(core, contentName);
             string SQL = "select defaultvalue from ccfields where name=" + DbController.encodeSQLText(fieldName) + " and contentid=(" + contentId + ")";
             using (var csData = new CsModel(core)) {
-                csData.openSql(SQL, "Default");
+                csData.openSql(SQL);
                 if (csData.ok()) {
                     defaultValue = csData.getText("defaultvalue");
                 }

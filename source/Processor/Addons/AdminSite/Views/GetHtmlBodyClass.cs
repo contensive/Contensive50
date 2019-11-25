@@ -448,15 +448,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                         foreach (var addonon in cp.core.addonCache.getDependsOnList(HelpAddonID)) {
                             IncludeHelp += GetAddonHelp(cp, addonon.id, HelpAddonID + "," + addonon.id.ToString());
                         }
-                        //SQL = "select IncludedAddonID from ccAddonIncludeRules where AddonID=" + HelpAddonID;
-                        //CS = csData.csOpenSql(SQL, "Default");
-                        //while (csData.csOk()) {
-                        //    IncludeId = csData.csGetInteger("IncludedAddonID");
-                        //    IncludeHelp = IncludeHelp + GetAddonHelp(cp, IncludeID, HelpAddonID + "," + IncludeID.ToString());
-                        //    csData.csGoNext();
-                        //}
-                        //csData.csClose();
-                        //
                         if (!string.IsNullOrEmpty(helpLink)) {
                             if (!string.IsNullOrEmpty(AddonHelpCopy)) {
                                 AddonHelpCopy = AddonHelpCopy + "<p>For additional help with this add-on, please visit <a href=\"" + helpLink + "\">" + helpLink + "</a>.</p>";
@@ -2445,7 +2436,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     SQL = "select Name, ID from ccContent where ParentID=" + ParentId + " and (AllowContentChildTool<>0) and not (allowcontentchildtool is null);";
                 }
                 using (var csData = new CsModel(cp.core)) {
-                    csData.openSql(SQL, "Default");
+                    csData.openSql(SQL);
                     while (csData.ok()) {
                         RecordName = csData.getText("Name");
                         RecordId = csData.getInteger("ID");
@@ -2543,7 +2534,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     PagesTotal = 0;
                     SQL = "SELECT Count(ID) as Result FROM ccVisits;";
                     using (var csData = new CsModel(cp.core)) {
-                        csData.openSql(SQL, "Default");
+                        csData.openSql(SQL);
                         if (csData.ok()) {
                             PagesTotal = csData.getInteger("Result");
                         }
@@ -2556,7 +2547,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     AgeInDays = "unknown";
                     using (var csData = new CsModel(cp.core)) {
                         SQL = cp.core.db.getSQLSelect("ccVisits", "DateAdded", "", "ID", "", 1);
-                        csData.openSql(SQL, "Default");
+                        csData.openSql(SQL);
                         if (csData.ok()) {
                             DateValue = csData.getDate("DateAdded");
                             if (DateValue != DateTime.MinValue) {
@@ -2572,7 +2563,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     PagesTotal = 0;
                     SQL = "SELECT Count(ID) as result  FROM ccViewings;";
                     using (var csData = new CsModel(cp.core)) {
-                        csData.openSql(SQL, "Default");
+                        csData.openSql(SQL);
                         if (csData.ok()) {
                             PagesTotal = csData.getInteger("Result");
                         }

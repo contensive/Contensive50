@@ -166,7 +166,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                             + " where " + baseCriteria + " and(v.CookieSupport<>0)"
                                             + " and(v.visitAuthenticated<>0)"
                                             + "";
-                                        csAuthPages.openSql(sql, "Default");
+                                        csAuthPages.openSql(sql);
                                         if (csAuthPages.ok()) {
                                             AuthenticatedPageViews = csAuthPages.getInteger("cnt");
                                         }
@@ -179,7 +179,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                             + " from ccviewings h left join ccvisits v on h.visitid=v.id"
                                             + " where " + baseCriteria + " and((v.CookieSupport=0)or(v.CookieSupport is null))"
                                             + "";
-                                        csNoCookie.openSql(sql, "Default");
+                                        csNoCookie.openSql(sql);
                                         if (csNoCookie.ok()) {
                                             NoCookiePageViews = csNoCookie.getInteger("NoCookiePageViews");
                                         }

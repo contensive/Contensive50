@@ -149,14 +149,21 @@ namespace Contensive.Processor {
         //
         internal const int addonRecursionLimit = 5;
         //
-        // -- templates
-        public static readonly string guidBootstrapStarterTemplate = "{810894df-e740-4a9b-bb6a-b7fbff892e63}";
-        //
-        // -- content
-        internal const string DefaultLandingPageGuid = "{925F4A57-32F7-44D9-9027-A91EF966FB0D}";
-        internal const string DefaultLandingSectionGuid = "{D882ED77-DB8F-4183-B12C-F83BD616E2E1}";
-        internal const string DefaultTemplateGuid = "{47BE95E4-5D21-42CC-9193-A343241E2513}";
-        internal const string DefaultDynamicMenuGuid = "{E8D575B9-54AE-4BF9-93B7-C7E7FE6F2DB3}";
+        internal const string defaultLandingPageName = "Home";
+        internal const string defaultLandingPageGuid = "{925F4A57-32F7-44D9-9027-A91EF966FB0D}";
+        internal const string defaultLandingPageHtml = ""
+            + "<h1>Welcome {% \"personalization-name\" %}, to Your New Website!</h1>"
+            + "<p>This is the landing page initially created for this domain. To edit this page, login as the administrator and click Quick Edit on the tool bar at the top. To edit page features, turn on Edit mode by clicking the Edit icon on the toolbar. Click the green edit icon in the upper left corner of this dotted region.</p>"
+            + "<ul>For more control, these areas can also be edited:"
+            + "<li>The Domain record controls how pages look for this domain name. A unique Landing Page can be set for each domain. The domain record also determines the default template to be used for pages on this domain name.</li>"
+            + "<li>The Template record controls the region of the page outside the central content.</li>"
+            + "</ul>"
+            + "";
+        /// <summary>
+        /// The default template. This guid is used for the single column header and footer template
+        /// </summary>
+        internal const string defaultTemplateName = "Default";
+        internal const string defaultTemplateGuid = "{810894df-e740-4a9b-bb6a-b7fbff892e63}";
         //
         // -- instance id used when running addons in the addon site 
         internal const string adminSiteInstanceId = "{E5418109-1206-43C5-A4F8-425E28BC629C}";
@@ -200,20 +207,6 @@ namespace Contensive.Processor {
         internal const string CollectionFileRootNode = "collection";
         internal const string CollectionFileRootNodeOld = "addoncollection";
         internal const string CollectionListRootNode = "collectionlist";
-        //
-        internal const string LegacyLandingPageName = "Landing Page Content";
-        internal const string DefaultNewLandingPageName = "Home";
-        internal const string DefaultLandingSectionName = "Home";
-        //
-        internal const string defaultLandingPageHtml = ""
-            + "<h1>Welcome {% \"personalization-name\" %}, to Your New Website!</h1>"
-            + "<p>This is the landing page initially created for this domain. To edit this page, login as the administrator and click Quick Edit on the tool bar at the top. To edit page features, turn on Edit mode by clicking the Edit icon on the toolbar. Click the green edit icon in the upper left corner of this dotted region.</p>"
-            + "<ul>For more control, these areas can also be edited:"
-            + "<li>The Domain record controls how pages look for this domain name. A unique Landing Page can be set for each domain. The domain record also determines the default template to be used for pages on this domain name.</li>"
-            + "<li>The Template record controls the region of the page outside the central content.</li>"
-            + "</ul>"
-            + "";
-        internal const string defaultTemplateName = "Default";
         //
         internal const int ignoreInteger = 0;
         internal const string ignoreString = "";

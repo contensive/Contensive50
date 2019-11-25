@@ -1057,9 +1057,11 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrWhiteSpace(core.doc.pageController.page.headline)) {
                     resultContent.Append("\r<h1>").Append(HtmlController.encodeHtml(core.doc.pageController.page.headline)).Append("</h1>");
                 }
-                if (core.session.isQuickEditing(PageContentModel.tableMetadata.contentName)) {
+                bool renderContent = true;
+                bool isQuickEditing = core.session.isQuickEditing(PageContentModel.tableMetadata.contentName);
+                if (isQuickEditing) {
                     //
-                    // -- drag-drop editor for addonList
+                    // -- drag-drop editor for addonList, then include rendered content after it
                     if (core.siteProperties.getBoolean("Allow AddonList Editor For Quick Editor")) {
                         core.docProperties.setProperty("contentid", ContentMetadataModel.getContentId(core, PageContentModel.tableMetadata.contentName));
                         core.docProperties.setProperty("recordid", core.doc.pageController.page.id);
@@ -1068,39 +1070,46 @@ namespace Contensive.Processor.Controllers {
                         }));
                     } else {
                         //
-                        // -- quick editor for wysiwyg content
+                        // -- quick editor for wysiwyg content instead of rendered content
+                        renderContent = false;
                         resultContent.Append(QuickEditController.getQuickEditing(core));
                     }
-                } else {
+                }
+                if(renderContent) {
                     //
-                    // -- Page Copy
-                    string htmlPageContent = core.doc.pageController.page.copyfilename.content;
+                    // -- render page content
+                    string htmlPageContent = "";
+                    if (!isQuickEditing) {
+                        if (!string.IsNullOrWhiteSpace(core.doc.pageController.page.addonList)) {
+                            //
+                            // -- addonList only if not editing it
+                            try {
+                                AddonModel addonListRender = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidRenderAddonList);
+                                if (addonListRender == null) {
+                                    //
+                                    // -- not installed
+                                    htmlPageContent += "<!-- Page Builder AddonList Render not available -->";
+                                } else {
+                                    //
+                                    // -- execute PageBuilder RenderAddonList
+                                    core.docProperties.setProperty("addonList", core.doc.pageController.page.addonList);
+                                    htmlPageContent += core.addon.execute(addonListRender, new CPUtilsBaseClass.addonExecuteContext() {
+                                        addonType = CPUtilsBaseClass.addonContext.ContextPage
+                                    });
+                                }
+                            } catch (Exception) {
+                                LogController.logWarn(core, "The addonList for page [" + core.doc.pageController.page.id + ", " + core.doc.pageController.page.name + "] was not empty, but deserialized to null, addonList '" + core.doc.pageController.page.addonList + "'");
+                            }
+                        }
+                    }
+                    //
+                    // -- Render the content for the page
+                    htmlPageContent += core.doc.pageController.page.copyfilename.content;
                     if (string.IsNullOrEmpty(htmlPageContent)) {
                         //
                         // Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
                         if (core.session.isEditing(PageContentModel.tableMetadata.contentName)) {
                             htmlPageContent = "\r<p><!-- Empty Content Placeholder --></p>";
-                        }
-                    }
-                    //
-                    // -- addonList
-                    if (!string.IsNullOrWhiteSpace(core.doc.pageController.page.addonList)) {
-                        try {
-                            AddonModel addonListRender = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidRenderAddonList);
-                            if ( addonListRender==null) {
-                                //
-                                // -- not installed
-                                htmlPageContent += "<!-- Page Builder AddonList Render not available -->";
-                            } else {
-                                //
-                                // -- execute PageBuilder RenderAddonList
-                                core.docProperties.setProperty("addonList", core.doc.pageController.page.addonList);
-                                htmlPageContent += core.addon.execute(addonListRender, new CPUtilsBaseClass.addonExecuteContext() {
-                                    addonType = CPUtilsBaseClass.addonContext.ContextPage
-                                });
-                            }
-                        } catch (Exception) {
-                            LogController.logWarn(core, "The addonList for page [" + core.doc.pageController.page.id + ", " + core.doc.pageController.page.name + "] was not empty, but deserialized to null, addonList '" + core.doc.pageController.page.addonList + "'");
                         }
                     }
                     //
@@ -1315,7 +1324,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- attempt failed, create default page
                     core.doc.pageController.page = PageContentModel.addDefault<PageContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PageContentModel.tableMetadata.contentName));
-                    core.doc.pageController.page.name = DefaultNewLandingPageName + ", " + domain.name;
+                    core.doc.pageController.page.name = defaultLandingPageName + ", " + domain.name;
                     core.doc.pageController.page.copyfilename.content = landingPageDefaultHtml;
                     core.doc.pageController.page.save(core.cpParent);
                     core.doc.pageController.pageToRootList.Add(core.doc.pageController.page);
@@ -1360,21 +1369,31 @@ namespace Contensive.Processor.Controllers {
                     }
                     if (core.doc.pageController.template == null) {
                         //
-                        // -- get template named Default
-                        core.doc.pageController.template = DbBaseModel.createByUniqueName<PageTemplateModel>(core.cpParent, defaultTemplateName);
+                        // -- get the default template site property
+                        core.doc.pageController.template = DbBaseModel.create<PageTemplateModel>(core.cpParent, core.siteProperties.getInteger("Default TemplateId"));
                         if (core.doc.pageController.template == null) {
                             //
-                            // -- ceate new template named Default
-                            core.doc.pageController.template = DbBaseModel.addDefault<PageTemplateModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PageTemplateModel.tableMetadata.contentName));
-                            core.doc.pageController.template.name = defaultTemplateName;
-                            core.doc.pageController.template.bodyHTML = Properties.Resources.DefaultTemplateHtml;
-                            core.doc.pageController.template.save(core.cpParent);
-                        }
-                        //
-                        // -- set this new template to all domains without a template
-                        foreach (DomainModel d in DbBaseModel.createList<DomainModel>(core.cpParent, "((DefaultTemplateId=0)or(DefaultTemplateId is null))")) {
-                            d.defaultTemplateId = core.doc.pageController.template.id;
-                            d.save(core.cpParent);
+                            // -- (legacy) get template named Default
+                            core.doc.pageController.template = DbBaseModel.createByUniqueName<PageTemplateModel>(core.cpParent, defaultTemplateName);
+                            if(core.doc.pageController.template==null) {
+                                //
+                                // -- get most recent template
+                                List<PageTemplateModel> templateList = DbBaseModel.createList<PageTemplateModel>(core.cpParent, "", "id desc");
+                                if (templateList.Count > 0) {
+                                    core.doc.pageController.template = templateList.First();
+                                } else {
+                                    //
+                                    // -- nothing found, create a new template matching the guid of Full Width template from themes and put just the content box
+                                    core.doc.pageController.template = DbBaseModel.addDefault<PageTemplateModel>(core.cpParent);
+                                    core.doc.pageController.template.name = defaultTemplateName;
+                                    core.doc.pageController.template.ccguid = defaultTemplateGuid;
+                                    core.doc.pageController.template.bodyHTML = Properties.Resources.DefaultTemplateHtml;
+                                    core.doc.pageController.template.save(core.cpParent);
+                                }
+                            }
+                            //
+                            // -- set site property for future looks
+                            core.siteProperties.setProperty("Default TemplateId", core.doc.pageController.template.id);
                         }
                     }
                 }
@@ -1470,7 +1489,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- create detault landing page
                             landingPage = DbBaseModel.addDefault<PageContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PageContentModel.tableMetadata.contentName));
-                            landingPage.name = DefaultNewLandingPageName + ", " + domain.name;
+                            landingPage.name = defaultLandingPageName + ", " + domain.name;
                             landingPage.copyfilename.content = landingPageDefaultHtml;
                             landingPage.save(core.cpParent);
                             core.doc.landingPageID = landingPage.id;

@@ -155,7 +155,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                             + "";
                         int NoCookieVisits = 0;
                         using (var csData = new CsModel(core)) {
-                            csData.openSql(SQL, "Default");
+                            csData.openSql(SQL);
                             if (csData.ok()) {
                                 NoCookieVisits = csData.getInteger("NoCookieVisits");
                             }
@@ -174,7 +174,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                         int VisitCnt = 0;
                         int HitCnt = 0;
                         using (var csData = new CsModel(core)) {
-                            csData.openSql(SQL, "Default");
+                            csData.openSql(SQL);
                             if (csData.ok()) {
                                 VisitCnt = csData.getInteger("VisitCnt");
                                 HitCnt = csData.getInteger("HitCnt");
@@ -199,7 +199,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 + " and(v.VisitorNew<>0)"
                                 + "";
                             using (var csData = new CsModel(core)) {
-                                csData.openSql(SQL, "Default");
+                                csData.openSql(SQL);
                                 if (csData.ok()) {
                                     NewVisitorVisits = csData.getInteger("NewVisitorVisits");
                                 }
@@ -216,7 +216,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 + " and(v.PageVisits=1)"
                                 + "";
                             using (var csData = new CsModel(core)) {
-                                csData.openSql(SQL, "Default");
+                                csData.openSql(SQL);
                                 if (csData.ok()) {
                                     SinglePageVisits = csData.getInteger("SinglePageVisits");
                                 }
@@ -236,7 +236,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                             int MultiPageVisitCnt = 0;
                             double MultiPageTimetoLastHitSum = 0;
                             using (var csData = new CsModel(core)) {
-                                csData.openSql(SQL, "Default");
+                                csData.openSql(SQL);
                                 if (csData.ok()) {
                                     MultiPageVisitCnt = csData.getInteger("VisitCnt");
                                     MultiPageHitCnt = csData.getInteger("HitCnt");
@@ -255,7 +255,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 + " and(VisitAuthenticated<>0)"
                                 + "";
                             using (var csData = new CsModel(core)) {
-                                csData.openSql(SQL, "Default");
+                                csData.openSql(SQL);
                                 if (csData.ok()) {
                                     AuthenticatedVisits = csData.getInteger("AuthenticatedVisits");
                                 }
@@ -273,7 +273,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 + " and(Mobile<>0)"
                                 + "";
                             using (var csData = new CsModel(core)) {
-                                csData.openSql(SQL, "Default");
+                                csData.openSql(SQL);
                                 if (csData.ok()) {
                                     MobileVisits = csData.getInteger("cnt");
                                 }
@@ -290,7 +290,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 + " and(Bot<>0)"
                                 + "";
                             using (var csData = new CsModel(core)) {
-                                csData.openSql(SQL, "Default");
+                                csData.openSql(SQL);
                                 if (csData.ok()) {
                                     BotVisits = csData.getInteger("cnt");
                                 }
@@ -353,7 +353,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                         //
                         SQL = core.db.getSQLSelect("ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + env.oldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
                         using (var csData = new CsModel(core)) {
-                            csData.openSql(SQL, "Default");
+                            csData.openSql(SQL);
                             DateTime datePtr = env.oldestVisitSummaryWeCareAbout;
                             while (datePtr <= env.yesterday) {
                                 if (!csData.ok()) {

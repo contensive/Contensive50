@@ -24,7 +24,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     LogController.logInfo(core, "Archive update for pages on [" + core.appConfig.name + "]");
                     SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + env.sQLNow + "))and(active<>0)";
                     using (var csData = new CsModel(core)) {
-                        csData.openSql(SQL, "Default");
+                        csData.openSql(SQL);
                         while (csData.ok()) {
                             int RecordId = csData.getInteger("ID");
                             int ArchiveParentId = csData.getInteger("ArchiveParentID");

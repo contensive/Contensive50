@@ -100,7 +100,8 @@ namespace Contensive.Processor.Properties {
         ///		&lt;label for=&quot;inputEmail&quot; class=&quot;sr-only pt-2&quot;&gt;Email address&lt;/label&gt;
         ///		&lt;input type=&quot;email&quot; name=&quot;username&quot; id=&quot;inputEmail&quot; class=&quot;form-control pt-2&quot; placeholder=&quot;Username&quot; required autofocus&gt;
         ///	&lt;/div&gt;
-        ///	&lt;div class=&quot;pt-2&quot;&gt;        /// [rest of string was truncated]&quot;;.
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         public static string defaultForgetPassword_html {
             get {
@@ -184,7 +185,7 @@ namespace Contensive.Processor.Properties {
         /// <summary>
         ///   Looks up a localized string similar to &lt;nav class=&quot;navbar navbar-expand-md navbar-dark bg-dark&quot;&gt;
         ///	&lt;a class=&quot;navbar-brand&quot; href=&quot;#&quot;&gt;Brand&lt;/a&gt;
-        ///	{% {&quot;addon&quot;:{&quot;addon&quot;:&quot;Bootstrap Nav 40&quot;,&quot;instanceId&quot;:&quot;Home Top Nav&quot;}} %}
+        ///	{% {&quot;addon&quot;:{&quot;addon&quot;:&quot;Bootstrap Nav 40&quot;,&quot;instanceId&quot;:&quot;Header Nav Menu&quot;}} %}
         ///&lt;/nav&gt;
         ///&lt;div class=&quot;container&quot;&gt;
         ///    &lt;div class=&quot;row&quot;&gt;
@@ -213,7 +214,8 @@ namespace Contensive.Processor.Properties {
         ///                &lt;/tr&gt;
         ///            &lt;/tbody&gt;
         ///        &lt;/table&gt;
-        ///    &lt;/td&gt;        /// [rest of string was truncated]&quot;;.
+        ///    &lt;/td&gt;
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         public static string GroupRuleEditorRow {
             get {
