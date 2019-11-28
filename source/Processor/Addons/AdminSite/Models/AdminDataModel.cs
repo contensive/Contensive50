@@ -422,38 +422,40 @@ namespace Contensive.Processor.Addons.AdminSite {
                         case "MODIFIEDBY":
                         case "MODIFIEDDATE":
                         case "CREATEKEY":
-                        case "CCGUID":
-                            //
-                            // ----- control fields are not editable user fields
-                            //
-                            break;
-                        default:
-                            //
-                            // ----- test access
-                            //
-                            HasEditRights = true;
-                            if (AdminOnly || DeveloperOnly) {
+                        case "CCGUID": {
                                 //
-                                // field has some kind of restriction
+                                // ----- control fields are not editable user fields
                                 //
-                                if (!core.session.user.developer) {
-                                    if (!core.session.user.admin) {
-                                        //
-                                        // you are not admin
-                                        //
-                                        HasEditRights = false;
-                                    } else if (DeveloperOnly) {
-                                        //
-                                        // you are admin, and the record is developer
-                                        //
-                                        HasEditRights = false;
+                                break;
+                            }
+                        default: {
+                                //
+                                // ----- test access
+                                //
+                                HasEditRights = true;
+                                if (AdminOnly || DeveloperOnly) {
+                                    //
+                                    // field has some kind of restriction
+                                    //
+                                    if (!core.session.user.developer) {
+                                        if (!core.session.user.admin) {
+                                            //
+                                            // you are not admin
+                                            //
+                                            HasEditRights = false;
+                                        } else if (DeveloperOnly) {
+                                            //
+                                            // you are admin, and the record is developer
+                                            //
+                                            HasEditRights = false;
+                                        }
                                     }
                                 }
+                                if ((HasEditRights) && (Active) && (Authorable)) {
+                                    tempIsVisibleUserField = true;
+                                }
+                                break;
                             }
-                            if ((HasEditRights) && (Active) && (Authorable)) {
-                                tempIsVisibleUserField = true;
-                            }
-                            break;
                     }
                 }
             } catch (Exception ex) {
@@ -844,53 +846,57 @@ namespace Contensive.Processor.Addons.AdminSite {
                         switch (field.fieldTypeId) {
                             case CPContentBaseClass.FieldTypeIdEnum.Integer:
                             case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
-                            case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
-                                //
-                                editRecord.fieldsLc[field.nameLc].value = encodeInteger(defaultValue);
-                                break;
+                            case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
+                                    //
+                                    editRecord.fieldsLc[field.nameLc].value = encodeInteger(defaultValue);
+                                    break;
+                                }
                             case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                            case CPContentBaseClass.FieldTypeIdEnum.Float:
-                                //
-                                editRecord.fieldsLc[field.nameLc].value = encodeNumber(defaultValue);
-                                break;
-                            case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                                //
-                                editRecord.fieldsLc[field.nameLc].value = encodeBoolean(defaultValue);
-                                break;
-                            case CPContentBaseClass.FieldTypeIdEnum.Date:
-                                //
-                                editRecord.fieldsLc[field.nameLc].value = encodeDate(defaultValue);
-                                break;
-                            case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-
-                                DefaultValueText = encodeText(field.defaultValue);
-                                if (!string.IsNullOrEmpty(DefaultValueText)) {
-                                    if (DefaultValueText.IsNumeric()) {
-                                        editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
-                                    } else {
-                                        if (field.lookupContentId != 0) {
-                                            LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentId);
-                                            if (!string.IsNullOrEmpty(LookupContentName)) {
-                                                editRecord.fieldsLc[field.nameLc].value = MetadataController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText);
-                                            }
-                                        } else if (field.lookupList != "") {
-                                            UCaseDefaultValueText = vbUCase(DefaultValueText);
-                                            lookups = field.lookupList.Split(',');
-                                            for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
-                                                if (UCaseDefaultValueText == vbUCase(lookups[Ptr])) {
-                                                    editRecord.fieldsLc[field.nameLc].value = Ptr + 1;
-                                                    break;
+                            case CPContentBaseClass.FieldTypeIdEnum.Float: {
+                                    //
+                                    editRecord.fieldsLc[field.nameLc].value = encodeNumber(defaultValue);
+                                    break;
+                                }
+                            case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                                    //
+                                    editRecord.fieldsLc[field.nameLc].value = encodeBoolean(defaultValue);
+                                    break;
+                                }
+                            case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                                    //
+                                    editRecord.fieldsLc[field.nameLc].value = encodeDate(defaultValue);
+                                    break;
+                                }
+                            case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
+                                    DefaultValueText = encodeText(field.defaultValue);
+                                    if (!string.IsNullOrEmpty(DefaultValueText)) {
+                                        if (DefaultValueText.IsNumeric()) {
+                                            editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
+                                        } else {
+                                            if (field.lookupContentId != 0) {
+                                                LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentId);
+                                                if (!string.IsNullOrEmpty(LookupContentName)) {
+                                                    editRecord.fieldsLc[field.nameLc].value = MetadataController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText);
+                                                }
+                                            } else if (field.lookupList != "") {
+                                                UCaseDefaultValueText = vbUCase(DefaultValueText);
+                                                lookups = field.lookupList.Split(',');
+                                                for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
+                                                    if (UCaseDefaultValueText == vbUCase(lookups[Ptr])) {
+                                                        editRecord.fieldsLc[field.nameLc].value = Ptr + 1;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
                                     }
+                                    break;
                                 }
-
-                                break;
-                            default:
-                                //
-                                editRecord.fieldsLc[field.nameLc].value = GenericController.encodeText(defaultValue);
-                                break;
+                            default: {
+                                    //
+                                    editRecord.fieldsLc[field.nameLc].value = GenericController.encodeText(defaultValue);
+                                    break;
+                                }
                         }
                     }
                     //
@@ -898,15 +904,22 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // (also, this presets readonly/devonly/adminonly fields not set to member)
                     //
                     switch (GenericController.vbUCase(field.nameLc)) {
-                        case "MODIFIEDBY":
-                            editRecord.fieldsLc[field.nameLc].value = core.session.user.id;
-                            break;
-                        case "CREATEDBY":
-                            editRecord.fieldsLc[field.nameLc].value = core.session.user.id;
-                            break;
-                        case "CONTENTCONTROLID":
-                            editRecord.fieldsLc[field.nameLc].value = adminContent.id;
-                            break;
+                        case "MODIFIEDBY": {
+                                editRecord.fieldsLc[field.nameLc].value = core.session.user.id;
+                                break;
+                            }
+                        case "CREATEDBY": {
+                                editRecord.fieldsLc[field.nameLc].value = core.session.user.id;
+                                break;
+                            }
+                        case "CONTENTCONTROLID": {
+                                editRecord.fieldsLc[field.nameLc].value = adminContent.id;
+                                break;
+                            }
+                        default: {
+                                // nop
+                                break;
+                            }
                     }
                     editRecord.fieldsLc[field.nameLc].dbValue = editRecord.fieldsLc[field.nameLc].value;
                 }
@@ -930,33 +943,39 @@ namespace Contensive.Processor.Addons.AdminSite {
                         switch (field.fieldTypeId) {
                             case CPContentBaseClass.FieldTypeIdEnum.Integer:
                             case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                            case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
-                                //
-                                editRecord.fieldsLc[field.nameLc].value = GenericController.encodeInteger(DefaultValueText);
-                                break;
+                            case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement: {
+                                    //
+                                    editRecord.fieldsLc[field.nameLc].value = GenericController.encodeInteger(DefaultValueText);
+                                    break;
+                                }
                             case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                            case CPContentBaseClass.FieldTypeIdEnum.Float:
-                                //
-                                editRecord.fieldsLc[field.nameLc].value = GenericController.encodeNumber(DefaultValueText);
-                                break;
-                            case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                                //
-                                editRecord.fieldsLc[field.nameLc].value = GenericController.encodeBoolean(DefaultValueText);
-                                break;
-                            case CPContentBaseClass.FieldTypeIdEnum.Date:
-                                //
-                                editRecord.fieldsLc[field.nameLc].value = GenericController.encodeDate(DefaultValueText);
-                                break;
-                            case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                                //
-                                // Many to Many can capture a list of ID values representing the 'secondary' values in the Many-To-Many Rules table
-                                //
-                                editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
-                                break;
-                            default:
-                                //
-                                editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
-                                break;
+                            case CPContentBaseClass.FieldTypeIdEnum.Float: {
+                                    //
+                                    editRecord.fieldsLc[field.nameLc].value = GenericController.encodeNumber(DefaultValueText);
+                                    break;
+                                }
+                            case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                                    //
+                                    editRecord.fieldsLc[field.nameLc].value = GenericController.encodeBoolean(DefaultValueText);
+                                    break;
+                                }
+                            case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                                    //
+                                    editRecord.fieldsLc[field.nameLc].value = GenericController.encodeDate(DefaultValueText);
+                                    break;
+                                }
+                            case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                                    //
+                                    // Many to Many can capture a list of ID values representing the 'secondary' values in the Many-To-Many Rules table
+                                    //
+                                    editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
+                                    break;
+                                }
+                            default: {
+                                    //
+                                    editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
+                                    break;
+                                }
                         }
                     }
                 }
@@ -1064,19 +1083,22 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 switch (adminContentcontent.fieldTypeId) {
                                     case CPContentBaseClass.FieldTypeIdEnum.Redirect:
-                                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                                        DBValueVariant = "";
-                                        break;
+                                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                                            DBValueVariant = "";
+                                            break;
+                                        }
                                     case CPContentBaseClass.FieldTypeIdEnum.FileText:
                                     case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                                     case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                                     case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                                        DBValueVariant = csData.getText(adminContentcontent.nameLc);
-                                        break;
-                                    default:
-                                        DBValueVariant = csData.getRawData(adminContentcontent.nameLc);
-                                        break;
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                                            DBValueVariant = csData.getText(adminContentcontent.nameLc);
+                                            break;
+                                        }
+                                    default: {
+                                            DBValueVariant = csData.getRawData(adminContentcontent.nameLc);
+                                            break;
+                                        }
                                 }
                                 //
                                 // Check for required and null case loading error
@@ -1110,56 +1132,70 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // Save EditRecord values
                                 //
                                 switch (GenericController.vbUCase(adminContentcontent.nameLc)) {
-                                    case "DATEADDED":
-                                        editRecord.dateAdded = csData.getDate(adminContentcontent.nameLc);
-                                        break;
-                                    case "MODIFIEDDATE":
-                                        editRecord.modifiedDate = csData.getDate(adminContentcontent.nameLc);
-                                        break;
-                                    case "CREATEDBY":
-                                        int createdByPersonId = csData.getInteger(adminContentcontent.nameLc);
-                                        if (createdByPersonId == 0) {
-                                            editRecord.createdBy = new PersonModel() { name = "system" };
-                                        } else {
-                                            editRecord.createdBy = DbBaseModel.create<PersonModel>(core.cpParent, createdByPersonId);
-                                            if (editRecord.createdBy == null) {
-                                                editRecord.createdBy = new PersonModel() { name = "deleted #" + createdByPersonId.ToString() };
+                                    case "DATEADDED": {
+                                            editRecord.dateAdded = csData.getDate(adminContentcontent.nameLc);
+                                            break;
+                                        }
+                                    case "MODIFIEDDATE": {
+                                            editRecord.modifiedDate = csData.getDate(adminContentcontent.nameLc);
+                                            break;
+                                        }
+                                    case "CREATEDBY": {
+                                            int createdByPersonId = csData.getInteger(adminContentcontent.nameLc);
+                                            if (createdByPersonId == 0) {
+                                                editRecord.createdBy = new PersonModel() { name = "system" };
+                                            } else {
+                                                editRecord.createdBy = DbBaseModel.create<PersonModel>(core.cpParent, createdByPersonId);
+                                                if (editRecord.createdBy == null) {
+                                                    editRecord.createdBy = new PersonModel() { name = "deleted #" + createdByPersonId.ToString() };
+                                                }
                                             }
+                                            break;
                                         }
-                                        break;
-                                    case "MODIFIEDBY":
-                                        int modifiedByPersonId = csData.getInteger(adminContentcontent.nameLc);
-                                        if (modifiedByPersonId == 0) {
-                                            editRecord.modifiedBy = new PersonModel() { name = "system" };
-                                        } else {
-                                            editRecord.modifiedBy = DbBaseModel.create<PersonModel>(core.cpParent, modifiedByPersonId);
-                                            if (editRecord.modifiedBy == null) {
-                                                editRecord.modifiedBy = new PersonModel() { name = "deleted #" + modifiedByPersonId.ToString() };
+                                    case "MODIFIEDBY": {
+                                            int modifiedByPersonId = csData.getInteger(adminContentcontent.nameLc);
+                                            if (modifiedByPersonId == 0) {
+                                                editRecord.modifiedBy = new PersonModel() { name = "system" };
+                                            } else {
+                                                editRecord.modifiedBy = DbBaseModel.create<PersonModel>(core.cpParent, modifiedByPersonId);
+                                                if (editRecord.modifiedBy == null) {
+                                                    editRecord.modifiedBy = new PersonModel() { name = "deleted #" + modifiedByPersonId.ToString() };
+                                                }
                                             }
+                                            break;
                                         }
-                                        break;
-                                    case "ACTIVE":
-                                        editRecord.active = csData.getBoolean(adminContentcontent.nameLc);
-                                        break;
-                                    case "CONTENTCONTROLID":
-                                        editRecord.contentControlId = csData.getInteger(adminContentcontent.nameLc);
-                                        if (editRecord.contentControlId.Equals(0)) {
-                                            editRecord.contentControlId = adminContent.id;
+                                    case "ACTIVE": {
+                                            editRecord.active = csData.getBoolean(adminContentcontent.nameLc);
+                                            break;
                                         }
-                                        editRecord.contentControlId_Name = MetadataController.getContentNameByID(core, editRecord.contentControlId);
-                                        break;
-                                    case "ID":
-                                        editRecord.id = csData.getInteger(adminContentcontent.nameLc);
-                                        break;
-                                    case "MENUHEADLINE":
-                                        editRecord.menuHeadline = csData.getText(adminContentcontent.nameLc);
-                                        break;
-                                    case "NAME":
-                                        editRecord.nameLc = csData.getText(adminContentcontent.nameLc);
-                                        break;
-                                    case "PARENTID":
-                                        editRecord.parentId = csData.getInteger(adminContentcontent.nameLc);
-                                        break;
+                                    case "CONTENTCONTROLID": {
+                                            editRecord.contentControlId = csData.getInteger(adminContentcontent.nameLc);
+                                            if (editRecord.contentControlId.Equals(0)) {
+                                                editRecord.contentControlId = adminContent.id;
+                                            }
+                                            editRecord.contentControlId_Name = MetadataController.getContentNameByID(core, editRecord.contentControlId);
+                                            break;
+                                        }
+                                    case "ID": {
+                                            editRecord.id = csData.getInteger(adminContentcontent.nameLc);
+                                            break;
+                                        }
+                                    case "MENUHEADLINE": {
+                                            editRecord.menuHeadline = csData.getText(adminContentcontent.nameLc);
+                                            break;
+                                        }
+                                    case "NAME": {
+                                            editRecord.nameLc = csData.getText(adminContentcontent.nameLc);
+                                            break;
+                                        }
+                                    case "PARENTID": {
+                                            editRecord.parentId = csData.getInteger(adminContentcontent.nameLc);
+                                            break;
+                                        }
+                                    default: {
+                                            // nop
+                                            break;
+                                        }
                                 }
                                 //
                                 editRecordField.dbValue = DBValueVariant;
@@ -1269,117 +1305,117 @@ namespace Contensive.Processor.Addons.AdminSite {
                 // -- process reserved fields
                 switch (field.nameLc) {
                     case "contentcontrolid":
-                        //
-                        // -- admin can change contentcontrolid to any in the same table
-                        if (allowAdminFieldCheck(core)) {
-                            if (!core.docProperties.containsKey(field.nameLc.ToUpper())) {
-                                if (!(!core.doc.userErrorList.Count.Equals(0))) {
-                                    //
-                                    // Add user error only for the first missing field
-                                    Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try again, taking care not to submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" + field.nameLc + " not found]. There may have been others.");
-                                }
-                                throw (new GenericException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but not found In the response stream.")
+                    //
+                    // -- admin can change contentcontrolid to any in the same table
+                    if (allowAdminFieldCheck(core)) {
+                        if (!core.docProperties.containsKey(field.nameLc.ToUpper())) {
+                            if (!(!core.doc.userErrorList.Count.Equals(0))) {
+                                //
+                                // Add user error only for the first missing field
+                                Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try again, taking care not to submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" + field.nameLc + " not found]. There may have been others.");
                             }
+                            throw (new GenericException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but not found In the response stream.")
                         }
-                        if (GenericController.encodeInteger(ResponseFieldValueText) != GenericController.encodeInteger(editRecord.fieldsLc[field.nameLc].value)) {
-                            //
-                            // new value
-                            editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
-                            ResponseFieldIsEmpty = false;
-                        }
-                        break;
-                    case "active":
+                    }
+                    if (GenericController.encodeInteger(ResponseFieldValueText) != GenericController.encodeInteger(editRecord.fieldsLc[field.nameLc].value)) {
                         //
-                        // anyone can change active
-                        if (allowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
-                            Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The error is [" + field.nameLc + " not found].");
+                        // new value
+                        editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
+                        ResponseFieldIsEmpty = false;
+                    }
+                    break;
+                    case "active":
+                    //
+                    // anyone can change active
+                    if (allowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
+                        Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The error is [" + field.nameLc + " not found].");
+                        return;
+                    }
+                    bool responseValue = core.docProperties.getBoolean(field.nameLc);
+                    if (!responseValue.Equals(encodeBoolean(editRecord.fieldsLc[field.nameLc].value))) {
+                        //
+                        // new value
+                        editRecord.fieldsLc[field.nameLc].value = responseValue;
+                        ResponseFieldIsEmpty = false;
+                    }
+                    break;
+                    case "ccguid":
+                    //
+                    // -- anyone can change
+                    InEmptyFieldList = FormEmptyFieldLcList.Contains(field.nameLc);
+                    InResponse = core.docProperties.containsKey(field.nameLc);
+                    if (allowAdminFieldCheck(core)) {
+                        if ((!InResponse) && (!InEmptyFieldList)) {
+                            Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The Error Is [" + field.nameLc + " not found].");
                             return;
                         }
-                        bool responseValue = core.docProperties.getBoolean(field.nameLc);
-                        if (!responseValue.Equals(encodeBoolean(editRecord.fieldsLc[field.nameLc].value))) {
-                            //
-                            // new value
-                            editRecord.fieldsLc[field.nameLc].value = responseValue;
-                            ResponseFieldIsEmpty = false;
-                        }
-                        break;
-                    case "ccguid":
+                    }
+                    if (ResponseFieldValueText != editRecord.fieldsLc[field.nameLc].value.ToString()) {
                         //
-                        // -- anyone can change
-                        InEmptyFieldList = FormEmptyFieldLcList.Contains(field.nameLc);
-                        InResponse = core.docProperties.containsKey(field.nameLc);
-                        if (allowAdminFieldCheck(core)) {
-                            if ((!InResponse) && (!InEmptyFieldList)) {
-                                Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The Error Is [" + field.nameLc + " not found].");
-                                return;
-                            }
-                        }
-                        if (ResponseFieldValueText != editRecord.fieldsLc[field.nameLc].value.ToString()) {
-                            //
-                            // new value
-                            editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
-                            ResponseFieldIsEmpty = false;
-                        }
-                        break;
+                        // new value
+                        editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
+                        ResponseFieldIsEmpty = false;
+                    }
+                    break;
                     case "id":
                     case "modifiedby":
                     case "modifieddate":
                     case "createdby":
                     case "dateadded":
-                        //
-                        // -----Control fields that cannot be edited
-                        ResponseFieldValueIsOKToSave = false;
-                        break;
+                    //
+                    // -----Control fields that cannot be edited
+                    ResponseFieldValueIsOKToSave = false;
+                    break;
                     default:
+                    //
+                    // ----- Read response for user fields
+                    //       9/24/2009 - if fieldname is not in FormFieldListToBeLoaded, go with what is there (Db value or default value)
+                    //
+                    if (!field.authorable) {
                         //
-                        // ----- Read response for user fields
-                        //       9/24/2009 - if fieldname is not in FormFieldListToBeLoaded, go with what is there (Db value or default value)
+                        // Is blocked from authoring, leave current value
                         //
-                        if (!field.authorable) {
-                            //
-                            // Is blocked from authoring, leave current value
-                            //
-                            ResponseFieldValueIsOKToSave = false;
-                        } else if ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement) || (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Redirect) || (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.ManyToMany)) {
-                            //
-                            // These fields types have no values to load, leave current value
-                            // (many to many is handled during save)
-                            //
-                            ResponseFieldValueIsOKToSave = false;
-                        } else if ((field.adminOnly) && (!core.session.isAuthenticatedAdmin())) {
-                            //
-                            // non-admin and admin only field, leave current value
-                            //
-                            ResponseFieldValueIsOKToSave = false;
-                        } else if ((field.developerOnly) && (!core.session.isAuthenticatedDeveloper())) {
-                            //
-                            // non-developer and developer only field, leave current value
-                            //
-                            ResponseFieldValueIsOKToSave = false;
-                        } else if ((field.readOnly) || (field.notEditable & (editRecord.id != 0))) {
-                            //
-                            // read only field, leave current
-                            //
-                            ResponseFieldValueIsOKToSave = false;
-                        } else if (!InLoadedFieldList) {
-                            //
-                            // Was not sent out, so just go with the current value. Also, if the loaded field list is not returned, and the field is not returned, this is the bestwe can do.
-                            ResponseFieldValueIsOKToSave = false;
-                        } else if (allowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
-                            //
-                            // Was sent out non-blank, and no response back, flag error and leave the current value to a retry
-                            string errorMessage = "There has been an error reading the response from your browser. The field[" + field.caption + "]" + TabCopy + " was missing. Please Try your change again. If this error happens repeatedly, please report this problem to your site administrator.";
-                            Processor.Controllers.ErrorController.addUserError(core, errorMessage);
-                            LogController.logError(core, new GenericException(errorMessage));
-                            ResponseFieldValueIsOKToSave = false;
-                        } else {
-                            int EditorPixelHeight = 0;
-                            int EditorRowHeight = 0;
-                            //
-                            // Test input value for valid data
-                            //
-                            switch (field.fieldTypeId) {
-                                case CPContentBaseClass.FieldTypeIdEnum.Integer:
+                        ResponseFieldValueIsOKToSave = false;
+                    } else if ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement) || (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Redirect) || (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.ManyToMany)) {
+                        //
+                        // These fields types have no values to load, leave current value
+                        // (many to many is handled during save)
+                        //
+                        ResponseFieldValueIsOKToSave = false;
+                    } else if ((field.adminOnly) && (!core.session.isAuthenticatedAdmin())) {
+                        //
+                        // non-admin and admin only field, leave current value
+                        //
+                        ResponseFieldValueIsOKToSave = false;
+                    } else if ((field.developerOnly) && (!core.session.isAuthenticatedDeveloper())) {
+                        //
+                        // non-developer and developer only field, leave current value
+                        //
+                        ResponseFieldValueIsOKToSave = false;
+                    } else if ((field.readOnly) || (field.notEditable & (editRecord.id != 0))) {
+                        //
+                        // read only field, leave current
+                        //
+                        ResponseFieldValueIsOKToSave = false;
+                    } else if (!InLoadedFieldList) {
+                        //
+                        // Was not sent out, so just go with the current value. Also, if the loaded field list is not returned, and the field is not returned, this is the bestwe can do.
+                        ResponseFieldValueIsOKToSave = false;
+                    } else if (allowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
+                        //
+                        // Was sent out non-blank, and no response back, flag error and leave the current value to a retry
+                        string errorMessage = "There has been an error reading the response from your browser. The field[" + field.caption + "]" + TabCopy + " was missing. Please Try your change again. If this error happens repeatedly, please report this problem to your site administrator.";
+                        Processor.Controllers.ErrorController.addUserError(core, errorMessage);
+                        LogController.logError(core, new GenericException(errorMessage));
+                        ResponseFieldValueIsOKToSave = false;
+                    } else {
+                        int EditorPixelHeight = 0;
+                        int EditorRowHeight = 0;
+                        //
+                        // Test input value for valid data
+                        //
+                        switch (field.fieldTypeId) {
+                            case CPContentBaseClass.FieldTypeIdEnum.Integer: {
                                     //
                                     // ----- Integer
                                     //
@@ -1392,8 +1428,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         }
                                     }
                                     break;
-                                case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                                case CPContentBaseClass.FieldTypeIdEnum.Float:
+                                }
+                            case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                            case CPContentBaseClass.FieldTypeIdEnum.Float: {
                                     //
                                     // ----- Floating point number
                                     //
@@ -1406,7 +1443,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         }
                                     }
                                     break;
-                                case CPContentBaseClass.FieldTypeIdEnum.Lookup:
+                                }
+                            case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
                                     //
                                     // ----- Must be a recordID
                                     //
@@ -1419,7 +1457,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         }
                                     }
                                     break;
-                                case CPContentBaseClass.FieldTypeIdEnum.Date:
+                                }
+                            case CPContentBaseClass.FieldTypeIdEnum.Date: {
                                     //
                                     // ----- Must be a Date value
                                     //
@@ -1431,13 +1470,15 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         }
                                     }
                                     break;
-                                case CPContentBaseClass.FieldTypeIdEnum.Boolean:
+                                }
+                            case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
                                     //
                                     // ----- translate to boolean
                                     //
                                     ResponseFieldValueText = GenericController.encodeBoolean(ResponseFieldValueText).ToString();
                                     break;
-                                case CPContentBaseClass.FieldTypeIdEnum.Link:
+                                }
+                            case CPContentBaseClass.FieldTypeIdEnum.Link: {
                                     //
                                     // ----- Link field - if it starts with 'www.', add the http:// automatically
                                     //
@@ -1446,8 +1487,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         ResponseFieldValueText = "http//" + ResponseFieldValueText;
                                     }
                                     break;
-                                case CPContentBaseClass.FieldTypeIdEnum.HTML:
-                                case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                                }
+                            case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                            case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
                                     //
                                     // ----- Html fields
                                     //
@@ -1490,7 +1532,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         }
                                     }
                                     break;
-                                default:
+                                }
+                            default: {
                                     //
                                     // ----- text types
                                     //
@@ -1503,110 +1546,111 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         core.userProperty.setProperty(adminContent.name + "." + field.nameLc + ".PixelHeight", EditorPixelHeight);
                                     }
                                     break;
-                            }
-                            if (field.nameLc == "parentid") {
-                                //
-                                // check circular reference on all parentid fields
-                                int ParentId = GenericController.encodeInteger(ResponseFieldValueText);
-                                int LoopPtr = 0;
-                                string UsedIDs = editRecord.id.ToString();
-                                const int LoopPtrMax = 100;
-                                while ((LoopPtr < LoopPtrMax) && (ParentId != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentId + ",") == -1)) {
-                                    UsedIDs = UsedIDs + "," + ParentId.ToString();
-                                    using (var csData = new CsModel(core)) {
-                                        csData.open(adminContent.name, "ID=" + ParentId, "", true, 0, "ParentID");
-                                        if (!csData.ok()) {
-                                            ParentId = 0;
-                                        } else {
-                                            ParentId = csData.getInteger("ParentID");
-                                        }
+                                }
+                        }
+                        if (field.nameLc == "parentid") {
+                            //
+                            // check circular reference on all parentid fields
+                            int ParentId = GenericController.encodeInteger(ResponseFieldValueText);
+                            int LoopPtr = 0;
+                            string UsedIDs = editRecord.id.ToString();
+                            const int LoopPtrMax = 100;
+                            while ((LoopPtr < LoopPtrMax) && (ParentId != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentId + ",") == -1)) {
+                                UsedIDs = UsedIDs + "," + ParentId.ToString();
+                                using (var csData = new CsModel(core)) {
+                                    csData.open(adminContent.name, "ID=" + ParentId, "", true, 0, "ParentID");
+                                    if (!csData.ok()) {
+                                        ParentId = 0;
+                                    } else {
+                                        ParentId = csData.getInteger("ParentID");
                                     }
-                                    LoopPtr = LoopPtr + 1;
                                 }
-                                if (LoopPtr == LoopPtrMax) {
-                                    //
-                                    // Too deep
-                                    //
-                                    Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " creates a relationship between records that Is too large. Please limit the depth of this relationship to " + LoopPtrMax + " records.");
-                                    ResponseFieldValueIsOKToSave = false;
-                                } else if ((editRecord.id != 0) && (editRecord.id == ParentId)) {
-                                    //
-                                    // Reference to iteslf
-                                    //
-                                    Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This record points back to itself. This is not allowed.");
-                                    ResponseFieldValueIsOKToSave = false;
-                                } else if (ParentId != 0) {
-                                    //
-                                    // Circular reference
-                                    //
-                                    Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This field either points to other records which then point back to this record. This is not allowed.");
-                                    ResponseFieldValueIsOKToSave = false;
-                                }
+                                LoopPtr = LoopPtr + 1;
                             }
-                            if (field.textBuffered) {
+                            if (LoopPtr == LoopPtrMax) {
                                 //
-                                // text buffering
+                                // Too deep
                                 //
-                            }
-                            if ((field.required) && (ResponseFieldIsEmpty)) {
+                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " creates a relationship between records that Is too large. Please limit the depth of this relationship to " + LoopPtrMax + " records.");
+                                ResponseFieldValueIsOKToSave = false;
+                            } else if ((editRecord.id != 0) && (editRecord.id == ParentId)) {
                                 //
-                                // field is required and is not given
+                                // Reference to iteslf
                                 //
-                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " Is required but has no value.");
+                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This record points back to itself. This is not allowed.");
+                                ResponseFieldValueIsOKToSave = false;
+                            } else if (ParentId != 0) {
+                                //
+                                // Circular reference
+                                //
+                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " contains a circular reference. This field either points to other records which then point back to this record. This is not allowed.");
                                 ResponseFieldValueIsOKToSave = false;
                             }
-                            bool blockDuplicateUsername = false;
-                            bool blockDuplicateEmail = false;
+                        }
+                        if (field.textBuffered) {
                             //
-                            // special case - people records without Allowduplicateusername require username to be unique
+                            // text buffering
                             //
-                            if (GenericController.vbLCase(adminContent.tableName) == "ccmembers") {
-                                if (GenericController.vbLCase(field.nameLc) == "username") {
-                                    blockDuplicateUsername = !(core.siteProperties.getBoolean("allowduplicateusername", false));
-                                }
-                                if (GenericController.vbLCase(field.nameLc) == "email") {
-                                    blockDuplicateEmail = (core.siteProperties.getBoolean("allowemaillogin", false));
-                                }
+                        }
+                        if ((field.required) && (ResponseFieldIsEmpty)) {
+                            //
+                            // field is required and is not given
+                            //
+                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " Is required but has no value.");
+                            ResponseFieldValueIsOKToSave = false;
+                        }
+                        bool blockDuplicateUsername = false;
+                        bool blockDuplicateEmail = false;
+                        //
+                        // special case - people records without Allowduplicateusername require username to be unique
+                        //
+                        if (GenericController.vbLCase(adminContent.tableName) == "ccmembers") {
+                            if (GenericController.vbLCase(field.nameLc) == "username") {
+                                blockDuplicateUsername = !(core.siteProperties.getBoolean("allowduplicateusername", false));
                             }
-                            if ((blockDuplicateUsername || blockDuplicateEmail || field.uniqueName) && (!ResponseFieldIsEmpty)) {
+                            if (GenericController.vbLCase(field.nameLc) == "email") {
+                                blockDuplicateEmail = (core.siteProperties.getBoolean("allowemaillogin", false));
+                            }
+                        }
+                        if ((blockDuplicateUsername || blockDuplicateEmail || field.uniqueName) && (!ResponseFieldIsEmpty)) {
+                            //
+                            // ----- Do the unique check for this field
+                            //
+                            string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + MetadataController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + adminContent.legacyContentControlCriteria + ")";
+                            if (editRecord.id > 0) {
                                 //
-                                // ----- Do the unique check for this field
-                                //
-                                string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + MetadataController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + adminContent.legacyContentControlCriteria + ")";
-                                if (editRecord.id > 0) {
+                                // --editing record
+                                SQLUnique = SQLUnique + "and(id<>" + editRecord.id + ")";
+                            }
+                            using (var csData = new CsModel(core)) {
+                                csData.openSql(SQLUnique, adminContent.dataSourceName);
+                                if (csData.ok()) {
                                     //
-                                    // --editing record
-                                    SQLUnique = SQLUnique + "and(id<>" + editRecord.id + ")";
-                                }
-                                using (var csData = new CsModel(core)) {
-                                    csData.openSql(SQLUnique, adminContent.dataSourceName);
-                                    if (csData.ok()) {
+                                    // field is not unique, skip it and flag error
+                                    //
+                                    if (blockDuplicateUsername) {
                                         //
-                                        // field is not unique, skip it and flag error
                                         //
-                                        if (blockDuplicateUsername) {
-                                            //
-                                            //
-                                            //
-                                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there Is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Duplicate Usernames' is Not checked.");
-                                        } else if (blockDuplicateEmail) {
-                                            //
-                                            //
-                                            //
-                                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Email Login' is checked.");
-                                        } else {
-                                            //
-                                            // non-workflow
-                                            //
-                                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "].");
-                                        }
-                                        ResponseFieldValueIsOKToSave = false;
+                                        //
+                                        Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there Is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Duplicate Usernames' is Not checked.");
+                                    } else if (blockDuplicateEmail) {
+                                        //
+                                        //
+                                        //
+                                        Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Email Login' is checked.");
+                                    } else {
+                                        //
+                                        // non-workflow
+                                        //
+                                        Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "].");
                                     }
+                                    ResponseFieldValueIsOKToSave = false;
                                 }
                             }
                         }
-                        // end case
-                        break;
+                    }
+                    // end case
+                    break;
                 }
                 //
                 // Save response if it is valid

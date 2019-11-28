@@ -331,124 +331,139 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                                 RowPtr = 0;
                                 foreach (XmlNode CDef_Node in LibCollections.DocumentElement.ChildNodes) {
                                     switch (GenericController.vbLCase(CDef_Node.Name)) {
-                                        case "collection":
-                                            //
-                                            // Read the collection
-                                            //
-                                            foreach (XmlNode CollectionNode in CDef_Node.ChildNodes) {
-                                                switch (GenericController.vbLCase(CollectionNode.Name)) {
-                                                    case "name":
-                                                        //
-                                                        // Name
-                                                        //
-                                                        Collectionname = CollectionNode.InnerText;
-                                                        break;
-                                                    case "guid":
-                                                        //
-                                                        // Guid
-                                                        //
-                                                        CollectionGuid = CollectionNode.InnerText;
-                                                        break;
-                                                    case "version":
-                                                        //
-                                                        // Version
-                                                        //
-                                                        CollectionVersion = CollectionNode.InnerText;
-                                                        break;
-                                                    case "description":
-                                                        //
-                                                        // Version
-                                                        //
-                                                        CollectionDescription = CollectionNode.InnerText;
-                                                        break;
-                                                    case "contensiveversion":
-                                                        //
-                                                        // Version
-                                                        //
-                                                        CollectionContensiveVersion = CollectionNode.InnerText;
-                                                        break;
-                                                    case "lastchangedate":
-                                                        //
-                                                        // Version
-                                                        //
-                                                        CollectionLastChangeDate = CollectionNode.InnerText;
-                                                        if (GenericController.IsDate(CollectionLastChangeDate)) {
-                                                            DateValue = DateTime.Parse(CollectionLastChangeDate);
-                                                            CollectionLastChangeDate = DateValue.ToShortDateString();
-                                                        }
-                                                        if (string.IsNullOrEmpty(CollectionLastChangeDate)) {
-                                                            CollectionLastChangeDate = "unknown";
-                                                        }
-                                                        break;
-                                                }
-                                            }
-                                            bool IsOnServer = false;
-                                            bool IsOnSite = false;
-                                            if (RowPtr >= Cells3.GetUpperBound(0)) {
-                                                string[,] tempVar2 = new string[RowPtr + 101, ColumnCnt + 1];
-                                                if (Cells3 != null) {
-                                                    for (int Dimension0 = 0; Dimension0 < Cells3.GetLength(0); Dimension0++) {
-                                                        int CopyLength = Math.Min(Cells3.GetLength(1), tempVar2.GetLength(1));
-                                                        for (int Dimension1 = 0; Dimension1 < CopyLength; Dimension1++) {
-                                                            tempVar2[Dimension0, Dimension1] = Cells3[Dimension0, Dimension1];
-                                                        }
+                                        case "collection": {
+                                                //
+                                                // Read the collection
+                                                //
+                                                foreach (XmlNode CollectionNode in CDef_Node.ChildNodes) {
+                                                    switch (GenericController.vbLCase(CollectionNode.Name)) {
+                                                        case "name": {
+                                                                //
+                                                                // Name
+                                                                //
+                                                                Collectionname = CollectionNode.InnerText;
+                                                                break;
+                                                            }
+                                                        case "guid": {
+                                                                //
+                                                                // Guid
+                                                                //
+                                                                CollectionGuid = CollectionNode.InnerText;
+                                                                break;
+                                                            }
+                                                        case "version": {
+                                                                //
+                                                                // Version
+                                                                //
+                                                                CollectionVersion = CollectionNode.InnerText;
+                                                                break;
+                                                            }
+                                                        case "description": {
+                                                                //
+                                                                // Version
+                                                                //
+                                                                CollectionDescription = CollectionNode.InnerText;
+                                                                break;
+                                                            }
+                                                        case "contensiveversion": {
+                                                                //
+                                                                // Version
+                                                                //
+                                                                CollectionContensiveVersion = CollectionNode.InnerText;
+                                                                break;
+                                                            }
+                                                        case "lastchangedate": {
+                                                                //
+                                                                // Version
+                                                                //
+                                                                CollectionLastChangeDate = CollectionNode.InnerText;
+                                                                if (GenericController.IsDate(CollectionLastChangeDate)) {
+                                                                    DateValue = DateTime.Parse(CollectionLastChangeDate);
+                                                                    CollectionLastChangeDate = DateValue.ToShortDateString();
+                                                                }
+                                                                if (string.IsNullOrEmpty(CollectionLastChangeDate)) {
+                                                                    CollectionLastChangeDate = "unknown";
+                                                                }
+                                                                break;
+                                                            }
+                                                        default: {
+                                                                // nop
+                                                                break;
+                                                            }
                                                     }
                                                 }
-                                                Cells3 = tempVar2;
-                                            }
-                                            if (string.IsNullOrEmpty(Collectionname)) {
-                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
-                                                Cells3[RowPtr, 1] = "no name";
-                                                Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
-                                                Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
-                                            } else {
-                                                if (string.IsNullOrEmpty(CollectionGuid)) {
+                                                bool IsOnServer = false;
+                                                bool IsOnSite = false;
+                                                if (RowPtr >= Cells3.GetUpperBound(0)) {
+                                                    string[,] tempVar2 = new string[RowPtr + 101, ColumnCnt + 1];
+                                                    if (Cells3 != null) {
+                                                        for (int Dimension0 = 0; Dimension0 < Cells3.GetLength(0); Dimension0++) {
+                                                            int CopyLength = Math.Min(Cells3.GetLength(1), tempVar2.GetLength(1));
+                                                            for (int Dimension1 = 0; Dimension1 < CopyLength; Dimension1++) {
+                                                                tempVar2[Dimension0, Dimension1] = Cells3[Dimension0, Dimension1];
+                                                            }
+                                                        }
+                                                    }
+                                                    Cells3 = tempVar2;
+                                                }
+                                                if (string.IsNullOrEmpty(Collectionname)) {
                                                     Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
-                                                    Cells3[RowPtr, 1] = Collectionname + " (no guid)";
+                                                    Cells3[RowPtr, 1] = "no name";
                                                     Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
                                                     Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
                                                 } else {
-                                                    IsOnServer = GenericController.encodeBoolean(OnServerGuidList.IndexOf(CollectionGuid, System.StringComparison.OrdinalIgnoreCase) + 1);
-                                                    using (var csData = new CsModel(core)) {
-                                                        IsOnSite = csData.open("Add-on Collections", GuidFieldName + "=" + DbController.encodeSQLText(CollectionGuid));
-                                                    }
-                                                    if (IsOnSite) {
-                                                        //
-                                                        // Already installed
-                                                        //
-                                                        Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow" + RowPtr + "\" VALUE=\"1\" disabled>";
-                                                        Cells3[RowPtr, 1] = Collectionname + "&nbsp;(installed already)";
-                                                        Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
-                                                        Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
-                                                    } else if ((!string.IsNullOrEmpty(CollectionContensiveVersion)) && (string.CompareOrdinal(CollectionContensiveVersion, core.codeVersion()) > 0)) {
-                                                        //
-                                                        // wrong version
-                                                        //
+                                                    if (string.IsNullOrEmpty(CollectionGuid)) {
                                                         Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
-                                                        Cells3[RowPtr, 1] = Collectionname + "&nbsp;(Contensive v" + CollectionContensiveVersion + " needed)";
-                                                        Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
-                                                        Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
-                                                    } else if (!DbUpToDate) {
-                                                        //
-                                                        // Site needs to by upgraded
-                                                        //
-                                                        Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
-                                                        Cells3[RowPtr, 1] = Collectionname + "&nbsp;(install disabled)";
+                                                        Cells3[RowPtr, 1] = Collectionname + " (no guid)";
                                                         Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
                                                         Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
                                                     } else {
-                                                        //
-                                                        // Not installed yet
-                                                        //
-                                                        Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + HtmlController.inputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + HtmlController.inputHidden("LibraryRowName" + RowPtr, Collectionname);
-                                                        Cells3[RowPtr, 1] = Collectionname + "&nbsp;";
-                                                        Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
-                                                        Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
+                                                        IsOnServer = GenericController.encodeBoolean(OnServerGuidList.IndexOf(CollectionGuid, System.StringComparison.OrdinalIgnoreCase) + 1);
+                                                        using (var csData = new CsModel(core)) {
+                                                            IsOnSite = csData.open("Add-on Collections", GuidFieldName + "=" + DbController.encodeSQLText(CollectionGuid));
+                                                        }
+                                                        if (IsOnSite) {
+                                                            //
+                                                            // Already installed
+                                                            //
+                                                            Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow" + RowPtr + "\" VALUE=\"1\" disabled>";
+                                                            Cells3[RowPtr, 1] = Collectionname + "&nbsp;(installed already)";
+                                                            Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
+                                                            Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
+                                                        } else if ((!string.IsNullOrEmpty(CollectionContensiveVersion)) && (string.CompareOrdinal(CollectionContensiveVersion, core.codeVersion()) > 0)) {
+                                                            //
+                                                            // wrong version
+                                                            //
+                                                            Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
+                                                            Cells3[RowPtr, 1] = Collectionname + "&nbsp;(Contensive v" + CollectionContensiveVersion + " needed)";
+                                                            Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
+                                                            Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
+                                                        } else if (!DbUpToDate) {
+                                                            //
+                                                            // Site needs to by upgraded
+                                                            //
+                                                            Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" disabled>";
+                                                            Cells3[RowPtr, 1] = Collectionname + "&nbsp;(install disabled)";
+                                                            Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
+                                                            Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
+                                                        } else {
+                                                            //
+                                                            // Not installed yet
+                                                            //
+                                                            Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + HtmlController.inputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + HtmlController.inputHidden("LibraryRowName" + RowPtr, Collectionname);
+                                                            Cells3[RowPtr, 1] = Collectionname + "&nbsp;";
+                                                            Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
+                                                            Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
+                                                        }
                                                     }
                                                 }
+                                                RowPtr = RowPtr + 1;
+                                                break;
                                             }
-                                            RowPtr = RowPtr + 1;
-                                            break;
+                                        default: {
+                                                // nop
+                                                break;
+                                            }
                                     }
                                 }
                             }

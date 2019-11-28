@@ -29,7 +29,7 @@ namespace Contensive.Processor.Addons.Tools {
         //
         // ----- data fields
         //
-        private string[] Findstring = new string[51]; 
+        private string[] Findstring = new string[51];
         private CoreController core;
         private string ToolsTable;
         private string ToolsContentName;
@@ -162,7 +162,7 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     // Cancel to the admin site
                     //
-                    return core.webServer.redirect( core.appConfig.adminRoute, "Tools-List, cancel button");
+                    return core.webServer.redirect(core.appConfig.adminRoute, "Tools-List, cancel button");
                 }
                 //
                 // ----- Check permissions
@@ -172,7 +172,7 @@ namespace Contensive.Processor.Addons.Tools {
                     // You must be admin to use this feature
                     //
                     tempGetForm = AdminUIController.getFormBodyAdminOnly();
-                    tempGetForm = AdminUIController.getToolBody(core,"Admin Tools", ButtonCancelAll, "", false, false, "<div>Administration Tools</div>", "", 0, tempGetForm);
+                    tempGetForm = AdminUIController.getToolBody(core, "Admin Tools", ButtonCancelAll, "", false, false, "<div>Administration Tools</div>", "", 0, tempGetForm);
                 } else {
                     ToolsAction = core.docProperties.getInteger("dta");
                     Button = core.docProperties.getText("Button");
@@ -204,97 +204,118 @@ namespace Contensive.Processor.Addons.Tools {
                         //
                         // -- Print out the page
                         switch (AdminFormTool) {
-                            case AdminFormToolCreateContentDefinition:
-                                //
-                                Stream.Add(GetForm_CreateContentDefinition());
-                                break;
-                            case AdminFormToolDefineContentFieldsFromTable:
-                                //
-                                Stream.Add((new DefineContentFieldsFromTableClass()).Execute(core.cpParent).ToString());
-                                break;
-                            case AdminFormToolConfigureListing:
-                                //
-                                Stream.Add(GetForm_ConfigureListing());
-                                break;
-                            case AdminFormToolConfigureEdit:
-                                //
-                                Stream.Add( ConfigureContentEditClass.configureContentEdit(core.cpParent));
-                                break;
-                            case AdminFormToolManualQuery:
-                                //
-                                Stream.Add( ManualQueryClass.getForm_ManualQuery(core.cpParent));
-                                break;
-                            case AdminFormToolCreateChildContent:
-                                //
-                                Stream.Add(GetForm_CreateChildContent());
-                                break;
-                            case AdminFormToolSyncTables:
-                                //
-                                Stream.Add(GetForm_SyncTables());
-                                break;
-                            case AdminFormToolBenchmark:
-                                //
-                                Stream.Add(GetForm_Benchmark());
-                                break;
-                            case AdminFormToolClearContentWatchLink:
-                                //
-                                Stream.Add(GetForm_ClearContentWatchLinks());
-                                break;
-                            case AdminFormToolSchema:
-                                //
-                                Stream.Add(GetForm_DbSchema());
-                                break;
-                            case AdminFormToolContentFileView:
-                                //
-                                Stream.Add(GetForm_ContentFileManager());
-                                break;
-                            case AdminFormToolWebsiteFileView:
-                                //
-                                Stream.Add(GetForm_WebsiteFileManager());
-                                break;
-                            case AdminFormToolDbIndex:
-                                //
-                                Stream.Add(GetForm_DbIndex());
-                                break;
-                            case AdminFormToolContentDbSchema:
-                                //
-                                Stream.Add(GetForm_ContentDbSchema());
-                                break;
-                            case AdminFormToolLogFileView:
-                                //
-                                Stream.Add(GetForm_LogFiles());
-                                break;
-                            case AdminFormToolLoadCDef:
-                                //
-                                Stream.Add(GetForm_LoadCDef());
-                                break;
-                            case AdminFormToolLoadTemplates:
-                                //
-                                Stream.Add(GetForm_LoadTemplates());
-                                break;
-                            case AdminformToolFindAndReplace:
-                                //
-                                Stream.Add(GetForm_FindAndReplace());
-                                break;
-                            case AdminformToolIISReset:
-                                //
-                                Stream.Add(GetForm_IISReset());
-                                break;
-                            case AdminformToolCreateGUID:
-                                //
-                                Stream.Add(GetForm_CreateGUID());
-                                break;
-                            default:
-                                //
-                                Stream.Add(GetForm_Root());
-                                break;
+                            case AdminFormToolCreateContentDefinition: {
+                                    //
+                                    Stream.Add(GetForm_CreateContentDefinition());
+                                    break;
+                                }
+                            case AdminFormToolDefineContentFieldsFromTable: {
+                                    //
+                                    Stream.Add((new DefineContentFieldsFromTableClass()).Execute(core.cpParent).ToString());
+                                    break;
+                                }
+                            case AdminFormToolConfigureListing: {
+                                    //
+                                    Stream.Add(GetForm_ConfigureListing());
+                                    break;
+                                }
+                            case AdminFormToolConfigureEdit: {
+                                    //
+                                    Stream.Add(ConfigureContentEditClass.configureContentEdit(core.cpParent));
+                                    break;
+                                }
+                            case AdminFormToolManualQuery: {
+                                    //
+                                    Stream.Add(ManualQueryClass.getForm_ManualQuery(core.cpParent));
+                                    break;
+                                }
+                            case AdminFormToolCreateChildContent: {
+                                    //
+                                    Stream.Add(GetForm_CreateChildContent());
+                                    break;
+                                }
+                            case AdminFormToolSyncTables: {
+                                    //
+                                    Stream.Add(GetForm_SyncTables());
+                                    break;
+                                }
+                            case AdminFormToolBenchmark: {
+                                    //
+                                    Stream.Add(GetForm_Benchmark());
+                                    break;
+                                }
+                            case AdminFormToolClearContentWatchLink: {
+                                    //
+                                    Stream.Add(GetForm_ClearContentWatchLinks());
+                                    break;
+                                }
+                            case AdminFormToolSchema: {
+                                    //
+                                    Stream.Add(GetForm_DbSchema());
+                                    break;
+                                }
+                            case AdminFormToolContentFileView: {
+                                    //
+                                    Stream.Add(GetForm_ContentFileManager());
+                                    break;
+                                }
+                            case AdminFormToolWebsiteFileView: {
+                                    //
+                                    Stream.Add(GetForm_WebsiteFileManager());
+                                    break;
+                                }
+                            case AdminFormToolDbIndex: {
+                                    //
+                                    Stream.Add(GetForm_DbIndex());
+                                    break;
+                                }
+                            case AdminFormToolContentDbSchema: {
+                                    //
+                                    Stream.Add(GetForm_ContentDbSchema());
+                                    break;
+                                }
+                            case AdminFormToolLogFileView: {
+                                    //
+                                    Stream.Add(GetForm_LogFiles());
+                                    break;
+                                }
+                            case AdminFormToolLoadCDef: {
+                                    //
+                                    Stream.Add(GetForm_LoadCDef());
+                                    break;
+                                }
+                            case AdminFormToolLoadTemplates: {
+                                    //
+                                    Stream.Add(GetForm_LoadTemplates());
+                                    break;
+                                }
+                            case AdminformToolFindAndReplace: {
+                                    //
+                                    Stream.Add(GetForm_FindAndReplace());
+                                    break;
+                                }
+                            case AdminformToolIISReset: {
+                                    //
+                                    Stream.Add(GetForm_IISReset());
+                                    break;
+                                }
+                            case AdminformToolCreateGUID: {
+                                    //
+                                    Stream.Add(GetForm_CreateGUID());
+                                    break;
+                                }
+                            default: {
+                                    //
+                                    Stream.Add(GetForm_Root());
+                                    break;
+                                }
                         }
                     }
                     //        Call Stream.Add("</blockquote>")
                     tempGetForm = Stream.Text;
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return tempGetForm;
         }
@@ -336,9 +357,9 @@ namespace Contensive.Processor.Addons.Tools {
                 Stream.Add("</table>");
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
-            return result; 
+            return result;
         }
         //
         //==================================================================================
@@ -362,7 +383,7 @@ namespace Contensive.Processor.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return tempGetForm_RootRow;
         }
@@ -405,11 +426,11 @@ namespace Contensive.Processor.Addons.Tools {
                         using (var db = new DbController(core, datasource.name)) {
                             db.createSQLTable(TableName);
                         }
-                        ContentMetadataModel.createFromSQLTable(core,datasource, TableName, ContentName);
+                        ContentMetadataModel.createFromSQLTable(core, datasource, TableName, ContentName);
                         core.cache.invalidateAll();
                         core.clearMetaData();
                         ContentId = Processor.Models.Domain.ContentMetadataModel.getContentId(core, ContentName);
-                        ParentNavId = MetadataController.getRecordIdByUniqueName( core,NavigatorEntryModel.tableMetadata.contentName, "Manage Site Content");
+                        ParentNavId = MetadataController.getRecordIdByUniqueName(core, NavigatorEntryModel.tableMetadata.contentName, "Manage Site Content");
                         if (ParentNavId != 0) {
                             ParentNavId = 0;
                             using (var csSrc = new CsModel(core)) {
@@ -444,15 +465,15 @@ namespace Contensive.Processor.Addons.Tools {
                 Stream.Add(core.html.selectFromContent("DataSourceID", datasource.id, "Data Sources", "", "Default"));
                 Stream.Add("<br><br>");
                 Stream.Add("Content Name<br>");
-                Stream.Add(HtmlController.inputText_Legacy( core,"ContentName", ContentName, 1, 40));
+                Stream.Add(HtmlController.inputText_Legacy(core, "ContentName", ContentName, 1, 40));
                 Stream.Add("<br><br>");
                 Stream.Add("Table Name<br>");
-                Stream.Add(HtmlController.inputText_Legacy( core,"TableName", TableName, 1, 40));
+                Stream.Add(HtmlController.inputText_Legacy(core, "TableName", TableName, 1, 40));
                 Stream.Add("<br><br>");
                 Stream.Add("</SPAN>");
-                result = AdminUIController.getToolBody(core,Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
+                result = AdminUIController.getToolBody(core, Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -695,6 +716,10 @@ namespace Contensive.Processor.Addons.Tools {
                                     }
                                     break;
                                 }
+                            default: {
+                                    // nop
+                                    break;
+                                }
                         }
                         //
                         // Get a new copy of the content definition
@@ -876,7 +901,7 @@ namespace Contensive.Processor.Addons.Tools {
                 Stream.Add(HtmlController.inputHidden("ReloadCDef", ReloadCDef));
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -906,14 +931,14 @@ namespace Contensive.Processor.Addons.Tools {
                             IndexColumn = csData.getInteger("IndexColumn");
                             ColumnWidth = csData.getInteger("IndexWidth");
                             if ((IndexColumn == 0) || (ColumnWidth == 0)) {
-                                csData.set( "IndexColumn", 0);
-                                csData.set( "IndexWidth", 0);
-                                csData.set( "IndexSortPriority", 0);
+                                csData.set("IndexColumn", 0);
+                                csData.set("IndexWidth", 0);
+                                csData.set("IndexSortPriority", 0);
                             } else {
                                 //
                                 // Column appears in Index, clean it up
                                 //
-                                csData.set( "IndexColumn", ColumnCounter);
+                                csData.set("IndexColumn", ColumnCounter);
                                 ColumnCounter = ColumnCounter + 1;
                                 ColumnWidthTotal = ColumnWidthTotal + ColumnWidth;
                             }
@@ -925,17 +950,23 @@ namespace Contensive.Processor.Addons.Tools {
                             //
                             csData.goFirst();
                             while (csData.ok()) {
-                                switch (GenericController.vbUCase(csData.getText( "name"))) {
-                                    case "ACTIVE":
-                                        csData.set( "IndexColumn", 0);
-                                        csData.set( "IndexWidth", 20);
-                                        ColumnWidthTotal = ColumnWidthTotal + 20;
-                                        break;
-                                    case "NAME":
-                                        csData.set( "IndexColumn", 1);
-                                        csData.set( "IndexWidth", 80);
-                                        ColumnWidthTotal = ColumnWidthTotal + 80;
-                                        break;
+                                switch (GenericController.vbUCase(csData.getText("name"))) {
+                                    case "ACTIVE": {
+                                            csData.set("IndexColumn", 0);
+                                            csData.set("IndexWidth", 20);
+                                            ColumnWidthTotal = ColumnWidthTotal + 20;
+                                            break;
+                                        }
+                                    case "NAME": {
+                                            csData.set("IndexColumn", 1);
+                                            csData.set("IndexWidth", 80);
+                                            ColumnWidthTotal = ColumnWidthTotal + 80;
+                                            break;
+                                        }
+                                    default: {
+                                            // nop
+                                            break;
+                                        }
                                 }
                                 csData.goNext();
                             }
@@ -948,7 +979,7 @@ namespace Contensive.Processor.Addons.Tools {
                             while (csData.ok()) {
                                 ColumnWidth = csData.getInteger("IndexWidth");
                                 ColumnWidth = encodeInteger((ColumnWidth * 100) / (double)ColumnWidthTotal);
-                                csData.set( "IndexWidth", ColumnWidth);
+                                csData.set("IndexWidth", ColumnWidth);
                                 csData.goNext();
                             }
                         }
@@ -993,7 +1024,7 @@ namespace Contensive.Processor.Addons.Tools {
                 }
                 return;
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
         }
         //
@@ -1046,7 +1077,7 @@ namespace Contensive.Processor.Addons.Tools {
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Child Content Name<br>");
-                Stream.Add(HtmlController.inputText_Legacy( core,"ChildContentName", ChildContentName, 1, 40));
+                Stream.Add(HtmlController.inputText_Legacy(core, "ChildContentName", ChildContentName, 1, 40));
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Add Admin Menu Entry under Parent's Menu Entry<br>");
@@ -1058,7 +1089,7 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1089,7 +1120,7 @@ namespace Contensive.Processor.Addons.Tools {
                 Stream.Add("</span>");
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1125,7 +1156,7 @@ namespace Contensive.Processor.Addons.Tools {
                                 metadata = Processor.Models.Domain.ContentMetadataModel.create(core, csData.getInteger("id"));
                                 TableName = metadata.tableName;
                                 Stream.Add("Synchronizing Content " + metadata.name + " to table " + TableName + "<br>");
-                                using( var db = new DbController( core, metadata.dataSourceName )) {
+                                using (var db = new DbController(core, metadata.dataSourceName)) {
                                     db.createSQLTable(TableName);
                                     if (metadata.fields.Count > 0) {
                                         foreach (var keyValuePair in metadata.fields) {
@@ -1144,7 +1175,7 @@ namespace Contensive.Processor.Addons.Tools {
                 }
                 returnValue = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnValue;
@@ -1339,7 +1370,7 @@ namespace Contensive.Processor.Addons.Tools {
                 // Print Start Button
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1357,7 +1388,7 @@ namespace Contensive.Processor.Addons.Tools {
                     tempLocal_GetContentId = GenericController.encodeInteger(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return tempLocal_GetContentId;
         }
@@ -1378,7 +1409,7 @@ namespace Contensive.Processor.Addons.Tools {
                     tempLocal_GetContentNameById = GenericController.encodeText(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return tempLocal_GetContentNameById;
         }
@@ -1399,7 +1430,7 @@ namespace Contensive.Processor.Addons.Tools {
                     tempLocal_GetContentTableName = GenericController.encodeText(RS.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return tempLocal_GetContentTableName;
         }
@@ -1429,7 +1460,7 @@ namespace Contensive.Processor.Addons.Tools {
                 string ButtonList = null;
                 DataTable RSSchema = null;
                 var tmpList = new List<string> { };
-                DataSourceModel datasource = DataSourceModel.create(core.cpParent, core.docProperties.getInteger("DataSourceID"),ref tmpList);
+                DataSourceModel datasource = DataSourceModel.create(core.cpParent, core.docProperties.getInteger("DataSourceID"), ref tmpList);
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
@@ -1629,7 +1660,7 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 Stream.Add("<br>");
                 Stream.Add("Table Name<br>");
-                Stream.Add(HtmlController.inputText_Legacy( core,"Tablename", TableName));
+                Stream.Add(HtmlController.inputText_Legacy(core, "Tablename", TableName));
                 //
                 Stream.Add("<br><br>");
                 Stream.Add("Data Source<br>");
@@ -1639,7 +1670,7 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1686,7 +1717,7 @@ namespace Contensive.Processor.Addons.Tools {
                         DataSource = csData.getText("DataSourceID");
                     }
                 }
-                using( var db = new DbController( core, DataSource )) {
+                using (var db = new DbController(core, DataSource)) {
                     //
                     if ((TableId != 0) && (TableId == core.docProperties.getInteger("previoustableid")) && (!string.IsNullOrEmpty(Button))) {
                         //
@@ -1805,7 +1836,7 @@ namespace Contensive.Processor.Addons.Tools {
                     result = AdminUIController.getToolForm(core, result, ButtonList);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1836,14 +1867,14 @@ namespace Contensive.Processor.Addons.Tools {
                     csData.openSql(SQL);
                     TableName = "";
                     while (csData.ok()) {
-                        if (TableName != csData.getText( "TableName")) {
-                            TableName = csData.getText( "TableName");
+                        if (TableName != csData.getText("TableName")) {
+                            TableName = csData.getText("TableName");
                             result += HtmlController.tableRow("<B>" + TableName + "</b>", TableColSpan, TableEvenRow);
                         }
                         result += HtmlController.tableRowStart();
                         result += HtmlController.td("&nbsp;", "", 0, TableEvenRow);
-                        result += HtmlController.td(csData.getText( "FieldName"), "", 0, TableEvenRow);
-                        result += HtmlController.td(csData.getText( "FieldType"), "", 0, TableEvenRow);
+                        result += HtmlController.td(csData.getText("FieldName"), "", 0, TableEvenRow);
+                        result += HtmlController.td(csData.getText("FieldType"), "", 0, TableEvenRow);
                         result += kmaEndTableRow;
                         TableEvenRow = !TableEvenRow;
                         csData.goNext();
@@ -1879,7 +1910,7 @@ namespace Contensive.Processor.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -1901,7 +1932,7 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 tempGetForm_LogFiles = AdminUIController.getToolForm(core, tempGetForm_LogFiles, ButtonList);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return tempGetForm_LogFiles;
         }
@@ -1955,7 +1986,7 @@ namespace Contensive.Processor.Addons.Tools {
                 CurrentPath = core.docProperties.getText("SetPath");
                 if (string.IsNullOrEmpty(CurrentPath)) {
                     CurrentPath = "\\";
-                } else if (CurrentPath.Left( 1) != "\\") {
+                } else if (CurrentPath.Left(1) != "\\") {
                     CurrentPath = "\\" + CurrentPath;
                 }
                 //
@@ -1965,7 +1996,7 @@ namespace Contensive.Processor.Addons.Tools {
                 if (Position == 1) {
                     ParentPath = "\\";
                 } else {
-                    ParentPath = CurrentPath.Left( Position - 1);
+                    ParentPath = CurrentPath.Left(Position - 1);
                 }
                 //
                 //
@@ -2037,7 +2068,7 @@ namespace Contensive.Processor.Addons.Tools {
                     result += GetTableEnd;
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2111,7 +2142,7 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return result;
@@ -2169,7 +2200,7 @@ namespace Contensive.Processor.Addons.Tools {
                 ButtonList = ButtonCancel + "," + ButtonImportTemplates;
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2191,9 +2222,9 @@ namespace Contensive.Processor.Addons.Tools {
                 });
                 string Description = "Manage files and folders within the virtual content file area.";
                 string ButtonList = ButtonApply + "," + ButtonCancel;
-                result = AdminUIController.getToolBody(core,"Content File Manager", ButtonList, "", false, false, Description, "", 0, Content);
+                result = AdminUIController.getToolBody(core, "Content File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2215,9 +2246,9 @@ namespace Contensive.Processor.Addons.Tools {
                 });
                 string Description = "Manage files and folders within the Website's file area.";
                 string ButtonList = ButtonApply + "," + ButtonCancel;
-                result = AdminUIController.getToolBody(core,"Website File Manager", ButtonList, "", false, false, Description, "", 0, Content);
+                result = AdminUIController.getToolBody(core, "Website File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2319,9 +2350,9 @@ namespace Contensive.Processor.Addons.Tools {
                         if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
                             RecordId = csData.getInteger("ID");
                             if (GenericController.vbInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
-                                TopHalf = TopHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, true) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csData.getText( "Name") + "</div>";
+                                TopHalf = TopHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, true) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csData.getText("Name") + "</div>";
                             } else {
-                                BottomHalf = BottomHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, false) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csData.getText( "Name") + "</div>";
+                                BottomHalf = BottomHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, false) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csData.getText("Name") + "</div>";
                             }
                         }
                         csData.goNext();
@@ -2332,7 +2363,7 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2363,14 +2394,14 @@ namespace Contensive.Processor.Addons.Tools {
                         addonName = "GetForm_IISReset",
                         args = new Dictionary<string, string>()
                     };
-                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false );
+                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false);
                 }
                 //
                 // Display form
                 //
                 result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonIISReset);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -2390,12 +2421,12 @@ namespace Contensive.Processor.Addons.Tools {
                 // Process the form
                 Button = core.docProperties.getText("button");
                 //
-                s.Add(HtmlController.inputText_Legacy( core,"GUID", GenericController.getGUID(), 1, 80));
+                s.Add(HtmlController.inputText_Legacy(core, "GUID", GenericController.getGUID(), 1, 80));
                 //
                 // Display form
                 result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonCreateGUId);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }

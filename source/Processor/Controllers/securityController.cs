@@ -74,12 +74,12 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static  string oneWayEncrypt(CoreController core, string password) {
+        public static string oneWayEncrypt(CoreController core, string password) {
             string returnResult = "";
             try {
                 returnResult = HashEncode.computeHash(password, "SHA512", null);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnResult;
@@ -96,7 +96,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 returnResult = HashEncode.verifyHash(sourceToTest, "SHA512", encryptedToken);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnResult;
@@ -174,7 +174,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     // Compute has key using DES
                     byte[] saltBytes = ASCIIEncoding.ASCII.GetBytes("notsorandomsalt");
-                    byte[] key = ASCIIEncoding.ASCII.GetBytes(HashEncode.computeHash(core.appConfig.privateKey,"SHA512",saltBytes));
+                    byte[] key = ASCIIEncoding.ASCII.GetBytes(HashEncode.computeHash(core.appConfig.privateKey, "SHA512", saltBytes));
                     Array.Resize(ref key, 24);
                     TripleDESCryptoServiceProvider DES = new TripleDESCryptoServiceProvider {
                         Key = key,
@@ -186,7 +186,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = Convert.ToBase64String(Buffer);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnResult;
@@ -198,7 +198,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sourceToDecrypt"></param>
         /// <returns></returns>
-        private static  string decryptDes(CoreController core, string sourceToDecrypt) {
+        private static string decryptDes(CoreController core, string sourceToDecrypt) {
             string returnResult = "";
             try {
                 if (string.IsNullOrEmpty(sourceToDecrypt)) {
@@ -221,12 +221,12 @@ namespace Contensive.Processor.Controllers {
                     try {
                         returnResult = System.Text.ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(buffer, 0, buffer.Length));
                     } catch (Exception ex) {
-                        LogController.logError( core,ex);
+                        LogController.logError(core, ex);
                         throw;
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnResult;
@@ -317,21 +317,26 @@ namespace Contensive.Processor.Controllers {
                 // actual hashing algorithm class later during object creation.
                 HashAlgorithm hash = null;
                 switch ((hashAlgorithm != null) ? hashAlgorithm.ToUpperInvariant() : "") {
-                    case "SHA1":
-                        hash = new SHA1Managed();
-                        break;
-                    case "SHA256":
-                        hash = new SHA256Managed();
-                        break;
-                    case "SHA384":
-                        hash = new SHA384Managed();
-                        break;
-                    case "SHA512":
-                        hash = new SHA512Managed();
-                        break;
-                    default:
-                        hash = new MD5CryptoServiceProvider();
-                        break;
+                    case "SHA1": {
+                            hash = new SHA1Managed();
+                            break;
+                        }
+                    case "SHA256": {
+                            hash = new SHA256Managed();
+                            break;
+                        }
+                    case "SHA384": {
+                            hash = new SHA384Managed();
+                            break;
+                        }
+                    case "SHA512": {
+                            hash = new SHA512Managed();
+                            break;
+                        }
+                    default: {
+                            hash = new MD5CryptoServiceProvider();
+                            break;
+                        }
                 }
                 //
                 // Compute hash value of our plain text with appended salt.
@@ -388,21 +393,26 @@ namespace Contensive.Processor.Controllers {
                 // We must know size of hash (without salt).
                 int hashSizeInBits = 0;
                 switch ((hashAlgorithm != null) ? hashAlgorithm.ToUpperInvariant() : "") {
-                    case "SHA1":
-                        hashSizeInBits = 160;
-                        break;
-                    case "SHA256":
-                        hashSizeInBits = 256;
-                        break;
-                    case "SHA384":
-                        hashSizeInBits = 384;
-                        break;
-                    case "SHA512":
-                        hashSizeInBits = 512;
-                        break;
-                    default: // Must be MD5
-                        hashSizeInBits = 128;
-                        break;
+                    case "SHA1": {
+                            hashSizeInBits = 160;
+                            break;
+                        }
+                    case "SHA256": {
+                            hashSizeInBits = 256;
+                            break;
+                        }
+                    case "SHA384": {
+                            hashSizeInBits = 384;
+                            break;
+                        }
+                    case "SHA512": {
+                            hashSizeInBits = 512;
+                            break;
+                        }
+                    default: {// Must be MD5
+                            hashSizeInBits = 128;
+                            break;
+                        }
                 }
                 // Convert size of hash from bits to bytes.
                 int hashSizeInBytes = encodeInteger(hashSizeInBits / 8.0);
@@ -424,7 +434,7 @@ namespace Contensive.Processor.Controllers {
         /// A class for creating a symetric encryption
         /// </summary>
         protected class Crypto {
-            protected Crypto() {}
+            protected Crypto() { }
             //
             // While an app specific salt is not the best practice for
             // password based encryption, it's probably safe enough as long as

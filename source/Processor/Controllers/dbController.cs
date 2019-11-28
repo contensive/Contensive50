@@ -413,7 +413,7 @@ namespace Contensive.Processor.Controllers {
                     executeNonQuery(sql);
                     return;
                 }
-                Task.Run( () => executeNonQueryAsync(sql));
+                Task.Run(() => executeNonQueryAsync(sql));
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "], inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
@@ -738,26 +738,31 @@ namespace Contensive.Processor.Controllers {
             string returnType = "";
             try {
                 switch (fieldType) {
-                    case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                    returnType = "Int NULL";
-                    break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                    returnType = "Float NULL";
-                    break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Date:
-                    // 20180416 - ms recommends using new, higher precision. Code requires 3 digits so 7 is more than enough
-                    returnType = "DateTime2(7) NULL";
-                    break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Float:
-                    returnType = "Float NULL";
-                    break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Integer:
-                    returnType = "Int NULL";
-                    break;
+                    case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                            returnType = "Int NULL";
+                            break;
+                        }
+                    case CPContentBaseClass.FieldTypeIdEnum.Currency: {
+                            returnType = "Float NULL";
+                            break;
+                        }
+                    case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                            returnType = "DateTime2(7) NULL";
+                            break;
+                        }
+                    case CPContentBaseClass.FieldTypeIdEnum.Float: {
+                            returnType = "Float NULL";
+                            break;
+                        }
+                    case CPContentBaseClass.FieldTypeIdEnum.Integer: {
+                            returnType = "Int NULL";
+                            break;
+                        }
                     case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
-                    returnType = "Int NULL";
-                    break;
+                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
+                            returnType = "Int NULL";
+                            break;
+                        }
                     case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
                     case CPContentBaseClass.FieldTypeIdEnum.Redirect:
                     case CPContentBaseClass.FieldTypeIdEnum.FileImage:
@@ -769,26 +774,30 @@ namespace Contensive.Processor.Controllers {
                     case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
                     case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                     case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
-                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                    returnType = "VarChar(255) NULL";
-                    break;
+                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                            returnType = "VarChar(255) NULL";
+                            break;
+                        }
                     case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                    case CPContentBaseClass.FieldTypeIdEnum.HTML:
-                    //
-                    // ----- Longtext, depends on datasource
-                    returnType = "varchar(max) Null";
-                    break;
-                    case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
-                    //
-                    // ----- autoincrement type, depends on datasource
-                    //
-                    returnType = "INT IDENTITY PRIMARY KEY";
-                    break;
-                    default:
-                    //
-                    // Invalid field type
-                    //
-                    throw new GenericException("Can not proceed because the field being created has an invalid FieldType [" + fieldType + "]");
+                    case CPContentBaseClass.FieldTypeIdEnum.HTML: {
+                            //
+                            // ----- Longtext, depends on datasource
+                            returnType = "varchar(max) Null";
+                            break;
+                        }
+                    case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement: {
+                            //
+                            // ----- autoincrement type, depends on datasource
+                            //
+                            returnType = "INT IDENTITY PRIMARY KEY";
+                            break;
+                        }
+                    default: {
+                            //
+                            // Invalid field type
+                            //
+                            throw new GenericException("Can not proceed because the field being created has an invalid FieldType [" + fieldType + "]");
+                        }
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -811,12 +820,14 @@ namespace Contensive.Processor.Controllers {
                     if (null != ts.indexes.Find(x => x.index_name.ToLowerInvariant() == IndexName.ToLowerInvariant())) {
                         string sql = "";
                         switch (getDataSourceType()) {
-                            case Constants.DataSourceTypeODBCAccess:
-                            sql = "DROP INDEX " + IndexName + " On " + TableName + ";";
-                            break;
-                            default:
-                            sql = "DROP INDEX [" + TableName + "].[" + IndexName + "];";
-                            break;
+                            case Constants.DataSourceTypeODBCAccess: {
+                                    sql = "DROP INDEX " + IndexName + " On " + TableName + ";";
+                                    break;
+                                }
+                            default: {
+                                    sql = "DROP INDEX [" + TableName + "].[" + IndexName + "];";
+                                    break;
+                                }
                         }
                         executeNonQuery(sql);
                         core.cache.invalidateAll();
@@ -848,48 +859,34 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ADOFieldType"></param>
         /// <returns></returns>
         public CPContentBaseClass.FieldTypeIdEnum getFieldTypeIdByADOType(int ADOFieldType) {
-            CPContentBaseClass.FieldTypeIdEnum returnType = 0;
             try {
                 switch (ADOFieldType) {
                     case 2:
-                    returnType = CPContentBaseClass.FieldTypeIdEnum.Float;
-                    break;
-                    case 3:
-                    returnType = CPContentBaseClass.FieldTypeIdEnum.Integer;
-                    break;
                     case 4:
-                    returnType = CPContentBaseClass.FieldTypeIdEnum.Float;
-                    break;
-                    case 5:
-                    returnType = CPContentBaseClass.FieldTypeIdEnum.Float;
-                    break;
-                    case 6:
-                    returnType = CPContentBaseClass.FieldTypeIdEnum.Integer;
-                    break;
-                    case 11:
-                    returnType = CPContentBaseClass.FieldTypeIdEnum.Boolean;
-                    break;
-                    case 135:
-                    returnType = CPContentBaseClass.FieldTypeIdEnum.Date;
-                    break;
-                    case 200:
-                    returnType = CPContentBaseClass.FieldTypeIdEnum.Text;
-                    break;
-                    case 201:
-                    returnType = CPContentBaseClass.FieldTypeIdEnum.LongText;
-                    break;
-                    case 202:
-                    returnType = CPContentBaseClass.FieldTypeIdEnum.Text;
-                    break;
-                    default:
-                    returnType = CPContentBaseClass.FieldTypeIdEnum.Text;
-                    break;
+                    case 5: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Float;
+                        }
+                    case 3:
+                    case 6: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Integer;
+                        }
+                    case 11: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Boolean;
+                        }
+                    case 135: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Date;
+                        }
+                    case 201: {
+                            return CPContentBaseClass.FieldTypeIdEnum.LongText;
+                        }
+                    default: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Text;
+                        }
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnType;
         }
         //
         //========================================================================
@@ -899,98 +896,96 @@ namespace Contensive.Processor.Controllers {
         /// <param name="FieldTypeName"></param>
         /// <returns></returns>
         public CPContentBaseClass.FieldTypeIdEnum getFieldTypeIdFromFieldTypeName(string FieldTypeName) {
-            CPContentBaseClass.FieldTypeIdEnum returnTypeId = 0;
             try {
                 switch (GenericController.vbLCase(FieldTypeName)) {
-                    case Constants.FieldTypeNameLcaseBoolean:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Boolean;
-                    break;
-                    case Constants.FieldTypeNameLcaseCurrency:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Currency;
-                    break;
-                    case Constants.FieldTypeNameLcaseDate:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Date;
-                    break;
-                    case Constants.FieldTypeNameLcaseFile:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.File;
-                    break;
-                    case Constants.FieldTypeNameLcaseFloat:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Float;
-                    break;
-                    case Constants.FieldTypeNameLcaseImage:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.FileImage;
-                    break;
-                    case Constants.FieldTypeNameLcaseLink:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Link;
-                    break;
+                    case Constants.FieldTypeNameLcaseBoolean: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Boolean;
+                        }
+                    case Constants.FieldTypeNameLcaseCurrency: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Currency;
+                        }
+                    case Constants.FieldTypeNameLcaseDate: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Date;
+                        }
+                    case Constants.FieldTypeNameLcaseFile: {
+                            return CPContentBaseClass.FieldTypeIdEnum.File;
+                        }
+                    case Constants.FieldTypeNameLcaseFloat: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Float;
+                        }
+                    case Constants.FieldTypeNameLcaseImage: {
+                            return CPContentBaseClass.FieldTypeIdEnum.FileImage;
+                        }
+                    case Constants.FieldTypeNameLcaseLink: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Link;
+                        }
                     case Constants.FieldTypeNameLcaseResourceLink:
-                    case "resource link":
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.ResourceLink;
-                    break;
-                    case Constants.FieldTypeNameLcaseInteger:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Integer;
-                    break;
+                    case "resource link": {
+                            return CPContentBaseClass.FieldTypeIdEnum.ResourceLink;
+                        }
+                    case Constants.FieldTypeNameLcaseInteger: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Integer;
+                        }
                     case Constants.FieldTypeNameLcaseLongText:
-                    case "Long text":
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.LongText;
-                    break;
+                    case "Long text": {
+                            return CPContentBaseClass.FieldTypeIdEnum.LongText;
+                        }
                     case Constants.FieldTypeNameLcaseLookup:
                     case "lookuplist":
-                    case "lookup list":
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Lookup;
-                    break;
-                    case Constants.FieldTypeNameLcaseMemberSelect:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.MemberSelect;
-                    break;
-                    case Constants.FieldTypeNameLcaseRedirect:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Redirect;
-                    break;
-                    case Constants.FieldTypeNameLcaseManyToMany:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.ManyToMany;
-                    break;
+                    case "lookup list": {
+                            return CPContentBaseClass.FieldTypeIdEnum.Lookup;
+                        }
+                    case Constants.FieldTypeNameLcaseMemberSelect: {
+                            return CPContentBaseClass.FieldTypeIdEnum.MemberSelect;
+                        }
+                    case Constants.FieldTypeNameLcaseRedirect: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Redirect;
+                        }
+                    case Constants.FieldTypeNameLcaseManyToMany: {
+                            return CPContentBaseClass.FieldTypeIdEnum.ManyToMany;
+                        }
                     case Constants.FieldTypeNameLcaseTextFile:
-                    case "text file":
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.FileText;
-                    break;
+                    case "text file": {
+                            return CPContentBaseClass.FieldTypeIdEnum.FileText;
+                        }
                     case Constants.FieldTypeNameLcaseCSSFile:
-                    case "css file":
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.FileCSS;
-                    break;
+                    case "css file": {
+                            return CPContentBaseClass.FieldTypeIdEnum.FileCSS;
+                        }
                     case Constants.FieldTypeNameLcaseXMLFile:
-                    case "xml file":
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.FileXML;
-                    break;
+                    case "xml file": {
+                            return CPContentBaseClass.FieldTypeIdEnum.FileXML;
+                        }
                     case Constants.FieldTypeNameLcaseJavascriptFile:
                     case "javascript file":
                     case "js file":
-                    case "jsfile":
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.FileJavascript;
-                    break;
-                    case Constants.FieldTypeNameLcaseText:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Text;
-                    break;
-                    case "autoincrement":
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement;
-                    break;
-                    case Constants.FieldTypeNameLcaseHTML:
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.HTML;
-                    break;
+                    case "jsfile": {
+                            return CPContentBaseClass.FieldTypeIdEnum.FileJavascript;
+                        }
+                    case Constants.FieldTypeNameLcaseText: {
+                            return CPContentBaseClass.FieldTypeIdEnum.Text;
+                        }
+                    case "autoincrement": {
+                            return CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement;
+                        }
+                    case Constants.FieldTypeNameLcaseHTML: {
+                            return CPContentBaseClass.FieldTypeIdEnum.HTML;
+                        }
                     case Constants.FieldTypeNameLcaseHTMLFile:
-                    case "html file":
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.FileHTML;
-                    break;
-                    default:
-                    //
-                    // Bad field type is a text field
-                    //
-                    returnTypeId = CPContentBaseClass.FieldTypeIdEnum.Text;
-                    break;
+                    case "html file": {
+                            return CPContentBaseClass.FieldTypeIdEnum.FileHTML;
+                        }
+                    default: {
+                            //
+                            // Bad field type is a text field
+                            //
+                            return CPContentBaseClass.FieldTypeIdEnum.Text;
+                        }
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnTypeId;
         }
         //
         //========================================================================

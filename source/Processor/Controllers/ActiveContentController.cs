@@ -112,297 +112,314 @@ namespace Contensive.Processor.Controllers {
                                 string AddonOptionStringHTMLEncoded = null;
                                 string ACInstanceId = null;
                                 switch (ElementTag) {
-                                    case "INPUT":
-                                    if (EncodeNonCachableTags) {
-                                        FormInputCount = FormInputCount + 1;
-                                    }
-                                    break;
-                                    case "A":
-                                    if (!string.IsNullOrEmpty(AnchorQuery)) {
-                                        //
-                                        // ----- Add ?eid=0000 to all anchors back to the same site so emails
-                                        //       can be sent that will automatically log the person in when they
-                                        //       arrive.
-                                        //
-                                        int AttributeCount = KmaHTML.ElementAttributeCount(ElementPointer);
-                                        if (AttributeCount > 0) {
-                                            Copy = "<A ";
-                                            for (int AttributePointer = 0; AttributePointer < AttributeCount; AttributePointer++) {
-                                                string attrName = KmaHTML.ElementAttributeName(ElementPointer, AttributePointer);
-                                                string attrValue = KmaHTML.ElementAttributeValue(ElementPointer, AttributePointer);
-                                                if (attrName.ToLower() == "href") {
-                                                    string linkDomain = "";
-                                                    int Pos = GenericController.vbInstr(1, attrValue, "://");
-                                                    if (Pos > 0) {
-                                                        linkDomain = attrValue;
-                                                        linkDomain = linkDomain.Substring(Pos + 2);
-                                                        Pos = GenericController.vbInstr(1, linkDomain, "/");
-                                                        if (Pos > 0) {
-                                                            linkDomain = linkDomain.Left(Pos - 1);
+                                    case "INPUT": {
+                                            if (EncodeNonCachableTags) {
+                                                FormInputCount = FormInputCount + 1;
+                                            }
+                                            break;
+                                        }
+                                    case "A": {
+                                            if (!string.IsNullOrEmpty(AnchorQuery)) {
+                                                //
+                                                // ----- Add ?eid=0000 to all anchors back to the same site so emails
+                                                //       can be sent that will automatically log the person in when they
+                                                //       arrive.
+                                                //
+                                                int AttributeCount = KmaHTML.ElementAttributeCount(ElementPointer);
+                                                if (AttributeCount > 0) {
+                                                    Copy = "<A ";
+                                                    for (int AttributePointer = 0; AttributePointer < AttributeCount; AttributePointer++) {
+                                                        string attrName = KmaHTML.ElementAttributeName(ElementPointer, AttributePointer);
+                                                        string attrValue = KmaHTML.ElementAttributeValue(ElementPointer, AttributePointer);
+                                                        if (attrName.ToLower() == "href") {
+                                                            string linkDomain = "";
+                                                            int Pos = GenericController.vbInstr(1, attrValue, "://");
+                                                            if (Pos > 0) {
+                                                                linkDomain = attrValue;
+                                                                linkDomain = linkDomain.Substring(Pos + 2);
+                                                                Pos = GenericController.vbInstr(1, linkDomain, "/");
+                                                                if (Pos > 0) {
+                                                                    linkDomain = linkDomain.Left(Pos - 1);
+                                                                }
+                                                            }
+                                                            {
+                                                                //
+                                                                // -- add to all links because it is difficult/impossible to trap every case. downside is we will link to other sites
+                                                                if (attrValue.Substring(attrValue.Length - 1) == "?") {
+                                                                    //
+                                                                    // Ends in a questionmark, must be Dwayne (?)
+                                                                    //
+                                                                    attrValue = attrValue + AnchorQuery;
+                                                                } else if (GenericController.vbInstr(1, attrValue, "mailto:", 1) != 0) {
+                                                                    //
+                                                                    // catch mailto
+                                                                    //
+                                                                } else if (GenericController.vbInstr(1, attrValue, "?") == 0) {
+                                                                    //
+                                                                    // No questionmark there, add it
+                                                                    //
+                                                                    attrValue = attrValue + "?" + AnchorQuery;
+                                                                } else {
+                                                                    //
+                                                                    // Questionmark somewhere, add new value with amp;
+                                                                    //
+                                                                    attrValue = attrValue + "&" + AnchorQuery;
+                                                                }
+                                                            }
                                                         }
+                                                        Copy += " " + attrName + "=\"" + attrValue + "\"";
                                                     }
-                                                    {
+                                                    Copy += ">";
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    case "AC": {
+                                            //
+                                            // ----- decode all AC tags
+                                            //
+                                            ACType = KmaHTML.ElementAttribute(ElementPointer, "TYPE");
+                                            ACInstanceId = KmaHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
+                                            string ACGuid = KmaHTML.ElementAttribute(ElementPointer, "GUID");
+                                            switch (ACType.ToUpper()) {
+                                                case ACTypeAggregateFunction: {
                                                         //
-                                                        // -- add to all links because it is difficult/impossible to trap every case. downside is we will link to other sites
-                                                        if (attrValue.Substring(attrValue.Length - 1) == "?") {
+                                                        // -- Add-on
+                                                        NotUsedId = 0;
+                                                        AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
+                                                        addonOptionString = HtmlController.decodeHtml(AddonOptionStringHTMLEncoded);
+                                                        if (IsEmailContent) {
                                                             //
-                                                            // Ends in a questionmark, must be Dwayne (?)
-                                                            //
-                                                            attrValue = attrValue + AnchorQuery;
-                                                        } else if (GenericController.vbInstr(1, attrValue, "mailto:", 1) != 0) {
-                                                            //
-                                                            // catch mailto
-                                                            //
-                                                        } else if (GenericController.vbInstr(1, attrValue, "?") == 0) {
-                                                            //
-                                                            // No questionmark there, add it
-                                                            //
-                                                            attrValue = attrValue + "?" + AnchorQuery;
+                                                            // -- Addon for email
+                                                            if (EncodeNonCachableTags) {
+                                                                switch (GenericController.vbLCase(ACName)) {
+                                                                    case "block text": {
+                                                                            //
+                                                                            // -- start block text
+                                                                            Copy = "";
+                                                                            string GroupIDList = HtmlController.getAddonOptionStringValue("AllowGroups", addonOptionString);
+                                                                            if (!GroupController.isInGroupList(core, deprecated_personalizationPeopleId, true, GroupIDList, true)) {
+                                                                                //
+                                                                                // Block content if not allowed
+                                                                                //
+                                                                                ElementPointer = ElementPointer + 1;
+                                                                                while (ElementPointer < KmaHTML.ElementCount) {
+                                                                                    ElementTag = GenericController.vbUCase(KmaHTML.TagName(ElementPointer));
+                                                                                    if (ElementTag == "AC") {
+                                                                                        ACType = GenericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"));
+                                                                                        if (ACType == ACTypeAggregateFunction) {
+                                                                                            if (GenericController.vbLCase(KmaHTML.ElementAttribute(ElementPointer, "name")) == "block text end") {
+                                                                                                break;
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                    ElementPointer = ElementPointer + 1;
+                                                                                }
+                                                                            }
+                                                                            break;
+                                                                        }
+                                                                    case "block text end": {
+                                                                            //
+                                                                            // -- end block text
+                                                                            Copy = "";
+                                                                            break;
+                                                                        }
+                                                                    default: {
+                                                                            //
+                                                                            // -- addons
+                                                                            CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                                                                addonType = CPUtilsBaseClass.addonContext.ContextEmail,
+                                                                                cssContainerClass = "",
+                                                                                cssContainerId = "",
+                                                                                hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                                                                    contentName = ContextContentName,
+                                                                                    fieldName = "",
+                                                                                    recordId = ContextRecordID
+                                                                                },
+                                                                                argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, AddonOptionStringHTMLEncoded),
+                                                                                instanceGuid = ACInstanceId,
+                                                                                errorContextMessage = "rendering addon found in active content within an email"
+                                                                            };
+                                                                            AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, ACName);
+                                                                            Copy = core.addon.execute(addon, executeContext);
+                                                                            break;
+                                                                        }
+                                                                }
+                                                            }
                                                         } else {
                                                             //
-                                                            // Questionmark somewhere, add new value with amp;
+                                                            // Addon - for web
                                                             //
-                                                            attrValue = attrValue + "&" + AnchorQuery;
-                                                        }
-                                                    }
-                                                }
-                                                Copy += " " + attrName + "=\"" + attrValue + "\"";
-                                            }
-                                            Copy += ">";
-                                        }
-                                    }
-                                    break;
-                                    case "AC":
-                                    //
-                                    // ----- decode all AC tags
-                                    //
-                                    ACType = KmaHTML.ElementAttribute(ElementPointer, "TYPE");
-                                    ACInstanceId = KmaHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
-                                    string ACGuid = KmaHTML.ElementAttribute(ElementPointer, "GUID");
-                                    switch (ACType.ToUpper()) {
-                                        case ACTypeAggregateFunction: {
-                                                //
-                                                // -- Add-on
-                                                NotUsedId = 0;
-                                                AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                addonOptionString = HtmlController.decodeHtml(AddonOptionStringHTMLEncoded);
-                                                if (IsEmailContent) {
-                                                    //
-                                                    // -- Addon for email
-                                                    if (EncodeNonCachableTags) {
-                                                        switch (GenericController.vbLCase(ACName)) {
-                                                            case "block text":
-                                                            //
-                                                            // -- start block text
-                                                            Copy = "";
-                                                            string GroupIDList = HtmlController.getAddonOptionStringValue("AllowGroups", addonOptionString);
-                                                            if (!GroupController.isInGroupList(core, deprecated_personalizationPeopleId, true, GroupIDList, true)) {
+
+                                                            if (encodeForWysiwygEditor) {
                                                                 //
-                                                                // Block content if not allowed
+                                                                // Get IconFilename, update the optionstring, and execute optionstring replacement functions
                                                                 //
-                                                                ElementPointer = ElementPointer + 1;
-                                                                while (ElementPointer < KmaHTML.ElementCount) {
-                                                                    ElementTag = GenericController.vbUCase(KmaHTML.TagName(ElementPointer));
-                                                                    if (ElementTag == "AC") {
-                                                                        ACType = GenericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"));
-                                                                        if (ACType == ACTypeAggregateFunction) {
-                                                                            if (GenericController.vbLCase(KmaHTML.ElementAttribute(ElementPointer, "name")) == "block text end") {
-                                                                                break;
-                                                                            }
+                                                                string AddonContentName = AddonModel.tableMetadata.contentName;
+                                                                string SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid";
+                                                                int IconWidth = 0;
+                                                                int IconHeight = 0;
+                                                                int IconSprites = 0;
+                                                                string IconAlt = "";
+                                                                string IconTitle = "";
+                                                                bool AddonIsInline = false;
+                                                                string SrcOptionList = "";
+                                                                string IconFilename = "";
+                                                                using (var csData = new CsModel(core)) {
+                                                                    string Criteria = "";
+                                                                    if (!string.IsNullOrEmpty(ACGuid)) {
+                                                                        Criteria = "ccguid=" + DbController.encodeSQLText(ACGuid);
+                                                                    } else {
+                                                                        Criteria = "name=" + DbController.encodeSQLText(ACName.ToUpper());
+                                                                    }
+                                                                    if (csData.open(AddonContentName, Criteria, "Name,ID", false, 0, SelectList)) {
+                                                                        IconFilename = csData.getText("IconFilename");
+                                                                        SrcOptionList = csData.getText("ArgumentList");
+                                                                        IconWidth = csData.getInteger("IconWidth");
+                                                                        IconHeight = csData.getInteger("IconHeight");
+                                                                        IconSprites = csData.getInteger("IconSprites");
+                                                                        AddonIsInline = csData.getBoolean("IsInline");
+                                                                        ACGuid = csData.getText("ccGuid");
+                                                                        IconAlt = ACName;
+                                                                        IconTitle = "Rendered as the Add-on [" + ACName + "]";
+                                                                    } else {
+                                                                        switch (GenericController.vbLCase(ACName)) {
+                                                                            case "block text": {
+                                                                                    IconFilename = "";
+                                                                                    SrcOptionList = AddonOptionConstructor_ForBlockText;
+                                                                                    IconWidth = 0;
+                                                                                    IconHeight = 0;
+                                                                                    IconSprites = 0;
+                                                                                    AddonIsInline = true;
+                                                                                    ACGuid = "";
+                                                                                    break;
+                                                                                }
+                                                                            case "block text end": {
+                                                                                    IconFilename = "";
+                                                                                    SrcOptionList = "";
+                                                                                    IconWidth = 0;
+                                                                                    IconHeight = 0;
+                                                                                    IconSprites = 0;
+                                                                                    AddonIsInline = true;
+                                                                                    ACGuid = "";
+                                                                                    break;
+                                                                                }
+                                                                            default: {
+                                                                                    IconFilename = "";
+                                                                                    SrcOptionList = "";
+                                                                                    IconWidth = 0;
+                                                                                    IconHeight = 0;
+                                                                                    IconSprites = 0;
+                                                                                    AddonIsInline = false;
+                                                                                    IconAlt = "Unknown Add-on [" + ACName + "]";
+                                                                                    IconTitle = "Unknown Add-on [" + ACName + "]";
+                                                                                    ACGuid = "";
+                                                                                    break;
+                                                                                }
                                                                         }
                                                                     }
-                                                                    ElementPointer = ElementPointer + 1;
+                                                                    csData.close();
                                                                 }
-                                                            }
-                                                            break;
-                                                            case "block text end":
-                                                            //
-                                                            // -- end block text
-                                                            Copy = "";
-                                                            break;
-                                                            default:
-                                                            //
-                                                            // -- addons
-                                                            CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                                                                addonType = CPUtilsBaseClass.addonContext.ContextEmail,
-                                                                cssContainerClass = "",
-                                                                cssContainerId = "",
-                                                                hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                                                    contentName = ContextContentName,
-                                                                    fieldName = "",
-                                                                    recordId = ContextRecordID
-                                                                },
-                                                                argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, AddonOptionStringHTMLEncoded),
-                                                                instanceGuid = ACInstanceId,
-                                                                errorContextMessage = "rendering addon found in active content within an email"
-                                                            };
-                                                            AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, ACName);
-                                                            Copy = core.addon.execute(addon, executeContext);
-                                                            break;
-                                                        }
-                                                    }
-                                                } else {
-                                                    //
-                                                    // Addon - for web
-                                                    //
-
-                                                    if (encodeForWysiwygEditor) {
-                                                        //
-                                                        // Get IconFilename, update the optionstring, and execute optionstring replacement functions
-                                                        //
-                                                        string AddonContentName = AddonModel.tableMetadata.contentName;
-                                                        string SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid";
-                                                        int IconWidth = 0;
-                                                        int IconHeight = 0;
-                                                        int IconSprites = 0;
-                                                        string IconAlt = "";
-                                                        string IconTitle = "";
-                                                        bool AddonIsInline = false;
-                                                        string SrcOptionList = "";
-                                                        string IconFilename = "";
-                                                        using (var csData = new CsModel(core)) {
-                                                            string Criteria = "";
-                                                            if (!string.IsNullOrEmpty(ACGuid)) {
-                                                                Criteria = "ccguid=" + DbController.encodeSQLText(ACGuid);
-                                                            } else {
-                                                                Criteria = "name=" + DbController.encodeSQLText(ACName.ToUpper());
-                                                            }
-                                                            if (csData.open(AddonContentName, Criteria, "Name,ID", false, 0, SelectList)) {
-                                                                IconFilename = csData.getText("IconFilename");
-                                                                SrcOptionList = csData.getText("ArgumentList");
-                                                                IconWidth = csData.getInteger("IconWidth");
-                                                                IconHeight = csData.getInteger("IconHeight");
-                                                                IconSprites = csData.getInteger("IconSprites");
-                                                                AddonIsInline = csData.getBoolean("IsInline");
-                                                                ACGuid = csData.getText("ccGuid");
-                                                                IconAlt = ACName;
-                                                                IconTitle = "Rendered as the Add-on [" + ACName + "]";
-                                                            } else {
-                                                                switch (GenericController.vbLCase(ACName)) {
-                                                                    case "block text":
-                                                                    IconFilename = "";
-                                                                    SrcOptionList = AddonOptionConstructor_ForBlockText;
-                                                                    IconWidth = 0;
-                                                                    IconHeight = 0;
-                                                                    IconSprites = 0;
-                                                                    AddonIsInline = true;
-                                                                    ACGuid = "";
-                                                                    break;
-                                                                    case "block text end":
-                                                                    IconFilename = "";
-                                                                    SrcOptionList = "";
-                                                                    IconWidth = 0;
-                                                                    IconHeight = 0;
-                                                                    IconSprites = 0;
-                                                                    AddonIsInline = true;
-                                                                    ACGuid = "";
-                                                                    break;
-                                                                    default:
-                                                                    IconFilename = "";
-                                                                    SrcOptionList = "";
-                                                                    IconWidth = 0;
-                                                                    IconHeight = 0;
-                                                                    IconSprites = 0;
-                                                                    AddonIsInline = false;
-                                                                    IconAlt = "Unknown Add-on [" + ACName + "]";
-                                                                    IconTitle = "Unknown Add-on [" + ACName + "]";
-                                                                    ACGuid = "";
-                                                                    break;
-                                                                }
-                                                            }
-                                                            csData.close();
-                                                        }
-                                                        //
-                                                        // Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
-                                                        //
-                                                        if (SrcOptionList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) == -1) {
-                                                            if (AddonIsInline) {
-                                                                SrcOptionList = SrcOptionList + Environment.NewLine + AddonOptionConstructor_Inline;
-                                                            } else {
-                                                                SrcOptionList = SrcOptionList + Environment.NewLine + AddonOptionConstructor_Block;
-                                                            }
-                                                        }
-                                                        string ResultOptionListHTMLEncoded = "";
-                                                        if (!string.IsNullOrEmpty(SrcOptionList)) {
-                                                            ResultOptionListHTMLEncoded = "";
-                                                            SrcOptionList = GenericController.vbReplace(SrcOptionList, Environment.NewLine, "\r");
-                                                            SrcOptionList = GenericController.vbReplace(SrcOptionList, "\n", "\r");
-                                                            string[] SrcOptions = GenericController.stringSplit(SrcOptionList, "\r");
-                                                            for (int Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
-                                                                string SrcOptionName = SrcOptions[Ptr];
-                                                                int LoopPtr2 = 0;
-
-                                                                while ((SrcOptionName.Length > 1) && (SrcOptionName.Left(1) == "\t") && (LoopPtr2 < 100)) {
-                                                                    SrcOptionName = SrcOptionName.Substring(1);
-                                                                    LoopPtr2 = LoopPtr2 + 1;
-                                                                }
-                                                                string SrcOptionValueSelector = "";
-                                                                string SrcOptionSelector = "";
-                                                                int Pos = GenericController.vbInstr(1, SrcOptionName, "=");
-                                                                if (Pos > 0) {
-                                                                    SrcOptionValueSelector = SrcOptionName.Substring(Pos);
-                                                                    SrcOptionName = SrcOptionName.Left(Pos - 1);
-                                                                    SrcOptionSelector = "";
-                                                                    Pos = GenericController.vbInstr(1, SrcOptionValueSelector, "[");
-                                                                    if (Pos != 0) {
-                                                                        SrcOptionSelector = SrcOptionValueSelector.Substring(Pos - 1);
+                                                                //
+                                                                // Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
+                                                                //
+                                                                if (SrcOptionList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) == -1) {
+                                                                    if (AddonIsInline) {
+                                                                        SrcOptionList = SrcOptionList + Environment.NewLine + AddonOptionConstructor_Inline;
+                                                                    } else {
+                                                                        SrcOptionList = SrcOptionList + Environment.NewLine + AddonOptionConstructor_Block;
                                                                     }
                                                                 }
-                                                                // all Src and Instance vars are already encoded correctly
-                                                                if (!string.IsNullOrEmpty(SrcOptionName)) {
-                                                                    // since AddonOptionString is encoded, InstanceOptionValue will be also
-                                                                    string InstanceOptionValue = HtmlController.getAddonOptionStringValue(SrcOptionName, addonOptionString);
-                                                                    string ResultOptionSelector = core.html.getAddonSelector(SrcOptionName, GenericController.encodeNvaArgument(InstanceOptionValue), SrcOptionSelector);
-                                                                    ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded + "&" + ResultOptionSelector;
+                                                                string ResultOptionListHTMLEncoded = "";
+                                                                if (!string.IsNullOrEmpty(SrcOptionList)) {
+                                                                    ResultOptionListHTMLEncoded = "";
+                                                                    SrcOptionList = GenericController.vbReplace(SrcOptionList, Environment.NewLine, "\r");
+                                                                    SrcOptionList = GenericController.vbReplace(SrcOptionList, "\n", "\r");
+                                                                    string[] SrcOptions = GenericController.stringSplit(SrcOptionList, "\r");
+                                                                    for (int Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
+                                                                        string SrcOptionName = SrcOptions[Ptr];
+                                                                        int LoopPtr2 = 0;
+
+                                                                        while ((SrcOptionName.Length > 1) && (SrcOptionName.Left(1) == "\t") && (LoopPtr2 < 100)) {
+                                                                            SrcOptionName = SrcOptionName.Substring(1);
+                                                                            LoopPtr2 = LoopPtr2 + 1;
+                                                                        }
+                                                                        string SrcOptionValueSelector = "";
+                                                                        string SrcOptionSelector = "";
+                                                                        int Pos = GenericController.vbInstr(1, SrcOptionName, "=");
+                                                                        if (Pos > 0) {
+                                                                            SrcOptionValueSelector = SrcOptionName.Substring(Pos);
+                                                                            SrcOptionName = SrcOptionName.Left(Pos - 1);
+                                                                            SrcOptionSelector = "";
+                                                                            Pos = GenericController.vbInstr(1, SrcOptionValueSelector, "[");
+                                                                            if (Pos != 0) {
+                                                                                SrcOptionSelector = SrcOptionValueSelector.Substring(Pos - 1);
+                                                                            }
+                                                                        }
+                                                                        // all Src and Instance vars are already encoded correctly
+                                                                        if (!string.IsNullOrEmpty(SrcOptionName)) {
+                                                                            // since AddonOptionString is encoded, InstanceOptionValue will be also
+                                                                            string InstanceOptionValue = HtmlController.getAddonOptionStringValue(SrcOptionName, addonOptionString);
+                                                                            string ResultOptionSelector = core.html.getAddonSelector(SrcOptionName, GenericController.encodeNvaArgument(InstanceOptionValue), SrcOptionSelector);
+                                                                            ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded + "&" + ResultOptionSelector;
+                                                                        }
+                                                                    }
+                                                                    if (!string.IsNullOrEmpty(ResultOptionListHTMLEncoded)) {
+                                                                        ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded.Substring(1);
+                                                                    }
                                                                 }
+                                                                string ACNameCaption = GenericController.vbReplace(ACName, "\"", "");
+                                                                ACNameCaption = HtmlController.encodeHtml(ACNameCaption);
+                                                                string IDControlString = "AC," + ACType + "," + NotUsedId + "," + GenericController.encodeNvaArgument(ACName) + "," + ResultOptionListHTMLEncoded + "," + ACGuid;
+                                                                Copy = AddonController.getAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceId, 0);
+                                                            } else if (EncodeNonCachableTags) {
+                                                                //
+                                                                // Add-on Experiment - move all processing to the Webclient
+                                                                // just pass the name and arguments back in th FPO
+                                                                // HTML encode and quote the name and AddonOptionString
+                                                                //
+                                                                Copy = ""
+                                                                + ""
+                                                                + "<!-- ADDON "
+                                                                + "\"" + ACName + "\""
+                                                                + ",\"" + AddonOptionStringHTMLEncoded + "\""
+                                                                + ",\"" + ACInstanceId + "\""
+                                                                + ",\"" + ACGuid + "\""
+                                                                + " -->"
+                                                                + "";
                                                             }
-                                                            if (!string.IsNullOrEmpty(ResultOptionListHTMLEncoded)) {
-                                                                ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded.Substring(1);
-                                                            }
+                                                            //
                                                         }
-                                                        string ACNameCaption = GenericController.vbReplace(ACName, "\"", "");
-                                                        ACNameCaption = HtmlController.encodeHtml(ACNameCaption);
-                                                        string IDControlString = "AC," + ACType + "," + NotUsedId + "," + GenericController.encodeNvaArgument(ACName) + "," + ResultOptionListHTMLEncoded + "," + ACGuid;
-                                                        Copy = AddonController.getAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceId, 0);
-                                                    } else if (EncodeNonCachableTags) {
-                                                        //
-                                                        // Add-on Experiment - move all processing to the Webclient
-                                                        // just pass the name and arguments back in th FPO
-                                                        // HTML encode and quote the name and AddonOptionString
-                                                        //
-                                                        Copy = ""
-                                                        + ""
-                                                        + "<!-- ADDON "
-                                                        + "\"" + ACName + "\""
-                                                        + ",\"" + AddonOptionStringHTMLEncoded + "\""
-                                                        + ",\"" + ACInstanceId + "\""
-                                                        + ",\"" + ACGuid + "\""
-                                                        + " -->"
-                                                        + "";
+                                                        break;
                                                     }
-                                                    //
-                                                }
-                                                break;
+                                                case ACTypeTemplateContent: {
+                                                        //
+                                                        // ----- Create Template Content
+                                                        AddonOptionStringHTMLEncoded = "";
+                                                        addonOptionString = "";
+                                                        NotUsedId = 0;
+                                                        if (encodeForWysiwygEditor) {
+                                                            //
+                                                            string IconIDControlString = "AC," + ACType + "," + NotUsedId + "," + ACName + "," + AddonOptionStringHTMLEncoded;
+                                                            Copy = AddonController.getAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceId, 0);
+                                                        } else if (EncodeNonCachableTags) {
+                                                            //
+                                                            // Add in the Content
+                                                            Copy = fpoContentBox;
+                                                        }
+                                                        break;
+                                                    }
+                                                default: {
+                                                        // nop
+                                                        break;
+                                                    }
                                             }
-                                        case ACTypeTemplateContent: {
-                                                //
-                                                // ----- Create Template Content
-                                                AddonOptionStringHTMLEncoded = "";
-                                                addonOptionString = "";
-                                                NotUsedId = 0;
-                                                if (encodeForWysiwygEditor) {
-                                                    //
-                                                    string IconIDControlString = "AC," + ACType + "," + NotUsedId + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                    Copy = AddonController.getAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceId, 0);
-                                                } else if (EncodeNonCachableTags) {
-                                                    //
-                                                    // Add in the Content
-                                                    Copy = fpoContentBox;
-                                                }
-                                                break;
-                                            }
-                                    }
-                                    break;
+                                            break;
+                                        }
+                                    default: {
+                                            // nop;
+                                            break;
+                                        }
                                 }
                             }
                             //
@@ -458,475 +475,487 @@ namespace Contensive.Processor.Controllers {
                                 if (DHTML.IsTag(ElementPointer)) {
                                     int AttributeCount = 0;
                                     switch (GenericController.vbUCase(DHTML.TagName(ElementPointer))) {
-                                        case "FORM":
-                                        //
-                                        // User created form - add the attribute "Contensive=1"
-                                        //
-                                        break;
-                                        case "IMG":
-                                        AttributeCount = DHTML.ElementAttributeCount(ElementPointer);
-
-                                        if (AttributeCount > 0) {
-                                            string ImageId = DHTML.ElementAttribute(ElementPointer, "id");
-                                            string ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src");
-                                            string VirtualFilePathBad = core.appConfig.name + "/files/";
-                                            string serverFilePath = "/" + VirtualFilePathBad;
-                                            if (ImageSrcOriginal.ToLowerInvariant().Left(VirtualFilePathBad.Length) == GenericController.vbLCase(VirtualFilePathBad)) {
+                                        case "FORM": {
                                                 //
-                                                // if the image is from the virtual file path, but the editor did not include the root path, add it
+                                                // User created form - add the attribute "Contensive=1"
                                                 //
-                                                ElementText = GenericController.vbReplace(ElementText, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
-                                                ImageSrcOriginal = GenericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
+                                                break;
                                             }
-                                            string ImageSrc = HtmlController.decodeHtml(ImageSrcOriginal);
-                                            ImageSrc = decodeURL(ImageSrc);
-                                            //
-                                            // problem with this case is if the addon icon image is from another site.
-                                            // not sure how it happened, but I do not think the src of an addon edit icon
-                                            // should be able to prevent the addon from executing.
-                                            //
-                                            string ACIdentifier = "";
-                                            string ACType = "";
-                                            string ACFieldName = "";
-                                            string ACInstanceName = "";
-                                            string ACGuid = "";
-                                            int ImageIDArrayCount = 0;
-                                            string ACQueryString = "";
-                                            int Ptr = 0;
-                                            string[] ImageIDArray = { };
-                                            if (0 != GenericController.vbInstr(1, ImageId, ",")) {
-                                                ImageIDArray = ImageId.Split(',');
-                                                ImageIDArrayCount = ImageIDArray.GetUpperBound(0) + 1;
-                                                if (ImageIDArrayCount > 5) {
-                                                    for (Ptr = 5; Ptr < ImageIDArrayCount; Ptr++) {
-                                                        ACGuid = ImageIDArray[Ptr];
-                                                        if ((ACGuid.Left(1) == "{") && (ACGuid.Substring(ACGuid.Length - 1) == "}")) {
-                                                            //
-                                                            // this element is the guid, go with it
-                                                            //
-                                                            break;
-                                                        } else if ((string.IsNullOrEmpty(ACGuid)) && (Ptr == (ImageIDArrayCount - 1))) {
-                                                            //
-                                                            // this is the last element, leave it as the guid
-                                                            //
-                                                            break;
-                                                        } else {
-                                                            //
-                                                            // not a valid guid, add it to element 4 and try the next
-                                                            //
-                                                            ImageIDArray[4] = ImageIDArray[4] + "," + ACGuid;
-                                                            ACGuid = "";
-                                                        }
+                                        case "IMG": {
+                                                AttributeCount = DHTML.ElementAttributeCount(ElementPointer);
+                                                if (AttributeCount > 0) {
+                                                    string ImageId = DHTML.ElementAttribute(ElementPointer, "id");
+                                                    string ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src");
+                                                    string VirtualFilePathBad = core.appConfig.name + "/files/";
+                                                    string serverFilePath = "/" + VirtualFilePathBad;
+                                                    if (ImageSrcOriginal.ToLowerInvariant().Left(VirtualFilePathBad.Length) == GenericController.vbLCase(VirtualFilePathBad)) {
+                                                        //
+                                                        // if the image is from the virtual file path, but the editor did not include the root path, add it
+                                                        //
+                                                        ElementText = GenericController.vbReplace(ElementText, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
+                                                        ImageSrcOriginal = GenericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
                                                     }
-                                                }
-                                                if (ImageIDArrayCount > 1) {
-                                                    ACIdentifier = GenericController.vbUCase(ImageIDArray[0]);
-                                                    ACType = ImageIDArray[1];
-                                                    if (ImageIDArrayCount > 2) {
-                                                        ACFieldName = ImageIDArray[2];
-                                                        if (ImageIDArrayCount > 3) {
-                                                            ACInstanceName = ImageIDArray[3];
-                                                            if (ImageIDArrayCount > 4) {
-                                                                ACQueryString = ImageIDArray[4];
+                                                    string ImageSrc = HtmlController.decodeHtml(ImageSrcOriginal);
+                                                    ImageSrc = decodeURL(ImageSrc);
+                                                    //
+                                                    // problem with this case is if the addon icon image is from another site.
+                                                    // not sure how it happened, but I do not think the src of an addon edit icon
+                                                    // should be able to prevent the addon from executing.
+                                                    //
+                                                    string ACIdentifier = "";
+                                                    string ACType = "";
+                                                    string ACFieldName = "";
+                                                    string ACInstanceName = "";
+                                                    string ACGuid = "";
+                                                    int ImageIDArrayCount = 0;
+                                                    string ACQueryString = "";
+                                                    int Ptr = 0;
+                                                    string[] ImageIDArray = { };
+                                                    if (0 != GenericController.vbInstr(1, ImageId, ",")) {
+                                                        ImageIDArray = ImageId.Split(',');
+                                                        ImageIDArrayCount = ImageIDArray.GetUpperBound(0) + 1;
+                                                        if (ImageIDArrayCount > 5) {
+                                                            for (Ptr = 5; Ptr < ImageIDArrayCount; Ptr++) {
+                                                                ACGuid = ImageIDArray[Ptr];
+                                                                if ((ACGuid.Left(1) == "{") && (ACGuid.Substring(ACGuid.Length - 1) == "}")) {
+                                                                    //
+                                                                    // this element is the guid, go with it
+                                                                    //
+                                                                    break;
+                                                                } else if ((string.IsNullOrEmpty(ACGuid)) && (Ptr == (ImageIDArrayCount - 1))) {
+                                                                    //
+                                                                    // this is the last element, leave it as the guid
+                                                                    //
+                                                                    break;
+                                                                } else {
+                                                                    //
+                                                                    // not a valid guid, add it to element 4 and try the next
+                                                                    //
+                                                                    ImageIDArray[4] = ImageIDArray[4] + "," + ACGuid;
+                                                                    ACGuid = "";
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                }
-                                            }
-                                            int Pos = 0;
-                                            int recordId = 0;
-                                            string imageStyle = null;
-                                            if (ACIdentifier == "AC") {
-                                                {
-                                                    {
-                                                        //
-                                                        // ----- Process AC Tag
-                                                        //
-                                                        string acInstanceID = DHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
-                                                        if (string.IsNullOrEmpty(acInstanceID)) {
-                                                            acInstanceID = GenericController.getGUID();
-                                                        }
-                                                        ElementText = "";
-                                                        string QueryString = null;
-                                                        string[] QSSplit = null;
-                                                        int QSPtr = 0;
-                                                        //----------------------------- change to ACType
-                                                        switch (GenericController.vbUCase(ACType)) {
-                                                            case "IMAGE":
-                                                            //
-                                                            // ----- AC Image, Decode Active Images to Resource Library references
-                                                            //
-                                                            if (ImageIDArrayCount >= 4) {
-                                                                recordId = GenericController.encodeInteger(ACInstanceName);
-                                                                string ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH");
-                                                                string ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT");
-                                                                string ImageAlt = HtmlController.encodeHtml(DHTML.ElementAttribute(ElementPointer, "Alt"));
-                                                                int ImageVSpace = GenericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"));
-                                                                int ImageHSpace = GenericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"));
-                                                                string ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align");
-                                                                string ImageBorder = DHTML.ElementAttribute(ElementPointer, "BORDER");
-                                                                string ImageLoop = DHTML.ElementAttribute(ElementPointer, "LOOP");
-                                                                imageStyle = DHTML.ElementAttribute(ElementPointer, "STYLE");
-
-                                                                if (!string.IsNullOrEmpty(imageStyle)) {
-                                                                    //
-                                                                    // ----- Process styles, which override attributes
-                                                                    //
-                                                                    string[] IMageStyleArray = imageStyle.Split(';');
-                                                                    int ImageStyleArrayCount = IMageStyleArray.GetUpperBound(0) + 1;
-                                                                    int ImageStyleArrayPointer = 0;
-                                                                    for (ImageStyleArrayPointer = 0; ImageStyleArrayPointer < ImageStyleArrayCount; ImageStyleArrayPointer++) {
-                                                                        string ImageStylePair = IMageStyleArray[ImageStyleArrayPointer].Trim(' ');
-                                                                        int PositionColon = GenericController.vbInstr(1, ImageStylePair, ":");
-                                                                        if (PositionColon > 1) {
-                                                                            string ImageStylePairName = (ImageStylePair.Left(PositionColon - 1)).Trim(' ');
-                                                                            string ImageStylePairValue = (ImageStylePair.Substring(PositionColon)).Trim(' ');
-                                                                            switch (GenericController.vbUCase(ImageStylePairName)) {
-                                                                                case "WIDTH":
-                                                                                ImageStylePairValue = GenericController.vbReplace(ImageStylePairValue, "px", "");
-                                                                                ImageWidthText = ImageStylePairValue;
-                                                                                break;
-                                                                                case "HEIGHT":
-                                                                                ImageStylePairValue = GenericController.vbReplace(ImageStylePairValue, "px", "");
-                                                                                ImageHeightText = ImageStylePairValue;
-                                                                                break;
-                                                                            }
-                                                                        }
+                                                        if (ImageIDArrayCount > 1) {
+                                                            ACIdentifier = GenericController.vbUCase(ImageIDArray[0]);
+                                                            ACType = ImageIDArray[1];
+                                                            if (ImageIDArrayCount > 2) {
+                                                                ACFieldName = ImageIDArray[2];
+                                                                if (ImageIDArrayCount > 3) {
+                                                                    ACInstanceName = ImageIDArray[3];
+                                                                    if (ImageIDArrayCount > 4) {
+                                                                        ACQueryString = ImageIDArray[4];
                                                                     }
                                                                 }
-                                                                ElementText = "<AC type=\"IMAGE\" ACInstanceID=\"" + acInstanceID + "\" RecordID=\"" + recordId + "\" Style=\"" + imageStyle + "\" Width=\"" + ImageWidthText + "\" Height=\"" + ImageHeightText + "\" VSpace=\"" + ImageVSpace + "\" HSpace=\"" + ImageHSpace + "\" Alt=\"" + ImageAlt + "\" Align=\"" + ImageAlign + "\" Border=\"" + ImageBorder + "\" Loop=\"" + ImageLoop + "\">";
                                                             }
-                                                            break;
-                                                            case ACTypeAggregateFunction:
-                                                            //
-                                                            // Function
-                                                            //
-                                                            QueryString = "";
-                                                            if (!string.IsNullOrEmpty(ACQueryString)) {
-                                                                // I added this because single stepping through it I found it split on the & in &amp;
-                                                                // I had added an Add-on and was saving
-                                                                // I find it VERY odd that this could be the case
+                                                        }
+                                                    }
+                                                    int Pos = 0;
+                                                    int recordId = 0;
+                                                    string imageStyle = null;
+                                                    if (ACIdentifier == "AC") {
+                                                        {
+                                                            {
                                                                 //
-                                                                string QSHTMLEncoded = GenericController.encodeText(ACQueryString);
-                                                                QueryString = HtmlController.decodeHtml(QSHTMLEncoded);
-                                                                QSSplit = QueryString.Split('&');
-                                                                for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                    Pos = GenericController.vbInstr(1, QSSplit[QSPtr], "[");
-                                                                    if (Pos > 0) {
-                                                                        QSSplit[QSPtr] = QSSplit[QSPtr].Left(Pos - 1);
-                                                                    }
-                                                                    QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
+                                                                // ----- Process AC Tag
+                                                                //
+                                                                string acInstanceID = DHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
+                                                                if (string.IsNullOrEmpty(acInstanceID)) {
+                                                                    acInstanceID = GenericController.getGUID();
                                                                 }
-                                                                QueryString = string.Join("&", QSSplit);
-                                                            }
-                                                            ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + acInstanceID + "\" querystring=\"" + QueryString + "\" guid=\"" + ACGuid + "\">";
-                                                            break;
-                                                            case ACTypeTemplateContent:
-                                                            case ACTypeTemplateText:
-                                                            //
-                                                            //
-                                                            //
-                                                            QueryString = "";
-                                                            if (ImageIDArrayCount > 4) {
-                                                                QueryString = GenericController.encodeText(ImageIDArray[4]);
-                                                                QSSplit = QueryString.Split('&');
-                                                                for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                    QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
-                                                                }
-                                                                QueryString = string.Join("&", QSSplit);
+                                                                ElementText = "";
+                                                                string QueryString = null;
+                                                                string[] QSSplit = null;
+                                                                int QSPtr = 0;
+                                                                //----------------------------- change to ACType
+                                                                switch (GenericController.vbUCase(ACType)) {
+                                                                    case "IMAGE": {
+                                                                            //
+                                                                            // ----- AC Image, Decode Active Images to Resource Library references
+                                                                            //
+                                                                            if (ImageIDArrayCount >= 4) {
+                                                                                recordId = GenericController.encodeInteger(ACInstanceName);
+                                                                                string ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH");
+                                                                                string ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT");
+                                                                                string ImageAlt = HtmlController.encodeHtml(DHTML.ElementAttribute(ElementPointer, "Alt"));
+                                                                                int ImageVSpace = GenericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"));
+                                                                                int ImageHSpace = GenericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"));
+                                                                                string ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align");
+                                                                                string ImageBorder = DHTML.ElementAttribute(ElementPointer, "BORDER");
+                                                                                string ImageLoop = DHTML.ElementAttribute(ElementPointer, "LOOP");
+                                                                                imageStyle = DHTML.ElementAttribute(ElementPointer, "STYLE");
 
-                                                            }
-                                                            ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + acInstanceID + "\" querystring=\"" + QueryString + "\">";
-                                                            break;
-                                                            default:
-                                                            //
-                                                            // All others -- added querystring from element(4) to all others to cover the group access AC object
-                                                            //
-                                                            QueryString = "";
-                                                            if (ImageIDArrayCount > 4) {
-                                                                QueryString = GenericController.encodeText(ImageIDArray[4]);
-                                                                QueryString = HtmlController.decodeHtml(QueryString);
-                                                                QSSplit = QueryString.Split('&');
-                                                                for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                    QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
-                                                                }
-                                                                QueryString = string.Join("&", QSSplit);
-                                                            }
-                                                            ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + acInstanceID + "\" field=\"" + ACFieldName + "\" querystring=\"" + QueryString + "\">";
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            } else if (GenericController.vbInstr(1, ImageSrc, "cclibraryfiles", 1) != 0) {
-                                                bool ImageAllowSFResize = core.siteProperties.getBoolean("ImageAllowSFResize", true);
-                                                if (ImageAllowSFResize && true) {
-                                                    //
-                                                    // if it is a real image, check for resize
-                                                    //
-                                                    Pos = GenericController.vbInstr(1, ImageSrc, "cclibraryfiles", 1);
-                                                    if (Pos != 0) {
-                                                        string ImageVirtualFilename = ImageSrc.Substring(Pos - 1);
-                                                        string[] Paths = ImageVirtualFilename.Split('/');
-                                                        if (Paths.GetUpperBound(0) > 2) {
-                                                            if (GenericController.vbLCase(Paths[1]) == "filename") {
-                                                                recordId = GenericController.encodeInteger(Paths[2]);
-                                                                if (recordId != 0) {
-                                                                    string ImageFilename = Paths[3];
-                                                                    string ImageVirtualFilePath = GenericController.vbReplace(ImageVirtualFilename, ImageFilename, "");
-                                                                    Pos = ImageFilename.LastIndexOf(".") + 1;
-                                                                    if (Pos > 0) {
-                                                                        string ImageFilenameAltSize = "";
-                                                                        string ImageFilenameExt = ImageFilename.Substring(Pos);
-                                                                        string ImageFilenameNoExt = ImageFilename.Left(Pos - 1);
-                                                                        Pos = ImageFilenameNoExt.LastIndexOf("-") + 1;
-                                                                        if (Pos > 0) {
-                                                                            //
-                                                                            // ImageAltSize should be set from the width and height of the img tag,
-                                                                            // NOT from the actual width and height of the image file
-                                                                            // NOT from the suffix of the image filename
-                                                                            // ImageFilenameAltSize is used when the image has been resized, then 'reset' was hit
-                                                                            //  on the properties dialog before the save. The width and height come from this suffix
-                                                                            //
-                                                                            ImageFilenameAltSize = ImageFilenameNoExt.Substring(Pos);
-                                                                            string[] SizeTest = ImageFilenameAltSize.Split('x');
-                                                                            if (SizeTest.GetUpperBound(0) != 1) {
-                                                                                ImageFilenameAltSize = "";
-                                                                            } else {
-                                                                                if ((SizeTest[0].IsNumeric() & SizeTest[1].IsNumeric())) {
-                                                                                    ImageFilenameNoExt = ImageFilenameNoExt.Left(Pos - 1);
-                                                                                } else {
-                                                                                    ImageFilenameAltSize = "";
+                                                                                if (!string.IsNullOrEmpty(imageStyle)) {
+                                                                                    //
+                                                                                    // ----- Process styles, which override attributes
+                                                                                    //
+                                                                                    string[] IMageStyleArray = imageStyle.Split(';');
+                                                                                    int ImageStyleArrayCount = IMageStyleArray.GetUpperBound(0) + 1;
+                                                                                    int ImageStyleArrayPointer = 0;
+                                                                                    for (ImageStyleArrayPointer = 0; ImageStyleArrayPointer < ImageStyleArrayCount; ImageStyleArrayPointer++) {
+                                                                                        string ImageStylePair = IMageStyleArray[ImageStyleArrayPointer].Trim(' ');
+                                                                                        int PositionColon = GenericController.vbInstr(1, ImageStylePair, ":");
+                                                                                        if (PositionColon > 1) {
+                                                                                            string ImageStylePairName = (ImageStylePair.Left(PositionColon - 1)).Trim(' ');
+                                                                                            string ImageStylePairValue = (ImageStylePair.Substring(PositionColon)).Trim(' ');
+                                                                                            switch (GenericController.vbUCase(ImageStylePairName)) {
+                                                                                                case "WIDTH": {
+                                                                                                        ImageStylePairValue = GenericController.vbReplace(ImageStylePairValue, "px", "");
+                                                                                                        ImageWidthText = ImageStylePairValue;
+                                                                                                        break;
+                                                                                                    }
+                                                                                                case "HEIGHT": {
+                                                                                                        ImageStylePairValue = GenericController.vbReplace(ImageStylePairValue, "px", "");
+                                                                                                        ImageHeightText = ImageStylePairValue;
+                                                                                                        break;
+                                                                                                    }
+                                                                                                default: {
+                                                                                                        // nop
+                                                                                                        break;
+                                                                                                    }
+                                                                                            }
+                                                                                        }
+                                                                                    }
                                                                                 }
+                                                                                ElementText = "<AC type=\"IMAGE\" ACInstanceID=\"" + acInstanceID + "\" RecordID=\"" + recordId + "\" Style=\"" + imageStyle + "\" Width=\"" + ImageWidthText + "\" Height=\"" + ImageHeightText + "\" VSpace=\"" + ImageVSpace + "\" HSpace=\"" + ImageHSpace + "\" Alt=\"" + ImageAlt + "\" Align=\"" + ImageAlign + "\" Border=\"" + ImageBorder + "\" Loop=\"" + ImageLoop + "\">";
                                                                             }
+                                                                            break;
                                                                         }
-                                                                        if (GenericController.vbInstr(1, sfImageExtList, ImageFilenameExt, 1) != 0) {
+                                                                    case ACTypeAggregateFunction: {
                                                                             //
-                                                                            // Determine ImageWidth and ImageHeight
+                                                                            // Function
                                                                             //
-                                                                            imageStyle = DHTML.ElementAttribute(ElementPointer, "style");
-                                                                            int ImageWidth = GenericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "width"));
-                                                                            int ImageHeight = GenericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "height"));
-                                                                            if (!string.IsNullOrEmpty(imageStyle)) {
-                                                                                string[] Styles = imageStyle.Split(';');
-                                                                                for (Ptr = 0; Ptr <= Styles.GetUpperBound(0); Ptr++) {
-                                                                                    string[] Style = Styles[Ptr].Split(':');
-                                                                                    if (Style.GetUpperBound(0) > 0) {
-                                                                                        string StyleName = GenericController.vbLCase(Style[0].Trim(' '));
-                                                                                        string StyleValue = null;
-                                                                                        int StyleValueInt = 0;
-                                                                                        if (StyleName == "width") {
-                                                                                            StyleValue = GenericController.vbLCase(Style[1].Trim(' '));
-                                                                                            StyleValue = GenericController.vbReplace(StyleValue, "px", "");
-                                                                                            StyleValueInt = GenericController.encodeInteger(StyleValue);
-                                                                                            if (StyleValueInt > 0) {
-                                                                                                ImageWidth = StyleValueInt;
-                                                                                            }
-                                                                                        } else if (StyleName == "height") {
-                                                                                            StyleValue = GenericController.vbLCase(Style[1].Trim(' '));
-                                                                                            StyleValue = GenericController.vbReplace(StyleValue, "px", "");
-                                                                                            StyleValueInt = GenericController.encodeInteger(StyleValue);
-                                                                                            if (StyleValueInt > 0) {
-                                                                                                ImageHeight = StyleValueInt;
-                                                                                            }
-                                                                                        }
+                                                                            QueryString = "";
+                                                                            if (!string.IsNullOrEmpty(ACQueryString)) {
+                                                                                // I added this because single stepping through it I found it split on the & in &amp;
+                                                                                // I had added an Add-on and was saving
+                                                                                // I find it VERY odd that this could be the case
+                                                                                //
+                                                                                string QSHTMLEncoded = GenericController.encodeText(ACQueryString);
+                                                                                QueryString = HtmlController.decodeHtml(QSHTMLEncoded);
+                                                                                QSSplit = QueryString.Split('&');
+                                                                                for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
+                                                                                    Pos = GenericController.vbInstr(1, QSSplit[QSPtr], "[");
+                                                                                    if (Pos > 0) {
+                                                                                        QSSplit[QSPtr] = QSSplit[QSPtr].Left(Pos - 1);
                                                                                     }
+                                                                                    QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
                                                                                 }
+                                                                                QueryString = string.Join("&", QSSplit);
                                                                             }
+                                                                            ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + acInstanceID + "\" querystring=\"" + QueryString + "\" guid=\"" + ACGuid + "\">";
+                                                                            break;
+                                                                        }
+                                                                    case ACTypeTemplateContent:
+                                                                    case ACTypeTemplateText: {
                                                                             //
-                                                                            // Get the record values
                                                                             //
-                                                                            LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, recordId);
-                                                                            if (file != null) {
-                                                                                string RecordVirtualFilename = file.filename;
-                                                                                int RecordWidth = file.width;
-                                                                                int RecordHeight = file.height;
-                                                                                string RecordAltSizeList = file.altSizeList;
-                                                                                string RecordFilename = RecordVirtualFilename;
-                                                                                Pos = RecordVirtualFilename.LastIndexOf("/") + 1;
+                                                                            //
+                                                                            QueryString = "";
+                                                                            if (ImageIDArrayCount > 4) {
+                                                                                QueryString = GenericController.encodeText(ImageIDArray[4]);
+                                                                                QSSplit = QueryString.Split('&');
+                                                                                for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
+                                                                                    QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
+                                                                                }
+                                                                                QueryString = string.Join("&", QSSplit);
+
+                                                                            }
+                                                                            ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + acInstanceID + "\" querystring=\"" + QueryString + "\">";
+                                                                            break;
+                                                                        }
+                                                                    default: {
+                                                                            //
+                                                                            // All others -- added querystring from element(4) to all others to cover the group access AC object
+                                                                            //
+                                                                            QueryString = "";
+                                                                            if (ImageIDArrayCount > 4) {
+                                                                                QueryString = GenericController.encodeText(ImageIDArray[4]);
+                                                                                QueryString = HtmlController.decodeHtml(QueryString);
+                                                                                QSSplit = QueryString.Split('&');
+                                                                                for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
+                                                                                    QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
+                                                                                }
+                                                                                QueryString = string.Join("&", QSSplit);
+                                                                            }
+                                                                            ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + acInstanceID + "\" field=\"" + ACFieldName + "\" querystring=\"" + QueryString + "\">";
+                                                                            break;
+                                                                        }
+                                                                }
+                                                            }
+                                                        }
+                                                    } else if (GenericController.vbInstr(1, ImageSrc, "cclibraryfiles", 1) != 0) {
+                                                        bool ImageAllowSFResize = core.siteProperties.getBoolean("ImageAllowSFResize", true);
+                                                        if (ImageAllowSFResize && true) {
+                                                            //
+                                                            // if it is a real image, check for resize
+                                                            //
+                                                            Pos = GenericController.vbInstr(1, ImageSrc, "cclibraryfiles", 1);
+                                                            if (Pos != 0) {
+                                                                string ImageVirtualFilename = ImageSrc.Substring(Pos - 1);
+                                                                string[] Paths = ImageVirtualFilename.Split('/');
+                                                                if (Paths.GetUpperBound(0) > 2) {
+                                                                    if (GenericController.vbLCase(Paths[1]) == "filename") {
+                                                                        recordId = GenericController.encodeInteger(Paths[2]);
+                                                                        if (recordId != 0) {
+                                                                            string ImageFilename = Paths[3];
+                                                                            string ImageVirtualFilePath = GenericController.vbReplace(ImageVirtualFilename, ImageFilename, "");
+                                                                            Pos = ImageFilename.LastIndexOf(".") + 1;
+                                                                            if (Pos > 0) {
+                                                                                string ImageFilenameAltSize = "";
+                                                                                string ImageFilenameExt = ImageFilename.Substring(Pos);
+                                                                                string ImageFilenameNoExt = ImageFilename.Left(Pos - 1);
+                                                                                Pos = ImageFilenameNoExt.LastIndexOf("-") + 1;
                                                                                 if (Pos > 0) {
-                                                                                    RecordFilename = RecordVirtualFilename.Substring(Pos);
-                                                                                }
-                                                                                string RecordFilenameExt = "";
-                                                                                string RecordFilenameNoExt = RecordFilename;
-                                                                                Pos = RecordFilenameNoExt.LastIndexOf(".") + 1;
-                                                                                if (Pos > 0) {
-                                                                                    RecordFilenameExt = RecordFilenameNoExt.Substring(Pos);
-                                                                                    RecordFilenameNoExt = RecordFilenameNoExt.Left(Pos - 1);
-                                                                                }
-                                                                                //
-                                                                                // if recordwidth or height are missing, get them from the file
-                                                                                //
-                                                                                if (RecordWidth == 0 || RecordHeight == 0) {
-                                                                                    using (var imageEditor = new ImageEditController()) {
-                                                                                        if (imageEditor.load(ImageVirtualFilename, core.cdnFiles)) {
-                                                                                            file.width = imageEditor.width;
-                                                                                            file.height = imageEditor.height;
-                                                                                            file.save(core.cpParent);
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                //
-                                                                                // continue only if we have record width and height
-                                                                                //
-                                                                                if (RecordWidth != 0 & RecordHeight != 0) {
                                                                                     //
-                                                                                    // set ImageWidth and ImageHeight if one of them is missing
+                                                                                    // ImageAltSize should be set from the width and height of the img tag,
+                                                                                    // NOT from the actual width and height of the image file
+                                                                                    // NOT from the suffix of the image filename
+                                                                                    // ImageFilenameAltSize is used when the image has been resized, then 'reset' was hit
+                                                                                    //  on the properties dialog before the save. The width and height come from this suffix
                                                                                     //
-                                                                                    if ((ImageWidth == RecordWidth) && (ImageHeight == 0)) {
-                                                                                        //
-                                                                                        // Image only included width, set default height
-                                                                                        //
-                                                                                        ImageHeight = RecordHeight;
-                                                                                    } else if ((ImageHeight == RecordHeight) && (ImageWidth == 0)) {
-                                                                                        //
-                                                                                        // Image only included height, set default width
-                                                                                        //
-                                                                                        ImageWidth = RecordWidth;
-                                                                                    } else if ((ImageHeight == 0) && (ImageWidth == 0)) {
-                                                                                        //
-                                                                                        // Image has no width or height, default both
-                                                                                        // This happens when you hit 'reset' on the image properties dialog
-                                                                                        //
-                                                                                        using (var imageEditor = new ImageEditController()) {
-                                                                                            if (imageEditor.load(ImageVirtualFilename, core.cdnFiles)) {
-                                                                                                ImageWidth = imageEditor.width;
-                                                                                                ImageHeight = imageEditor.height;
-                                                                                            }
-                                                                                        }
-                                                                                        if ((ImageHeight == 0) && (ImageWidth == 0) && (!string.IsNullOrEmpty(ImageFilenameAltSize))) {
-                                                                                            Pos = GenericController.vbInstr(1, ImageFilenameAltSize, "x");
-                                                                                            if (Pos != 0) {
-                                                                                                ImageWidth = GenericController.encodeInteger(ImageFilenameAltSize.Left(Pos - 1));
-                                                                                                ImageHeight = GenericController.encodeInteger(ImageFilenameAltSize.Substring(Pos));
-                                                                                            }
-                                                                                        }
-                                                                                        if (ImageHeight == 0 && ImageWidth == 0) {
-                                                                                            ImageHeight = RecordHeight;
-                                                                                            ImageWidth = RecordWidth;
-                                                                                        }
-                                                                                    }
-                                                                                    //
-                                                                                    // Set the ImageAltSize to what was requested from the img tag
-                                                                                    // if the actual image is a few rounding-error pixels off does not matter
-                                                                                    // if either is 0, let altsize be 0, set real value for image height/width
-                                                                                    //
-                                                                                    string ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
-                                                                                    string NewImageFilename = null;
-                                                                                    //
-                                                                                    // determine if we are OK, or need to rebuild
-                                                                                    //
-                                                                                    if ((RecordVirtualFilename == (ImageVirtualFilePath + ImageFilename)) && ((RecordWidth == ImageWidth) || (RecordHeight == ImageHeight))) {
-                                                                                        //
-                                                                                        // OK
-                                                                                        // this is the raw image
-                                                                                        // image matches record, and the sizes are the same
-                                                                                        //
-                                                                                    } else if ((RecordVirtualFilename == ImageVirtualFilePath + ImageFilenameNoExt + "." + ImageFilenameExt) && (RecordAltSizeList.IndexOf(ImageAltSize, System.StringComparison.OrdinalIgnoreCase) != -1)) {
-                                                                                        //
-                                                                                        // OK
-                                                                                        // resized image, and altsize is in the list - go with resized image name
-                                                                                        //
-                                                                                        NewImageFilename = ImageFilenameNoExt + "-" + ImageAltSize + "." + ImageFilenameExt;
-                                                                                        // images included in email have spaces that must be converted to "%20" or they 404
-                                                                                        string imageNewLink = GenericController.encodeURL(GenericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename);
-                                                                                        ElementText = GenericController.vbReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(imageNewLink));
-                                                                                    } else if ((RecordWidth < ImageWidth) || (RecordHeight < ImageHeight)) {
-                                                                                        //
-                                                                                        // OK
-                                                                                        // reize image larger then original - go with it as is
-                                                                                        //
-                                                                                        // images included in email have spaces that must be converted to "%20" or they 404
-                                                                                        ElementText = GenericController.vbReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(GenericController.encodeURL(GenericController.getCdnFileLink(core, RecordVirtualFilename))));
+                                                                                    ImageFilenameAltSize = ImageFilenameNoExt.Substring(Pos);
+                                                                                    string[] SizeTest = ImageFilenameAltSize.Split('x');
+                                                                                    if (SizeTest.GetUpperBound(0) != 1) {
+                                                                                        ImageFilenameAltSize = "";
                                                                                     } else {
-                                                                                        //
-                                                                                        // resized image - create NewImageFilename (and add new alt size to the record)
-                                                                                        //
-                                                                                        if (RecordWidth == ImageWidth && RecordHeight == ImageHeight) {
-                                                                                            //
-                                                                                            // set back to Raw image untouched, use the record image filename
-                                                                                            //
+                                                                                        if ((SizeTest[0].IsNumeric() & SizeTest[1].IsNumeric())) {
+                                                                                            ImageFilenameNoExt = ImageFilenameNoExt.Left(Pos - 1);
                                                                                         } else {
-                                                                                            //
-                                                                                            // Raw image filename in content, but it is resized, switch to an alternate size
-                                                                                            //
-                                                                                            NewImageFilename = RecordFilename;
-                                                                                            if ((ImageWidth == 0) || (ImageHeight == 0)) {
-                                                                                                //
-                                                                                                // Alt image has not been built
-                                                                                                //
-                                                                                                using (var imageEditor = new ImageEditController()) {
-                                                                                                    if (!imageEditor.load(RecordVirtualFilename, core.cdnFiles)) {
-                                                                                                        //
-                                                                                                        // image load failed, use raw filename
-                                                                                                        //
-                                                                                                        LogController.logWarn(core, new GenericException("ImageEditController failed to load filename [" + RecordVirtualFilename + "]"));
-                                                                                                    } else {
-                                                                                                        //
-                                                                                                        //
-                                                                                                        //
-                                                                                                        RecordWidth = imageEditor.width;
-                                                                                                        RecordHeight = imageEditor.height;
-                                                                                                        if (ImageWidth == 0) {
-                                                                                                            //
-                                                                                                            //
-                                                                                                            //
-                                                                                                            imageEditor.height = ImageHeight;
-                                                                                                        } else if (ImageHeight == 0) {
-                                                                                                            //
-                                                                                                            //
-                                                                                                            //
-                                                                                                            imageEditor.width = ImageWidth;
-                                                                                                        } else if (RecordHeight == ImageHeight) {
-                                                                                                            //
-                                                                                                            // change the width
-                                                                                                            //
-                                                                                                            imageEditor.width = ImageWidth;
-                                                                                                        } else {
-                                                                                                            //
-                                                                                                            // change the height
-                                                                                                            //
-                                                                                                            imageEditor.height = ImageHeight;
-                                                                                                        }
-                                                                                                        //
-                                                                                                        // if resized only width or height, set the other
-                                                                                                        //
-                                                                                                        if (ImageWidth == 0) {
-                                                                                                            ImageWidth = imageEditor.width;
-                                                                                                            ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
-                                                                                                        }
-                                                                                                        if (ImageHeight == 0) {
-                                                                                                            ImageHeight = imageEditor.height;
-                                                                                                            ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
-                                                                                                        }
-                                                                                                        //
-                                                                                                        // set HTML attributes so image properties will display
-                                                                                                        //
-                                                                                                        if (GenericController.vbInstr(1, ElementText, "height=", 1) == 0) {
-                                                                                                            ElementText = GenericController.vbReplace(ElementText, ">", " height=\"" + ImageHeight + "\">");
-                                                                                                        }
-                                                                                                        if (GenericController.vbInstr(1, ElementText, "width=", 1) == 0) {
-                                                                                                            ElementText = GenericController.vbReplace(ElementText, ">", " width=\"" + ImageWidth + "\">");
-                                                                                                        }
-                                                                                                        //
-                                                                                                        // Save new file
-                                                                                                        //
-                                                                                                        NewImageFilename = RecordFilenameNoExt + "-" + ImageAltSize + "." + RecordFilenameExt;
-                                                                                                        imageEditor.save(ImageVirtualFilePath + NewImageFilename, core.cdnFiles);
-                                                                                                        //
-                                                                                                        // Update image record
-                                                                                                        //
-                                                                                                        RecordAltSizeList = RecordAltSizeList + Environment.NewLine + ImageAltSize;
+                                                                                            ImageFilenameAltSize = "";
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                                if (GenericController.vbInstr(1, sfImageExtList, ImageFilenameExt, 1) != 0) {
+                                                                                    //
+                                                                                    // Determine ImageWidth and ImageHeight
+                                                                                    //
+                                                                                    imageStyle = DHTML.ElementAttribute(ElementPointer, "style");
+                                                                                    int ImageWidth = GenericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "width"));
+                                                                                    int ImageHeight = GenericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "height"));
+                                                                                    if (!string.IsNullOrEmpty(imageStyle)) {
+                                                                                        string[] Styles = imageStyle.Split(';');
+                                                                                        for (Ptr = 0; Ptr <= Styles.GetUpperBound(0); Ptr++) {
+                                                                                            string[] Style = Styles[Ptr].Split(':');
+                                                                                            if (Style.GetUpperBound(0) > 0) {
+                                                                                                string StyleName = GenericController.vbLCase(Style[0].Trim(' '));
+                                                                                                string StyleValue = null;
+                                                                                                int StyleValueInt = 0;
+                                                                                                if (StyleName == "width") {
+                                                                                                    StyleValue = GenericController.vbLCase(Style[1].Trim(' '));
+                                                                                                    StyleValue = GenericController.vbReplace(StyleValue, "px", "");
+                                                                                                    StyleValueInt = GenericController.encodeInteger(StyleValue);
+                                                                                                    if (StyleValueInt > 0) {
+                                                                                                        ImageWidth = StyleValueInt;
+                                                                                                    }
+                                                                                                } else if (StyleName == "height") {
+                                                                                                    StyleValue = GenericController.vbLCase(Style[1].Trim(' '));
+                                                                                                    StyleValue = GenericController.vbReplace(StyleValue, "px", "");
+                                                                                                    StyleValueInt = GenericController.encodeInteger(StyleValue);
+                                                                                                    if (StyleValueInt > 0) {
+                                                                                                        ImageHeight = StyleValueInt;
                                                                                                     }
                                                                                                 }
-
                                                                                             }
-                                                                                            //
-                                                                                            // Change the image src to the AltSize
-                                                                                            ElementText = GenericController.vbReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(GenericController.encodeURL(GenericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename)));
                                                                                         }
                                                                                     }
+                                                                                    //
+                                                                                    // Get the record values
+                                                                                    //
+                                                                                    LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, recordId);
+                                                                                    if (file != null) {
+                                                                                        string RecordVirtualFilename = file.filename;
+                                                                                        int RecordWidth = file.width;
+                                                                                        int RecordHeight = file.height;
+                                                                                        string RecordAltSizeList = file.altSizeList;
+                                                                                        string RecordFilename = RecordVirtualFilename;
+                                                                                        Pos = RecordVirtualFilename.LastIndexOf("/") + 1;
+                                                                                        if (Pos > 0) {
+                                                                                            RecordFilename = RecordVirtualFilename.Substring(Pos);
+                                                                                        }
+                                                                                        string RecordFilenameExt = "";
+                                                                                        string RecordFilenameNoExt = RecordFilename;
+                                                                                        Pos = RecordFilenameNoExt.LastIndexOf(".") + 1;
+                                                                                        if (Pos > 0) {
+                                                                                            RecordFilenameExt = RecordFilenameNoExt.Substring(Pos);
+                                                                                            RecordFilenameNoExt = RecordFilenameNoExt.Left(Pos - 1);
+                                                                                        }
+                                                                                        //
+                                                                                        // if recordwidth or height are missing, get them from the file
+                                                                                        //
+                                                                                        if (RecordWidth == 0 || RecordHeight == 0) {
+                                                                                            using (var imageEditor = new ImageEditController()) {
+                                                                                                if (imageEditor.load(ImageVirtualFilename, core.cdnFiles)) {
+                                                                                                    file.width = imageEditor.width;
+                                                                                                    file.height = imageEditor.height;
+                                                                                                    file.save(core.cpParent);
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                        //
+                                                                                        // continue only if we have record width and height
+                                                                                        //
+                                                                                        if (RecordWidth != 0 & RecordHeight != 0) {
+                                                                                            //
+                                                                                            // set ImageWidth and ImageHeight if one of them is missing
+                                                                                            //
+                                                                                            if ((ImageWidth == RecordWidth) && (ImageHeight == 0)) {
+                                                                                                //
+                                                                                                // Image only included width, set default height
+                                                                                                //
+                                                                                                ImageHeight = RecordHeight;
+                                                                                            } else if ((ImageHeight == RecordHeight) && (ImageWidth == 0)) {
+                                                                                                //
+                                                                                                // Image only included height, set default width
+                                                                                                //
+                                                                                                ImageWidth = RecordWidth;
+                                                                                            } else if ((ImageHeight == 0) && (ImageWidth == 0)) {
+                                                                                                //
+                                                                                                // Image has no width or height, default both
+                                                                                                // This happens when you hit 'reset' on the image properties dialog
+                                                                                                //
+                                                                                                using (var imageEditor = new ImageEditController()) {
+                                                                                                    if (imageEditor.load(ImageVirtualFilename, core.cdnFiles)) {
+                                                                                                        ImageWidth = imageEditor.width;
+                                                                                                        ImageHeight = imageEditor.height;
+                                                                                                    }
+                                                                                                }
+                                                                                                if ((ImageHeight == 0) && (ImageWidth == 0) && (!string.IsNullOrEmpty(ImageFilenameAltSize))) {
+                                                                                                    Pos = GenericController.vbInstr(1, ImageFilenameAltSize, "x");
+                                                                                                    if (Pos != 0) {
+                                                                                                        ImageWidth = GenericController.encodeInteger(ImageFilenameAltSize.Left(Pos - 1));
+                                                                                                        ImageHeight = GenericController.encodeInteger(ImageFilenameAltSize.Substring(Pos));
+                                                                                                    }
+                                                                                                }
+                                                                                                if (ImageHeight == 0 && ImageWidth == 0) {
+                                                                                                    ImageHeight = RecordHeight;
+                                                                                                    ImageWidth = RecordWidth;
+                                                                                                }
+                                                                                            }
+                                                                                            //
+                                                                                            // Set the ImageAltSize to what was requested from the img tag
+                                                                                            // if the actual image is a few rounding-error pixels off does not matter
+                                                                                            // if either is 0, let altsize be 0, set real value for image height/width
+                                                                                            //
+                                                                                            string ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
+                                                                                            string NewImageFilename = null;
+                                                                                            //
+                                                                                            // determine if we are OK, or need to rebuild
+                                                                                            //
+                                                                                            if ((RecordVirtualFilename == (ImageVirtualFilePath + ImageFilename)) && ((RecordWidth == ImageWidth) || (RecordHeight == ImageHeight))) {
+                                                                                                //
+                                                                                                // OK
+                                                                                                // this is the raw image
+                                                                                                // image matches record, and the sizes are the same
+                                                                                                //
+                                                                                            } else if ((RecordVirtualFilename == ImageVirtualFilePath + ImageFilenameNoExt + "." + ImageFilenameExt) && (RecordAltSizeList.IndexOf(ImageAltSize, System.StringComparison.OrdinalIgnoreCase) != -1)) {
+                                                                                                //
+                                                                                                // OK
+                                                                                                // resized image, and altsize is in the list - go with resized image name
+                                                                                                //
+                                                                                                NewImageFilename = ImageFilenameNoExt + "-" + ImageAltSize + "." + ImageFilenameExt;
+                                                                                                // images included in email have spaces that must be converted to "%20" or they 404
+                                                                                                string imageNewLink = GenericController.encodeURL(GenericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename);
+                                                                                                ElementText = GenericController.vbReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(imageNewLink));
+                                                                                            } else if ((RecordWidth < ImageWidth) || (RecordHeight < ImageHeight)) {
+                                                                                                //
+                                                                                                // OK
+                                                                                                // reize image larger then original - go with it as is
+                                                                                                //
+                                                                                                // images included in email have spaces that must be converted to "%20" or they 404
+                                                                                                ElementText = GenericController.vbReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(GenericController.encodeURL(GenericController.getCdnFileLink(core, RecordVirtualFilename))));
+                                                                                            } else {
+                                                                                                //
+                                                                                                // resized image - create NewImageFilename (and add new alt size to the record)
+                                                                                                //
+                                                                                                if (RecordWidth == ImageWidth && RecordHeight == ImageHeight) {
+                                                                                                    //
+                                                                                                    // set back to Raw image untouched, use the record image filename
+                                                                                                    //
+                                                                                                } else {
+                                                                                                    //
+                                                                                                    // Raw image filename in content, but it is resized, switch to an alternate size
+                                                                                                    //
+                                                                                                    NewImageFilename = RecordFilename;
+                                                                                                    if ((ImageWidth == 0) || (ImageHeight == 0)) {
+                                                                                                        //
+                                                                                                        // Alt image has not been built
+                                                                                                        //
+                                                                                                        using (var imageEditor = new ImageEditController()) {
+                                                                                                            if (!imageEditor.load(RecordVirtualFilename, core.cdnFiles)) {
+                                                                                                                //
+                                                                                                                // image load failed, use raw filename
+                                                                                                                //
+                                                                                                                LogController.logWarn(core, new GenericException("ImageEditController failed to load filename [" + RecordVirtualFilename + "]"));
+                                                                                                            } else {
+                                                                                                                //
+                                                                                                                //
+                                                                                                                //
+                                                                                                                RecordWidth = imageEditor.width;
+                                                                                                                RecordHeight = imageEditor.height;
+                                                                                                                if (ImageWidth == 0) {
+                                                                                                                    //
+                                                                                                                    //
+                                                                                                                    //
+                                                                                                                    imageEditor.height = ImageHeight;
+                                                                                                                } else if (ImageHeight == 0) {
+                                                                                                                    //
+                                                                                                                    //
+                                                                                                                    //
+                                                                                                                    imageEditor.width = ImageWidth;
+                                                                                                                } else if (RecordHeight == ImageHeight) {
+                                                                                                                    //
+                                                                                                                    // change the width
+                                                                                                                    //
+                                                                                                                    imageEditor.width = ImageWidth;
+                                                                                                                } else {
+                                                                                                                    //
+                                                                                                                    // change the height
+                                                                                                                    //
+                                                                                                                    imageEditor.height = ImageHeight;
+                                                                                                                }
+                                                                                                                //
+                                                                                                                // if resized only width or height, set the other
+                                                                                                                //
+                                                                                                                if (ImageWidth == 0) {
+                                                                                                                    ImageWidth = imageEditor.width;
+                                                                                                                    ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
+                                                                                                                }
+                                                                                                                if (ImageHeight == 0) {
+                                                                                                                    ImageHeight = imageEditor.height;
+                                                                                                                    ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
+                                                                                                                }
+                                                                                                                //
+                                                                                                                // set HTML attributes so image properties will display
+                                                                                                                //
+                                                                                                                if (GenericController.vbInstr(1, ElementText, "height=", 1) == 0) {
+                                                                                                                    ElementText = GenericController.vbReplace(ElementText, ">", " height=\"" + ImageHeight + "\">");
+                                                                                                                }
+                                                                                                                if (GenericController.vbInstr(1, ElementText, "width=", 1) == 0) {
+                                                                                                                    ElementText = GenericController.vbReplace(ElementText, ">", " width=\"" + ImageWidth + "\">");
+                                                                                                                }
+                                                                                                                //
+                                                                                                                // Save new file
+                                                                                                                //
+                                                                                                                NewImageFilename = RecordFilenameNoExt + "-" + ImageAltSize + "." + RecordFilenameExt;
+                                                                                                                imageEditor.save(ImageVirtualFilePath + NewImageFilename, core.cdnFiles);
+                                                                                                                //
+                                                                                                                // Update image record
+                                                                                                                //
+                                                                                                                RecordAltSizeList = RecordAltSizeList + Environment.NewLine + ImageAltSize;
+                                                                                                            }
+                                                                                                        }
+
+                                                                                                    }
+                                                                                                    //
+                                                                                                    // Change the image src to the AltSize
+                                                                                                    ElementText = GenericController.vbReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(GenericController.encodeURL(GenericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename)));
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                        file.save(core.cpParent);
+                                                                                    }
                                                                                 }
-                                                                                file.save(core.cpParent);
                                                                             }
                                                                         }
                                                                     }
@@ -935,9 +964,12 @@ namespace Contensive.Processor.Controllers {
                                                         }
                                                     }
                                                 }
+                                                break;
                                             }
-                                        }
-                                        break;
+                                        default: {
+                                                // nop
+                                                break;
+                                            }
                                     }
                                 }
                                 Stream.Add(ElementText);

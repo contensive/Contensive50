@@ -88,7 +88,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public bool requestSecure {
             get {
-                if(_requestSecure==null) {
+                if (_requestSecure == null) {
                     _requestSecure = (core.webServer.serverEnvironment.ContainsKey("SERVER_PORT_SECURE")) ? encodeBoolean(core.webServer.serverEnvironment["SERVER_PORT_SECURE"]) : false;
                 }
                 return (bool)_requestSecure;
@@ -598,7 +598,7 @@ namespace Contensive.Processor.Controllers {
                             newDomain.pageNotFoundPageId = 0;
                             newDomain.forwardDomainId = 0;
                             newDomain.defaultRouteId = core.siteProperties.getInteger("");
-                            newDomain.save(core.cpParent,0);
+                            newDomain.save(core.cpParent, 0);
                             core.domainDictionary.Add(domain.ToLowerInvariant(), newDomain);
                             updateDomainCache = true;
                         }
@@ -1227,50 +1227,55 @@ namespace Contensive.Processor.Controllers {
                         //
                         NonEncodedLink = GenericController.decodeResponseVariable(EncodedLink);
                         switch (GenericController.vbUCase(iContentName)) {
-                            case "CONTENT WATCH":
-                                //
-                                // ----- special case
-                                //       if this is a content watch record, check the underlying content for
-                                //       inactive or expired before redirecting
-                                //
-                                LinkPrefix = core.webServer.requestContentWatchPrefix;
-                                contentId = csData.getInteger("ContentID");
-                                var contentMeta = ContentMetadataModel.create(core, contentId);
-                                contentMeta.name = MetadataController.getContentNameByID(core, contentId);
-                                if (string.IsNullOrEmpty(contentMeta.name)) {
+                            case "CONTENT WATCH": {
                                     //
-                                    // ----- Content Watch with a bad ContentID, mark inactive
+                                    // ----- special case
+                                    //       if this is a content watch record, check the underlying content for
+                                    //       inactive or expired before redirecting
                                     //
-                                    BlockRedirect = true;
-                                    csData.set("active", 0);
-                                } else {
-                                    HostRecordId = (csData.getInteger("RecordID"));
-                                    if (HostRecordId == 0) {
+                                    LinkPrefix = core.webServer.requestContentWatchPrefix;
+                                    contentId = csData.getInteger("ContentID");
+                                    var contentMeta = ContentMetadataModel.create(core, contentId);
+                                    contentMeta.name = MetadataController.getContentNameByID(core, contentId);
+                                    if (string.IsNullOrEmpty(contentMeta.name)) {
                                         //
-                                        // ----- Content Watch with a bad iRecordID, mark inactive
+                                        // ----- Content Watch with a bad ContentID, mark inactive
                                         //
                                         BlockRedirect = true;
                                         csData.set("active", 0);
                                     } else {
-                                        using (var CSHost = new CsModel(core)) {
-                                            CSHost.open(contentMeta.name, "ID=" + HostRecordId);
-                                            if (!CSHost.ok()) {
-                                                //
-                                                // ----- Content Watch host record not found, mark inactive
-                                                //
-                                                BlockRedirect = true;
-                                                csData.set("active", 0);
+                                        HostRecordId = (csData.getInteger("RecordID"));
+                                        if (HostRecordId == 0) {
+                                            //
+                                            // ----- Content Watch with a bad iRecordID, mark inactive
+                                            //
+                                            BlockRedirect = true;
+                                            csData.set("active", 0);
+                                        } else {
+                                            using (var CSHost = new CsModel(core)) {
+                                                CSHost.open(contentMeta.name, "ID=" + HostRecordId);
+                                                if (!CSHost.ok()) {
+                                                    //
+                                                    // ----- Content Watch host record not found, mark inactive
+                                                    //
+                                                    BlockRedirect = true;
+                                                    csData.set("active", 0);
+                                                }
                                             }
                                         }
                                     }
+                                    if (BlockRedirect) {
+                                        //
+                                        // ----- if a content watch record is blocked, delete the content tracking
+                                        //
+                                        MetadataController.deleteContentRules(core, contentMeta, HostRecordId);
+                                    }
+                                    break;
                                 }
-                                if (BlockRedirect) {
-                                    //
-                                    // ----- if a content watch record is blocked, delete the content tracking
-                                    //
-                                    MetadataController.deleteContentRules(core, contentMeta, HostRecordId);
+                            default: {
+                                    // nop
+                                    break;
                                 }
-                                break;
                         }
                     }
                     if (!BlockRedirect) {

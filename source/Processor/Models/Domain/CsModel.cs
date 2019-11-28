@@ -166,55 +166,56 @@ namespace Contensive.Processor {
                 foreach (var kvp in contentMeta.fields) {
                     ContentFieldMetadataModel field = kvp.Value;
                     switch (field.nameLc) {
-                        case "id":
-                            break;
-                        default:
-                            //
-                            // ----- fields to copy
-                            //
-
-                            switch (field.fieldTypeId) {
-                                case CPContentBaseClass.FieldTypeIdEnum.Redirect:
-                                case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                                    //
-                                    // -- no data saved for these field types
-                                    break;
-                                case CPContentBaseClass.FieldTypeIdEnum.File:
-                                case CPContentBaseClass.FieldTypeIdEnum.FileImage:
-                                case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
-                                case CPContentBaseClass.FieldTypeIdEnum.FileXML:
-                                case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                                    //
-                                    // ----- cdn file
-                                    {
-                                        string SourceFilename = getFieldFilename(field.nameLc, "", contentMeta.name, field.fieldTypeId);
-                                        if (!string.IsNullOrEmpty(SourceFilename)) {
-                                            string DestFilename = destination.getFieldFilename(field.nameLc, "", destination.contentName, field.fieldTypeId);
-                                            destination.set(field.nameLc, DestFilename);
-                                            core.cdnFiles.copyFile(SourceFilename, DestFilename);
-                                        }
-                                    }
-                                    break;
-                                case CPContentBaseClass.FieldTypeIdEnum.FileText:
-                                case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                                    //
-                                    // ----- private file
-                                    {
-                                        string SourceFilename = getFieldFilename(field.nameLc, "", contentMeta.name, field.fieldTypeId);
-                                        if (!string.IsNullOrEmpty(SourceFilename)) {
-                                            string DestFilename = destination.getFieldFilename(field.nameLc, "", destination.contentName, field.fieldTypeId);
-                                            destination.set(field.nameLc, DestFilename);
-                                            core.privateFiles.copyFile(SourceFilename, DestFilename);
-                                        }
-                                    }
-                                    break;
-                                default:
-                                    //
-                                    // ----- value
-                                    destination.set(field.nameLc, getRawData(field.nameLc));
-                                    break;
+                        case "id": {
+                                break;
                             }
-                            break;
+                        default: {
+                                //
+                                // ----- fields to copy
+                                //
+                                switch (field.fieldTypeId) {
+                                    case CPContentBaseClass.FieldTypeIdEnum.Redirect:
+                                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                                            //
+                                            // -- no data saved for these field types
+                                            break;
+                                        }
+                                    case CPContentBaseClass.FieldTypeIdEnum.File:
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileImage:
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileXML:
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileJavascript: {
+                                            //
+                                            // ----- cdn file
+                                            string SourceFilename = getFieldFilename(field.nameLc, "", contentMeta.name, field.fieldTypeId);
+                                            if (!string.IsNullOrEmpty(SourceFilename)) {
+                                                string DestFilename = destination.getFieldFilename(field.nameLc, "", destination.contentName, field.fieldTypeId);
+                                                destination.set(field.nameLc, DestFilename);
+                                                core.cdnFiles.copyFile(SourceFilename, DestFilename);
+                                            }
+                                            break;
+                                        }
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileText:
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                                            //
+                                            // ----- private file
+                                            string SourceFilename = getFieldFilename(field.nameLc, "", contentMeta.name, field.fieldTypeId);
+                                            if (!string.IsNullOrEmpty(SourceFilename)) {
+                                                string DestFilename = destination.getFieldFilename(field.nameLc, "", destination.contentName, field.fieldTypeId);
+                                                destination.set(field.nameLc, DestFilename);
+                                                core.privateFiles.copyFile(SourceFilename, DestFilename);
+                                            }
+                                            break;
+                                        }
+                                    default: {
+                                            //
+                                            // ----- value
+                                            destination.set(field.nameLc, getRawData(field.nameLc));
+                                            break;
+                                        }
+                                }
+                                break;
+                            }
                     }
                 }
 
@@ -259,6 +260,10 @@ namespace Contensive.Processor {
                                     if (!string.IsNullOrEmpty(Filename)) { core.privateFiles.deleteFile(Filename); }
                                     break;
                                 }
+                            default: {
+                                    // nop
+                                    break;
+                                }
                         }
                     }
                 }
@@ -298,72 +303,82 @@ namespace Contensive.Processor {
                             case "dateadded":
                             case "createdby":
                             case "contentcontrolid":
-                            case "id":
-                                //
-                                // Block control fields
-                                break;
-                            default:
-                                switch (field.fieldTypeId) {
-                                    case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
-                                        //
-                                        // cannot insert an autoincremnt
-                                        break;
-                                    case CPContentBaseClass.FieldTypeIdEnum.Redirect:
-                                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                                        //
-                                        // ignore these fields, they have no associated DB field
-                                        break;
-                                    case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                                        sqlList.Add(field.nameLc, DbController.encodeSQLBoolean(GenericController.encodeBoolean(field.defaultValue)));
-                                        break;
-                                    case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                                    case CPContentBaseClass.FieldTypeIdEnum.Float:
-                                        sqlList.Add(field.nameLc, DbController.encodeSQLNumber(GenericController.encodeNumber(field.defaultValue)));
-                                        break;
-                                    case CPContentBaseClass.FieldTypeIdEnum.Integer:
-                                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
-                                        sqlList.Add(field.nameLc, DbController.encodeSQLNumber(GenericController.encodeInteger(field.defaultValue)));
-                                        break;
-                                    case CPContentBaseClass.FieldTypeIdEnum.Date:
-                                        sqlList.Add(field.nameLc, DbController.encodeSQLDate(GenericController.encodeDate(field.defaultValue)));
-                                        break;
-                                    case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                                        //
-                                        // refactor --
-                                        // This is a problem - the defaults should come in as the ID values, not the names
-                                        //   so a select can be added to the default configuration page
-                                        //
-                                        string DefaultValueText = GenericController.encodeText(field.defaultValue);
-                                        if (string.IsNullOrEmpty(DefaultValueText)) {
-                                            DefaultValueText = "null";
-                                        } else {
-                                            if (field.lookupContentId != 0) {
-                                                string LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentId);
-                                                if (!string.IsNullOrEmpty(LookupContentName)) {
-                                                    DefaultValueText = MetadataController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText).ToString();
-                                                }
-                                            } else if (field.lookupList != "") {
-                                                string UCaseDefaultValueText = GenericController.vbUCase(DefaultValueText);
-                                                string[] lookups = field.lookupList.Split(',');
+                            case "id": {
+                                    //
+                                    // Block control fields
+                                    break;
+                                }
+                            default: {
+                                    switch (field.fieldTypeId) {
+                                        case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement: {
+                                                //
+                                                // cannot insert an autoincremnt
+                                                break;
+                                            }
+                                        case CPContentBaseClass.FieldTypeIdEnum.Redirect:
+                                        case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                                                //
+                                                // ignore these fields, they have no associated DB field
+                                                break;
+                                            }
+                                        case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                                                sqlList.Add(field.nameLc, DbController.encodeSQLBoolean(GenericController.encodeBoolean(field.defaultValue)));
+                                                break;
+                                            }
+                                        case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                                        case CPContentBaseClass.FieldTypeIdEnum.Float: {
+                                                sqlList.Add(field.nameLc, DbController.encodeSQLNumber(GenericController.encodeNumber(field.defaultValue)));
+                                                break;
+                                            }
+                                        case CPContentBaseClass.FieldTypeIdEnum.Integer:
+                                        case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
+                                                sqlList.Add(field.nameLc, DbController.encodeSQLNumber(GenericController.encodeInteger(field.defaultValue)));
+                                                break;
+                                            }
+                                        case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                                                sqlList.Add(field.nameLc, DbController.encodeSQLDate(GenericController.encodeDate(field.defaultValue)));
+                                                break;
+                                            }
+                                        case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
+                                                //
+                                                // refactor --
+                                                // This is a problem - the defaults should come in as the ID values, not the names
+                                                //   so a select can be added to the default configuration page
+                                                //
+                                                string DefaultValueText = GenericController.encodeText(field.defaultValue);
+                                                if (string.IsNullOrEmpty(DefaultValueText)) {
+                                                    DefaultValueText = "null";
+                                                } else {
+                                                    if (field.lookupContentId != 0) {
+                                                        string LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentId);
+                                                        if (!string.IsNullOrEmpty(LookupContentName)) {
+                                                            DefaultValueText = MetadataController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText).ToString();
+                                                        }
+                                                    } else if (field.lookupList != "") {
+                                                        string UCaseDefaultValueText = GenericController.vbUCase(DefaultValueText);
+                                                        string[] lookups = field.lookupList.Split(',');
 
-                                                int Ptr = 0;
-                                                for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
-                                                    if (UCaseDefaultValueText == GenericController.vbUCase(lookups[Ptr])) {
-                                                        DefaultValueText = (Ptr + 1).ToString();
+                                                        int Ptr = 0;
+                                                        for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
+                                                            if (UCaseDefaultValueText == GenericController.vbUCase(lookups[Ptr])) {
+                                                                DefaultValueText = (Ptr + 1).ToString();
+                                                            }
+                                                        }
                                                     }
                                                 }
+                                                sqlList.Add(field.nameLc, DefaultValueText);
+                                                break;
                                             }
-                                        }
-                                        sqlList.Add(field.nameLc, DefaultValueText);
-                                        break;
-                                    default:
-                                        //
-                                        // else text
-                                        //
-                                        sqlList.Add(field.nameLc, DbController.encodeSQLText(field.defaultValue));
-                                        break;
+                                        default: {
+                                                //
+                                                // else text
+                                                //
+                                                sqlList.Add(field.nameLc, DbController.encodeSQLText(field.defaultValue));
+                                                break;
+                                            }
+                                    }
+                                    break;
                                 }
-                                break;
                         }
                     }
                 }
@@ -762,9 +777,9 @@ namespace Contensive.Processor {
                         if (fieldTypeId == 0) {
                             if (string.IsNullOrEmpty(contentName)) {
                                 if (string.IsNullOrEmpty(originalFilename)) {
-                                    fieldTypeId =  CPContentBaseClass.FieldTypeIdEnum.Text;
+                                    fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Text;
                                 } else {
-                                    fieldTypeId =  CPContentBaseClass.FieldTypeIdEnum.File;
+                                    fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.File;
                                 }
                             } else if (this.createdWithMetaData) {
                                 //
@@ -774,9 +789,9 @@ namespace Contensive.Processor {
                                 //
                                 // -- else assume text
                                 if (string.IsNullOrEmpty(originalFilename)) {
-                                    fieldTypeId =  CPContentBaseClass.FieldTypeIdEnum.Text;
+                                    fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Text;
                                 } else {
-                                    fieldTypeId =  CPContentBaseClass.FieldTypeIdEnum.File;
+                                    fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.File;
                                 }
                             }
                         }
@@ -836,7 +851,7 @@ namespace Contensive.Processor {
                 if (string.IsNullOrEmpty(contentName)) { throw new ArgumentException("content Name cannot be blank"); }
                 if (!createdWithMetaData) { throw new GenericException("Cannot save a data set created by a query."); }
                 string OldFilename = getText(fieldName);
-                string Filename = getFieldFilename(fieldName, "", contentName,  CPContentBaseClass.FieldTypeIdEnum.FileText);
+                string Filename = getFieldFilename(fieldName, "", contentName, CPContentBaseClass.FieldTypeIdEnum.FileText);
                 if (OldFilename != Filename) {
                     //
                     // Filename changed, mark record changed
@@ -915,7 +930,7 @@ namespace Contensive.Processor {
                 var field = this.contentMeta.fields[fieldName.ToLowerInvariant()];
                 //
                 // -- many-to-many field, special case, return record id list
-                if (field.fieldTypeId ==  CPContentBaseClass.FieldTypeIdEnum.ManyToMany) {
+                if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.ManyToMany) {
                     int RecordId = 0;
                     string DbTable = null;
                     string ContentName = null;
@@ -940,91 +955,101 @@ namespace Contensive.Processor {
                 string rawData = getRawData(fieldName);
                 if (IsNull(rawData)) { return string.Empty; }
                 switch (field.fieldTypeId) {
-                    case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                        //
-                        // -- boolean
-                        if (GenericController.encodeBoolean(rawData)) { return "Yes"; }
-                        return "No";
-                    case CPContentBaseClass.FieldTypeIdEnum.Date:
-                        //
-                        // -- DateTime
-                        DateTime dateValue = GenericController.encodeDate(rawData);
-                        if (dateValue == DateTime.MinValue) { return string.Empty; }
-                        if (dateValue.Equals(dateValue.Date)) { return dateValue.ToString("d"); }
-                        return dateValue.ToString();
-                    case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                        //
-                        // -- Lookup
-                        if (!rawData.IsNumeric()) { return string.Empty; }
-                        if (field.lookupContentId > 0) {
-                            string LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentId);
-                            if (!string.IsNullOrEmpty(LookupContentName)) {
+                    case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                            //
+                            // -- boolean
+                            if (GenericController.encodeBoolean(rawData)) { return "Yes"; }
+                            return "No";
+                        }
+                    case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                            //
+                            // -- DateTime
+                            DateTime dateValue = GenericController.encodeDate(rawData);
+                            if (dateValue == DateTime.MinValue) { return string.Empty; }
+                            if (dateValue.Equals(dateValue.Date)) { return dateValue.ToString("d"); }
+                            return dateValue.ToString();
+                        }
+                    case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
+                            //
+                            // -- Lookup
+                            if (!rawData.IsNumeric()) { return string.Empty; }
+                            if (field.lookupContentId > 0) {
+                                string LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentId);
+                                if (!string.IsNullOrEmpty(LookupContentName)) {
+                                    //
+                                    // -- First try Lookup Content
+                                    using (var cs = new CsModel(core)) {
+                                        if (cs.open(LookupContentName, "ID=" + DbController.encodeSQLNumber(GenericController.encodeInteger(rawData)), "", true, 0, "name", 1)) {
+                                            return cs.getText("name");
+                                        }
+                                    }
+                                }
+                                return string.Empty;
+                            }
+                            if (!string.IsNullOrEmpty(field.lookupList)) {
                                 //
-                                // -- First try Lookup Content
-                                using (var cs = new CsModel(core)) {
-                                    if (cs.open(LookupContentName, "ID=" + DbController.encodeSQLNumber(GenericController.encodeInteger(rawData)), "", true, 0, "name", 1)) {
-                                        return cs.getText("name");
+                                // -- lookup list, index is 1-based (to be consistent with Db), but array is 0-based, so adjust
+                                int FieldValueInteger = GenericController.encodeInteger(rawData) - 1;
+                                if (FieldValueInteger >= 0) {
+                                    string[] lookups = field.lookupList.Split(',');
+                                    if (lookups.GetUpperBound(0) >= FieldValueInteger) {
+                                        return lookups[FieldValueInteger];
                                     }
                                 }
                             }
                             return string.Empty;
                         }
-                        if (!string.IsNullOrEmpty(field.lookupList)) {
+                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
                             //
-                            // -- lookup list, index is 1-based (to be consistent with Db), but array is 0-based, so adjust
-                            int FieldValueInteger = GenericController.encodeInteger(rawData) - 1;
-                            if (FieldValueInteger >= 0) {
-                                string[] lookups = field.lookupList.Split(',');
-                                if (lookups.GetUpperBound(0) >= FieldValueInteger) {
-                                    return lookups[FieldValueInteger];
-                                }
-                            }
+                            // -- member select
+                            if (rawData.IsNumeric()) { return MetadataController.getRecordName(core, "people", GenericController.encodeInteger(rawData)); }
+                            return string.Empty;
                         }
-                        return string.Empty;
-                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
-                        //
-                        // -- member select
-                        if (rawData.IsNumeric()) { return MetadataController.getRecordName(core, "people", GenericController.encodeInteger(rawData)); }
-                        return string.Empty;
-                    case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                        //
-                        // -- currency
-                        if (rawData.IsNumeric()) { return rawData.ToString(); }
-                        return string.Empty;
+                    case CPContentBaseClass.FieldTypeIdEnum.Currency: {
+                            //
+                            // -- currency
+                            if (rawData.IsNumeric()) { return rawData.ToString(); }
+                            return string.Empty;
+                        }
                     case CPContentBaseClass.FieldTypeIdEnum.FileText:
                     case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                     case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                     case CPContentBaseClass.FieldTypeIdEnum.FileXML:
-                    case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                        //
-                        // -- cdn file
-                        return core.cdnFiles.readFileText(GenericController.encodeText(rawData));
+                    case CPContentBaseClass.FieldTypeIdEnum.FileJavascript: {
+                            //
+                            // -- cdn file
+                            return core.cdnFiles.readFileText(GenericController.encodeText(rawData));
+                        }
                     case CPContentBaseClass.FieldTypeIdEnum.Text:
                     case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                    case CPContentBaseClass.FieldTypeIdEnum.HTML:
-                        //
-                        // -- text saved in database
-                        return rawData;
+                    case CPContentBaseClass.FieldTypeIdEnum.HTML: {
+                            //
+                            // -- text saved in database
+                            return rawData;
+                        }
                     case CPContentBaseClass.FieldTypeIdEnum.File:
                     case CPContentBaseClass.FieldTypeIdEnum.FileImage:
                     case CPContentBaseClass.FieldTypeIdEnum.Link:
                     case CPContentBaseClass.FieldTypeIdEnum.ResourceLink:
                     case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
                     case CPContentBaseClass.FieldTypeIdEnum.Float:
-                    case CPContentBaseClass.FieldTypeIdEnum.Integer:
-                        //
-                        // -- other types returned in string format
-                        return GenericController.encodeText(rawData);
+                    case CPContentBaseClass.FieldTypeIdEnum.Integer: {
+                            //
+                            // -- other types returned in string format
+                            return GenericController.encodeText(rawData);
+                        }
                     case CPContentBaseClass.FieldTypeIdEnum.Redirect:
-                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                        //
-                        // This case is covered before the select - but leave this here as safety net
-                        return string.Empty;
-                    default:
-                        //
-                        // Unknown field type
-                        //
-                        throw new GenericException("Cannot use field [" + fieldName + "] because the fieldType [" + field.fieldTypeId + "] is not valid.");
+                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                            //
+                            // This case is covered before the select - but leave this here as safety net
+                            return string.Empty;
+                        }
+                    default: {
+                            //
+                            // Unknown field type
+                            //
+                            throw new GenericException("Cannot use field [" + fieldName + "] because the fieldType [" + field.fieldTypeId + "] is not valid.");
+                        }
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1055,133 +1080,141 @@ namespace Contensive.Processor {
                 switch (field.fieldTypeId) {
                     case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
                     case CPContentBaseClass.FieldTypeIdEnum.Redirect:
-                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                        //
-                        // Never set
-                        //
-                        break;
+                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                            //
+                            // Never set
+                            //
+                            break;
+                        }
                     case CPContentBaseClass.FieldTypeIdEnum.File:
-                    case CPContentBaseClass.FieldTypeIdEnum.FileImage:
-                        //
-                        // Always set
-                        // Saved in the field is the filename to the file
-                        SetNeeded = true;
-                        break;
+                    case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
+                            //
+                            // Always set
+                            // Saved in the field is the filename to the file
+                            SetNeeded = true;
+                            break;
+                        }
                     case CPContentBaseClass.FieldTypeIdEnum.FileText:
                     case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                     case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                     case CPContentBaseClass.FieldTypeIdEnum.FileXML:
-                    case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                        //
-                        // public files - save as FieldTypeTextFile except if only white space, consider it blank
-                        //
-                        string PathFilename = null;
-                        string FileExt = null;
-                        int FilenameRev = 0;
-                        string path = null;
-                        int Pos = 0;
-                        string pathFilenameOriginal = getRawData(field.nameLc);
-                        PathFilename = pathFilenameOriginal;
-                        string BlankTest = null;
-                        BlankTest = rawValueForDb;
-                        BlankTest = GenericController.vbReplace(BlankTest, " ", "");
-                        BlankTest = GenericController.vbReplace(BlankTest, "\r", "");
-                        BlankTest = GenericController.vbReplace(BlankTest, "\n", "");
-                        BlankTest = GenericController.vbReplace(BlankTest, "\t", "");
-                        if (string.IsNullOrEmpty(BlankTest)) {
-                            if (!string.IsNullOrEmpty(PathFilename)) {
-                                core.cdnFiles.deleteFile(PathFilename);
-                                PathFilename = "";
-                            }
-                        } else {
-                            if (string.IsNullOrEmpty(PathFilename)) {
-                                PathFilename = getFieldFilename(field.nameLc, "", this.contentName, field.fieldTypeId);
-                            }
-                            if (PathFilename.Left(1) == "/") {
-                                //
-                                // root file, do not include revision
-                                //
+                    case CPContentBaseClass.FieldTypeIdEnum.FileJavascript: {
+                            //
+                            // public files - save as FieldTypeTextFile except if only white space, consider it blank
+                            //
+                            string PathFilename = null;
+                            string FileExt = null;
+                            int FilenameRev = 0;
+                            string path = null;
+                            int Pos = 0;
+                            string pathFilenameOriginal = getRawData(field.nameLc);
+                            PathFilename = pathFilenameOriginal;
+                            string BlankTest = null;
+                            BlankTest = rawValueForDb;
+                            BlankTest = GenericController.vbReplace(BlankTest, " ", "");
+                            BlankTest = GenericController.vbReplace(BlankTest, "\r", "");
+                            BlankTest = GenericController.vbReplace(BlankTest, "\n", "");
+                            BlankTest = GenericController.vbReplace(BlankTest, "\t", "");
+                            if (string.IsNullOrEmpty(BlankTest)) {
+                                if (!string.IsNullOrEmpty(PathFilename)) {
+                                    core.cdnFiles.deleteFile(PathFilename);
+                                    PathFilename = "";
+                                }
                             } else {
-                                //
-                                // content file, add a revision to the filename
-                                //
-                                Pos = PathFilename.LastIndexOf(".") + 1;
-                                if (Pos > 0) {
-                                    FileExt = PathFilename.Substring(Pos);
-                                    string fileNameNoExt = PathFilename.Left(Pos - 1);
-                                    Pos = fileNameNoExt.LastIndexOf("/") + 1;
+                                if (string.IsNullOrEmpty(PathFilename)) {
+                                    PathFilename = getFieldFilename(field.nameLc, "", this.contentName, field.fieldTypeId);
+                                }
+                                if (PathFilename.Left(1) == "/") {
+                                    //
+                                    // root file, do not include revision
+                                    //
+                                } else {
+                                    //
+                                    // content file, add a revision to the filename
+                                    //
+                                    Pos = PathFilename.LastIndexOf(".") + 1;
                                     if (Pos > 0) {
-                                        fileNameNoExt = fileNameNoExt.Substring(Pos);
-                                        path = PathFilename.Left(Pos);
-                                        FilenameRev = 1;
-                                        if (!fileNameNoExt.IsNumeric()) {
-                                            Pos = GenericController.vbInstr(1, fileNameNoExt, ".r", 1);
-                                            if (Pos > 0) {
-                                                FilenameRev = GenericController.encodeInteger(fileNameNoExt.Substring(Pos + 1));
-                                                FilenameRev = FilenameRev + 1;
-                                                fileNameNoExt = fileNameNoExt.Left(Pos - 1);
+                                        FileExt = PathFilename.Substring(Pos);
+                                        string fileNameNoExt = PathFilename.Left(Pos - 1);
+                                        Pos = fileNameNoExt.LastIndexOf("/") + 1;
+                                        if (Pos > 0) {
+                                            fileNameNoExt = fileNameNoExt.Substring(Pos);
+                                            path = PathFilename.Left(Pos);
+                                            FilenameRev = 1;
+                                            if (!fileNameNoExt.IsNumeric()) {
+                                                Pos = GenericController.vbInstr(1, fileNameNoExt, ".r", 1);
+                                                if (Pos > 0) {
+                                                    FilenameRev = GenericController.encodeInteger(fileNameNoExt.Substring(Pos + 1));
+                                                    FilenameRev = FilenameRev + 1;
+                                                    fileNameNoExt = fileNameNoExt.Left(Pos - 1);
+                                                }
                                             }
+                                            string fileName = fileNameNoExt + ".r" + FilenameRev + "." + FileExt;
+                                            path = GenericController.convertCdnUrlToCdnPathFilename(path);
+                                            PathFilename = path + fileName;
                                         }
-                                        string fileName = fileNameNoExt + ".r" + FilenameRev + "." + FileExt;
-                                        path = GenericController.convertCdnUrlToCdnPathFilename(path);
-                                        PathFilename = path + fileName;
                                     }
                                 }
+                                if ((!string.IsNullOrEmpty(pathFilenameOriginal)) && (pathFilenameOriginal != PathFilename)) {
+                                    pathFilenameOriginal = GenericController.convertCdnUrlToCdnPathFilename(pathFilenameOriginal);
+                                    core.cdnFiles.deleteFile(pathFilenameOriginal);
+                                }
+                                core.cdnFiles.saveFile(PathFilename, rawValueForDb);
                             }
-                            if ((!string.IsNullOrEmpty(pathFilenameOriginal)) && (pathFilenameOriginal != PathFilename)) {
-                                pathFilenameOriginal = GenericController.convertCdnUrlToCdnPathFilename(pathFilenameOriginal);
-                                core.cdnFiles.deleteFile(pathFilenameOriginal);
-                            }
-                            core.cdnFiles.saveFile(PathFilename, rawValueForDb);
-                        }
-                        rawValueForDb = PathFilename;
-                        SetNeeded = true;
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                        //
-                        // Boolean - sepcial case, block on typed GetAlways set
-                        if (GenericController.encodeBoolean(rawValueForDb) != getBoolean(field.nameLc)) {
+                            rawValueForDb = PathFilename;
                             SetNeeded = true;
+                            break;
                         }
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Text:
-                        //
-                        // Set if text of value changes
-                        //
-                        if (GenericController.encodeText(rawValueForDb) != getText(field.nameLc)) {
-                            SetNeeded = true;
-                            if (rawValueForDb.Length > 255) {
-                                LogController.logWarn(core, new GenericException("Text length too long saving field [" + contentMeta.name + "." + fieldName + "], length [" + rawValueForDb.Length + "], but max for Text field is 255. Save will be attempted"));
+                    case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                            //
+                            // Boolean - sepcial case, block on typed GetAlways set
+                            if (GenericController.encodeBoolean(rawValueForDb) != getBoolean(field.nameLc)) {
+                                SetNeeded = true;
                             }
+                            break;
                         }
-                        break;
+                    case CPContentBaseClass.FieldTypeIdEnum.Text: {
+                            //
+                            // Set if text of value changes
+                            //
+                            if (GenericController.encodeText(rawValueForDb) != getText(field.nameLc)) {
+                                SetNeeded = true;
+                                if (rawValueForDb.Length > 255) {
+                                    LogController.logWarn(core, new GenericException("Text length too long saving field [" + contentMeta.name + "." + fieldName + "], length [" + rawValueForDb.Length + "], but max for Text field is 255. Save will be attempted"));
+                                }
+                            }
+                            break;
+                        }
                     case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                    case CPContentBaseClass.FieldTypeIdEnum.HTML:
-                        //
-                        // Set if text of value changes
-                        //
-                        if (GenericController.encodeText(rawValueForDb) != getText(field.nameLc)) {
-                            SetNeeded = true;
-                            if (rawValueForDb.Length > 65535) {
-                                LogController.logWarn(core, new GenericException("Text length too long saving field [" + contentMeta.name + "." + fieldName + "], length [" + rawValueForDb.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
+                    case CPContentBaseClass.FieldTypeIdEnum.HTML: {
+                            //
+                            // Set if text of value changes
+                            //
+                            if (GenericController.encodeText(rawValueForDb) != getText(field.nameLc)) {
+                                SetNeeded = true;
+                                if (rawValueForDb.Length > 65535) {
+                                    LogController.logWarn(core, new GenericException("Text length too long saving field [" + contentMeta.name + "." + fieldName + "], length [" + rawValueForDb.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
+                                }
                             }
+                            break;
                         }
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                    //
-                    // -- Lookup, compare the integer value read with the getInteger from the read cache.
-                    if (GenericController.encodeInteger(rawValueForDb) != getInteger(field.nameLc)) {
-                        SetNeeded = true;
-                    }
-                    break;
-                    default:
-                        //
-                        // Set if text of value changes
-                        //
-                        if (GenericController.encodeText(rawValueForDb) != getText(field.nameLc)) {
-                            SetNeeded = true;
+                    case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
+                            //
+                            // -- Lookup, compare the integer value read with the getInteger from the read cache.
+                            if (GenericController.encodeInteger(rawValueForDb) != getInteger(field.nameLc)) {
+                                SetNeeded = true;
+                            }
+                            break;
                         }
-                        break;
+                    default: {
+                            //
+                            // Set if text of value changes
+                            //
+                            if (GenericController.encodeText(rawValueForDb) != getText(field.nameLc)) {
+                                SetNeeded = true;
+                            }
+                            break;
+                        }
                 }
                 if (SetNeeded) {
                     //
@@ -1233,7 +1266,7 @@ namespace Contensive.Processor {
             try {
                 if (!ok()) { return; }
                 if (this.writeCache.Count == 0) { return; }
-                if ( contentMeta == null ) {
+                if (contentMeta == null) {
                     Controllers.LogController.logTrace(core, "save, contentMeta NULL, sqlSource [" + sqlSource + "]");
                 } else {
                     Controllers.LogController.logTrace(core, "save, enter, contentMeta.name [" + contentMeta.name + "], contentMeta.tableName [" + contentMeta.tableName + "], contentMeta.dataSourceName [" + contentMeta.dataSourceName + "], asyncSave [" + asyncSave + "], blockClearCache [" + blockClearCache + "]");
@@ -1285,46 +1318,53 @@ namespace Contensive.Processor {
                             //
                             switch (field.fieldTypeId) {
                                 case CPContentBaseClass.FieldTypeIdEnum.Redirect:
-                                case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                                    break;
+                                case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                                        // nop
+                                        break;
+                                    }
                                 case CPContentBaseClass.FieldTypeIdEnum.Integer:
                                 case CPContentBaseClass.FieldTypeIdEnum.Lookup:
                                 case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
-                                case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
-                                    //
-                                    // -- allow nullable (if null, set db to null). for example, a field 'chargesremaining' could be blank or numeric
-                                    if (string.IsNullOrWhiteSpace(encodeText(writeCacheValue))) {
-                                        SQLSetPair = fieldName + "=null";
-                                    } else {
-                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLNumber(encodeInteger(writeCacheValue));
+                                case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
+                                        //
+                                        // -- allow nullable (if null, set db to null). for example, a field 'chargesremaining' could be blank or numeric
+                                        if (string.IsNullOrWhiteSpace(encodeText(writeCacheValue))) {
+                                            SQLSetPair = fieldName + "=null";
+                                        } else {
+                                            SQLSetPair = fieldName + "=" + DbController.encodeSQLNumber(encodeInteger(writeCacheValue));
+                                        }
+                                        break;
                                     }
-                                    break;
                                 case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                                case CPContentBaseClass.FieldTypeIdEnum.Float:
-                                    //
-                                    // -- allow nullable (if null, set db to null). for example, a field 'chargesremaining' could be blank or numeric
-                                    if (string.IsNullOrWhiteSpace(encodeText(writeCacheValue))) {
-                                        SQLSetPair = fieldName + "=null";
-                                    } else {
-                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLNumber(encodeNumber(writeCacheValue));
+                                case CPContentBaseClass.FieldTypeIdEnum.Float: {
+                                        //
+                                        // -- allow nullable (if null, set db to null). for example, a field 'chargesremaining' could be blank or numeric
+                                        if (string.IsNullOrWhiteSpace(encodeText(writeCacheValue))) {
+                                            SQLSetPair = fieldName + "=null";
+                                        } else {
+                                            SQLSetPair = fieldName + "=" + DbController.encodeSQLNumber(encodeNumber(writeCacheValue));
+                                        }
+                                        break;
                                     }
-                                    break;
-                                case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLBoolean(encodeBoolean(writeCacheValue));
-                                    break;
-                                case CPContentBaseClass.FieldTypeIdEnum.Date:
-                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLDate(encodeDate(writeCacheValue));
-                                    break;
-                                case CPContentBaseClass.FieldTypeIdEnum.Text:
-                                    string Copy = encodeText(writeCacheValue);
-                                    if (Copy.Length > 255) {
-                                        Copy = Copy.Left(255);
+                                case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLBoolean(encodeBoolean(writeCacheValue));
+                                        break;
                                     }
-                                    if (field.scramble) {
-                                        Copy = TextScramble(core, Copy);
+                                case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLDate(encodeDate(writeCacheValue));
+                                        break;
                                     }
-                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLText(Copy);
-                                    break;
+                                case CPContentBaseClass.FieldTypeIdEnum.Text: {
+                                        string Copy = encodeText(writeCacheValue);
+                                        if (Copy.Length > 255) {
+                                            Copy = Copy.Left(255);
+                                        }
+                                        if (field.scramble) {
+                                            Copy = TextScramble(core, Copy);
+                                        }
+                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLText(Copy);
+                                        break;
+                                    }
                                 case CPContentBaseClass.FieldTypeIdEnum.Link:
                                 case CPContentBaseClass.FieldTypeIdEnum.ResourceLink:
                                 case CPContentBaseClass.FieldTypeIdEnum.File:
@@ -1333,22 +1373,25 @@ namespace Contensive.Processor {
                                 case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                                 case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                                 case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                                case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                                    string filename = encodeText(writeCacheValue);
-                                    if (filename.Length > 255) {
-                                        filename = filename.Left(255);
+                                case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                                        string filename = encodeText(writeCacheValue);
+                                        if (filename.Length > 255) {
+                                            filename = filename.Left(255);
+                                        }
+                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLText(filename);
+                                        break;
                                     }
-                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLText(filename);
-                                    break;
                                 case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                                case CPContentBaseClass.FieldTypeIdEnum.HTML:
-                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLText(GenericController.encodeText(writeCacheValue));
-                                    break;
-                                default:
-                                    //
-                                    // Invalid fieldtype
-                                    //
-                                    throw new GenericException("Can Not save this record because the field [" + field.nameLc + "] has an invalid field type Id [" + field.fieldTypeId + "]");
+                                case CPContentBaseClass.FieldTypeIdEnum.HTML: {
+                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLText(GenericController.encodeText(writeCacheValue));
+                                        break;
+                                    }
+                                default: {
+                                        //
+                                        // Invalid fieldtype
+                                        //
+                                        throw new GenericException("Can Not save this record because the field [" + field.nameLc + "] has an invalid field type Id [" + field.fieldTypeId + "]");
+                                    }
                             }
                             if (!string.IsNullOrEmpty(SQLSetPair)) {
                                 //
@@ -1378,11 +1421,13 @@ namespace Contensive.Processor {
                                     }
                                     switch (field.fieldTypeId) {
                                         case CPContentBaseClass.FieldTypeIdEnum.Redirect:
-                                        case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                                            break;
-                                        default:
-                                            SQLCriteriaUnique += "(" + field.nameLc + "=" + MetadataController.encodeSQL(writeCacheValue, field.fieldTypeId) + ")";
-                                            break;
+                                        case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                                                break;
+                                            }
+                                        default: {
+                                                SQLCriteriaUnique += "(" + field.nameLc + "=" + MetadataController.encodeSQL(writeCacheValue, field.fieldTypeId) + ")";
+                                                break;
+                                            }
                                     }
                                 }
                                 //
@@ -1403,8 +1448,8 @@ namespace Contensive.Processor {
                             //
                             // ----- Authorable Fields Updated in non-Authoring Mode, set Live Record Modified
                             //
-                            sqlUpdate = sqlUpdate 
-                                + ",modifiedDate=" + DbController.encodeSQLDate(sqlModifiedDate) 
+                            sqlUpdate = sqlUpdate
+                                + ",modifiedDate=" + DbController.encodeSQLDate(sqlModifiedDate)
                                 + ",modifiedBy=" + DbController.encodeSQLNumber(sqlModifiedBy);
                         }
                     }
@@ -1658,43 +1703,48 @@ namespace Contensive.Processor {
                     LocalRequestName = FieldName;
                 }
                 switch (getFieldTypeId(FieldName)) {
-                    case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                        //
-                        // -- Boolean
-                        set(FieldName, core.docProperties.getBoolean(LocalRequestName));
-                        break;
+                    case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                            //
+                            // -- Boolean
+                            set(FieldName, core.docProperties.getBoolean(LocalRequestName));
+                            break;
+                        }
                     case CPContentBaseClass.FieldTypeIdEnum.Currency:
                     case CPContentBaseClass.FieldTypeIdEnum.Float:
                     case CPContentBaseClass.FieldTypeIdEnum.Integer:
                     case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                        //
-                        // -- Numbers
-                        set(FieldName, core.docProperties.getNumber(LocalRequestName));
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.Date:
-                        //
-                        // -- Date
-                        set(FieldName, core.docProperties.getDate(LocalRequestName));
-                        break;
-                    case CPContentBaseClass.FieldTypeIdEnum.File:
-                    case CPContentBaseClass.FieldTypeIdEnum.FileImage:
-                        //
-                        // -- upload file
-                        Filename = core.docProperties.getText(LocalRequestName);
-                        if (!string.IsNullOrEmpty(Filename)) {
-                            Path = getFieldFilename(FieldName, Filename, "", getFieldTypeId(FieldName));
-                            set(FieldName, Path);
-                            Path = GenericController.vbReplace(Path, "\\", "/");
-                            Path = GenericController.vbReplace(Path, "/" + Filename, "");
-                            core.cdnFiles.upload(LocalRequestName, Path, ref Filename);
+                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                            //
+                            // -- Numbers
+                            set(FieldName, core.docProperties.getNumber(LocalRequestName));
+                            break;
                         }
-                        break;
-                    default:
-                        //
-                        // -- text files
-                        set(FieldName, core.docProperties.getText(LocalRequestName));
-                        break;
+                    case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                            //
+                            // -- Date
+                            set(FieldName, core.docProperties.getDate(LocalRequestName));
+                            break;
+                        }
+                    case CPContentBaseClass.FieldTypeIdEnum.File:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
+                            //
+                            // -- upload file
+                            Filename = core.docProperties.getText(LocalRequestName);
+                            if (!string.IsNullOrEmpty(Filename)) {
+                                Path = getFieldFilename(FieldName, Filename, "", getFieldTypeId(FieldName));
+                                set(FieldName, Path);
+                                Path = GenericController.vbReplace(Path, "\\", "/");
+                                Path = GenericController.vbReplace(Path, "/" + Filename, "");
+                                core.cdnFiles.upload(LocalRequestName, Path, ref Filename);
+                            }
+                            break;
+                        }
+                    default: {
+                            //
+                            // -- text files
+                            set(FieldName, core.docProperties.getText(LocalRequestName));
+                            break;
+                        }
                 }
             }
         }
@@ -1970,7 +2020,7 @@ namespace Contensive.Processor {
                 this.dataSourceName = dataSourceName;
                 this.sqlSelectFieldList = "";
                 this.sqlSource = sql;
-                using( var db = new DbController( core, dataSourceName )) {
+                using (var db = new DbController(core, dataSourceName)) {
                     this.dt = core.db.executeQuery(sql, pageSize * (pageNumber - 1), pageSize);
                 }
                 initAfterOpen(0);

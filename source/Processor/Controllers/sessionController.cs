@@ -370,15 +370,18 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- mobile detect
                             switch (resultSessionContext.visitor.forceBrowserMobile) {
-                                case 1:
-                                    resultSessionContext.visit.mobile = true;
-                                    break;
-                                case 2:
-                                    resultSessionContext.visit.mobile = false;
-                                    break;
-                                default:
-                                    resultSessionContext.visit.mobile = isMobile(core.webServer.requestBrowser);
-                                    break;
+                                case 1: {
+                                        resultSessionContext.visit.mobile = true;
+                                        break;
+                                    }
+                                case 2: {
+                                        resultSessionContext.visit.mobile = false;
+                                        break;
+                                    }
+                                default: {
+                                        resultSessionContext.visit.mobile = isMobile(core.webServer.requestBrowser);
+                                        break;
+                                    }
                             }
                             //
                             // -- bot and badBot detect
@@ -543,7 +546,7 @@ namespace Contensive.Processor.Controllers {
                     if (resultSessionContext.user.id > 0) {
                         if (resultSessionContext.visitor.memberId != resultSessionContext.user.id) {
                             resultSessionContext.visitor.memberId = resultSessionContext.user.id;
-                            visitor_changes = true;  
+                            visitor_changes = true;
                         }
                         if (resultSessionContext.visit.memberId != resultSessionContext.user.id) {
                             resultSessionContext.visit.memberId = resultSessionContext.user.id;

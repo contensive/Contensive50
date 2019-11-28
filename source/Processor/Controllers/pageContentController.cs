@@ -363,21 +363,27 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             int AnonymousUserResponseId = GenericController.encodeInteger(core.siteProperties.getText("AnonymousUserResponseID", "0"));
                             switch (AnonymousUserResponseId) {
-                                case 1:
-                                    //
-                                    // -- block with login
-                                    core.doc.continueProcessing = false;
-                                    return core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
-                                        addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                                        errorContextMessage = "calling login page addon [" + addonGuidLoginPage + "] because page is blocked"
-                                    });
-                                case 2:
-                                    //
-                                    // -- block with custom content
-                                    core.doc.continueProcessing = false;
-                                    core.doc.setMetaContent(0, 0);
-                                    core.html.addScriptCode_onLoad("document.body.style.overflow='scroll'", "Anonymous User Block");
-                                    return core.html.getHtmlDoc('\r' + core.html.getContentCopy("AnonymousUserResponseCopy", "<p style=\"width:250px;margin:100px auto auto auto;\">The site is currently not available for anonymous access.</p>", core.session.user.id, true, core.session.isAuthenticated), TemplateDefaultBodyTag, true, true);
+                                case 1: {
+                                        //
+                                        // -- block with login
+                                        core.doc.continueProcessing = false;
+                                        return core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
+                                            addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                            errorContextMessage = "calling login page addon [" + addonGuidLoginPage + "] because page is blocked"
+                                        });
+                                    }
+                                case 2: {
+                                        //
+                                        // -- block with custom content
+                                        core.doc.continueProcessing = false;
+                                        core.doc.setMetaContent(0, 0);
+                                        core.html.addScriptCode_onLoad("document.body.style.overflow='scroll'", "Anonymous User Block");
+                                        return core.html.getHtmlDoc('\r' + core.html.getContentCopy("AnonymousUserResponseCopy", "<p style=\"width:250px;margin:100px auto auto auto;\">The site is currently not available for anonymous access.</p>", core.session.user.id, true, core.session.isAuthenticated), TemplateDefaultBodyTag, true, true);
+                                    }
+                                default: {
+                                        // nop
+                                        break;
+                                    }
                             }
                         }
                     }
@@ -888,56 +894,63 @@ namespace Contensive.Processor.Controllers {
                         int RemoveGroupId = core.doc.pageController.page.triggerRemoveGroupId;
                         int SystemEMailId = core.doc.pageController.page.triggerSendSystemEmailId;
                         switch (ConditionId) {
-                            case 1:
-                                //
-                                // Always
-                                //
-                                if (SystemEMailId != 0) {
-                                    EmailController.queueSystemEmail(core, MetadataController.getRecordName(core, "System Email", SystemEMailId), "", core.session.user.id);
+                            case 1: {
+                                    //
+                                    // Always
+                                    //
+                                    if (SystemEMailId != 0) {
+                                        EmailController.queueSystemEmail(core, MetadataController.getRecordName(core, "System Email", SystemEMailId), "", core.session.user.id);
+                                    }
+                                    if (main_AddGroupId != 0) {
+                                        GroupController.addUser(core, GroupController.getGroupName(core, main_AddGroupId));
+                                    }
+                                    if (RemoveGroupId != 0) {
+                                        GroupController.removeUser(core, GroupController.getGroupName(core, RemoveGroupId));
+                                    }
+                                    break;
                                 }
-                                if (main_AddGroupId != 0) {
-                                    GroupController.addUser(core, GroupController.getGroupName(core, main_AddGroupId));
-                                }
-                                if (RemoveGroupId != 0) {
-                                    GroupController.removeUser(core, GroupController.getGroupName(core, RemoveGroupId));
-                                }
-                                break;
-                            case 2:
-                                //
-                                // If in Condition Group
-                                //
-                                if (ConditionGroupId != 0) {
-                                    if (GroupController.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupId))) {
-                                        if (SystemEMailId != 0) {
-                                            EmailController.queueSystemEmail(core, MetadataController.getRecordName(core, "System Email", SystemEMailId), "", core.session.user.id);
-                                        }
-                                        if (main_AddGroupId != 0) {
-                                            GroupController.addUser(core, GroupController.getGroupName(core, main_AddGroupId));
-                                        }
-                                        if (RemoveGroupId != 0) {
-                                            GroupController.removeUser(core, GroupController.getGroupName(core, RemoveGroupId));
+                            case 2: {
+                                    //
+                                    // If in Condition Group
+                                    //
+                                    if (ConditionGroupId != 0) {
+                                        if (GroupController.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupId))) {
+                                            if (SystemEMailId != 0) {
+                                                EmailController.queueSystemEmail(core, MetadataController.getRecordName(core, "System Email", SystemEMailId), "", core.session.user.id);
+                                            }
+                                            if (main_AddGroupId != 0) {
+                                                GroupController.addUser(core, GroupController.getGroupName(core, main_AddGroupId));
+                                            }
+                                            if (RemoveGroupId != 0) {
+                                                GroupController.removeUser(core, GroupController.getGroupName(core, RemoveGroupId));
+                                            }
                                         }
                                     }
+                                    break;
                                 }
-                                break;
-                            case 3:
-                                //
-                                // If not in Condition Group
-                                //
-                                if (ConditionGroupId != 0) {
-                                    if (!GroupController.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupId))) {
-                                        if (main_AddGroupId != 0) {
-                                            GroupController.addUser(core, GroupController.getGroupName(core, main_AddGroupId));
-                                        }
-                                        if (RemoveGroupId != 0) {
-                                            GroupController.removeUser(core, GroupController.getGroupName(core, RemoveGroupId));
-                                        }
-                                        if (SystemEMailId != 0) {
-                                            EmailController.queueSystemEmail(core, MetadataController.getRecordName(core, "System Email", SystemEMailId), "", core.session.user.id);
+                            case 3: {
+                                    //
+                                    // If not in Condition Group
+                                    //
+                                    if (ConditionGroupId != 0) {
+                                        if (!GroupController.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupId))) {
+                                            if (main_AddGroupId != 0) {
+                                                GroupController.addUser(core, GroupController.getGroupName(core, main_AddGroupId));
+                                            }
+                                            if (RemoveGroupId != 0) {
+                                                GroupController.removeUser(core, GroupController.getGroupName(core, RemoveGroupId));
+                                            }
+                                            if (SystemEMailId != 0) {
+                                                EmailController.queueSystemEmail(core, MetadataController.getRecordName(core, "System Email", SystemEMailId), "", core.session.user.id);
+                                            }
                                         }
                                     }
+                                    break;
                                 }
-                                break;
+                            default: {
+                                    // nop
+                                    break;
+                                }
                         }
                     }
                     //
@@ -1068,7 +1081,7 @@ namespace Contensive.Processor.Controllers {
                         resultContent.Append(QuickEditController.getQuickEditing(core));
                     }
                 }
-                if(renderContent) {
+                if (renderContent) {
                     //
                     // -- render page content
                     string htmlPageContent = "";
@@ -1368,7 +1381,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- (legacy) get template named Default
                             core.doc.pageController.template = DbBaseModel.createByUniqueName<PageTemplateModel>(core.cpParent, singleColumnTemplateName);
-                            if(core.doc.pageController.template==null) {
+                            if (core.doc.pageController.template == null) {
                                 //
                                 // -- get most recent template
                                 List<PageTemplateModel> templateList = DbBaseModel.createList<PageTemplateModel>(core.cpParent, "", "id desc");
@@ -1733,84 +1746,97 @@ namespace Contensive.Processor.Controllers {
                         bool WasInGroup = false;
                         string FormValue = null;
                         switch (formField.Type) {
-                            case 1:
-                                //
-                                // People Record
-                                //
-                                if (peopleMeta == null) { peopleMeta = Models.Domain.ContentMetadataModel.createByUniqueName(core, "people"); }
-                                var peopleFieldMeta = Models.Domain.ContentMetadataModel.getField(core, peopleMeta, formField.peopleFieldName);
-                                if (peopleFieldMeta != null) {
-                                    FormValue = core.docProperties.getText(formField.peopleFieldName);
-                                    if ((!string.IsNullOrEmpty(FormValue)) & peopleFieldMeta.uniqueName) {
-                                        using (var csData = new CsModel(core)) {
-                                            string SQL = "select count(*) from ccMembers where " + formField.peopleFieldName + "=" + DbController.encodeSQLText(FormValue);
-                                            csData.openSql(SQL);
-                                            if (csData.ok()) {
-                                                Success = csData.getInteger("cnt") == 0;
+                            case 1: {
+                                    //
+                                    // People Record
+                                    //
+                                    if (peopleMeta == null) { peopleMeta = Models.Domain.ContentMetadataModel.createByUniqueName(core, "people"); }
+                                    var peopleFieldMeta = Models.Domain.ContentMetadataModel.getField(core, peopleMeta, formField.peopleFieldName);
+                                    if (peopleFieldMeta != null) {
+                                        FormValue = core.docProperties.getText(formField.peopleFieldName);
+                                        if ((!string.IsNullOrEmpty(FormValue)) & peopleFieldMeta.uniqueName) {
+                                            using (var csData = new CsModel(core)) {
+                                                string SQL = "select count(*) from ccMembers where " + formField.peopleFieldName + "=" + DbController.encodeSQLText(FormValue);
+                                                csData.openSql(SQL);
+                                                if (csData.ok()) {
+                                                    Success = csData.getInteger("cnt") == 0;
+                                                }
+                                            }
+                                            if (!Success) {
+                                                ErrorController.addUserError(core, "The field [" + formField.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
                                             }
                                         }
-                                        if (!Success) {
-                                            ErrorController.addUserError(core, "The field [" + formField.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
-                                        }
-                                    }
-                                    if ((formField.REquired || peopleFieldMeta.required) && string.IsNullOrEmpty(FormValue)) {
-                                        Success = false;
-                                        ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(formField.Caption) + "] is required.");
-                                    } else {
-                                        using (var csData = new CsModel(core)) {
-                                            if (!csData.ok()) {
-                                                csData.openRecord("people", core.session.user.id);
-                                            }
-                                            if (csData.ok()) {
-                                                string PeopleUsername = null;
-                                                string PeoplePassword = null;
-                                                string PeopleEmail = "";
-                                                switch (GenericController.vbUCase(formField.peopleFieldName)) {
-                                                    case "NAME":
-                                                        PeopleName = FormValue;
-                                                        csData.set(formField.peopleFieldName, FormValue);
-                                                        break;
-                                                    case "FIRSTNAME":
-                                                        PeopleFirstName = FormValue;
-                                                        csData.set(formField.peopleFieldName, FormValue);
-                                                        break;
-                                                    case "LASTNAME":
-                                                        PeopleLastName = FormValue;
-                                                        csData.set(formField.peopleFieldName, FormValue);
-                                                        break;
-                                                    case "EMAIL":
-                                                        PeopleEmail = FormValue;
-                                                        csData.set(formField.peopleFieldName, FormValue);
-                                                        break;
-                                                    case "USERNAME":
-                                                        PeopleUsername = FormValue;
-                                                        csData.set(formField.peopleFieldName, FormValue);
-                                                        break;
-                                                    case "PASSWORD":
-                                                        PeoplePassword = FormValue;
-                                                        csData.set(formField.peopleFieldName, FormValue);
-                                                        break;
-                                                    default:
-                                                        csData.set(formField.peopleFieldName, FormValue);
-                                                        break;
+                                        if ((formField.REquired || peopleFieldMeta.required) && string.IsNullOrEmpty(FormValue)) {
+                                            Success = false;
+                                            ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(formField.Caption) + "] is required.");
+                                        } else {
+                                            using (var csData = new CsModel(core)) {
+                                                if (!csData.ok()) {
+                                                    csData.openRecord("people", core.session.user.id);
+                                                }
+                                                if (csData.ok()) {
+                                                    string PeopleUsername = null;
+                                                    string PeoplePassword = null;
+                                                    string PeopleEmail = "";
+                                                    switch (GenericController.vbUCase(formField.peopleFieldName)) {
+                                                        case "NAME": {
+                                                                PeopleName = FormValue;
+                                                                csData.set(formField.peopleFieldName, FormValue);
+                                                                break;
+                                                            }
+                                                        case "FIRSTNAME": {
+                                                                PeopleFirstName = FormValue;
+                                                                csData.set(formField.peopleFieldName, FormValue);
+                                                                break;
+                                                            }
+                                                        case "LASTNAME": {
+                                                                PeopleLastName = FormValue;
+                                                                csData.set(formField.peopleFieldName, FormValue);
+                                                                break;
+                                                            }
+                                                        case "EMAIL": {
+                                                                PeopleEmail = FormValue;
+                                                                csData.set(formField.peopleFieldName, FormValue);
+                                                                break;
+                                                            }
+                                                        case "USERNAME": {
+                                                                PeopleUsername = FormValue;
+                                                                csData.set(formField.peopleFieldName, FormValue);
+                                                                break;
+                                                            }
+                                                        case "PASSWORD": {
+                                                                PeoplePassword = FormValue;
+                                                                csData.set(formField.peopleFieldName, FormValue);
+                                                                break;
+                                                            }
+                                                        default: {
+                                                                csData.set(formField.peopleFieldName, FormValue);
+                                                                break;
+                                                            }
+                                                    }
                                                 }
                                             }
                                         }
                                     }
+                                    break;
                                 }
-                                break;
-                            case 2:
-                                //
-                                // Group main_MemberShip
-                                //
-                                IsInGroup = core.docProperties.getBoolean("Group" + formField.GroupName);
-                                WasInGroup = GroupController.isMemberOfGroup(core, formField.GroupName);
-                                if (WasInGroup && !IsInGroup) {
-                                    GroupController.removeUser(core, formField.GroupName);
-                                } else if (IsInGroup && !WasInGroup) {
-                                    GroupController.addUser(core, formField.GroupName);
+                            case 2: {
+                                    //
+                                    // Group main_MemberShip
+                                    //
+                                    IsInGroup = core.docProperties.getBoolean("Group" + formField.GroupName);
+                                    WasInGroup = GroupController.isMemberOfGroup(core, formField.GroupName);
+                                    if (WasInGroup && !IsInGroup) {
+                                        GroupController.removeUser(core, formField.GroupName);
+                                    } else if (IsInGroup && !WasInGroup) {
+                                        GroupController.addUser(core, formField.GroupName);
+                                    }
+                                    break;
                                 }
-                                break;
+                            default: {
+                                    // nop
+                                    break;
+                                }
                         }
                     }
                     //
@@ -1921,18 +1947,24 @@ namespace Contensive.Processor.Controllers {
                                                 tempVar.Type = GenericController.encodeInteger(IArgs[main_IPosType]);
                                                 tempVar.REquired = GenericController.encodeBoolean(IArgs[main_IPosRequired]);
                                                 switch (tempVar.Type) {
-                                                    case 1:
-                                                        //
-                                                        // People Record
-                                                        //
-                                                        tempVar.peopleFieldName = IArgs[main_IPosPeopleField];
-                                                        break;
-                                                    case 2:
-                                                        //
-                                                        // Group main_MemberShip
-                                                        //
-                                                        tempVar.GroupName = IArgs[main_IPosGroupName];
-                                                        break;
+                                                    case 1: {
+                                                            //
+                                                            // People Record
+                                                            //
+                                                            tempVar.peopleFieldName = IArgs[main_IPosPeopleField];
+                                                            break;
+                                                        }
+                                                    case 2: {
+                                                            //
+                                                            // Group main_MemberShip
+                                                            //
+                                                            tempVar.GroupName = IArgs[main_IPosGroupName];
+                                                            break;
+                                                        }
+                                                    default: {
+                                                            // nop
+                                                            break;
+                                                        }
                                                 }
                                             }
                                         }
@@ -1978,44 +2010,50 @@ namespace Contensive.Processor.Controllers {
                     string CaptionSpan = null;
                     string Caption = null;
                     switch (formField.Type) {
-                        case 1:
-                            //
-                            // People Record
-                            //
-                            var peopleMetaField = Models.Domain.ContentMetadataModel.getField(core, peopleMeta, formField.peopleFieldName);
-                            if (IsRetry && core.docProperties.getText(formField.peopleFieldName) == "") {
-                                CaptionSpan = "<span class=\"ccError\">";
-                            } else {
-                                CaptionSpan = "<span>";
-                            }
-                            Caption = formField.Caption;
-                            if (formField.REquired || peopleMetaField.required) {
-                                Caption = "*" + Caption;
-                            }
-                            using (var csPeople = new CsModel(core)) {
-                                csPeople.openRecord("people", core.session.user.id);
-                                if (csPeople.ok()) {
-                                    Body = pageForm.RepeatCell;
-                                    Body = GenericController.vbReplace(Body, "{{CAPTION}}", CaptionSpan + Caption + "</span>", 1, 99, 1);
-                                    Body = GenericController.vbReplace(Body, "{{FIELD}}", core.html.inputCs(csPeople, "People", formField.peopleFieldName), 1, 99, 1);
-                                    RepeatBody = RepeatBody + Body;
-                                    HasRequiredFields = HasRequiredFields || formField.REquired;
+                        case 1: {
+                                //
+                                // People Record
+                                //
+                                var peopleMetaField = Models.Domain.ContentMetadataModel.getField(core, peopleMeta, formField.peopleFieldName);
+                                if (IsRetry && core.docProperties.getText(formField.peopleFieldName) == "") {
+                                    CaptionSpan = "<span class=\"ccError\">";
+                                } else {
+                                    CaptionSpan = "<span>";
                                 }
-                            }
+                                Caption = formField.Caption;
+                                if (formField.REquired || peopleMetaField.required) {
+                                    Caption = "*" + Caption;
+                                }
+                                using (var csPeople = new CsModel(core)) {
+                                    csPeople.openRecord("people", core.session.user.id);
+                                    if (csPeople.ok()) {
+                                        Body = pageForm.RepeatCell;
+                                        Body = GenericController.vbReplace(Body, "{{CAPTION}}", CaptionSpan + Caption + "</span>", 1, 99, 1);
+                                        Body = GenericController.vbReplace(Body, "{{FIELD}}", core.html.inputCs(csPeople, "People", formField.peopleFieldName), 1, 99, 1);
+                                        RepeatBody = RepeatBody + Body;
+                                        HasRequiredFields = HasRequiredFields || formField.REquired;
+                                    }
+                                }
 
-                            break;
-                        case 2:
-                            //
-                            // Group main_MemberShip
-                            //
-                            GroupValue = GroupController.isMemberOfGroup(core, formField.GroupName);
-                            Body = pageForm.RepeatCell;
-                            Body = GenericController.vbReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + formField.GroupName, GroupValue), 1, 99, 1);
-                            Body = GenericController.vbReplace(Body, "{{FIELD}}", formField.Caption);
-                            RepeatBody = RepeatBody + Body;
-                            GroupRowPtr = GroupRowPtr + 1;
-                            HasRequiredFields = HasRequiredFields || formField.REquired;
-                            break;
+                                break;
+                            }
+                        case 2: {
+                                //
+                                // Group main_MemberShip
+                                //
+                                GroupValue = GroupController.isMemberOfGroup(core, formField.GroupName);
+                                Body = pageForm.RepeatCell;
+                                Body = GenericController.vbReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + formField.GroupName, GroupValue), 1, 99, 1);
+                                Body = GenericController.vbReplace(Body, "{{FIELD}}", formField.Caption);
+                                RepeatBody = RepeatBody + Body;
+                                GroupRowPtr = GroupRowPtr + 1;
+                                HasRequiredFields = HasRequiredFields || formField.REquired;
+                                break;
+                            }
+                        default: {
+                                // nop
+                                break;
+                            }
                     }
                 }
                 if (HasRequiredFields) {
@@ -2114,93 +2152,95 @@ namespace Contensive.Processor.Controllers {
                 string NoteFromEmail = null;
                 string NoteFromName = null;
                 switch (FeedbackButton) {
-                    case FeedbackButtonSubmit:
-                        //
-                        // ----- form was submitted, save the note, send it and say thanks
-                        //
-                        NoteFromName = core.docProperties.getText("NoteFromName");
-                        NoteFromEmail = core.docProperties.getText("NoteFromEmail");
-                        //
-                        NoteCopy = NoteCopy + "Feedback Submitted" + BR;
-                        NoteCopy = NoteCopy + "From " + NoteFromName + " at " + NoteFromEmail + BR;
-                        NoteCopy = NoteCopy + "Replying to:" + BR;
-                        if (!string.IsNullOrEmpty(headline)) {
-                            NoteCopy = NoteCopy + "    Article titled [" + headline + "]" + BR;
-                        }
-                        NoteCopy = NoteCopy + "    Record [" + RecordID + "] in Content Definition [" + ContentName + "]" + BR;
-                        NoteCopy = NoteCopy + BR;
-                        NoteCopy = NoteCopy + "<b>Comments</b>" + BR;
-                        //
-                        Copy = core.docProperties.getText("NoteCopy");
-                        if (string.IsNullOrEmpty(Copy)) {
-                            NoteCopy = NoteCopy + "[no comments entered]" + BR;
-                        } else {
-                            NoteCopy = NoteCopy + HtmlController.convertNewLineToHtmlBreak(Copy) + BR;
-                        }
-                        //
-                        NoteCopy = NoteCopy + BR;
-                        NoteCopy = NoteCopy + "<b>Content on which the comments are based</b>" + BR;
-                        //
-                        using (var csData = new CsModel(core)) {
-                            csData.open(ContentName, "ID=" + RecordID);
-                            Copy = "[the content of this page is not available]" + BR;
-                            if (csData.ok()) {
-                                Copy = (csData.getText("copyFilename"));
+                    case FeedbackButtonSubmit: {
+                            //
+                            // ----- form was submitted, save the note, send it and say thanks
+                            //
+                            NoteFromName = core.docProperties.getText("NoteFromName");
+                            NoteFromEmail = core.docProperties.getText("NoteFromEmail");
+                            //
+                            NoteCopy = NoteCopy + "Feedback Submitted" + BR;
+                            NoteCopy = NoteCopy + "From " + NoteFromName + " at " + NoteFromEmail + BR;
+                            NoteCopy = NoteCopy + "Replying to:" + BR;
+                            if (!string.IsNullOrEmpty(headline)) {
+                                NoteCopy = NoteCopy + "    Article titled [" + headline + "]" + BR;
                             }
-                            NoteCopy = NoteCopy + Copy + BR;
+                            NoteCopy = NoteCopy + "    Record [" + RecordID + "] in Content Definition [" + ContentName + "]" + BR;
+                            NoteCopy = NoteCopy + BR;
+                            NoteCopy = NoteCopy + "<b>Comments</b>" + BR;
+                            //
+                            Copy = core.docProperties.getText("NoteCopy");
+                            if (string.IsNullOrEmpty(Copy)) {
+                                NoteCopy = NoteCopy + "[no comments entered]" + BR;
+                            } else {
+                                NoteCopy = NoteCopy + HtmlController.convertNewLineToHtmlBreak(Copy) + BR;
+                            }
+                            //
+                            NoteCopy = NoteCopy + BR;
+                            NoteCopy = NoteCopy + "<b>Content on which the comments are based</b>" + BR;
+                            //
+                            using (var csData = new CsModel(core)) {
+                                csData.open(ContentName, "ID=" + RecordID);
+                                Copy = "[the content of this page is not available]" + BR;
+                                if (csData.ok()) {
+                                    Copy = (csData.getText("copyFilename"));
+                                }
+                                NoteCopy = NoteCopy + Copy + BR;
+                            }
+                            //
+                            PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, ToMemberID);
+                            if (person != null) {
+                                string sendStatus = "";
+                                string queryStringForLinkAppend = "";
+                                EmailController.queuePersonEmail(core, person, NoteFromEmail, "Feedback Form Submitted", NoteCopy, "", "", false, true, 0, "", false, ref sendStatus, queryStringForLinkAppend, "Feedback Form Email");
+                            }
+                            //
+                            // ----- Note sent, say thanks
+                            //
+                            result += "<p>Thank you. Your feedback was received.</p>";
+                            break;
                         }
-                        //
-                        PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, ToMemberID);
-                        if (person != null) {
-                            string sendStatus = "";
-                            string queryStringForLinkAppend = "";
-                            EmailController.queuePersonEmail(core, person, NoteFromEmail, "Feedback Form Submitted", NoteCopy, "", "", false, true, 0, "", false, ref sendStatus, queryStringForLinkAppend, "Feedback Form Email");
+                    default: {
+                            //
+                            // ----- print the feedback submit form
+                            //
+                            Panel = "<form Action=\"" + core.webServer.serverFormActionURL + "?" + core.doc.refreshQueryString + "\" Method=\"post\">";
+                            Panel = Panel + "<table border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"100%\">";
+                            Panel = Panel + "<tr>";
+                            Panel = Panel + "<td colspan=\"2\"><p>Your feedback is welcome</p></td>";
+                            Panel = Panel + "</tr><tr>";
+                            //
+                            // ----- From Name
+                            //
+                            Copy = core.session.user.name;
+                            Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Name</p></td>";
+                            Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromName\" value=\"" + HtmlController.encodeHtml(Copy) + "\"></span></td>";
+                            Panel = Panel + "</tr><tr>";
+                            //
+                            // ----- From Email address
+                            //
+                            Copy = core.session.user.email;
+                            Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Email</p></td>";
+                            Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromEmail\" value=\"" + HtmlController.encodeHtml(Copy) + "\"></span></td>";
+                            Panel = Panel + "</tr><tr>";
+                            //
+                            // ----- Message
+                            //
+                            Copy = "";
+                            Panel = Panel + "<td align=\"right\" width=\"100\" valign=\"top\"><p>Feedback</p></td>";
+                            Panel = Panel + "<td>" + HtmlController.inputText_Legacy(core, "NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
+                            Panel = Panel + "</tr><tr>";
+                            //
+                            // ----- submit button
+                            //
+                            Panel = Panel + "<td>&nbsp;</td>";
+                            Panel = Panel + "<td>" + HtmlController.inputSubmit(FeedbackButtonSubmit, "fbb") + "</td>";
+                            Panel = Panel + "</tr></table>";
+                            Panel = Panel + "</form>";
+                            //
+                            result = Panel;
+                            break;
                         }
-                        //
-                        // ----- Note sent, say thanks
-                        //
-                        result += "<p>Thank you. Your feedback was received.</p>";
-                        break;
-                    default:
-                        //
-                        // ----- print the feedback submit form
-                        //
-                        Panel = "<form Action=\"" + core.webServer.serverFormActionURL + "?" + core.doc.refreshQueryString + "\" Method=\"post\">";
-                        Panel = Panel + "<table border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"100%\">";
-                        Panel = Panel + "<tr>";
-                        Panel = Panel + "<td colspan=\"2\"><p>Your feedback is welcome</p></td>";
-                        Panel = Panel + "</tr><tr>";
-                        //
-                        // ----- From Name
-                        //
-                        Copy = core.session.user.name;
-                        Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Name</p></td>";
-                        Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromName\" value=\"" + HtmlController.encodeHtml(Copy) + "\"></span></td>";
-                        Panel = Panel + "</tr><tr>";
-                        //
-                        // ----- From Email address
-                        //
-                        Copy = core.session.user.email;
-                        Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Email</p></td>";
-                        Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromEmail\" value=\"" + HtmlController.encodeHtml(Copy) + "\"></span></td>";
-                        Panel = Panel + "</tr><tr>";
-                        //
-                        // ----- Message
-                        //
-                        Copy = "";
-                        Panel = Panel + "<td align=\"right\" width=\"100\" valign=\"top\"><p>Feedback</p></td>";
-                        Panel = Panel + "<td>" + HtmlController.inputText_Legacy(core, "NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
-                        Panel = Panel + "</tr><tr>";
-                        //
-                        // ----- submit button
-                        //
-                        Panel = Panel + "<td>&nbsp;</td>";
-                        Panel = Panel + "<td>" + HtmlController.inputSubmit(FeedbackButtonSubmit, "fbb") + "</td>";
-                        Panel = Panel + "</tr></table>";
-                        Panel = Panel + "</form>";
-                        //
-                        result = Panel;
-                        break;
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

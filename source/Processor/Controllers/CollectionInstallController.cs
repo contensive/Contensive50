@@ -295,31 +295,34 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 // -- 
                                                                 switch (resourceType.ToLowerInvariant()) {
-                                                                    case "www":
-                                                                        wwwFileList += Environment.NewLine + dstDosPath + filename;
-                                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.localWwwPath + dstDosPath + "].");
-                                                                        core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.wwwFiles);
-                                                                        if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
-                                                                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping www file [" + core.appConfig.localWwwPath + dstDosPath + filename + "].");
-                                                                            core.wwwFiles.unzipFile(dstDosPath + filename);
+                                                                    case "www": {
+                                                                            wwwFileList += Environment.NewLine + dstDosPath + filename;
+                                                                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.localWwwPath + dstDosPath + "].");
+                                                                            core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.wwwFiles);
+                                                                            if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
+                                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping www file [" + core.appConfig.localWwwPath + dstDosPath + filename + "].");
+                                                                                core.wwwFiles.unzipFile(dstDosPath + filename);
+                                                                            }
+                                                                            break;
                                                                         }
-                                                                        break;
                                                                     case "file":
-                                                                    case "content":
-                                                                        ContentFileList += Environment.NewLine + dstDosPath + filename;
-                                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, copying file to content, src [" + CollectionVersionFolder + SrcPath + "], dst [" + dstDosPath + "].");
-                                                                        core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.cdnFiles);
-                                                                        if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
-                                                                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping content file [" + dstDosPath + filename + "].");
-                                                                            core.cdnFiles.unzipFile(dstDosPath + filename);
+                                                                    case "content": {
+                                                                            ContentFileList += Environment.NewLine + dstDosPath + filename;
+                                                                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, copying file to content, src [" + CollectionVersionFolder + SrcPath + "], dst [" + dstDosPath + "].");
+                                                                            core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.cdnFiles);
+                                                                            if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
+                                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping content file [" + dstDosPath + filename + "].");
+                                                                                core.cdnFiles.unzipFile(dstDosPath + filename);
+                                                                            }
+                                                                            break;
                                                                         }
-                                                                        break;
-                                                                    default:
-                                                                        if (assembliesInZip.Contains(filename.ToLowerInvariant())) {
-                                                                            assembliesInZip.Remove(filename.ToLowerInvariant());
+                                                                    default: {
+                                                                            if (assembliesInZip.Contains(filename.ToLowerInvariant())) {
+                                                                                assembliesInZip.Remove(filename.ToLowerInvariant());
+                                                                            }
+                                                                            ExecFileList = ExecFileList + Environment.NewLine + filename;
+                                                                            break;
                                                                         }
-                                                                        ExecFileList = ExecFileList + Environment.NewLine + filename;
-                                                                        break;
                                                                 }
                                                                 break;
                                                             }
@@ -344,6 +347,10 @@ namespace Contensive.Processor.Controllers {
                                                                     // -- all included collections should already be installed, because buildfolder is called before call
                                                                     installCollectionFromCollectionFolder(core, contextLog, ChildCollectionGUId, ref return_ErrorMessage, IsNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, false, ref collectionsDownloaded);
                                                                 }
+                                                                break;
+                                                            }
+                                                        default: {
+                                                                // nop
                                                                 break;
                                                             }
                                                     }
@@ -449,15 +456,16 @@ namespace Contensive.Processor.Controllers {
                                                     if (!isBaseCollection || includeBaseMetaDataInstall) {
                                                         string metaDataMiniCollection = "";
                                                         foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                            switch (metaDataSection.Name.ToLower(CultureInfo.InvariantCulture)) {
-                                                                case "contensivecdef":
-                                                                    //
-                                                                    // old metadata section -- take the inner
-                                                                    //
-                                                                    foreach (XmlNode ChildNode in metaDataSection.ChildNodes) {
-                                                                        metaDataMiniCollection += Environment.NewLine + ChildNode.OuterXml;
+                                                            switch (metaDataSection.Name.ToLowerInvariant()) {
+                                                                case "contensivecdef": {
+                                                                        //
+                                                                        // old metadata section -- take the inner
+                                                                        //
+                                                                        foreach (XmlNode ChildNode in metaDataSection.ChildNodes) {
+                                                                            metaDataMiniCollection += Environment.NewLine + ChildNode.OuterXml;
+                                                                        }
+                                                                        break;
                                                                     }
-                                                                    break;
                                                                 case "cdef":
                                                                 case "sqlindex":
                                                                 case "style":
@@ -465,11 +473,16 @@ namespace Contensive.Processor.Controllers {
                                                                 case "stylesheet":
                                                                 case "adminmenu":
                                                                 case "menuentry":
-                                                                case "navigatorentry":
-                                                                    //
-                                                                    // handled by Upgrade class
-                                                                    metaDataMiniCollection += metaDataSection.OuterXml;
-                                                                    break;
+                                                                case "navigatorentry": {
+                                                                        //
+                                                                        // handled by Upgrade class
+                                                                        metaDataMiniCollection += metaDataSection.OuterXml;
+                                                                        break;
+                                                                    }
+                                                                default: {
+                                                                        // nop
+                                                                        break;
+                                                                    }
                                                             }
                                                         }
                                                         //
@@ -497,22 +510,27 @@ namespace Contensive.Processor.Controllers {
                                                             if (loadOK) {
                                                                 foreach (XmlNode metaDataNode in NavDoc.DocumentElement.ChildNodes) {
                                                                     switch (GenericController.vbLCase(metaDataNode.Name)) {
-                                                                        case "cdef":
-                                                                            string ContentName = XmlController.GetXMLAttribute(core, IsFound, metaDataNode, "name", "");
-                                                                            //
-                                                                            // setup metadata rule
-                                                                            //
-                                                                            int ContentId = ContentMetadataModel.getContentId(core, ContentName);
-                                                                            if (ContentId > 0) {
-                                                                                using (var csData = new CsModel(core)) {
-                                                                                    csData.insert("Add-on Collection CDef Rules");
-                                                                                    if (csData.ok()) {
-                                                                                        csData.set("Contentid", ContentId);
-                                                                                        csData.set("CollectionID", collection.id);
+                                                                        case "cdef": {
+                                                                                string ContentName = XmlController.GetXMLAttribute(core, IsFound, metaDataNode, "name", "");
+                                                                                //
+                                                                                // setup metadata rule
+                                                                                //
+                                                                                int ContentId = ContentMetadataModel.getContentId(core, ContentName);
+                                                                                if (ContentId > 0) {
+                                                                                    using (var csData = new CsModel(core)) {
+                                                                                        csData.insert("Add-on Collection CDef Rules");
+                                                                                        if (csData.ok()) {
+                                                                                            csData.set("Contentid", ContentId);
+                                                                                            csData.set("CollectionID", collection.id);
+                                                                                        }
                                                                                     }
                                                                                 }
+                                                                                break;
                                                                             }
-                                                                            break;
+                                                                        default: {
+                                                                                // nop
+                                                                                break;
+                                                                            }
                                                                     }
                                                                 }
                                                             }
@@ -601,6 +619,10 @@ namespace Contensive.Processor.Controllers {
                                                                         }
                                                                         break;
                                                                     }
+                                                                default: {
+                                                                        // nop
+                                                                        break;
+                                                                    }
                                                             }
                                                         }
                                                     }
@@ -615,66 +637,76 @@ namespace Contensive.Processor.Controllers {
                                                             case "data":
                                                             case "help":
                                                             case "resource":
-                                                            case "helplink":
-                                                                //
-                                                                // ignore - processed in previous passes
-                                                                break;
-                                                            case "getcollection":
-                                                            case "importcollection":
-                                                                //
-                                                                // processed, but add rule for collection record
-                                                                bool Found = false;
-                                                                string ChildCollectionName = XmlController.GetXMLAttribute(core, Found, metaDataSection, "name", "");
-                                                                string ChildCollectionGUId = XmlController.GetXMLAttribute(core, Found, metaDataSection, "guid", metaDataSection.InnerText);
-                                                                if (string.IsNullOrEmpty(ChildCollectionGUId)) {
-                                                                    ChildCollectionGUId = metaDataSection.InnerText;
+                                                            case "helplink": {
+                                                                    //
+                                                                    // ignore - processed in previous passes
+                                                                    break;
                                                                 }
-                                                                if (!string.IsNullOrEmpty(ChildCollectionGUId)) {
-                                                                    int ChildCollectionId = 0;
-                                                                    using (var csData = new CsModel(core)) {
-                                                                        csData.open("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUId));
-                                                                        if (csData.ok()) {
-                                                                            ChildCollectionId = csData.getInteger("id");
-                                                                        }
-                                                                        csData.close();
-                                                                        if (ChildCollectionId != 0) {
-                                                                            csData.insert("Add-on Collection Parent Rules");
+                                                            case "getcollection":
+                                                            case "importcollection": {
+                                                                    //
+                                                                    // processed, but add rule for collection record
+                                                                    bool Found = false;
+                                                                    string ChildCollectionName = XmlController.GetXMLAttribute(core, Found, metaDataSection, "name", "");
+                                                                    string ChildCollectionGUId = XmlController.GetXMLAttribute(core, Found, metaDataSection, "guid", metaDataSection.InnerText);
+                                                                    if (string.IsNullOrEmpty(ChildCollectionGUId)) {
+                                                                        ChildCollectionGUId = metaDataSection.InnerText;
+                                                                    }
+                                                                    if (!string.IsNullOrEmpty(ChildCollectionGUId)) {
+                                                                        int ChildCollectionId = 0;
+                                                                        using (var csData = new CsModel(core)) {
+                                                                            csData.open("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUId));
                                                                             if (csData.ok()) {
-                                                                                csData.set("ParentID", collection.id);
-                                                                                csData.set("ChildID", ChildCollectionId);
+                                                                                ChildCollectionId = csData.getInteger("id");
                                                                             }
                                                                             csData.close();
+                                                                            if (ChildCollectionId != 0) {
+                                                                                csData.insert("Add-on Collection Parent Rules");
+                                                                                if (csData.ok()) {
+                                                                                    csData.set("ParentID", collection.id);
+                                                                                    csData.set("ChildID", ChildCollectionId);
+                                                                                }
+                                                                                csData.close();
+                                                                            }
                                                                         }
                                                                     }
+                                                                    break;
                                                                 }
-                                                                break;
                                                             case "scriptingmodule":
-                                                            case "scriptingmodules":
-                                                                result = false;
-                                                                return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a scripting module which is no longer supported. Move scripts to the code tab.</P>";
-                                                                return false;
-                                                            case "sharedstyle":
-                                                                result = false;
-                                                                return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a shared style which is no longer supported. Move styles to the default styles tab.</P>";
-                                                                return false;
-                                                            case "addon":
-                                                            case "add-on":
-                                                                //
-                                                                // Add-on Node, do part 1 of 2
-                                                                //   (include add-on node must be done after all add-ons are installed)
-                                                                //
-                                                                InstallAddonNode(core, metaDataSection, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
-                                                                if (!result) { return result; }
-                                                                break;
-                                                            case "interfaces":
-                                                                //
-                                                                // Legacy Interface Node
-                                                                //
-                                                                foreach (XmlNode metaDataInterfaces in metaDataSection.ChildNodes) {
-                                                                    InstallAddonNode(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
-                                                                    if (!result) { return result; }
+                                                            case "scriptingmodules": {
+                                                                    result = false;
+                                                                    return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a scripting module which is no longer supported. Move scripts to the code tab.</P>";
+                                                                    return false;
                                                                 }
-                                                                break;
+                                                            case "sharedstyle": {
+                                                                    result = false;
+                                                                    return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a shared style which is no longer supported. Move styles to the default styles tab.</P>";
+                                                                    return false;
+                                                                }
+                                                            case "addon":
+                                                            case "add-on": {
+                                                                    //
+                                                                    // Add-on Node, do part 1 of 2
+                                                                    //   (include add-on node must be done after all add-ons are installed)
+                                                                    //
+                                                                    InstallAddonNode(core, metaDataSection, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
+                                                                    if (!result) { return result; }
+                                                                    break;
+                                                                }
+                                                            case "interfaces": {
+                                                                    //
+                                                                    // Legacy Interface Node
+                                                                    //
+                                                                    foreach (XmlNode metaDataInterfaces in metaDataSection.ChildNodes) {
+                                                                        InstallAddonNode(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
+                                                                        if (!result) { return result; }
+                                                                    }
+                                                                    break;
+                                                                }
+                                                            default: {
+                                                                    // nop
+                                                                    break;
+                                                                }
                                                         }
                                                     }
                                                     //
@@ -685,21 +717,27 @@ namespace Contensive.Processor.Controllers {
                                                     foreach (XmlNode collectionNode in Doc.DocumentElement.ChildNodes) {
                                                         switch (collectionNode.Name.ToLowerInvariant()) {
                                                             case "addon":
-                                                            case "add-on":
-                                                                //
-                                                                // Add-on Node, do part 1, verify the addon in the table with name and guid
-                                                                setAddonDependencies(core, collectionNode, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
-                                                                if (!result) { return result; }
-                                                                break;
-                                                            case "interfaces":
-                                                                //
-                                                                // Legacy Interface Node
-                                                                //
-                                                                foreach (XmlNode metaDataInterfaces in collectionNode.ChildNodes) {
-                                                                    setAddonDependencies(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                            case "add-on": {
+                                                                    //
+                                                                    // Add-on Node, do part 1, verify the addon in the table with name and guid
+                                                                    setAddonDependencies(core, collectionNode, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                     if (!result) { return result; }
+                                                                    break;
                                                                 }
-                                                                break;
+                                                            case "interfaces": {
+                                                                    //
+                                                                    // Legacy Interface Node
+                                                                    //
+                                                                    foreach (XmlNode metaDataInterfaces in collectionNode.ChildNodes) {
+                                                                        setAddonDependencies(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                                        if (!result) { return result; }
+                                                                    }
+                                                                    break;
+                                                                }
+                                                            default: {
+                                                                    // nop
+                                                                    break;
+                                                                }
                                                         }
                                                     }
                                                     //
@@ -709,83 +747,84 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
                                                         switch (GenericController.vbLCase(metaDataSection.Name)) {
-                                                            case "data":
-                                                                int recordPtr = 0;
-                                                                foreach (XmlNode ContentNode in metaDataSection.ChildNodes) {
-                                                                    if (ContentNode.Name.ToLowerInvariant() == "record") {
-                                                                        recordPtr += 1;
-                                                                        string ContentName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "content", "");
-                                                                        if (string.IsNullOrEmpty(ContentName)) {
-                                                                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
-                                                                            result = false;
-                                                                            return_ErrorMessage += "<P>Collection file contains a data.record node with a blank content attribute.</P>";
-                                                                            return false;
-                                                                        } else {
-                                                                            string ContentRecordGuid = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
-                                                                            string ContentRecordName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
-                                                                            if ((!string.IsNullOrEmpty(ContentRecordGuid)) || (!string.IsNullOrEmpty(ContentRecordName))) {
-                                                                                ContentMetadataModel metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
-                                                                                using (var csData = new CsModel(core)) {
-                                                                                    if (!string.IsNullOrEmpty(ContentRecordGuid)) {
-                                                                                        csData.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
-                                                                                    } else {
-                                                                                        csData.open(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
-                                                                                    }
-                                                                                    if (csData.ok()) {
-                                                                                        //
-                                                                                        // Update the record
-                                                                                        foreach (XmlNode FieldNode in ContentNode.ChildNodes) {
-                                                                                            if (FieldNode.Name.ToLowerInvariant() == "field") {
-                                                                                                bool IsFieldFound = false;
-                                                                                                string FieldName = XmlController.GetXMLAttribute(core, IsFound, FieldNode, "name", "").ToLowerInvariant();
-                                                                                                CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
-                                                                                                int FieldLookupContentId = -1;
-                                                                                                foreach (var keyValuePair in metaData.fields) {
-                                                                                                    Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
-                                                                                                    if (GenericController.vbLCase(field.nameLc) == FieldName) {
-                                                                                                        fieldTypeId = field.fieldTypeId;
-                                                                                                        FieldLookupContentId = field.lookupContentId;
-                                                                                                        IsFieldFound = true;
-                                                                                                        break;
+                                                            case "data": {
+                                                                    int recordPtr = 0;
+                                                                    foreach (XmlNode ContentNode in metaDataSection.ChildNodes) {
+                                                                        if (ContentNode.Name.ToLowerInvariant() == "record") {
+                                                                            recordPtr += 1;
+                                                                            string ContentName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "content", "");
+                                                                            if (string.IsNullOrEmpty(ContentName)) {
+                                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
+                                                                                result = false;
+                                                                                return_ErrorMessage += "<P>Collection file contains a data.record node with a blank content attribute.</P>";
+                                                                                return false;
+                                                                            } else {
+                                                                                string ContentRecordGuid = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
+                                                                                string ContentRecordName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
+                                                                                if ((!string.IsNullOrEmpty(ContentRecordGuid)) || (!string.IsNullOrEmpty(ContentRecordName))) {
+                                                                                    ContentMetadataModel metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
+                                                                                    using (var csData = new CsModel(core)) {
+                                                                                        if (!string.IsNullOrEmpty(ContentRecordGuid)) {
+                                                                                            csData.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
+                                                                                        } else {
+                                                                                            csData.open(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
+                                                                                        }
+                                                                                        if (csData.ok()) {
+                                                                                            //
+                                                                                            // Update the record
+                                                                                            foreach (XmlNode FieldNode in ContentNode.ChildNodes) {
+                                                                                                if (FieldNode.Name.ToLowerInvariant() == "field") {
+                                                                                                    bool IsFieldFound = false;
+                                                                                                    string FieldName = XmlController.GetXMLAttribute(core, IsFound, FieldNode, "name", "").ToLowerInvariant();
+                                                                                                    CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
+                                                                                                    int FieldLookupContentId = -1;
+                                                                                                    foreach (var keyValuePair in metaData.fields) {
+                                                                                                        Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
+                                                                                                        if (GenericController.vbLCase(field.nameLc) == FieldName) {
+                                                                                                            fieldTypeId = field.fieldTypeId;
+                                                                                                            FieldLookupContentId = field.lookupContentId;
+                                                                                                            IsFieldFound = true;
+                                                                                                            break;
+                                                                                                        }
                                                                                                     }
-                                                                                                }
-                                                                                                if (IsFieldFound) {
-                                                                                                    string fieldValue = FieldNode.InnerText;
-                                                                                                    switch (fieldTypeId) {
-                                                                                                        case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
-                                                                                                        case CPContentBaseClass.FieldTypeIdEnum.Redirect: {
-                                                                                                                //
-                                                                                                                // not supported
-                                                                                                                break;
-                                                                                                            }
-                                                                                                        case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
-                                                                                                                //
-                                                                                                                // read in text value, if a guid, use it, otherwise assume name
-                                                                                                                if (!string.IsNullOrWhiteSpace(fieldValue)) {
-                                                                                                                    if (FieldLookupContentId != 0) {
-                                                                                                                        var lookupContentMetadata = ContentMetadataModel.create(core, FieldLookupContentId);
-                                                                                                                        if (lookupContentMetadata != null) {
-                                                                                                                            int fieldLookupId = lookupContentMetadata.getRecordId(core, fieldValue);
-                                                                                                                            if (fieldLookupId <= 0) {
-                                                                                                                                return_ErrorMessage += "<P>Warning: In collection [" + CollectionName + "], data section, record number [" + recordPtr + "], the lookup field [" + FieldName + "], value [" + fieldValue + "] was not found in lookup content [" + lookupContentMetadata.name + "].</P>";
-                                                                                                                                return false;
-                                                                                                                            } else {
-                                                                                                                                csData.set(FieldName, fieldLookupId);
-                                                                                                                            }
-                                                                                                                        }
-                                                                                                                    } else if (fieldValue.IsNumeric()) {
-                                                                                                                        //
-                                                                                                                        // must be lookup list
-                                                                                                                        csData.set(FieldName, fieldValue);
-                                                                                                                    }
-
+                                                                                                    if (IsFieldFound) {
+                                                                                                        string fieldValue = FieldNode.InnerText;
+                                                                                                        switch (fieldTypeId) {
+                                                                                                            case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
+                                                                                                            case CPContentBaseClass.FieldTypeIdEnum.Redirect: {
+                                                                                                                    //
+                                                                                                                    // not supported
+                                                                                                                    break;
                                                                                                                 }
-                                                                                                                break;
-                                                                                                            }
-                                                                                                        default: {
-                                                                                                                csData.set(FieldName, fieldValue);
-                                                                                                                break;
-                                                                                                            }
+                                                                                                            case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
+                                                                                                                    //
+                                                                                                                    // read in text value, if a guid, use it, otherwise assume name
+                                                                                                                    if (!string.IsNullOrWhiteSpace(fieldValue)) {
+                                                                                                                        if (FieldLookupContentId != 0) {
+                                                                                                                            var lookupContentMetadata = ContentMetadataModel.create(core, FieldLookupContentId);
+                                                                                                                            if (lookupContentMetadata != null) {
+                                                                                                                                int fieldLookupId = lookupContentMetadata.getRecordId(core, fieldValue);
+                                                                                                                                if (fieldLookupId <= 0) {
+                                                                                                                                    return_ErrorMessage += "<P>Warning: In collection [" + CollectionName + "], data section, record number [" + recordPtr + "], the lookup field [" + FieldName + "], value [" + fieldValue + "] was not found in lookup content [" + lookupContentMetadata.name + "].</P>";
+                                                                                                                                    return false;
+                                                                                                                                } else {
+                                                                                                                                    csData.set(FieldName, fieldLookupId);
+                                                                                                                                }
+                                                                                                                            }
+                                                                                                                        } else if (fieldValue.IsNumeric()) {
+                                                                                                                            //
+                                                                                                                            // must be lookup list
+                                                                                                                            csData.set(FieldName, fieldValue);
+                                                                                                                        }
+
+                                                                                                                    }
+                                                                                                                    break;
+                                                                                                                }
+                                                                                                            default: {
+                                                                                                                    csData.set(FieldName, fieldValue);
+                                                                                                                    break;
+                                                                                                                }
+                                                                                                        }
                                                                                                     }
                                                                                                 }
                                                                                             }
@@ -795,8 +834,12 @@ namespace Contensive.Processor.Controllers {
                                                                             }
                                                                         }
                                                                     }
+                                                                    break;
                                                                 }
-                                                                break;
+                                                            default: {
+                                                                    // nop
+                                                                    break;
+                                                                }
                                                         }
                                                     }
                                                     //
@@ -1147,311 +1190,340 @@ namespace Contensive.Processor.Controllers {
                                         int ScriptingTimeout = 0;
                                         string ScriptingLanguage = null;
                                         switch (GenericController.vbLCase(Addonfield.Name)) {
-                                            case "activexdll":
-                                                //
-                                                // This is handled in BuildLocalCollectionFolder
-                                                //
-                                                break;
-                                            case "editors":
-                                                //
-                                                // list of editors
-                                                //
-                                                foreach (XmlNode TriggerNode in Addonfield.ChildNodes) {
+                                            case "activexdll": {
                                                     //
-                                                    int fieldTypeId = 0;
-                                                    string fieldType = null;
-                                                    switch (GenericController.vbLCase(TriggerNode.Name)) {
-                                                        case "type":
-                                                            fieldType = TriggerNode.InnerText;
-                                                            fieldTypeId = MetadataController.getRecordIdByUniqueName(core, "Content Field Types", fieldType);
-                                                            if (fieldTypeId > 0) {
-                                                                using (var CS2 = new CsModel(core)) {
-                                                                    Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeId + ")";
-                                                                    CS2.open("Add-on Content Field Type Rules", Criteria);
-                                                                    if (!CS2.ok()) {
-                                                                        CS2.insert("Add-on Content Field Type Rules");
-                                                                    }
-                                                                    if (CS2.ok()) {
-                                                                        CS2.set("addonid", addonId);
-                                                                        CS2.set("contentfieldTypeID", fieldTypeId);
-                                                                    }
-                                                                }
-                                                            }
-                                                            break;
-                                                    }
+                                                    // This is handled in BuildLocalCollectionFolder
+                                                    //
+                                                    break;
                                                 }
-                                                break;
-                                            case "processtriggers":
-                                                //
-                                                // list of events that trigger a process run for this addon
-                                                //
-                                                foreach (XmlNode TriggerNode in Addonfield.ChildNodes) {
-                                                    int TriggerContentId = 0;
-                                                    string ContentNameorGuid = null;
-                                                    switch (GenericController.vbLCase(TriggerNode.Name)) {
-                                                        case "contentchange":
-                                                            TriggerContentId = 0;
-                                                            ContentNameorGuid = TriggerNode.InnerText;
-                                                            if (string.IsNullOrEmpty(ContentNameorGuid)) {
-                                                                ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "guid", "");
-                                                                if (string.IsNullOrEmpty(ContentNameorGuid)) {
-                                                                    ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "name", "");
-                                                                }
-                                                            }
-                                                            using (var CS2 = new CsModel(core)) {
-                                                                Criteria = "(ccguid=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
-                                                                CS2.open("Content", Criteria);
-                                                                if (!CS2.ok()) {
-                                                                    Criteria = "(ccguid is null)and(name=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
-                                                                    CS2.open("content", Criteria);
-                                                                }
-                                                                if (CS2.ok()) {
-                                                                    TriggerContentId = CS2.getInteger("ID");
-                                                                }
-                                                            }
-                                                            if (TriggerContentId != 0) {
-                                                                using (var CS2 = new CsModel(core)) {
-                                                                    Criteria = "(addonid=" + addonId + ")and(contentid=" + TriggerContentId + ")";
-                                                                    CS2.open("Add-on Content Trigger Rules", Criteria);
-                                                                    if (!CS2.ok()) {
-                                                                        CS2.insert("Add-on Content Trigger Rules");
-                                                                        if (CS2.ok()) {
-                                                                            CS2.set("addonid", addonId);
-                                                                            CS2.set("contentid", TriggerContentId);
+                                            case "editors": {
+                                                    //
+                                                    // list of editors
+                                                    //
+                                                    foreach (XmlNode TriggerNode in Addonfield.ChildNodes) {
+                                                        //
+                                                        int fieldTypeId = 0;
+                                                        string fieldType = null;
+                                                        switch (GenericController.vbLCase(TriggerNode.Name)) {
+                                                            case "type": {
+                                                                    fieldType = TriggerNode.InnerText;
+                                                                    fieldTypeId = MetadataController.getRecordIdByUniqueName(core, "Content Field Types", fieldType);
+                                                                    if (fieldTypeId > 0) {
+                                                                        using (var CS2 = new CsModel(core)) {
+                                                                            Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeId + ")";
+                                                                            CS2.open("Add-on Content Field Type Rules", Criteria);
+                                                                            if (!CS2.ok()) {
+                                                                                CS2.insert("Add-on Content Field Type Rules");
+                                                                            }
+                                                                            if (CS2.ok()) {
+                                                                                CS2.set("addonid", addonId);
+                                                                                CS2.set("contentfieldTypeID", fieldTypeId);
+                                                                            }
                                                                         }
                                                                     }
-                                                                    CS2.close();
+                                                                    break;
                                                                 }
-                                                            }
-                                                            break;
+                                                            default: {
+                                                                    // nop
+                                                                    break;
+                                                                }
+                                                        }
                                                     }
+                                                    break;
                                                 }
-                                                break;
-                                            case "scripting":
-                                                //
-                                                // include add-ons - NOTE - import collections must be run before interfaces
-                                                // when importing a collectin that will be used for an include
-                                                //
-                                                ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "language", "");
-                                                if (ScriptingLanguage.ToLower(CultureInfo.InvariantCulture) == "jscript") {
-                                                    scriptinglanguageid = (int)AddonController.ScriptLanguages.Javascript;
-                                                } else {
-                                                    scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
-                                                }
-                                                cs.set("scriptinglanguageid", scriptinglanguageid);
-                                                ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "entrypoint", "");
-                                                cs.set("ScriptingEntryPoint", ScriptingEntryPoint);
-                                                ScriptingTimeout = GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "timeout", "5000"));
-                                                cs.set("ScriptingTimeout", ScriptingTimeout);
-                                                ScriptingCode = "";
-                                                foreach (XmlNode ScriptingNode in Addonfield.ChildNodes) {
-                                                    switch (GenericController.vbLCase(ScriptingNode.Name)) {
-                                                        case "code":
-                                                            ScriptingCode += ScriptingNode.InnerText;
-                                                            break;
+                                            case "processtriggers": {
+                                                    //
+                                                    // list of events that trigger a process run for this addon
+                                                    //
+                                                    foreach (XmlNode TriggerNode in Addonfield.ChildNodes) {
+                                                        switch (GenericController.vbLCase(TriggerNode.Name)) {
+                                                            case "contentchange": {
+                                                                    int TriggerContentId = 0;
+                                                                    string ContentNameorGuid = TriggerNode.InnerText;
+                                                                    if (string.IsNullOrEmpty(ContentNameorGuid)) {
+                                                                        ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "guid", "");
+                                                                        if (string.IsNullOrEmpty(ContentNameorGuid)) {
+                                                                            ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "name", "");
+                                                                        }
+                                                                    }
+                                                                    using (var CS2 = new CsModel(core)) {
+                                                                        Criteria = "(ccguid=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
+                                                                        CS2.open("Content", Criteria);
+                                                                        if (!CS2.ok()) {
+                                                                            Criteria = "(ccguid is null)and(name=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
+                                                                            CS2.open("content", Criteria);
+                                                                        }
+                                                                        if (CS2.ok()) {
+                                                                            TriggerContentId = CS2.getInteger("ID");
+                                                                        }
+                                                                    }
+                                                                    if (TriggerContentId != 0) {
+                                                                        using (var CS2 = new CsModel(core)) {
+                                                                            Criteria = "(addonid=" + addonId + ")and(contentid=" + TriggerContentId + ")";
+                                                                            CS2.open("Add-on Content Trigger Rules", Criteria);
+                                                                            if (!CS2.ok()) {
+                                                                                CS2.insert("Add-on Content Trigger Rules");
+                                                                                if (CS2.ok()) {
+                                                                                    CS2.set("addonid", addonId);
+                                                                                    CS2.set("contentid", TriggerContentId);
+                                                                                }
+                                                                            }
+                                                                            CS2.close();
+                                                                        }
+                                                                    }
+                                                                    break;
+                                                                }
+                                                            default: {
+                                                                    // nop
+                                                                    break;
+                                                                }
+                                                        }
                                                     }
+                                                    break;
                                                 }
-                                                cs.set("ScriptingCode", ScriptingCode);
-                                                break;
-                                            case "activexprogramid":
-                                                //
-                                                // save program id
-                                                //
-                                                FieldValue = Addonfield.InnerText;
-                                                cs.set("ObjectProgramID", FieldValue);
-                                                break;
-                                            case "navigator":
-                                                //
-                                                // create a navigator entry with a parent set to this
-                                                //
-                                                cs.save();
-                                                menuNameSpace = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "NameSpace", "");
-                                                if (!string.IsNullOrEmpty(menuNameSpace)) {
-                                                    string NavIconTypeString = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "type", "");
-                                                    if (string.IsNullOrEmpty(NavIconTypeString)) {
-                                                        NavIconTypeString = "Addon";
+                                            case "scripting": {
+                                                    //
+                                                    // include add-ons - NOTE - import collections must be run before interfaces
+                                                    // when importing a collectin that will be used for an include
+                                                    //
+                                                    ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "language", "");
+                                                    if (ScriptingLanguage.ToLower(CultureInfo.InvariantCulture) == "jscript") {
+                                                        scriptinglanguageid = (int)AddonController.ScriptLanguages.Javascript;
+                                                    } else {
+                                                        scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
                                                     }
-                                                    BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
-                                                        menuNameSpace = menuNameSpace,
-                                                        name = addonName,
-                                                        AdminOnly = false,
-                                                        DeveloperOnly = false,
-                                                        NewWindow = false,
-                                                        Active = true,
-                                                        AddonName = addonName,
-                                                        NavIconType = NavIconTypeString,
-                                                        NavIconTitle = addonName
-                                                    }, CollectionID);
+                                                    cs.set("scriptinglanguageid", scriptinglanguageid);
+                                                    ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "entrypoint", "");
+                                                    cs.set("ScriptingEntryPoint", ScriptingEntryPoint);
+                                                    ScriptingTimeout = GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "timeout", "5000"));
+                                                    cs.set("ScriptingTimeout", ScriptingTimeout);
+                                                    ScriptingCode = "";
+                                                    foreach (XmlNode ScriptingNode in Addonfield.ChildNodes) {
+                                                        switch (GenericController.vbLCase(ScriptingNode.Name)) {
+                                                            case "code": {
+                                                                    ScriptingCode += ScriptingNode.InnerText;
+                                                                    break;
+                                                                }
+                                                            default: {
+                                                                    // nop
+                                                                    break;
+                                                                }
+                                                        }
+                                                    }
+                                                    cs.set("ScriptingCode", ScriptingCode);
+                                                    break;
                                                 }
-                                                break;
+                                            case "activexprogramid": {
+                                                    //
+                                                    // save program id
+                                                    //
+                                                    FieldValue = Addonfield.InnerText;
+                                                    cs.set("ObjectProgramID", FieldValue);
+                                                    break;
+                                                }
+                                            case "navigator": {
+                                                    //
+                                                    // create a navigator entry with a parent set to this
+                                                    //
+                                                    cs.save();
+                                                    menuNameSpace = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "NameSpace", "");
+                                                    if (!string.IsNullOrEmpty(menuNameSpace)) {
+                                                        string NavIconTypeString = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "type", "");
+                                                        if (string.IsNullOrEmpty(NavIconTypeString)) {
+                                                            NavIconTypeString = "Addon";
+                                                        }
+                                                        BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
+                                                            menuNameSpace = menuNameSpace,
+                                                            name = addonName,
+                                                            AdminOnly = false,
+                                                            DeveloperOnly = false,
+                                                            NewWindow = false,
+                                                            Active = true,
+                                                            AddonName = addonName,
+                                                            NavIconType = NavIconTypeString,
+                                                            NavIconTitle = addonName
+                                                        }, CollectionID);
+                                                    }
+                                                    break;
+                                                }
                                             case "argument":
-                                            case "argumentlist":
-                                                //
-                                                // multiple argumentlist elements are concatinated with crlf
-                                                //
-                                                NewValue = encodeText(Addonfield.InnerText).Trim(' ');
-                                                if (!string.IsNullOrEmpty(NewValue)) {
-                                                    if (string.IsNullOrEmpty(ArgumentList)) {
-                                                        ArgumentList = NewValue;
-                                                    } else if (NewValue != FieldValue) {
-                                                        ArgumentList = ArgumentList + Environment.NewLine + NewValue;
+                                            case "argumentlist": {
+                                                    //
+                                                    // multiple argumentlist elements are concatinated with crlf
+                                                    //
+                                                    NewValue = encodeText(Addonfield.InnerText).Trim(' ');
+                                                    if (!string.IsNullOrEmpty(NewValue)) {
+                                                        if (string.IsNullOrEmpty(ArgumentList)) {
+                                                            ArgumentList = NewValue;
+                                                        } else if (NewValue != FieldValue) {
+                                                            ArgumentList = ArgumentList + Environment.NewLine + NewValue;
+                                                        }
                                                     }
+                                                    break;
                                                 }
-                                                break;
-                                            case "style":
-                                                //
-                                                // import exclusive style
-                                                //
-                                                NodeName = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "name", "");
-                                                NewValue = encodeText(Addonfield.InnerText).Trim(' ');
-                                                if (NewValue.Left(1) != "{") {
-                                                    NewValue = "{" + NewValue;
+                                            case "style": {
+                                                    //
+                                                    // import exclusive style
+                                                    //
+                                                    NodeName = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "name", "");
+                                                    NewValue = encodeText(Addonfield.InnerText).Trim(' ');
+                                                    if (NewValue.Left(1) != "{") {
+                                                        NewValue = "{" + NewValue;
+                                                    }
+                                                    if (NewValue.Substring(NewValue.Length - 1) != "}") {
+                                                        NewValue = NewValue + "}";
+                                                    }
+                                                    StyleSheet = StyleSheet + Environment.NewLine + NodeName + " " + NewValue;
+                                                    break;
                                                 }
-                                                if (NewValue.Substring(NewValue.Length - 1) != "}") {
-                                                    NewValue = NewValue + "}";
-                                                }
-                                                StyleSheet = StyleSheet + Environment.NewLine + NodeName + " " + NewValue;
-                                                break;
                                             case "stylesheet":
-                                            case "styles":
-                                                //
-                                                // import exclusive stylesheet if more then whitespace
-                                                //
-                                                test = Addonfield.InnerText;
-                                                test = GenericController.vbReplace(test, " ", "");
-                                                test = GenericController.vbReplace(test, "\r", "");
-                                                test = GenericController.vbReplace(test, "\n", "");
-                                                test = GenericController.vbReplace(test, "\t", "");
-                                                if (!string.IsNullOrEmpty(test)) {
-                                                    StyleSheet = StyleSheet + Environment.NewLine + Addonfield.InnerText;
+                                            case "styles": {
+                                                    //
+                                                    // import exclusive stylesheet if more then whitespace
+                                                    //
+                                                    test = Addonfield.InnerText;
+                                                    test = GenericController.vbReplace(test, " ", "");
+                                                    test = GenericController.vbReplace(test, "\r", "");
+                                                    test = GenericController.vbReplace(test, "\n", "");
+                                                    test = GenericController.vbReplace(test, "\t", "");
+                                                    if (!string.IsNullOrEmpty(test)) {
+                                                        StyleSheet = StyleSheet + Environment.NewLine + Addonfield.InnerText;
+                                                    }
+                                                    break;
                                                 }
-                                                break;
                                             case "template":
                                             case "content":
-                                            case "admin":
-                                                //
-                                                // these add-ons will be "non-developer only" in navigation
-                                                //
-                                                fieldName = Addonfield.Name;
-                                                FieldValue = Addonfield.InnerText;
-                                                if (!cs.isFieldSupported(fieldName)) {
+                                            case "admin": {
                                                     //
-                                                    // Bad field name - need to report it somehow
+                                                    // these add-ons will be "non-developer only" in navigation
                                                     //
-                                                } else {
-                                                    cs.set(fieldName, FieldValue);
-                                                    if (GenericController.encodeBoolean(Addonfield.InnerText)) {
+                                                    fieldName = Addonfield.Name;
+                                                    FieldValue = Addonfield.InnerText;
+                                                    if (!cs.isFieldSupported(fieldName)) {
                                                         //
-                                                        // if template, admin or content - let non-developers have navigator entry
-                                                        //
-                                                    }
-                                                }
-                                                break;
-                                            case "icon":
-                                                //
-                                                // icon
-                                                //
-                                                FieldValue = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "link", "");
-                                                if (!string.IsNullOrEmpty(FieldValue)) {
-                                                    //
-                                                    // Icons can be either in the root of the website or in content files
-                                                    //
-                                                    FieldValue = GenericController.vbReplace(FieldValue, "\\", "/"); // make it a link, not a file
-                                                    if (GenericController.vbInstr(1, FieldValue, "://") != 0) {
-                                                        //
-                                                        // the link is an absolute URL, leave it link this
+                                                        // Bad field name - need to report it somehow
                                                         //
                                                     } else {
-                                                        if (FieldValue.Left(1) != "/") {
+                                                        cs.set(fieldName, FieldValue);
+                                                        if (GenericController.encodeBoolean(Addonfield.InnerText)) {
                                                             //
-                                                            // make sure it starts with a slash to be consistance
+                                                            // if template, admin or content - let non-developers have navigator entry
                                                             //
-                                                            FieldValue = "/" + FieldValue;
-                                                        }
-                                                        if (FieldValue.Left(17) == "/contensivefiles/") {
-                                                            //
-                                                            // in content files, start link without the slash
-                                                            //
-                                                            FieldValue = FieldValue.Substring(17);
                                                         }
                                                     }
-                                                    cs.set("IconFilename", FieldValue);
-                                                    {
-                                                        cs.set("IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "width", "0")));
-                                                        cs.set("IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "height", "0")));
-                                                        cs.set("IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "sprites", "0")));
-                                                    }
+                                                    break;
                                                 }
-                                                break;
+                                            case "icon": {
+                                                    //
+                                                    // icon
+                                                    //
+                                                    FieldValue = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "link", "");
+                                                    if (!string.IsNullOrEmpty(FieldValue)) {
+                                                        //
+                                                        // Icons can be either in the root of the website or in content files
+                                                        //
+                                                        FieldValue = GenericController.vbReplace(FieldValue, "\\", "/"); // make it a link, not a file
+                                                        if (GenericController.vbInstr(1, FieldValue, "://") != 0) {
+                                                            //
+                                                            // the link is an absolute URL, leave it link this
+                                                            //
+                                                        } else {
+                                                            if (FieldValue.Left(1) != "/") {
+                                                                //
+                                                                // make sure it starts with a slash to be consistance
+                                                                //
+                                                                FieldValue = "/" + FieldValue;
+                                                            }
+                                                            if (FieldValue.Left(17) == "/contensivefiles/") {
+                                                                //
+                                                                // in content files, start link without the slash
+                                                                //
+                                                                FieldValue = FieldValue.Substring(17);
+                                                            }
+                                                        }
+                                                        cs.set("IconFilename", FieldValue);
+                                                        {
+                                                            cs.set("IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "width", "0")));
+                                                            cs.set("IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "height", "0")));
+                                                            cs.set("IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "sprites", "0")));
+                                                        }
+                                                    }
+                                                    break;
+                                                }
                                             case "includeaddon":
                                             case "includeadd-on":
                                             case "include addon":
-                                            case "include add-on":
-                                                //
-                                                // processed in phase2 of this routine, after all the add-ons are installed
-                                                //
-                                                break;
-                                            case "form":
-                                                //
-                                                // The value of this node is the xml instructions to create a form. Take then
-                                                //   entire node, children and all, and save them in the formxml field.
-                                                //   this replaces the settings add-on type, and soo to be report add-on types as well.
-                                                //   this removes the ccsettingpages and settingcollectionrules, etc.
-                                                //
-                                                {
-                                                    cs.set("formxml", Addonfield.InnerXml);
+                                            case "include add-on": {
+                                                    //
+                                                    // processed in phase2 of this routine, after all the add-ons are installed
+                                                    //
+                                                    break;
                                                 }
-                                                break;
+                                            case "form": {
+                                                    //
+                                                    // The value of this node is the xml instructions to create a form. Take then
+                                                    //   entire node, children and all, and save them in the formxml field.
+                                                    //   this replaces the settings add-on type, and soo to be report add-on types as well.
+                                                    //   this removes the ccsettingpages and settingcollectionrules, etc.
+                                                    //
+                                                    {
+                                                        cs.set("formxml", Addonfield.InnerXml);
+                                                    }
+                                                    break;
+                                                }
                                             case "javascript":
-                                            case "javascriptinhead":
-                                                //
-                                                // these all translate to JSFilename
-                                                //
-                                                fieldName = "jsfilename";
-                                                cs.set(fieldName, Addonfield.InnerText);
+                                            case "javascriptinhead": {
+                                                    //
+                                                    // these all translate to JSFilename
+                                                    //
+                                                    fieldName = "jsfilename";
+                                                    cs.set(fieldName, Addonfield.InnerText);
 
-                                                break;
-                                            case "iniframe":
-                                                //
-                                                // typo - field is inframe
-                                                //
-                                                fieldName = "inframe";
-                                                cs.set(fieldName, Addonfield.InnerText);
-                                                break;
+                                                    break;
+                                                }
+                                            case "iniframe": {
+                                                    //
+                                                    // typo - field is inframe
+                                                    //
+                                                    fieldName = "inframe";
+                                                    cs.set(fieldName, Addonfield.InnerText);
+                                                    break;
+                                                }
                                             case "diagnostic": {
                                                     bool fieldValue = encodeBoolean(Addonfield.InnerText);
                                                     cs.set("diagnostic", fieldValue);
                                                     collectionIncludesDiagnosticAddons = collectionIncludesDiagnosticAddons || fieldValue;
+                                                    break;
                                                 }
-                                                break;
                                             case "category": {
                                                     string fieldValue = Addonfield.InnerText;
-                                                    if(!string.IsNullOrWhiteSpace(fieldValue)) {
+                                                    if (!string.IsNullOrWhiteSpace(fieldValue)) {
                                                         AddonCategoryModel category = DbBaseModel.createByUniqueName<AddonCategoryModel>(core.cpParent, fieldValue);
-                                                        if(category == null) {
+                                                        if (category == null) {
                                                             category = DbBaseModel.addDefault<AddonCategoryModel>(core.cpParent);
                                                             category.name = fieldValue;
                                                             category.save(core.cpParent);
                                                         }
                                                         cs.set("addonCategoryId", category.id);
                                                     }
+                                                    break;
                                                 }
-                                                break;
-                                            default:
-                                                //
-                                                // All the other fields should match the Db fields
-                                                //
-                                                fieldName = Addonfield.Name;
-                                                FieldValue = Addonfield.InnerText;
-                                                if (!cs.isFieldSupported(fieldName)) {
+                                            default: {
                                                     //
-                                                    // Bad field name - need to report it somehow
+                                                    // All the other fields should match the Db fields
                                                     //
-                                                    LogController.logError(core, new ApplicationException("bad field found [" + fieldName + "], in addon node [" + addonName + "], of collection [" + MetadataController.getRecordName(core, "add-on collections", CollectionID) + "]"));
-                                                } else {
-                                                    cs.set(fieldName, FieldValue);
+                                                    fieldName = Addonfield.Name;
+                                                    FieldValue = Addonfield.InnerText;
+                                                    if (!cs.isFieldSupported(fieldName)) {
+                                                        //
+                                                        // Bad field name - need to report it somehow
+                                                        //
+                                                        LogController.logError(core, new ApplicationException("bad field found [" + fieldName + "], in addon node [" + addonName + "], of collection [" + MetadataController.getRecordName(core, "add-on collections", CollectionID) + "]"));
+                                                    } else {
+                                                        cs.set(fieldName, FieldValue);
+                                                    }
+                                                    break;
                                                 }
-                                                break;
                                         }
                                     }
                                 }
@@ -1508,12 +1580,11 @@ namespace Contensive.Processor.Controllers {
                                         case "includeaddon":
                                         case "includeadd-on":
                                         case "include addon":
-                                        case "include add-on":
-                                            //
-                                            // include add-ons - NOTE - import collections must be run before interfaces
-                                            // when importing a collectin that will be used for an include
-                                            //
-                                            {
+                                        case "include add-on": {
+                                                //
+                                                // include add-ons - NOTE - import collections must be run before interfaces
+                                                // when importing a collectin that will be used for an include
+                                                //
                                                 string IncludeAddonName = XmlController.GetXMLAttribute(core, IsFound, PageInterface, "name", "");
                                                 string IncludeAddonGuid = XmlController.GetXMLAttribute(core, IsFound, PageInterface, "guid", IncludeAddonName);
                                                 int IncludeAddonId = 0;
@@ -1554,8 +1625,12 @@ namespace Contensive.Processor.Controllers {
                                                         }
                                                     }
                                                 }
+                                                break;
                                             }
-                                            break;
+                                        default: {
+                                                // nop
+                                                break;
+                                            }
                                     }
                                 }
                             }
