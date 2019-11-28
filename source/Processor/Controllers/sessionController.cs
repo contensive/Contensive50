@@ -205,7 +205,6 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- Visit Tracking
                     //
-                    //LogController.logTrace(core, "visittracking");
                     var visitToken = new SecurityController.TokenData();
                     if (!string.IsNullOrEmpty(visitCookie)) {
                         //
@@ -525,7 +524,6 @@ namespace Contensive.Processor.Controllers {
                         resultSessionContext.user = new PersonModel {
                             name = DefaultMemberName
                         };
-                        //user_changes = false;
                         if (!resultSessionContext.visitor.memberId.Equals(0)) {
                             resultSessionContext.visitor.memberId = 0;
                             visitor_changes = true;
@@ -558,7 +556,6 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- count the page hit
-                    //LogController.logTrace(core, "attempt visit count update");
                     resultSessionContext.visit.excludeFromAnalytics |= resultSessionContext.visit.bot || resultSessionContext.user.excludeFromAnalytics || resultSessionContext.user.admin || resultSessionContext.user.developer;
                     if (!core.webServer.pageExcludeFromAnalytics) {
                         resultSessionContext.visit.pageVisits += 1;
@@ -566,7 +563,6 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- Save anything that changed
-                    //LogController.logTrace(core, "save visit,visitor,user if updated");
                     if (visit_changes) {
                         resultSessionContext.visit.save(core.cpParent, 0, true);
                     }

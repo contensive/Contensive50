@@ -332,9 +332,6 @@ namespace Contensive.Processor.Controllers {
                                 nameValueDict.Remove(cacheName);
                             }
                             nameValueDict.Add(cacheName, Value);
-                            //
-                            // -- set cache, no memory cache not used, instead load all into local cache on load
-                            //core.cache.setObject(cacheName, Value)
                         }
                     }
                 }

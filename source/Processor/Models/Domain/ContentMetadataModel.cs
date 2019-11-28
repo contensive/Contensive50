@@ -568,7 +568,6 @@ namespace Contensive.Processor.Models.Domain {
                                             }
                                             field.helpChanged = false;
                                             result.fields.Add(fieldNameLower, field);
-                                            //REFACTOR
                                             if ((field.fieldTypeId != CPContentBaseClass.FieldTypeIdEnum.ManyToMany) && (field.fieldTypeId != CPContentBaseClass.FieldTypeIdEnum.Redirect) && (!result.selectList.Contains(fieldNameLower))) {
                                                 //
                                                 // add only fields that can be selected
@@ -1305,20 +1304,6 @@ namespace Contensive.Processor.Models.Domain {
                             };
                             contentMetadata.verifyContentField(core, fieldMetadata, true);
                         }
-                        //// -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
-                        //if (!contentMetadata.fields.ContainsKey("ContentCategoryId")) {
-                        //    ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
-                        //        nameLc = "contentcategoryid",
-                        //        active = true,
-                        //        fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.Integer,
-                        //        editSortPriority = 9999,
-                        //        authorable = false,
-                        //        caption = "Content Category",
-                        //        defaultValue = "",
-                        //        isBaseField = contentMetadata.isBaseContent
-                        //    };
-                        //    contentMetadata.verifyContentField(core, fieldMetadata, true);
-                        //}
                     }
                 }
                 //
@@ -1452,8 +1437,6 @@ namespace Contensive.Processor.Models.Domain {
                     break;
                 case "ALLOWDELETE":
                     result = allowDelete.ToString();
-                    //Case "CHILDIDLIST"
-                    //    main_result = Contentdefinition.ChildIDList
                     break;
                 case "DATASOURCEID":
                     result = dataSourceId.ToString();
@@ -1466,8 +1449,6 @@ namespace Contensive.Processor.Models.Domain {
                     break;
                 case "FIELDCOUNT":
                     result = fields.Count.ToString();
-                    //Case "FIELDPOINTER"
-                    //    main_result = Contentdefinition.FieldPointer
                     break;
                 case "ID":
                     result = id.ToString();
@@ -1477,23 +1458,15 @@ namespace Contensive.Processor.Models.Domain {
                     break;
                 case "PARENTID":
                     result = parentId.ToString();
-                    //Case "SINGLERECORD"
-                    //    main_result = Contentdefinition.SingleRecord
                     break;
                 case "CONTENTTABLENAME":
                     result = tableName;
                     break;
                 case "CONTENTDATASOURCENAME":
                     result = dataSourceName;
-                    //Case "AUTHORINGTABLENAME"
-                    //    result = Contentdefinition.AuthoringTableName
-                    //Case "AUTHORINGDATASOURCENAME"
-                    //    result = Contentdefinition.AuthoringDataSourceName
                     break;
                 case "WHERECLAUSE":
                     result = whereClause;
-                    //Case "ALLOWWORKFLOWAUTHORING"
-                    //    result = Contentdefinition.AllowWorkflowAuthoring.ToString
                     break;
                 case "DROPDOWNFIELDLIST":
                     result = dropDownFieldList;
@@ -1502,7 +1475,6 @@ namespace Contensive.Processor.Models.Domain {
                     result = selectCommaList;
                     break;
                 default:
-                    //throw new GenericException("Unexpected exception"); // todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
                     break;
             }
             return result;

@@ -88,7 +88,7 @@ namespace Contensive.Processor.Controllers {
                         downloadDelay += 2000;
                         return_ErrorMessage = "There was an error while requesting the download details for collection [" + collectionGuid + "]";
                         result = false;
-                        LogController.logInfo(core, errorPrefix + "There was a parse error reading the response [" + ex.ToString() + "]");
+                        LogController.logInfo(core, errorPrefix + "There was a parse error reading the response [" + ex + "]");
                     }
                     downloadRetry += 1;
                 } while (downloadRetry < downloadRetryMax);

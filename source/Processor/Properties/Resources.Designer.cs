@@ -265,23 +265,6 @@ namespace Contensive.Processor.Properties {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to IF EXISTS (SELECT * FROM sys.objects WHERE [name] = N&apos;ccManyManyRuleDelete_{ruleTable}_{ruleField}&apos; AND [type] = &apos;TR&apos;)
-        ///BEGIN
-        ///      DROP TRIGGER [dbo].[ccManyManyRuleDelete_{ruleTable}_{ruleField}];
-        ///END
-        ///GO
-        ///DROP TRIGGER IF EXISTS ccManyManyRuleDelete_{ruleTable}_{ruleField}
-        ///CREATE TRIGGER ccManyManyRuleDelete_{ruleTable}_{ruleField}
-        ///ON {joinTable}
-        ///AFTER UPDATE,DELETE
-        ///AS
-        ///delete from {ruleTable} 
-        ///from {ruleTable} r 
-        ///left join {joinTable} a on a.{joinField}=r.{ruleField} where a.id is null
-        ///
-        ///--sampl [rest of string was truncated]&quot;;.
-        /// </summary>
         public static string sqlTriggerManyManyRule {
             get {
                 return ResourceManager.GetString("sqlTriggerManyManyRule", resourceCulture);

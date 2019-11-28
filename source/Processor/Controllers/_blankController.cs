@@ -11,16 +11,12 @@ namespace Contensive.Processor.Controllers {
         //
         // ----- constants
         //
-        //Private Const invalidationDaysDefault As Double = 365
         //
         // ----- objects constructed that must be disposed
         //
-        //Private cacheClient As Enyim.Caching.MemcachedClient
         //
         // ----- private instance storage
         //
-        //Private remoteCacheDisabled As Boolean
-
         //
         //====================================================================================================
         #region  IDisposable Support 

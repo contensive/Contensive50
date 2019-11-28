@@ -46,7 +46,6 @@ namespace Contensive.Processor.Addons.PageManager {
                         } else {
                             //
                             // -- create childPageIdList
-                            //Dim childListName As String = ParentPageValues(2)
                             List<int> childPageIdList = new List<int>();
                             foreach (string PageIDText in pageList) {
                                 int pageId = encodeInteger(PageIDText.Replace("page", ""));

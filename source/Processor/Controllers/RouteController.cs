@@ -108,11 +108,6 @@ namespace Contensive.Processor.Controllers {
                             // moved to Addons.AdminSite
                             core.doc.continueProcessing = false;
                             return (new Contensive.Processor.Addons.AdminSite.CloseAjaxIndexFilterClass()).Execute(core.cpParent).ToString();
-                            //case AjaxOpenAdminNav:
-                            ////
-                            //// moved to Addons.AdminSite
-                            //core.doc.continueProcessing = false;
-                            //return (new Contensive.Processor.Addons.AdminSite.OpenAjaxAdminNavClass()).Execute(core.cpParent).ToString();
                             default:
                             //
                             // -- unknown method, log warning

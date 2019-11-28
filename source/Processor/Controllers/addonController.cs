@@ -374,7 +374,6 @@ namespace Contensive.Processor.Controllers {
                                 hint = "20";
                                 if (addon.jsFilename.filename != "") {
                                     string scriptFilename = GenericController.getCdnFileLink(core, addon.jsFilename.filename);
-                                    //string scriptFilename = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, addon.JSFilename.filename);
                                     core.html.addScriptLinkSrc(scriptFilename, AddedByName + " Javascript Head Code", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
                                 }
                                 //
@@ -427,7 +426,7 @@ namespace Contensive.Processor.Controllers {
                                     } catch (Exception ex) {
                                         hint = "14.5";
                                         string addonDescription = getAddonDescription(core, addon);
-                                        throw new GenericException("There was an error executing the script component of Add-on [" + addonDescription + "]. The exception was [" + ex.ToString() + "]." + ((ex.InnerException != null) ? " There was an inner exception [" + ex.InnerException.Message + "]" : ""));
+                                        throw new GenericException("There was an error executing the script component of Add-on [" + addonDescription + "]. The exception was [" + ex + "]." + ((ex.InnerException != null) ? " There was an inner exception [" + ex.InnerException.Message + "]" : ""));
                                     }
                                 }
                                 //
@@ -772,7 +771,6 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // ----- Display Form
                                 //
-                                //Content.Add(AdminUIController.editTableOpen);
                                 Name = xml_GetAttribute(IsFound, Doc.DocumentElement, "name", "");
                                 int TabCnt = 0;
                                 var adminMenu = new TabController();
@@ -867,7 +865,6 @@ namespace Contensive.Processor.Controllers {
                                                                                 Copy = core.html.inputFile(FieldName);
                                                                             } else {
                                                                                 string NonEncodedLink = GenericController.getCdnFileLink(core, FieldValue);
-                                                                                //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValue);
                                                                                 string EncodedLink = encodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
@@ -979,10 +976,8 @@ namespace Contensive.Processor.Controllers {
                                                         }
                                                         if (FieldHTML) {
                                                             Copy = AdminUIController.getDefaultEditor_Html(core, FieldName, FieldValue, "", "", "", FieldReadOnly);
-                                                            //Copy = core.html.getFormInputHTML(FieldName, FieldValue);
                                                         } else {
                                                             Copy = AdminUIController.getDefaultEditor_TextArea(core, FieldName, FieldValue, FieldReadOnly);
-                                                            //Copy = htmlController.inputText(core, FieldName, FieldValue);
                                                         }
                                                         TabCell.Add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
@@ -1047,17 +1042,13 @@ namespace Contensive.Processor.Controllers {
                                                                     } else {
                                                                         foreach (DataRow dr in dt.Rows) {
                                                                             //
-                                                                            //Const LoginMode_None = 1
-                                                                            //Const LoginMode_AutoRecognize = 2
-                                                                            //Const LoginMode_AutoLogin = 3
-                                                                            //
                                                                             // Build headers
                                                                             //
                                                                             int FieldCount = dr.ItemArray.Length;
                                                                             Copy += ("\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;\">");
                                                                             Copy += ("\r\t<tr>");
                                                                             foreach (DataColumn dc in dr.ItemArray) {
-                                                                                Copy += ("\r\t\t<td class=\"ccadminsmall\" style=\"border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;\">" + dr[dc].ToString() + "</td>");
+                                                                                Copy += ("\r\t\t<td class=\"ccadminsmall\" style=\"border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;\">" + dr[dc] + "</td>");
                                                                             }
                                                                             Copy += ("\r\t</tr>");
                                                                             //
@@ -1085,13 +1076,6 @@ namespace Contensive.Processor.Controllers {
                                                                                         Copy += (ColumnStart + "[empty]" + ColumnEnd);
                                                                                     } else if (Microsoft.VisualBasic.Information.IsArray(CellData)) {
                                                                                         Copy += ColumnStart + "[array]";
-                                                                                        //Dim Cnt As Integer
-                                                                                        //Cnt = UBound(CellData)
-                                                                                        //Dim Ptr As Integer
-                                                                                        //For Ptr = 0 To Cnt - 1
-                                                                                        //    Copy = Copy & ("<br>(" & Ptr & ")&nbsp;[" & CellData[Ptr] & "]")
-                                                                                        //Next
-                                                                                        //Copy = Copy & (ColumnEnd)
                                                                                     } else if (GenericController.encodeText(CellData) == "") {
                                                                                         Copy += (ColumnStart + "[empty]" + ColumnEnd);
                                                                                     } else {
@@ -1107,7 +1091,6 @@ namespace Contensive.Processor.Controllers {
                                                             }
                                                         }
                                                         TabCell.Add(AdminUIController.getEditRow(core, Copy, FieldCaption, FieldDescription, false, false, ""));
-                                                        //TabCell.Add(adminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                 }
                                             }
@@ -1115,7 +1098,6 @@ namespace Contensive.Processor.Controllers {
                                             if (!string.IsNullOrEmpty(Copy)) {
                                                 adminMenu.addEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
-                                            //Content.Add( GetForm_Edit_AddTab(core,TabName, Copy, True))
                                             TabCell = null;
                                             break;
                                         default:
@@ -1467,13 +1449,13 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- exception thrown out of application bin folder when xunit library included -- ignore
                     //
-                    LogController.logWarn(core, "execute_dotNetClass_assembly, 6, Assembly matches addon pattern but caused a ReflectionTypeLoadException. Return blank. addon [" + addon.name + "], [" + assemblyPhysicalPrivatePathname + "], exception [" + ex.ToString() + "]");
+                    LogController.logWarn(core, "execute_dotNetClass_assembly, 6, Assembly matches addon pattern but caused a ReflectionTypeLoadException. Return blank. addon [" + addon.name + "], [" + assemblyPhysicalPrivatePathname + "], exception [" + ex + "]");
                     return string.Empty;
                 } catch (Exception ex) {
                     //
                     // -- problem loading types
                     //
-                    LogController.logWarn(core, "execute_dotNetClass_assembly, 6, Assembly matches addon pattern but caused a load exception. Return blank. addon [" + addon.name + "], [" + assemblyPhysicalPrivatePathname + "], exception [" + ex.ToString() + "]");
+                    LogController.logWarn(core, "execute_dotNetClass_assembly, 6, Assembly matches addon pattern but caused a load exception. Return blank. addon [" + addon.name + "], [" + assemblyPhysicalPrivatePathname + "], exception [" + ex + "]");
                     return string.Empty;
                 }
                 try {
@@ -1489,7 +1471,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- error in the addon
                     //
-                    LogController.logError(core, ex, "execute_dotNetClass_assembly, 9, [" + assemblyPhysicalPrivatePathname + "]. There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + assemblyPhysicalPrivatePathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + ex.ToString() + "]");
+                    LogController.logError(core, ex, "execute_dotNetClass_assembly, 9, [" + assemblyPhysicalPrivatePathname + "]. There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + assemblyPhysicalPrivatePathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + ex + "]");
                     return string.Empty;
                 }
             } catch (Exception ex) {
@@ -1900,7 +1882,7 @@ namespace Contensive.Processor.Controllers {
                 if (collection != null) {
                     collectionName = collection.name;
                 }
-                addonDescription = "[#" + addon.id.ToString() + ", " + addon.name + "], collection [" + collectionName + "]";
+                addonDescription = "[#" + addon.id + ", " + addon.name + "], collection [" + collectionName + "]";
             }
             return addonDescription;
         }
@@ -1923,7 +1905,7 @@ namespace Contensive.Processor.Controllers {
                         });
                     }
                 } catch (Exception ex) {
-                    LogController.logError(core, new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
+                    LogController.logError(core, new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex + "]"));
                     AddonStatusOK = false;
                 }
                 if (string.IsNullOrEmpty(result)) {

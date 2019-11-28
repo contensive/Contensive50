@@ -74,10 +74,8 @@ namespace Contensive.Models.Db.Tests {
                     { "otherHeadTags", "" },
                     //
                     // double
-                    //defaultValues.Add("", "");
                     //
                     // double nullable
-                    //defaultValues.Add("", "");
                     //
                     // date
                     { "processNextRun", "" }
@@ -100,10 +98,6 @@ namespace Contensive.Models.Db.Tests {
                 //
                 Assert.AreEqual("asdf", test.pageTitle);
                 Assert.AreEqual("", test.otherHeadTags);
-                //
-                //Assert.AreEqual("", test.pageTitle);
-                //
-                //Assert.AreEqual("", test.pageTitle);
                 //
                 Assert.AreEqual(null, test.processNextRun);
             }

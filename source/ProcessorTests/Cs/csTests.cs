@@ -166,10 +166,6 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                         cs.SetField(fieldname, valueString);
                         Assert.AreEqual(valueString, cs.GetText(fieldname));
                         string filename = cs.GetFilename(fieldname);
-                        // todo -- dont save the value to drive until the cs.save()
-                        //Assert.AreNotEqual(valueString, cp.cdnFiles.read(filename));
-                        //cs.Save();
-                        //Assert.AreEqual(valueString, cp.cdnFiles.read(filename));
                         cs.Close();
                     }
                 }
@@ -203,11 +199,6 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                         if (!cs.Insert(contentName)) Assert.Fail("Insert content failed");
                         cs.SetField(fieldName, testValue);
                         Assert.AreEqual(testValue, cs.GetNumber(fieldName));
-                        //string filename = cs.GetFilename(fieldName);
-                        // todo -- dont save the value to drive until the cs.save()
-                        //    Assert.AreNotEqual(testValue, cp.cdnFiles.read(filename));
-                        //cs.Save();
-                        //Assert.AreEqual(valueString, cp.cdnFiles.read(filename));
                         cs.Close();
                     }
                 }
@@ -224,17 +215,6 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 string testContent = "testContent" + cp.Utils.GetRandomInteger().ToString();
                 string testField = "testField" + cp.Utils.GetRandomInteger().ToString();
                 string contentSaved = new string('*', 65535);
-                //string contentSaved = ""
-                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
-                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
-                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
-                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
-                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
-                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
-                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
-                //    + "1234123412341234123412341234123412341234asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
-                //    + "";
-                //string test = string.
                 string contentRead = "";
                 string fieldFilename = "";
                 DataTable dbRead = null;

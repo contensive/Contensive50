@@ -183,11 +183,11 @@ namespace Contensive.Processor {
         }
         //
         public override void ErrorReport(System.Exception ex, string message) {
-            LogController.log(cp.core, message + ", exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
+            LogController.log(cp.core, message + ", exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
         }
         //
         public override void ErrorReport(System.Exception ex) {
-            LogController.log(cp.core, "exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
+            LogController.log(cp.core, "exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
         }
         //
         //====================================================================================================
@@ -200,10 +200,6 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         // Deprecated
-        //
-        // - removed because two new methods (without optional) replace this. They are uppercase
-        //[Obsolete("Use AddLinkAlias()", false)]
-        //public override void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "") => LinkAliasController.addLinkAlias(cp.core, linkAlias, pageId, queryStringSuffix);
         //
         [Obsolete("Deprecated.", false)]
         public override bool MultiDomainMode { get { return false; } }

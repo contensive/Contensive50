@@ -73,7 +73,6 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     returnValue = layout;
                     posStart = getTagStartPos( core, layout, 1, Key);
-                    //outerHTML = getOuterHTML(ignore, layout, Key, PosStart)
                     if (posStart != 0) {
                         posEnd = getTagEndPos( core, layout, posStart);
                         if (posEnd > 0) {
@@ -418,7 +417,6 @@ namespace Contensive.Processor.Controllers {
                             searchClass = searchClass.Left( Pos - 1);
                         }
                         //
-                        //workingKey = Mid(workingKey, 2)
                         searchKey = "<";
                     } else if (workingKey.Left( 1) == "#") {
                         //
@@ -433,7 +431,6 @@ namespace Contensive.Processor.Controllers {
                             searchId = searchId.Left( Pos - 1);
                         }
                         //
-                        //workingKey = Mid(workingKey, 2)
                         searchKey = "<";
                     } else {
                         //
@@ -468,16 +465,12 @@ namespace Contensive.Processor.Controllers {
                     }
                     lenSearchKey = searchKey.Length;
                     Pos = layoutStartPos;
-                    //posMatch = genericController.vbInstr(layoutStartPos, layout, searchKey)
-                    //pos = posMatch
-                    //searchIsOver = False
                     do {
                         Pos = GenericController.vbInstr(Pos, layout, searchKey);
                         if (Pos == 0) {
                             //
                             // not found, return empty
                             //
-                            //s = ""
                             break;
                         } else {
                             //

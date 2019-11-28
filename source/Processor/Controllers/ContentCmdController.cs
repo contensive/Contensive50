@@ -274,7 +274,6 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                             } while (escape == "\\");
                                             Ptr = posSq + 1;
-                                            //notFound = False
                                         }
                                         break;
                                     default:
@@ -288,7 +287,6 @@ namespace Contensive.Processor.Controllers {
                                             // skip forward to the next non-escaped dq
                                             //
                                             do {
-                                                //Ptr = posDq + 1
                                                 posDq = GenericController.vbInstr(posDq + 1, src, "\"");
                                                 escape = "";
                                                 if (posDq > 0) {
@@ -296,7 +294,6 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                             } while (escape == "\\");
                                             Ptr = posDq + 1;
-                                            //notFound = False
                                         }
                                         break;
                                 }
@@ -345,12 +342,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 // accumulator gets the result of each cmd, then is passed to the next command to filter
                 List<object> cmdCollection = null;
-                //Collection<object> cmdCollection = null;
                 Dictionary<string, object> cmdDef = null;
                 Dictionary<string, object> cmdArgDef = new Dictionary<string, object>();
                 var json = new System.Web.Script.Serialization.JavaScriptSerializer();
                 //
-                //htmlDoc = new Controllers.htmlController(core);
                 cmdSrc = cmdSrc.Trim(' ');
                 string whiteChrs = Environment.NewLine + "\t ";
                 bool trimming;
@@ -372,20 +367,6 @@ namespace Contensive.Processor.Controllers {
                 } while (trimming);
                 string CmdAccumulator = "";
                 if (!string.IsNullOrEmpty(cmdSrc)) {
-                    //
-                    // convert cmdSrc to cmdCollection
-                    //   cmdCollection is a collection of
-                    //       1) dictionary objects
-                    //       2) strings
-                    //
-                    // the cmdSrc can be one of three things:
-                    //   - [a,b,c,d] a JSON array - parseJSON returns a collection
-                    //       - leave as collection
-                    //   - {a:b,c:d} a JSON object - parseJSON returns a dictionary
-                    //       - convert to a collection of each dictionaries
-                    //   - a "b" - do not use the parseJSON
-                    //       - just make a collection
-                    //
                     Dictionary<string, object>.KeyCollection dictionaryKeys = null;
                     string Key = null;
                     object itemObject = null;
@@ -394,7 +375,6 @@ namespace Contensive.Processor.Controllers {
                     //
                     // +++++
                     cmdCollection = new List<object>();
-                    //cmdCollection = new Collection<object>();
                     if ((cmdSrc.Left(1) == "{") && (cmdSrc.Substring(cmdSrc.Length - 1) == "}")) {
                         //
                         // JSON is a single command in the form of an object, like:
@@ -442,7 +422,7 @@ namespace Contensive.Processor.Controllers {
                         string cmdArg = "";
                         if (cmdText.Left(1) == "\"") {
                             //
-                            //cmd is quoted
+                            // cmd is quoted
                             //   "open"
                             //   "Open" file
                             //   "Open" "file"
@@ -482,7 +462,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         if (cmdArg.Left(1) == "\"") {
                             //
-                            //cmdarg is quoted
+                            // cmdarg is quoted
                             //
                             int Pos = GenericController.vbInstr(2, cmdArg, "\"");
                             if (Pos <= 1) {
@@ -510,7 +490,6 @@ namespace Contensive.Processor.Controllers {
                                 { cmdText, cmdDictionaryOrCollection }
                             };
                             cmdCollection = new List<object> {
-                                //cmdCollection = new Collection<object>();
                                 cmdDef
                             };
                         } else {
@@ -528,8 +507,6 @@ namespace Contensive.Processor.Controllers {
                     //
                     // execute the commands in the JSON cmdCollection
                     //
-                    //Dim cmdVariant As Variant
-
                     foreach (object cmd in cmdCollection) {
                         //
                         // repeat for all commands in the collection:
@@ -659,7 +636,6 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        //CmdAccumulator = core.main_GetContentCopy(ArgName, "copy content")
                                         DataTable dt = core.db.executeQuery("select layout from ccLayouts where name=" + DbController.encodeSQLText(ArgName));
                                         if (dt != null) {
                                             CmdAccumulator = GenericController.encodeText(dt.Rows[0]["layout"]);
@@ -741,21 +717,14 @@ namespace Contensive.Processor.Controllers {
                                     // execute an add-on
                                     //
                                     string addonName = "";
-                                    //ArgInstanceId = ""
-                                    //ArgGuid = ""
                                     Dictionary<string, string> addonArgDict = new Dictionary<string, string>();
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
                                         switch (kvp.Key.ToLowerInvariant()) {
                                             case "addon":
                                                 addonName = kvp.Value.ToString();
-                                                //Case "instanceid"
-                                                //    ArgInstanceId = kvp.Value.ToString()
-                                                //Case "guid"
-                                                //    ArgGuid = kvp.Value.ToString()
                                                 break;
                                             default:
                                                 addonArgDict.Add(kvp.Key, kvp.Value.ToString());
-                                                //ArgOptionString &= "&" & encodeNvaArgument(genericController.encodeText(kvp.Key.ToString())) & "=" & encodeNvaArgument(genericController.encodeText(kvp.Value.ToString()))
                                                 break;
                                         }
                                     }
@@ -786,18 +755,11 @@ namespace Contensive.Processor.Controllers {
                                     // execute an add-on
                                     //
                                     string addonName = cmdText;
-                                    //ArgInstanceId = ""
-                                    //ArgGuid = ""
                                     Dictionary<string, string> addonArgDict = new Dictionary<string, string>();
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
                                         switch (encodeInteger(kvp.Key.ToLowerInvariant())) {
-                                            //Case "instanceid"
-                                            //    ArgInstanceId = kvp.Value.ToString()
-                                            //Case "guid"
-                                            //    ArgGuid = kvp.Value.ToString()
                                             default:
                                                 addonArgDict.Add(kvp.Key, kvp.Value.ToString());
-                                                //ArgOptionString &= "&" & encodeNvaArgument(genericController.encodeText(kvp.Key.ToString())) & "=" & encodeNvaArgument(genericController.encodeText(kvp.Value.ToString()))
                                                 break;
                                         }
                                     }
@@ -816,43 +778,6 @@ namespace Contensive.Processor.Controllers {
                                     };
                                     AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, addonName);
                                     CmdAccumulator = core.addon.execute(addon, executeContext);
-
-
-                                    //
-                                    // attempts to execute an add-on with the command name
-                                    //
-                                    //addonName = cmdText
-                                    //ArgInstanceId = ""
-                                    //ArgGuid = ""
-                                    //For Each kvp As KeyValuePair(Of String, Object) In cmdArgDef
-                                    //    Select Case kvp.Key.ToLowerInvariant()
-                                    //        Case "instanceid"
-                                    //            ArgInstanceId = kvp.Value.ToString()
-                                    //        Case "guid"
-                                    //            ArgGuid = kvp.Value.ToString()
-                                    //        Case Else
-                                    //            ArgOptionString &= "&" & encodeNvaArgument(genericController.encodeText(kvp.Key)) & "=" & encodeNvaArgument(genericController.encodeText(kvp.Value.ToString()))
-                                    //    End Select
-                                    //Next
-                                    //ArgOptionString = ArgOptionString & "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
-                                    //ArgOptionString = Mid(ArgOptionString, 2)
-                                    //Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
-                                    //    .addonType = Context,
-                                    //    .cssContainerClass = "",
-                                    //    .cssContainerId = "",
-                                    //    .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
-                                    //        .contentName = "",
-                                    //        .fieldName = "",
-                                    //        .recordId = 0
-                                    //    },
-                                    //    .personalizationAuthenticated = personalizationIsAuthenticated,
-                                    //    .personalizationPeopleId = personalizationPeopleId,
-                                    //    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, ArgOptionString)
-                                    //}
-                                    //Dim addon As addonModel = addonModel.createByName(core, addonName)
-                                    //CmdAccumulator = core.addon.execute(addon, executeContext)
-                                    //CmdAccumulator = core.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
-                                    //CmdAccumulator = mainOrNothing.ExecuteAddon3(addonName, ArgOptionString, Context)
                                     break;
                                 }
                         }

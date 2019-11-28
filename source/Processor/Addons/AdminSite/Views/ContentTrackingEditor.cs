@@ -38,19 +38,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         CSLists.open("Content Watch Lists", "name<>" + DbController.encodeSQLText(""), "ID");
                         if (CSLists.ok()) {
                             //
-                            // ----- Open the panel
-                            //
-                            //Call core.main_PrintPanelTop("ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
-                            //Call FastString.Add(adminUIController.EditTableOpen)
-                            //Call FastString.Add(vbCrLf & "<tr><td colspan=""3"" class=""ccAdminEditSubHeader"">Content Tracking</td></tr>")
-                            //            '
-                            //            ' ----- Print matching Content Watch fields
-                            //            '
-                            //            Call FastString.Add(core.main_GetFormInputHidden("WhatsNewResponse", -1))
-                            //            Call FastString.Add(core.main_GetFormInputHidden("contentwatchrecordid", ContentWatchRecordID))
-                            //
                             // ----- Content Watch Lists, checking the ones that have active rules
-                            //
                             RecordCount = 0;
                             while (CSLists.ok()) {
                                 ContentWatchListId = CSLists.getInteger("id");
@@ -83,7 +71,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 HTMLFieldString = HtmlController.encodeHtml(adminData.contentWatchLinkLabel);
                             } else {
                                 HTMLFieldString = HtmlController.inputText_Legacy(core, "ContentWatchLinkLabel", adminData.contentWatchLinkLabel, 1, core.siteProperties.defaultFormInputWidth);
-                                //HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchLinkLabel"" cols=""" & core.app.SiteProperty_DefaultFormInputWidth & """>" & ContentWatchLinkLabel & "</textarea>"
                             }
                             FastString.Add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Caption", "This caption is displayed on all Content Watch Lists, linked to the location on the web site where this content is displayed. RSS feeds created from Content Watch Lists will use this caption as the record title if not other field is selected in the Content Definition.", false, true, "ContentWatchLinkLabel"));
                             //

@@ -426,9 +426,9 @@ namespace Contensive.Processor.Controllers {
         protected class Crypto {
             protected Crypto() {}
             //
-            //While an app specific salt is not the best practice for
-            //password based encryption, it's probably safe enough as long as
-            //it is truly uncommon. Also too much work to alter this answer otherwise.
+            // While an app specific salt is not the best practice for
+            // password based encryption, it's probably safe enough as long as
+            // it is truly uncommon. Also too much work to alter this answer otherwise.
             //
             private static byte[] _salt = Encoding.ASCII.GetBytes("notreallyrandomsalt");
             //
@@ -462,7 +462,6 @@ namespace Contensive.Processor.Controllers {
                             msEncrypt.Write(aesAlg.IV, 0, aesAlg.IV.Length);
                             using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write)) {
                                 using (StreamWriter swEncrypt = new StreamWriter(csEncrypt)) {
-                                    //Write all data to the stream.
                                     swEncrypt.Write(plainText);
                                 }
                             }

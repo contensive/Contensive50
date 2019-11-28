@@ -95,27 +95,6 @@ namespace Contensive.Processor.Controllers {
             }
         }
         internal Dictionary<string, int> _contentNameIdDictionary = null;
-        ////
-        ////===================================================================================================
-        ///// <summary>
-        ///// list of DLLs in the addon assembly path that are not adds. As they are discovered, they are added to this list
-        ///// and not loaded in the future. The me.dispose compares the list count to the loaded count and caches if different.
-        ///// </summary>
-        ///// <returns></returns>
-        //public List<string> assemblyList_NonAddonsFound {
-        //    get {
-        //        if (_assemblyList_NonAddonsFound == null) {
-        //            _assemblyList_NonAddonsFound = cache.getObject<List<string>>(cacheName_AssemblyList_NonAddonsFound);
-        //            if (_assemblyList_NonAddonsFound == null) {
-        //                _assemblyList_NonAddonsFound = new List<string>();
-        //            }
-        //            _assemblyList_NonAddonsFound_CountWhenLoaded = _assemblyList_NonAddonsFound.Count;
-        //        }
-        //        return _assemblyList_NonAddonsFound;
-        //    }
-        //}
-        //private List<string> _assemblyList_NonAddonsFound;
-        //private int _assemblyList_NonAddonsFound_CountWhenLoaded;
         //
         // -- assembly files to skip
         public List<string> assemblyList_NonAddonsInstalled = new List<string>() {
@@ -405,7 +384,6 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- dev environment, setup programfiles path 
                         string executePath = System.IO.Path.GetDirectoryName(this.GetType().Assembly.Location);
-                        //string executePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
                         if (!executePath.ToLowerInvariant().IndexOf("\\git\\").Equals(-1)) {
                             //
                             //  -- save if not in developer execution path
@@ -786,24 +764,6 @@ namespace Contensive.Processor.Controllers {
         }
         private Logger _nlogLogger = null;
 
-        ////
-        ////====================================================================================================
-        ////
-        //public AppDomain addonAppDomain {
-        //    get {
-        //        if (_addonAppDomain==null) {
-
-        //            AppDomainSetup domaininfo = new AppDomainSetup();
-        //            domaininfo.ApplicationBase = System.Environment.CurrentDirectory;
-        //            Evidence adevidence = AppDomain.CurrentDomain.Evidence;
-        //            _addonAppDomain = AppDomain.CreateDomain("MyDomain", adevidence, domaininfo);
-        //        }
-        //        return _addonAppDomain;
-        //    }
-        //}
-        //private AppDomain _addonAppDomain = null;
-        ////
-
         #region  IDisposable Support 
         //
         protected bool disposed = false;
@@ -911,43 +871,36 @@ namespace Contensive.Processor.Controllers {
                     //
                     if (_siteProperties != null) {
                         // no dispose
-                        //Call _siteProperties.Dispose()
                         _siteProperties = null;
                     }
                     //
                     if (_domains != null) {
                         // no dispose
-                        //Call _domains.Dispose()
                         _domains = null;
                     }
                     //
                     if (_docProperties != null) {
                         // no dispose
-                        //Call _doc.Dispose()
                         _docProperties = null;
                     }
                     //
                     if (_webServer != null) {
                         // no dispose
-                        //Call _webServer.Dispose()
                         _webServer = null;
                     }
                     //
                     if (_visitProperty != null) {
                         // no dispose
-                        //Call _visitProperty.Dispose()
                         _visitProperty = null;
                     }
                     //
                     if (_visitorProperty != null) {
                         // no dispose
-                        //Call _visitorProperty.Dispose()
                         _visitorProperty = null;
                     }
                     //
                     if (_userProperty != null) {
                         // no dispose
-                        //Call _userProperty.Dispose()
                         _userProperty = null;
                     }
                     //

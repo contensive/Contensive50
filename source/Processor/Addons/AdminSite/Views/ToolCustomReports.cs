@@ -18,7 +18,6 @@ namespace Contensive.Processor.Addons.AdminSite {
             try {
                 //
                 string Button = null;
-                //string RecordName = null;
                 string SQL = null;
                 string RQS = null;
                 int PageSize = 0;
@@ -38,7 +37,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 int RowPtr = 0;
                 int ContentId = 0;
                 string Format = null;
-                //string Filename = null;
                 string Name = null;
                 string title = null;
                 string Description = null;
@@ -62,7 +60,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 Description = "Custom Reports are a way for you to create a snapshot of data to view or download. To request a report, select the Custom Reports tab, check the report(s) you want, and click the [Request Download] Button. When your report is ready, it will be available in the <a href=\"?" + rnAdminForm + "=30\">Download Manager</a>. To create a new custom report, select the Request New Report tab, enter a name and SQL statement, and click the Apply button.";
                 ContentPadding = 0;
                 ButtonCommaListLeft = ButtonCancel + "," + ButtonDelete + "," + ButtonRequestDownload;
-                //ButtonListLeft = ButtonCancel & "," & ButtonDelete & "," & ButtonRequestDownload & "," & ButtonApply
                 ButtonCommaListRight = "";
                 SQLFieldName = "SQLQuery";
                 //
@@ -79,7 +76,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                         switch (Button) {
                             case ButtonCancel:
                                 return core.webServer.redirect("/" + core.appConfig.adminRoute, "CustomReports, Cancel Button Pressed");
-                            //Call core.main_Redirect2(encodeAppRootPath(core.main_GetSiteProperty2("AdminURL"), core.main_ServerVirtualPath, core.app.RootPath, core.main_ServerHost))
                             case ButtonDelete:
                                 RowCnt = core.docProperties.getInteger("RowCnt");
                                 if (RowCnt > 0) {
@@ -176,11 +172,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     ColWidth[ColumnPtr] = "150";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    //ColCaption(ColumnPtr) = "?<br><img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif"" width=100 height=1>"
-                    //ColAlign(ColumnPtr) = "Left"
-                    //ColWidth(ColumnPtr) = "100"
-                    //ColumnPtr = ColumnPtr + 1
-                    //
                     //   Get Data
                     //
                     using (var csData = new CsModel(core)) {
@@ -196,7 +187,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 Cells[RowPointer, 1] = csData.getText("name");
                                 Cells[RowPointer, 2] = csData.getText("CreatedBy");
                                 Cells[RowPointer, 3] = csData.getDate("DateAdded").ToShortDateString();
-                                //Cells(RowPointer, 4) = "&nbsp;"
                                 RowPointer = RowPointer + 1;
                                 csData.goNext();
                             }
@@ -205,7 +195,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                     string Cell = null;
                     Tab0.Add(HtmlController.inputHidden("RowCnt", RowPointer));
-                    //adminUIController Adminui = new adminUIController(core);
                     Cell = AdminUIController.getReport(core, RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
                     Tab0.Add("<div>" + Cell + "</div>");
                     //

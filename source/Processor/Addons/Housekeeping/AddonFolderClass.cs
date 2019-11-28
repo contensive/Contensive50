@@ -80,7 +80,6 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 //
                                 // Go through all subpaths of the collection path, register the version match, unregister all others
                                 //
-                                //fs = New fileSystemClass
                                 if (string.IsNullOrEmpty(collectionPath)) {
                                     //
                                     LogController.logInfo(core, "no collection path, skipping");

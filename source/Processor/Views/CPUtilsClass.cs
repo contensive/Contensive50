@@ -168,10 +168,6 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        //public override string ModifyLinkQueryString(string Link, string QueryName, string QueryValue, bool AddIfMissing = true) {
-        //    return GenericController.modifyLinkQuery(Link, QueryName, QueryValue, AddIfMissing);
-        //}
-        //
         public override string ModifyLinkQueryString(string url, string key, string value, bool addIfMissing) {
             return GenericController.modifyLinkQuery(url, key, value, addIfMissing);
         }
@@ -211,12 +207,6 @@ namespace Contensive.Processor {
         public override string ModifyLinkQueryString(string url, string key, DateTime value, bool addIfMissing) {
             return GenericController.modifyLinkQuery(url, key, value.ToString(), addIfMissing);
         }
-        ////
-        //// ====================================================================================================
-        ////
-        //public override string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true) {
-        //    return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing);
-        //}
 
         public override string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing) {
             return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing);
@@ -305,13 +295,6 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override string DecodeHtmlFromWysiwygEditor(string Source) {
             return ActiveContentController.processWysiwygResponseForSave(cp.core, Source);
-        }
-        //
-        // ====================================================================================================
-        //
-        private void appendDebugLog(string copy) {
-            //My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.utils, " & copy & vbCrLf, True)
-            // 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
         }
         //
         //====================================================================================================
@@ -536,7 +519,6 @@ namespace Contensive.Processor {
         [Obsolete("Deprecated.", false)]
         public override string hashMd5(string source) {
             throw new NotImplementedException("hashMd5 not implemented");
-            //Return HashPasswordForStoringInConfigFile(source, "md5")
         }
         // todo implement taskId return value, create cp.task object to track task status
         //====================================================================================================
@@ -612,7 +594,6 @@ namespace Contensive.Processor {
         // dispose
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
-                appendDebugLog(".dispose, dereference cp, main, csv");
                 if (disposing) {
                     //
                     // call .dispose for managed objects

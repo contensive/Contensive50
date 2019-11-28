@@ -248,7 +248,7 @@ namespace Contensive.Processor.Controllers {
             bool result = false;
             try {
                 if (recipient == null) {
-                    userErrorMessage = "The email was not sent because the recipient could not be found by thier id [" + recipient.id.ToString() + "]";
+                    userErrorMessage = "The email was not sent because the recipient could not be found by thier id [" + recipient.id + "]";
                 } else if (!verifyEmailAddress(core, recipient.email)) {
                     //
                     userErrorMessage = "Email not sent because the to-address is not valid.";
@@ -279,7 +279,7 @@ namespace Contensive.Processor.Controllers {
                         replyToAddress = replyToAddress,
                         subject = subject,
                         textBody = textBody,
-                        toAddress = (string.IsNullOrWhiteSpace(recipientName)) ? recipient.email : recipientName + " <" + recipient.email.Trim() + ">",
+                        toAddress = (string.IsNullOrWhiteSpace(recipientName)) ? recipient.email : "\"" + recipientName.Replace("\"", "") + "\" <" + recipient.email.Trim() + ">",
                         toMemberId = recipient.id
                     };
                     if (verifyEmail(core, email, ref userErrorMessage)) {
@@ -941,7 +941,7 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             //
                             // -- fail, add back to end of queue for retry
-                            string sendStatus = "Retrying unsuccessful send (" + emailData.attempts.ToString() + " of 3), reason [" + reasonForFail + "]";
+                            string sendStatus = "Retrying unsuccessful send (" + emailData.attempts + " of 3), reason [" + reasonForFail + "]";
                             sendStatus = sendStatus.Substring(0, (sendStatus.Length > 254) ? 254 : sendStatus.Length);
                             emailData.attempts += 1;
                             var log = EmailLogModel.addDefault<EmailLogModel>(core.cpParent);
@@ -956,7 +956,7 @@ namespace Contensive.Processor.Controllers {
                             log.memberId = emailData.toMemberId;
                             log.save(core.cpParent);
                             queueEmail(core, false, queueRecord.name, emailData);
-                            LogController.logInfo(core, "sendEmailInQueue, failed attempt (" + emailData.attempts.ToString() + " of 3), reason [" + reasonForFail + "], added to end of queue, toAddress [" + emailData.toAddress + "], fromAddress [" + emailData.fromAddress + "], subject [" + emailData.subject + "], attempts [" + emailData.attempts + "]");
+                            LogController.logInfo(core, "sendEmailInQueue, failed attempt (" + emailData.attempts + " of 3), reason [" + reasonForFail + "], added to end of queue, toAddress [" + emailData.toAddress + "], fromAddress [" + emailData.fromAddress + "], subject [" + emailData.subject + "], attempts [" + emailData.attempts + "]");
                         }
                     }
                 }

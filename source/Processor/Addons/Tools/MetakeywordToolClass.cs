@@ -116,8 +116,6 @@ namespace Contensive.Processor.Addons.Tools {
                 tempGetForm_MetaKeywordTool = AdminUIController.getToolBody(core, "Meta Keyword Entry Tool", ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
                 //
-                ///Dim th as integer: Exit Function
-                //
                 // ----- Error Trap
                 //
             } catch (Exception ex) {

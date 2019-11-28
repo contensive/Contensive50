@@ -82,7 +82,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                         errorContextMessage = "executing addon id:" + addonId + " set as Admin Root addon"
                     });
-                    //returnHtml = returnHtml & core.addon.execute_legacy4(CStr(addonId), "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                 }
                 if (string.IsNullOrEmpty(returnHtml)) {
                     //

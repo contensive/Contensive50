@@ -25,28 +25,6 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
         //
         private CoreController core;
         //
-        // To interigate Add-on Collections to check for re-use
-        //
-        //private struct DeleteType {
-        //    public string Name;
-        //    public int ParentID;
-        //}
-        //private struct NavigatorType {
-        //    public string Name;
-        //    public string menuNameSpace;
-        //}
-        //private struct Collection2Type {
-        //    public int AddOnCnt;
-        //    public string[] AddonGuid;
-        //    public string[] AddonName;
-        //    public int MenuCnt;
-        //    public string[] Menus;
-        //    public int NavigatorCnt;
-        //    public NavigatorType[] Navigators;
-        //}
-        //private int CollectionCnt;
-        //private Collection2Type[] Collections;
-        //
         //==================================================================================================================================
         /// <summary>
         /// constructor
@@ -79,8 +57,6 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                 XmlDocument LocalCollections = null;
                 XmlDocument LibCollections = null;
                 string InstallFolder = null;
-                //Dim LibGuids() As String
-                //Dim IISResetRequired As Boolean
                 int AddonNavigatorId = 0;
                 string TargetCollectionName = null;
                 string Collectionname = "";
@@ -117,15 +93,10 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                 string InstallLibCollectionList = "";
                 int TargetCollectionId = 0;
                 string privateFilesInstallPath = null;
-                //adminUIController Adminui = new adminUIController(core);
                 List<string> nonCriticalErrorList = new List<string>();
-                //
-                // BuildVersion = core.app.dataBuildVersion
                 string dataBuildVersion = core.siteProperties.dataBuildVersion;
                 string coreVersion = core.codeVersion();
                 var adminMenu = new TabController();
-
-
                 DbUpToDate = (dataBuildVersion == coreVersion);
                 //
                 Button = core.docProperties.getText(Constants.RequestNameButton);
@@ -226,7 +197,6 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                                 AllowInstallFromFolder = true;
                             }
                             //
-                            //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of core.docProperties.getInteger("UploadCount") for every iteration:
                             int tempVar = core.docProperties.getInteger("UploadCount");
                             for (Ptr = 0; Ptr < tempVar; Ptr++) {
                                 if (core.privateFiles.upload("Upload" + Ptr, InstallFolder, ref CollectionFilename)) {
@@ -263,7 +233,6 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                         // --------------------------------------------------------------------------------
                         //
                         if (AllowInstallFromFolder) {
-                            //InstallFolder = core.asv.config.physicalFilePath & InstallFolderName & "\"
                             if (core.privateFiles.pathExists(privateFilesInstallPath)) {
                                 string logPrefix = "SafeModeAddonManager";
                                 var context = new Stack<string>();
@@ -472,7 +441,6 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                                                         // Not installed yet
                                                         //
                                                         Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + HtmlController.inputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + HtmlController.inputHidden("LibraryRowName" + RowPtr, Collectionname);
-                                                        //Cells3(RowPtr, 0) = core.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & core.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & core.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
                                                         Cells3[RowPtr, 1] = Collectionname + "&nbsp;";
                                                         Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
                                                         Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
@@ -666,8 +634,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
             string tempGetXMLAttribute = null;
             try {
                 //
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlAttribute NodeAttribute = null;
+                // todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 XmlNode ResultNode = null;
                 string UcaseName = null;
                 //
@@ -696,7 +663,6 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
             HandleClassTrapError("GetXMLAttribute");
             return tempGetXMLAttribute;
         }
@@ -727,7 +693,6 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                 //
                 tempGetParentIDFromNameSpace = 0;
                 if (!string.IsNullOrEmpty(menuNameSpace)) {
-                    //ParentName = ParentNameSpace
                     Pos = GenericController.vbInstr(1, menuNameSpace, ".");
                     if (Pos == 0) {
                         ParentName = menuNameSpace;
@@ -762,7 +727,6 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
             HandleClassTrapError("GetParentIDFromNameSpace");
             return tempGetParentIDFromNameSpace;
         }

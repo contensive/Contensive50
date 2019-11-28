@@ -49,11 +49,8 @@ namespace Contensive.Processor.Controllers {
             string returnBag = "";
             try {
                 returnBag = SerializeObject(store);
-                //returnBag = SerializeObject(store)
-                //Catch ex As Newtonsoft.Json.JsonException
-                //    Throw New indexException("ExportPropertyBag JSON error", ex)
             } catch (Exception ex) {
-                throw new indexException("ExportPropertyBag error", ex);
+                throw new IndexException("ExportPropertyBag error", ex);
             }
             return returnBag;
         }
@@ -64,7 +61,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 store = DeserializeObject<storageClass>(bag);
             } catch (Exception ex) {
-                throw new indexException("ImportPropertyBag error", ex);
+                throw new IndexException("ImportPropertyBag error", ex);
             }
         }
         //
@@ -92,9 +89,7 @@ namespace Contensive.Processor.Controllers {
                     LowGuess = -1;
                     HighGuess = store.ArrayCount - 1;
                     while ((HighGuess - LowGuess) > 1) {
-                        // 20150823 jk added to prevent implicit conversion
                         PointerGuess = encodeInteger(Math.Floor((HighGuess + LowGuess) / 2.0));
-                        //PointerGuess = (HighGuess + LowGuess) / 2
                         if (UcaseTargetKey == store.UcaseKeyArray[PointerGuess]) {
                             HighGuess = PointerGuess;
                             break;
@@ -110,7 +105,7 @@ namespace Contensive.Processor.Controllers {
                 }
 
             } catch (Exception ex) {
-                throw new indexException("getArrayPointer error", ex);
+                throw new IndexException("getArrayPointer error", ex);
             }
             return ArrayPointer;
         }
@@ -142,7 +137,7 @@ namespace Contensive.Processor.Controllers {
                     returnKey = GenericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
                 }
             } catch (Exception ex) {
-                throw new indexException("GetPointer error", ex);
+                throw new IndexException("GetPointer error", ex);
             }
             return returnKey;
         }
@@ -170,7 +165,7 @@ namespace Contensive.Processor.Controllers {
                 store.PointerArray[store.ArrayPointer] = Pointer.ToString();
                 store.ArrayDirty = true;
             } catch (Exception ex) {
-                throw new indexException("SetPointer error", ex);
+                throw new IndexException("SetPointer error", ex);
             }
         }
         //
@@ -194,7 +189,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                throw new indexException("GetNextPointerMatch error", ex);
+                throw new IndexException("GetNextPointerMatch error", ex);
             }
             return nextPointerMatch;
         }
@@ -218,7 +213,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
             } catch (Exception ex) {
-                throw new indexException("GetFirstPointer error", ex);
+                throw new IndexException("GetFirstPointer error", ex);
             }
             return firstPointer;
         }
@@ -235,13 +230,12 @@ namespace Contensive.Processor.Controllers {
                     Sort();
                 }
                 //
-                //nextPointer = -1
                 if ((store.ArrayPointer + 1) < store.ArrayCount) {
                     store.ArrayPointer = store.ArrayPointer + 1;
                     nextPointer = GenericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
                 }
             } catch (Exception ex) {
-                throw new indexException("GetPointer error", ex);
+                throw new IndexException("GetPointer error", ex);
             }
             return nextPointer;
         }
@@ -265,7 +259,6 @@ namespace Contensive.Processor.Controllers {
                     MaxPointer = store.ArrayCount - 2;
                     for (SlowPointer = MaxPointer; SlowPointer >= 0; SlowPointer--) {
                         CleanPass = true;
-                        //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of MaxPointer - SlowPointer for every iteration:
                         int tempVar = MaxPointer - SlowPointer;
                         for (FastPointer = MaxPointer; FastPointer >= tempVar; FastPointer--) {
                             if (string.CompareOrdinal(store.UcaseKeyArray[FastPointer], store.UcaseKeyArray[FastPointer + PointerDelta]) > 0) {
@@ -285,7 +278,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 store.ArrayDirty = false;
             } catch (Exception ex) {
-                throw new indexException("BubbleSort error", ex);
+                throw new IndexException("BubbleSort error", ex);
             }
         }
         //
@@ -302,7 +295,7 @@ namespace Contensive.Processor.Controllers {
                     QuickSort_Segment(store.UcaseKeyArray, store.PointerArray, 0, store.ArrayCount - 1);
                 }
             } catch (Exception ex) {
-                throw new indexException("QuickSort error", ex);
+                throw new IndexException("QuickSort error", ex);
             }
         }
         //
@@ -351,7 +344,7 @@ namespace Contensive.Processor.Controllers {
                     QuickSort_Segment(C, P, Low, Last);
                 }
             } catch (Exception ex) {
-                throw new indexException("QuickSort_Segment error", ex);
+                throw new IndexException("QuickSort_Segment error", ex);
             }
         }
         //
@@ -362,7 +355,7 @@ namespace Contensive.Processor.Controllers {
                 QuickSort();
                 store.ArrayDirty = false;
             } catch (Exception ex) {
-                throw new indexException("Sort error", ex);
+                throw new IndexException("Sort error", ex);
             }
         }
     }
@@ -370,27 +363,22 @@ namespace Contensive.Processor.Controllers {
     //
     //
 
-    public class indexException : System.Exception, System.Runtime.Serialization.ISerializable {
-        //
-        //Private _message As String
+    public class IndexException : System.Exception, System.Runtime.Serialization.ISerializable {
 
-        //
-
-
-        public indexException() : base() {
+        public IndexException() : base() {
             // Add implementation.
         }
 
-        public indexException(string message) : base(message) {
+        public IndexException(string message) : base(message) {
             // Add implementation.
         }
 
-        public indexException(string message, Exception inner) : base(message, inner) {
+        public IndexException(string message, Exception inner) : base(message, inner) {
             // Add implementation.
         }
 
         // This constructor is needed for serialization.
-        protected indexException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) {
+        protected IndexException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) {
             // Add implementation.
         }
     }

@@ -325,12 +325,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     Caption = Caption + "*";
                                     InheritedFieldCount = InheritedFieldCount + 1;
                                 }
-                                //adminUIController Adminui = new adminUIController(core);
                                 int ColumnPtr = 0;
                                 string link = "?" + core.doc.refreshQueryString + "&FieldName=" + HtmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns; 
-                                //string AStart = "<a href=\"?" + core.doc.refreshQueryString + "&FieldName=" + htmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
                                 Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">");
-                                //Stream.Add("<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.GIF\" width=\"100%\" height=\"1\" >");
                                 Stream.Add(HtmlController.div(AdminUIController.getDeleteLink(link + "&dta=" + ToolsActionRemoveField),"text-center"));
                                 Stream.Add(HtmlController.div(AdminUIController.getArrowRightLink(link + "&dta=" + ToolsActionMoveFieldRight), "text-center"));
                                 Stream.Add(HtmlController.div(AdminUIController.getArrowLeftLink(link + "&dta=" + ToolsActionMoveFieldLeft), "text-center"));
@@ -339,7 +336,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 Stream.Add("</td>");
                             }
                             Stream.Add("</tr>");
-                            //
                             Stream.Add("</table>");
                         }
                     }
@@ -419,13 +415,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 // print the content tables that have index forms to Configure
                 //--------------------------------------------------------------------------------
                 //
-                //FormPanel = FormPanel & SpanClassAdminNormal & "Select a Content Definition to Configure its index form<br>"
-                //FormPanel = FormPanel & core.main_GetFormInputHidden("af", AdminFormToolConfigureIndex)
-                //FormPanel = FormPanel & core.htmldoc.main_GetFormInputSelect2("ContentID", ContentID, "Content")
-                //Call Stream.Add(core.htmldoc.main_GetPanel(FormPanel))
-                //
                 core.siteProperties.setProperty("AllowContentAutoLoad", GenericController.encodeText(AllowContentAutoLoad));
-                //Stream.Add( core.main_GetFormInputHidden("NeedToReloadConfig", NeedToReloadConfig))
                 string Content = ""
                     + Stream.Text
                     + HtmlController.inputHidden("cid", adminContent.id.ToString())
@@ -434,36 +424,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     + "";
                 //
                 // -- assemble form
-
                 result = AdminUIController.getToolForm(core, Content, ButtonOK + "," + ButtonReset);
-                //result = adminUIController.getBody(core, Title, ButtonOK + "," + ButtonReset, "", false, false, Description, "", 10, Content);
-                //
-                //
-                //    ButtonBar = adminUIController.GetButtonsFromList( ButtonList, True, True, "button")
-                //    ButtonBar = adminUIController.GetButtonBar(ButtonBar, "")
-                //    Stream = New FastStringClass
-                //
-                //    GetForm_Index_SetColumns = "" _
-                //        & ButtonBar _
-                //        & adminUIController.EditTableOpen _
-                //        & Stream.Text _
-                //        & adminUIController.EditTableClose _
-                //        & ButtonBar _
-                //    '
-                //    '
-                //    ' Assemble LiveWindowTable
-                //    '
-                //    Stream.Add( OpenLiveWindowTable)
-                //    Stream.Add( vbCrLf & core.main_GetFormStart()
-                //    Stream.Add( ButtonBar)
-                //    Stream.Add( TitleBar)
-                //    Stream.Add( Content)
-                //    Stream.Add( ButtonBar)
-                //    Stream.Add( "<input type=hidden name=asf VALUE=" & AdminFormIndex_SubFormSetColumns & ">")
-                //    Stream.Add( "</form>")
-                //    Stream.Add( CloseLiveWindowTable)
-                //    '
-                //    GetForm_Index_SetColumns = Stream.Text
                 core.html.addTitle(Title);
             } catch (Exception ex) {
                 LogController.logError(core, ex);

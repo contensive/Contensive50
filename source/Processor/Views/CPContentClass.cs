@@ -303,22 +303,22 @@ namespace Contensive.Processor {
         //
         [Obsolete("workflow editing is deprecated", false)]
         public override void PublishEdit(string ContentName, int RecordID) {
-            // Call WorkflowController.publishEdit(ContentName, RecordID, 0)
+            // 
         }
         //
         [Obsolete("workflow editing is deprecated", false)]
         public override void SubmitEdit(string ContentName, int RecordID) {
-            //Call WorkflowController.submitEdit2(ContentName, RecordID, 0)
+            //
         }
         //
         [Obsolete("workflow editing is deprecated", false)]
         public override void AbortEdit(string ContentName, int RecordId) {
-            // Call WorkflowController.abortEdit2(ContentName, RecordId, 0)
+            // 
         }
         //
         [Obsolete("workflow editing is deprecated", false)]
         public override void ApproveEdit(string ContentName, int RecordId) {
-            //Call WorkflowController.approveEdit(ContentName, RecordId, 0)
+            //
         }
         //
         [Obsolete("Deprecated, template link is not supported", false)]

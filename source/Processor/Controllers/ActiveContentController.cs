@@ -153,7 +153,6 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             // catch mailto
                                                             //
-                                                            //Value = Value & AnchorQuery
                                                         } else if (GenericController.vbInstr(1, attrValue, "?") == 0) {
                                                             //
                                                             // No questionmark there, add it
@@ -353,9 +352,7 @@ namespace Contensive.Processor.Controllers {
                                                                 if (!string.IsNullOrEmpty(SrcOptionName)) {
                                                                     // since AddonOptionString is encoded, InstanceOptionValue will be also
                                                                     string InstanceOptionValue = HtmlController.getAddonOptionStringValue(SrcOptionName, addonOptionString);
-                                                                    //InstanceOptionValue = core.csv_GetAddonOption(SrcOptionName, AddonOptionString)
                                                                     string ResultOptionSelector = core.html.getAddonSelector(SrcOptionName, GenericController.encodeNvaArgument(InstanceOptionValue), SrcOptionSelector);
-                                                                    //ResultOptionSelector = csv_GetAddonSelector(SrcOptionName, InstanceOptionValue, SrcOptionValueSelector)
                                                                     ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded + "&" + ResultOptionSelector;
                                                                 }
                                                             }
@@ -397,7 +394,6 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     string IconIDControlString = "AC," + ACType + "," + NotUsedId + "," + ACName + "," + AddonOptionStringHTMLEncoded;
                                                     Copy = AddonController.getAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceId, 0);
-                                                    //Copy = IconImg;
                                                 } else if (EncodeNonCachableTags) {
                                                     //
                                                     // Add in the Content
@@ -466,8 +462,6 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // User created form - add the attribute "Contensive=1"
                                         //
-                                        // 5/14/2009 - DM said it is OK to remove UserResponseForm Processing
-                                        //ElementText = genericController.vbReplace(ElementText, "<FORM", "<FORM ContensiveUserForm=1 ", vbTextCompare)
                                         break;
                                         case "IMG":
                                         AttributeCount = DHTML.ElementAttributeCount(ElementPointer);
@@ -700,12 +694,10 @@ namespace Contensive.Processor.Controllers {
                                                                             } else {
                                                                                 if ((SizeTest[0].IsNumeric() & SizeTest[1].IsNumeric())) {
                                                                                     ImageFilenameNoExt = ImageFilenameNoExt.Left(Pos - 1);
-                                                                                    //RecordVirtualFilenameNoExt = Mid(RecordVirtualFilename, 1, Pos - 1)
                                                                                 } else {
                                                                                     ImageFilenameAltSize = "";
                                                                                 }
                                                                             }
-                                                                            //ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
                                                                         }
                                                                         if (GenericController.vbInstr(1, sfImageExtList, ImageFilenameExt, 1) != 0) {
                                                                             //
@@ -761,7 +753,6 @@ namespace Contensive.Processor.Controllers {
                                                                                     RecordFilenameExt = RecordFilenameNoExt.Substring(Pos);
                                                                                     RecordFilenameNoExt = RecordFilenameNoExt.Left(Pos - 1);
                                                                                 }
-                                                                                //ImageEditController imageEditor = null;
                                                                                 //
                                                                                 // if recordwidth or height are missing, get them from the file
                                                                                 //
@@ -830,7 +821,6 @@ namespace Contensive.Processor.Controllers {
                                                                                         // this is the raw image
                                                                                         // image matches record, and the sizes are the same
                                                                                         //
-                                                                                        //RecordVirtualFilename = RecordVirtualFilename;
                                                                                     } else if ((RecordVirtualFilename == ImageVirtualFilePath + ImageFilenameNoExt + "." + ImageFilenameExt) && (RecordAltSizeList.IndexOf(ImageAltSize, System.StringComparison.OrdinalIgnoreCase) != -1)) {
                                                                                         //
                                                                                         // OK
@@ -855,8 +845,6 @@ namespace Contensive.Processor.Controllers {
                                                                                             //
                                                                                             // set back to Raw image untouched, use the record image filename
                                                                                             //
-                                                                                            //ElementText = ElementText;
-                                                                                            //ElementText = genericController.vbReplace(ElementText, ImageVirtualFilename, RecordVirtualFilename)
                                                                                         } else {
                                                                                             //
                                                                                             // Raw image filename in content, but it is resized, switch to an alternate size
@@ -1141,7 +1129,6 @@ namespace Contensive.Processor.Controllers {
                                         DoAnotherPass = false;
                                     } else {
                                         result = result.Left(LineStart - 1) + result.Substring(LineEnd + 3);
-                                        //returnValue = Mid(returnValue, 1, LineStart - 1) & Copy & Mid(returnValue, LineEnd + 4)
                                     }
                                 }
                             }

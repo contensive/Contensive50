@@ -35,7 +35,6 @@ namespace Contensive.Processor.Controllers {
         //
         // ----- Alarms within Process Timer
         //
-        //Private SiteProcessAlarmTime As Date            ' Run Site Processes every 30 seconds
         private const int SiteProcessIntervalSeconds = 30;
         //
         // ----- Debugging
@@ -69,7 +68,6 @@ namespace Contensive.Processor.Controllers {
                 //
                 // cp  creates and destroys cmc
                 //
-                //GC.Collect(); -- no more activeX, so let GC take care of itself
             }
         }
         //
@@ -107,7 +105,6 @@ namespace Contensive.Processor.Controllers {
                 if (processTimerInProcess) {
                     //
                     // -- trace log without core
-                    //LogController.logRaw("taskRunner.processTimerTick, skip -- processTimerInProcess true",BaseClasses.CPLogBaseClass.LogLevel.Trace);
                 } else {
                     processTimerInProcess = true;
                     //
@@ -247,7 +244,6 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- trace log without core
-                //LogController.logRaw("taskRunner.runTasks, exit (" + swProcess.ElapsedMilliseconds + "ms)", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             } catch (Exception ex) {
                 LogController.logError(serverCore, ex);
             }
@@ -302,12 +298,10 @@ namespace Contensive.Processor.Controllers {
                                                 download.save(cp);
                                             }
                                         }
-                                        //task.filename.content = result;
                                     }
                                 }
                             }
                             task.dateCompleted = DateTime.Now;
-                            //task.save(cp.core);
                             DbBaseModel.delete<TaskModel>(cp, task.id);
                             //
                             // -- info log the task running - so info state will log for memory leaks
@@ -319,7 +313,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                Console.WriteLine("Error: [" + ex.ToString() + "]");
+                Console.WriteLine("Error: [" + ex + "]");
             }
         }
         #region  IDisposable Support 

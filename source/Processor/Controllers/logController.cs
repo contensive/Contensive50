@@ -19,33 +19,6 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public static class LogController {
         //
-        //public enum LogLevel {
-        //    /// <summary>
-        //    /// Begin method X, end method X etc
-        //    /// </summary>
-        //    Trace = 0,
-        //    /// <summary>
-        //    /// Executed queries, user authenticated, session expired
-        //    /// </summary>
-        //    Debug = 1,
-        //    /// <summary>
-        //    /// Normal behavior like mail sent, user updated profile etc.
-        //    /// </summary>
-        //    Info = 2,
-        //    /// <summary>
-        //    /// Incorrect behavior but the application can continue
-        //    /// </summary>
-        //    Warn = 3,
-        //    /// <summary>
-        //    /// For example application crashes / exceptions.
-        //    /// </summary>
-        //    Error = 4,
-        //    /// <summary>
-        //    /// Highest level: important stuff down
-        //    /// </summary>
-        //    Fatal = 5
-        //}
-        //
         //=============================================================================
         /// <summary>
         /// configure target "aws" for AWS CloudWatch
@@ -215,37 +188,37 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public static void logError(CoreController core, Exception ex, string cause) {
-            log(core, cause + ", exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
+            log(core, cause + ", exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
         }
         //
         //====================================================================================================
         //
         public static void logError(CoreController core, Exception ex) {
-            log(core, "exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
+            log(core, "exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
         }
         //
         //====================================================================================================
         //
         public static void logWarn(CoreController core, Exception ex, string cause) {
-            log(core, cause + ", exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Warn);
+            log(core, cause + ", exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Warn);
         }
         //
         //====================================================================================================
         //
         public static void logWarn(CoreController core, Exception ex) {
-            log(core, "exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Warn);
+            log(core, "exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Warn);
         }
         //
         //====================================================================================================
         //
         public static void logFatal(CoreController core, Exception ex, string cause) {
-            log(core, cause + ", exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
+            log(core, cause + ", exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
         }
         //
         //====================================================================================================
         //
         public static void logFatal(CoreController core, Exception ex) {
-            log(core, "exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
+            log(core, "exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
         }
         //
         //=====================================================================================================
@@ -281,8 +254,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            throw (new Exception("Unexpected exception"));
         }
         //
         //=====================================================================================================

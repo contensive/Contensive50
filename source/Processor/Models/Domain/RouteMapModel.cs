@@ -97,21 +97,6 @@ namespace Contensive.Processor.Models.Domain {
                             }
                         }
                     }
-                    //foreach (var remoteMethod in AddonModel.createList_RemoteMethods(core, new List<string>())) {
-                    //    string route = GenericController.normalizeRoute(remoteMethod.name);
-                    //    if (!string.IsNullOrWhiteSpace(route)) {
-                    //        if (result.routeDictionary.ContainsKey(route)) {
-                    //            LogController.handleWarn( core,new GenericException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
-                    //        } else {
-                    //            result.routeDictionary.Add(route, new routeClass() {
-                    //                physicalRoute = physicalFile,
-                    //                virtualRoute = route,
-                    //                routeType = routeTypeEnum.remoteMethod,
-                    //                remoteMethodAddonId = remoteMethod.id
-                    //            });
-                    //        }
-                    //    }
-                    //}
                     //
                     // -- link forwards
                     foreach (var linkForward in DbBaseModel.createList<LinkForwardModel>(core.cpParent, "name Is Not null")) {

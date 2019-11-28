@@ -96,7 +96,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 if (!core.doc.userErrorList.Count.Equals(0)) { result += HtmlController.div(ErrorController.getUserError(core)); }
                 result = HtmlController.div(result, "p-2");
                 return HtmlController.section(result);
-                //return HtmlController.div(result, "ccAdminTitleBar");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 return "";
@@ -162,35 +161,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
             result = result.Replace("{rightSideMessage}", rightSideMessage);
             result = result.Replace("{rightSideNavHtml}", rightSideNavHtml);
             return result;
-            //string s = "";
-            //try {
-            //    if (string.IsNullOrEmpty(rightSideMessage)) {
-            //        rightSideMessage = core.doc.profileStartTime.ToString("G");
-            //    }
-            //    if (isInStr(1, leftSideMessage + rightSideMessage, Environment.NewLine)) {
-            //        s = ""
-            //            + "\r<td width=\"50%\" valign=Middle class=\"cchLeft\">"
-            //            + nop(leftSideMessage) + "\r</td>"
-            //            + "\r<td width=\"50%\" valign=Middle class=\"cchRight\">"
-            //            + nop(rightSideMessage) + "\r</td>";
-            //    } else {
-            //        s = ""
-            //            + "\r<td width=\"50%\" valign=Middle class=\"cchLeft\">" + leftSideMessage + "</td>"
-            //            + "\r<td width=\"50%\" valign=Middle class=\"cchRight\">" + rightSideMessage + "</td>";
-            //    }
-            //    s = ""
-            //        + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
-            //        + nop(s) + "\r</tr></table>"
-            //        + "";
-            //    s = ""
-            //        + "\r<div class=\"ccHeaderCon\">"
-            //        + nop(s) + "\r</div>"
-            //        + "";
-            //    //
-            //} catch (Exception ex) {
-            //    LogController.handleError(core, ex);
-            //}
-            //return s;
         }
         //
         //====================================================================================================
@@ -234,7 +204,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
             } else if (string.IsNullOrWhiteSpace(rightButtonHtml)) {
                 return HtmlController.section( HtmlController.div(leftButtonHtml, "border bg-white p-2"));
             } else {
-                //return "<div class=\"border bg-white p-2\">" + leftButtonHtml + "<div class=\"float-right\">" + rightButtonHtml + "</div></div>";
                 return HtmlController.section(HtmlController.div(leftButtonHtml + HtmlController.div(rightButtonHtml, "float-right"), "border bg-white p-2"));
             }
         }
@@ -282,7 +251,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
             }
             result = getSectionButtonBar(core, LeftButtons, RightButtons);
             return result;
-            //return adminUIController.getForm_index_pageNavigation(core, LeftButtons, RightButtons, pageNumber, recordsPerPage, PageCount, recordCnt, contentName);
         }
         //
         //====================================================================================================
@@ -357,7 +325,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 if (!string.IsNullOrEmpty(ButtonCommaListRight.Trim(' '))) {
                     RightHtmlButtonList = getButtonHtmlFromCommaList(core, ButtonCommaListRight, AllowDelete, AllowAdd, "Button");
                 }
-                //string ButtonBar = getButtonBar(core, LeftHtmlButtonList, RightHtmlButtonList);
                 if (!string.IsNullOrEmpty(ContentSummary)) {
                     CellContentSummary = ""
                         + "\r<div class=\"ccPanelBackground\" style=\"padding:10px;\">"
@@ -373,7 +340,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 // -- assemble form
                 body = getToolForm(core, body, ButtonCommaListLeft, ButtonCommaListRight);
                 return body;
-                //return HtmlController.formMultipart(core, body, core.doc.refreshQueryString, "", "ccForm");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 return toolExceptionMessage;
@@ -1000,7 +966,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                         } else {
                             result += getDefaultEditor_text(core, fieldName + "-readonly-fpo", csData.getText("Name"), readOnly, htmlId);
                         }
-                        result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentId + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">View details in new window</a>]");
+                        result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentId + "&id=" + fieldValue + "\" target=\"_blank\">View details in new window</a>]");
                     } else {
                         result += ("None");
                     }
@@ -1015,7 +981,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 if (fieldValue != 0) {
                     using (var csData = new CsModel(core)) {
                         if (csData.openRecord(lookupContentMetacontent.name, fieldValue, "ID")) {
-                            result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentId + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">Details</a>]");
+                            result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentId + "&id=" + fieldValue + "\" target=\"_blank\">Details</a>]");
                         }
                         csData.close();
                     }
@@ -1125,7 +1091,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                         EditorString += getDefaultEditor_text(core, htmlName + "-readonly-fpo", "(deleted)", readOnly, htmlId);
                     } else {
                         EditorString += getDefaultEditor_text(core, htmlName + "-readonly-fpo", (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : HtmlController.encodeHtml(selectedUser.name), readOnly, htmlId);
-                        EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlId.ToString() + "&id=" + selectedRecordId.ToString() + "\" target=\"_blank\">View details in new window</a>]");
+                        EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlId + "&id=" + selectedRecordId + "\" target=\"_blank\">View details in new window</a>]");
                     }
                 }
                 EditorString += WhyReadOnlyMsg;
@@ -1139,7 +1105,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                         EditorString += "Deleted";
                     } else {
                         string recordName = (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : HtmlController.encodeHtml(selectedUser.name);
-                        EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlId.ToString() + "&id=" + selectedRecordId.ToString() + "\">" + HtmlController.encodeHtml(recordName) + "</a>]";
+                        EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlId + "&id=" + selectedRecordId + "\">" + HtmlController.encodeHtml(recordName) + "</a>]";
                     }
                 }
                 EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + ContentMetadataModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
@@ -1158,7 +1124,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
             string MTMRuleField0 = field.manyToManyRulePrimaryField;
             string MTMRuleField1 = field.manyToManyRuleSecondaryField;
             result += core.html.getCheckList(htmlName, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", readOnly, false, currentValueCommaList);
-            //result += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1);
             result += WhyReadOnlyMsg;
             return result;
         }
@@ -1174,7 +1139,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 string ExpandedSelector = "";
                 Dictionary<string, string> addonInstanceProperties = new Dictionary<string, string>();
                 core.addon.buildAddonOptionLists(ref addonInstanceProperties, ref ExpandedSelector, SitePropertyName + "=" + selector, instanceOptions, "0", true);
-                //buildAddonOptionLists(ref addonInstanceProperties, ref ExpandedSelector, SitePropertyName + "=" + selector, instanceOptions, "0", true);
                 int Pos = GenericController.vbInstr(1, ExpandedSelector, "[");
                 if (Pos != 0) {
                     //
@@ -1245,7 +1209,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                             }
                         }
                     }
-                    //stringBuilderLegacyController FastString = null;
                     string Copy = "";
                     switch (OptionSuffix) {
                         case "checkbox":
@@ -1257,7 +1220,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                             //
                             // Create Radio addon_execute_result
                             //
-                            //addon_execute_result = "<div>" & genericController.vbReplace(addon_execute_result, "><", "></div><div><") & "</div>"
                             break;
                         default:
                             //
@@ -1270,12 +1232,9 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                     //
                     // Create Text addon_execute_result
                     //
-
                     selector = GenericController.decodeNvaArgument(selector);
                     result = getDefaultEditor_text(core, SitePropertyName, selector);
                 }
-
-                //FastString = null;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
@@ -1610,7 +1569,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                         PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentId, content.id.ToString(), true);
                         PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordId, ParentId.ToString(), true);
                         PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteFieldList, presetNameValueList, true);
-                        //result.Add(HtmlController.div(HtmlController.a(iconContentPaste_Green, PasteLink, "ccRecordPasteLink", "", "-1"), "ccRecordLinkCon"));
                         string pasteLinkAnchor = HtmlController.a(iconContentPaste_Green + "&nbsp;Paste Record", PasteLink, "ccRecordPasteLink", "", "-1");
                         result.Add(HtmlController.div(pasteLinkAnchor + HtmlController.div("&nbsp;", "ccEditLinkEndCap"), "ccRecordLinkCon"));
                     }
@@ -1711,8 +1669,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                         // Add the Menu Entry* to the current menu (MenuName)
                         //
                         Link = "";
-                        //string ButtonCaption = content.name;
-                        //result = MenuName;
                         if (contentAllowAdd && groupRulesAllowAdd && memberRulesAllow) {
                             Link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=4&aa=2&ad=1";
                             if (!string.IsNullOrEmpty(PresetNameValueList)) {
@@ -1721,18 +1677,12 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                             }
                         }
                         result.Add(HtmlController.div(HtmlController.a(iconAdd_Green + "&nbsp;Add " + content.name + " Record", Link, "ccRecordAddLink", "", "-1") + HtmlController.div("&nbsp;", "ccEditLinkEndCap"), "ccRecordLinkCon"));
-                        //core.menuFlyout.menu_AddEntry(MenuName + ":" + content.name, ParentMenuName, "", "", Link, ButtonCaption, "", "", true);
                         //
                         // Create child submenu if Child Entries found
                         var childList = DbBaseModel.createList<ContentModel>(core.cpParent, "ParentID=" + content.id);
                         if (childList.Count > 0) {
                             //
-                            // Add the child menu
-                            //string ChildMenuName = MenuName + ":" + content.name;
-                            //int ChildMenuButtonCount = 0;
-                            //
                             // ----- Create the ChildPanel with all Children found
-                            //
                             foreach (var child in childList) {
                                 result.AddRange(getRecordAddLink_GetChildContentLinks(core, child, PresetNameValueList, usedContentIdList));
                             }

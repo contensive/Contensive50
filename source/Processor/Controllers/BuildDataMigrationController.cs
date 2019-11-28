@@ -154,8 +154,6 @@ namespace Contensive.Processor.Controllers {
                                             menu.classTopAnchor = cs.getText("classTopItem");
                                             menu.classTopItem = cs.getText("classTopItem");
                                             menu.classTopList = cs.getText("classTopList");
-                                            //menu.classTopParentAnchor = cs.getText("classTopParentAnchor");
-                                            //menu.classTopParentItem = cs.getText("classTopParentItem");
                                             menu.classTopWrapper = cs.getText("classTopWrapper");
                                         } catch (Exception ex) {
                                             LogController.logError(core, ex, "migrateData error populating menu from dynamic menu.");

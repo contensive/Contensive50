@@ -114,7 +114,6 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 cp.core.mockEmail = true;
                 // arrange
                 string htmlBody = "a<b>1</b><br>2<p>3</p><div>4</div>";
-                //string textBody = "a1\n2\n3\n4";
                 //
                 var confirmPerson = DbBaseModel.addDefault<PersonModel>(cp);
                 Assert.IsNotNull(confirmPerson);

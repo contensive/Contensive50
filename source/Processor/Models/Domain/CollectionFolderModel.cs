@@ -19,8 +19,6 @@ namespace Contensive.Processor.Models.Domain {
         public string guid { get; set; }
         public string path { get; set; }
         public DateTime lastChangeDate { get; set; }
-        //public DateTime installedDate { get; set; }
-
         //
         //====================================================================================================
         /// <summary>

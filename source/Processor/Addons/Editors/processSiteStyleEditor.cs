@@ -45,11 +45,6 @@ namespace Contensive.Processor.Addons.Primitives {
                         int StyleSN = core.siteProperties.getInteger("StylesheetSerialNumber", 0);
                         StyleSN = StyleSN + 1;
                         core.siteProperties.setProperty("StylesheetSerialNumber", GenericController.encodeText(StyleSN));
-                        //
-                        // Save new public stylesheet
-                        //
-                        //Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", html.html_getStyleSheet2(0, 0))
-                        //Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", html.getStyleSheetDefault())
                     }
                 }
             } catch (Exception ex) {

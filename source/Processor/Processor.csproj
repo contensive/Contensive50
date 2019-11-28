@@ -64,12 +64,12 @@
     <Reference Include="ClearScript, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ClearScript.5.6.0\lib\net45\ClearScript.dll</HintPath>
     </Reference>
-    <Reference Include="ContensiveDbModels, Version=5.19.1127.1, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.5.19.1127.1\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.19.1128.2, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.5.19.1128.2\lib\net461\ContensiveDbModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1127.1\lib\net472\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1128.2\lib\net472\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -123,9 +123,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Addons\AdminNavigator\common.cs" />
-    <Compile Include="Addons\AdminNavigator\Views\getFullClass.cs" />
-    <Compile Include="Addons\AdminNavigator\Views\getNodeClass.cs" />
     <Compile Include="Addons\AdminSite\Constants.cs" />
     <Compile Include="Addons\AdminSite\Models\EditRecordFieldModel.cs" />
     <Compile Include="Addons\AdminSite\Models\EditRecordModel.cs" />
@@ -226,7 +223,6 @@
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\GetAjaxVisitProperty.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\GetFieldEditorPreference.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\GetOkClass.cs" />
-    <Compile Include="Addons\AdminSite\Views\RemoteMethods\OpenAjaxAdminNav.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\OpenAjaxIndexFilter.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\OpenAjaxIndexFilterGetContent.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\ProcessAjaxDataClass.cs" />
@@ -249,7 +245,6 @@
     <Compile Include="Addons\Authentication\processLoginMethod.cs" />
     <Compile Include="Addons\Authentication\processLogoutLoginMethod.cs" />
     <Compile Include="Addons\Authentication\processLogoutMethod.cs" />
-    <Compile Include="Addons\PayPal\processPayPalConformMethod.cs" />
     <Compile Include="Addons\Redirect\processRedirectMethod.cs" />
     <Compile Include="Addons\ResourceLibrary\processResourceLibraryMethod.cs" />
     <Compile Include="Addons\Authentication\processSendPasswordForm.cs" />
@@ -271,7 +266,6 @@
     <Compile Include="Addons\AdminSite\Controllers\AdminUIController.cs" />
     <Compile Include="Controllers\BuildController.cs" />
     <Compile Include="Controllers\CacheController.cs" />
-    <Compile Include="Controllers\KeyPtrIndexController.cs" />
     <Compile Include="Controllers\ContentCmdController.cs" />
     <Compile Include="Models\Domain\CsModel.cs" />
     <Compile Include="Controllers\DbController.cs" />
@@ -392,7 +386,6 @@
     <Content Include="Resources\sqlTriggerManyManyRule.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Addons\AdminNavigator\Controllers\" />
     <Folder Include="Models\Db\" />
     <Folder Include="Models\View\" />
   </ItemGroup>

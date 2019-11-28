@@ -188,7 +188,6 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- and go
                                 string link = GenericController.getCdnFileLink(core, file.filename);
-                                //string link = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, file.Filename);
                                 return core.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record.");
                             }
                         }
@@ -327,7 +326,6 @@ namespace Contensive.Processor.Controllers {
                                     string LinkQueryString = rnPageId + "=" + linkAlias.pageId + "&" + linkAlias.queryStringSuffix;
                                     core.docProperties.setProperty(rnPageId, linkAlias.pageId.ToString(), DocPropertyController.DocPropertyTypesEnum.userDefined);
                                     string[] nameValuePairs = linkAlias.queryStringSuffix.Split('&');
-                                    //Dim nameValuePairs As String() = Split(core.cache_linkAlias(linkAliasCache_queryStringSuffix, Ptr), "&")
                                     foreach (string nameValuePair in nameValuePairs) {
                                         string[] nameValueThing = nameValuePair.Split('=');
                                         if (nameValueThing.GetUpperBound(0) == 0) {
@@ -405,7 +403,6 @@ namespace Contensive.Processor.Controllers {
                         core.doc.redirectReason = "Redirecting because neither the page or the template requires a secure link.";
                         core.doc.redirectBecausePageNotFound = false;
                         return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
-                        //return "";
                     } else if ((!SecureLink_CurrentURL) && SecureLink_Required) {
                         //
                         // -- redirect to secure
@@ -417,7 +414,6 @@ namespace Contensive.Processor.Controllers {
                         }
                         core.doc.redirectBecausePageNotFound = false;
                         return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
-                        //return "";
                     }
                     //
                     // -- check that this template exists on this domain
@@ -445,7 +441,6 @@ namespace Contensive.Processor.Controllers {
                             core.doc.redirectReason = "Redirecting because this domain has template requiements set, and this template is not configured [" + core.doc.pageController.template.name + "].";
                             core.doc.redirectBecausePageNotFound = false;
                             return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
-                            //return "";
                         }
                     }
                     result += htmlDocBody;
@@ -458,9 +453,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.addSiteWarning(core, "Page Not Found", "Page Not Found", "", 0, "Page Not Found from [" + core.webServer.requestUrlSource + "]", "Page Not Found", "Page Not Found");
                     core.webServer.setResponseStatus(WebServerController.httpResponseStatus404_NotFound);
                     core.docProperties.setProperty(rnPageId, getPageNotFoundPageId(core));
-                    //Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
                     if (core.session.isAuthenticatedAdmin()) {
-                        //string RedirectLink = "";
                         string PageNotFoundReason = "";
                         core.doc.adminWarning = PageNotFoundReason;
                         core.doc.adminWarningPageID = 0;
@@ -1919,7 +1912,6 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // read in and compose the repeat lines
                                         //
-                                        //Array.Resize(ref result.IDontKnowWhatList, i.GetUpperBound(0));
                                         int IPtr = 0;
                                         for (IPtr = 0; IPtr <= i.GetUpperBound(0) - IStart; IPtr++) {
                                             var tempVar = result.formFieldList[IPtr];
@@ -2198,14 +2190,12 @@ namespace Contensive.Processor.Controllers {
                         Copy = "";
                         Panel = Panel + "<td align=\"right\" width=\"100\" valign=\"top\"><p>Feedback</p></td>";
                         Panel = Panel + "<td>" + HtmlController.inputText_Legacy(core, "NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
-                        //Panel = Panel & "<td><textarea ID=""TextArea"" rows=""4"" cols=""40"" name=""NoteCopy"">" & Copy & "</textarea></td>"
                         Panel = Panel + "</tr><tr>";
                         //
                         // ----- submit button
                         //
                         Panel = Panel + "<td>&nbsp;</td>";
                         Panel = Panel + "<td>" + HtmlController.inputSubmit(FeedbackButtonSubmit, "fbb") + "</td>";
-                        //Panel = Panel + "<td><input type=\"submit\" name=\"fbb\" value=\"" + FeedbackButtonSubmit + "\"></td>";
                         Panel = Panel + "</tr></table>";
                         Panel = Panel + "</form>";
                         //
@@ -2253,9 +2243,6 @@ namespace Contensive.Processor.Controllers {
                 archiveLink = GenericController.ConvertLinkToShortLink(archiveLink, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
                 archiveLink = GenericController.encodeVirtualPath(archiveLink, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 //
-                //string sqlCriteria = "(parentId=" + parentPageID + ")";
-                //string sqlCriteria = "(parentId=" + core.doc.pageController.page.id + ")";
-                //string sqlOrderBy = "sortOrder";
                 List<PageContentModel> childPageList = DbBaseModel.createList<PageContentModel>(core.cpParent, "(parentId=" + parentPageID + ")", "sortOrder");
                 string inactiveList = "";
                 string activeList = "";
@@ -2377,12 +2364,10 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         activeList += "</li>";
-                        //activeList +=  "<i class=\"fas fa-grip - horizontal\" style=\"color:#222;\"></i></li>";
                         //
                         // -- add child page to childPagesListed list
                         if (!core.doc.pageController.childPageIdsListed.Contains(childPage.id)) { core.doc.pageController.childPageIdsListed.Add(childPage.id); }
                         ChildListCount = ChildListCount + 1;
-                        //.IsDisplayed = True
                     }
                 }
                 //
@@ -2399,7 +2384,6 @@ namespace Contensive.Processor.Controllers {
                 result = "";
                 if (!string.IsNullOrEmpty(activeList + inactiveList)) {
                     result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + activeList + inactiveList + "\r</ul>";
-                    //result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + GenericController.nop(activeList) + "\r</ul>";
                 }
                 if ((!string.IsNullOrEmpty(UcaseRequestedListName)) && (ChildListCount == 0) & isAuthoring) {
                     result = "[Child Page List with no pages]</p><p>" + result;

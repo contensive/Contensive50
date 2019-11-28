@@ -129,7 +129,7 @@ namespace Contensive.Processor.Controllers {
                 if (dateCompare >= 0) {
                     //
                     // -- global invalidation
-                    LogController.logTrace(core, "key [" + key + "], invalidated because cacheObject saveDate [" + cacheDocument.saveDate.ToString() + "] is before the globalInvalidationDate [" + globalInvalidationDate + "]");
+                    LogController.logTrace(core, "key [" + key + "], invalidated because cacheObject saveDate [" + cacheDocument.saveDate + "] is before the globalInvalidationDate [" + globalInvalidationDate + "]");
                     return default(TData);
                 }
                 //
@@ -150,7 +150,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- invalidate because a dependent document was changed after the cacheDocument was saved
                             cacheMiss = true;
-                            LogController.logTrace(core, "[" + key + "], invalidated because the dependantKey [" + dependentKey + "] was modified [" + dependantCacheDocument.saveDate.ToString() + "] after the cacheDocument's saveDate [" + cacheDocument.saveDate.ToString() + "]");
+                            LogController.logTrace(core, "[" + key + "], invalidated because the dependantKey [" + dependentKey + "] was modified [" + dependantCacheDocument.saveDate + "] after the cacheDocument's saveDate [" + cacheDocument.saveDate + "]");
                             break;
                         }
                     }
@@ -181,7 +181,7 @@ namespace Contensive.Processor.Controllers {
                         } catch (Exception ex) {
                             //
                             // -- object value did not match. return as miss
-                            LogController.logWarn(core, "cache getObject failed to cast value as type, key [" + key + "], type requested [" +  typeof(TData).FullName + "], ex [" + ex.ToString() + "]");
+                            LogController.logWarn(core, "cache getObject failed to cast value as type, key [" + key + "], type requested [" +  typeof(TData).FullName + "], ex [" + ex + "]");
                             result = default(TData);
                         }
                     }
@@ -301,11 +301,11 @@ namespace Contensive.Processor.Controllers {
                     LogController.logTrace(core, "miss, cacheType [" + typeMessage + "], key [" + key + "]");
                 } else {
                     if (result.content == null) {
-                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], saveDate [" + result.saveDate.ToString() + "], content [null]");
+                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], saveDate [" + result.saveDate + "], content [null]");
                     } else {
                         string content = result.content.ToString();
                         content = (content.Length > 50) ? (content.Left(50) + "...") : content;
-                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], saveDate [" + result.saveDate.ToString() + "], content [" + content + "]");
+                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], saveDate [" + result.saveDate + "], content [" + content + "]");
                     }
                 }
                 //
@@ -567,7 +567,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string createCacheKey_forDbRecord(int recordId, string tableName, string dataSourceName) {
             string key = (String.IsNullOrWhiteSpace(dataSourceName)) ? "dbtable/default/" : "dbtable/" + dataSourceName.Trim() + "/";
-            key += tableName.Trim() + "/id/" + recordId.ToString() + "/";
+            key += tableName.Trim() + "/id/" + recordId + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
@@ -740,7 +740,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 //
-                LogController.logTrace(core, "cacheType [" + typeMessage + "], key [" + key + "], expires [" + cacheDocument.invalidationDate.ToString() + "], depends on [" + string.Join(",", cacheDocument.dependentKeyList) + "], points to [" + string.Join(",", cacheDocument.keyPtr) + "]");
+                LogController.logTrace(core, "cacheType [" + typeMessage + "], key [" + key + "], expires [" + cacheDocument.invalidationDate + "], depends on [" + string.Join(",", cacheDocument.dependentKeyList) + "], points to [" + string.Join(",", cacheDocument.keyPtr) + "]");
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -780,7 +780,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dbTableName"></param>
         public void invalidateTableObjects(string dbTableName) {
             storeObject(createCacheKey_TableObjectsInvalidationDate(dbTableName), DateTime.Now);
-            //invalidate(createCacheKey_TableObjectsInvalidationDate(dbTableName));
         }
         //
         //====================================================================================================

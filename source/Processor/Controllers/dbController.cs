@@ -550,9 +550,7 @@ namespace Contensive.Processor.Controllers {
                     createSQLTableField(tableName, "sortOrder", CPContentBaseClass.FieldTypeIdEnum.Text);
                     createSQLTableField(tableName, "contentControlId", CPContentBaseClass.FieldTypeIdEnum.Integer);
                     createSQLTableField(tableName, "ccGuid", CPContentBaseClass.FieldTypeIdEnum.Text);
-                    // -- 20171029 - deprecating fields makes migration difficult. add back and figure out future path
                     createSQLTableField(tableName, "createKey", CPContentBaseClass.FieldTypeIdEnum.Integer);
-                    //createSQLTableField(tableName, "contentCategoryId", CPContentBaseClass.FieldTypeIdEnum.Integer);
                     //
                     // ----- setup core indexes
                     //
@@ -564,7 +562,6 @@ namespace Contensive.Processor.Controllers {
                     createSQLIndex(tableName, tableName + "ContentControlId", "contentControlId");
                     createSQLIndex(tableName, tableName + "ModifiedDate", "modifiedDate");
                     createSQLIndex(tableName, tableName + "CcGuid", "ccGuid");
-                    //createSQLIndex(TableName, TableName + "CreateKey", "createKey");
                 }
                 Models.Domain.TableSchemaModel.tableSchemaListClear(core);
             } catch (Exception ex) {
@@ -659,7 +656,7 @@ namespace Contensive.Processor.Controllers {
                                             try {
                                                 core.db.deleteIndex(tableName, index.index_name);
                                             } catch (Exception ex) {
-                                                LogController.logWarn(core, "dropWorkflowField, error dropping index, [" + ex.ToString() + "]");
+                                                LogController.logWarn(core, "dropWorkflowField, error dropping index, [" + ex + "]");
                                             }
                                         }
                                     }
@@ -780,33 +777,12 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- Longtext, depends on datasource
                     returnType = "varchar(max) Null";
-                    //returnType = "Text Null";
-                    //Select Case DataSourceConnectionObjs(Pointer).Type
-                    //    Case DataSourceTypeODBCSQLServer
-                    //        csv_returnType = "Text Null"
-                    //    Case DataSourceTypeODBCAccess
-                    //        csv_returnType = "Memo Null"
-                    //    Case DataSourceTypeODBCMySQL
-                    //        csv_returnType = "Text Null"
-                    //    Case Else
-                    //        csv_returnType = "VarChar(65535)"
-                    //End Select
                     break;
                     case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
                     //
                     // ----- autoincrement type, depends on datasource
                     //
                     returnType = "INT IDENTITY PRIMARY KEY";
-                    //Select Case DataSourceConnectionObjs(Pointer).Type
-                    //    Case DataSourceTypeODBCSQLServer
-                    //        csv_returnType = "INT IDENTITY PRIMARY KEY"
-                    //    Case DataSourceTypeODBCAccess
-                    //        csv_returnType = "COUNTER CONSTRAINT PrimaryKey PRIMARY KEY"
-                    //    Case DataSourceTypeODBCMySQL
-                    //        csv_returnType = "INT AUTO_INCREMENT PRIMARY KEY"
-                    //    Case Else
-                    //        csv_returnType = "INT AUTO_INCREMENT PRIMARY KEY"
-                    //End Select
                     break;
                     default:
                     //
@@ -1397,14 +1373,12 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ChunkSize"></param>
         /// <param name="MaxChunkCount"></param>
         public void deleteTableRecordChunks(string TableName, string Criteria, int ChunkSize = 1000, int MaxChunkCount = 1000) {
-            //
             int PreviousCount = 0;
             int CurrentCount = 0;
             int LoopCount = 0;
             string SQL = null;
             int iChunkSize = 0;
             int iChunkCount = 0;
-            //dim dt as datatable
             int DataSourceType;
             //
             DataSourceType = getDataSourceType();
@@ -1638,78 +1612,4 @@ namespace Contensive.Processor.Controllers {
         }
         #endregion
     }
-    //
-    // moved to Contensive.Models in .CPBase
-    //
-
-    ////
-    //// ====================================================================================================
-    ///// <summary>
-    ///// Model to create name=value lists
-    ///// </summary>
-    //public class NameValueCollection {
-    //    /// <summary>
-    //    /// store
-    //    /// </summary>
-    //    private List<NameValueModel> _sqlList = new List<NameValueModel>();
-    //    /// <summary>
-    //    /// add a name=value pair to the list. values MUST be punctuated correctly for their type in sql (quoted text, etc)
-    //    /// </summary>
-    //    /// <param name="name"></param>
-    //    /// <param name="value"></param>
-    //    public void add(string name, string value) {
-    //        _sqlList.Add(new NameValueModel() {
-    //            name = name,
-    //            value = value
-    //        });
-    //    }
-    //    /// <summary>
-    //    /// get name=value list
-    //    /// </summary>
-    //    /// <returns></returns>
-    //    public string getNameValueList() {
-    //        string returnPairs = "";
-    //        string delim = "";
-    //        foreach (var nameValue in _sqlList) {
-    //            returnPairs += delim + nameValue.name + "=" + nameValue.value;
-    //            delim = ",";
-    //        }
-    //        return returnPairs;
-    //    }
-    //    /// <summary>
-    //    /// get list of names
-    //    /// </summary>
-    //    /// <returns></returns>
-    //    public string getNameList() {
-    //        string returnPairs = "";
-    //        string delim = "";
-    //        foreach (var nameValue in _sqlList) {
-    //            returnPairs += delim + nameValue.name;
-    //            delim = ",";
-    //        }
-    //        return returnPairs;
-    //    }
-    //    /// <summary>
-    //    /// get list of values
-    //    /// </summary>
-    //    /// <returns></returns>
-    //    public string getValueList() {
-    //        string returnPairs = "";
-    //        string delim = "";
-    //        foreach (var nameValue in _sqlList) {
-    //            returnPairs += delim + nameValue.value;
-    //            delim = ",";
-    //        }
-    //        return returnPairs;
-    //    }
-    //    /// <summary>
-    //    /// get count of name=value pairs
-    //    /// </summary>
-    //    public int count {
-    //        get {
-    //            return _sqlList.Count;
-    //        }
-    //    }
-
-    //}
 }

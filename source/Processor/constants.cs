@@ -352,13 +352,6 @@ namespace Contensive.Processor {
         internal const string RequestNameAjaxFunction = "ajaxfn";
         internal const string RequestNameAjaxFastFunction = "ajaxfastfn";
         //
-        //internal const string AjaxOpenAdminNav = "aps89102kd";
-        //internal const string AjaxOpenAdminNavGetContent = "d8475jkdmfj2";
-        //internal const string AjaxCloseAdminNav = "3857fdjdskf91";
-        //internal const string AjaxAdminNavOpenNode = "8395j2hf6jdjf";
-        //internal const string AjaxAdminNavOpenNodeGetContent = "eieofdwl34efvclaeoi234598";
-        //internal const string AjaxAdminNavCloseNode = "w325gfd73fhdf4rgcvjk2";
-        //
         internal const string AjaxCloseIndexFilter = "k48smckdhorle0";
         internal const string AjaxOpenIndexFilter = "Ls8jCDt87kpU45YH";
         internal const string AjaxOpenIndexFilterGetContent = "llL98bbJQ38JC0KJm";
@@ -1051,12 +1044,7 @@ namespace Contensive.Processor {
         internal const bool ALLOWLEGACYAPI = false;
         internal const bool ALLOWPROFILING = false;
         //
-        //internal const string cacheName_AssemblyList_NonAddonsFound = "assembly-skip-list";
         internal const string cacheNameGlobalInvalidationDate = "global-invalidation-date";
-        //
-        // put content definitions here
-        //
-        //
         //
         //========================================================================
         //   defined errors (event log eventId)
@@ -1221,8 +1209,6 @@ namespace Contensive.Processor {
         public int FileSize;
         public string fileType;
         public DocPropertyController.DocPropertyTypesEnum propertyType;
-        //public bool IsForm;
-        //public bool IsFile;
     }
     //
     // SF Resize Algorithms

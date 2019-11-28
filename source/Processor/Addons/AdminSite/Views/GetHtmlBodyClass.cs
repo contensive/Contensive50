@@ -18,10 +18,6 @@ using Contensive.Processor.Addons.AdminSite.Models;
 
 namespace Contensive.Processor.Addons.AdminSite {
     public class GetHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
-        ////
-        //private CPClass cp;
-        ////
-        //private CoreController core;
         //
         //====================================================================================================
         /// <summary>
@@ -100,9 +96,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (string.Compare(cp.core.siteProperties.dataBuildVersion, cp.Version) < 0) {
                         LogController.logWarn(cp.core, new GenericException("Application code (v" + cp.Version + ") is newer than database (v" + cp.core.siteProperties.dataBuildVersion + "). Upgrade the database with the command line 'cc.exe -a " + cp.core.appConfig.name + " -u'."));
                     }
-                    //
-                    //// Get Requests, initialize adminContext.content and editRecord objects 
-                    //contextConstructor(ref adminContext, ref adminContext.content, ref editRecord);
                     //
                     // Process SourceForm/Button into Action/Form, and process
                     if (adminData.requestButton == ButtonCancelAll) {
@@ -419,7 +412,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 string helpLink = "";
                 bool FoundAddon = false;
                 //
-                if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpAddonID.ToString() + ",") == 0) {
+                if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpAddonID + ",") == 0) {
                     using (var csData = new CsModel(cp.core)) {
                         csData.openRecord(AddonModel.tableMetadata.contentName, HelpAddonID);
                         if (csData.ok()) {
@@ -489,7 +482,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 DateTime CollectionLastUpdated = default(DateTime);
                 string IncludeHelp = "";
                 //
-                if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpCollectionID.ToString() + ",") == 0) {
+                if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpCollectionID + ",") == 0) {
                     using (var csData = new CsModel(cp.core)) {
                         csData.openRecord("Add-on Collections", HelpCollectionID);
                         if (csData.ok()) {
@@ -704,7 +697,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             using (var csData = new CsModel(cp.core)) {
                                                 csData.openRecord("Group Email", adminData.editRecord.id);
                                                 if (!csData.ok()) {
-                                                    //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" &  adminContext.editRecord.id & "] could not be found in Group Email.")
                                                 } else if (csData.getText("FromAddress") == "") {
                                                     Processor.Controllers.ErrorController.addUserError(cp.core, "A 'From Address' is required before sending an email.");
                                                 } else if (csData.getText("Subject") == "") {
@@ -757,7 +749,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             using (var csData = new CsModel(cp.core)) {
                                                 csData.openRecord("Conditional Email", adminData.editRecord.id);
                                                 if (!csData.ok()) {
-                                                    //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
                                                 } else if (csData.getInteger("ConditionID") == 0) {
                                                     Processor.Controllers.ErrorController.addUserError(cp.core, "A condition must be set.");
                                                 } else {
@@ -825,7 +816,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                         // Page Content special cases
                                                         //
                                                         if (GenericController.vbLCase(adminData.adminContent.tableName) == "ccpagecontent") {
-                                                            //Call cp.core.pages.cache_pageContent_removeRow(RecordID, False, False)
                                                             if (RecordId == (cp.core.siteProperties.getInteger("PageNotFoundPageID", 0))) {
                                                                 cp.core.siteProperties.getText("PageNotFoundPageID", "0");
                                                             }
@@ -942,7 +932,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 RecordChanged = true;
                             } else if (RuleFound && !RuleNeeded) {
                                 DeleteIdList += ", " + RuleId;
-                                //Call cp.core.main_DeleteCSRecord(CSPointer)
                                 RecordChanged = true;
                             } else if (RuleFound && RuleNeeded) {
                                 if (AllowAdd != csData.getBoolean("AllowAdd")) {
@@ -1634,76 +1623,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             }
             return result;
         }
-        ////
-        ////========================================================================
-        //// Get sql for menu
-        ////   if MenuContentName is blank, it will select values from either cdef
-        ////========================================================================
-        ////
-        //private string GetMenuSQL(CPClass cp, string ParentCriteria, string MenuContentName) {
-        //    string result = "";
-        //    try {
-        //        string iParentCriteria = null;
-        //        string Criteria = null;
-        //        string SelectList = null;
-        //        List<int> editableCdefIdList = null;
-        //        //
-        //        Criteria = "(Active<>0)";
-        //        if (!string.IsNullOrEmpty(MenuContentName)) {
-        //            //ContentControlCriteria = cp.core.csv_GetContentControlCriteria(MenuContentName)
-        //            Criteria = Criteria + "AND" + MetadataController.getContentControlCriteria(cp.core, MenuContentName);
-        //        }
-        //        iParentCriteria = GenericController.encodeEmpty(ParentCriteria, "");
-        //        if (cp.core.session.isAuthenticatedDeveloper(cp.core)) {
-        //            //
-        //            // ----- Developer
-        //            //
-        //        } else if (cp.core.session.isAuthenticatedAdmin(cp.core)) {
-        //            //
-        //            // ----- Administrator
-        //            //
-        //            Criteria = Criteria + "AND((DeveloperOnly is null)or(DeveloperOnly=0))"
-        //                + "AND(ID in ("
-        //                + " SELECT AllowedEntries.ID"
-        //                + " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentId = ccContent.ID"
-        //                + " Where ((ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0)))"
-        //                    + "OR(ccContent.ID Is Null)"
-        //                + "))";
-        //        } else {
-        //            //
-        //            // ----- Content Manager
-        //            //
-        //            string CMCriteria = null;
-
-        //            editableCdefIdList = MetadataController.getEditableMetaDataIdList(cp.core);
-        //            if (editableCdefIdList.Count == 0) {
-        //                CMCriteria = "(1=0)";
-        //            } else if (editableCdefIdList.Count == 1) {
-        //                CMCriteria = "(ccContent.ID=" + editableCdefIdList[0] + ")";
-        //            } else {
-        //                CMCriteria = "(ccContent.ID in (" + string.Join(",", editableCdefIdList) + "))";
-        //            }
-
-        //            Criteria = Criteria + "AND((DeveloperOnly is null)or(DeveloperOnly=0))"
-        //                + "AND((AdminOnly is null)or(AdminOnly=0))"
-        //                + "AND(ID in ("
-        //                + " SELECT AllowedEntries.ID"
-        //                + " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentId = ccContent.ID"
-        //                + " Where (" + CMCriteria + "and(ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0))And((ccContent.AdminOnly is null)or(ccContent.AdminOnly=0)))"
-        //                    + "OR(ccContent.ID Is Null)"
-        //                + "))";
-        //        }
-        //        if (!string.IsNullOrEmpty(iParentCriteria)) {
-        //            Criteria = "(" + iParentCriteria + ")AND" + Criteria;
-        //        }
-        //        SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle, HelpAddonID,HelpCollectionID,0 as collectionid";
-        //        result = "select " + SelectList + " from ccMenuEntries where " + Criteria + " order by ccMenuEntries.Name";
-        //    } catch (Exception ex) {
-        //        LogController.handleError(cp.core, ex);
-        //    }
-        //    return result;
-        //}
-        ////
+        //
         //========================================================================
         // Get Menu Link
         //========================================================================
@@ -1926,20 +1846,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     } else {
                                         // mark to rebuild next fetch
                                         cp.core.siteProperties.setProperty("StylesheetSerialNumber", "-1");
-                                        //
-                                        // Linked Styles
-                                        // Bump the Style Serial Number so next fetch is not cached
-                                        //
-                                        //StyleSN = genericController.EncodeInteger(cp.core.main_GetSiteProperty2("StylesheetSerialNumber", "0"))
-                                        //StyleSN = StyleSN + 1
-                                        //Call cp.core.app.setSiteProperty("StylesheetSerialNumber", genericController.encodeText(StyleSN))
-                                        //
-                                        // Save new public stylesheet
-                                        //
-                                        // 11/24/3009 - style sheet processing deprecated
-                                        //Call cp.core.app.virtualFiles.SaveFile("templates\Public" & StyleSN & ".css", cp.core.main_GetStyleSheet)
-                                        //Call cp.core.app.virtualFiles.SaveFile("templates\Public" & StyleSN & ".css", cp.core.main_GetStyleSheetProcessed)
-                                        //Call cp.core.app.virtualFiles.SaveFile("templates\Admin" & StyleSN & ".css", cp.core.main_GetStyleSheetDefault)
                                     }
                                     //
                                     // delete all templateid based editorstylerule files, build on-demand
@@ -2273,7 +2179,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 bool IsEmptyList = false;
                 int ParentContentId = 0;
-                //string ParentContentName = null;
                 string ChildContentName = "";
                 int ChildContentId = 0;
                 bool AddAdminMenuEntry = false;
@@ -2501,8 +2406,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     ArchiveRecordAgeDays = (cp.core.siteProperties.getInteger("ArchiveRecordAgeDays", 0));
                     ArchiveTimeOfDay = cp.core.siteProperties.getText("ArchiveTimeOfDay", "12:00:00 AM");
                     ArchiveAllowFileClean = (cp.core.siteProperties.getBoolean("ArchiveAllowFileClean", false));
-                    //ArchiveAllowLogClean = genericController.EncodeBoolean(cp.core.main_GetSiteProperty2("ArchiveAllowLogClean", False))
-
                     //
                     // Process Requests
                     //
@@ -2647,7 +2550,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                         ErrorList = Processor.Controllers.ErrorController.getUserError(cp.core);
                         ErrorList = GenericController.vbReplace(ErrorList, UserErrorHeadline, "", 1, 99, 1);
                         Processor.Controllers.ErrorController.addUserError(cp.core, "The following errors occurred while verifying Link Alias entries for your existing pages." + ErrorList);
-                        //Call cp.core.htmldoc.main_AddUserError(ErrorList)
                     }
                 }
             } catch (Exception ex) {
@@ -2662,15 +2564,12 @@ namespace Contensive.Processor.Addons.AdminSite {
         private string GetForm_BuildCollection(CPClass cp) {
             string tempGetForm_BuildCollection = null;
             try {
-                //
                 string Description = null;
                 StringBuilderLegacyController Content = new StringBuilderLegacyController();
                 string Button = null;
-                //adminUIController Adminui = new adminUIController(cp.core);
                 string ButtonList = null;
                 bool AllowAutoLogin = false;
                 string Copy = null;
-                //
                 Button = cp.core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonCancel) {
                     //

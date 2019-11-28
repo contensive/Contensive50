@@ -30,15 +30,12 @@ namespace Contensive.Processor.Controllers {
         private string privateRequestUserAgent;
         private string privateRequestCookie;
         private int privateRequestTimeoutMsec;
-        //
         private string privateResponseFilename;
         private string privateResponseProtocol = "HTTP/1.1"; // had to fake bc webClient removes first line of header
         private string privateResponseStatusDescription;
         private int privateResponseStatusCode;
-        //Private privateResponseStatus As System.Net.HttpStatusCode = New System.Net.HttpStatusCode
         private System.Net.WebHeaderCollection privateResponseHeaders = new System.Net.WebHeaderCollection();
         private int privateResponseLength = 0;
-        //
         private string privateSocketResponse = "";
         //
         //======================================================================================
@@ -71,8 +68,6 @@ namespace Contensive.Processor.Controllers {
                 string path = null;
                 int ptr = 0;
                 //
-                //core.AppendLog( "http4Class.getUrlToFile, url=[" & URL & "], filename=[" & Filename & "]")
-                //
                 privateResponseFilename = Filename;
                 path = Filename.Replace("/", "\\");
                 ptr = path.LastIndexOf("\\");
@@ -100,7 +95,6 @@ namespace Contensive.Processor.Controllers {
                 privateResponseLength = 0;
                 try {
                     http.DownloadFile(URL, privateResponseFilename);
-                    //privateResponseProtocol = ""
                     privateResponseStatusCode = 200;
                     privateResponseStatusDescription = HttpStatusCode.OK.ToString();
                     privateResponseHeaders = http.ResponseHeaders;
@@ -119,10 +113,6 @@ namespace Contensive.Processor.Controllers {
                     throw;
                 }
             } catch (Exception ex) {
-                //
-                //
-                //
-                //Throw
                 throw new httpException("Error in getUrlToFile(" + URL + "," + Filename + ")", ex);
             }
         }
@@ -141,10 +131,6 @@ namespace Contensive.Processor.Controllers {
                 int CookiePointer = 0;
                 string[] CookiePart = null;
                 //
-                //core.AppendLog( "http4Class.getURL, url=[" & URL & "]")
-                //
-                //Dim TimeoutTime As Date
-                //
                 http.password = privateRequestPassword;
                 http.username = privateRequestUsername;
                 http.UserAgent = privateRequestUserAgent;
@@ -156,18 +142,15 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 http.Timeout = privateRequestTimeoutMsec;
-                //TimeoutTime = System.DateTime.FromOADate(Now.ToOADate + (privateRequestTimeoutMsec / 24 / 60 / 60))
                 //
                 privateRequestHeaders = http.Headers;
                 privateResponseHeaders = new System.Net.WebHeaderCollection();
                 privateResponseLength = 0;
                 privateResponseStatusCode = 0;
                 privateResponseStatusDescription = "";
-                //privateResponseHeaders = response.Headers
                 privateResponseLength = 0;
                 try {
                     returnString = http.DownloadString(URL);
-                    //privateResponseProtocol = ""
                     privateResponseStatusCode = 200;
                     privateResponseStatusDescription = HttpStatusCode.OK.ToString();
                     privateResponseHeaders = http.ResponseHeaders;
@@ -184,9 +167,6 @@ namespace Contensive.Processor.Controllers {
                 //
                 throw;
             }
-            //
-            //core.AppendLog( "http4Class.getURL exit, return=[" & returnString & "]")
-            //
             return returnString;
         }
         //
@@ -281,7 +261,6 @@ namespace Contensive.Processor.Controllers {
                     }
                 } catch {
                     throw;
-                    //Throw new GenericException("Error in responseHeader Property, get Method")
                 }
                 return returnString;
             }
@@ -294,7 +273,6 @@ namespace Contensive.Processor.Controllers {
         public string socketResponse {
             get {
                 string returnString = "";
-                //Dim ptr As Integer
                 //
                 try {
                     returnString = privateSocketResponse;
@@ -312,7 +290,6 @@ namespace Contensive.Processor.Controllers {
         public string responseStatusDescription {
             get {
                 string returnString = "";
-                //Dim ptr As Integer
                 //
                 try {
                     returnString = privateResponseStatusDescription;
@@ -330,7 +307,6 @@ namespace Contensive.Processor.Controllers {
         public int responseStatusCode {
             get {
                 int returnCode = 0;
-                //Dim ptr As Integer
                 //
                 try {
                     returnCode = privateResponseStatusCode;

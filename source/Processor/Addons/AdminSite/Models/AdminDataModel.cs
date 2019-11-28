@@ -564,7 +564,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                         if (csData.ok()) {
                             editRecord.id = requestedRecordId;
                             int recordContentId = csData.getInteger("contentControlId");
-                            //adminContent.id = csData.csGetInteger("contentControlId");
                             if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
                                 adminContent = ContentMetadataModel.create(core, recordContentId);
                             }
@@ -606,8 +605,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // ***** really needs a server.URLDecode() function
                     //
                     core.doc.addRefreshQueryString("wc", WhereClauseContent);
-                    //WhereClauseContent = genericController.vbReplace(WhereClauseContent, "%3D", "=")
-                    //WhereClauseContent = genericController.vbReplace(WhereClauseContent, "%26", "&")
                     if (!string.IsNullOrEmpty(WhereClauseContent)) {
                         string[] QSSplit = WhereClauseContent.Split(',');
                         int QSPointer = 0;
@@ -677,7 +674,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         //
                                         // remove current preferences for this field
                                         //
-                                        string[] Parts = ("," + editorpreferences).Split(new[] { "," + fieldEditorFieldId.ToString() + ":" }, StringSplitOptions.None);
+                                        string[] Parts = ("," + editorpreferences).Split(new[] { "," + fieldEditorFieldId + ":" }, StringSplitOptions.None);
                                         int Cnt = Parts.GetUpperBound(0) + 1;
                                         if (Cnt > 0) {
                                             int Ptr = 0;
@@ -748,24 +745,18 @@ namespace Contensive.Processor.Addons.AdminSite {
                         editRecord.menuHeadline = GenericController.encodeText(editRecord.fieldsLc["menuheadline"].value);
                     }
                     //
-                    //editRecord.menuHeadline = "";
                     if (editRecord.fieldsLc.ContainsKey("name")) {
-                        //Dim editRecordField As editRecordFieldClass = editRecord.fieldsLc["name")
-                        //editRecord.nameLc = editRecordField.value.ToString()
                         editRecord.nameLc = GenericController.encodeText(editRecord.fieldsLc["name"].value);
                     }
                     //
-                    //editRecord.menuHeadline = "";
                     if (editRecord.fieldsLc.ContainsKey("active")) {
                         editRecord.active = GenericController.encodeBoolean(editRecord.fieldsLc["active"].value);
                     }
                     //
-                    //editRecord.menuHeadline = "";
                     if (editRecord.fieldsLc.ContainsKey("contentcontrolid")) {
                         editRecord.contentControlId = GenericController.encodeInteger(editRecord.fieldsLc["contentcontrolid"].value);
                     }
                     //
-                    //editRecord.menuHeadline = "";
                     if (editRecord.fieldsLc.ContainsKey("parentid")) {
                         editRecord.parentId = GenericController.encodeInteger(editRecord.fieldsLc["parentid"].value);
                     }
@@ -907,26 +898,14 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // (also, this presets readonly/devonly/adminonly fields not set to member)
                     //
                     switch (GenericController.vbUCase(field.nameLc)) {
-                        //Case "ID"
-                        //    .readonlyfield = True
-                        //    .Required = False
                         case "MODIFIEDBY":
                             editRecord.fieldsLc[field.nameLc].value = core.session.user.id;
-                            //    .readonlyfield = True
-                            //    .Required = False
                             break;
                         case "CREATEDBY":
                             editRecord.fieldsLc[field.nameLc].value = core.session.user.id;
-                            //    .readonlyfield = True
-                            //    .Required = False
-                            //Case "DATEADDED"
-                            //    .readonlyfield = True
-                            //    .Required = False
                             break;
                         case "CONTENTCONTROLID":
                             editRecord.fieldsLc[field.nameLc].value = adminContent.id;
-                            //Case "SORTORDER"
-                            // default to ID * 100, but must be done later
                             break;
                     }
                     editRecord.fieldsLc[field.nameLc].dbValue = editRecord.fieldsLc[field.nameLc].value;
@@ -1058,7 +1037,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                             Processor.Controllers.ErrorController.addUserError(core, "The information you have requested could not be found. The record could have been deleted, Or there may be a system Error.");
                             // removed because it was throwing too many false positives (1/14/04 - tried to do it again)
                             // If a CM hits the edit tag for a deleted record, this is hit. It should not cause the Developers to spend hours running down.
-                            //Call HandleInternalError("AdminClass.LoadEditRecord_Dbase", "Content edit record For [" & adminContent.Name & "." & EditRecord.ID & "] was not found.")
                         } else {
                             //
                             // Read database values into RecordValuesVariant array
@@ -1181,8 +1159,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         break;
                                     case "PARENTID":
                                         editRecord.parentId = csData.getInteger(adminContentcontent.nameLc);
-                                        //Case Else
-                                        //    EditRecordValuesVariant(FieldPointer) = DBValueVariant
                                         break;
                                 }
                                 //
@@ -1410,7 +1386,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
                                     if (!ResponseFieldIsEmpty) {
                                         if (ResponseFieldValueText.IsNumeric()) {
-                                            //ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
                                         } else {
                                             Processor.Controllers.ErrorController.addUserError(core, "The record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a numeric value.");
                                             ResponseFieldValueIsOKToSave = false;
@@ -1425,7 +1400,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
                                     if (!ResponseFieldIsEmpty) {
                                         if (ResponseFieldValueText.IsNumeric()) {
-                                            //ResponseValueVariant = EncodeNumber(ResponseValueVariant)
                                         } else {
                                             Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a numeric value.");
                                             ResponseFieldValueIsOKToSave = false;
@@ -1439,7 +1413,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
                                     if (!ResponseFieldIsEmpty) {
                                         if (ResponseFieldValueText.IsNumeric()) {
-                                            //ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
                                         } else {
                                             Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " had an invalid selection.");
                                             ResponseFieldValueIsOKToSave = false;
@@ -1457,7 +1430,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             ResponseFieldValueIsOKToSave = false;
                                         }
                                     }
-                                    //End Case
                                     break;
                                 case CPContentBaseClass.FieldTypeIdEnum.Boolean:
                                     //
@@ -1505,7 +1477,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                 //
                                                 ResponseFieldValueText = GenericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyStartMark, "");
                                                 ResponseFieldValueText = GenericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyEndMark, "");
-                                                //ResponseValueVariant = ResponseValueText
                                             }
                                             //
                                             // If the response is only white space, remove it
@@ -1540,7 +1511,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 int LoopPtr = 0;
                                 string UsedIDs = editRecord.id.ToString();
                                 const int LoopPtrMax = 100;
-                                while ((LoopPtr < LoopPtrMax) && (ParentId != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentId.ToString() + ",") == -1)) {
+                                while ((LoopPtr < LoopPtrMax) && (ParentId != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentId + ",") == -1)) {
                                     UsedIDs = UsedIDs + "," + ParentId.ToString();
                                     using (var csData = new CsModel(core)) {
                                         csData.open(adminContent.name, "ID=" + ParentId, "", true, 0, "ParentID");
@@ -1576,7 +1547,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // text buffering
                                 //
-                                //ResponseFieldValueText = genericController.main_RemoveControlCharacters(ResponseFieldValueText);
                             }
                             if ((field.required) && (ResponseFieldIsEmpty)) {
                                 //
@@ -1660,18 +1630,5 @@ namespace Contensive.Processor.Addons.AdminSite {
             }
         }
         private List<FieldTypeEditorAddonModel> _fieldTypeDefaultEditors = null;
-        ////
-        ////====================================================================================================
-        ////
-        //public List<FieldTypeEditorAddonModel> fieldEditors {
-        //    get {
-        //        if (_fieldEditors == null) {
-        //            _fieldEditors = EditorController.getFieldEditorAddonList(core);
-        //        }
-        //        return _fieldEditors;
-        //    }
-        //}
-        //private List<FieldTypeEditorAddonModel> _fieldEditors = null;
-        //
     }
 }

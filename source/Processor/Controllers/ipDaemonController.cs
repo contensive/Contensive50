@@ -81,7 +81,6 @@ namespace Contensive.Processor.Controllers {
                         Hint += ",start";
                         cmdListener.Start();
                         do {
-                            //hint = "do,get request response obj"
                             context = cmdListener.GetContext();
                             request = context.Request;
                             response = context.Response;
@@ -119,9 +118,6 @@ namespace Contensive.Processor.Controllers {
                             output.Write(buffer, 0, buffer.Length);
                             output.Close();
                         } while (true);
-                        //cmdListener.Stop();
-                        //cmdListener.Abort();
-                        //cmdListener = Nothing
                     }
                 }
             } catch (HttpListenerException ex) {
@@ -129,13 +125,11 @@ namespace Contensive.Processor.Controllers {
                 //
                 //
                 Microsoft.VisualBasic.FileIO.FileSystem.WriteAllText("C:\\clibIpDaemonDebug.log", Environment.NewLine + DateTime.Now.ToString() + " HttpListenerException, hintPrefixes=[" + hintPrefixes + "], hint=[" + Hint + "], ex=[" + ex.Message + "/" + ex.StackTrace + "]", true);
-                //Throw
             } catch (Exception ex) {
                 //
                 //
                 //
                 Microsoft.VisualBasic.FileIO.FileSystem.WriteAllText("C:\\clibIpDaemonDebug.log", Environment.NewLine + DateTime.Now.ToString() + " Exception, hintPrefixes=[" + hintPrefixes + "], hint=[" + Hint + "], ex=[" + ex.Message + "/" + ex.StackTrace + "]", true);
-                //Throw
             }
         }
         //
@@ -154,7 +148,6 @@ namespace Contensive.Processor.Controllers {
                     //
                     // start on this thread and block
                     //
-                    //thread_cmdListener();
                 } else {
                     //
                     // start on a new thread and return

@@ -69,11 +69,6 @@ namespace Contensive.Processor.Models.Domain {
         // -- if provided, NLog data will be sent to this CloudWatch LogGroup 
         public override string awsCloudWatchLogGroup { get; set; }
         //
-        // -- configuration of async command listener on render machines (not sure if used still)
-        //public int serverListenerPort { get; set; }
-        //public string username { get; set; }
-        //public string password { get; set; }
-        //
         // -- used by applications to enable/disable features, like 
         //      - ecommerce batch should only run in production
         // todo figure out how to expose this, add it to configuration setup
@@ -151,16 +146,6 @@ namespace Contensive.Processor.Models.Domain {
             }
             return 0;
         }
-        ////
-        ///// <summary>
-        ///// case insensative dictionary. Use for application lookup
-        ///// </summary>
-        ///// <typeparam name="V"></typeparam>
-        //[Serializable]
-        //public class CaseInsensitiveDictionary<S, V> : Dictionary<string, V> {
-        //    public CaseInsensitiveDictionary() : base(StringComparer.OrdinalIgnoreCase) {
-        //    }
-        //}
     }
 }
 

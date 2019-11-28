@@ -18,8 +18,6 @@ namespace Contensive.Processor.Controllers {
         public static string GetXMLAttribute(CoreController core, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
             string returnAttr = "";
             try {
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlAttribute NodeAttribute = null;
                 XmlNode ResultNode = null;
                 string UcaseName = null;
                 //

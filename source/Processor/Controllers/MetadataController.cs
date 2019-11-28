@@ -19,42 +19,6 @@ namespace Contensive.Processor.Controllers {
     /// Static methods that support the metadata domain model.
     /// </summary>
     public class MetadataController {
-
-        ////       
-        ////===========================================================================
-        ///// <summary>
-        ///// returns a comma delimited list of ContentIDs that the Member can author
-        ///// </summary>
-        ///// <param name="core"></param>
-        ///// <returns></returns>
-        //public static List<int> getEditableMetaDataIdList(CoreController core) {
-        //    try {
-        //        string SQL = "Select ccGroupRules.ContentID as ID"
-        //        + " FROM ((ccmembersrules"
-        //        + " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)"
-        //        + " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)"
-        //        + " WHERE"
-        //            + " (ccMemberRules.memberId=" + core.session.user.id + ")"
-        //            + " AND(ccGroupRules.Active<>0)"
-        //            + " AND(ccContent.Active<>0)"
-        //            + " AND(ccMemberRules.Active<>0)";
-        //        DataTable cidDataTable = core.db.executeQuery(SQL);
-        //        int CIDCount = cidDataTable.Rows.Count;
-        //        List<int> returnList = new List<int>();
-        //        for (int CIDPointer = 0; CIDPointer < CIDCount; CIDPointer++) {
-        //            int ContentId = encodeInteger(cidDataTable.Rows[CIDPointer][0]);
-        //            returnList.Add(ContentID);
-        //            var metaData = ContentMetadataModel.create(core, ContentID);
-        //            if (metaData != null) {
-        //                returnList.AddRange(metaData.childIdList(core));
-        //            }
-        //        }
-        //        return returnList;
-        //    } catch (Exception ex) {
-        //        LogController.handleError(core, ex);
-        //        throw;
-        //    }
-        //}
         //
         //========================================================================
         /// <summary>
@@ -73,24 +37,6 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-        ////
-        ////========================================================================
-        ///// <summary>
-        ///// Get a DataSource Name from its ContentName
-        ///// </summary>
-        ///// <param name="core"></param>
-        ///// <param name="contentName"></param>
-        ///// <returns></returns>
-        //public static string getContentDataSource(CoreController core, string contentName) {
-        //    try {
-        //        var meta = ContentMetadataModel.createByUniqueName(core, contentName);
-        //        if (meta != null) { return meta.dataSourceName; }
-        //        return string.Empty;
-        //    } catch (Exception ex) {
-        //        LogController.handleError(core, ex);
-        //        throw;
-        //    }
-        //}
         //
         //========================================================================
         /// <summary>
@@ -109,20 +55,6 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-        ////
-        ////========================================================================
-        ///// <summary>
-        ///// return the sql criteria required to return only records included in the content specified
-        ///// </summary>
-        ///// <param name="core"></param>
-        ///// <param name="contentName"></param>
-        ///// <returns></returns>
-        //public static string getContentControlCriteria(CoreController core, string contentName) {
-        //    var meta = ContentMetadataModel.createByUniqueName(core, contentName);
-        //    if (meta == null) { return ""; }
-        //    return meta.legacyContentControlCriteria;
-        //}
-        //
         //
         //=============================================================
         /// <summary>
@@ -196,24 +128,6 @@ namespace Contensive.Processor.Controllers {
             if (meta == null) { return false; }
             return meta.fields.ContainsKey(FieldName.Trim().ToLower(CultureInfo.InvariantCulture));
         }
-        ////
-        ////========================================================================
-        ///// <summary>
-        ///// InsertContentRecordGetID
-        ///// Inserts a record based on a content definition.
-        ///// Returns the ID of the record, -1 if error
-        ///// </summary>
-        ///// <param name="contentName"></param>
-        ///// <param name="userId"></param>
-        ///// <returns></returns>
-        /////
-        //public static int insertContentRecordGetID(CoreController core, string contentName, int userId) {
-        //    var meta = ContentMetadataModel.createByUniqueName(core, contentName);
-        //    if (meta == null) { return 0; }
-        //    using (var db = new DbController(core, meta.dataSourceName)) {
-        //        return core.db.insertTableRecordGetId(meta.tableName, userId);
-        //    }
-        //}
         //
         //========================================================================
         /// <summary>

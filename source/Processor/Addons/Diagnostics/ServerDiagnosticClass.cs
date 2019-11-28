@@ -63,7 +63,7 @@ namespace Contensive.Processor.Addons.Diagnostics {
                         }
                     }
                 } catch (Exception exDb) {
-                    return "ERROR, exception occured during default data source record insert, [" + exDb.ToString() + "].";
+                    return "ERROR, exception occured during default data source record insert, [" + exDb + "].";
                 }
                 result.AppendLine("ok, database connection passed.");
                 //
@@ -107,7 +107,7 @@ namespace Contensive.Processor.Addons.Diagnostics {
                     if ( !dt.Rows.Count.Equals(0)) {
                         string badFieldList = "";
                         foreach (DataRow row in dt.Rows) {
-                            badFieldList += "," + row["contentName"].ToString() + "." + row["name"].ToString();
+                            badFieldList += "," + row["contentName"] + "." + row["name"].ToString();
                         }
                         return "ERROR, the following field(s) are configured as lookup, but the field's lookup-content is not set [" + badFieldList.Substring(1) + "].";
                     }
@@ -133,7 +133,7 @@ namespace Contensive.Processor.Addons.Diagnostics {
                     if (!dt.Rows.Count.Equals(0)) {
                         string badFieldList = "";
                         foreach (DataRow row in dt.Rows) {
-                            badFieldList += "," + row["primaryContentName"].ToString() + "." + row["fieldName"].ToString();
+                            badFieldList += "," + row["primaryContentName"] + "." + row["fieldName"].ToString();
                         }
                         return "ERROR, the following field(s) are configured as many-to-many, but the field's many-to-many metadata is not set [" + badFieldList.Substring(1) + "].";
                     }

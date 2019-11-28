@@ -138,7 +138,6 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- this collection has already been installed during this installation process. Skip and return success
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", [" + collectionGuid + "] was not installed because it was previously installed during this installation.");
-                    //return_ErrorMessage += "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>";
                     return true;
                 }
                 // -- collection needs to be 
@@ -205,7 +204,6 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             // ----- Error condition -- it must have a collection name
                                             //
-                                            //Call AppendAddonLog("UpgradeAppFromLocalCollection, collection has no name")
                                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], collection has no name");
                                             return_ErrorMessage += "<P>The collection was not installed because the collection name in the xml collection file is blank</P>";
                                             return false;
@@ -495,7 +493,6 @@ namespace Contensive.Processor.Controllers {
                                                                 result = false;
                                                                 return_ErrorMessage += "<P>The collection was not installed because the xml collection file has an error.</P>";
                                                                 return false;
-                                                                //loadOK = false;
                                                             }
                                                             if (loadOK) {
                                                                 foreach (XmlNode metaDataNode in NavDoc.DocumentElement.ChildNodes) {
@@ -802,13 +799,11 @@ namespace Contensive.Processor.Controllers {
                                                                 break;
                                                         }
                                                     }
-                                                    // todo - install navigator entries here, after addons installed to pickup nodes with addon references
                                                     //
                                                     //----------------------------------------------------------------------------------------------------------------------
                                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", verify all navigator menu entries for updated addons");
                                                     //----------------------------------------------------------------------------------------------------------------------
                                                     //
-                                                    //var emptyList = new List<string>();
                                                     MetadataMiniCollectionModel Collection = MetadataMiniCollectionModel.loadXML(core, collectionFileContent, isBaseCollection, false, IsNewBuild, "");
                                                     foreach (var kvp in Collection.menus) {
                                                         BuildController.verifyNavigatorEntry(core, kvp.Value, 0);
@@ -1005,12 +1000,10 @@ namespace Contensive.Processor.Controllers {
                             //
                             // can not copy dll or exe
                             //
-                            //Filename = Filename
                         } else if (("," + BlockFileList + ",").IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase) != -1) {
                             //
                             // can not copy the current collection file
                             //
-                            //file.Name = file.Name
                         } else {
                             //
                             // copy this file to destination
@@ -1278,7 +1271,6 @@ namespace Contensive.Processor.Controllers {
                                                     if (string.IsNullOrEmpty(NavIconTypeString)) {
                                                         NavIconTypeString = "Addon";
                                                     }
-                                                    //Dim builder As New coreBuilderClass(core)
                                                     BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
                                                         menuNameSpace = menuNameSpace,
                                                         name = addonName,

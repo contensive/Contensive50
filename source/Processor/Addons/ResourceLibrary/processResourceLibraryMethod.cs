@@ -38,7 +38,6 @@ namespace Contensive.Processor.Addons.Primitives {
                     //
                     core.doc.addRefreshQueryString("EditorObjectName", EditorObjectName);
                     core.html.addScriptLinkSrc("https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/ClientSide/dialogs.js", "Resource Library");
-                    //Call AddHeadScript("<script type=""text/javascript"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/ClientSide/dialogs.js""></script>")
                     core.doc.setMetaContent(0, 0);
                     core.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Resource Library");
                     string Copy = core.html.getResourceLibrary("", true, EditorObjectName, LinkObjectName, true);

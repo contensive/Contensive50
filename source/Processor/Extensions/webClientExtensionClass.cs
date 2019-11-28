@@ -62,7 +62,6 @@ public class webClientExt : WebClient {
         timeout = -1;
         userAgent = "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727)";
         cookieContainer = new CookieContainer();
-        //cookieContainer.Add(new Cookie("example", "example_value"));
     }
 
     protected override WebRequest GetWebRequest(Uri address) {

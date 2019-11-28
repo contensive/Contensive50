@@ -77,12 +77,12 @@ namespace Contensive.Processor.Controllers {
                         client.Send(mailMessage);
                         status = true;
                     } catch (Exception ex) {
-                        returnErrorMessage = "There was an error sending email [" + ex.ToString() + "]";
+                        returnErrorMessage = "There was an error sending email [" + ex + "]";
                         LogController.logError(core, returnErrorMessage);
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError(core, "There was an error configuring smtp server ex [" + ex.ToString() + "]");
+                LogController.logError(core, "There was an error configuring smtp server ex [" + ex + "]");
                 throw;
             }
             return status;

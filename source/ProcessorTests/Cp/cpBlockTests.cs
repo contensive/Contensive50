@@ -306,7 +306,6 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         //
         [TestMethod]
         public void vbInstr_test() {
-            //genericController.vbInstr(1, Link, "?")
             Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("d") + 1, vbInstr("abcdefgabcdefgabcdefgabcdefg", "d"));
             Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E") + 1, vbInstr("abcdefgabcdefgabcdefgabcdefg", "E"));
             Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E", 9) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E"));
@@ -317,7 +316,6 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
             string haystack = "abcdefgabcdefgabcdefgabcdefg";
             string needle = "c";
             Assert.AreEqual("?".IndexOf("?") + 1, vbInstr(1, "?", "?"));
-            //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of haystack.Length for every iteration:
             int tempVar = haystack.Length;
             for (int ptr = 1; ptr <= tempVar; ptr++) {
                 Assert.AreEqual(haystack.IndexOf(needle, ptr - 1) + 1, vbInstr(ptr, haystack, needle, 2));

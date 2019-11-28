@@ -133,7 +133,6 @@ namespace Contensive.Processor.Addons.Tools {
                                 foreach (DataColumn dc in dt.Columns) Stream.Add("<th>" + dc.ColumnName + "</th>");
                                 Stream.Add("</tr></thead>");
                                 //
-                                //Dim dtOK As Boolean
                                 string[,] resultArray = core.db.convertDataTabletoArray(dt);
                                 //
                                 int RowMax = resultArray.GetUpperBound(1);
@@ -150,15 +149,6 @@ namespace Contensive.Processor.Addons.Tools {
                                         string CellData = resultArray[ColumnPointer, RowPointer];
                                         if (IsNull(CellData)) {
                                             Stream.Add(ColumnStart + "[null]" + ColumnEnd);
-                                            //ElseIf IsEmpty(CellData) Then
-                                            //    Stream.Add(ColumnStart & "[empty]" & ColumnEnd)
-                                            //ElseIf IsArray(CellData) Then
-                                            //    Stream.Add(ColumnStart & "[array]")
-                                            //    Cnt = UBound(CellData)
-                                            //    For Ptr = 0 To Cnt - 1
-                                            //        Stream.Add("<br>(" & Ptr & ")&nbsp;[" & CellData[Ptr] & "]")
-                                            //    Next
-                                            //    Stream.Add(ColumnEnd)
                                         } else if (string.IsNullOrEmpty(CellData)) {
                                             Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
                                         } else {

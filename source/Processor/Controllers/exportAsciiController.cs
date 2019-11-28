@@ -65,7 +65,6 @@ namespace Contensive.Processor.Controllers {
                                             sb.Append(Delimiter + "\"" + FieldName + "\"");
                                         }
                                         FieldNameVariant = csData.getNextFieldName();
-                                        ///DoEvents
                                     }
                                     sb.Append(Environment.NewLine);
                                 }
@@ -155,7 +154,6 @@ namespace Contensive.Processor.Controllers {
                                         core.wwwFiles.appendFile(TestFilename, Delimiter + "\"" + Copy + "\"");
                                         Delimiter = ",";
                                         FieldNameVariant = csData.getNextFieldName();
-                                        ///DoEvents
                                     }
                                     core.wwwFiles.appendFile(TestFilename, Environment.NewLine);
                                     csData.goNext();

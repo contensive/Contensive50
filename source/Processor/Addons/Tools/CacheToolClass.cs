@@ -59,7 +59,7 @@ namespace Contensive.Processor.Addons.Tools {
                             cacheValue = Newtonsoft.Json.JsonConvert.SerializeObject(resultObj);
                             Stream.Add("<div>" + DateTime.Now + "CacheValue object returned, json serialized, length [" + cacheValue.Length + "]</div>");
                         } catch (Exception ex) {
-                            Stream.Add("<div>" + DateTime.Now + " exception during serialization, ex [" + ex.ToString() + "]</div>");
+                            Stream.Add("<div>" + DateTime.Now + " exception during serialization, ex [" + ex + "]</div>");
                         }
                     }
                     Stream.Add("<p>" + DateTime.Now + " Done</p>");

@@ -96,31 +96,11 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// when exeecuting iis, this is the default page.
         /// </summary>
-        public override string defaultPage { get; set; } //= "default.aspx";
+        public override string defaultPage { get; set; } 
         /// <summary>
         /// if true, the command line delete cannot delete this app
         /// </summary>
-        public override bool deleteProtection { get; set; } //= true;
-        //
-        //====================================================================================================
-        /// <summary>
-        /// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
-        /// </summary>
-        //[System.Serializable]
-        //public enum AppModeEnum {
-        //    normal = 0,
-        //    maintainence = 1
-        //}
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
-        ///// </summary>
-        //[System.Serializable]
-        //public enum AppStatusEnum {
-        //    ok = 0,
-        //    maintenance = 1
-        //}
+        public override bool deleteProtection { get; set; } 
         //
         //====================================================================================================
         /// <summary>

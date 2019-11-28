@@ -77,13 +77,7 @@ namespace Contensive.Processor.Addons.Tools {
                                                   //
                                                   // ----- Diagnostic Action Types
                                                   //
-        //private int DiagActionCount;
         private const int DiagActionCountMax = 10;
-        ////
-        //private class DiagActionType {
-        //    public string Name;
-        //    public string Command;
-        //}
         private const int DiagActionNop = 0; // no arguments
         private const int DiagActionSetFieldType = 1; // Arg(1)=ContentName, Arg(2)=FieldName, Arg(3)=TypeID
         private const int DiagActionDeleteRecord = 2; // Arg(1)=ContentName, Arg(2)=RecordID
@@ -210,10 +204,6 @@ namespace Contensive.Processor.Addons.Tools {
                         //
                         // -- Print out the page
                         switch (AdminFormTool) {
-                            //case AdminFormToolContentDiagnostic:
-                            //    //
-                            //    Stream.Add(GetForm_ContentDiagnostic());
-                            //    break;
                             case AdminFormToolCreateContentDefinition:
                                 //
                                 Stream.Add(GetForm_CreateContentDefinition());
@@ -228,7 +218,6 @@ namespace Contensive.Processor.Addons.Tools {
                                 break;
                             case AdminFormToolConfigureEdit:
                                 //
-                                //Call Stream.Add(core.addon.execute(guid_ToolConfigureEdit))
                                 Stream.Add( ConfigureContentEditClass.configureContentEdit(core.cpParent));
                                 break;
                             case AdminFormToolManualQuery:
@@ -346,7 +335,6 @@ namespace Contensive.Processor.Addons.Tools {
                 Stream.Add(GetForm_RootRow(AdminFormTools, AdminformToolCreateGUID, "Create GUID", "Use this tool to create a new GUID. This is useful when creating a new core.addon."));
                 Stream.Add("</table>");
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
-                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
@@ -401,8 +389,6 @@ namespace Contensive.Processor.Addons.Tools {
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 Caption = "Create Content Definition";
                 Description = "This tool creates a Content Definition. If the SQL table exists, it is used. If it does not exist, it is created. If records exist in the table with a blank ContentControlID, the ContentControlID will be populated from this new definition. A Navigator Menu entry will be added under Manage Site Content - Advanced.";
-                //
-                //Stream.Add( GetTitle(Caption, Description)
                 //
                 //   print out the submit form
                 //
@@ -768,9 +754,6 @@ namespace Contensive.Processor.Addons.Tools {
                         foreach (KeyValuePair<string, Processor.Models.Domain.ContentMetadataModel.MetaAdminColumnClass> kvp in CDef.adminColumns) {
                             ColumnWidthTotal += kvp.Value.Width;
                         }
-                        //For ColumnCount = 0 To CDef.adminColumns.Count - 1
-                        //    ColumnWidthTotal = ColumnWidthTotal + CDef.adminColumns(ColumnCount).Width
-                        //Next
                         if (ColumnWidthTotal > 0) {
                             Stream.Add("<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"90%\">");
                             int ColumnCount = 0;
@@ -824,7 +807,6 @@ namespace Contensive.Processor.Addons.Tools {
                             // test if this column is in use
                             //
                             skipField = false;
-                            //ColumnPointer = CDef.adminColumns.Count
                             if (CDef.adminColumns.Count > 0) {
                                 foreach (KeyValuePair<string, Processor.Models.Domain.ContentMetadataModel.MetaAdminColumnClass> kvp in CDef.adminColumns) {
                                     if (field.nameLc == kvp.Value.Name) {
@@ -911,9 +893,6 @@ namespace Contensive.Processor.Addons.Tools {
                 int ColumnWidthTotal = 0;
                 int ColumnCounter = 0;
                 int IndexColumn = 0;
-                //
-                //Call LoadContentDefinitions
-                //
                 using (var csData = new CsModel(core)) {
                     csData.open("Content Fields", "(ContentID=" + ContentID + ")", "IndexColumn");
                     if (!csData.ok()) {
@@ -1026,7 +1005,6 @@ namespace Contensive.Processor.Addons.Tools {
             string result = "";
             try {
                 int ParentContentId = 0;
-                //string ParentContentName = null;
                 string ChildContentName = "";
                 bool AddAdminMenuEntry = false;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
@@ -1041,7 +1019,6 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     ParentContentId = core.docProperties.getInteger("ParentContentID");
                     var parentContentMetadata = ContentMetadataModel.create(core, ParentContentId);
-                    //ParentContentName = Local_GetContentNameByID(ParentContentID);
                     ChildContentName = core.docProperties.getText("ChildContentName");
                     AddAdminMenuEntry = core.docProperties.getBoolean("AddAdminMenuEntry");
                     //
@@ -1080,7 +1057,6 @@ namespace Contensive.Processor.Addons.Tools {
                 Stream.Add("</SPAN>");
                 //
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
-                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
@@ -1112,7 +1088,6 @@ namespace Contensive.Processor.Addons.Tools {
                 }
                 Stream.Add("</span>");
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
-                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
@@ -1174,49 +1149,6 @@ namespace Contensive.Processor.Addons.Tools {
             }
             return returnValue;
         }
-        ////
-        ////
-        ////
-        //private string AddDiagError(string ProblemMsg, DiagActionType[] DiagActions) {
-        //    return GetDiagError(ProblemMsg, DiagActions);
-        //}
-        //
-        //
-        //
-        //private string GetDiagError(string ProblemMsg, DiagActionType[] DiagActions) {
-        //    string result = "";
-        //    try {
-        //        int ActionCount = 0;
-        //        int ActionPointer = 0;
-        //        string Caption = null;
-        //        string Panel = "";
-        //        //
-        //        Panel = Panel + "<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" width=\"100%\">";
-        //        Panel = Panel + "<tr><td colspan=\"2\">" + SpanClassAdminNormal + "<b>" + ProblemMsg + "</b></SPAN></td></tr>";
-        //        ActionCount = DiagActions.GetUpperBound(0);
-        //        if (ActionCount > 0) {
-        //            for (ActionPointer = 0; ActionPointer <= ActionCount; ActionPointer++) {
-        //                Caption = DiagActions[ActionPointer].Name;
-        //                if (!string.IsNullOrEmpty(Caption)) {
-        //                    Panel = Panel + "<tr>";
-        //                    Panel = Panel + "<td width=\"30\" align=\"right\">";
-        //                    Panel = Panel + core.html.inputRadio("DiagAction" + DiagActionCount, DiagActions[ActionPointer].Command, "");
-        //                    Panel = Panel + "</td>";
-        //                    Panel = Panel + "<td width=\"100%\">" + SpanClassAdminNormal + Caption + "</SPAN></td>";
-        //                    Panel = Panel + "</tr>";
-        //                }
-        //            }
-        //        }
-        //        Panel = Panel + "</TABLE>";
-        //        DiagActionCount = DiagActionCount + 1;
-        //        result =  core.html.getPanel(Panel);
-        //    } catch (Exception ex) {
-        //        LogController.handleError( core,ex);
-        //    }
-        //    return result;
-        //}
-        //
-        //
         //
         private string GetDiagHeader(string Copy) {
             return core.html.getPanel("<B>" + SpanClassAdminNormal + Copy + "</SPAN><B>");
@@ -1293,16 +1225,6 @@ namespace Contensive.Processor.Addons.Tools {
                     PageSize = 50;
                     PageNumber = 1;
                     SQL = "SELECT * FROM ccSetup WHERE ACTIVE<>0;";
-                    //
-                    //Stream.Add("<br>")
-                    //Stream.Add("Measure ContentServer communication time by getting contentfieldcount 1000 times<br>")
-                    //Stream.Add(Now & " count=[" & TestCount & "]x, PageSize=[" & PageSize & "]<br>")
-                    //For TestPointer = 1 To 1000
-                    //    TestTicks = GetTickCount
-                    //    TestCopy = genericController.encodeText(core.csGetFieldCount(1))
-                    //    OpenTicks = OpenTicks + GetTickCount - TestTicks
-                    //Next
-                    //Stream.Add(Now & " Finished<br>")
                     Stream.Add("Time to make a ContentServer call = " + ((OpenTicks / 1000.0)).ToString("00.000") + " msec<br>");
                     //
                     // ExecuteSQL Test
@@ -1416,7 +1338,6 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 // Print Start Button
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
-                //result =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
@@ -1527,9 +1448,6 @@ namespace Contensive.Processor.Addons.Tools {
                     TableName = core.docProperties.getText("TableName");
                     //
                     // Run the SQL
-                    //
-                    //ConnectionString = core.db.getmain_GetConnectionString(DataSourceName)
-                    //
                     Stream.Add(SpanClassAdminSmall + "<br><br>");
                     Stream.Add(DateTime.Now + " Opening Table Schema on DataSource [" + datasource.name + "]<br>");
                     //
@@ -1556,7 +1474,6 @@ namespace Contensive.Processor.Addons.Tools {
                         }
                         Stream.Add("</tr>");
                         //
-                        //Dim dtok As Boolean = False
                         arrayOfSchema = core.db.convertDataTabletoArray(RSSchema);
                         //
                         RowMax = arrayOfSchema.GetUpperBound(1);
@@ -1565,10 +1482,6 @@ namespace Contensive.Processor.Addons.Tools {
                         RowEnd = "</tr>";
                         ColumnStart = "<td class=\"ccadminsmall\">";
                         ColumnEnd = "</td>";
-                        //ColumnStart = "<td class=""ccadminsmall"">&nbsp;"
-                        //ColumnEnd = "&nbsp;</td>"
-                        //ColumnStart = "<TD>" & SpanClassAdminSmall
-                        //ColumnEnd = "</SPAN></td>"
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             Stream.Add(RowStart);
                             for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
@@ -1627,10 +1540,6 @@ namespace Contensive.Processor.Addons.Tools {
                         RowEnd = "</tr>";
                         ColumnStart = "<td class=\"ccadminsmall\">";
                         ColumnEnd = "</td>";
-                        //ColumnStart = "<td class=""ccadminsmall"">&nbsp;"
-                        //ColumnEnd = "&nbsp;</td>"
-                        //ColumnStart = "<TD>" & SpanClassAdminSmall
-                        //ColumnEnd = "</SPAN></td>"
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             Stream.Add(RowStart);
                             for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
@@ -1688,10 +1597,6 @@ namespace Contensive.Processor.Addons.Tools {
                         RowEnd = "</tr>";
                         ColumnStart = "<td class=\"ccadminsmall\">";
                         ColumnEnd = "</td>";
-                        //ColumnStart = "<td class=""ccadminsmall"">&nbsp;"
-                        //ColumnEnd = "&nbsp;</td>"
-                        //ColumnStart = "<TD>" & SpanClassAdminSmall
-                        //ColumnEnd = "</SPAN></td>"
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             Stream.Add(RowStart);
                             for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
@@ -1730,11 +1635,9 @@ namespace Contensive.Processor.Addons.Tools {
                 Stream.Add("Data Source<br>");
                 Stream.Add(core.html.selectFromContent("DataSourceID", datasource.id, "Data Sources", "", "Default"));
                 //
-                //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
                 Stream.Add("</SPAN>");
                 //
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
-                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
@@ -1806,7 +1709,6 @@ namespace Contensive.Processor.Addons.Tools {
                         if (Count > 0) {
                             for (Pointer = 0; Pointer < Count; Pointer++) {
                                 if (core.docProperties.getBoolean("AddIndex." + Pointer)) {
-                                    //IndexName = core.main_GetStreamText2("AddIndexFieldName." & Pointer)
                                     FieldName = core.docProperties.getText("AddIndexFieldName." + Pointer);
                                     IndexName = TableName + FieldName;
                                     result += "<br>Adding index [" + IndexName + "] to table [" + TableName + "] for field [" + FieldName + "]";
@@ -1816,7 +1718,6 @@ namespace Contensive.Processor.Addons.Tools {
                         }
                     }
                     //
-                    //result += htmlController.form_start(core);
                     TableColSpan = 3;
                     result += HtmlController.tableStart(2, 0, 0);
                     //
@@ -1973,10 +1874,7 @@ namespace Contensive.Processor.Addons.Tools {
                 result += kmaEndTableRow;
                 result += kmaEndTable;
                 //
-                //GetForm_ContentDbSchema = GetForm_ContentDbSchema & core.main_GetFormInputHidden("af", AdminFormToolContentDbSchema)
                 result = AdminUIController.getToolForm(core, result, ButtonList);
-                //result =  (adminUIController.getToolFormOpen(core, ButtonList)) + result + (adminUIController.getToolFormClose(core, ButtonList));
-                //
                 //
                 // ----- Error Trap
                 //
@@ -2002,7 +1900,6 @@ namespace Contensive.Processor.Addons.Tools {
                 tempGetForm_LogFiles = tempGetForm_LogFiles + GenericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew + "&", 1, 99, 1);
                 //
                 tempGetForm_LogFiles = AdminUIController.getToolForm(core, tempGetForm_LogFiles, ButtonList);
-                //tempGetForm_LogFiles = adminUIController.getToolFormOpen(core, ButtonList) + tempGetForm_LogFiles + (adminUIController.getToolFormClose(core, ButtonList));
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
@@ -2213,7 +2110,6 @@ namespace Contensive.Processor.Addons.Tools {
                 Stream.Add("</span>");
                 //
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
-                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
                 throw;
@@ -2257,7 +2153,6 @@ namespace Contensive.Processor.Addons.Tools {
                     // Restart
                     //
                     Stream.Add("<br>Loading Templates...");
-                    //Call Stream.Add(ImportTemplates(core.appRootFiles.rootLocalPath, "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
                     Stream.Add("<br>Templates loaded");
                 }
                 //
@@ -2265,7 +2160,6 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 Stream.Add(SpanClassAdminNormal);
                 Stream.Add("<br>");
-                //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolLoadTemplates)
                 Stream.Add("<br>" + HtmlController.checkbox("AllowBodyHTML", AllowBodyHTML) + " Update/Import Soft Templates from the Body of .HTM and .HTML files");
                 Stream.Add("<br>" + HtmlController.checkbox("AllowScriptLink", AllowScriptLink) + " Update/Import Hard Templates with links to .ASP and .ASPX scripts");
                 Stream.Add("<br>" + HtmlController.checkbox("AllowImageImport", AllowImageImport) + " Update/Import image links (.GIF,.JPG,.PDF ) into the resource library");
@@ -2274,7 +2168,6 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 ButtonList = ButtonCancel + "," + ButtonImportTemplates;
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
-                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
@@ -2438,7 +2331,6 @@ namespace Contensive.Processor.Addons.Tools {
                 Stream.Add(TopHalf + BottomHalf + HtmlController.inputHidden("CDefRowCnt", RowPtr));
                 //
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonFindAndReplace);
-                //result = adminUIController.getToolFormOpen(core, ) + Stream.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
@@ -2477,7 +2369,6 @@ namespace Contensive.Processor.Addons.Tools {
                 // Display form
                 //
                 result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonIISReset);
-                //result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonIISReset) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonIISReset);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
@@ -2503,37 +2394,10 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 // Display form
                 result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonCreateGUId);
-                //result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonCreateGUID);
             } catch (Exception ex) {
                 LogController.logError( core,ex);
             }
             return result;
         }
-        //
-        //====================================================================================================
-        // <summary>
-        // 'handle legacy errors in this class, v1
-        // </summary>
-        // <param name="MethodName"></param>
-        // <param name="ignore0"></param>
-        // <remarks></remarks>
-        //Private Sub handleLegacyClassErrors1(ByVal MethodName As String, Optional ByVal ignore0 As String = "")
-        //   throw (new GenericException("Unexpected exception"))'core.handleLegacyError("Tools", MethodName, Err.Number, Err.Source, Err.Description, True, False)
-        //End Sub
-        //
-        //====================================================================================================
-        // <summary>
-        // handle legacy errors in this class, v2
-        // </summary>
-        // <param name="MethodName"></param>
-        // <param name="ErrDescription"></param>
-        // <remarks></remarks>
-        //Private Sub handleLegacyClassErrors2(ByVal MethodName As String, ByVal ErrDescription As String)
-        //    fixme-- logController.handleException( core,new GenericException("")) ' -----ignoreInteger, "App.EXEName", ErrDescription)
-        //End Sub
-
-
-
-
     }
 }

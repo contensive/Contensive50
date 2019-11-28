@@ -45,7 +45,6 @@ namespace Contensive.Processor.Controllers {
             //
             // if a AltSizeList is blank, make large,medium,small and thumbnails
             //
-            //hint = hint & ",180"
             if (core.siteProperties.getBoolean("ImageAllowSFResize", true) && (!isDelete)) {
                 using (var csData = new CsModel(core)) {
                     if (csData.openRecord("library files", recordID)) {
@@ -179,7 +178,6 @@ namespace Contensive.Processor.Controllers {
                 } else if (tableNameLower == SitePropertyModel.tableMetadata.tableNameLower) {
                     //
                     // -- Site Properties
-                    //hint = hint & ",130"
                     switch (GenericController.vbLCase(recordName)) {
                         case "allowlinkalias":
                             PageContentModel.invalidateCacheOfTable<PageContentModel>(core.cpParent);

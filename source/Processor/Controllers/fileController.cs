@@ -721,7 +721,6 @@ namespace Contensive.Processor.Controllers {
             try {
                 path = normalizeDosPath(path);
                 string unixPath = convertToUnixSlash(joinPath(remotePathPrefix, path));
-                //path = normalizeDosPath(path);
                 ListObjectsRequest request = new ListObjectsRequest {
                     BucketName = core.serverConfig.awsBucketName,
                     Prefix = unixPath,
@@ -1272,7 +1271,6 @@ namespace Contensive.Processor.Controllers {
             // -- convert to dos slash and lowercase()
             // no, should not lowercase the filenames, just the path. An uploaded image to S3 must match the link saved for it so any case change must happen before call to fileController.
             string returnPathFilename = pathFilename.Replace("/", "\\");
-            //string returnPath = path.Replace("/", "\\").ToLowerInvariant();
             //
             // -- remove accidental double slashes
             while (returnPathFilename.IndexOf("\\\\") >= 0) {
@@ -1940,7 +1938,6 @@ namespace Contensive.Processor.Controllers {
         protected bool disposed = false;
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
-                //Call appendDebugLog(".dispose, dereference main, csv")
                 if (disposing) {
                     //
                     // call .dispose for managed objects
@@ -1957,7 +1954,6 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Add code here to release the unmanaged resource.
                 //
-                //FileSystem = Nothing
             }
             this.disposed = true;
         }

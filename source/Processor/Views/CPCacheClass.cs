@@ -61,19 +61,15 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string CreateDependencyKeyInvalidateOnChange(string tableName) => CacheController.createCacheKey_TableObjectsInvalidationDate(tableName);
-        //public override string CreateDependencyKeyInvalidateOnChange(string tableName) => CacheController.createCacheKey_LastRecordModifiedDate(tableName);
         //
         public override string CreateDependencyKeyInvalidateOnChange(string tableName, string dataSourceName) => CacheController.createCacheKey_TableObjectsInvalidationDate(tableName, dataSourceName);
-        //public override string CreateDependencyKeyInvalidateOnChange(string tableName, string dataSourceName) => CacheController.createCacheKey_LastRecordModifiedDate(tableName, dataSourceName);
         //
-
         public override void UpdateLastModified(string tableName) => cp.core.cache.store_LastRecordModifiedDate(tableName);
-
         //
         //====================================================================================================
         //
         public override string CreateKeyForDbRecord(int recordId, string tableName, string dataSourceName) => CacheController.createCacheKey_forDbRecord(recordId, tableName, dataSourceName);
-
+        //
         public override string CreateKeyForDbRecord(int recordId, string tableName) => CacheController.createCacheKey_forDbRecord(recordId, tableName);
         //
         //====================================================================================================

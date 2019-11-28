@@ -151,12 +151,6 @@ namespace Contensive.Processor.Models.Domain {
             public string Guid;
             public string Style;
         }
-        ////
-        //internal static void installmetadataMiniCollectionFromXml_2(CoreController core, string srcXml, bool isNewBuild, bool isBaseCollection, bool isRepairMode, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
-        //    metadataMiniCollectionModel baseCollection = installmetadataMiniCollection_LoadXml(core, srcXml, true, true, isNewBuild, new metadataMiniCollectionModel(), logPrefix, ref installedCollections);
-        //    installmetadataMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollections);
-
-        //}
         //
         //======================================================================================================
         //
@@ -167,23 +161,6 @@ namespace Contensive.Processor.Models.Domain {
                     installMetaDataMiniCollection_BuildDb(core, isBaseCollection, newCollection, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
                     return;
                 }
-                //if (quick) {
-                //    //
-                //    LogController.logInfo(core, "installmetadataMiniCollectionFromXML");
-                //    // 
-                //    // -- method 1, just install
-                //    MetadataMiniCollectionModel baseCollection = loadXML(core, srcXml, true, true, isNewBuild, new MetadataMiniCollectionModel(), logPrefix);
-
-                //    installMetaDataMiniCollection_BuildDb(core, baseCollection, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
-                //} else {
-                //    //
-                //    // -- method 2, merge with application collection and install
-                //    //
-                //    MetadataMiniCollectionModel miniCollectionWorking = getApplicationMetaDataMiniCollection(core, isNewBuild, logPrefix);
-                //    MetadataMiniCollectionModel miniCollectionToAdd = loadXML(core, srcXml, isBaseCollection, false, isNewBuild, miniCollectionWorking, logPrefix);
-                //    addMiniCollectionSrcToDst(core, ref miniCollectionWorking, miniCollectionToAdd);
-                //    installMetaDataMiniCollection_BuildDb(core, miniCollectionWorking, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
-                //}
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -212,7 +189,7 @@ namespace Contensive.Processor.Models.Domain {
                     } catch (Exception ex) {
                         //
                         // -- xml load error
-                        LogController.logError(core, "Upgrademetadata_LoadDataToCollection Error reading xml archive, ex=[" + ex.ToString() + "]");
+                        LogController.logError(core, "Upgrademetadata_LoadDataToCollection Error reading xml archive, ex=[" + ex + "]");
                         throw new Exception("Error in Upgrademetadata_LoadDataToCollection, during doc.loadXml()", ex);
                     }
                     if ((srcXmlDom.DocumentElement.Name.ToLowerInvariant() != CollectionFileRootNode) && (srcXmlDom.DocumentElement.Name.ToLowerInvariant() != "contensivecdef")) {
@@ -225,12 +202,9 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         // Get Collection Name for logs
                         //
-                        //hint = "get collection name"
                         string Collectionname = XmlController.GetXMLAttribute(core, Found, srcXmlDom.DocumentElement, "name", "");
                         if (string.IsNullOrEmpty(Collectionname)) {
                             LogController.logInfo(core, "Upgrademetadata_LoadDataToCollection, Application: " + core.appConfig.name + ", Collection has no name");
-                        } else {
-                            //Call AppendClassLogFile(core.app.config.name,"Upgrademetadata_LoadDataToCollection", "Upgrademetadata_LoadDataToCollection, Application: " & core.app.appEnvironment.name & ", Collection: " & Collectionname)
                         }
                         result.name = Collectionname;
                         //
@@ -352,9 +326,6 @@ namespace Contensive.Processor.Models.Domain {
                                     //
                                     if (textMatch(MetaDataChildNode.Name, "field")) {
                                         string FieldName = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "Name", "");
-                                        if (FieldName.ToLowerInvariant() == "middlename") {
-                                            //FieldName = FieldName;
-                                        }
                                         ContentFieldMetadataModel DefaultMetaDataField = null;
                                         //
                                         // try to find field in the defaultmetadata
@@ -591,7 +562,6 @@ namespace Contensive.Processor.Models.Domain {
                                 break;
                             }
                         }
-                        //hint = "nodes done"
                         //
                         // Convert Menus.ParentName to Menu.menuNameSpace
                         //
@@ -619,12 +589,6 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 logPrefix += ", installCollection_BuildDbFromMiniCollection";
                 LogController.logInfo(core, "Application: " + core.appConfig.name + ", Upgrademetadata_BuildDbFromCollection");
-                //
-                //----------------------------------------------------------------------------------------------------------------------
-                //LogController.logInfo(core, "metadata Load, stage 1: verify core sql tables");
-                //----------------------------------------------------------------------------------------------------------------------
-                //
-                //BuildController.verifyBasicTables(core, logPrefix);
                 //
                 //----------------------------------------------------------------------------------------------------------------------
                 LogController.logInfo(core, "metadata Load, stage 1: create SQL tables in default datasource");
@@ -657,32 +621,6 @@ namespace Contensive.Processor.Models.Domain {
                     core.db.executeNonQuery("update ccfields set isBaseField=0");
                     core.db.executeNonQuery("update ccContent set isBaseContent=0");
                 }
-                //
-                //{
-                //    string UsedTables = "";
-                //    foreach (var keypairvalue in Collection.metaData) {
-                //        ContentMetadataModel contentMetaData = keypairvalue.Value;
-                //        if (contentMetaData.dataChanged) {
-                //            LogController.logInfo(core, "creating sql table [" + contentMetaData.tableName + "], datasource [" + contentMetaData.dataSourceName + "]");
-                //            using (var db = new DbController(core, contentMetaData.dataSourceName)) {
-                //                if (GenericController.vbLCase(contentMetaData.dataSourceName) == "default" || contentMetaData.dataSourceName == "") {
-                //                    if (GenericController.vbInstr(1, "," + UsedTables + ",", "," + contentMetaData.tableName + ",", 1) != 0) {
-                //                        //TableName = TableName;
-                //                    } else {
-                //                        UsedTables = UsedTables + "," + contentMetaData.tableName;
-                //                        db.createSQLTable(contentMetaData.tableName);
-                //                    }
-                //                    foreach (var fieldNvp in contentMetaData.fields) {
-                //                        ContentFieldMetadataModel field = fieldNvp.Value;
-                //                        db.createSQLTableField(contentMetaData.tableName, field.nameLc, field.fieldTypeId);
-                //                    }
-                //                }
-                //            }
-                //        }
-                //    }
-                //    core.clearMetaData();
-                //    core.cache.invalidateAll();
-                //}
                 //
                 //----------------------------------------------------------------------------------------------------------------------
                 LogController.logInfo(core, "metadata Load, stage 3: Verify all metadata names in ccContent so GetContentID calls will succeed");
@@ -816,35 +754,6 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "metadata Load, Upgrade collections added during upgrade process");
-                //----------------------------------------------------------------------------------------------------------------------
-                //\//
-                // 
-                // 20181028 - metadata upgrades shuld not include addon upgrdes
-                //LogController.logInfo(core, "Installing Add-on Collections gathered during upgrade");
-                //foreach (var import in Collection.collectionImports) {
-                //    string CollectionPath = "";
-                //    DateTime lastChangeDate = new DateTime();
-                //    string emptyString = "";
-                //    CollectionController.getCollectionConfig(core, import.Guid, ref CollectionPath, ref lastChangeDate, ref emptyString);
-                //    string errorMessage = "";
-                //    if (!string.IsNullOrEmpty(CollectionPath)) {
-                //        //
-                //        // This collection is installed locally, install from local collections
-                //        //
-                //        CollectionController.installCollectionFromLocalRepo(core, import.Guid, core.codeVersion(), ref errorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
-                //    } else {
-                //        //
-                //        // This is a new collection, install to the server and force it on this site
-                //        //
-                //        bool addonInstallOk = CollectionController.installCollectionFromRemoteRepo(core, import.Guid, ref errorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
-                //        if (!addonInstallOk) {
-                //            throw (new GenericException("Failure to install addon collection from remote repository. Collection [" + import.Guid + "] was referenced in collection [" + Collection.name + "]")); //core.handleLegacyError3(core.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
-                //        }
-                //    }
-                //}
-                //
-                //----------------------------------------------------------------------------------------------------------------------
                 LogController.logInfo(core, "metadata Load, stage 9: Verify Styles");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
@@ -859,7 +768,6 @@ namespace Contensive.Processor.Models.Domain {
                         SiteStyleSplit = (SiteStyles + " ").Split('}');
                         SiteStyleCnt = SiteStyleSplit.GetUpperBound(0) + 1;
                     }
-                    //Dim AddonClass As addonInstallClass
                     string StyleSheetAdd = "";
                     for (var Ptr = 0; Ptr < Collection.styleCnt; Ptr++) {
                         bool Found = false;
@@ -956,7 +864,6 @@ namespace Contensive.Processor.Models.Domain {
                                     Models.Domain.ContentFieldMetadataModel field = dstFieldKeyValuePair.Value;
                                     if (field.isBaseField) {
                                         field.isBaseField = false;
-                                        //field.Changed = True
                                     }
                                 }
                             }
@@ -1067,7 +974,6 @@ namespace Contensive.Processor.Models.Domain {
                     // Now check each of the field records for an addition, or a change
                     // DstPtr is still set to the Dst metadata
                     //
-                    //Call AppendClassLogFile(core.app.config.name,"Upgrademetadata_AddSrcToDst", "CollectionSrc.metadata[SrcPtr].fields.count=" & CollectionSrc.metadata[SrcPtr].fields.count)
                     foreach (var srcFieldKeyValuePair in srcMetaData.fields) {
                         Models.Domain.ContentFieldMetadataModel srcMetaDataField = srcFieldKeyValuePair.Value;
                         SrcFieldName = srcMetaDataField.nameLc;
@@ -1085,7 +991,6 @@ namespace Contensive.Processor.Models.Domain {
                                 //
                                 // Src field was found in Dst fields
                                 //
-
                                 dstMetaDataField = dstMetaData.fields[SrcFieldName.ToLowerInvariant()];
                                 updateDst = false;
                                 if (dstMetaDataField.isBaseField == srcMetaDataField.isBaseField) {
@@ -1368,9 +1273,6 @@ namespace Contensive.Processor.Models.Domain {
                 // Add Collections
                 //-------------------------------------------------------------------------------------------------
                 //
-                //foreach (var import in srcCollection.collectionImports) {
-                //    dstCollection.collectionImports.Add(import);
-                //}
                 //
                 //-------------------------------------------------------------------------------------------------
                 // Page Templates
@@ -1440,7 +1342,6 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         // -- update content field help records
                         if (fieldMetadata.helpChanged) {
-                            //int FieldHelpId = 0;
                             ContentFieldHelpModel fieldHelp = null;
                             var fieldHelpList = DbBaseModel.createList<ContentFieldHelpModel>(core.cpParent, "fieldid=" + fieldMetadata.id);
                             if (fieldHelpList.Count == 0) {
@@ -1464,9 +1365,6 @@ namespace Contensive.Processor.Models.Domain {
                             }
                         }
                     }
-                    //
-                    // -- save changes
-                    //content.save(core, true);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

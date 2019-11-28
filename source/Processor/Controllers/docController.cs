@@ -86,15 +86,6 @@ namespace Contensive.Processor.Controllers {
         //
         // -- todo
         public int menuSystemCloseCount { get; set; } = 0;
-        ////
-        //// -- todo
-        //internal class HelpStuff {
-        //    public String code;
-        //    public String caption;
-        //}
-        ////
-        //// -- In advanced edit, each addon edit header has several help-bubble popups. This is a list for them.
-        //internal List<HelpStuff> helpCodes { get; set; } = new List<HelpStuff>();
         //
         // -- todo
         internal int helpDialogCnt { get; set; } = 0;
@@ -274,9 +265,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            ////throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
-            //
         }
         //
         //=============================================================================

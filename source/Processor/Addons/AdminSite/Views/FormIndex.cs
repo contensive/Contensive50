@@ -56,9 +56,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     DataSourceModel datasource = DataSourceModel.create(core.cpParent, adminData.adminContent.dataSourceId, ref tmp);
                     //
                     // get access rights
-                    //bool allowCMEdit = false;
-                    //bool allowCMAdd = false;
-                    //bool allowCMDelete = false;
                     var userContentPermissions = PermissionController.getUserContentPermissions(core, adminData.adminContent);
                     //
                     // detemine which subform to disaply
@@ -227,9 +224,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                             // Edit Column
                             DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\">Edit</td>";
                             //
-                            // Row Number Column
-                            //DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\">Row</td>";
-                            //
                             // Delete Select Box Columns
                             if (!AllowDelete) {
                                 DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\"><input TYPE=CheckBox disabled=\"disabled\"></td>";
@@ -243,7 +237,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- print column headers - anchored so they sort columns
                                 //
                                 int ColumnWidth = encodeInteger((100 * column.Width) / (double)ColumnWidthTotal);
-                                //fieldId = column.FieldId
                                 string FieldName = column.Name;
                                 //
                                 // if this is a current sort ,add the reverse flag
@@ -295,7 +288,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         break;
                                     }
                                 }
-                                //ButtonObject = "Button" + ButtonObjectCount;
                                 adminData.buttonObjectCount += 1;
                                 DataTable_HdrRow += "<td width=\"" + ColumnWidth + "%\" valign=bottom align=left class=\"small ccAdminListCaption\">";
                                 DataTable_HdrRow += ("<a title=\"" + SortTitle + "\" href=\"" + HtmlController.encodeHtml(ButtonHref) + "\" class=\"ccAdminListCaption\">" + ButtonFace + "</A>");
@@ -334,9 +326,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         }
                                         DataTableRows.Append(AdminUIController.getRecordEditLink(URI));
                                         DataTableRows.Append(("</td>"));
-                                        //
-                                        // --- Record Number column
-                                        //DataTable_DataRows.Append( "<td align=right " + RowColor + ">" + SpanClassAdminSmall + "[" + (RecordPointer + 1) + "]</span></td>";
                                         //
                                         // --- Delete Checkbox Columns
                                         if (AllowDelete) {
@@ -1699,7 +1688,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
                                 if (IsLookupFieldValid) {
-                                    Stream.Add(csData.getText("LookupTable" + field.id.ToString() + "Name"));
+                                    Stream.Add(csData.getText("LookupTable" + field.id + "Name"));
                                 } else if (field.lookupList != "") {
                                     string[] lookups = field.lookupList.Split(',');
                                     int LookupPtr = csData.getInteger(field.nameLc) - 1;
@@ -1715,7 +1704,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
                                 if (IsLookupFieldValid) {
-                                    Stream.Add(csData.getText("LookupTable" + field.id.ToString() + "Name"));
+                                    Stream.Add(csData.getText("LookupTable" + field.id + "Name"));
                                 } else {
                                     Stream.Add(csData.getText(field.nameLc));
                                 }

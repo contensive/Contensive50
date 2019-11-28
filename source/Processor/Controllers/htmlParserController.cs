@@ -178,8 +178,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            LogController.logError(core, new Exception("unexpected exception"));
             return tempLoad;
         }
         //
@@ -225,8 +223,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            LogController.logError(core, new Exception("unexpected exception"));
             return tempText;
         }
         //
@@ -247,8 +243,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            LogController.logError(core, new Exception("unexpected exception"));
             return tempTagName;
         }
         //
@@ -269,8 +263,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            LogController.logError(core, new Exception("unexpected exception"));
             return tempPosition;
         }
         //
@@ -291,8 +283,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            LogController.logError(core, new Exception("unexpected exception"));
             return tempElementAttributeCount;
         }
         //
@@ -315,8 +305,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            LogController.logError(core, new Exception("unexpected exception"));
             return tempElementAttributeName;
         }
         //
@@ -339,8 +327,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            LogController.logError(core, new Exception("unexpected exception"));
             return tempElementAttributeValue;
         }
         //
@@ -359,7 +345,6 @@ namespace Contensive.Processor.Controllers {
                 if (ElementPointer < LocalElementCount) {
                     if (LocalElements[ElementPointer].AttributeCount > 0) {
                         UcaseName = GenericController.vbUCase(Name);
-                        //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of LocalElements(ElementPointer).AttributeCount for every iteration:
                         int tempVar = LocalElements[ElementPointer].AttributeCount;
                         for (AttributePointer = 0; AttributePointer < tempVar; AttributePointer++) {
                             if (LocalElements[ElementPointer].Attributes[AttributePointer].UcaseName == UcaseName) {
@@ -374,8 +359,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            LogController.logError(core, new Exception("unexpected exception"));
             return tempElementAttribute;
         }
         //
@@ -452,8 +435,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            LogController.logError(core, new Exception("unexpected exception"));
         }
         //
         //====================================================================================================
@@ -480,8 +461,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            LogController.logError(core, new Exception("unexpected exception"));
             return tempGetLesserNonZero;
         }
         //
@@ -501,8 +480,6 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            //ErrorTrap:
-            LogController.logError(core, new Exception("unexpected exception"));
             return tempPassWhiteSpace;
         }
         //

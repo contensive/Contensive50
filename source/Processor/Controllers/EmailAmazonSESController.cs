@@ -55,14 +55,14 @@ namespace Contensive.Processor.Controllers {
                             return true;
                         } catch (Exception ex) {
                             reasonForFail = "Error sending email [" + ex.Message + "]" + logShortDetail;
-                            LogController.logError(core, "Unexpected exception during SES send" + logLongDetail + ", exception [" + ex.ToString() + "]");
+                            LogController.logError(core, "Unexpected exception during SES send" + logLongDetail + ", exception [" + ex + "]");
                             return false;
                         }
                     }
                 }
             } catch (Exception ex) {
                 reasonForFail = "Error sending email [" + ex.Message + "]" + logShortDetail;
-                LogController.logError(core, "Unexpected exception during SES configure" + logLongDetail + ", exception [" + ex.ToString() + "]");
+                LogController.logError(core, "Unexpected exception during SES configure" + logLongDetail + ", exception [" + ex + "]");
                 return false;
             }
         }

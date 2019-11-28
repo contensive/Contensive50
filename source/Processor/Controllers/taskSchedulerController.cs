@@ -36,12 +36,10 @@ namespace Contensive.Processor.Controllers {
                     //
                     // call .dispose for managed objects
                     //
-                    //core.dispose()
                 }
                 //
                 // cp  creates and destroys cmc
                 //
-                //GC.Collect(); -- no more activeX, so let GC take care of itself
             }
         }
         //
@@ -77,7 +75,6 @@ namespace Contensive.Processor.Controllers {
                     StartServiceInProgress = true;
                     processTimer = new System.Timers.Timer(ProcessTimerMsecPerTick);
                     processTimer.Elapsed += processTimerTick;
-                    //processTimer.Interval = ProcessTimerMsecPerTick;
                     processTimer.Enabled = true;
                     returnStartedOk = true;
                     StartServiceInProgress = false;
@@ -184,95 +181,17 @@ namespace Contensive.Processor.Controllers {
                                     addon.save(cpApp);
                                 }
                             } catch (Exception ex) {
-                                LogController.logTrace(cpApp.core, "scheduleTasks, exception [" + ex.ToString() + "]");
+                                LogController.logTrace(cpApp.core, "scheduleTasks, exception [" + ex + "]");
                                 LogController.logError(cpApp.core, ex);
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                LogController.logTrace(coreServer, "scheduleTasks, exeception [" + ex.ToString() + "]");
+                LogController.logTrace(coreServer, "scheduleTasks, exeception [" + ex + "]");
                 LogController.logError(coreServer, ex);
             }
         }
-        //private void scheduleTasks(CoreController coreServer) {
-        //    try {
-        //        //
-        //        // -- run tasks for each app
-        //        foreach (KeyValuePair<string, Models.Domain.AppConfigModel> appKvp in coreServer.serverConfig.apps) {
-        //            LogController.logTrace(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
-        //            using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
-        //                CoreController coreApp = cpApp.core;
-        //                if (!(coreApp.appConfig.appStatus == AppConfigModel.AppStatusEnum.ok)) {
-        //                    //
-        //                    LogController.logTrace(coreApp, "scheduleTasks, app status not ok");
-        //                //} else if (!(coreApp.appConfig.appMode == appConfigModel.appModeEnum.normal)) {
-        //                //    //
-        //                //    logController.logTrace(coreApp, "scheduleTasks, app mode not normal");
-        //                } else {
-        //                    //
-        //                    // Execute Processes
-        //                    try {
-        //                        DateTime RightNow = DateTime.Now;
-        //                        string SQLNow = DbController.encodeSQLDate(RightNow);
-        //                        string sqlAddonsCriteria = ""
-        //                            + "(Active<>0)"
-        //                            + " and(name<>'')"
-        //                            + " and("
-        //                            + "  ((ProcessRunOnce is not null)and(ProcessRunOnce<>0))"
-        //                            + "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))"
-        //                            + "  or(ProcessNextRun<" + SQLNow + ")"
-        //                            + " )";
-        //                        int CS = coreApp.db.csOpen(AddonModel.tableMetadata.contentName, sqlAddonsCriteria);
-        //                        while (coreApp.db.csOk()) {
-        //                            int addonProcessInterval = coreApp.db.csGetInteger("ProcessInterval");
-        //                            string addonName = coreApp.db.csGetText("name");
-        //                            bool addonProcessRunOnce = coreApp.db.csGetBoolean("ProcessRunOnce");
-        //                            DateTime addonProcessNextRun = coreApp.db.csGetDate("ProcessNextRun");
-        //                            DateTime nextRun = DateTime.MinValue;
-        //                            if (addonProcessInterval > 0) {
-        //                                nextRun = RightNow.AddMinutes(addonProcessInterval);
-        //                            }
-        //                            if ((addonProcessNextRun < RightNow) || (addonProcessRunOnce)) {
-        //                                //
-        //                                LogController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], add task, addonProcessRunOnce [" + addonProcessRunOnce + "], addonProcessNextRun [" + addonProcessNextRun + "]");
-        //                                //
-        //                                // -- resolve triggering state
-        //                                coreApp.db.csSet("ProcessRunOnce", false);
-        //                                if (addonProcessNextRun < RightNow) {
-        //                                    coreApp.db.csSet("ProcessNextRun", nextRun);
-        //                                }
-        //                                coreApp.db.csSave(CS);
-        //                                //
-        //                                // -- add task to queue for runner
-        //                                var cmdDetail = new TaskModel.CmdDetailClass();
-        //                                cmdDetail.addonId = coreApp.db.csGetInteger("ID");
-        //                                cmdDetail.addonName = addonName;
-        //                                cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText("argumentlist"));
-        //                                addTaskToQueue(coreApp, cmdDetail, false);
-        //                            } else if (coreApp.db.csGetDate("ProcessNextRun") == DateTime.MinValue) {
-        //                                //
-        //                                LogController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
-        //                                //
-        //                                // -- Interval is OK but NextRun is 0, just set next run
-        //                                coreApp.db.csSet("ProcessNextRun", nextRun);
-        //                            }
-        //                            coreApp.db.csGoNext();
-        //                        }
-        //                        coreApp.db.csClose();
-        //                    } catch (Exception ex) {
-        //                        //
-        //                        LogController.logTrace(coreApp, "scheduleTasks, exception [" + ex.ToString() + "]");
-        //                        LogController.handleError(coreApp, ex);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    } catch (Exception ex) {
-        //        LogController.logTrace(coreServer, "scheduleTasks, exeception [" + ex.ToString() + "]");
-        //        LogController.handleError(coreServer, ex);
-        //    }
-        //}
         //
         //====================================================================================================
         /// <summary>
@@ -323,7 +242,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logTrace(core, "addTaskToQueue, cmdDetailJson [" + cmdDetailJson + "]");
                 }
             } catch (Exception ex) {
-                LogController.logTrace(core, "addTaskToQueue, exeception [" + ex.ToString() + "]");
+                LogController.logTrace(core, "addTaskToQueue, exeception [" + ex + "]");
                 LogController.logError(core, ex);
             }
             return resultTaskAdded;

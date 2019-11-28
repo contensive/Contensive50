@@ -86,7 +86,6 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         /// </summary>
         [TestMethod]
         public void views_cp_ExecuteRouteTest() {
-            //reviewed 20190107
             //
             // arrange
             using (CPClass cp = new CPClass(testAppName)) {

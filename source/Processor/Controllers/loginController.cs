@@ -100,7 +100,6 @@ namespace Contensive.Processor.Controllers {
                     loginForm += HtmlController.inputHidden("Type", FormTypeLogin);
                     loginForm += HtmlController.inputHidden("email", core.session.user.email);
                     result += HtmlController.form(core, loginForm, QueryString);
-                    //string Panel = errorController.getUserError(core) + "\r<p class=\"ccAdminNormal\">" + usernameMsg + loginForm + "";
                     //
                     // ----- Password Form
                     if (core.siteProperties.getBoolean("allowPasswordEmail", true)) {
@@ -136,7 +135,6 @@ namespace Contensive.Processor.Controllers {
                             errorContextMessage = "calling login form addon [" + loginAddonId + "] from internal method"
                         };
                         returnHtml = core.addon.execute(addon, executeContext);
-                        //returnHtml = core.addon.execute_legacy2(loginAddonID, "", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", False, Nothing)
                         if (string.IsNullOrEmpty(returnHtml)) {
                             //
                             // -- login successful, redirect back to this page (without a method)
@@ -288,16 +286,13 @@ namespace Contensive.Processor.Controllers {
                 //
                 result = false;
                 if (string.IsNullOrEmpty(workingEmail)) {
-                    //hint = "110"
                     ErrorController.addUserError(core, "Please enter your email address before requesting your username and password.");
                 } else {
-                    //hint = "120"
                     atPtr = GenericController.vbInstr(1, workingEmail, "@");
                     if (atPtr < 2) {
                         //
                         // email not valid
                         //
-                        //hint = "130"
                         ErrorController.addUserError(core, "Please enter a valid email address before requesting your username and password.");
                     } else {
                         EMailName = vbMid(workingEmail, 1, atPtr - 1);
@@ -324,7 +319,6 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // renew this old record
                                         //
-                                        //hint = "150"
                                         csData.set("developer", "1");
                                         csData.set("admin", "1");
                                         if (csData.getDate("dateExpires") > DateTime.MinValue) { csData.set("dateExpires", DateTime.Now.AddDays(7).Date.ToString()); }
@@ -349,78 +343,58 @@ namespace Contensive.Processor.Controllers {
                                 subject = "Password Request at " + core.webServer.requestDomain;
                                 Message = "";
                                 while (csData.ok()) {
-                                    //hint = "170"
                                     updateUser = false;
                                     if (string.IsNullOrEmpty(Message)) {
-                                        //hint = "180"
                                         Message = "This email was sent in reply to a request at " + core.webServer.requestDomain + " for the username and password associated with this email address. ";
                                         Message = Message + "If this request was made by you, please return to the login screen and use the following:\r\n";
                                         Message = Message + Environment.NewLine;
                                     } else {
-                                        //hint = "190"
                                         Message = Message + Environment.NewLine;
                                         Message = Message + "Additional user accounts with the same email address: \r\n";
                                     }
                                     //
                                     // username
                                     //
-                                    //hint = "200"
                                     Username = csData.getText("Username");
                                     usernameOK = true;
                                     if (!allowEmailLogin) {
-                                        //hint = "210"
                                         if (Username != Username.Trim()) {
-                                            //hint = "220"
                                             Username = Username.Trim();
                                             updateUser = true;
                                         }
                                         if (string.IsNullOrEmpty(Username)) {
-                                            //hint = "230"
-                                            //username = emailName & Int(Rnd() * 9999)
                                             usernameOK = false;
                                             Ptr = 0;
                                             while (!usernameOK && (Ptr < 100)) {
-                                                //hint = "240"
                                                 Username = EMailName + encodeInteger(Math.Floor(encodeNumber(Microsoft.VisualBasic.VBMath.Rnd() * 9999)));
                                                 usernameOK = !core.session.isLoginOK(Username, "test");
                                                 Ptr = Ptr + 1;
                                             }
-                                            //hint = "250"
                                             if (usernameOK) {
                                                 updateUser = true;
                                             }
                                         }
-                                        //hint = "260"
                                         Message = Message + " username: " + Username + Environment.NewLine;
                                     }
-                                    //hint = "270"
                                     if (usernameOK) {
                                         //
                                         // password
                                         //
-                                        //hint = "280"
                                         Password = csData.getText("Password");
                                         if (Password.Trim() != Password) {
-                                            //hint = "290"
                                             Password = Password.Trim();
                                             updateUser = true;
                                         }
-                                        //hint = "300"
                                         if (string.IsNullOrEmpty(Password)) {
-                                            //hint = "310"
                                             for (Ptr = 0; Ptr <= 8; Ptr++) {
-                                                //hint = "320"
                                                 Index = encodeInteger(Microsoft.VisualBasic.VBMath.Rnd() * passwordChrsLength);
                                                 Password = Password + vbMid(passwordChrs, Index, 1);
                                             }
-                                            //hint = "330"
                                             updateUser = true;
                                         }
-                                        //hint = "340"
                                         Message = Message + " password: " + Password + Environment.NewLine;
                                         result = true;
                                         if (updateUser) {
-                                            //hint = "350"
                                             csData.set("username", Username);
                                             csData.set("password", Password);
                                         }

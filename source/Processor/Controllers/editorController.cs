@@ -104,7 +104,6 @@ namespace Contensive.Processor.Controllers {
                             EditorPanel = EditorPanel + HtmlController.inputHidden("fn", strFieldName);
                             EditorPanel = EditorPanel + GenericController.encodeText(FormElements);
                             EditorPanel = EditorPanel + core.html.getFormInputHTML("ContentCopy", Copy, "3", "45", false, true);
-                            //EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
                             ButtonPanel = core.html.getPanelButtons(ButtonCancel + "," + ButtonSave);
                             EditorPanel = EditorPanel + ButtonPanel;
                         }
@@ -161,64 +160,6 @@ namespace Contensive.Processor.Controllers {
                 return null;
             }
         }
-        //
-        //====================================================================================================
-        //
-        //public static List<FieldEditorAddonModel> getFieldEditorAddonList(CoreController core, int contentId) {
-        //    try {
-        //        string fieldEditorListKey = "editorPreferencesForContentV2:" + contentId;
-        //        List<FieldEditorAddonModel> fieldEditorList = core.userProperty.getObject<List<FieldEditorAddonModel>>(fieldEditorListKey);
-        //        if (fieldEditorList == null) {
-        //            fieldEditorList = new List<FieldEditorAddonModel>();
-        //            //
-        //            // -- check for legacy fieldeditor preference comma-string
-        //            string fieldEditorCommaList = core.userProperty.getText("editorPreferencesForContent:" + contentId, "");
-        //            if (!string.IsNullOrEmpty(fieldEditorCommaList)) {
-        //                foreach (var fieldPair in fieldEditorCommaList.Split(',')) {
-        //                    var fieldEditor = fieldPair.Split(':');
-        //                    fieldEditorList.Add(new FieldEditorAddonModel() {
-        //                        fieldId = encodeInteger(fieldEditor[0]),
-        //                        editorAddonId = encodeInteger(fieldEditor[1])
-        //                    });
-        //                }
-        //            }
-        //            core.userProperty.setProperty(fieldEditorListKey, fieldEditorList);
-        //        }
-        //        //
-        //        // todo - this should be added to metaData load
-        //        // add the addon editors assigned to each field
-        //        string SQL = "select f.id,f.editorAddonID from ccfields f where f.ContentID=" + contentId + " and f.editorAddonId is not null";
-        //        using (DataTable dt = core.db.executeQuery(SQL)) {
-        //            foreach (DataRow row in dt.Rows) {
-        //                fieldEditorList.Add(new FieldEditorAddonModel() {
-        //                    fieldId = encodeInteger(row[0]),
-        //                    editorAddonId = encodeInteger(row[1])
-        //                });
-        //            };
-        //        }
-        //        //
-        //        // load fieldEditorOptions - these are all the editors available for each field
-        //        //
-        //        Dictionary<string, int> fieldEditorOptions = new Dictionary<string, int>();
-        //        SQL = "select r.contentFieldTypeId,a.Id"
-        //            + " from ccAddonContentFieldTypeRules r"
-        //            + " left join ccaggregatefunctions a on a.id=r.addonid"
-        //            + " where (r.active<>0)and(a.active<>0)and(a.id is not null) order by r.contentFieldTypeID";
-        //        using (DataTable dt = core.db.executeQuery(SQL)) {
-        //            foreach (DataRow row in dt.Rows) {
-        //                int fieldId = encodeInteger(row[0]);
-        //                if ((fieldId > 0) && (!fieldEditorOptions.ContainsKey(fieldId.ToString()))) {
-        //                    fieldEditorOptions.Add(fieldId.ToString(), encodeInteger(row[1]));
-        //                }
-
-        //            }
-        //        }
-        //        return fieldEditorList;
-        //    } catch (Exception ex) {
-        //        LogController.logError(core, ex);
-        //        throw;
-        //    }
-        //}
         //
         //====================================================================================================
         #region  IDisposable Support 

@@ -784,35 +784,6 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string decodeURL(string source) {
             return WebUtility.UrlDecode(source);
-            //string tempDecodeURL = null;
-            //// ##### removed to catch err<>0 problem //On Error //Resume Next
-            ////
-            //int Position = 0;
-            //string ESCString = null;
-            //int ESCValue = 0;
-            //string Digit0 = null;
-            //string Digit1 = null;
-            ////Dim iURL As String
-            ////
-            ////iURL = Source
-            //// plus to space only applies for query component of a URL, but %99 encoding works for both
-            ////DecodeURL = vbReplace(iURL, "+", " ")
-            //tempDecodeURL = source;
-            //Position = vbInstr(1, tempDecodeURL, "%");
-            //while (Position != 0) {
-            //    ESCString = tempDecodeURL.Substring(Position - 1, 3);
-            //    Digit0 = vbUCase(ESCString.Substring(1, 1));
-            //    Digit1 = vbUCase(ESCString.Substring(2, 1));
-            //    if (((string.CompareOrdinal(Digit0, "0") >= 0) && (string.CompareOrdinal(Digit0, "9") <= 0)) || ((string.CompareOrdinal(Digit0, "A") >= 0) && (string.CompareOrdinal(Digit0, "F") <= 0))) {
-            //        if (((string.CompareOrdinal(Digit1, "0") >= 0) && (string.CompareOrdinal(Digit1, "9") <= 0)) || ((string.CompareOrdinal(Digit1, "A") >= 0) && (string.CompareOrdinal(Digit1, "F") <= 0))) {
-            //            ESCValue = int.Parse("&H" + ESCString.Substring(1));
-            //            tempDecodeURL = vbReplace(tempDecodeURL, ESCString, Convert.ToChar(ESCValue));
-            //        }
-            //    }
-            //    Position = vbInstr(Position + 1, tempDecodeURL, "%");
-            //}
-            ////
-            //return tempDecodeURL;
         }
         //
         //========================================================================
@@ -912,7 +883,6 @@ namespace Contensive.Processor.Controllers {
                             OutSize = OutSize + 10;
                             Array.Resize(ref Out, OutSize + 1);
                         }
-                        //OutPointer = OutPointer + 1
                     } else {
                         if (!InQuote) {
                             string[] SpaceSplit = Fragment.Split(Delimiter.ToCharArray());
@@ -1188,16 +1158,6 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string EncodeJavascriptStringSingleQuote(string Source) {
             return HttpUtility.JavaScriptStringEncode(Source);
-            //string tempEncodeJavascript = null;
-            ////
-            //tempEncodeJavascript = Source;
-            //tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\\", "\\\\");
-            //tempEncodeJavascript = vbReplace(tempEncodeJavascript, "'", "\\'");
-            ////EncodeJavascript = vbReplace(EncodeJavascript, "'", "'+""'""+'")
-            //tempEncodeJavascript = vbReplace(tempEncodeJavascript, Environment.NewLine, "\\n");
-            //tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\r", "\\n");
-            //return vbReplace(tempEncodeJavascript, "\n", "\\n");
-            ////
         }
         //
         // ====================================================================================================

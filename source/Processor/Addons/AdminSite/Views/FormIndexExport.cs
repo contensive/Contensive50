@@ -23,7 +23,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 bool AllowContentAccess = false;
                 string ButtonCommaList = "";
                 string ExportName = null;
-                //adminUIController Adminui = new adminUIController(core);
                 string Description = null;
                 string Content = "";
                 string Button = null;
@@ -88,11 +87,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         //
                         // Get the SQL parts
                         //
-                        //DataSourceName = core.db.getDataSourceNameByID(adminContext.content.dataSourceId)
-                        //DataSourceType = core.db.getDataSourceType(DataSourceName)
                         IndexConfig = IndexConfigClass.get(core, adminData);
-                        //RecordTop = IndexConfig.RecordTop
-                        //RecordsPerPage = IndexConfig.RecordsPerPage
                         FormIndex.setIndexSQL(core, adminData, IndexConfig, ref AllowContentAccess, ref sqlFieldList, ref SQLFrom, ref SQLWhere, ref SQLOrderBy, ref IsLimitedToSubContent, ref ContentAccessLimitMessage, ref FieldUsedInColumns, IsLookupFieldValid);
                         if (!AllowContentAccess) {
                             //

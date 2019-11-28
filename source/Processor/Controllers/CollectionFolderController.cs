@@ -442,7 +442,6 @@ namespace Contensive.Processor.Controllers {
                 //
                 // This is an install
                 //
-                //hint = hint & ",460"
                 CollectionFolderName = collectionGuid;
                 CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "{", "");
                 CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "}", "");

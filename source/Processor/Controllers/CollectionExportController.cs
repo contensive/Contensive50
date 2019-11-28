@@ -64,16 +64,9 @@ namespace Contensive.Processor.Controllers {
                     string tempExportZip_Filename = encodeFilename(cp, CollectionName + ".zip");
                     cdnExportZip_Filename = encodeFilename(cp, CollectionName + ".zip");
                     //
-                    // Delete old archive file
-                    //cp.TempFiles.DeleteFile(tempExportXml_Filename)
-                    //cp.TempFiles.DeleteFile(tempExportZipPathFilename)
-                    //cp.CdnFiles.DeleteFile(cdnExportZipPathFilename)
-                    //
-                    //
                     // Build executable file list Resource Node so executables can be added to addons for Version40compatibility
                     //   but save it for the end, executableFileList
                     //
-                    //Call Main.testpoint("getCollection, 400")
                     string AddonPath = "addons\\";
                     string FileList = CS.GetText("execFileList");
                     string Path = null;
@@ -82,10 +75,8 @@ namespace Contensive.Processor.Controllers {
                     int Ptr = 0;
                     string[] Files = null;
                     int ResourceCnt = 0;
-                    //Dim ContentName As String
                     int Pos = 0;
                     List<string> tempPathFileList = new List<string>();
-                    //Dim PhysicalWWWPath As String
                     string CollectionPath = "";
                     string ExecFileListNode = "";
                     if (!string.IsNullOrEmpty(FileList)) {
@@ -113,7 +104,6 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 string ManualFilename = "";
                                 if (Filename.ToLower(CultureInfo.InvariantCulture) != ManualFilename.ToLower(CultureInfo.InvariantCulture)) {
-                                    //AddFilename = AddonPath & CollectionPath & Filename
                                     cp.PrivateFiles.Copy(AddonPath + CollectionPath + Filename, tempExportPath + Filename, cp.TempFiles);
                                     if (!tempPathFileList.Contains(tempExportPath + Filename)) {
                                         tempPathFileList.Add(tempExportPath + Filename);
@@ -289,16 +279,13 @@ namespace Contensive.Processor.Controllers {
                                                                 Array.Resize(ref fieldTypes, fieldCnt + 1);
                                                                 Array.Resize(ref fieldLookupContent, fieldCnt + 1);
                                                                 Array.Resize(ref fieldLookupList, fieldCnt + 1);
-                                                                //fieldLookupContent
                                                                 fieldNames[fieldCnt] = FieldName;
                                                                 fieldTypes[fieldCnt] = FieldTypeNumber;
                                                                 fieldLookupContent[fieldCnt] = FieldLookupContentName;
                                                                 fieldLookupList[fieldCnt] = fieldLookupListValue;
                                                                 fieldCnt = fieldCnt + 1;
-                                                                //end case
                                                                 break;
                                                             }
-                                                            //end case
                                                             break;
                                                         }
                                                     }
@@ -325,7 +312,6 @@ namespace Contensive.Processor.Controllers {
                                                 for (fieldPtr = 0; fieldPtr < fieldCnt; fieldPtr++) {
                                                     FieldName = fieldNames[fieldPtr];
                                                     FieldTypeNumber = cp.Utils.EncodeInteger(fieldTypes[fieldPtr]);
-                                                    //Dim ContentID As Integer
                                                     string FieldValue = null;
                                                     switch (FieldTypeNumber) {
                                                         case (int)FieldTypeIdEnum.Boolean:
@@ -427,13 +413,10 @@ namespace Contensive.Processor.Controllers {
                     //
                     // CDef
                     //
-                    //Call Main.testpoint("getCollection, 700")
                     foreach (ContentModel content in ContentModel.createListFromCollection(cp, CollectionID)) {
-                        //bool reload = false;
                         if (string.IsNullOrEmpty(content.ccguid)) {
                             content.ccguid = cp.Utils.CreateGuid();
                             content.save(cp);
-                            //reload = true;
                         }
                         Node = CollectionExportCDefController.getCollectionCdef(cp.core, content.name, false);
                         //
@@ -452,8 +435,6 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Scripting Modules
                     //
-                    //Call Main.testpoint("getCollection, 800")
-
                     if (!string.IsNullOrEmpty(IncludeModuleGuidList)) {
                         string[] Modules = Microsoft.VisualBasic.Strings.Split(IncludeModuleGuidList, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
                         for (Ptr = 0; Ptr <= Modules.GetUpperBound(0); Ptr++) {

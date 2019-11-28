@@ -231,7 +231,6 @@ public static class ExtensionMethods {
         }
         int initialDayOfWeek = (int)startDate.DayOfWeek;
         int weeksBase = (int)Math.Truncate((double)Math.Abs(businessDays / 5));
-        //int weeksBase = Math.Abs(businessDays / 5);
         int addDays = Math.Abs(businessDays % 5);
         if ((direction == 1 && addDays + initialDayOfWeek > 5) ||
              (direction == -1 && addDays >= initialDayOfWeek)) {

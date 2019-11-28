@@ -51,7 +51,6 @@ namespace Contensive.Processor.Addons.Housekeeping {
                             }
                         }
                     }
-                    //Call AppendClassLog(core, core.appEnvironment.name, "HouseKeep", "Verify there are 24 hour records for the past 90 days")
                     DateTime PeriodStartDate = env.rightNow.Date.AddDays(-90);
                     double PeriodStep = 1;
                     int HoursPerDay = 0;
@@ -297,9 +296,6 @@ namespace Contensive.Processor.Addons.Housekeeping {
                             }
                             //
                             if ((MultiPageHitCnt > MultiPageVisitCnt) && (HitCnt > 0)) {
-                                //XmlDocument LibraryCollections = new XmlDocument();
-                                //XmlDocument LocalCollections = new XmlDocument();
-                                //XmlDocument Doc = new XmlDocument();
                                 int AveReadTime = encodeInteger(MultiPageTimetoLastHitSum / (MultiPageHitCnt - MultiPageVisitCnt));
                                 double TotalTimeOnSite = MultiPageTimetoLastHitSum + (AveReadTime * VisitCnt);
                                 AveTimeOnSite = TotalTimeOnSite / VisitCnt;
@@ -361,7 +357,6 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                     // Out of data, start with this DatePtr
                                     //
                                     VisitSummaryClass.summarizePeriod(core, env, datePtr, datePtr, 24, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
-                                    //Exit For
                                 } else {
                                     DateTime workingDate = DateTime.MinValue.AddDays(csData.getInteger("DateNumber"));
                                     if (datePtr < workingDate) {

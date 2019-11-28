@@ -669,7 +669,6 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 StringBuilderLegacyController FastString = new StringBuilderLegacyController();
-                //string[] lookups = null;
                 int Ptr = 0;
                 int RecordID = 0;
                 string Copy = null;
@@ -691,7 +690,6 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- select values
                 //
-                //lookups = SelectList.Split(',');
                 for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
                     RecordID = Ptr + 1;
                     Copy = lookups[Ptr];
@@ -699,7 +697,6 @@ namespace Contensive.Processor.Controllers {
                         FastString.Add(Environment.NewLine + "<option value=\"" + RecordID + "\" ");
                         if (RecordID == CurrentValue) {
                             FastString.Add("selected");
-                            //SelectedFound = True
                         }
                         if (Copy.Length > SelectFieldWidthLimit) {
                             Copy = Copy.Left(SelectFieldWidthLimit) + "...+";
@@ -739,7 +736,6 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         Link = core.webServer.requestPage + "?" + core.doc.refreshQueryString;
                         Link = GenericController.modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, true);
-                        //Link = genericController.modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
                         result += "<a href=\"" + HtmlController.encodeHtml(Link) + "\" >";
                     }
                     IconFilename = core.siteProperties.loginIconFilename;
@@ -833,7 +829,6 @@ namespace Contensive.Processor.Controllers {
             //
             // todo - remove comments if this is correct
             // -- I dont think serverActionForm is correct. Form action, if not provided should be refreshQueryString
-            //string action = joinQueryString(core.webServer.serverFormActionURL, actionQueryString);
             string action = "?" + actionQueryString;
             string result = "<form name=\"" + htmlName + "\" action=\"" + action + "\" method=\"" + htmlMethod + "\" style=\"display: inline;\"";
             result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
@@ -1156,7 +1151,6 @@ namespace Contensive.Processor.Controllers {
                                 if (FieldReadOnly) {
                                     returnResult = FieldValueText;
                                 } else {
-                                    //Height = encodeEmptyInteger(Height, 4)
                                     returnResult = getFormInputHTML(fieldName, FieldValueText, "", Width.ToString());
                                 }
                                 break;
@@ -1171,7 +1165,6 @@ namespace Contensive.Processor.Controllers {
                                 if (FieldReadOnly) {
                                     returnResult = FieldValueText;
                                 } else {
-                                    //Height = encodeEmptyInteger(Height, 4)
                                     returnResult = inputText_Legacy(core, fieldName, FieldValueText, Height, Width);
                                 }
                                 //
@@ -1472,7 +1465,6 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // Block activex addons from email
                                     //
-                                    //ObjectProgramID2 = ObjectProgramID2;
                                 } else {
                                     string addonName = encodeText(csData.getText("name")).Trim(' ');
                                     if (!string.IsNullOrEmpty(addonName) && (addonName != LastAddonName)) {
@@ -1584,7 +1576,6 @@ namespace Contensive.Processor.Controllers {
                 const string ACFunctionList3 = "selectcontentname";
                 const string ACFunctionListId = "ListID";
                 const string ACFunctionListFields = "ListFields";
-                //string SrcSelectorInner = null;
                 string SrcSelector = SrcOptionValueSelector.Trim(' ');
                 //
                 string SrcSelectorInner = SrcSelector;
@@ -1745,7 +1736,6 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Build output string
                 //
-                //csv_result = encodeNvaArgument(SrcOptionName)
                 result = HtmlController.encodeHtml(GenericController.encodeNvaArgument(SrcOptionName)) + "=";
                 if (!string.IsNullOrEmpty(InstanceOptionValue_AddonEncoded)) {
                     result += HtmlController.encodeHtml(InstanceOptionValue_AddonEncoded);
@@ -2333,7 +2323,6 @@ namespace Contensive.Processor.Controllers {
                                 if (main_MemberShipCount > 0) {
                                     main_MemberShipRuleCopy = new string[main_MemberShipCount];
                                 }
-                                //main_MemberShipCount = UBound(main_MemberShip) + 1
                                 main_MemberShipSize = main_MemberShipCount;
                             }
                         } else {
@@ -2415,17 +2404,12 @@ namespace Contensive.Processor.Controllers {
                                             } else {
                                                 optionCaptionHtmlEncoded = HtmlController.encodeHtml(OptionCaption);
                                             }
-                                            if (DivCheckBoxCnt != 0) {
-                                                // leave this between checkboxes - it is searched in the admin page
-                                                //returnHtml += "<br>\r\n";
-                                            }
                                             string RuleCopy = "";
                                             bool Found = false;
                                             if (main_MemberShipCount != 0) {
                                                 int main_MemberShipPointer = 0;
                                                 for (main_MemberShipPointer = 0; main_MemberShipPointer < main_MemberShipCount; main_MemberShipPointer++) {
                                                     if (main_MemberShip[main_MemberShipPointer] == (RecordID)) {
-                                                        //s = s & main_GetFormInputHidden(TagName & "." & CheckBoxCnt, True)
                                                         RuleCopy = main_MemberShipRuleCopy[main_MemberShipPointer];
                                                         Found = true;
                                                         break;
@@ -2433,22 +2417,16 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                             }
                                             // must leave the first hidden with the value in this form - it is searched in the admin pge
-                                            //returnHtml += Environment.NewLine;
-                                            //returnHtml += "<table><tr><td style=\"vertical-align:top;margin-top:0;width:20px;\">";
                                             returnHtml += "<input type=hidden name=\"" + htmlNamePrefix + "." + CheckBoxCnt + ".id\" value=" + RecordID + ">";
                                             if (readOnlyfield && !Found) {
                                                 returnHtml += "<div class=\"checkbox\"><label><input type=checkbox disabled>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
-                                                //returnHtml += "<input type=checkbox disabled>";
                                             } else if (readOnlyfield) {
                                                 returnHtml += "<div class=\"checkbox\"><label><input type=checkbox disabled checked>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
-                                                //returnHtml += "<input type=checkbox disabled checked>";
                                                 returnHtml += "<input type=\"hidden\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
                                             } else if (Found) {
                                                 returnHtml += "<div class=\"checkbox\"><label><input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\" checked>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
-                                                //returnHtml += "<input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" checked>";
                                             } else {
                                                 returnHtml += "<div class=\"checkbox\"><label><input type=\"checkbox\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\">&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
-                                                //returnHtml += "<input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\">";
                                             }
                                             CheckBoxCnt = CheckBoxCnt + 1;
                                             DivCheckBoxCnt = DivCheckBoxCnt + 1;
@@ -3128,7 +3106,6 @@ namespace Contensive.Processor.Controllers {
                         RecordID = csData.getInteger("ID");
                         contactPeopleId = csData.getInteger("modifiedBy");
                         returnCopy = csData.getText("Copy");
-                        //returnCopy = contentCmdController.executeContentCommands(core, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, ref Return_ErrorMessage);
                         returnCopy = ActiveContentController.renderHtmlForWeb(core, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
                         //
                         {
@@ -3647,7 +3624,6 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         result = sourceHtml.Replace(Environment.NewLine, Environment.NewLine + "\t");
                     }
-                    //Indent = genericController.vbReplace(SourceHtml, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
                 } else {
                     //
                     // text area found, isolate it and indent before and after

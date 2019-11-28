@@ -17,7 +17,6 @@ namespace Contensive.Processor.Addons.AdminSite {
             try {
                 StringBuilderLegacyController Content = new StringBuilderLegacyController();
                 string Button = null;
-                ////adminUIController Adminui = new adminUIController(core);
                 string Description = null;
                 string ButtonList = null;
                 //

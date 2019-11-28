@@ -44,7 +44,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 int FieldCnt = 0;
                 int FieldSize = 0;
                 int RowPointer = 0;
-                //adminUIController Adminui = new adminUIController(core);
                 string LeftButtons = "";
                 string ButtonBar = null;
                 string Title = null;
@@ -112,19 +111,14 @@ namespace Contensive.Processor.Addons.AdminSite {
                     LeftButtons += AdminUIController.getButtonPrimary(ButtonClose, "window.close();");
                 } else {
                     LeftButtons += AdminUIController.getButtonPrimary(ButtonCancel);
-                    //LeftButtons &= core.main_GetFormButton(ButtonCancel, , , "return processSubmit(this)")
                 }
                 LeftButtons += AdminUIController.getButtonPrimary(ButtonSearch);
-                //LeftButtons &= core.main_GetFormButton(ButtonSearch, , , "return processSubmit(this)")
                 ButtonBar = AdminUIController.getSectionButtonBar(core, LeftButtons, "");
                 //
                 // ----- TitleBar
                 //
                 Title = adminData.adminContent.name;
                 Title = Title + " Advanced Search";
-                //Title = "<strong>" + Title + "</strong>";
-                //Title = SpanClassAdminNormal + Title + "</span>";
-                //Title = Title & core.main_GetHelpLink(46, "Using the Advanced Search Page", BubbleCopy_AdminIndexPage)
                 string TitleDescription = "<div>Enter criteria for each field to identify and select your results. The results of a search will have to have all of the criteria you enter.</div>";
                 TitleBar = AdminUIController.getSectionHeader(core, Title, TitleDescription);
                 //
@@ -205,9 +199,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 + "</td>"
                                 + "</tr>";
                             break;
-
-
-                        //genericController.vbReplace(result, ">", ">")
                         case CPContentBaseClass.FieldTypeIdEnum.Currency:
                         case CPContentBaseClass.FieldTypeIdEnum.Float:
                         case CPContentBaseClass.FieldTypeIdEnum.Integer:

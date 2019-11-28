@@ -91,8 +91,6 @@ namespace Contensive.Processor.Addons.Tools {
                                             } else if ((!cdefFieldKvp.Value.inherited) && (formFieldInherited)) {
                                                 //
                                                 // Was a field, make it inherit from it's parent
-                                                //
-                                                //CSTarget = CSTarget;
                                                 MetadataController.deleteContentRecord(core, "Content Fields", formFieldId);
                                                 ReloadCDef = true;
                                             } else if ((!cdefFieldKvp.Value.inherited) && (!formFieldInherited)) {
@@ -188,15 +186,6 @@ namespace Contensive.Processor.Addons.Tools {
                             field.editSortPriority = 0;
                             field.save(core.cpParent);
                             ReloadCDef = true;
-                            //
-                            //using (var csData = new CsModel(core)) {
-                            //    if (csData.insert("Content Fields")) {
-                            //        csData.csSet("name", "unnamedField" + csData.csGetInteger("id").ToString());
-                            //        csData.csSet("ContentID", ContentID);
-                            //        csData.csSet("EditSortPriority", 0);
-                            //        ReloadCDef = true;
-                            //    }
-                            //}
                         }
                         //
                         // ----- Button Reload CDef
@@ -309,7 +298,6 @@ namespace Contensive.Processor.Addons.Tools {
                         int FieldCount = contentMetadata.fields.Count;
                         foreach (var keyValuePair in contentMetadata.fields) {
                             FieldSortClass fieldSort = new FieldSortClass();
-                            //Dim field As New appServices_metaDataClass.CDefFieldClass
                             string sortOrder = "";
                             fieldSort.field = keyValuePair.Value;
                             sortOrder = "";
@@ -521,10 +509,8 @@ namespace Contensive.Processor.Addons.Tools {
                         Stream.Add(HtmlController.inputHidden("dtfaRecordCount", RecordCount));
                     }
                     Stream.Add("</table>");
-                    //Stream.Add( core.htmldoc.main_GetPanelButtons(ButtonList, "Button"))
                     //
                     Stream.Add(core.html.getPanelBottom());
-                    //Call Stream.Add(core.main_GetFormEnd())
                     if (NeedFootNote1) {
                         Stream.Add("<br>*Field Inheritance is not allowed because this Content Definition has no parent.");
                     }

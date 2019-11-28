@@ -133,7 +133,6 @@ namespace Contensive.Processor {
                     resultColumnCount = 0;
                     readCacheRowCnt = 0;
                     readCacheRowPtr = -1;
-                    //resultEOF = true;
                     isOpen = false;
                     if (dt != null) {
                         dt.Dispose();
@@ -447,14 +446,12 @@ namespace Contensive.Processor {
         /// <returns></returns>
         private void init() {
             isOpen = true;
-            //newRecord = true;
             contentName = "";
             contentMeta = null;
             dataSourceName = "";
             dt = null;
             fieldNames = null;
             fieldPointer = 0;
-            //isModified = false;
             lastUsed = DateTime.Now;
             userId = core.session.user.id;
             pageNumber = 0;
@@ -463,7 +460,6 @@ namespace Contensive.Processor {
             readCacheRowCnt = 0;
             readCacheRowPtr = 0;
             resultColumnCount = 0;
-            //resultEOF = true;
             sqlSelectFieldList = "";
             sqlSource = "";
             createdWithMetaData = false;
@@ -541,7 +537,6 @@ namespace Contensive.Processor {
                             //
                             // -- reading from write-only returns default value, because save there is legacy code that detects change bycomparing value to read cache
                             returnValue = "";
-                            //throw new GenericException("Cannot read from a dataset opened write-only.");
                         } else if (this.dt == null) {
                             throw new GenericException("Cannot read from a dataset because the data is not valid.");
                         } else {
@@ -1116,7 +1111,6 @@ namespace Contensive.Processor {
                                     string fileNameNoExt = PathFilename.Left(Pos - 1);
                                     Pos = fileNameNoExt.LastIndexOf("/") + 1;
                                     if (Pos > 0) {
-                                        //path = PathFilename
                                         fileNameNoExt = fileNameNoExt.Substring(Pos);
                                         path = PathFilename.Left(Pos);
                                         FilenameRev = 1;
@@ -1129,12 +1123,8 @@ namespace Contensive.Processor {
                                             }
                                         }
                                         string fileName = fileNameNoExt + ".r" + FilenameRev + "." + FileExt;
-                                        //PathFilename = PathFilename & dstFilename
                                         path = GenericController.convertCdnUrlToCdnPathFilename(path);
-                                        //srcSysFile = config.physicalFilePath & genericController.vbReplace(srcPathFilename, "/", "\")
-                                        //dstSysFile = config.physicalFilePath & genericController.vbReplace(PathFilename, "/", "\")
                                         PathFilename = path + fileName;
-                                        //Call publicFiles.renameFile(pathFilenameOriginal, fileName)
                                     }
                                 }
                             }
@@ -1285,7 +1275,6 @@ namespace Contensive.Processor {
                             //
                             // let these field be added to the sql
                             //
-                            //recordInactive = (ucaseFieldName == "ACTIVE" && (!GenericController.encodeBoolean(writeCacheValue)));
                             FieldFoundCount += 1;
                             Models.Domain.ContentFieldMetadataModel field = this.contentMeta.fields[fieldName.ToLowerInvariant()];
                             string SQLSetPair = "";
@@ -1408,10 +1397,6 @@ namespace Contensive.Processor {
                         }
                     }
                     //
-                    // -- clear write cache
-                    // 20180314 - no, dont cleare the write cache for now because a subsequent read will replace the original read's value, which may be updated by the save
-                    //this.writeCache = new Dictionary<string, string>();
-                    //
                     // ----- Set ModifiedBy,ModifiedDate Fields if an admin visible field has changed
                     if (AuthorableFieldUpdate) {
                         if (!string.IsNullOrEmpty(sqlUpdate)) {
@@ -1487,7 +1472,6 @@ namespace Contensive.Processor {
                 this.resultColumnCount = 0;
                 this.readCacheRowCnt = 0;
                 this.readCacheRowPtr = -1;
-                //this.resultEOF = true;
                 this.writeCache = new Dictionary<string, string>();
                 this.fieldNames = new String[] { };
                 if (this.dt != null) {
@@ -1978,7 +1962,6 @@ namespace Contensive.Processor {
         public bool openSql(string sql, string dataSourceName, int pageSize, int pageNumber) {
             try {
                 init();
-                //this.newRecord = false;
                 this.readable = true;
                 this.createdWithMetaData = false;
                 this.contentName = "";

@@ -23,9 +23,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 // todo
                 Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;
                 //
-                //
                 StringBuilderLegacyController f = new StringBuilderLegacyController();
-                //adminUIController Adminui = new adminUIController(core);
                 //
                 s = core.html.getCheckList("EmailTopics", "Group Email", editRecord.id, "Topics", "Email Topics", "EmailID", "TopicID", "", "Name");
                 s = "<tr>"

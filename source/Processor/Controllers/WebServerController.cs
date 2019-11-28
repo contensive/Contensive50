@@ -534,8 +534,6 @@ namespace Contensive.Processor.Controllers {
                     //
                     // continue
                     //
-                    //initCounter += 1
-                    //
                     core.html.enableOutputBuffer(true);
                     core.doc.continueProcessing = true;
                     setResponseContentType("text/html");
@@ -670,10 +668,6 @@ namespace Contensive.Processor.Controllers {
                     } else if ((core.domain.typeId == 2) && (core.domain.forwardUrl != "")) {
                         //
                         // forward to a URL
-                        //
-                        //
-                        //Call AppendLog("main_init(), 1710 - exit for domain forward")
-                        //
                         if (GenericController.vbInstr(1, core.domain.forwardUrl, "://") == 0) {
                             core.domain.forwardUrl = "http://" + core.domain.forwardUrl;
                         }
@@ -963,7 +957,6 @@ namespace Contensive.Processor.Controllers {
                         //
                         LogController.addSiteWarning(core, "Page Not Found Redirect", "Page Not Found Redirect", "", 0, "Page Not Found Redirect [" + requestUrlSource + "]", "Page Not Found Redirect", "Page Not Found Redirect");
                         if (!string.IsNullOrEmpty(ShortLink)) {
-                            //core.db.executeNonQueryAsync("Update ccContentWatch set link=null where link=" + DbController.encodeSQLText(ShortLink));
                             string sql = "Update ccContentWatch set link=null where link=" + DbController.encodeSQLText(ShortLink);
                             Task.Run(() => core.db.executeNonQueryAsync(sql));
                         }
@@ -1017,13 +1010,6 @@ namespace Contensive.Processor.Controllers {
                 iisContext.Response.Flush();
             }
         }
-        //
-        //====================================================================================================
-        //
-        //Private Structure fieldTypePrivate
-        //    Dim Name As String
-        //    Dim fieldTypePrivate As Integer
-        //End Structure
         //
         //====================================================================================================
         /// <summary>
@@ -1107,7 +1093,6 @@ namespace Contensive.Processor.Controllers {
                     site = iisManager.Sites[appName];
                     //
                     // -- verify the domain binding
-                    //verifyWebsite_Binding(core, site, "*:80:" + appName, "http");
                     verifyWebsite_Binding(core, site, "*:80:" + domainName, "http");
                     //
                     // -- verify the application pool

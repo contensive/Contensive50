@@ -16,7 +16,6 @@ namespace Contensive.Processor.Addons.Housekeeping {
         /// <param name="core"></param>
         public static void housekeep(CoreController core) {
             try {
-                //string sqlInner = "select p.id from ccProperties p left join ccmembers m on m.id=p.KeyID where (p.TypeID=" + PropertyModelClass.PropertyTypeEnum.user + ") and (m.ID is null)";
                 string sql = "delete from ccProperties from ccProperties p left join ccmembers m on m.id=p.KeyID where (p.TypeID=" + (int)PropertyModelClass.PropertyTypeEnum.user + ") and (m.ID is null)";
                 core.db.executeNonQuery(sql);
                 //

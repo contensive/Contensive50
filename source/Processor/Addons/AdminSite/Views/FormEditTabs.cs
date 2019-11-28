@@ -365,7 +365,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     return_NewFieldList += "," + field.nameLc;
                                     NonEncodedLink = GenericController.getCdnFileLink(core, fieldValue_text);
                                     EncodedLink = System.Net.WebUtility.HtmlEncode(NonEncodedLink);
-                                    //EncodedLink = GenericController.encodeURL(NonEncodedLink);
                                     EditorString += (HtmlController.inputHidden(field.nameLc, ""));
                                     if (string.IsNullOrEmpty(fieldValue_text)) {
                                         EditorString += ("[no file]");
@@ -497,7 +496,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     } else {
                                         if (string.IsNullOrEmpty(fieldValue_text)) {
                                             EditorString += (HtmlController.inputNumber(core, field.nameLc, null, fieldHtmlId, "text form-control", editorReadOnly, false));
-                                            //EditorString += (HtmlController.inputText(core, field.nameLc, "", -1, -1, fieldHtmlId, false, false, "text form-control"));
                                         } else {
                                             EditorString += (HtmlController.inputNumber(core, field.nameLc, encodeNumber(fieldValue_text), fieldHtmlId, "text form-control", editorReadOnly, false));
                                         }
@@ -589,7 +587,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             //
                                             // longer text data, or text that contains a CR
                                             //
-                                            //EditorStyleModifier = "textexpandable";
                                             EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, fieldHtmlId, false, false, "text form-control");
                                         }
                                     } else if (field.htmlContent) {
