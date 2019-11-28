@@ -160,10 +160,13 @@ namespace Contensive.Processor {
             + "</ul>"
             + "";
         /// <summary>
-        /// The default template. This guid is used for the single column header and footer template
+        /// The default templates. These names and guids describe template characteristics. Themes with similar templates can use the save guid to over-write/update templates
         /// </summary>
-        internal const string defaultTemplateName = "Default";
-        internal const string defaultTemplateGuid = "{810894df-e740-4a9b-bb6a-b7fbff892e63}";
+        internal const string singleColumnTemplateName = "Single Column Template";
+        internal const string singleColumnTemplateGuid = "{810894df-e740-4a9b-bb6a-b7fbff892e63}";
+        //
+        internal const string fullBleedTemplateName = "Full Bleed Template";
+        internal const string fullBleedTemplateGuid = "{560C0081-065A-41B1-BE37-CC54739E67F2}";
         //
         // -- instance id used when running addons in the addon site 
         internal const string adminSiteInstanceId = "{E5418109-1206-43C5-A4F8-425E28BC629C}";
@@ -349,12 +352,12 @@ namespace Contensive.Processor {
         internal const string RequestNameAjaxFunction = "ajaxfn";
         internal const string RequestNameAjaxFastFunction = "ajaxfastfn";
         //
-        internal const string AjaxOpenAdminNav = "aps89102kd";
-        internal const string AjaxOpenAdminNavGetContent = "d8475jkdmfj2";
-        internal const string AjaxCloseAdminNav = "3857fdjdskf91";
-        internal const string AjaxAdminNavOpenNode = "8395j2hf6jdjf";
-        internal const string AjaxAdminNavOpenNodeGetContent = "eieofdwl34efvclaeoi234598";
-        internal const string AjaxAdminNavCloseNode = "w325gfd73fhdf4rgcvjk2";
+        //internal const string AjaxOpenAdminNav = "aps89102kd";
+        //internal const string AjaxOpenAdminNavGetContent = "d8475jkdmfj2";
+        //internal const string AjaxCloseAdminNav = "3857fdjdskf91";
+        //internal const string AjaxAdminNavOpenNode = "8395j2hf6jdjf";
+        //internal const string AjaxAdminNavOpenNodeGetContent = "eieofdwl34efvclaeoi234598";
+        //internal const string AjaxAdminNavCloseNode = "w325gfd73fhdf4rgcvjk2";
         //
         internal const string AjaxCloseIndexFilter = "k48smckdhorle0";
         internal const string AjaxOpenIndexFilter = "Ls8jCDt87kpU45YH";

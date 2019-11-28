@@ -1054,14 +1054,14 @@ namespace Contensive.Processor.Controllers {
             }
             //
             // -- default template
-            PageTemplateModel defaultTemplate = DbBaseModel.create<PageTemplateModel>(core.cpParent, defaultTemplateGuid);
+            PageTemplateModel defaultTemplate = DbBaseModel.create<PageTemplateModel>(core.cpParent, singleColumnTemplateGuid);
             if (defaultTemplate == null) {
                 // -- did not install correctly, build a placeholder
                 // -- create content, never update content
                 core.doc.pageController.template = DbBaseModel.addDefault<PageTemplateModel>(core.cpParent);
                 core.doc.pageController.template.bodyHTML = Properties.Resources.DefaultTemplateHtml;
-                core.doc.pageController.template.name = defaultTemplateName;
-                core.doc.pageController.template.ccguid = defaultTemplateGuid;
+                core.doc.pageController.template.name = singleColumnTemplateName;
+                core.doc.pageController.template.ccguid = singleColumnTemplateGuid;
                 core.doc.pageController.template.save(core.cpParent);
             }
             //

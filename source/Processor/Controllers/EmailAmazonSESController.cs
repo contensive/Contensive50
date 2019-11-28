@@ -15,9 +15,10 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Send email by SMTP. return 'ok' if success, else return a user compatible error message
         /// </summary>
-        public static bool send(CoreController core, EmailController.EmailClass email, ref string returnErrorMessage, string awsAccessKeyId, string awsSecretAccessKey) {
-            bool status = false;
-            returnErrorMessage = "";
+        public static bool send(CoreController core, EmailController.EmailClass email, ref string reasonForFail, string awsAccessKeyId, string awsSecretAccessKey) {
+            string logShortDetail = ", subject [" + email.subject + "], toMemberId [" + email.toMemberId + "], toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "]";
+            string logLongDetail = logShortDetail + ", BounceAddress [" + email.BounceAddress + "], replyToAddress [" + email.replyToAddress + "]";
+            reasonForFail = "";
             try {
                 if (core.mockEmail) {
                     //
@@ -25,7 +26,7 @@ namespace Contensive.Processor.Controllers {
                     core.mockEmailList.Add(new MockEmailClass() {
                         email = email
                     });
-                    status = true;
+                    return true;
                 } else {
                     //
                     // -- send email
@@ -49,20 +50,21 @@ namespace Contensive.Processor.Controllers {
                             }
                         };
                         try {
-                            LogController.logInfo(core, "sendSmtp, to [" + email.toAddress + "], from [" + email.fromAddress + "], subject [" + email.subject + "]");
+                            LogController.logInfo(core, "Sending SES email" + logShortDetail);
                             var response = client.SendEmail(sendRequest);
-                            status = true;
+                            return true;
                         } catch (Exception ex) {
-                            returnErrorMessage = "There was an error sending email [" + ex.ToString() + "]";
-                            LogController.logError(core, returnErrorMessage);
+                            reasonForFail = "Error sending email [" + ex.Message + "]" + logShortDetail;
+                            LogController.logError(core, "Unexpected exception during SES send" + logLongDetail + ", exception [" + ex.ToString() + "]");
+                            return false;
                         }
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError(core, "There was an error configuring smtp server ex [" + ex.ToString() + "]");
-                throw;
+                reasonForFail = "Error sending email [" + ex.Message + "]" + logShortDetail;
+                LogController.logError(core, "Unexpected exception during SES configure" + logLongDetail + ", exception [" + ex.ToString() + "]");
+                return false;
             }
-            return status;
         }
     }
 }

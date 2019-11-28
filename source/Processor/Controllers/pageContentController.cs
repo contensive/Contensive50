@@ -1374,7 +1374,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.doc.pageController.template == null) {
                             //
                             // -- (legacy) get template named Default
-                            core.doc.pageController.template = DbBaseModel.createByUniqueName<PageTemplateModel>(core.cpParent, defaultTemplateName);
+                            core.doc.pageController.template = DbBaseModel.createByUniqueName<PageTemplateModel>(core.cpParent, singleColumnTemplateName);
                             if(core.doc.pageController.template==null) {
                                 //
                                 // -- get most recent template
@@ -1385,8 +1385,8 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // -- nothing found, create a new template matching the guid of Full Width template from themes and put just the content box
                                     core.doc.pageController.template = DbBaseModel.addDefault<PageTemplateModel>(core.cpParent);
-                                    core.doc.pageController.template.name = defaultTemplateName;
-                                    core.doc.pageController.template.ccguid = defaultTemplateGuid;
+                                    core.doc.pageController.template.name = singleColumnTemplateName;
+                                    core.doc.pageController.template.ccguid = singleColumnTemplateGuid;
                                     core.doc.pageController.template.bodyHTML = Properties.Resources.DefaultTemplateHtml;
                                     core.doc.pageController.template.save(core.cpParent);
                                 }
