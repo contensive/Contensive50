@@ -137,7 +137,7 @@ namespace Contensive.Models.Db.Tests {
         //
         //
         [TestMethod()]
-        public void FieldFileTypes_HtmlFieldTypeTest() {
+        public void fieldFileTypes_HtmlFieldTypeTest() {
             using (CPClass cp = new CPClass(testAppName)) {
                 string contentSaved = new string('*', 65535);
                 var pageCreated = PageContentModel.addEmpty<PageContentModel>(cp);
@@ -174,7 +174,7 @@ namespace Contensive.Models.Db.Tests {
         //
         //
         [TestMethod()]
-        public void FieldFileTypes_TextFieldTypeTest() {
+        public void fieldFileTypes_TextFieldTypeTest() {
             using (CPClass cp = new CPClass(testAppName)) {
                 string contentSaved = new string('*', 65535);
                 var contentCreated = DownloadModel.addEmpty<DownloadModel>(cp);

@@ -31,7 +31,7 @@ namespace Contensive.Processor.Controllers {
         private const int KeyPointerArrayChunk = 1000;
         //
         [Serializable]
-        public class storageClass {
+        public class StorageClass {
             //
             public int ArraySize;
             public int ArrayCount;
@@ -41,7 +41,7 @@ namespace Contensive.Processor.Controllers {
             public int ArrayPointer;
         }
         //
-        private storageClass store = new storageClass();
+        private StorageClass store = new StorageClass();
         //
         //
         //
@@ -59,7 +59,7 @@ namespace Contensive.Processor.Controllers {
         //
         public void importPropertyBag(string bag) {
             try {
-                store = DeserializeObject<storageClass>(bag);
+                store = DeserializeObject<StorageClass>(bag);
             } catch (Exception ex) {
                 throw new IndexException("ImportPropertyBag error", ex);
             }
@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 ArrayPointer = -1;
                 if (store.ArrayCount > 0) {
-                    UcaseTargetKey = GenericController.vbReplace(Key.ToUpper(), Environment.NewLine, "");
+                    UcaseTargetKey = GenericController.strReplace(Key.ToUpper(), Environment.NewLine, "");
                     LowGuess = -1;
                     HighGuess = store.ArrayCount - 1;
                     while ((HighGuess - LowGuess) > 1) {
@@ -121,7 +121,7 @@ namespace Contensive.Processor.Controllers {
                 bool MatchFound = false;
                 string UcaseKey = null;
                 //
-                UcaseKey = GenericController.vbReplace(Key.ToUpper(), Environment.NewLine, "");
+                UcaseKey = GenericController.strReplace(Key.ToUpper(), Environment.NewLine, "");
                 store.ArrayPointer = GetArrayPointer(Key);
                 if (store.ArrayPointer > -1) {
                     MatchFound = true;
@@ -152,7 +152,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 string keyToSave;
                 //
-                keyToSave = GenericController.vbReplace(Key.ToUpper(), Environment.NewLine, "");
+                keyToSave = GenericController.strReplace(Key.ToUpper(), Environment.NewLine, "");
                 //
                 if (store.ArrayCount >= store.ArraySize) {
                     store.ArraySize = store.ArraySize + KeyPointerArrayChunk;
@@ -365,7 +365,7 @@ namespace Contensive.Processor.Controllers {
 
     public class IndexException : System.Exception, System.Runtime.Serialization.ISerializable {
 
-        public IndexException() : base() {
+        public IndexException() {
             // Add implementation.
         }
 

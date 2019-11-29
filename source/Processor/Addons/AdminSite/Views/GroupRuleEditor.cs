@@ -58,7 +58,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         csGroups.openSql("select id,name as groupName,caption as groupCaption from ccgroups where (active>0) order by caption,name,id");
                         while (csGroups.ok()) {
                             string GroupName = csGroups.getText("GroupName");
-                            if ((GroupName.Left(1) != "_") || canSeeHiddenGroups) {
+                            if ((GroupName.left(1) != "_") || canSeeHiddenGroups) {
                                 string GroupCaption = csGroups.getText("GroupCaption");
                                 int GroupID = csGroups.getInteger("ID");
                                 if (string.IsNullOrEmpty(GroupCaption)) {

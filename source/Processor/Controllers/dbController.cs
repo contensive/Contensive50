@@ -28,7 +28,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// dependencies
         /// </summary>
-        private CoreController core;
+        private readonly CoreController core;
         /// <summary>
         /// The datasouorce used for this instance of the object
         /// </summary>
@@ -75,7 +75,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core">dependencies</param>
         /// <param name="dataSourceName">The datasource. The default datasource is setup in the config file. Others are in the Datasources table</param>
-        public DbController(CoreController core, string dataSourceName) : base() {
+        public DbController(CoreController core, string dataSourceName) {
             this.core = core;
             this.dataSourceName = dataSourceName;
         }
@@ -1048,7 +1048,7 @@ namespace Contensive.Processor.Controllers {
             if (string.IsNullOrEmpty(returnResult)) {
                 return "null";
             } else {
-                return "'" + GenericController.vbReplace(returnResult, "'", "''") + "'";
+                return "'" + GenericController.strReplace(returnResult, "'", "''") + "'";
             }
         }
         //
@@ -1306,7 +1306,7 @@ namespace Contensive.Processor.Controllers {
         public string getNameIdOrGuidSqlCriteria(string nameIdOrGuid) {
             string sqlCriteria = "";
             try {
-                if (nameIdOrGuid.IsNumeric()) {
+                if (nameIdOrGuid.isNumeric()) {
                     sqlCriteria = "id=" + encodeSQLNumber(double.Parse(nameIdOrGuid));
                 } else if (GenericController.common_isGuid(nameIdOrGuid)) {
                     sqlCriteria = "ccGuid=" + encodeSQLText(nameIdOrGuid);

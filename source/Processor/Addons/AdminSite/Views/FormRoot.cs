@@ -13,7 +13,7 @@ namespace Contensive.Processor.Addons.AdminSite {
         //========================================================================
         //   Print the root form
         //
-        public static string GetForm_Root(CoreController core) {
+        public static string getForm_Root(CoreController core) {
             string returnHtml = "";
             try {
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
@@ -48,7 +48,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         // the desktop has been set to none - go with default desktop
                         //
                         addonId = 0;
-                    } else if (AddonIDText.IsNumeric()) {
+                    } else if (AddonIDText.isNumeric()) {
                         //
                         // it has been set to a non-zero number
                         //

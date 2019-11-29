@@ -293,7 +293,7 @@ namespace Contensive.Processor.Controllers {
                                 resultSessionContext.visit.http_referer = WorkingReferer;
                             } else {
                                 resultSessionContext.visit.refererPathPage = WorkingReferer.Substring(SlashPosition - 1);
-                                resultSessionContext.visit.http_referer = WorkingReferer.Left(SlashPosition - 1);
+                                resultSessionContext.visit.http_referer = WorkingReferer.left(SlashPosition - 1);
                             }
                         }
                         //
@@ -419,7 +419,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             if (!string.IsNullOrEmpty(botFileContent)) {
-                                botFileContent = GenericController.vbReplace(botFileContent, Environment.NewLine, "\n");
+                                botFileContent = GenericController.strReplace(botFileContent, Environment.NewLine, "\n");
                                 List<string> botList = new List<string>();
                                 botList.AddRange(botFileContent.Split(Convert.ToChar("\n")));
                                 bool visitNameFound = false;
@@ -429,7 +429,7 @@ namespace Contensive.Processor.Controllers {
                                         // -- remove comment
                                         int posComment = line.IndexOf("//");
                                         if (posComment >= 0) {
-                                            line = line.Left(posComment);
+                                            line = line.left(posComment);
                                         }
                                         if (!string.IsNullOrWhiteSpace(line)) {
                                             // -- parse line on tab characters
@@ -521,7 +521,7 @@ namespace Contensive.Processor.Controllers {
                         // if a user record has not been created, do not automatically create it.
                         // lazy create a user if/when it is needed
                         string DefaultMemberName = resultSessionContext.visit.name;
-                        if (DefaultMemberName.Left(5).ToLowerInvariant() == "visit") {
+                        if (DefaultMemberName.left(5).ToLowerInvariant() == "visit") {
                             DefaultMemberName = "Guest";
                         }
                         resultSessionContext.user = new PersonModel {
@@ -1116,7 +1116,7 @@ namespace Contensive.Processor.Controllers {
                     if (core.doc.contentNotEditingList.Contains(cacheTestName)) { return false; }
                     if (core.visitProperty.getBoolean("AllowEditing") || core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                         if (!string.IsNullOrEmpty(contentNameOrId)) {
-                            if (contentNameOrId.IsNumeric()) {
+                            if (contentNameOrId.isNumeric()) {
                                 contentNameOrId = MetadataController.getContentNameByID(core, encodeInteger(contentNameOrId));
                             }
                         }
@@ -1197,9 +1197,9 @@ namespace Contensive.Processor.Controllers {
             // ----- site does not support workflow authoring
             //
             if (RecordEditLocked) {
-                Copy = GenericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName);
-                Copy = GenericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString());
-                Copy = GenericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", GenericController.encodeText(main_EditLockExpiresMinutes));
+                Copy = GenericController.strReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName);
+                Copy = GenericController.strReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString());
+                Copy = GenericController.strReplace(Copy, "<EDITEXPIRESMINUTES>", GenericController.encodeText(main_EditLockExpiresMinutes));
                 result += Delimiter + Copy;
                 Delimiter = "<br>";
             }

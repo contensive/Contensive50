@@ -175,7 +175,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             }
                                             listIndex += 1;
                                         }
-                                        IndexConfig.columns.Swap(listIndex, listIndex - 1);
+                                        IndexConfig.columns.swap(listIndex, listIndex - 1);
                                         normalizeSaveLoad = true;
                                     }
                                     break;
@@ -189,7 +189,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             }
                                             listIndex += 1;
                                         }
-                                        IndexConfig.columns.Swap(listIndex, listIndex + 1);
+                                        IndexConfig.columns.swap(listIndex, listIndex + 1);
                                         normalizeSaveLoad = true;
                                     }
                                     break;

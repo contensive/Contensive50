@@ -147,7 +147,7 @@ namespace Contensive.Processor.Addons.Tools {
                                     int ColumnPointer = 0;
                                     for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                         string CellData = resultArray[ColumnPointer, RowPointer];
-                                        if (IsNull(CellData)) {
+                                        if (isNull(CellData)) {
                                             Stream.Add(ColumnStart + "[null]" + ColumnEnd);
                                         } else if (string.IsNullOrEmpty(CellData)) {
                                             Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
@@ -197,15 +197,15 @@ namespace Contensive.Processor.Addons.Tools {
                 }
                 //
                 // -- page size
-                if (IsNull(PageSize)) PageSize = 100;
+                if (isNull(PageSize)) PageSize = 100;
                 Stream.Add(AdminUIController.getToolFormInputRow(core, "Page Size", AdminUIController.getDefaultEditor_text(core, "PageSize", PageSize.ToString())));
                 //
                 // -- page number
-                if (IsNull(PageNumber)) PageNumber = 1;
+                if (isNull(PageNumber)) PageNumber = 1;
                 Stream.Add(AdminUIController.getToolFormInputRow(core, "Page Number", AdminUIController.getDefaultEditor_text(core, "PageNumber", PageNumber.ToString())));
                 //
                 // -- timeout
-                if (IsNull(Timeout)) Timeout = 30;
+                if (isNull(Timeout)) Timeout = 30;
                 Stream.Add(AdminUIController.getToolFormInputRow(core, "Timeout (sec)", AdminUIController.getDefaultEditor_text(core, "Timeout", Timeout.ToString())));
                 //
                 // -- assemble form

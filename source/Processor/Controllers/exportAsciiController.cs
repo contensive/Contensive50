@@ -26,7 +26,7 @@ namespace Contensive.Processor.Controllers {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string TestFilename;
                 //
-                TestFilename = "AsciiExport" + GenericController.GetRandomInteger(core) + ".txt";
+                TestFilename = "AsciiExport" + GenericController.getRandomInteger(core) + ".txt";
                 //
                 iContentName = GenericController.encodeText(ContentName);
                 if (PageSize == 0) {
@@ -83,10 +83,10 @@ namespace Contensive.Processor.Controllers {
                                             if ((UcaseFieldName != "USERNAME") && (UcaseFieldName != "PASSWORD")) {
                                                 Copy = csData.getText(FieldName);
                                                 if (!string.IsNullOrEmpty(Copy)) {
-                                                    Copy = GenericController.vbReplace(Copy, "\"", "'");
-                                                    Copy = GenericController.vbReplace(Copy, Environment.NewLine, " ");
-                                                    Copy = GenericController.vbReplace(Copy, "\r", " ");
-                                                    Copy = GenericController.vbReplace(Copy, "\n", " ");
+                                                    Copy = GenericController.strReplace(Copy, "\"", "'");
+                                                    Copy = GenericController.strReplace(Copy, Environment.NewLine, " ");
+                                                    Copy = GenericController.strReplace(Copy, "\r", " ");
+                                                    Copy = GenericController.strReplace(Copy, "\n", " ");
                                                 }
                                                 sb.Append(Delimiter + "\"" + Copy + "\"");
                                             }
@@ -146,10 +146,10 @@ namespace Contensive.Processor.Controllers {
                                                 break;
                                         }
                                         if (!string.IsNullOrEmpty(Copy)) {
-                                            Copy = GenericController.vbReplace(Copy, "\"", "'");
-                                            Copy = GenericController.vbReplace(Copy, Environment.NewLine, " ");
-                                            Copy = GenericController.vbReplace(Copy, "\r", " ");
-                                            Copy = GenericController.vbReplace(Copy, "\n", " ");
+                                            Copy = GenericController.strReplace(Copy, "\"", "'");
+                                            Copy = GenericController.strReplace(Copy, Environment.NewLine, " ");
+                                            Copy = GenericController.strReplace(Copy, "\r", " ");
+                                            Copy = GenericController.strReplace(Copy, "\n", " ");
                                         }
                                         core.wwwFiles.appendFile(TestFilename, Delimiter + "\"" + Copy + "\"");
                                         Delimiter = ",";

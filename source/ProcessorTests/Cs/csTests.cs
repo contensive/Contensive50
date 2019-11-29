@@ -194,7 +194,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                     if (!cp.Content.IsField(contentName, fieldName)) {
                         cp.Content.AddContentField(contentName, fieldName, CPContentBaseClass.FieldTypeIdEnum.Currency);
                     }
-                    double testValue = ((Double)GenericController.GetRandomInteger(cp.core)) / 100.0;
+                    double testValue = ((Double)GenericController.getRandomInteger(cp.core)) / 100.0;
                     using (CPCSBaseClass cs = cp.CSNew()) {
                         if (!cs.Insert(contentName)) Assert.Fail("Insert content failed");
                         cs.SetField(fieldName, testValue);

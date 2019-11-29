@@ -17,8 +17,8 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 cp.core.mockEmail = true;
                 // arrange
-                string test1 = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
-                string test2 = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
+                string test1 = GenericController.getRandomInteger(cp.core).ToString() + "@kma.net";
+                string test2 = GenericController.getRandomInteger(cp.core).ToString() + "@kma.net";
                 // act
                 EmailController.addToBlockList(cp.core, test1);
                 string blockList = Processor.Controllers.EmailController.getBlockList(cp.core);
@@ -48,7 +48,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 cp.core.mockEmail = true;
                 // arrange
-                string body = GenericController.GetRandomInteger(cp.core).ToString();
+                string body = GenericController.getRandomInteger(cp.core).ToString();
                 string sendStatus = "";
                 string ResultLogFilename = "";
                 // act
@@ -73,12 +73,12 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 cp.core.mockEmail = true;
                 // arrange
-                string body = GenericController.GetRandomInteger(cp.core).ToString();
+                string body = GenericController.getRandomInteger(cp.core).ToString();
                 var toPerson = DbBaseModel.addDefault<PersonModel>(cp, ContentMetadataModel.getDefaultValueDict(cp.core, PersonModel.tableMetadata.contentName));
                 Assert.IsNotNull(toPerson);
-                toPerson.email = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
-                toPerson.firstName = GenericController.GetRandomInteger(cp.core).ToString();
-                toPerson.lastName = GenericController.GetRandomInteger(cp.core).ToString();
+                toPerson.email = GenericController.getRandomInteger(cp.core).ToString() + "@kma.net";
+                toPerson.firstName = GenericController.getRandomInteger(cp.core).ToString();
+                toPerson.lastName = GenericController.getRandomInteger(cp.core).ToString();
                 toPerson.save(cp);
                 string sendStatus = "";
                 // act
@@ -117,9 +117,9 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 //
                 var confirmPerson = DbBaseModel.addDefault<PersonModel>(cp);
                 Assert.IsNotNull(confirmPerson);
-                confirmPerson.email = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
-                confirmPerson.firstName = GenericController.GetRandomInteger(cp.core).ToString();
-                confirmPerson.lastName = GenericController.GetRandomInteger(cp.core).ToString();
+                confirmPerson.email = GenericController.getRandomInteger(cp.core).ToString() + "@kma.net";
+                confirmPerson.firstName = GenericController.getRandomInteger(cp.core).ToString();
+                confirmPerson.lastName = GenericController.getRandomInteger(cp.core).ToString();
                 confirmPerson.save(cp);
                 //
                 SystemEmailModel systemEmail = DbBaseModel.addDefault<SystemEmailModel>(cp);
@@ -127,7 +127,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 systemEmail.addLinkEId = false;
                 systemEmail.allowSpamFooter = false;
                 systemEmail.emailTemplateId = 0;
-                systemEmail.fromAddress = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
+                systemEmail.fromAddress = GenericController.getRandomInteger(cp.core).ToString() + "@kma.net";
                 systemEmail.subject = htmlBody;
                 systemEmail.copyFilename.content = systemEmail.subject;
                 systemEmail.testMemberId = confirmPerson.id;
@@ -135,9 +135,9 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 //
                 var toPerson = DbBaseModel.addDefault<PersonModel>(cp);
                 Assert.IsNotNull(toPerson);
-                toPerson.email = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
-                toPerson.firstName = GenericController.GetRandomInteger(cp.core).ToString();
-                toPerson.lastName = GenericController.GetRandomInteger(cp.core).ToString();
+                toPerson.email = GenericController.getRandomInteger(cp.core).ToString() + "@kma.net";
+                toPerson.firstName = GenericController.getRandomInteger(cp.core).ToString();
+                toPerson.lastName = GenericController.getRandomInteger(cp.core).ToString();
                 toPerson.save(cp);
                 //
                 var group = DbBaseModel.addDefault<GroupModel>(cp);

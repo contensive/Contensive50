@@ -242,7 +242,7 @@ namespace Contensive.CLI {
             if (argPtr >= args.Length) { return string.Empty; }
             if (args[argPtr].IndexOf('-').Equals(0)) { return string.Empty; }
             string arg = args[argPtr++];
-            arg = (arg.Left(1).Equals("\"") && arg.Right(1).Equals("\"")) ? arg.Substring(1, arg.Length - 2) : arg;
+            arg = (arg.left(1).Equals("\"") && arg.right(1).Equals("\"")) ? arg.Substring(1, arg.Length - 2) : arg;
             return arg;
         }
         /// <summary>

@@ -40,7 +40,7 @@ namespace Contensive.Processor.Controllers {
             List<LinkAliasModel> linkAliasList = LinkAliasModel.createPageList(core.cpParent, PageID, QueryStringSuffix);
             if (linkAliasList.Count > 0) {
                 linkAlias = linkAliasList.First().name;
-                if (linkAlias.Left(1) != "/") {
+                if (linkAlias.left(1) != "/") {
                     linkAlias = "/" + linkAlias;
                 }
             }
@@ -97,18 +97,18 @@ namespace Contensive.Processor.Controllers {
                     }
                     int Ptr = 0;
                     while (normalizedLinkAlias.Contains("\t\t") && (Ptr < 100)) {
-                        normalizedLinkAlias = GenericController.vbReplace(normalizedLinkAlias, "\t\t", "\t");
+                        normalizedLinkAlias = GenericController.strReplace(normalizedLinkAlias, "\t\t", "\t");
                         Ptr = Ptr + 1;
                     }
                     if (normalizedLinkAlias.Substring(normalizedLinkAlias.Length - 1) == "\t") {
-                        normalizedLinkAlias = normalizedLinkAlias.Left(normalizedLinkAlias.Length - 1);
+                        normalizedLinkAlias = normalizedLinkAlias.left(normalizedLinkAlias.Length - 1);
                     }
-                    if (normalizedLinkAlias.Left(1) == "\t") {
+                    if (normalizedLinkAlias.left(1) == "\t") {
                         normalizedLinkAlias = normalizedLinkAlias.Substring(1);
                     }
-                    normalizedLinkAlias = GenericController.vbReplace(normalizedLinkAlias, "\t", "-");
+                    normalizedLinkAlias = GenericController.strReplace(normalizedLinkAlias, "\t", "-");
                     if (!string.IsNullOrEmpty(normalizedLinkAlias)) {
-                        if (normalizedLinkAlias.Left(1) != "/") {
+                        if (normalizedLinkAlias.left(1) != "/") {
                             normalizedLinkAlias = "/" + normalizedLinkAlias;
                         }
                         //

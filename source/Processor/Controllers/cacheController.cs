@@ -96,7 +96,7 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         // ----- objects passed in constructor, do not dispose
         //
-        private CoreController core;
+        private readonly CoreController core;
         //
         // ====================================================================================================
         // ----- objects constructed that must be disposed
@@ -304,7 +304,7 @@ namespace Contensive.Processor.Controllers {
                         LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], saveDate [" + result.saveDate + "], content [null]");
                     } else {
                         string content = result.content.ToString();
-                        content = (content.Length > 50) ? (content.Left(50) + "...") : content;
+                        content = (content.Length > 50) ? (content.left(50) + "...") : content;
                         LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], saveDate [" + result.saveDate + "], content [" + content + "]");
                     }
                 }

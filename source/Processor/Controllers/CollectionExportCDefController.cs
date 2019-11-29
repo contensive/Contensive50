@@ -597,9 +597,9 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         private static string encodeXMLattribute(string Source) {
             string tempEncodeXMLattribute = HtmlController.encodeHtml(Source);
-            tempEncodeXMLattribute = GenericController.vbReplace(tempEncodeXMLattribute, Environment.NewLine, " ");
-            tempEncodeXMLattribute = GenericController.vbReplace(tempEncodeXMLattribute, "\r", "");
-            return GenericController.vbReplace(tempEncodeXMLattribute, "\n", "");
+            tempEncodeXMLattribute = GenericController.strReplace(tempEncodeXMLattribute, Environment.NewLine, " ");
+            tempEncodeXMLattribute = GenericController.strReplace(tempEncodeXMLattribute, "\r", "");
+            return GenericController.strReplace(tempEncodeXMLattribute, "\n", "");
         }
         //
         //====================================================================================================

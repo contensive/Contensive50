@@ -255,7 +255,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         args = docProperties
                     };
                     string ExportFilename = "CustomReport_" + customReport.id.ToString("00000000") + ".csv";
-                    string reportName = (customReport.name == null) ? "#" + customReport.id : customReport.name;
+                    string reportName = customReport.name ?? "#" + customReport.id;
                     TaskSchedulerController.addTaskToQueue(core, cmdDetail, false, "Custom Report, " + reportName, ExportFilename);
                 }
             }

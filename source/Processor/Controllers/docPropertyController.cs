@@ -20,11 +20,11 @@ namespace Contensive.Processor.Controllers {
             userDefined = 6
         }
         //
-        private CoreController core;
+        private readonly CoreController core;
         //
         private Dictionary<string, DocPropertiesClass> docPropertiesDict = new Dictionary<string, DocPropertiesClass>();
         //
-        public DocPropertyController(CoreController core) : base() {
+        public DocPropertyController(CoreController core) {
             this.core = core;
         }
         //

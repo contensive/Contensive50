@@ -102,8 +102,8 @@ namespace Contensive.Processor.Addons.Tools {
                                                         //
                                                         // remoave spaces from new name
                                                         //
-                                                        StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was renamed [" + GenericController.vbReplace(formFieldName, " ", "") + "] because the field name can not include spaces.</LI>";
-                                                        formFieldName = GenericController.vbReplace(formFieldName, " ", "");
+                                                        StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was renamed [" + GenericController.strReplace(formFieldName, " ", "") + "] because the field name can not include spaces.</LI>";
+                                                        formFieldName = GenericController.strReplace(formFieldName, " ", "");
                                                     }
                                                     //
                                                     string SQL = null;

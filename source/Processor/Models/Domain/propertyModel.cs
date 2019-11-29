@@ -22,7 +22,7 @@ namespace Contensive.Processor.Models.Domain {
     [System.Serializable]
     public class PropertyModelClass {
         //
-        private CoreController core;
+        private readonly CoreController core;
         //
         public enum PropertyTypeEnum {
             user = 0,

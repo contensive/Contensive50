@@ -140,8 +140,8 @@ namespace Contensive.Processor.Controllers {
                             //
                             // Collection File
                             //
-                            string Collectionname = XmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "name", "");
-                            string collectionGuid = XmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "guid", Collectionname);
+                            string Collectionname = XmlController.getXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "name", "");
+                            string collectionGuid = XmlController.getXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "guid", Collectionname);
                             if ((!collectionsInstalledList.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture))) && (!collectionsDownloaded.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture)))) {
                                 if (string.IsNullOrEmpty(Collectionname)) {
                                     //
@@ -182,8 +182,8 @@ namespace Contensive.Processor.Controllers {
                                         case "importcollection":
                                             //
                                             // -- Download Collection file into install folder
-                                            ChildCollectionName = XmlController.GetXMLAttribute(core, Found, metaDataSection, "name", "");
-                                            ChildCollectionGUID = XmlController.GetXMLAttribute(core, Found, metaDataSection, "guid", metaDataSection.InnerText);
+                                            ChildCollectionName = XmlController.getXMLAttribute(core, Found, metaDataSection, "name", "");
+                                            ChildCollectionGUID = XmlController.getXMLAttribute(core, Found, metaDataSection, "guid", metaDataSection.InnerText);
                                             if (string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                 ChildCollectionGUID = metaDataSection.InnerText;
                                             }
@@ -436,17 +436,17 @@ namespace Contensive.Processor.Controllers {
                 //
                 int Pos = GenericController.vbInstr(1, CollectionVersionFolderName, "\\");
                 if (Pos > 0) {
-                    CollectionFolderName = CollectionVersionFolderName.Left(Pos - 1);
+                    CollectionFolderName = CollectionVersionFolderName.left(Pos - 1);
                 }
             } else {
                 //
                 // This is an install
                 //
                 CollectionFolderName = collectionGuid;
-                CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "{", "");
-                CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "}", "");
-                CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "-", "");
-                CollectionFolderName = GenericController.vbReplace(CollectionFolderName, " ", "");
+                CollectionFolderName = GenericController.strReplace(CollectionFolderName, "{", "");
+                CollectionFolderName = GenericController.strReplace(CollectionFolderName, "}", "");
+                CollectionFolderName = GenericController.strReplace(CollectionFolderName, "-", "");
+                CollectionFolderName = GenericController.strReplace(CollectionFolderName, " ", "");
                 CollectionFolderName = CollectionName + "_" + CollectionFolderName;
                 CollectionFolderName = CollectionFolderName.ToLowerInvariant();
             }

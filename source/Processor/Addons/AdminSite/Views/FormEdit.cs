@@ -72,12 +72,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (!string.IsNullOrEmpty(EditReferer)) {
                         //
                         // special case - if you are coming from the advanced search, go back to the list page
-                        EditReferer = GenericController.vbReplace(EditReferer, "&af=39", "");
+                        EditReferer = GenericController.strReplace(EditReferer, "&af=39", "");
                         //
                         // if referer includes AdminWarningMsg (admin hint message), remove it -- this edit may fix the problem
                         int Pos = EditReferer.IndexOf("AdminWarningMsg=");
                         if (Pos >= 0) {
-                            EditReferer = EditReferer.Left(Pos - 2);
+                            EditReferer = EditReferer.left(Pos - 2);
                         }
                     }
                 }
@@ -418,7 +418,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 core.html.addScriptCode("var docLoaded=false", "Form loader");
                 core.html.addScriptCode_onLoad("docLoaded=true;", "Form loader");
                 result = HtmlController.formMultipart_start(core, core.doc.refreshQueryString, "", "ccForm", "adminEditForm");
-                result = GenericController.vbReplace(result, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\" autocomplete=\"off\">");
+                result = GenericController.strReplace(result, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\" autocomplete=\"off\">");
                 result += Environment.NewLine + "<!-- block --><div class=\"d-none\"><input type=password name=\"password_block\" value=\"\"><input type=text name=\"username_block\" value=\"\"></div><!-- end block -->";
                 result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + rnAdminSourceForm + "\" VALUE=\"" + AdminFormID + "\">";
                 result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + adminData.titleExtension + "\">";

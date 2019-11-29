@@ -125,7 +125,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dateExpires"></param>
         public static void addUser(CoreController core, string groupNameIdOrGuid, int userid, DateTime dateExpires) {
             GroupModel group = null;
-            if ( groupNameIdOrGuid.IsNumeric()) {
+            if ( groupNameIdOrGuid.isNumeric()) {
                 group = DbBaseModel.create<GroupModel>(core.cpParent, GenericController.encodeInteger(groupNameIdOrGuid));
                 if (group == null) {
                     LogController.logError(core, new GenericException("addUser called with invalid groupId [" + groupNameIdOrGuid + "]"));
@@ -331,9 +331,9 @@ namespace Contensive.Processor.Controllers {
                 returnREsult = false;
                 if (isAuthenticated) {
                     WorkingIDList = GroupIDList;
-                    WorkingIDList = GenericController.vbReplace(WorkingIDList, " ", "");
+                    WorkingIDList = GenericController.strReplace(WorkingIDList, " ", "");
                     while (GenericController.vbInstr(1, WorkingIDList, ",,") != 0) {
-                        WorkingIDList = GenericController.vbReplace(WorkingIDList, ",,", ",");
+                        WorkingIDList = GenericController.strReplace(WorkingIDList, ",,", ",");
                     }
                     if (!string.IsNullOrEmpty(WorkingIDList)) {
                         if (vbMid(WorkingIDList, 1) == ",") {
@@ -345,7 +345,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     if (!string.IsNullOrEmpty(WorkingIDList)) {
-                        if (WorkingIDList.Right(1) == ",") {
+                        if (WorkingIDList.right(1) == ",") {
                             if (vbLen(WorkingIDList) <= 1) {
                                 WorkingIDList = "";
                             } else {

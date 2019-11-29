@@ -30,7 +30,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// core object
         /// </summary>
-        private CoreController core;
+        private readonly CoreController core;
         /// <summary>
         /// true if the filesystem is local, false if files transfered through the local system to the remote system
         /// </summary>
@@ -119,7 +119,7 @@ namespace Contensive.Processor.Controllers {
                     pathFilename = normalizeDosPathFilename(pathFilename);
                     int lastSlashPos = pathFilename.LastIndexOf("\\");
                     if (lastSlashPos >= 0) {
-                        path = pathFilename.Left(lastSlashPos + 1);
+                        path = pathFilename.left(lastSlashPos + 1);
                         filename = pathFilename.Substring(lastSlashPos + 1);
                     } else {
                         filename = pathFilename;
@@ -336,7 +336,7 @@ namespace Contensive.Processor.Controllers {
                     if (!Directory.Exists(WorkingPath)) {
                         Position = GenericController.vbInstr(1, WorkingPath, "\\");
                         while (Position != 0) {
-                            PartialPath = WorkingPath.Left(Position - 1);
+                            PartialPath = WorkingPath.left(Position - 1);
                             if (!Directory.Exists(PartialPath)) {
                                 Directory.CreateDirectory(PartialPath);
                             }
@@ -462,7 +462,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     string localPath = joinPath(localAbsRootPath, path);
                     if (localPath.Substring(localPath.Length - 1) == "\\") {
-                        localPath = localPath.Left(localPath.Length - 1);
+                        localPath = localPath.left(localPath.Length - 1);
                     }
                     if (pathExists_local(path)) {
                         Directory.Delete(localPath, true);
@@ -948,7 +948,7 @@ namespace Contensive.Processor.Controllers {
                         int Pos = srcPathFilename.LastIndexOf("\\") + 1;
                         string sourceFullPath = "";
                         if (Pos >= 0) {
-                            sourceFullPath = srcPathFilename.Left(Pos);
+                            sourceFullPath = srcPathFilename.left(Pos);
                         }
                         if (string.IsNullOrEmpty(dstFilename)) {
                             throw new GenericException("Invalid destination file []");
@@ -987,7 +987,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Drive Space
                     //
-                    driveLetter = localAbsRootPath.Left(1);
+                    driveLetter = localAbsRootPath.left(1);
                     scriptingDrive = new DriveInfo(driveLetter);
                     if (scriptingDrive.IsReady) {
                         returnSize = scriptingDrive.AvailableFreeSpace;
@@ -1126,7 +1126,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 if ((!string.IsNullOrEmpty(pathFilename)) && (!string.IsNullOrEmpty(Link))) {
-                    string URLLink = GenericController.vbReplace(Link, " ", "%20");
+                    string URLLink = GenericController.strReplace(Link, " ", "%20");
                     HttpRequestController HTTP = new HttpRequestController {
                         timeout = 600
                     };
@@ -1880,7 +1880,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     //
                     // -- divide path and filename and return just path
-                    return pathFilename.Left(slashpos + 1);
+                    return pathFilename.left(slashpos + 1);
                 }
             }
         }

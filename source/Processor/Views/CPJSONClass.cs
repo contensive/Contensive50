@@ -16,7 +16,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="cpParent"></param>
         //
-        public CPJSONClass(CPClass cpParent) : base() {
+        public CPJSONClass(CPClass cpParent) {
             cp = cpParent;
         }
         //

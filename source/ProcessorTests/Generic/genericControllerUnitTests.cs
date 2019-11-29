@@ -9,10 +9,10 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     [TestClass]
-    public class genericControllerUnitTests {
+    public class GenericControllerUnitTests {
         //
         [TestMethod]
-        public void Controllers_empty_test() {
+        public void controllers_empty_test() {
             // arrange
             // act
             // assert
@@ -31,16 +31,16 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_encodeJavascript_test() {
+        public void controllers_encodeJavascript_test() {
             // arrange
             // act
-            string result1 = GenericController.EncodeJavascriptStringSingleQuote("a'b");
+            string result1 = GenericController.encodeJavascriptStringSingleQuote("a'b");
             // assert
             Assert.AreEqual("a\\u0027b", result1);
         }
         //
         [TestMethod]
-        public void Controllers_getSingular_test() {
+        public void controllers_getSingular_test() {
             // arrange
             // act
             // assert
@@ -51,7 +51,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_encodeInitialCaps_test() {
+        public void controllers_encodeInitialCaps_test() {
             // arrange
             // act
             // assert
@@ -59,7 +59,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_getLinkedText_test() {
+        public void controllers_getLinkedText_test() {
             // arrange
             // act
             string result1 = GenericController.getLinkedText("<a href=\"goHere\">", "abc<link>zzzz</link>def");
@@ -68,18 +68,18 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_ConvertLinkToShortLink_test() {
+        public void controllers_ConvertLinkToShortLink_test() {
             // arrange
             // act
-            string result1 = GenericController.ConvertLinkToShortLink("/c/d.html", "domain.com", "/a/b");
-            string result2 = GenericController.ConvertLinkToShortLink("HTTP://ServerHost/ServerVirtualPath/folder/page", "ServerHost", "/ServerVirtualPath");
+            string result1 = GenericController.convertLinkToShortLink("/c/d.html", "domain.com", "/a/b");
+            string result2 = GenericController.convertLinkToShortLink("HTTP://ServerHost/ServerVirtualPath/folder/page", "ServerHost", "/ServerVirtualPath");
             // assert
             Assert.AreEqual("/c/d.html", result1);
             Assert.AreEqual("/folder/page", result2);
         }
         //
         [TestMethod]
-        public void Controllers_getYesNo_test() {
+        public void controllers_getYesNo_test() {
             // arrange
             // act
             // assert
@@ -88,7 +88,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_getFirstNonzeroInteger_test() {
+        public void controllers_getFirstNonzeroInteger_test() {
             // arrange            
 
             // act
@@ -99,7 +99,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_getFirstNonzeroDate_test() {
+        public void controllers_getFirstNonzeroDate_test() {
             // arrange            
             DateTime zeroDate = new DateTime(1990, 8, 7);
             DateTime newBeginning = new DateTime(1999, 2, 2);
@@ -116,7 +116,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_decodeUrl_test() {
+        public void controllers_decodeUrl_test() {
             const string pattern1 = "a/b c";
             // arrange
             string test1 = GenericController.encodeURL(pattern1);
@@ -127,7 +127,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_decodeRequestString_test() {
+        public void controllers_decodeRequestString_test() {
             // arrange
             // act
 
@@ -138,7 +138,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_encodeRequestVariable_test() {
+        public void controllers_encodeRequestVariable_test() {
             // arrange
             // act
             string result1 = GenericController.encodeRequestVariable("abc");
@@ -149,7 +149,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_encodeQuerySting_test() {
+        public void controllers_encodeQuerySting_test() {
             // arrange
             // act
             string result1 = GenericController.encodeQueryString("a=b&c=d");
@@ -160,7 +160,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_encodeUrl_test() {
+        public void controllers_encodeUrl_test() {
             // arrange
             // act
             string result1 = GenericController.encodeURL("http://www.a.com/b/c.html");
@@ -171,7 +171,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_isInDelimitedString_test() {
+        public void controllers_isInDelimitedString_test() {
             // arrange
             // act
             // assert
@@ -184,7 +184,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_getIntegerString_test() {
+        public void controllers_getIntegerString_test() {
             // arrange
             // act
             // assert
@@ -192,12 +192,12 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_getRandomInteger_test() {
+        public void controllers_getRandomInteger_test() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 // act
-                int test1 = GenericController.GetRandomInteger(cp.core);
-                int test2 = GenericController.GetRandomInteger(cp.core);
+                int test1 = GenericController.getRandomInteger(cp.core);
+                int test2 = GenericController.getRandomInteger(cp.core);
                 // assert
                 Assert.AreNotEqual(test1, test2);
             }
@@ -205,7 +205,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //
         //
         [TestMethod]
-        public void Controllers_getValueFromNameValueString_test() {
+        public void controllers_getValueFromNameValueString_test() {
             // arrange
             const string test1 = "a=1&b=2&c=3";
             // act
@@ -221,11 +221,11 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_splitUrl_test() {
+        public void controllers_splitUrl_test() {
             // arrange
             const string test1 = "http://www.a.com/b/c.html?d=e";
             //
-            string expect1 = SerializeObject( new GenericController.urlDetailsClass() {
+            string expect1 = SerializeObject( new GenericController.UrlDetailsClass() {
                 filename = "c.html",
                 host = "www.a.com",
                 port = "80",
@@ -240,7 +240,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_splitUrl2_test() {
+        public void controllers_splitUrl2_test() {
             // arrange
             const string url1 = "http://www.a.com/b/c.html?d=e";
             //
@@ -262,7 +262,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_splitNewLine_test() {
+        public void controllers_splitNewLine_test() {
             // arrange
             const string test1 = "1\r2\n3\r\n4";
             const string test2 = "1 \r 2\n 3 \r\n4";
@@ -286,7 +286,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_convertLinksToAbsolute_test() {
+        public void controllers_convertLinksToAbsolute_test() {
             // arrange
             const string link1 = "http://www.good.com/";
             const string link2 = "https://www.good.com/";
@@ -306,7 +306,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_decodeHtml_test() {
+        public void controllers_decodeHtml_test() {
             // arrange
             string test1 = "&quot; &amp; &apos; &minus; &lt; &gt;";
             string test2 = "&#34; &#35; &#36; &#37;";
@@ -319,7 +319,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_modifyLinkQuery_test() {
+        public void controllers_modifyLinkQuery_test() {
             // arrange
             string testLink1 = "http://www.test.com/path/page.aspx?a=1&b=2";
             // act
@@ -335,7 +335,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_modifyQueryString_test3() {
+        public void controllers_modifyQueryString_test3() {
             // arrange
             string testLink1 = "a=1&b=2";
             // act
@@ -355,7 +355,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_modifyQueryString_test2() {
+        public void controllers_modifyQueryString_test2() {
             // arrange
             string testLink1 = "a=1&b=2";
             // act
@@ -375,7 +375,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_modifyQueryString_test() {
+        public void controllers_modifyQueryString_test() {
             // arrange
             string testLink1 = "a=1&b=2";
             // act
@@ -395,7 +395,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_encodeEmptyDate_test() {
+        public void controllers_encodeEmptyDate_test() {
             // arrange
             DateTime zeroDate = new DateTime(1990, 8, 7);
             DateTime newBeginning = new DateTime(1999, 2, 2);
@@ -411,7 +411,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_encodeEmpty_test() {
+        public void controllers_encodeEmpty_test() {
             // arrange
             // act
             string test1 = GenericController.encodeEmpty("1", "2");
@@ -424,7 +424,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_encodeEmptyInteger_test() {
+        public void controllers_encodeEmptyInteger_test() {
             // arrange
             // act
             int test1 = GenericController.encodeEmptyInteger("1", 2);
@@ -495,11 +495,11 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             string in4 = "1,,2";
             string in5 = "1 \" 2 \" 3 \" 4\" \"5 \"";
             // act
-            string[] out1 = GenericController.SplitDelimited(in1, " ");
-            string[] out2 = GenericController.SplitDelimited(in2, " ");
-            string[] out3 = GenericController.SplitDelimited(in3, ",");
-            string[] out4 = GenericController.SplitDelimited(in4, ",");
-            string[] out5 = GenericController.SplitDelimited(in5, " ");
+            string[] out1 = GenericController.splitDelimited(in1, " ");
+            string[] out2 = GenericController.splitDelimited(in2, " ");
+            string[] out3 = GenericController.splitDelimited(in3, ",");
+            string[] out4 = GenericController.splitDelimited(in4, ",");
+            string[] out5 = GenericController.splitDelimited(in5, " ");
             // assert
             Assert.AreEqual(3, out1.Length);
             Assert.AreEqual(3, out2.Length);

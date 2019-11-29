@@ -24,7 +24,7 @@ namespace Contensive.Processor {
         /// Constructor
         /// </summary>
         /// <param name="cpParent"></param>
-        public CPGroupClass(CPClass cpParent) : base() {
+        public CPGroupClass(CPClass cpParent) {
             cp = cpParent;
             core = cp.core;
         }
@@ -83,7 +83,7 @@ namespace Contensive.Processor {
                 GroupModel.delete<GroupModel>(core.cpParent, GroupNameIdOrGuid);
                 return;
             }
-            if ( GroupNameIdOrGuid.IsNumeric()) {
+            if ( GroupNameIdOrGuid.isNumeric()) {
                 //
                 // -- id
                 GroupModel.delete<GroupModel>(core.cpParent, GenericController.encodeInteger( GroupNameIdOrGuid));
@@ -114,7 +114,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetName(string GroupIdOrGuid) {
-            if (GroupIdOrGuid.IsNumeric()) {
+            if (GroupIdOrGuid.isNumeric()) {
                 //
                 // id
                 return DbBaseModel.getRecordName<GroupModel>(core.cpParent, GenericController.encodeInteger(GroupIdOrGuid));

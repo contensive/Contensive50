@@ -103,7 +103,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         [TestMethod]
         public void views_cpBlock_ImportFileTest() {
             using (CPClass cp = new CPClass(testAppName)) {
-                string filename = "cpBlockTest" + GetRandomInteger(cp.core).ToString() + ".html";
+                string filename = "cpBlockTest" + getRandomInteger(cp.core).ToString() + ".html";
                 try {
                     CPBlockBaseClass block = cp.BlockNew();
                     // act
@@ -126,7 +126,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         [TestMethod]
         public void views_cpBlock_OpenCopyTest() {
             using (CPClass cp = new CPClass(testAppName)) {
-                string recordName = "cpBlockTest" + GetRandomInteger(cp.core).ToString();
+                string recordName = "cpBlockTest" + getRandomInteger(cp.core).ToString();
                 int recordId = 0;
                 try {
                     // arrange
@@ -156,7 +156,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         [TestMethod]
         public void views_cpBlock_OpenFileTest() {
             using (CPClass cp = new CPClass(testAppName)) {
-                string filename = "cpBlockTest" + GetRandomInteger(cp.core).ToString() + ".html";
+                string filename = "cpBlockTest" + getRandomInteger(cp.core).ToString() + ".html";
                 // act
                 cp.core.wwwFiles.saveFile(filename, layoutA);
                 CPBlockBaseClass block = cp.BlockNew();
@@ -174,7 +174,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         [TestMethod]
         public void views_cpBlock_OpenLayoutTest() {
             using (CPClass cp = new CPClass(testAppName)) {
-                string recordName = "cpBlockTest" + GetRandomInteger(cp.core).ToString();
+                string recordName = "cpBlockTest" + getRandomInteger(cp.core).ToString();
                 int recordId = 0;
                 // arrange
                 CPBlockBaseClass block = cp.BlockNew();

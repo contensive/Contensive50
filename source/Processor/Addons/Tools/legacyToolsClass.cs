@@ -1,19 +1,11 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-//
 using System.Threading;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor.Addons.AdminSite.Controllers;
@@ -24,26 +16,7 @@ using Contensive.Models.Db;
 namespace Contensive.Processor.Addons.Tools {
     public class LegacyToolsClass {
         //
-        // ----- global scope variables
-        //
-        //
-        // ----- data fields
-        //
-        private string[] Findstring = new string[51];
-        private CoreController core;
-        private string ToolsTable;
-        private string ToolsContentName;
-        private bool DefaultReadOnly;
-        private bool DefaultActive;
-        private bool DefaultPassword;
-        private bool DefaulttextBuffered;
-        private bool DefaultRequired;
-        private bool DefaultAdminOnly;
-        private bool DefaultDeveloperOnly;
-        private bool DefaultCreateBlankRecord;
-        private bool defaultAddMenu;
-        private string ToolsQuery;
-        private string ToolsDataSource;
+        private readonly CoreController core;
         //
         // ----- Forms
         //
@@ -139,7 +112,7 @@ namespace Contensive.Processor.Addons.Tools {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public LegacyToolsClass(CoreController core) : base() {
+        public LegacyToolsClass(CoreController core) {
             this.core = core;
         }
         //
@@ -177,22 +150,9 @@ namespace Contensive.Processor.Addons.Tools {
                     ToolsAction = core.docProperties.getInteger("dta");
                     Button = core.docProperties.getText("Button");
                     AdminFormTool = core.docProperties.getInteger(RequestNameAdminForm);
-                    ToolsTable = core.docProperties.getText("dtt");
-                    ToolsContentName = core.docProperties.getText("ContentName");
-                    ToolsQuery = core.docProperties.getText("dtq");
-                    ToolsDataSource = core.docProperties.getText("dtds");
                     MenuEntryId = core.docProperties.getInteger("dtei");
                     MenuHeaderId = core.docProperties.getInteger("dthi");
                     MenuDirection = core.docProperties.getInteger("dtmd");
-                    DefaultReadOnly = core.docProperties.getBoolean("dtdreadonly");
-                    DefaultActive = core.docProperties.getBoolean("dtdactive");
-                    DefaultPassword = core.docProperties.getBoolean("dtdpassword");
-                    DefaulttextBuffered = core.docProperties.getBoolean("dtdtextbuffered");
-                    DefaultRequired = core.docProperties.getBoolean("dtdrequired");
-                    DefaultAdminOnly = core.docProperties.getBoolean("dtdadmin");
-                    DefaultDeveloperOnly = core.docProperties.getBoolean("dtddev");
-                    defaultAddMenu = core.docProperties.getBoolean("dtdam");
-                    DefaultCreateBlankRecord = core.docProperties.getBoolean("dtblank");
                     //
                     core.doc.addRefreshQueryString("dta", ToolsAction.ToString());
                     //
@@ -717,7 +677,7 @@ namespace Contensive.Processor.Addons.Tools {
                                     break;
                                 }
                             default: {
-                                    // nop
+                                    // do nothing
                                     break;
                                 }
                         }
@@ -964,7 +924,7 @@ namespace Contensive.Processor.Addons.Tools {
                                             break;
                                         }
                                     default: {
-                                            // nop
+                                            // do nothing
                                             break;
                                         }
                                 }
@@ -1517,7 +1477,7 @@ namespace Contensive.Processor.Addons.Tools {
                             Stream.Add(RowStart);
                             for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                 CellData = arrayOfSchema[ColumnPointer, RowPointer];
-                                if (IsNull(CellData)) {
+                                if (isNull(CellData)) {
                                     Stream.Add(ColumnStart + "[null]" + ColumnEnd);
                                 } else if ((CellData == null)) {
                                     Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
@@ -1575,7 +1535,7 @@ namespace Contensive.Processor.Addons.Tools {
                             Stream.Add(RowStart);
                             for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                 CellData = arrayOfSchema[ColumnPointer, RowPointer];
-                                if (IsNull(CellData)) {
+                                if (isNull(CellData)) {
                                     Stream.Add(ColumnStart + "[null]" + ColumnEnd);
                                 } else if ((CellData == null)) {
                                     Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
@@ -1632,7 +1592,7 @@ namespace Contensive.Processor.Addons.Tools {
                             Stream.Add(RowStart);
                             for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                 CellData = arrayOfSchema[ColumnPointer, RowPointer];
-                                if (IsNull(CellData)) {
+                                if (isNull(CellData)) {
                                     Stream.Add(ColumnStart + "[null]" + ColumnEnd);
                                 } else if ((CellData == null)) {
                                     Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
@@ -1986,7 +1946,7 @@ namespace Contensive.Processor.Addons.Tools {
                 CurrentPath = core.docProperties.getText("SetPath");
                 if (string.IsNullOrEmpty(CurrentPath)) {
                     CurrentPath = "\\";
-                } else if (CurrentPath.Left(1) != "\\") {
+                } else if (CurrentPath.left(1) != "\\") {
                     CurrentPath = "\\" + CurrentPath;
                 }
                 //
@@ -1996,7 +1956,7 @@ namespace Contensive.Processor.Addons.Tools {
                 if (Position == 1) {
                     ParentPath = "\\";
                 } else {
-                    ParentPath = CurrentPath.Left(Position - 1);
+                    ParentPath = CurrentPath.left(Position - 1);
                 }
                 //
                 //

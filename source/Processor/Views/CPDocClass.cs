@@ -21,7 +21,7 @@ namespace Contensive.Processor {
         /// constructor
         /// </summary>
         /// <param name="cpParent"></param>
-        public CPDocClass(CPClass cpParent) : base() {
+        public CPDocClass(CPClass cpParent) {
             cp = cpParent;
         }
         //

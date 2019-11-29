@@ -17,7 +17,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Addons.PageManager {
-    public class saveChildPageListDraggableClass : Contensive.BaseClasses.AddonBaseClass {
+    public class SaveChildPageListDraggableClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>

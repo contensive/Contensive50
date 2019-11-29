@@ -151,13 +151,13 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override int GetListIndex(string Item, string ListOfItems) {
-            return GenericController.GetListIndex(Item, ListOfItems);
+            return GenericController.getListIndex(Item, ListOfItems);
         }
         //
         // ====================================================================================================
         //
         public override int GetRandomInteger() {
-            return GenericController.GetRandomInteger(cp.core);
+            return GenericController.getRandomInteger(cp.core);
         }
         //
         // ====================================================================================================
@@ -268,7 +268,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override object SplitDelimited(string WordList, string Delimiter) {
-            return GenericController.SplitDelimited(WordList, Delimiter);
+            return GenericController.splitDelimited(WordList, Delimiter);
         }
         //
         // ====================================================================================================
@@ -399,13 +399,13 @@ namespace Contensive.Processor {
             return cp.core.programFiles.readFileText("Resources\\WaitPageOpen.htm");
         }
         //
-        public string ExecuteAddon(string addonIDGuidOrName, int wrapperId, addonContext context) {
+        public string executeAddon(string addonIDGuidOrName, int wrapperId, addonContext context) {
             addonExecuteContext executeContext = new addonExecuteContext() {
                 addonType = context,
                 instanceGuid = cp.core.docProperties.getText("instanceId"),
                 wrapperID = wrapperId
             };
-            if (addonIDGuidOrName.IsNumeric()) {
+            if (addonIDGuidOrName.isNumeric()) {
                 return (string)cp.Addon.Execute(EncodeInteger(addonIDGuidOrName), executeContext);
             } else if (isGuid(addonIDGuidOrName)) {
                 return (string)cp.Addon.Execute(addonIDGuidOrName, executeContext);
@@ -415,19 +415,19 @@ namespace Contensive.Processor {
         }
         //
         [Obsolete("Deprecated, use cp.addon.Execute", false)]
-        public override string ExecuteAddon(string addonIDGuidOrName) => ExecuteAddon(addonIDGuidOrName, 0, addonContext.ContextPage);
+        public override string ExecuteAddon(string addonIDGuidOrName) => executeAddon(addonIDGuidOrName, 0, addonContext.ContextPage);
         //
         [Obsolete("Deprecated, use cp.addon.Execute", false)]
-        public override string ExecuteAddon(string addonIDGuidOrName, int WrapperId) => ExecuteAddon(addonIDGuidOrName, WrapperId, addonContext.ContextPage);
+        public override string ExecuteAddon(string addonIDGuidOrName, int WrapperId) => executeAddon(addonIDGuidOrName, WrapperId, addonContext.ContextPage);
         //
         [Obsolete("Deprecated, use cp.addon.Execute", false)]
-        public override string ExecuteAddon(string addonIDGuidOrName, addonContext context) => ExecuteAddon(addonIDGuidOrName, 0, context);
+        public override string ExecuteAddon(string addonIDGuidOrName, addonContext context) => executeAddon(addonIDGuidOrName, 0, context);
         //
         [Obsolete("Deprecated, use cp.addon.Execute", false)]
         public override string ExecuteAddonAsProcess(string addonIDGuidOrName) {
             try {
                 AddonModel addon = null;
-                if (addonIDGuidOrName.IsNumeric()) {
+                if (addonIDGuidOrName.isNumeric()) {
                     addon = cp.core.addonCache.getAddonById(EncodeInteger(addonIDGuidOrName));
                 } else if (GenericController.isGuid(addonIDGuidOrName)) {
                     addon = cp.core.addonCache.getAddonByGuid(addonIDGuidOrName);
@@ -459,7 +459,7 @@ namespace Contensive.Processor {
         //
         [Obsolete("Deprecated", false)]
         public override string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath) {
-            return GenericController.ConvertLinkToShortLink(URL, ServerHost, ServerVirtualPath);
+            return GenericController.convertLinkToShortLink(URL, ServerHost, ServerVirtualPath);
         }
         //
         [Obsolete("Deprecated", false)]
@@ -478,7 +478,7 @@ namespace Contensive.Processor {
         //
         [Obsolete("Deprecated.", false)]
         public override string EncodeJavascript(string Source) {
-            return GenericController.EncodeJavascriptStringSingleQuote(Source);
+            return GenericController.encodeJavascriptStringSingleQuote(Source);
         }
         //
         [Obsolete("Deprecated.", false)]

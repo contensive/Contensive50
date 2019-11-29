@@ -223,12 +223,12 @@ namespace Contensive.Processor.Controllers {
                     //--------------------------------------------------------------------------
                     //
                     string linkAliasTest1 = core.webServer.requestPathPage;
-                    if (linkAliasTest1.Left(1) == "/") {
+                    if (linkAliasTest1.left(1) == "/") {
                         linkAliasTest1 = linkAliasTest1.Substring(1);
                     }
                     if (linkAliasTest1.Length > 0) {
                         if (linkAliasTest1.Substring(linkAliasTest1.Length - 1, 1) == "/") {
-                            linkAliasTest1 = linkAliasTest1.Left(linkAliasTest1.Length - 1);
+                            linkAliasTest1 = linkAliasTest1.left(linkAliasTest1.Length - 1);
                         }
                     }
                     string linkAliasTest2 = linkAliasTest1 + "/";
@@ -244,7 +244,7 @@ namespace Contensive.Processor.Controllers {
                             LinkNoProtocol = core.webServer.requestPathPage.Substring(PosProtocol + 2);
                             int Pos = GenericController.vbInstr(PosProtocol + 3, core.webServer.requestPathPage, "/", 2);
                             if (Pos != 0) {
-                                string linkDomain = core.webServer.requestPathPage.Left(Pos - 1);
+                                string linkDomain = core.webServer.requestPathPage.left(Pos - 1);
                                 LinkFullPath = core.webServer.requestPathPage.Substring(Pos - 1);
                                 //
                                 // strip off leading or trailing slashes, and return only the string between the leading and secton slash
@@ -381,7 +381,7 @@ namespace Contensive.Processor.Controllers {
                                         return core.html.getHtmlDoc('\r' + core.html.getContentCopy("AnonymousUserResponseCopy", "<p style=\"width:250px;margin:100px auto auto auto;\">The site is currently not available for anonymous access.</p>", core.session.user.id, true, core.session.isAuthenticated), TemplateDefaultBodyTag, true, true);
                                     }
                                 default: {
-                                        // nop
+                                        // do nothing
                                         break;
                                     }
                             }
@@ -401,18 +401,18 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     bool SecureLink_Required = SecureLink_Template_Required || SecureLink_Page_Required;
-                    bool SecureLink_CurrentURL = (core.webServer.requestUrl.ToLowerInvariant().Left(8) == "https://");
+                    bool SecureLink_CurrentURL = (core.webServer.requestUrl.ToLowerInvariant().left(8) == "https://");
                     if (SecureLink_CurrentURL && (!SecureLink_Required)) {
                         //
                         // -- redirect to non-secure
-                        core.doc.redirectLink = GenericController.vbReplace(core.webServer.requestUrl, "https://", "http://");
+                        core.doc.redirectLink = GenericController.strReplace(core.webServer.requestUrl, "https://", "http://");
                         core.doc.redirectReason = "Redirecting because neither the page or the template requires a secure link.";
                         core.doc.redirectBecausePageNotFound = false;
                         return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
                     } else if ((!SecureLink_CurrentURL) && SecureLink_Required) {
                         //
                         // -- redirect to secure
-                        core.doc.redirectLink = GenericController.vbReplace(core.webServer.requestUrl, "http://", "https://");
+                        core.doc.redirectLink = GenericController.strReplace(core.webServer.requestUrl, "http://", "https://");
                         if (SecureLink_Page_Required) {
                             core.doc.redirectReason = "Redirecting because this page [" + core.doc.pageController.pageToRootList[0].name + "] requires a secure link.";
                         } else {
@@ -511,7 +511,7 @@ namespace Contensive.Processor.Controllers {
                 if (result.IndexOf(fpoContentBox) != -1) {
                     //
                     // -- replace page content into templatecontent
-                    result = GenericController.vbReplace(result, fpoContentBox, PageContent);
+                    result = GenericController.strReplace(result, fpoContentBox, PageContent);
                 } else {
                     //
                     // If Content was not found, add it to the end
@@ -634,7 +634,7 @@ namespace Contensive.Processor.Controllers {
                             csData.openSql(SQL);
                             BlockedRecordIDList = "," + BlockedRecordIDList;
                             while (csData.ok()) {
-                                BlockedRecordIDList = GenericController.vbReplace(BlockedRecordIDList, "," + csData.getText("RecordID"), "");
+                                BlockedRecordIDList = GenericController.strReplace(BlockedRecordIDList, "," + csData.getText("RecordID"), "");
                                 csData.goNext();
                             }
                             csData.close();
@@ -659,7 +659,7 @@ namespace Contensive.Processor.Controllers {
                             using (var csData = new CsModel(core)) {
                                 csData.openSql(SQL);
                                 while (csData.ok()) {
-                                    BlockedRecordIDList = GenericController.vbReplace(BlockedRecordIDList, "," + csData.getText("RecordID"), "");
+                                    BlockedRecordIDList = GenericController.strReplace(BlockedRecordIDList, "," + csData.getText("RecordID"), "");
                                     csData.goNext();
                                 }
                             }
@@ -948,7 +948,7 @@ namespace Contensive.Processor.Controllers {
                                     break;
                                 }
                             default: {
-                                    // nop
+                                    // do nothing
                                     break;
                                 }
                         }
@@ -1409,7 +1409,7 @@ namespace Contensive.Processor.Controllers {
                 //---------------------------------------------------------------------------------
                 //
                 if (core.doc.pageController.page.modifiedDate != DateTime.MinValue) {
-                    core.webServer.addResponseHeader("LAST-MODIFIED", GenericController.GetRFC1123PatternDateFormat(encodeDate(core.doc.pageController.page.modifiedDate)));
+                    core.webServer.addResponseHeader("LAST-MODIFIED", GenericController.getRFC1123PatternDateFormat(encodeDate(core.doc.pageController.page.modifiedDate)));
                 }
                 //
                 //---------------------------------------------------------------------------------
@@ -1527,12 +1527,12 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     //
                     // no protocol, convert to short link
-                    if (result.Left(1) != "/") {
+                    if (result.left(1) != "/") {
                         //
                         // page entered without path, assume it is in root path
                         result = "/" + result;
                     }
-                    result = GenericController.ConvertLinkToShortLink(result, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
+                    result = GenericController.convertLinkToShortLink(result, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
                     result = GenericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 }
             }
@@ -1581,15 +1581,15 @@ namespace Contensive.Processor.Controllers {
                         String referer = core.webServer.requestReferrer;
                         int Pos = GenericController.vbInstr(1, referer, "AdminWarningPageID=", 1);
                         if (Pos != 0) {
-                            referer = referer.Left(Pos - 2);
+                            referer = referer.left(Pos - 2);
                         }
                         Pos = GenericController.vbInstr(1, referer, "AdminWarningMsg=", 1);
                         if (Pos != 0) {
-                            referer = referer.Left(Pos - 2);
+                            referer = referer.left(Pos - 2);
                         }
                         Pos = GenericController.vbInstr(1, referer, "blockcontenttracking=", 1);
                         if (Pos != 0) {
-                            referer = referer.Left(Pos - 2);
+                            referer = referer.left(Pos - 2);
                         }
                         adminMessage = adminMessage + " The referring page was " + referer + ".";
                     }
@@ -1631,9 +1631,9 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         int Pos = GenericController.vbInstr(1, linkPathPage, "?");
                         if (Pos != 0) {
-                            linkPathPage = linkPathPage.Left(Pos - 1);
+                            linkPathPage = linkPathPage.left(Pos - 1);
                         }
-                        if (linkPathPage.Left(1) != "/") {
+                        if (linkPathPage.left(1) != "/") {
                             linkPathPage = "/" + linkPathPage;
                         }
                     }
@@ -1834,7 +1834,7 @@ namespace Contensive.Processor.Controllers {
                                     break;
                                 }
                             default: {
-                                    // nop
+                                    // do nothing
                                     break;
                                 }
                         }
@@ -1914,7 +1914,7 @@ namespace Contensive.Processor.Controllers {
                     if (PtrFront > 0) {
                         int PtrBack = GenericController.vbInstr(PtrFront, Formhtml, "}}");
                         if (PtrBack > 0) {
-                            result.PreRepeat = Formhtml.Left(PtrFront - 1);
+                            result.PreRepeat = Formhtml.left(PtrFront - 1);
                             PtrFront = GenericController.vbInstr(PtrBack, Formhtml, "{{REPEATEND", 1);
                             if (PtrFront > 0) {
                                 result.RepeatCell = Formhtml.Substring(PtrBack + 1, PtrFront - PtrBack - 2);
@@ -1962,7 +1962,7 @@ namespace Contensive.Processor.Controllers {
                                                             break;
                                                         }
                                                     default: {
-                                                            // nop
+                                                            // do nothing
                                                             break;
                                                         }
                                                 }
@@ -2044,14 +2044,14 @@ namespace Contensive.Processor.Controllers {
                                 GroupValue = GroupController.isMemberOfGroup(core, formField.GroupName);
                                 Body = pageForm.RepeatCell;
                                 Body = GenericController.vbReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + formField.GroupName, GroupValue), 1, 99, 1);
-                                Body = GenericController.vbReplace(Body, "{{FIELD}}", formField.Caption);
+                                Body = GenericController.strReplace(Body, "{{FIELD}}", formField.Caption);
                                 RepeatBody = RepeatBody + Body;
                                 GroupRowPtr = GroupRowPtr + 1;
                                 HasRequiredFields = HasRequiredFields || formField.REquired;
                                 break;
                             }
                         default: {
-                                // nop
+                                // do nothing
                                 break;
                             }
                     }
@@ -2059,7 +2059,7 @@ namespace Contensive.Processor.Controllers {
                 if (HasRequiredFields) {
                     Body = pageForm.RepeatCell;
                     Body = GenericController.vbReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, 1);
-                    Body = GenericController.vbReplace(Body, "{{FIELD}}", "*&nbsp;Required Fields");
+                    Body = GenericController.strReplace(Body, "{{FIELD}}", "*&nbsp;Required Fields");
                     RepeatBody = RepeatBody + Body;
                 }
                 //
@@ -2280,7 +2280,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 string archiveLink = core.webServer.requestPathPage;
-                archiveLink = GenericController.ConvertLinkToShortLink(archiveLink, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
+                archiveLink = GenericController.convertLinkToShortLink(archiveLink, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
                 archiveLink = GenericController.encodeVirtualPath(archiveLink, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 //
                 List<PageContentModel> childPageList = DbBaseModel.createList<PageContentModel>(core.cpParent, "(parentId=" + parentPageID + ")", "sortOrder");
@@ -2764,7 +2764,7 @@ namespace Contensive.Processor.Controllers {
                                     int FieldCount = Fields.GetUpperBound(0) + 1;
                                     for (var FieldPointer = 0; FieldPointer < FieldCount; FieldPointer++) {
                                         string Pair = Fields[FieldPointer];
-                                        if (Pair.Left(1) == "(" && Pair.Substring(Pair.Length - 1, 1) == ")") {
+                                        if (Pair.left(1) == "(" && Pair.Substring(Pair.Length - 1, 1) == ")") {
                                             Pair = Pair.Substring(1, Pair.Length - 2);
                                         }
                                         string[] NameValues = Pair.Split('=');

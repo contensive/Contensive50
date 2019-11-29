@@ -210,9 +210,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         if (PosStart > 0) {
                                             int PosEnd = GenericController.vbInstr(PosStart + 1, "," + tmpList, ",");
                                             if (PosEnd == 0) {
-                                                tmpList = tmpList.Left(PosStart - 1);
+                                                tmpList = tmpList.left(PosStart - 1);
                                             } else {
-                                                tmpList = tmpList.Left(PosStart - 1) + tmpList.Substring(PosEnd - 1);
+                                                tmpList = tmpList.left(PosStart - 1) + tmpList.Substring(PosEnd - 1);
                                             }
                                             core.userProperty.setProperty("editorPreferencesForContent:" + adminData.adminContent.id, tmpList);
                                         }
@@ -243,7 +243,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 if (editRecord.id == 0) {
                                     EditorString += ("[available after save]");
                                 } else {
-                                    RedirectPath = GenericController.vbReplace(RedirectPath, "'", "\\'");
+                                    RedirectPath = GenericController.strReplace(RedirectPath, "'", "\\'");
                                     EditorString += ("<a href=\"#\"");
                                     EditorString += (" onclick=\" window.open('" + RedirectPath + "', '_blank', 'scrollbars=yes,toolbar=no,status=no,resizable=yes'); return false;\"");
                                     EditorString += (">");
@@ -635,7 +635,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         bool IsEmptyHelp = HelpMsgClosed.Length == 0;
                         bool IsLongHelp = (HelpMsgClosed.Length > 100);
                         if (IsLongHelp) {
-                            HelpMsgClosed = HelpMsgClosed.Left(100) + "...";
+                            HelpMsgClosed = HelpMsgClosed.left(100) + "...";
                         }
                         //
                         string HelpId = "helpId" + field.id;

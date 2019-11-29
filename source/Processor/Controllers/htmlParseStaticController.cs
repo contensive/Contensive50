@@ -48,7 +48,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // seems like these are the correct positions here.
                             //
-                            returnValue = layout.Left( posStart - 1) + textToInsert + layout.Substring(posEnd - 1);
+                            returnValue = layout.left( posStart - 1) + textToInsert + layout.Substring(posEnd - 1);
                         }
                     }
                 }
@@ -81,7 +81,7 @@ namespace Contensive.Processor.Controllers {
                                 posStart = posStart + 1;
                                 posEnd = layout.LastIndexOf("<", posEnd - 2) + 1;
                                 if (posEnd != 0) {
-                                    returnValue = layout.Left( posStart - 1) + textToInsert + layout.Substring(posEnd - 1);
+                                    returnValue = layout.left( posStart - 1) + textToInsert + layout.Substring(posEnd - 1);
                                 }
                             }
                         }
@@ -160,7 +160,7 @@ namespace Contensive.Processor.Controllers {
                     workingLayout = workingLayout.Substring(posStart - 1);
                     int posEnd = getTagEndPos(core, workingLayout, 1);
                     if (posEnd > 0) {
-                        workingLayout = workingLayout.Left(posEnd - 1);
+                        workingLayout = workingLayout.left(posEnd - 1);
                         result = workingLayout;
                     }
                 }
@@ -359,25 +359,25 @@ namespace Contensive.Processor.Controllers {
                     //
                     // does not support > yet.
                     //
-                    workingKey = GenericController.vbReplace(workingKey, ">", " ");
+                    workingKey = GenericController.strReplace(workingKey, ">", " ");
                 }
                 //
                 // eliminate whitespace
                 //
                 while (GenericController.vbInstr(1, workingKey, "\t") != 0) {
-                    workingKey = GenericController.vbReplace(workingKey, "\t", " ");
+                    workingKey = GenericController.strReplace(workingKey, "\t", " ");
                 }
                 //
                 while (GenericController.vbInstr(1, workingKey, "\r") != 0) {
-                    workingKey = GenericController.vbReplace(workingKey, "\r", " ");
+                    workingKey = GenericController.strReplace(workingKey, "\r", " ");
                 }
                 //
                 while (GenericController.vbInstr(1, workingKey, "\n") != 0) {
-                    workingKey = GenericController.vbReplace(workingKey, "\n", " ");
+                    workingKey = GenericController.strReplace(workingKey, "\n", " ");
                 }
                 //
                 while (GenericController.vbInstr(1, workingKey, "  ") != 0) {
-                    workingKey = GenericController.vbReplace(workingKey, "  ", " ");
+                    workingKey = GenericController.strReplace(workingKey, "  ", " ");
                 }
                 //
                 workingKey = workingKey.Trim(' ');
@@ -404,7 +404,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     //   searchKey = the search pattern to start
                     //
-                    if (workingKey.Left( 1) == ".") {
+                    if (workingKey.left( 1) == ".") {
                         //
                         // search for a class
                         //
@@ -414,11 +414,11 @@ namespace Contensive.Processor.Controllers {
                         Pos = GenericController.vbInstr(1, searchClass, "#");
                         if (Pos != 0) {
                             searchId = searchClass.Substring(Pos - 1);
-                            searchClass = searchClass.Left( Pos - 1);
+                            searchClass = searchClass.left( Pos - 1);
                         }
                         //
                         searchKey = "<";
-                    } else if (workingKey.Left( 1) == "#") {
+                    } else if (workingKey.left( 1) == "#") {
                         //
                         // search for an ID
                         //
@@ -428,7 +428,7 @@ namespace Contensive.Processor.Controllers {
                         Pos = GenericController.vbInstr(1, searchId, ".");
                         if (Pos != 0) {
                             searchClass = searchId.Substring(Pos - 1);
-                            searchId = searchId.Left( Pos - 1);
+                            searchId = searchId.left( Pos - 1);
                         }
                         //
                         searchKey = "<";
@@ -443,21 +443,21 @@ namespace Contensive.Processor.Controllers {
                         Pos = GenericController.vbInstr(1, searchTag, "#");
                         if (Pos != 0) {
                             searchId = searchTag.Substring(Pos);
-                            searchTag = searchTag.Left( Pos - 1);
+                            searchTag = searchTag.left( Pos - 1);
                             Pos = GenericController.vbInstr(1, searchId, ".");
                             if (Pos != 0) {
                                 searchClass = searchId.Substring(Pos - 1);
-                                searchId = searchId.Left( Pos - 1);
+                                searchId = searchId.left( Pos - 1);
                             }
                         }
                         Pos = GenericController.vbInstr(1, searchTag, ".");
                         if (Pos != 0) {
                             searchClass = searchTag.Substring(Pos);
-                            searchTag = searchTag.Left( Pos - 1);
+                            searchTag = searchTag.left( Pos - 1);
                             Pos = GenericController.vbInstr(1, searchClass, "#");
                             if (Pos != 0) {
                                 searchId = searchClass.Substring(Pos - 1);
-                                searchClass = searchClass.Left( Pos - 1);
+                                searchClass = searchClass.left( Pos - 1);
                             }
                         }
                         //

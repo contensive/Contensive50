@@ -25,7 +25,7 @@ namespace Contensive.Processor {
         /// constructor for server use. No application context will be available. Use to create new apps or iterate through apps.
         /// </summary>
         /// <remarks></remarks>
-        public CPClass() : base() {
+        public CPClass() {
             core = new CoreController(this);
         }
         //
@@ -34,7 +34,7 @@ namespace Contensive.Processor {
         /// constructor for non-Internet app use. Configuration read from programdata json
         /// </summary>
         /// <remarks></remarks>
-        public CPClass(string appName) : base() {
+        public CPClass(string appName) {
             core = new CoreController(this, appName);
         }
         //
@@ -43,7 +43,7 @@ namespace Contensive.Processor {
         /// constructor for non-Internet app use. Configuration provided manually
         /// </summary>
         /// <remarks></remarks>
-        public CPClass(string appName,  ServerConfigModel serverConfig ) : base() {
+        public CPClass(string appName,  ServerConfigModel serverConfig ) {
             core = new CoreController(this, appName, serverConfig);
         }
         //
@@ -53,7 +53,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="httpContext"></param>
         /// <remarks></remarks>
-        public CPClass(string appName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
+        public CPClass(string appName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) {
             core = new CoreController(this, appName, serverConfig, httpContext);
         }
         //
@@ -63,7 +63,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="httpContext"></param>
         /// <remarks></remarks>
-        public CPClass(string appName, System.Web.HttpContext httpContext) : base() {
+        public CPClass(string appName, System.Web.HttpContext httpContext) {
             core = new CoreController(this, appName, httpContext);
         }
         //
@@ -83,7 +83,7 @@ namespace Contensive.Processor {
         /// </summary>
         public string statusMessage {
                 get {
-                    return GenericController.GetApplicationStatusMessage(core.appConfig.appStatus);
+                    return GenericController.getApplicationStatusMessage(core.appConfig.appStatus);
                 }
             }
         //
@@ -183,7 +183,7 @@ namespace Contensive.Processor {
                             addonType = addonContext,
                             errorContextMessage = "external call to execute addon [" + addonNameOrGuid + "]"
                         });
-                    } else if (addonNameOrGuid.IsNumeric() ) {
+                    } else if (addonNameOrGuid.isNumeric() ) {
                         //
                         // -- compatibility - call by id
                         return executeAddon(GenericController.encodeInteger(addonNameOrGuid), addonContext);

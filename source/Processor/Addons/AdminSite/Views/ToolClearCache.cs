@@ -12,7 +12,7 @@ namespace Contensive.Processor.Addons.AdminSite {
         //
         //========================================================================
         //
-        public static string GetForm_ClearCache(CoreController core) {
+        public static string getForm_ClearCache(CoreController core) {
             string returnHtml = "";
             try {
                 StringBuilderLegacyController Content = new StringBuilderLegacyController();

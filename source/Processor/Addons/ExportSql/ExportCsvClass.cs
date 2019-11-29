@@ -22,7 +22,7 @@ namespace Contensive.Processor.Addons.ExportSql {
                 //
                 using ( var db = cp.DbNew(cp.Doc.GetText("datasource"))) {
                     using (DataTable dt = db.ExecuteQuery(cp.Doc.GetText("sql"))) {
-                        string result = dt.ToCsv();
+                        string result = dt.toCsv();
                         //
                         LogController.logTrace(core, "ExportCsvClass.execute, result [" + (result.Length>100 ? result.Substring(0,100) : result) + "]");
                         //

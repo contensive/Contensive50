@@ -17,6 +17,7 @@ using System.Reflection;
 using NLog;
 using Contensive.Models.Db;
 using System.Globalization;
+using System.Text;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -81,7 +82,7 @@ namespace Contensive.Processor.Controllers {
                 {
                     //
                     // now treat as a regular collection and install - to pickup everything else 
-                    string installPrivatePath = "installBaseCollection" + GenericController.GetRandomInteger(core).ToString() + "\\";
+                    string installPrivatePath = "installBaseCollection" + GenericController.getRandomInteger(core).ToString() + "\\";
                     try {
                         core.privateFiles.createPath(installPrivatePath);
                         core.programFiles.copyFile(baseCollectionFilename, installPrivatePath + baseCollectionFilename, core.privateFiles);
@@ -199,7 +200,7 @@ namespace Contensive.Processor.Controllers {
                                         //------------------------------------------------------------------------------------------------------
                                         //
                                         bool IsFound = false;
-                                        string CollectionName = XmlController.GetXMLAttribute(core, IsFound, Doc.DocumentElement, "name", "");
+                                        string CollectionName = XmlController.getXMLAttribute(core, IsFound, Doc.DocumentElement, "name", "");
                                         if (string.IsNullOrEmpty(CollectionName)) {
                                             //
                                             // ----- Error condition -- it must have a collection name
@@ -211,8 +212,8 @@ namespace Contensive.Processor.Controllers {
                                             bool CollectionSystem_fileValueOK = false;
                                             bool CollectionUpdatable_fileValueOK = false;
                                             //												Dim CollectionblockNavigatorNode_fileValueOK As Boolean
-                                            bool CollectionSystem = GenericController.encodeBoolean(XmlController.GetXMLAttribute(core, CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
-                                            int Parent_NavId = BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
+                                            bool CollectionSystem = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
+                                            int Parent_NavId = BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel {
                                                 Guid = addonGuidManageAddon,
                                                 name = "Manage Add-ons",
                                                 AdminOnly = false,
@@ -220,10 +221,10 @@ namespace Contensive.Processor.Controllers {
                                                 NewWindow = false,
                                                 Active = true,
                                             }, 0);
-                                            bool CollectionUpdatable = GenericController.encodeBoolean(XmlController.GetXMLAttribute(core, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""));
-                                            string onInstallAddonGuid = XmlController.GetXMLAttribute(core, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "OnInstallAddonGuid", "");
-                                            bool CollectionblockNavigatorNode = GenericController.encodeBoolean(XmlController.GetXMLAttribute(core, CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""));
-                                            string FileGuid = XmlController.GetXMLAttribute(core, IsFound, Doc.DocumentElement, "guid", CollectionName);
+                                            bool CollectionUpdatable = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""));
+                                            string onInstallAddonGuid = XmlController.getXMLAttribute(core, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "OnInstallAddonGuid", "");
+                                            bool CollectionblockNavigatorNode = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""));
+                                            string FileGuid = XmlController.getXMLAttribute(core, IsFound, Doc.DocumentElement, "guid", CollectionName);
                                             if (string.IsNullOrEmpty(FileGuid)) {
                                                 FileGuid = CollectionName;
                                             }
@@ -260,9 +261,9 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 // set wwwfilelist, contentfilelist, execfilelist
                                                                 //
-                                                                string resourceType = XmlController.GetXMLAttribute(core, IsFound, MetaDataSection, "type", "");
-                                                                string resourcePath = XmlController.GetXMLAttribute(core, IsFound, MetaDataSection, "path", "");
-                                                                string filename = XmlController.GetXMLAttribute(core, IsFound, MetaDataSection, "name", "");
+                                                                string resourceType = XmlController.getXMLAttribute(core, IsFound, MetaDataSection, "type", "");
+                                                                string resourcePath = XmlController.getXMLAttribute(core, IsFound, MetaDataSection, "path", "");
+                                                                string filename = XmlController.getXMLAttribute(core, IsFound, MetaDataSection, "name", "");
                                                                 //
                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], resource found, name [" + filename + "], type [" + resourceType + "], path [" + resourcePath + "]");
                                                                 //
@@ -274,7 +275,7 @@ namespace Contensive.Processor.Controllers {
                                                                     //
                                                                     // Source path is in filename
                                                                     //
-                                                                    SrcPath = filename.Left(Pos - 1);
+                                                                    SrcPath = filename.left(Pos - 1);
                                                                     filename = filename.Substring(Pos);
                                                                     if (string.IsNullOrEmpty(resourcePath)) {
                                                                         //
@@ -332,8 +333,8 @@ namespace Contensive.Processor.Controllers {
                                                                 // Get path to this collection and call into it
                                                                 //
                                                                 bool Found = false;
-                                                                string ChildCollectionName = XmlController.GetXMLAttribute(core, Found, MetaDataSection, "name", "");
-                                                                string ChildCollectionGUId = XmlController.GetXMLAttribute(core, Found, MetaDataSection, "guid", MetaDataSection.InnerText);
+                                                                string ChildCollectionName = XmlController.getXMLAttribute(core, Found, MetaDataSection, "name", "");
+                                                                string ChildCollectionGUId = XmlController.getXMLAttribute(core, Found, MetaDataSection, "guid", MetaDataSection.InnerText);
                                                                 if (string.IsNullOrEmpty(ChildCollectionGUId)) {
                                                                     ChildCollectionGUId = MetaDataSection.InnerText;
                                                                 }
@@ -350,7 +351,7 @@ namespace Contensive.Processor.Controllers {
                                                                 break;
                                                             }
                                                         default: {
-                                                                // nop
+                                                                // do nothing
                                                                 break;
                                                             }
                                                     }
@@ -480,7 +481,7 @@ namespace Contensive.Processor.Controllers {
                                                                         break;
                                                                     }
                                                                 default: {
-                                                                        // nop
+                                                                        // do nothing
                                                                         break;
                                                                     }
                                                             }
@@ -511,7 +512,7 @@ namespace Contensive.Processor.Controllers {
                                                                 foreach (XmlNode metaDataNode in NavDoc.DocumentElement.ChildNodes) {
                                                                     switch (GenericController.vbLCase(metaDataNode.Name)) {
                                                                         case "cdef": {
-                                                                                string ContentName = XmlController.GetXMLAttribute(core, IsFound, metaDataNode, "name", "");
+                                                                                string ContentName = XmlController.getXMLAttribute(core, IsFound, metaDataNode, "name", "");
                                                                                 //
                                                                                 // setup metadata rule
                                                                                 //
@@ -528,7 +529,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 break;
                                                                             }
                                                                         default: {
-                                                                                // nop
+                                                                                // do nothing
                                                                                 break;
                                                                             }
                                                                     }
@@ -554,15 +555,15 @@ namespace Contensive.Processor.Controllers {
                                                                                 //
                                                                                 // Data.Record node
                                                                                 //
-                                                                                string ContentName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "content", "");
+                                                                                string ContentName = XmlController.getXMLAttribute(core, IsFound, ContentNode, "content", "");
                                                                                 if (string.IsNullOrEmpty(ContentName)) {
                                                                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
                                                                                     result = false;
                                                                                     return_ErrorMessage += "<P>Collection file [" + CollectionName + "] contains a data.record node with a blank content attribute.</P>";
                                                                                     return false;
                                                                                 } else {
-                                                                                    string ContentRecordGuid = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
-                                                                                    string ContentRecordName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
+                                                                                    string ContentRecordGuid = XmlController.getXMLAttribute(core, IsFound, ContentNode, "guid", "");
+                                                                                    string ContentRecordName = XmlController.getXMLAttribute(core, IsFound, ContentNode, "name", "");
                                                                                     if ((string.IsNullOrEmpty(ContentRecordGuid)) && (string.IsNullOrEmpty(ContentRecordName))) {
                                                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" + ContentName + "]");
                                                                                         result = false;
@@ -620,7 +621,7 @@ namespace Contensive.Processor.Controllers {
                                                                         break;
                                                                     }
                                                                 default: {
-                                                                        // nop
+                                                                        // do nothing
                                                                         break;
                                                                     }
                                                             }
@@ -647,8 +648,8 @@ namespace Contensive.Processor.Controllers {
                                                                     //
                                                                     // processed, but add rule for collection record
                                                                     bool Found = false;
-                                                                    string ChildCollectionName = XmlController.GetXMLAttribute(core, Found, metaDataSection, "name", "");
-                                                                    string ChildCollectionGUId = XmlController.GetXMLAttribute(core, Found, metaDataSection, "guid", metaDataSection.InnerText);
+                                                                    string ChildCollectionName = XmlController.getXMLAttribute(core, Found, metaDataSection, "name", "");
+                                                                    string ChildCollectionGUId = XmlController.getXMLAttribute(core, Found, metaDataSection, "guid", metaDataSection.InnerText);
                                                                     if (string.IsNullOrEmpty(ChildCollectionGUId)) {
                                                                         ChildCollectionGUId = metaDataSection.InnerText;
                                                                     }
@@ -704,7 +705,7 @@ namespace Contensive.Processor.Controllers {
                                                                     break;
                                                                 }
                                                             default: {
-                                                                    // nop
+                                                                    // do nothing
                                                                     break;
                                                                 }
                                                         }
@@ -735,7 +736,7 @@ namespace Contensive.Processor.Controllers {
                                                                     break;
                                                                 }
                                                             default: {
-                                                                    // nop
+                                                                    // do nothing
                                                                     break;
                                                                 }
                                                         }
@@ -752,15 +753,15 @@ namespace Contensive.Processor.Controllers {
                                                                     foreach (XmlNode ContentNode in metaDataSection.ChildNodes) {
                                                                         if (ContentNode.Name.ToLowerInvariant() == "record") {
                                                                             recordPtr += 1;
-                                                                            string ContentName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "content", "");
+                                                                            string ContentName = XmlController.getXMLAttribute(core, IsFound, ContentNode, "content", "");
                                                                             if (string.IsNullOrEmpty(ContentName)) {
                                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
                                                                                 result = false;
                                                                                 return_ErrorMessage += "<P>Collection file contains a data.record node with a blank content attribute.</P>";
                                                                                 return false;
                                                                             } else {
-                                                                                string ContentRecordGuid = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
-                                                                                string ContentRecordName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
+                                                                                string ContentRecordGuid = XmlController.getXMLAttribute(core, IsFound, ContentNode, "guid", "");
+                                                                                string ContentRecordName = XmlController.getXMLAttribute(core, IsFound, ContentNode, "name", "");
                                                                                 if ((!string.IsNullOrEmpty(ContentRecordGuid)) || (!string.IsNullOrEmpty(ContentRecordName))) {
                                                                                     ContentMetadataModel metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
                                                                                     using (var csData = new CsModel(core)) {
@@ -775,7 +776,7 @@ namespace Contensive.Processor.Controllers {
                                                                                             foreach (XmlNode FieldNode in ContentNode.ChildNodes) {
                                                                                                 if (FieldNode.Name.ToLowerInvariant() == "field") {
                                                                                                     bool IsFieldFound = false;
-                                                                                                    string FieldName = XmlController.GetXMLAttribute(core, IsFound, FieldNode, "name", "").ToLowerInvariant();
+                                                                                                    string FieldName = XmlController.getXMLAttribute(core, IsFound, FieldNode, "name", "").ToLowerInvariant();
                                                                                                     CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
                                                                                                     int FieldLookupContentId = -1;
                                                                                                     foreach (var keyValuePair in metaData.fields) {
@@ -811,7 +812,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                                                     csData.set(FieldName, fieldLookupId);
                                                                                                                                 }
                                                                                                                             }
-                                                                                                                        } else if (fieldValue.IsNumeric()) {
+                                                                                                                        } else if (fieldValue.isNumeric()) {
                                                                                                                             //
                                                                                                                             // must be lookup list
                                                                                                                             csData.set(FieldName, fieldValue);
@@ -837,7 +838,7 @@ namespace Contensive.Processor.Controllers {
                                                                     break;
                                                                 }
                                                             default: {
-                                                                    // nop
+                                                                    // do nothing
                                                                     break;
                                                                 }
                                                         }
@@ -874,7 +875,7 @@ namespace Contensive.Processor.Controllers {
                                                     // -- install the install addon
                                                     var addon = DbBaseModel.create<AddonModel>(core.cpParent, onInstallAddonGuid);
                                                     if (addon != null) {
-                                                        var executeContext = new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                                                        var executeContext = new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                                             addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
                                                             errorContextMessage = "calling onInstall Addon [" + addon.name + "] for collection [" + collection.name + "]"
                                                         };
@@ -1028,12 +1029,12 @@ namespace Contensive.Processor.Controllers {
                 //
                 privateFilesSrcFolder = privateFilesSrcPath;
                 if (privateFilesSrcFolder.Substring(privateFilesSrcFolder.Length - 1) == "\\") {
-                    privateFilesSrcFolder = privateFilesSrcFolder.Left(privateFilesSrcFolder.Length - 1);
+                    privateFilesSrcFolder = privateFilesSrcFolder.left(privateFilesSrcFolder.Length - 1);
                 }
                 //
                 wwwFilesDstDstFolder = wwwFilesDstPath;
                 if (wwwFilesDstDstFolder.Substring(wwwFilesDstDstFolder.Length - 1) == "\\") {
-                    wwwFilesDstDstFolder = wwwFilesDstDstFolder.Left(wwwFilesDstDstFolder.Length - 1);
+                    wwwFilesDstDstFolder = wwwFilesDstDstFolder.left(wwwFilesDstDstFolder.Length - 1);
                 }
                 //
                 if (core.privateFiles.pathExists(privateFilesSrcFolder)) {
@@ -1079,7 +1080,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 privateFilesSrcFolder = privateFilesSrcPath + SubFolder;
                 if (privateFilesSrcFolder.Substring(privateFilesSrcFolder.Length - 1) == "\\") {
-                    privateFilesSrcFolder = privateFilesSrcFolder.Left(privateFilesSrcFolder.Length - 1);
+                    privateFilesSrcFolder = privateFilesSrcFolder.left(privateFilesSrcFolder.Length - 1);
                 }
                 //
                 if (core.privateFiles.pathExists(privateFilesSrcFolder)) {
@@ -1116,16 +1117,16 @@ namespace Contensive.Processor.Controllers {
                 string Basename = GenericController.vbLCase(AddonNode.Name);
                 if ((Basename == "page") || (Basename == "process") || (Basename == "addon") || (Basename == "add-on")) {
                     bool IsFound = false;
-                    string addonName = XmlController.GetXMLAttribute(core, IsFound, AddonNode, "name", "No Name");
+                    string addonName = XmlController.getXMLAttribute(core, IsFound, AddonNode, "name", "No Name");
                     if (string.IsNullOrEmpty(addonName)) {
                         addonName = "No Name";
                     }
-                    string addonGuid = XmlController.GetXMLAttribute(core, IsFound, AddonNode, "guid", addonName);
+                    string addonGuid = XmlController.getXMLAttribute(core, IsFound, AddonNode, "guid", addonName);
                     if (string.IsNullOrEmpty(addonGuid)) {
                         addonGuid = addonName;
                     }
-                    string navTypeName = XmlController.GetXMLAttribute(core, IsFound, AddonNode, "type", "");
-                    int navTypeId = GetListIndex(navTypeName, navTypeIDList);
+                    string navTypeName = XmlController.getXMLAttribute(core, IsFound, AddonNode, "type", "");
+                    int navTypeId = getListIndex(navTypeName, navTypeIDList);
                     if (navTypeId == 0) {
                         navTypeId = NavTypeIDAddon;
                     }
@@ -1172,8 +1173,8 @@ namespace Contensive.Processor.Controllers {
                             cs.set(AddonGuidFieldName, addonGuid);
                             cs.set("name", addonName);
                             cs.set("navTypeId", navTypeId);
-                            string ArgumentList = "";
-                            string StyleSheet = "";
+                            var ArgumentList = new StringBuilder();
+                            var StyleSheet = new StringBuilder();
                             if (AddonNode.ChildNodes.Count > 0) {
                                 foreach (XmlNode Addonfield in AddonNode.ChildNodes) {
                                     if (!(Addonfield is XmlComment)) {
@@ -1224,7 +1225,7 @@ namespace Contensive.Processor.Controllers {
                                                                     break;
                                                                 }
                                                             default: {
-                                                                    // nop
+                                                                    // do nothing
                                                                     break;
                                                                 }
                                                         }
@@ -1241,9 +1242,9 @@ namespace Contensive.Processor.Controllers {
                                                                     int TriggerContentId = 0;
                                                                     string ContentNameorGuid = TriggerNode.InnerText;
                                                                     if (string.IsNullOrEmpty(ContentNameorGuid)) {
-                                                                        ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "guid", "");
+                                                                        ContentNameorGuid = XmlController.getXMLAttribute(core, IsFound, TriggerNode, "guid", "");
                                                                         if (string.IsNullOrEmpty(ContentNameorGuid)) {
-                                                                            ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "name", "");
+                                                                            ContentNameorGuid = XmlController.getXMLAttribute(core, IsFound, TriggerNode, "name", "");
                                                                         }
                                                                     }
                                                                     using (var CS2 = new CsModel(core)) {
@@ -1274,7 +1275,7 @@ namespace Contensive.Processor.Controllers {
                                                                     break;
                                                                 }
                                                             default: {
-                                                                    // nop
+                                                                    // do nothing
                                                                     break;
                                                                 }
                                                         }
@@ -1286,16 +1287,16 @@ namespace Contensive.Processor.Controllers {
                                                     // include add-ons - NOTE - import collections must be run before interfaces
                                                     // when importing a collectin that will be used for an include
                                                     //
-                                                    ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "language", "");
+                                                    ScriptingLanguage = XmlController.getXMLAttribute(core, IsFound, Addonfield, "language", "");
                                                     if (ScriptingLanguage.ToLower(CultureInfo.InvariantCulture) == "jscript") {
                                                         scriptinglanguageid = (int)AddonController.ScriptLanguages.Javascript;
                                                     } else {
                                                         scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
                                                     }
                                                     cs.set("scriptinglanguageid", scriptinglanguageid);
-                                                    ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "entrypoint", "");
+                                                    ScriptingEntryPoint = XmlController.getXMLAttribute(core, IsFound, Addonfield, "entrypoint", "");
                                                     cs.set("ScriptingEntryPoint", ScriptingEntryPoint);
-                                                    ScriptingTimeout = GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "timeout", "5000"));
+                                                    ScriptingTimeout = GenericController.encodeInteger(XmlController.getXMLAttribute(core, IsFound, Addonfield, "timeout", "5000"));
                                                     cs.set("ScriptingTimeout", ScriptingTimeout);
                                                     ScriptingCode = "";
                                                     foreach (XmlNode ScriptingNode in Addonfield.ChildNodes) {
@@ -1305,7 +1306,7 @@ namespace Contensive.Processor.Controllers {
                                                                     break;
                                                                 }
                                                             default: {
-                                                                    // nop
+                                                                    // do nothing
                                                                     break;
                                                                 }
                                                         }
@@ -1326,13 +1327,13 @@ namespace Contensive.Processor.Controllers {
                                                     // create a navigator entry with a parent set to this
                                                     //
                                                     cs.save();
-                                                    menuNameSpace = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "NameSpace", "");
+                                                    menuNameSpace = XmlController.getXMLAttribute(core, IsFound, Addonfield, "NameSpace", "");
                                                     if (!string.IsNullOrEmpty(menuNameSpace)) {
-                                                        string NavIconTypeString = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "type", "");
+                                                        string NavIconTypeString = XmlController.getXMLAttribute(core, IsFound, Addonfield, "type", "");
                                                         if (string.IsNullOrEmpty(NavIconTypeString)) {
                                                             NavIconTypeString = "Addon";
                                                         }
-                                                        BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel() {
+                                                        BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel {
                                                             menuNameSpace = menuNameSpace,
                                                             name = addonName,
                                                             AdminOnly = false,
@@ -1350,30 +1351,22 @@ namespace Contensive.Processor.Controllers {
                                             case "argumentlist": {
                                                     //
                                                     // multiple argumentlist elements are concatinated with crlf
-                                                    //
-                                                    NewValue = encodeText(Addonfield.InnerText).Trim(' ');
-                                                    if (!string.IsNullOrEmpty(NewValue)) {
-                                                        if (string.IsNullOrEmpty(ArgumentList)) {
-                                                            ArgumentList = NewValue;
-                                                        } else if (NewValue != FieldValue) {
-                                                            ArgumentList = ArgumentList + Environment.NewLine + NewValue;
-                                                        }
-                                                    }
+                                                    ArgumentList.Append(Addonfield.InnerText.Trim(' ') + Environment.NewLine);
                                                     break;
                                                 }
                                             case "style": {
                                                     //
                                                     // import exclusive style
                                                     //
-                                                    NodeName = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "name", "");
+                                                    NodeName = XmlController.getXMLAttribute(core, IsFound, Addonfield, "name", "");
                                                     NewValue = encodeText(Addonfield.InnerText).Trim(' ');
-                                                    if (NewValue.Left(1) != "{") {
+                                                    if (NewValue.left(1) != "{") {
                                                         NewValue = "{" + NewValue;
                                                     }
                                                     if (NewValue.Substring(NewValue.Length - 1) != "}") {
                                                         NewValue = NewValue + "}";
                                                     }
-                                                    StyleSheet = StyleSheet + Environment.NewLine + NodeName + " " + NewValue;
+                                                    StyleSheet.Append(NodeName + " " + NewValue + Environment.NewLine);
                                                     break;
                                                 }
                                             case "stylesheet":
@@ -1382,12 +1375,12 @@ namespace Contensive.Processor.Controllers {
                                                     // import exclusive stylesheet if more then whitespace
                                                     //
                                                     test = Addonfield.InnerText;
-                                                    test = GenericController.vbReplace(test, " ", "");
-                                                    test = GenericController.vbReplace(test, "\r", "");
-                                                    test = GenericController.vbReplace(test, "\n", "");
-                                                    test = GenericController.vbReplace(test, "\t", "");
+                                                    test = strReplace(test, " ", "");
+                                                    test = strReplace(test, "\r", "");
+                                                    test = strReplace(test, "\n", "");
+                                                    test = strReplace(test, "\t", "");
                                                     if (!string.IsNullOrEmpty(test)) {
-                                                        StyleSheet = StyleSheet + Environment.NewLine + Addonfield.InnerText;
+                                                        StyleSheet.Append(Addonfield.InnerText + Environment.NewLine);
                                                     }
                                                     break;
                                                 }
@@ -1417,24 +1410,24 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // icon
                                                     //
-                                                    FieldValue = XmlController.GetXMLAttribute(core, IsFound, Addonfield, "link", "");
+                                                    FieldValue = XmlController.getXMLAttribute(core, IsFound, Addonfield, "link", "");
                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                         //
                                                         // Icons can be either in the root of the website or in content files
                                                         //
-                                                        FieldValue = GenericController.vbReplace(FieldValue, "\\", "/"); // make it a link, not a file
+                                                        FieldValue = GenericController.strReplace(FieldValue, "\\", "/"); // make it a link, not a file
                                                         if (GenericController.vbInstr(1, FieldValue, "://") != 0) {
                                                             //
                                                             // the link is an absolute URL, leave it link this
                                                             //
                                                         } else {
-                                                            if (FieldValue.Left(1) != "/") {
+                                                            if (FieldValue.left(1) != "/") {
                                                                 //
                                                                 // make sure it starts with a slash to be consistance
                                                                 //
                                                                 FieldValue = "/" + FieldValue;
                                                             }
-                                                            if (FieldValue.Left(17) == "/contensivefiles/") {
+                                                            if (FieldValue.left(17) == "/contensivefiles/") {
                                                                 //
                                                                 // in content files, start link without the slash
                                                                 //
@@ -1443,9 +1436,9 @@ namespace Contensive.Processor.Controllers {
                                                         }
                                                         cs.set("IconFilename", FieldValue);
                                                         {
-                                                            cs.set("IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "width", "0")));
-                                                            cs.set("IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "height", "0")));
-                                                            cs.set("IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, Addonfield, "sprites", "0")));
+                                                            cs.set("IconWidth", GenericController.encodeInteger(XmlController.getXMLAttribute(core, IsFound, Addonfield, "width", "0")));
+                                                            cs.set("IconHeight", GenericController.encodeInteger(XmlController.getXMLAttribute(core, IsFound, Addonfield, "height", "0")));
+                                                            cs.set("IconSprites", GenericController.encodeInteger(XmlController.getXMLAttribute(core, IsFound, Addonfield, "sprites", "0")));
                                                         }
                                                     }
                                                     break;
@@ -1528,8 +1521,8 @@ namespace Contensive.Processor.Controllers {
                                     }
                                 }
                             }
-                            cs.set("ArgumentList", ArgumentList);
-                            cs.set("StylesFilename", StyleSheet);
+                            cs.set("ArgumentList", ArgumentList.ToString());
+                            cs.set("StylesFilename", StyleSheet.ToString());
                         }
                         cs.close();
                     }
@@ -1552,11 +1545,11 @@ namespace Contensive.Processor.Controllers {
                 string Basename = GenericController.vbLCase(AddonNode.Name);
                 if ((Basename == "page") || (Basename == "process") || (Basename == "addon") || (Basename == "add-on")) {
                     bool IsFound = false;
-                    string AOName = XmlController.GetXMLAttribute(core, IsFound, AddonNode, "name", "No Name");
+                    string AOName = XmlController.getXMLAttribute(core, IsFound, AddonNode, "name", "No Name");
                     if (string.IsNullOrEmpty(AOName)) { AOName = "No Name"; }
-                    string AOGuid = XmlController.GetXMLAttribute(core, IsFound, AddonNode, "guid", AOName);
+                    string AOGuid = XmlController.getXMLAttribute(core, IsFound, AddonNode, "guid", AOName);
                     if (string.IsNullOrEmpty(AOGuid)) { AOGuid = AOName; }
-                    string AddOnType = XmlController.GetXMLAttribute(core, IsFound, AddonNode, "type", "");
+                    string AddOnType = XmlController.getXMLAttribute(core, IsFound, AddonNode, "type", "");
                     string Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(AOGuid) + ")";
                     using (var csData = new CsModel(core)) {
                         if (csData.open(AddonModel.tableMetadata.contentName, Criteria, "", false)) {
@@ -1585,8 +1578,8 @@ namespace Contensive.Processor.Controllers {
                                                 // include add-ons - NOTE - import collections must be run before interfaces
                                                 // when importing a collectin that will be used for an include
                                                 //
-                                                string IncludeAddonName = XmlController.GetXMLAttribute(core, IsFound, PageInterface, "name", "");
-                                                string IncludeAddonGuid = XmlController.GetXMLAttribute(core, IsFound, PageInterface, "guid", IncludeAddonName);
+                                                string IncludeAddonName = XmlController.getXMLAttribute(core, IsFound, PageInterface, "name", "");
+                                                string IncludeAddonGuid = XmlController.getXMLAttribute(core, IsFound, PageInterface, "guid", IncludeAddonName);
                                                 int IncludeAddonId = 0;
                                                 Criteria = "";
                                                 if (!string.IsNullOrEmpty(IncludeAddonGuid)) {
@@ -1628,7 +1621,7 @@ namespace Contensive.Processor.Controllers {
                                                 break;
                                             }
                                         default: {
-                                                // nop
+                                                // do nothing
                                                 break;
                                             }
                                     }

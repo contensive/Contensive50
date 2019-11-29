@@ -23,7 +23,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public CPContentClass(CPClass cp) : base() {
+        public CPContentClass(CPClass cp) {
             this.cp = cp;
         }
         //

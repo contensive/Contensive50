@@ -16,12 +16,12 @@ namespace Contensive.ProcessorTests.UnitTests {
             string arg2 = "";
             string arg3 = null;
             // act
-            string result1 = arg1.Left(5);
-            string result11 = arg1.Left(10);
-            string result12 = arg1.Left(20);
-            string result13 = arg1.Left(0);
-            string result2 = arg2.Left(10);
-            string result3 = arg3.Left(10);
+            string result1 = arg1.left(5);
+            string result11 = arg1.left(10);
+            string result12 = arg1.left(20);
+            string result13 = arg1.left(0);
+            string result2 = arg2.left(10);
+            string result3 = arg3.left(10);
             // assert
             Assert.AreEqual("12345", result1);
             Assert.AreEqual("1234567890", result11);
@@ -40,12 +40,12 @@ namespace Contensive.ProcessorTests.UnitTests {
             string arg2 = "";
             string arg3 = null;
             // act
-            string result1 = arg1.Right(5);
-            string result11 = arg1.Right(10);
-            string result12 = arg1.Right(20);
-            string result13 = arg1.Right(0);
-            string result2 = arg2.Right(10);
-            string result3 = arg3.Right(10);
+            string result1 = arg1.right(5);
+            string result11 = arg1.right(10);
+            string result12 = arg1.right(20);
+            string result13 = arg1.right(0);
+            string result2 = arg2.right(10);
+            string result3 = arg3.right(10);
             // assert
             Assert.AreEqual("67890", result1);
             Assert.AreEqual("1234567890", result11);
@@ -72,16 +72,16 @@ namespace Contensive.ProcessorTests.UnitTests {
             string arg10 = "a";
             // act
             // assert
-            Assert.AreEqual(true, arg1.IsNumeric());
-            Assert.AreEqual(false, arg2.IsNumeric());
-            Assert.AreEqual(false, arg3.IsNumeric());
-            Assert.AreEqual(false, arg4.IsNumeric());
-            Assert.AreEqual(false, arg5.IsNumeric());
-            Assert.AreEqual(false, arg6.IsNumeric());
-            Assert.AreEqual(false, arg7.IsNumeric());
-            Assert.AreEqual(true, arg8.IsNumeric());
-            Assert.AreEqual(true, arg9.IsNumeric());
-            Assert.AreEqual(false, arg10.IsNumeric());
+            Assert.AreEqual(true, arg1.isNumeric());
+            Assert.AreEqual(false, arg2.isNumeric());
+            Assert.AreEqual(false, arg3.isNumeric());
+            Assert.AreEqual(false, arg4.isNumeric());
+            Assert.AreEqual(false, arg5.isNumeric());
+            Assert.AreEqual(false, arg6.isNumeric());
+            Assert.AreEqual(false, arg7.isNumeric());
+            Assert.AreEqual(true, arg8.isNumeric());
+            Assert.AreEqual(true, arg9.isNumeric());
+            Assert.AreEqual(false, arg10.isNumeric());
         }
         //
         //====================================================================================================
@@ -112,10 +112,10 @@ namespace Contensive.ProcessorTests.UnitTests {
             var arg4 = new DateTime(1990, 1, 1);
             // act
             // assert
-            Assert.AreEqual(DateTime.MinValue, arg1.MinValueIfOld());
-            Assert.AreEqual(arg2, arg2.MinValueIfOld());
-            Assert.AreEqual(DateTime.MinValue, arg3.MinValueIfOld());
-            Assert.AreEqual(arg4, arg4.MinValueIfOld());
+            Assert.AreEqual(DateTime.MinValue, arg1.minValueIfOld());
+            Assert.AreEqual(arg2, arg2.minValueIfOld());
+            Assert.AreEqual(DateTime.MinValue, arg3.minValueIfOld());
+            Assert.AreEqual(arg4, arg4.minValueIfOld());
         }
 
 

@@ -23,7 +23,7 @@ namespace Contensive.Processor {
         /// Constructor
         /// </summary>
         /// <param name="core"></param>
-        public CPFileSystemClass(CPClass cp, FileController fileSystemController) : base() {
+        public CPFileSystemClass(CPClass cp, FileController fileSystemController) {
             core = cp.core;
             this.fileSystemController = fileSystemController;
         }

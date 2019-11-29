@@ -549,7 +549,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public CoreController(CPClass cp, string applicationName) : base() {
+        public CoreController(CPClass cp, string applicationName) {
             this.cpParent = cp;
             this.cpParent.core = this;
             deleteSessionOnExit = true;
@@ -604,7 +604,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig) : base() {
+        public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig) {
             cpParent = cp;
             deleteSessionOnExit = true;
             LogController.log(this, "CoreController constructor-2, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
@@ -630,7 +630,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
+        public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) {
             this.cpParent = cp;
             this.cpParent.core = this;
             deleteSessionOnExit = false;
@@ -652,7 +652,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// coreClass constructor for a web request/response environment. coreClass is the primary object internally, created by cp.
         /// </summary>
-        public CoreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) : base() {
+        public CoreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) {
             this.cpParent = cp;
             this.cpParent.core = this;
             LogController.log(this, "CoreController constructor-4, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
@@ -812,7 +812,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // If visit tracking, save the viewing record
                                     //
-                                    string ViewingName = ((string)(session.visit.id + "." + session.visit.pageVisits)).Left(10);
+                                    string ViewingName = ((string)(session.visit.id + "." + session.visit.pageVisits)).left(10);
                                     int PageId = 0;
                                     if (_doc != null) {
                                         if (doc.pageController.page != null) {
@@ -835,9 +835,9 @@ namespace Contensive.Processor.Controllers {
                                         + "," + DbController.encodeSQLText(webServer.requestDomain)
                                         + "," + DbController.encodeSQLText(webServer.requestPath)
                                         + "," + DbController.encodeSQLText(webServer.requestPage)
-                                        + "," + DbController.encodeSQLText(webServer.requestQueryString.Left(255))
-                                        + "," + DbController.encodeSQLText(requestFormSerialized.Left(255))
-                                        + "," + DbController.encodeSQLText(webServer.requestReferrer.Left(255))
+                                        + "," + DbController.encodeSQLText(webServer.requestQueryString.left(255))
+                                        + "," + DbController.encodeSQLText(requestFormSerialized.left(255))
+                                        + "," + DbController.encodeSQLText(webServer.requestReferrer.left(255))
                                         + "," + DbController.encodeSQLDate(doc.profileStartTime)
                                         + "," + DbController.encodeSQLBoolean(session.visitStateOk)
                                         + "," + doc.appStopWatch.ElapsedMilliseconds.ToString()

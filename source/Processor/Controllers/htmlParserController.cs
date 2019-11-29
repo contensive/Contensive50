@@ -40,13 +40,12 @@ namespace Contensive.Processor.Controllers {
         //
         //   Internal Storage
         //
-        private CoreController core;
+        private readonly CoreController core;
         //
         private const bool NewWay = true;
         //
         private Element[] LocalElements;
         private int LocalElementSize;
-        private int LocalElementCount;
         private string[] SplitStore;
         private int SplitStoreCnt;
         private string[] Blobs;
@@ -83,7 +82,7 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //   Parses the string, returns true if loaded OK
         //
-        public bool Load(string HTMLSource) {
+        public bool load(string HTMLSource) {
             bool tempLoad = false;
             try {
                 //
@@ -97,7 +96,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- initialize internal storage
                 //
                 WorkingSrc = HTMLSource;
-                LocalElementCount = 0;
+                elementCount = 0;
                 LocalElementSize = 0;
                 LocalElements = new Contensive.Processor.Controllers.HtmlParserController.Element[LocalElementSize + 1];
                 tempLoad = true;
@@ -106,7 +105,7 @@ namespace Contensive.Processor.Controllers {
                 // get a unique signature
                 //
                 do {
-                    BlobSN = "/blob" + encodeText(GenericController.GetRandomInteger(core)) + ":";
+                    BlobSN = "/blob" + encodeText(GenericController.getRandomInteger(core)) + ":";
                     Ptr = Ptr + 1;
                 } while ((WorkingSrc.IndexOf(BlobSN, System.StringComparison.OrdinalIgnoreCase) != -1) && (Ptr < 10));
                 //
@@ -123,7 +122,7 @@ namespace Contensive.Processor.Controllers {
                             if (PosEndScript > 0) {
                                 Array.Resize(ref Blobs, BlobCnt + 1);
                                 Blobs[BlobCnt] = splittest[Ptr].Substring(PosScriptEnd, (PosEndScript - 1) - (PosScriptEnd + 1) + 1);
-                                splittest[Ptr] = splittest[Ptr].Left(PosScriptEnd) + BlobSN + BlobCnt + "/" + splittest[Ptr].Substring(PosEndScript - 1);
+                                splittest[Ptr] = splittest[Ptr].left(PosScriptEnd) + BlobSN + BlobCnt + "/" + splittest[Ptr].Substring(PosEndScript - 1);
                                 BlobCnt = BlobCnt + 1;
                             }
                         }
@@ -143,7 +142,7 @@ namespace Contensive.Processor.Controllers {
                             if (PosEndScript > 0) {
                                 Array.Resize(ref Blobs, BlobCnt + 1);
                                 Blobs[BlobCnt] = splittest[Ptr].Substring(PosScriptEnd, (PosEndScript - 1) - (PosScriptEnd + 1) + 1);
-                                splittest[Ptr] = splittest[Ptr].Left(PosScriptEnd) + BlobSN + BlobCnt + "/" + splittest[Ptr].Substring(PosEndScript - 1);
+                                splittest[Ptr] = splittest[Ptr].left(PosScriptEnd) + BlobSN + BlobCnt + "/" + splittest[Ptr].Substring(PosEndScript - 1);
                                 BlobCnt = BlobCnt + 1;
                             }
                         }
@@ -160,7 +159,7 @@ namespace Contensive.Processor.Controllers {
                         PosScriptEnd = GenericController.vbInstr(1, splittest[Ptr], "-->");
                         if (PosScriptEnd > 0) {
                             Array.Resize(ref Blobs, BlobCnt + 1);
-                            Blobs[BlobCnt] = splittest[Ptr].Left(PosScriptEnd - 1);
+                            Blobs[BlobCnt] = splittest[Ptr].left(PosScriptEnd - 1);
                             splittest[Ptr] = BlobSN + BlobCnt + "/" + splittest[Ptr].Substring(PosScriptEnd - 1);
                             BlobCnt = BlobCnt + 1;
                         }
@@ -172,8 +171,8 @@ namespace Contensive.Processor.Controllers {
                 //
                 SplitStore = WorkingSrc.Split('<');
                 SplitStoreCnt = SplitStore.GetUpperBound(0) + 1;
-                LocalElementCount = (SplitStoreCnt * 2);
-                LocalElements = new Contensive.Processor.Controllers.HtmlParserController.Element[LocalElementCount + 1];
+                elementCount = (SplitStoreCnt * 2);
+                LocalElements = new Contensive.Processor.Controllers.HtmlParserController.Element[elementCount + 1];
                 return tempLoad;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -184,20 +183,16 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //   Get the element count
         //
-        public int ElementCount {
-            get {
-                return LocalElementCount;
-            }
-        }
+        public int elementCount { get; private set; }
         //
         //====================================================================================================
         //   is the specified element a tag (or text)
         //
-        public bool IsTag(int ElementPointer) {
+        public bool isTag(int ElementPointer) {
             bool result = false;
             try {
                 LoadElement(ElementPointer);
-                if (ElementPointer < LocalElementCount) {
+                if (ElementPointer < elementCount) {
                     result = LocalElements[ElementPointer].IsTag;
                 }
             } catch (Exception ex) {
@@ -209,13 +204,13 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //   Get the LocalElements value
         //
-        public string Text(int ElementPointer) {
+        public string text(int ElementPointer) {
             string tempText = null;
             try {
                 //
                 tempText = "";
                 LoadElement(ElementPointer);
-                if (ElementPointer < LocalElementCount) {
+                if (ElementPointer < elementCount) {
                     tempText = LocalElements[ElementPointer].Text;
                 }
                 //
@@ -229,13 +224,13 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //   Get the LocalElements value
         //
-        public string TagName(int ElementPointer) {
+        public string tagName(int ElementPointer) {
             string tempTagName = null;
             try {
                 //
                 tempTagName = "";
                 LoadElement(ElementPointer);
-                if (ElementPointer < LocalElementCount) {
+                if (ElementPointer < elementCount) {
                     tempTagName = LocalElements[ElementPointer].TagName;
                 }
                 //
@@ -249,13 +244,13 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //   Get the LocalElements value
         //
-        public int Position(int ElementPointer) {
+        public int position(int ElementPointer) {
             int tempPosition = 0;
             try {
                 //
                 tempPosition = 0;
                 LoadElement(ElementPointer);
-                if (ElementPointer < LocalElementCount) {
+                if (ElementPointer < elementCount) {
                     tempPosition = LocalElements[ElementPointer].Position;
                 }
                 //
@@ -269,13 +264,13 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //   Get an LocalElements attribute count
         //
-        public int ElementAttributeCount(int ElementPointer) {
+        public int elementAttributeCount(int ElementPointer) {
             int tempElementAttributeCount = 0;
             try {
                 //
                 tempElementAttributeCount = 0;
                 LoadElement(ElementPointer);
-                if (ElementPointer < LocalElementCount) {
+                if (ElementPointer < elementCount) {
                     tempElementAttributeCount = LocalElements[ElementPointer].AttributeCount;
                 }
                 //
@@ -289,13 +284,13 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //   Get an LocalElements attribute name
         //
-        public string ElementAttributeName(int ElementPointer, int AttributePointer) {
+        public string elementAttributeName(int ElementPointer, int AttributePointer) {
             string tempElementAttributeName = null;
             try {
                 //
                 tempElementAttributeName = "";
                 LoadElement(ElementPointer);
-                if (ElementPointer < LocalElementCount) {
+                if (ElementPointer < elementCount) {
                     if (AttributePointer < LocalElements[ElementPointer].AttributeCount) {
                         tempElementAttributeName = LocalElements[ElementPointer].Attributes[AttributePointer].Name;
                     }
@@ -311,13 +306,13 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //   Get an LocalElements attribute value
         //
-        public string ElementAttributeValue(int ElementPointer, int AttributePointer) {
+        public string elementAttributeValue(int ElementPointer, int AttributePointer) {
             string tempElementAttributeValue = null;
             try {
                 //
                 tempElementAttributeValue = "";
                 LoadElement(ElementPointer);
-                if (ElementPointer < LocalElementCount) {
+                if (ElementPointer < elementCount) {
                     if (AttributePointer < LocalElements[ElementPointer].AttributeCount) {
                         tempElementAttributeValue = LocalElements[ElementPointer].Attributes[AttributePointer].Value;
                     }
@@ -333,7 +328,7 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //   Get an LocalElements attribute value
         //
-        public string ElementAttribute(int ElementPointer, string Name) {
+        public string elementAttribute(int ElementPointer, string Name) {
             string tempElementAttribute = null;
             try {
                 //
@@ -342,7 +337,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 tempElementAttribute = "";
                 LoadElement(ElementPointer);
-                if (ElementPointer < LocalElementCount) {
+                if (ElementPointer < elementCount) {
                     if (LocalElements[ElementPointer].AttributeCount > 0) {
                         UcaseName = GenericController.vbUCase(Name);
                         int tempVar = LocalElements[ElementPointer].AttributeCount;
@@ -377,16 +372,16 @@ namespace Contensive.Processor.Controllers {
                 //
                 TagString = LocalElements[ElementPointer].Text.Substring(1, LocalElements[ElementPointer].Text.Length - 2);
                 if (TagString.Substring(TagString.Length - 1) == "/") {
-                    TagString = TagString.Left(TagString.Length - 1);
+                    TagString = TagString.left(TagString.Length - 1);
                 }
-                TagString = GenericController.vbReplace(TagString, "\r", " ");
-                TagString = GenericController.vbReplace(TagString, "\n", " ");
-                TagString = GenericController.vbReplace(TagString, "  ", " ");
+                TagString = GenericController.strReplace(TagString, "\r", " ");
+                TagString = GenericController.strReplace(TagString, "\n", " ");
+                TagString = GenericController.strReplace(TagString, "  ", " ");
                 LocalElements[ElementPointer].AttributeCount = 0;
                 LocalElements[ElementPointer].AttributeSize = 1;
                 LocalElements[ElementPointer].Attributes = new Contensive.Processor.Controllers.HtmlParserController.ElementAttributeStructure[1];
                 if (!string.IsNullOrEmpty(TagString)) {
-                    AttrSplit = SplitDelimited(TagString, " ");
+                    AttrSplit = splitDelimited(TagString, " ");
                     AttrCount = AttrSplit.GetUpperBound(0) + 1;
                     if (AttrCount > 0) {
                         LocalElements[ElementPointer].TagName = AttrSplit[0];
@@ -415,11 +410,11 @@ namespace Contensive.Processor.Controllers {
                                             AttrValue = AttrName.Substring(EqualPosition);
                                             AttrValueLen = AttrValue.Length;
                                             if (AttrValueLen > 1) {
-                                                if ((AttrValue.Left(1) == "\"") && (AttrValue.Substring(AttrValueLen - 1, 1) == "\"")) {
+                                                if ((AttrValue.left(1) == "\"") && (AttrValue.Substring(AttrValueLen - 1, 1) == "\"")) {
                                                     AttrValue = AttrValue.Substring(1, AttrValueLen - 2);
                                                 }
                                             }
-                                            AttrName = AttrName.Left(EqualPosition - 1);
+                                            AttrName = AttrName.left(EqualPosition - 1);
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Name = AttrName;
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].UcaseName = GenericController.vbUCase(AttrName);
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Value = AttrValue;
@@ -506,7 +501,7 @@ namespace Contensive.Processor.Controllers {
                         SrcTag = "";
                         SrcBody = ReplaceBlob(SplitSrc);
                     } else {
-                        SrcTag = ReplaceBlob(SplitSrc.Left(Ptr));
+                        SrcTag = ReplaceBlob(SplitSrc.left(Ptr));
                         SrcBody = ReplaceBlob(SplitSrc.Substring(Ptr));
                     }
                     if (Ptr == 0) {
@@ -579,12 +574,12 @@ namespace Contensive.Processor.Controllers {
                     PosNum = GenericController.vbInstr(Pos + 1, Src, ":");
                     if (PosNum > 0) {
                         PtrText = Src.Substring(PosNum, PosEnd - PosNum - 1);
-                        if (PtrText.IsNumeric()) {
+                        if (PtrText.isNumeric()) {
                             Ptr = int.Parse(PtrText);
                             if (Ptr < BlobCnt) {
                                 Blob = Blobs[Ptr];
                             }
-                            tempReplaceBlob = Src.Left(Pos - 1) + Blob + Src.Substring(PosEnd);
+                            tempReplaceBlob = Src.left(Pos - 1) + Blob + Src.Substring(PosEnd);
                         }
                     }
                 }

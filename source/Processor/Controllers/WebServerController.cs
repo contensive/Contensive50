@@ -24,7 +24,7 @@ namespace Contensive.Processor.Controllers {
         public const string httpResponseStatus404_NotFound = "404 Not Found";
         public const string httpResponseStatus500_ServerError = "500 Internal Server Error";
         //
-        private CoreController core;
+        private readonly CoreController core;
         //
         /// <summary>
         /// if this instance is a webRole, retain pointer for callbacks
@@ -298,7 +298,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public WebServerController(CoreController core) : base() {
+        public WebServerController(CoreController core) {
             this.core = core;
             requestCookies = new Dictionary<string, CookieClass>();
         }
@@ -316,15 +316,15 @@ namespace Contensive.Processor.Controllers {
                 string LogFilename = null;
                 string Copy = null;
                 //
-                LogFilename = "Temp\\" + GenericController.encodeText(GenericController.GetRandomInteger(core)) + ".Log";
+                LogFilename = "Temp\\" + GenericController.encodeText(GenericController.getRandomInteger(core)) + ".Log";
                 Cmd = "IISReset.exe";
                 arg = "/restart >> \"" + LogFilename + "\"";
                 runProcess(core, Cmd, arg, true);
                 Copy = core.privateFiles.readFileText(LogFilename);
                 core.privateFiles.deleteFile(LogFilename);
-                Copy = GenericController.vbReplace(Copy, Environment.NewLine, "\\n");
-                Copy = GenericController.vbReplace(Copy, "\r", "\\n");
-                Copy = GenericController.vbReplace(Copy, "\n", "\\n");
+                Copy = GenericController.strReplace(Copy, Environment.NewLine, "\\n");
+                Copy = GenericController.strReplace(Copy, "\r", "\\n");
+                Copy = GenericController.strReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -343,14 +343,14 @@ namespace Contensive.Processor.Controllers {
                 string LogFilename = null;
                 string Copy = null;
                 //
-                LogFilename = "Temp\\" + GenericController.encodeText(GenericController.GetRandomInteger(core)) + ".Log";
+                LogFilename = "Temp\\" + GenericController.encodeText(GenericController.getRandomInteger(core)) + ".Log";
                 Cmd = "%comspec% /c IISReset /stop >> \"" + LogFilename + "\"";
                 runProcess(core, Cmd, "", true);
                 Copy = core.privateFiles.readFileText(LogFilename);
                 core.privateFiles.deleteFile(LogFilename);
-                Copy = GenericController.vbReplace(Copy, Environment.NewLine, "\\n");
-                Copy = GenericController.vbReplace(Copy, "\r", "\\n");
-                Copy = GenericController.vbReplace(Copy, "\n", "\\n");
+                Copy = GenericController.strReplace(Copy, Environment.NewLine, "\\n");
+                Copy = GenericController.strReplace(Copy, "\r", "\\n");
+                Copy = GenericController.strReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -374,9 +374,9 @@ namespace Contensive.Processor.Controllers {
                 runProcess(core, Cmd, "", true);
                 Copy = core.privateFiles.readFileText(LogFilename);
                 core.privateFiles.deleteFile(LogFilename);
-                Copy = GenericController.vbReplace(Copy, Environment.NewLine, "\\n");
-                Copy = GenericController.vbReplace(Copy, "\r", "\\n");
-                Copy = GenericController.vbReplace(Copy, "\n", "\\n");
+                Copy = GenericController.strReplace(Copy, Environment.NewLine, "\\n");
+                Copy = GenericController.strReplace(Copy, "\r", "\\n");
+                Copy = GenericController.strReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -681,7 +681,7 @@ namespace Contensive.Processor.Controllers {
                         if (!string.IsNullOrEmpty(forwardDomain)) {
                             int pos = requestUrlSource.ToLowerInvariant().IndexOf(requestDomain.ToLowerInvariant());
                             if (pos > 0) {
-                                core.domain.forwardUrl = requestUrlSource.ToString().Left(pos) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length));
+                                core.domain.forwardUrl = requestUrlSource.ToString().left(pos) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length));
                                 redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this replacement domain", false, false);
                                 return core.doc.continueProcessing;
                             }
@@ -706,7 +706,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     requestContentWatchPrefix = requestProtocol + requestDomain + "/";
-                    requestContentWatchPrefix = requestContentWatchPrefix.Left(requestContentWatchPrefix.Length - 1);
+                    requestContentWatchPrefix = requestContentWatchPrefix.left(requestContentWatchPrefix.Length - 1);
                     //
                     requestPath = "/";
                     if (string.IsNullOrWhiteSpace(requestPathPage)) {
@@ -716,7 +716,7 @@ namespace Contensive.Processor.Controllers {
                         int slashPtr = requestPathPage.LastIndexOf("/");
                         if (slashPtr >= 0) {
                             requestPage = "";
-                            requestPath = requestPathPage.Left(slashPtr + 1);
+                            requestPath = requestPathPage.left(slashPtr + 1);
                             if (requestPathPage.Length > 1) requestPage = requestPathPage.Substring(slashPtr + 1);
                         }
                     }
@@ -885,7 +885,7 @@ namespace Contensive.Processor.Controllers {
                     if (bufferResponseHeader != "") {
                         bufferResponseHeader = bufferResponseHeader + Environment.NewLine;
                     }
-                    bufferResponseHeader = bufferResponseHeader + GenericController.vbReplace(HeaderName, Environment.NewLine, "") + Environment.NewLine + GenericController.vbReplace(GenericController.encodeText(HeaderValue), Environment.NewLine, "");
+                    bufferResponseHeader = bufferResponseHeader + GenericController.strReplace(HeaderName, Environment.NewLine, "") + Environment.NewLine + GenericController.strReplace(GenericController.encodeText(HeaderValue), Environment.NewLine, "");
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -913,13 +913,13 @@ namespace Contensive.Processor.Controllers {
                     redirectCycles = core.docProperties.getInteger(rnRedirectCycleFlag);
                     //
                     // convert link to a long link on this domain
-                    if (NonEncodedLink.Left(4).ToLowerInvariant() == "http") {
+                    if (NonEncodedLink.left(4).ToLowerInvariant() == "http") {
                         FullLink = NonEncodedLink;
                     } else {
-                        if (NonEncodedLink.Left(1).ToLowerInvariant() == "/") {
+                        if (NonEncodedLink.left(1).ToLowerInvariant() == "/") {
                             //
                             // -- root relative - url starts with path, let it go
-                        } else if (NonEncodedLink.Left(1).ToLowerInvariant() == "?") {
+                        } else if (NonEncodedLink.left(1).ToLowerInvariant() == "?") {
                             //
                             // -- starts with qs, fix issue where iis consideres this on the physical page, not the link-alias vitrual route
                             NonEncodedLink = requestPathPage + NonEncodedLink;
@@ -929,7 +929,7 @@ namespace Contensive.Processor.Controllers {
                             NonEncodedLink = requestPath + NonEncodedLink;
                         }
                         ShortLink = NonEncodedLink;
-                        ShortLink = GenericController.ConvertLinkToShortLink(ShortLink, requestDomain, core.appConfig.cdnFileUrl);
+                        ShortLink = GenericController.convertLinkToShortLink(ShortLink, requestDomain, core.appConfig.cdnFileUrl);
                         ShortLink = GenericController.encodeVirtualPath(ShortLink, core.appConfig.cdnFileUrl, appRootPath, requestDomain);
                         FullLink = requestProtocol + requestDomain + ShortLink;
                     }
@@ -1273,7 +1273,7 @@ namespace Contensive.Processor.Controllers {
                                     break;
                                 }
                             default: {
-                                    // nop
+                                    // do nothing
                                     break;
                                 }
                         }
@@ -1301,16 +1301,16 @@ namespace Contensive.Processor.Controllers {
                 string AcceptLanguageString = (core.webServer.serverEnvironment.ContainsKey("HTTP_ACCEPT_LANGUAGE")) ? core.webServer.serverEnvironment["HTTP_ACCEPT_LANGUAGE"] : "";
                 int CommaPosition = GenericController.vbInstr(1, AcceptLanguageString, ",");
                 while (CommaPosition != 0) {
-                    string AcceptLanguage = (AcceptLanguageString.Left(CommaPosition - 1)).Trim(' ');
+                    string AcceptLanguage = (AcceptLanguageString.left(CommaPosition - 1)).Trim(' ');
                     AcceptLanguageString = AcceptLanguageString.Substring(CommaPosition);
                     if (AcceptLanguage.Length > 0) {
                         int DashPosition = GenericController.vbInstr(1, AcceptLanguage, "-");
                         if (DashPosition > 1) {
-                            AcceptLanguage = AcceptLanguage.Left(DashPosition - 1);
+                            AcceptLanguage = AcceptLanguage.left(DashPosition - 1);
                         }
                         DashPosition = GenericController.vbInstr(1, AcceptLanguage, ";");
                         if (DashPosition > 1) {
-                            return AcceptLanguage.Left(DashPosition - 1);
+                            return AcceptLanguage.left(DashPosition - 1);
                         }
                     }
                     CommaPosition = GenericController.vbInstr(1, AcceptLanguageString, ",");

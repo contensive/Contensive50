@@ -7,9 +7,9 @@ using Contensive.Processor.Models.Domain;
 
 namespace Contensive.ProcessorTests.UnitTests.ModelTests {
     [TestClass()]
-    public class routeMapModelTests {
+    public class RouteMapModelTests {
         [TestMethod]
-        public void Models_RouteMap_DictionaryHasAdmin() {
+        public void models_RouteMap_DictionaryHasAdmin() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 // act

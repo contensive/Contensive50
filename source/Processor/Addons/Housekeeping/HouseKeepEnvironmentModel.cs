@@ -100,7 +100,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     AlarmTimeString = "12:00:00 AM";
                     core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
                 }
-                if (!GenericController.IsDate(AlarmTimeString)) {
+                if (!GenericController.isDate(AlarmTimeString)) {
                     AlarmTimeString = "12:00:00 AM";
                     core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
                 }

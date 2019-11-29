@@ -52,14 +52,14 @@ namespace Contensive.Processor.Controllers {
                         int Pos = Filename.LastIndexOf("/") + 1;
                         string FilePath = "";
                         if (Pos > 0) {
-                            FilePath = Filename.Left(Pos);
+                            FilePath = Filename.left(Pos);
                             Filename = Filename.Substring(Pos);
                         }
                         csData.set("filesize", core.wwwFiles.getFileSize(FilePath + Filename));
                         Pos = Filename.LastIndexOf(".") + 1;
                         if (Pos > 0) {
                             string FilenameExt = Filename.Substring(Pos);
-                            string FilenameNoExt = Filename.Left(Pos - 1);
+                            string FilenameNoExt = Filename.left(Pos - 1);
                             if (GenericController.vbInstr(1, "jpg,gif,png", FilenameExt, 1) != 0) {
                                 ImageEditController sf = new ImageEditController();
                                 if (sf.load(FilePath + Filename, core.wwwFiles)) {

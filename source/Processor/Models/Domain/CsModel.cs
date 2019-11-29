@@ -25,7 +25,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// dependencies
         /// </summary>
-        private CoreController core;
+        private readonly CoreController core;
         /// <summary>
         /// The user that opened this set
         /// </summary>
@@ -261,7 +261,7 @@ namespace Contensive.Processor {
                                     break;
                                 }
                             default: {
-                                    // nop
+                                    // do nothing
                                     break;
                                 }
                         }
@@ -953,7 +953,7 @@ namespace Contensive.Processor {
                 // -- redirect field, special case, no data
                 if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Redirect) { return string.Empty; }
                 string rawData = getRawData(fieldName);
-                if (IsNull(rawData)) { return string.Empty; }
+                if (isNull(rawData)) { return string.Empty; }
                 switch (field.fieldTypeId) {
                     case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
                             //
@@ -972,7 +972,7 @@ namespace Contensive.Processor {
                     case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
                             //
                             // -- Lookup
-                            if (!rawData.IsNumeric()) { return string.Empty; }
+                            if (!rawData.isNumeric()) { return string.Empty; }
                             if (field.lookupContentId > 0) {
                                 string LookupContentName = MetadataController.getContentNameByID(core, field.lookupContentId);
                                 if (!string.IsNullOrEmpty(LookupContentName)) {
@@ -1002,13 +1002,13 @@ namespace Contensive.Processor {
                     case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
                             //
                             // -- member select
-                            if (rawData.IsNumeric()) { return MetadataController.getRecordName(core, "people", GenericController.encodeInteger(rawData)); }
+                            if (rawData.isNumeric()) { return MetadataController.getRecordName(core, "people", GenericController.encodeInteger(rawData)); }
                             return string.Empty;
                         }
                     case CPContentBaseClass.FieldTypeIdEnum.Currency: {
                             //
                             // -- currency
-                            if (rawData.IsNumeric()) { return rawData.ToString(); }
+                            if (rawData.isNumeric()) { return rawData.ToString(); }
                             return string.Empty;
                         }
                     case CPContentBaseClass.FieldTypeIdEnum.FileText:
@@ -1111,10 +1111,10 @@ namespace Contensive.Processor {
                             PathFilename = pathFilenameOriginal;
                             string BlankTest = null;
                             BlankTest = rawValueForDb;
-                            BlankTest = GenericController.vbReplace(BlankTest, " ", "");
-                            BlankTest = GenericController.vbReplace(BlankTest, "\r", "");
-                            BlankTest = GenericController.vbReplace(BlankTest, "\n", "");
-                            BlankTest = GenericController.vbReplace(BlankTest, "\t", "");
+                            BlankTest = GenericController.strReplace(BlankTest, " ", "");
+                            BlankTest = GenericController.strReplace(BlankTest, "\r", "");
+                            BlankTest = GenericController.strReplace(BlankTest, "\n", "");
+                            BlankTest = GenericController.strReplace(BlankTest, "\t", "");
                             if (string.IsNullOrEmpty(BlankTest)) {
                                 if (!string.IsNullOrEmpty(PathFilename)) {
                                     core.cdnFiles.deleteFile(PathFilename);
@@ -1124,7 +1124,7 @@ namespace Contensive.Processor {
                                 if (string.IsNullOrEmpty(PathFilename)) {
                                     PathFilename = getFieldFilename(field.nameLc, "", this.contentName, field.fieldTypeId);
                                 }
-                                if (PathFilename.Left(1) == "/") {
+                                if (PathFilename.left(1) == "/") {
                                     //
                                     // root file, do not include revision
                                     //
@@ -1135,18 +1135,18 @@ namespace Contensive.Processor {
                                     Pos = PathFilename.LastIndexOf(".") + 1;
                                     if (Pos > 0) {
                                         FileExt = PathFilename.Substring(Pos);
-                                        string fileNameNoExt = PathFilename.Left(Pos - 1);
+                                        string fileNameNoExt = PathFilename.left(Pos - 1);
                                         Pos = fileNameNoExt.LastIndexOf("/") + 1;
                                         if (Pos > 0) {
                                             fileNameNoExt = fileNameNoExt.Substring(Pos);
-                                            path = PathFilename.Left(Pos);
+                                            path = PathFilename.left(Pos);
                                             FilenameRev = 1;
-                                            if (!fileNameNoExt.IsNumeric()) {
+                                            if (!fileNameNoExt.isNumeric()) {
                                                 Pos = GenericController.vbInstr(1, fileNameNoExt, ".r", 1);
                                                 if (Pos > 0) {
                                                     FilenameRev = GenericController.encodeInteger(fileNameNoExt.Substring(Pos + 1));
                                                     FilenameRev = FilenameRev + 1;
-                                                    fileNameNoExt = fileNameNoExt.Left(Pos - 1);
+                                                    fileNameNoExt = fileNameNoExt.left(Pos - 1);
                                                 }
                                             }
                                             string fileName = fileNameNoExt + ".r" + FilenameRev + "." + FileExt;
@@ -1319,7 +1319,7 @@ namespace Contensive.Processor {
                             switch (field.fieldTypeId) {
                                 case CPContentBaseClass.FieldTypeIdEnum.Redirect:
                                 case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
-                                        // nop
+                                        // do nothing
                                         break;
                                     }
                                 case CPContentBaseClass.FieldTypeIdEnum.Integer:
@@ -1357,10 +1357,10 @@ namespace Contensive.Processor {
                                 case CPContentBaseClass.FieldTypeIdEnum.Text: {
                                         string Copy = encodeText(writeCacheValue);
                                         if (Copy.Length > 255) {
-                                            Copy = Copy.Left(255);
+                                            Copy = Copy.left(255);
                                         }
                                         if (field.scramble) {
-                                            Copy = TextScramble(core, Copy);
+                                            Copy = textScramble(core, Copy);
                                         }
                                         SQLSetPair = fieldName + "=" + DbController.encodeSQLText(Copy);
                                         break;
@@ -1376,7 +1376,7 @@ namespace Contensive.Processor {
                                 case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
                                         string filename = encodeText(writeCacheValue);
                                         if (filename.Length > 255) {
-                                            filename = filename.Left(255);
+                                            filename = filename.left(255);
                                         }
                                         SQLSetPair = fieldName + "=" + DbController.encodeSQLText(filename);
                                         break;
@@ -1417,7 +1417,7 @@ namespace Contensive.Processor {
                                     if (writeCacheValueText.Length < 255) {
                                         UniqueViolationFieldList += field.nameLc + "=\"" + writeCacheValueText + "\"";
                                     } else {
-                                        UniqueViolationFieldList += field.nameLc + "=\"" + writeCacheValueText.Left(255) + "...\"";
+                                        UniqueViolationFieldList += field.nameLc + "=\"" + writeCacheValueText.left(255) + "...\"";
                                     }
                                     switch (field.fieldTypeId) {
                                         case CPContentBaseClass.FieldTypeIdEnum.Redirect:
@@ -1733,8 +1733,8 @@ namespace Contensive.Processor {
                             if (!string.IsNullOrEmpty(Filename)) {
                                 Path = getFieldFilename(FieldName, Filename, "", getFieldTypeId(FieldName));
                                 set(FieldName, Path);
-                                Path = GenericController.vbReplace(Path, "\\", "/");
-                                Path = GenericController.vbReplace(Path, "/" + Filename, "");
+                                Path = GenericController.strReplace(Path, "\\", "/");
+                                Path = GenericController.strReplace(Path, "/" + Filename, "");
                                 core.cdnFiles.upload(LocalRequestName, Path, ref Filename);
                             }
                             break;
@@ -1810,7 +1810,7 @@ namespace Contensive.Processor {
                 sortFieldList = encodeEmpty(sortFieldList, "dateadded").Trim(' ');
                 //
                 // ----- Add tablename to the front of SortFieldList fieldnames
-                sortFieldList = " " + GenericController.vbReplace(sortFieldList, ",", " , ") + " ";
+                sortFieldList = " " + GenericController.strReplace(sortFieldList, ",", " , ") + " ";
                 sortFieldList = GenericController.vbReplace(sortFieldList, " ID ", " ccContentWatch.ID ", 1, 99, 1);
                 sortFieldList = GenericController.vbReplace(sortFieldList, " Link ", " ccContentWatch.Link ", 1, 99, 1);
                 sortFieldList = GenericController.vbReplace(sortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ", 1, 99, 1);
@@ -1936,15 +1936,15 @@ namespace Contensive.Processor {
                 } else {
                     //
                     // -- remove tablename from contentcontrolcriteria - if in workflow mode, and authoringtable is different, this would be wrong, also makes sql smaller, and is not necessary
-                    sqlContentCriteria = GenericController.vbReplace(sqlContentCriteria, contentMetaData.tableName + ".", "");
+                    sqlContentCriteria = GenericController.strReplace(sqlContentCriteria, contentMetaData.tableName + ".", "");
                 }
                 if (!string.IsNullOrEmpty(sqlCriteria)) { sqlContentCriteria += "and(" + sqlCriteria + ")"; }
                 if (activeOnly) { sqlContentCriteria += "and(active<>0)"; }
                 //
                 // -- Process Select Fields, make sure ContentControlID,ID,Name,Active are included
-                sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, "\t", " ");
-                while (GenericController.vbInstr(1, sqlSelectFieldList, " ,") != 0) { sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, " ,", ","); }
-                while (GenericController.vbInstr(1, sqlSelectFieldList, ", ") != 0) { sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, ", ", ","); }
+                sqlSelectFieldList = GenericController.strReplace(sqlSelectFieldList, "\t", " ");
+                while (GenericController.vbInstr(1, sqlSelectFieldList, " ,") != 0) { sqlSelectFieldList = GenericController.strReplace(sqlSelectFieldList, " ,", ","); }
+                while (GenericController.vbInstr(1, sqlSelectFieldList, ", ") != 0) { sqlSelectFieldList = GenericController.strReplace(sqlSelectFieldList, ", ", ","); }
                 //
                 // -- add required fields into select list
                 if ((!string.IsNullOrEmpty(sqlSelectFieldList)) && (sqlSelectFieldList.IndexOf("*", System.StringComparison.OrdinalIgnoreCase) == -1)) {

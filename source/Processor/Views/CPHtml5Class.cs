@@ -25,7 +25,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="cpParent"></param>
         //
-        public CPHtml5Class(CPClass cpParent) : base() {
+        public CPHtml5Class(CPClass cpParent) {
             cp = cpParent;
         }
         //

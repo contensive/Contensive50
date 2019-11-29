@@ -284,7 +284,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 if (NavEnd < PageCount) {
                     Nav = Nav + "<li class=\"delim\">&#187;</li><li onclick=\"bbj(this);\">" + PageCount + "</li>";
                 }
-                Nav = GenericController.vbReplace(Nav, ">" + PageNumber + "<", " class=\"hit\">" + PageNumber + "<");
+                Nav = GenericController.strReplace(Nav, ">" + PageNumber + "<", " class=\"hit\">" + PageNumber + "<");
                 string recordDetails = "";
                 switch (recordCnt) {
                     case 0:
@@ -431,7 +431,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
             string result = "";
             try {
                 string Copy = "&nbsp;";
-                if (!string.IsNullOrEmpty(Title)) { Copy = GenericController.vbReplace(Title, " ", "&nbsp;"); }
+                if (!string.IsNullOrEmpty(Title)) { Copy = GenericController.strReplace(Title, " ", "&nbsp;"); }
                 string Style = "VERTICAL-ALIGN:bottom;";
                 if (!string.IsNullOrEmpty(Align)) { Style += "TEXT-ALIGN:" + Align + ";"; }
                 switch (SortingState) {
@@ -1144,7 +1144,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                     //
                     // List of Options, might be select, radio or checkbox
                     //
-                    string LCaseOptionDefault = GenericController.vbLCase(ExpandedSelector.Left(Pos - 1));
+                    string LCaseOptionDefault = GenericController.vbLCase(ExpandedSelector.left(Pos - 1));
                     int PosEqual = GenericController.vbInstr(1, LCaseOptionDefault, "=");
 
                     if (PosEqual > 0) {
@@ -1159,7 +1159,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                         if (Pos < ExpandedSelector.Length) {
                             OptionSuffix = GenericController.vbLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
                         }
-                        ExpandedSelector = ExpandedSelector.Left(Pos - 1);
+                        ExpandedSelector = ExpandedSelector.left(Pos - 1);
                     }
                     string[] OptionValues = ExpandedSelector.Split('|');
                     result = "";
@@ -1175,7 +1175,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                                 OptionValue = GenericController.decodeNvaArgument(OptionValue_AddonEncoded);
                                 OptionCaption = OptionValue;
                             } else {
-                                OptionCaption = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.Left(Pos - 1));
+                                OptionCaption = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.left(Pos - 1));
                                 OptionValue = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
                             }
                             switch (OptionSuffix) {

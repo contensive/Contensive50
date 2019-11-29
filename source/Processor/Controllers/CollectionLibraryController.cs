@@ -246,7 +246,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (!collectionsInstalledList.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture))) {
                     //
                     // Download all files for this collection and build the collection folder(s)
-                    string privateFilesDownloadPath = core.addon.getPrivateFilesAddonPath() + "temp_" + GenericController.GetRandomInteger(core) + "\\";
+                    string privateFilesDownloadPath = core.addon.getPrivateFilesAddonPath() + "temp_" + GenericController.getRandomInteger(core) + "\\";
                     core.privateFiles.createPath(privateFilesDownloadPath);
                     //
                     // -- download the collection file into the download path from the collectionGuid provided

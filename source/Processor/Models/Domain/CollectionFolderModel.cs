@@ -105,10 +105,10 @@ namespace Contensive.Processor.Models.Domain {
                         foreach (FolderDetail folder in FolderList) {
                             FolderName = folder.Name;
                             if (FolderName.Length > 34) {
-                                if (GenericController.vbLCase(FolderName.Left(4)) != "temp") {
+                                if (GenericController.vbLCase(FolderName.left(4)) != "temp") {
                                     CollectionGuid = FolderName.Substring(FolderName.Length - 32);
-                                    Collectionname = FolderName.Left(FolderName.Length - CollectionGuid.Length - 1);
-                                    CollectionGuid = CollectionGuid.Left(8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
+                                    Collectionname = FolderName.left(FolderName.Length - CollectionGuid.Length - 1);
+                                    CollectionGuid = CollectionGuid.left(8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
                                     CollectionGuid = "{" + CollectionGuid + "}";
                                     if (collectionsFound.Contains(CollectionGuid)) {
                                         //
@@ -120,8 +120,8 @@ namespace Contensive.Processor.Models.Domain {
                                         if (SubFolderList.Count > 0) {
                                             FolderDetail lastSubFolder = SubFolderList.Last<FolderDetail>();
                                             FolderName = FolderName + "\\" + lastSubFolder.Name;
-                                            LastChangeDate = lastSubFolder.Name.Substring(4, 2) + "/" + lastSubFolder.Name.Substring(6, 2) + "/" + lastSubFolder.Name.Left(4);
-                                            if (!GenericController.IsDate(LastChangeDate)) {
+                                            LastChangeDate = lastSubFolder.Name.Substring(4, 2) + "/" + lastSubFolder.Name.Substring(6, 2) + "/" + lastSubFolder.Name.left(4);
+                                            if (!GenericController.isDate(LastChangeDate)) {
                                                 LastChangeDate = "";
                                             }
                                         }

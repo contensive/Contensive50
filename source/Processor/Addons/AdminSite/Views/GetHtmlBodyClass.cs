@@ -199,7 +199,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // normalize guid
                     //
                     if (!string.IsNullOrEmpty(AddonGuid)) {
-                        if ((AddonGuid.Length == 38) && (AddonGuid.Left(1) == "{") && (AddonGuid.Substring(AddonGuid.Length - 1) == "}")) {
+                        if ((AddonGuid.Length == 38) && (AddonGuid.left(1) == "{") && (AddonGuid.Substring(AddonGuid.Length - 1) == "}")) {
                             //
                             // Good to go
                             //
@@ -212,7 +212,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             //
                             // might be valid with the brackets and the dashes, add them
                             //
-                            AddonGuid = "{" + AddonGuid.Left(8) + "-" + AddonGuid.Substring(8, 4) + "-" + AddonGuid.Substring(12, 4) + "-" + AddonGuid.Substring(16, 4) + "-" + AddonGuid.Substring(20) + "}";
+                            AddonGuid = "{" + AddonGuid.left(8) + "-" + AddonGuid.Substring(8, 4) + "-" + AddonGuid.Substring(12, 4) + "-" + AddonGuid.Substring(16, 4) + "-" + AddonGuid.Substring(20) + "}";
                         } else {
                             //
                             // not valid
@@ -264,7 +264,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 errorContextMessage = "get Preferences for Admin"
                             });
                         } else if (adminData.adminForm == AdminFormClearCache) {
-                            adminBody = ToolClearCache.GetForm_ClearCache(cp.core);
+                            adminBody = ToolClearCache.getForm_ClearCache(cp.core);
                         } else if (adminData.adminForm == AdminFormSpiderControl) {
                             adminBody = cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, "Content Spider Control"), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
@@ -354,14 +354,14 @@ namespace Contensive.Processor.Addons.AdminSite {
                             if (string.IsNullOrEmpty(adminBody)) {
                                 //
                                 // empty returned, display desktop
-                                adminBody = FormRoot.GetForm_Root(cp.core);
+                                adminBody = FormRoot.getForm_Root(cp.core);
                             }
 
                         }
                     } else {
                         //
                         // nothing so far, display desktop
-                        adminBody = FormRoot.GetForm_Root(cp.core);
+                        adminBody = FormRoot.getForm_Root(cp.core);
                     }
                     //
                     // include fancybox if it was needed
@@ -846,7 +846,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 break;
                                 default:
                                 //
-                                // Nop action or anything unrecognized - read in database
+                                // do nothing action or anything unrecognized - read in database
                                 //
                                 break;
                             }
@@ -1347,8 +1347,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             //
                                             // ----- make sure content watch expires before content expires
                                             //
-                                            if (!GenericController.IsNull(fieldValueObject)) {
-                                                if (GenericController.IsDate(fieldValueObject)) {
+                                            if (!GenericController.isNull(fieldValueObject)) {
+                                                if (GenericController.isDate(fieldValueObject)) {
                                                     DateTime saveValue = GenericController.encodeDate(fieldValueObject);
                                                     if (adminData.contentWatchExpires <= DateTime.MinValue) {
                                                         adminData.contentWatchExpires = saveValue;
@@ -1364,8 +1364,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             //
                                             // ----- make sure content watch expires before content archives
                                             //
-                                            if (!GenericController.IsNull(fieldValueObject)) {
-                                                if (GenericController.IsDate(fieldValueObject)) {
+                                            if (!GenericController.isNull(fieldValueObject)) {
+                                                if (GenericController.isDate(fieldValueObject)) {
                                                     DateTime saveValue = GenericController.encodeDate(fieldValueObject);
                                                     if ((adminData.contentWatchExpires) <= DateTime.MinValue) {
                                                         adminData.contentWatchExpires = saveValue;
@@ -1377,7 +1377,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             break;
                                         }
                                     default: {
-                                            // nop
+                                            // do nothing
                                             break;
                                         }
                                 }
@@ -1542,7 +1542,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                     break;
                                                 }
                                             default: {
-                                                    // nop
+                                                    // do nothing
                                                     break;
                                                 }
                                         }
@@ -1643,7 +1643,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (!string.IsNullOrEmpty(LinkPage) || (LinkCID != 0)) {
                     tempGetMenuLink = LinkPage;
                     if (!string.IsNullOrEmpty(tempGetMenuLink)) {
-                        if (tempGetMenuLink.Left(1) == "?" || tempGetMenuLink.Left(1) == "#") {
+                        if (tempGetMenuLink.left(1) == "?" || tempGetMenuLink.left(1) == "#") {
                             tempGetMenuLink = "/" + cp.core.appConfig.adminRoute + tempGetMenuLink;
                         }
                     } else {
@@ -1691,7 +1691,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             break;
                                         }
                                     default: {
-                                            // nop
+                                            // do nothing
                                             break;
                                         }
                                 }
@@ -1705,7 +1705,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             break;
                                         }
                                     default: {
-                                            // nop
+                                            // do nothing
                                             break;
                                         }
                                 }
@@ -1722,7 +1722,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             break;
                                         }
                                     default: {
-                                            // nop
+                                            // do nothing
                                             break;
                                         }
                                 }
@@ -1782,7 +1782,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             break;
                                         }
                                     default: {
-                                            // nop
+                                            // do nothing
                                             break;
                                         }
                                 }
@@ -1901,7 +1901,7 @@ namespace Contensive.Processor.Addons.AdminSite {
 
                                         }
                                     default: {
-                                            // nop
+                                            // do nothing
                                             break;
                                         }
                                 }
@@ -1944,7 +1944,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             break;
                                         }
                                     default: {
-                                            // nop
+                                            // do nothing
                                             break;
                                         }
                                 }
@@ -1958,7 +1958,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             break;
                                         }
                                     default: {
-                                            // nop
+                                            // do nothing
                                             break;
                                         }
                                 }

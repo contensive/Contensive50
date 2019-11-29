@@ -93,7 +93,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                         LogController.logInfo(core, "CollectionPath has no '\\', skipping");
                                         //
                                     } else {
-                                        CollectionRootPath = CollectionRootPath.Left(Pos - 1);
+                                        CollectionRootPath = CollectionRootPath.left(Pos - 1);
                                         string Path = core.addon.getPrivateFilesAddonPath() + CollectionRootPath + "\\";
                                         List<FolderDetail> folderList = new List<FolderDetail>();
                                         if (core.privateFiles.pathExists(Path)) {

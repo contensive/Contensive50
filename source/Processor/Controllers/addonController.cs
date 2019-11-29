@@ -30,7 +30,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ----- objects passed in constructor, do not dispose
         //
-        private CoreController core;
+        private readonly CoreController core;
         //
         public enum ScriptLanguages {
             VBScript = 1,
@@ -42,7 +42,7 @@ namespace Contensive.Processor.Controllers {
         /// constructor
         /// </summary>
         /// <param name="core"></param>
-        public AddonController(CoreController core) : base() {
+        public AddonController(CoreController core) {
             this.core = core;
         }
         //
@@ -173,7 +173,7 @@ namespace Contensive.Processor.Controllers {
                                                 nvpValue = nvp[1];
                                             }
                                             if (nvpValue.IndexOf("[") >= 0) {
-                                                nvpValue = nvpValue.Left(nvpValue.IndexOf("["));
+                                                nvpValue = nvpValue.left(nvpValue.IndexOf("["));
                                             }
                                             core.docProperties.setProperty(nvp[0], nvpValue);
                                         }
@@ -258,13 +258,13 @@ namespace Contensive.Processor.Controllers {
                                         if (testString.Contains(("$" + key + "$").ToLowerInvariant())) {
                                             string ReplaceSource = "$" + key + "$";
                                             string ReplaceValue = core.docProperties.getText(key);
-                                            addon.copy = addon.copy.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                            addon.copyText = addon.copyText.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                            addon.pageTitle = addon.pageTitle.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                            addon.metaDescription = addon.metaDescription.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                            addon.metaKeywordList = addon.metaKeywordList.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                            addon.otherHeadTags = addon.otherHeadTags.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                            addon.formXML = addon.formXML.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                            addon.copy = addon.copy.replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                            addon.copyText = addon.copyText.replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                            addon.pageTitle = addon.pageTitle.replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                            addon.metaDescription = addon.metaDescription.replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                            addon.metaKeywordList = addon.metaKeywordList.replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                            addon.otherHeadTags = addon.otherHeadTags.replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                            addon.formXML = addon.formXML.replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
                                         }
                                     }
                                 }
@@ -315,7 +315,7 @@ namespace Contensive.Processor.Controllers {
                                     if (RemoteAssetLink.IndexOf("://") < 0) {
                                         //
                                         // use request object to build link
-                                        if (RemoteAssetLink.Left(1) == "/") {
+                                        if (RemoteAssetLink.left(1) == "/") {
                                             // asset starts with a slash, add to appRoot
                                             RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + RemoteAssetLink;
                                         } else {
@@ -487,7 +487,7 @@ namespace Contensive.Processor.Controllers {
                                 hint = "26";
                                 if (true && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextAdmin) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple)) {
                                     if (core.visitProperty.getBoolean("AllowDebugging")) {
-                                        string AddonCommentName = GenericController.vbReplace(addon.name, "-->", "..>");
+                                        string AddonCommentName = GenericController.strReplace(addon.name, "-->", "..>");
                                         if (addon.isInline) {
                                             result = "<!-- Add-on " + AddonCommentName + " -->" + result + "<!-- /Add-on " + AddonCommentName + " -->";
                                         } else {
@@ -1070,7 +1070,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 int ColumnMax = 0;
                                                                                 for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                                                                     object CellData = something[ColumnPointer, RowPointer];
-                                                                                    if (IsNull(CellData)) {
+                                                                                    if (isNull(CellData)) {
                                                                                         Copy += (ColumnStart + "[null]" + ColumnEnd);
                                                                                     } else if ((CellData == null)) {
                                                                                         Copy += (ColumnStart + "[empty]" + ColumnEnd);
@@ -1346,7 +1346,7 @@ namespace Contensive.Processor.Controllers {
                 foreach (var testPathFilename in Directory.GetFileSystemEntries(fullPath, "*.dll")) {
                     //
                     // -- tmp test skipping the non-addon list, depend on found-addon list instead
-                    if (!string.IsNullOrEmpty(core.assemblyList_NonAddonsInstalled.Find(x => testPathFilename.ToLower(CultureInfo.InvariantCulture).Right(x.Length) == x))) {
+                    if (!string.IsNullOrEmpty(core.assemblyList_NonAddonsInstalled.Find(x => testPathFilename.ToLower(CultureInfo.InvariantCulture).right(x.Length) == x))) {
                         //
                         // -- this assembly is a non-addon installed file, block full path
                         continue;
@@ -1600,11 +1600,11 @@ namespace Contensive.Processor.Controllers {
                         int Pos = GenericController.vbInstr(1, ConstructorName, "=");
                         if (Pos > 1) {
                             ConstructorValue = ConstructorName.Substring(Pos);
-                            ConstructorName = (ConstructorName.Left(Pos - 1)).Trim(' ');
+                            ConstructorName = (ConstructorName.left(Pos - 1)).Trim(' ');
                             Pos = GenericController.vbInstr(1, ConstructorValue, "[");
                             if (Pos > 0) {
                                 ConstructorSelector = ConstructorValue.Substring(Pos - 1);
-                                ConstructorValue = ConstructorValue.Left(Pos - 1);
+                                ConstructorValue = ConstructorValue.left(Pos - 1);
                             }
                         }
                         if (!string.IsNullOrEmpty(ConstructorName)) {
@@ -1729,7 +1729,7 @@ namespace Contensive.Processor.Controllers {
                         string Copy = csData.getText("stylesfilename");
                         if (!string.IsNullOrEmpty(Copy)) {
                             if (GenericController.vbInstr(1, Copy, "://") != 0) {
-                            } else if (Copy.Left(1) == "/") {
+                            } else if (Copy.left(1) == "/") {
                             } else {
                                 Copy = GenericController.getCdnFileLink(core, Copy);
                             }
@@ -1792,9 +1792,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="IsInline"></param>
         /// <returns></returns>
         public static string getDefaultAddonOptions(CoreController core, string ArgumentList, string AddonGuid, bool IsInline) {
-            ArgumentList = GenericController.vbReplace(ArgumentList, Environment.NewLine, "\r");
-            ArgumentList = GenericController.vbReplace(ArgumentList, "\n", "\r");
-            ArgumentList = GenericController.vbReplace(ArgumentList, "\r", Environment.NewLine);
+            ArgumentList = GenericController.strReplace(ArgumentList, Environment.NewLine, "\r");
+            ArgumentList = GenericController.strReplace(ArgumentList, "\n", "\r");
+            ArgumentList = GenericController.strReplace(ArgumentList, "\r", Environment.NewLine);
             if (ArgumentList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) == -1) {
                 //
                 // Add in default constructors, like wrapper
@@ -1827,38 +1827,38 @@ namespace Contensive.Processor.Controllers {
                         //
                         // split on equal
                         //
-                        NameValue = GenericController.vbReplace(NameValue, "\\=", Environment.NewLine);
+                        NameValue = GenericController.strReplace(NameValue, "\\=", Environment.NewLine);
                         int Pos = GenericController.vbInstr(1, NameValue, "=");
                         if (Pos == 0) {
                             OptionName = NameValue;
                         } else {
-                            OptionName = NameValue.Left(Pos - 1);
+                            OptionName = NameValue.left(Pos - 1);
                             OptionValue = NameValue.Substring(Pos);
                         }
-                        OptionName = GenericController.vbReplace(OptionName, Environment.NewLine, "\\=");
-                        OptionValue = GenericController.vbReplace(OptionValue, Environment.NewLine, "\\=");
+                        OptionName = GenericController.strReplace(OptionName, Environment.NewLine, "\\=");
+                        OptionValue = GenericController.strReplace(OptionValue, Environment.NewLine, "\\=");
                         //
                         // split optionvalue on [
                         //
-                        OptionValue = GenericController.vbReplace(OptionValue, "\\[", Environment.NewLine);
+                        OptionValue = GenericController.strReplace(OptionValue, "\\[", Environment.NewLine);
                         Pos = GenericController.vbInstr(1, OptionValue, "[");
                         if (Pos != 0) {
                             OptionSelector = OptionValue.Substring(Pos - 1);
-                            OptionValue = OptionValue.Left(Pos - 1);
+                            OptionValue = OptionValue.left(Pos - 1);
                         }
-                        OptionValue = GenericController.vbReplace(OptionValue, Environment.NewLine, "\\[");
-                        OptionSelector = GenericController.vbReplace(OptionSelector, Environment.NewLine, "\\[");
+                        OptionValue = GenericController.strReplace(OptionValue, Environment.NewLine, "\\[");
+                        OptionSelector = GenericController.strReplace(OptionSelector, Environment.NewLine, "\\[");
                         //
                         // Decode AddonConstructor format
-                        OptionName = GenericController.DecodeAddonConstructorArgument(OptionName);
-                        OptionValue = GenericController.DecodeAddonConstructorArgument(OptionValue);
+                        OptionName = GenericController.decodeAddonConstructorArgument(OptionName);
+                        OptionValue = GenericController.decodeAddonConstructorArgument(OptionValue);
                         //
                         // Encode AddonOption format
                         OptionValue = GenericController.encodeNvaArgument(OptionValue);
                         //
                         // rejoin
                         string NameValuePair = core.html.getAddonSelector(OptionName, OptionValue, OptionSelector);
-                        NameValuePair = GenericController.EncodeJavascriptStringSingleQuote(NameValuePair);
+                        NameValuePair = GenericController.encodeJavascriptStringSingleQuote(NameValuePair);
                         result += "&" + NameValuePair;
                         if (GenericController.vbInstr(1, NameValuePair, "=") == 0) {
                             result += "=";
@@ -1937,7 +1937,7 @@ namespace Contensive.Processor.Controllers {
                         + " from (ccAddonEvents e"
                         + " left join ccAddonEventCatchers c on c.eventId=e.id)"
                         + " where ";
-                    if (eventNameIdOrGuid.IsNumeric()) {
+                    if (eventNameIdOrGuid.isNumeric()) {
                         sql += "e.id=" + DbController.encodeSQLNumber(double.Parse(eventNameIdOrGuid));
                     } else if (GenericController.isGuid(eventNameIdOrGuid)) {
                         sql += "e.ccGuid=" + DbController.encodeSQLText(eventNameIdOrGuid);
@@ -1947,7 +1947,7 @@ namespace Contensive.Processor.Controllers {
                     if (!cs.openSql(sql)) {
                         //
                         // event not found
-                        if (eventNameIdOrGuid.IsNumeric()) {
+                        if (eventNameIdOrGuid.isNumeric()) {
                             //
                             // can not create an id
                         } else if (GenericController.isGuid(eventNameIdOrGuid)) {
@@ -2025,7 +2025,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // icon is an Absolute URL - leave it
                     //
-                } else if (IconFilename.Left(1) == "/") {
+                } else if (IconFilename.left(1) == "/") {
                     //
                     // icon is Root Relative, leave it
                     //

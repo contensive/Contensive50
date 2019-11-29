@@ -30,7 +30,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// parent object
         /// </summary>
-        private CoreController core;
+        private readonly CoreController core;
         /// <summary>
         /// this documents unique guid (created on the fly)
         /// </summary>
@@ -229,7 +229,7 @@ namespace Contensive.Processor.Controllers {
             get {
                 if (_landingLink == "") {
                     _landingLink = core.siteProperties.getText("SectionLandingLink", "/" + core.siteProperties.serverPageDefault);
-                    _landingLink = GenericController.ConvertLinkToShortLink(_landingLink, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
+                    _landingLink = GenericController.convertLinkToShortLink(_landingLink, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
                     _landingLink = GenericController.encodeVirtualPath(_landingLink, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 }
                 return _landingLink;
@@ -249,12 +249,12 @@ namespace Contensive.Processor.Controllers {
                 CDef = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
                 Link = "/" + core.appConfig.adminRoute + "?af=" + AdminFormPublishing;
                 Copy = Msg_AuthoringSubmittedNotification;
-                Copy = GenericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + HtmlController.encodeHtml(Link) + "\">" + core.webServer.requestDomain + "</a>");
-                Copy = GenericController.vbReplace(Copy, "<RECORDNAME>", RecordName);
-                Copy = GenericController.vbReplace(Copy, "<CONTENTNAME>", ContentName);
-                Copy = GenericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString());
-                Copy = GenericController.vbReplace(Copy, "<SUBMITTEDDATE>", core.doc.profileStartTime.ToString());
-                Copy = GenericController.vbReplace(Copy, "<SUBMITTEDNAME>", core.session.user.name);
+                Copy = GenericController.strReplace(Copy, "<DOMAINNAME>", "<a href=\"" + HtmlController.encodeHtml(Link) + "\">" + core.webServer.requestDomain + "</a>");
+                Copy = GenericController.strReplace(Copy, "<RECORDNAME>", RecordName);
+                Copy = GenericController.strReplace(Copy, "<CONTENTNAME>", ContentName);
+                Copy = GenericController.strReplace(Copy, "<RECORDID>", RecordID.ToString());
+                Copy = GenericController.strReplace(Copy, "<SUBMITTEDDATE>", core.doc.profileStartTime.ToString());
+                Copy = GenericController.strReplace(Copy, "<SUBMITTEDNAME>", core.session.user.name);
                 //
                 EmailController.queueGroupEmail(core, core.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, false, true);
                 //
@@ -361,7 +361,7 @@ namespace Contensive.Processor.Controllers {
             // Convert default page to default link
             //
             DefaultLink = core.siteProperties.serverPageDefault;
-            if (DefaultLink.Left(1) != "/") {
+            if (DefaultLink.left(1) != "/") {
                 DefaultLink = "/" + core.siteProperties.serverPageDefault;
             }
             //
@@ -558,7 +558,7 @@ namespace Contensive.Processor.Controllers {
                         csData.goNext();
                     }
                     if (!string.IsNullOrEmpty(keywordList)) {
-                        if (keywordList.Left(1) == ",") {
+                        if (keywordList.left(1) == ",") {
                             keywordList = keywordList.Substring(1);
                         }
                         keywordList = HtmlController.encodeHtml(keywordList);

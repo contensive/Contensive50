@@ -131,7 +131,7 @@ namespace Contensive.Processor {
             try {
                 accum = "";
                 CopyContentModel copy;
-                if (copyRecordNameOrGuid.IsNumeric()) {
+                if (copyRecordNameOrGuid.isNumeric()) {
                     //
                     // -- recordId
                     copy = CopyContentModel.create<CopyContentModel>(cp, GenericController.encodeInteger(copyRecordNameOrGuid));
@@ -173,7 +173,7 @@ namespace Contensive.Processor {
             try {
                 accum = "";
                 LayoutModel layout;
-                if (layoutRecordNameOrGuid.IsNumeric()) {
+                if (layoutRecordNameOrGuid.isNumeric()) {
                     //
                     // -- recordId
                     layout = DbBaseModel.create<LayoutModel>(cp, GenericController.encodeInteger(layoutRecordNameOrGuid));

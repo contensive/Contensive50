@@ -340,7 +340,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- datetime2(0)...datetime2(2) need to be converted to datetime2(7)
                                 // -- rename column to tempName
-                                string tempName = "tempDateTime" + GenericController.GetRandomInteger(core).ToString();
+                                string tempName = "tempDateTime" + GenericController.getRandomInteger(core).ToString();
                                 core.db.executeNonQuery("sp_rename '" + table.name + "." + column.COLUMN_NAME + "', '" + tempName + "', 'COLUMN';");
                                 core.db.executeNonQuery("ALTER TABLE " + table.name + " ADD " + column.COLUMN_NAME + " DateTime2(7) NULL;");
                                 core.db.executeNonQuery("update " + table.name + " set " + column.COLUMN_NAME + "=" + tempName + " ");
@@ -833,7 +833,7 @@ namespace Contensive.Processor.Controllers {
                     entry.addonId = (addon == null) ? 0 : addon.id;
                     entry.ccguid = menu.Guid;
                     entry.navIconTitle = menu.NavIconTitle;
-                    entry.navIconType = GetListIndex(menu.NavIconType, NavIconTypeList);
+                    entry.navIconType = getListIndex(menu.NavIconType, NavIconTypeList);
                     entry.installedByCollectionId = InstalledByCollectionID;
                     entry.save(core.cpParent);
                     returnEntry = entry.id;

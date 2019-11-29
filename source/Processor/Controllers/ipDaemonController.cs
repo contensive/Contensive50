@@ -88,7 +88,7 @@ namespace Contensive.Processor.Controllers {
                             queryString = request.Url.Query;
                             Hint += ",cmd=[" + cmd + "],querystring=[" + queryString + "]";
                             if (queryString.Length > 0) {
-                                if (queryString.Left(1) == "?") {
+                                if (queryString.left(1) == "?") {
                                     queryString = queryString.Substring(1);
                                 }
                             }
@@ -152,9 +152,10 @@ namespace Contensive.Processor.Controllers {
                     //
                     // start on a new thread and return
                     //
-                    cmdListenThread = new Thread(thread_cmdListener);
-                    cmdListenThread.Name = "cmdListen";
-                    cmdListenThread.IsBackground = true;
+                    cmdListenThread = new Thread(thread_cmdListener) {
+                        Name = "cmdListen",
+                        IsBackground = true
+                    };
                     cmdListenThread.Start();
                 }
             } catch (Exception) {

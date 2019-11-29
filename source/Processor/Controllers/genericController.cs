@@ -69,7 +69,7 @@ namespace Contensive.Processor.Controllers {
             if (guid.Length == 36) { return "{" + guid.ToLowerInvariant() + "}"; }
             if (guid.Length == 32) {
                 guid = guid.ToLowerInvariant();
-                return guid.Left(8) + "-" + guid.Substring(8, 4) + "-" + guid.Substring(12, 4) + "-" + guid.Substring(16, 4) + "-" + guid.Substring(20);
+                return guid.left(8) + "-" + guid.Substring(8, 4) + "-" + guid.Substring(12, 4) + "-" + guid.Substring(16, 4) + "-" + guid.Substring(20);
             }
             return string.Empty;
         }
@@ -144,7 +144,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 iAddIfMissing = addIfMissing;
                 if (vbInstr(1, link, "?") != 0) {
-                    tempmodifyLinkQuery = link.Left(vbInstr(1, link, "?") - 1);
+                    tempmodifyLinkQuery = link.left(vbInstr(1, link, "?") - 1);
                     QueryString = link.Substring(tempmodifyLinkQuery.Length + 1);
                 } else {
                     tempmodifyLinkQuery = link;
@@ -189,12 +189,12 @@ namespace Contensive.Processor.Controllers {
                         //
                         // element found and needs to be removed
                         //
-                        QueryString = vbReplace(QueryString, "&&", "&");
-                        if (QueryString.Left(1) == "&") {
+                        QueryString = strReplace(QueryString, "&&", "&");
+                        if (QueryString.left(1) == "&") {
                             QueryString = QueryString.Substring(1);
                         }
                         if (QueryString.Substring(QueryString.Length - 1) == "&") {
-                            QueryString = QueryString.Left(QueryString.Length - 1);
+                            QueryString = QueryString.left(QueryString.Length - 1);
                         }
                     }
                 }
@@ -286,7 +286,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DateValue"></param>
         /// <returns></returns>
         //
-        public static string GetRFC1123PatternDateFormat(DateTime DateValue) {
+        public static string getRFC1123PatternDateFormat(DateTime DateValue) {
             //
             return DateValue.ToString("R");
         }
@@ -297,7 +297,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="ApplicationStatus"></param>
         /// <returns></returns>
-        public static string GetApplicationStatusMessage(AppConfigModel.AppStatusEnum ApplicationStatus) {
+        public static string getApplicationStatusMessage(AppConfigModel.AppStatusEnum ApplicationStatus) {
             string tempGetApplicationStatusMessage = null;
 
             switch (ApplicationStatus) {
@@ -383,20 +383,20 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="Arg"></param>
         /// <returns></returns>
-        public static string EncodeAddonConstructorArgument(string Arg) {
+        public static string encodeAddonConstructorArgument(string Arg) {
             string a = Arg;
-            a = vbReplace(a, "\\", "\\\\");
-            a = vbReplace(a, Environment.NewLine, "\\n");
-            a = vbReplace(a, "\t", "\\t");
-            a = vbReplace(a, "&", "\\&");
-            a = vbReplace(a, "=", "\\=");
-            a = vbReplace(a, ",", "\\,");
-            a = vbReplace(a, "\"", "\\\"");
-            a = vbReplace(a, "'", "\\'");
-            a = vbReplace(a, "|", "\\|");
-            a = vbReplace(a, "[", "\\[");
-            a = vbReplace(a, "]", "\\]");
-            a = vbReplace(a, ":", "\\:");
+            a = strReplace(a, "\\", "\\\\");
+            a = strReplace(a, Environment.NewLine, "\\n");
+            a = strReplace(a, "\t", "\\t");
+            a = strReplace(a, "&", "\\&");
+            a = strReplace(a, "=", "\\=");
+            a = strReplace(a, ",", "\\,");
+            a = strReplace(a, "\"", "\\\"");
+            a = strReplace(a, "'", "\\'");
+            a = strReplace(a, "|", "\\|");
+            a = strReplace(a, "[", "\\[");
+            a = strReplace(a, "]", "\\]");
+            a = strReplace(a, ":", "\\:");
             return a;
         }
         //
@@ -413,22 +413,22 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="EncodedArg"></param>
         /// <returns></returns>
-        public static string DecodeAddonConstructorArgument(string EncodedArg) {
+        public static string decodeAddonConstructorArgument(string EncodedArg) {
             string a;
             //
             a = EncodedArg;
-            a = vbReplace(a, "\\:", ":");
-            a = vbReplace(a, "\\]", "]");
-            a = vbReplace(a, "\\[", "[");
-            a = vbReplace(a, "\\|", "|");
-            a = vbReplace(a, "\\'", "'");
-            a = vbReplace(a, "\\\"", "\"");
-            a = vbReplace(a, "\\,", ",");
-            a = vbReplace(a, "\\=", "=");
-            a = vbReplace(a, "\\&", "&");
-            a = vbReplace(a, "\\t", "\t");
-            a = vbReplace(a, "\\n", Environment.NewLine);
-            a = vbReplace(a, "\\\\", "\\");
+            a = strReplace(a, "\\:", ":");
+            a = strReplace(a, "\\]", "]");
+            a = strReplace(a, "\\[", "[");
+            a = strReplace(a, "\\|", "|");
+            a = strReplace(a, "\\'", "'");
+            a = strReplace(a, "\\\"", "\"");
+            a = strReplace(a, "\\,", ",");
+            a = strReplace(a, "\\=", "=");
+            a = strReplace(a, "\\&", "&");
+            a = strReplace(a, "\\t", "\t");
+            a = strReplace(a, "\\n", Environment.NewLine);
+            a = strReplace(a, "\\\\", "\\");
             return a;
         }
         //
@@ -436,7 +436,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// return argument for separateUrl
         /// </summary>
-        public class urlDetailsClass {
+        public class UrlDetailsClass {
             public string protocol = "";
             public string host = "";
             public string port = "";
@@ -452,8 +452,8 @@ namespace Contensive.Processor.Controllers {
         /// split a source Url into its components. Url and Uri are always UNIX slashed.
         /// </summary>
         /// <param name="sourceUrl"></param>
-        public static urlDetailsClass splitUrl(string sourceUrl) {
-            var urlDetails = new urlDetailsClass();
+        public static UrlDetailsClass splitUrl(string sourceUrl) {
+            var urlDetails = new UrlDetailsClass();
             string path = "";
             splitUrl(sourceUrl, ref urlDetails.protocol, ref urlDetails.host, ref urlDetails.port, ref path, ref urlDetails.filename, ref urlDetails.queryString);
             foreach (string segment in path.Split('/')) {
@@ -498,7 +498,7 @@ namespace Contensive.Processor.Controllers {
             iURLWorking = sourceURL;
             Position = vbInstr(1, iURLWorking, "://");
             if (Position != 0) {
-                iURLProtocol = iURLWorking.Left(Position + 2);
+                iURLProtocol = iURLWorking.left(Position + 2);
                 iURLWorking = iURLWorking.Substring(Position + 2);
             }
             //
@@ -514,7 +514,7 @@ namespace Contensive.Processor.Controllers {
                 iURLPage = "";
             } else {
                 iURLPath = iURLHost.Substring(Position - 1);
-                iURLHost = iURLHost.Left(Position - 1);
+                iURLHost = iURLHost.left(Position - 1);
                 //
                 // separate page from path
                 //
@@ -527,7 +527,7 @@ namespace Contensive.Processor.Controllers {
                     iURLPath = "/";
                 } else {
                     iURLPage = iURLPath.Substring(Position);
-                    iURLPath = iURLPath.Left(Position);
+                    iURLPath = iURLPath.left(Position);
                 }
             }
             //
@@ -552,12 +552,12 @@ namespace Contensive.Processor.Controllers {
                 }
             } else {
                 iURLPort = iURLHost.Substring(Position);
-                iURLHost = iURLHost.Left(Position - 1);
+                iURLHost = iURLHost.left(Position - 1);
             }
             Position = vbInstr(1, iURLPage, "?");
             if (Position > 0) {
                 iURLQueryString = iURLPage.Substring(Position - 1);
-                iURLPage = iURLPage.Left(Position - 1);
+                iURLPage = iURLPage.left(Position - 1);
             }
             protocol = iURLProtocol;
             host = iURLHost;
@@ -578,9 +578,9 @@ namespace Contensive.Processor.Controllers {
             try {
                 if (!string.IsNullOrEmpty(GMTDate)) {
                     double HourPart = encodeNumber(GMTDate.Substring(5, 11));
-                    if (GenericController.IsDate(HourPart)) {
+                    if (GenericController.isDate(HourPart)) {
                         double YearPart = encodeNumber(GMTDate.Substring(17, 8));
-                        if (GenericController.IsDate(YearPart)) {
+                        if (GenericController.isDate(YearPart)) {
                             result = DateTime.FromOADate(YearPart + (HourPart + 4) / 24);
                         }
                     }
@@ -657,7 +657,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static int GetRandomInteger(CoreController core) {
+        public static int getRandomInteger(CoreController core) {
             return core.random.Next(Int32.MaxValue);
         }
         //
@@ -767,7 +767,7 @@ namespace Contensive.Processor.Controllers {
                         } catch {
                             // do nothing -- just put a 0 in as the escape code was not valid, a data problem not a code problem
                         }
-                        result = result.Left(Position - 1) + Convert.ToChar(ESCValue) + result.Substring(Position + 2);
+                        result = result.left(Position - 1) + Convert.ToChar(ESCValue) + result.Substring(Position + 2);
                     }
                 }
                 Position = vbInstr(Position + 1, result, "%");
@@ -863,13 +863,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="WordList"></param>
         /// <param name="Delimiter"></param>
         /// <returns></returns>
-        public static string[] SplitDelimited(string WordList, string Delimiter) {
+        public static string[] splitDelimited(string WordList, string Delimiter) {
             string[] Out = new string[1];
             int OutPointer = 0;
             if (!string.IsNullOrEmpty(WordList)) {
                 string[] QuoteSplit = stringSplit(WordList, "\"");
                 int QuoteSplitCount = QuoteSplit.GetUpperBound(0) + 1;
-                bool InQuote = (string.IsNullOrEmpty(WordList.Left(1)));
+                bool InQuote = (string.IsNullOrEmpty(WordList.left(1)));
                 int OutSize = 1;
                 for (int QuoteSplitPointer = 0; QuoteSplitPointer < QuoteSplitCount; QuoteSplitPointer++) {
                     string Fragment = QuoteSplit[QuoteSplitPointer];
@@ -957,7 +957,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="domain"></param>
         /// <param name="appVirtualPath">App virtualPath is typically /appName,  </param>
         /// <returns></returns>
-        public static string ConvertLinkToShortLink(string url, string domain, string appVirtualPath) {
+        public static string convertLinkToShortLink(string url, string domain, string appVirtualPath) {
             //
             string BadString = "";
             string GoodString = "";
@@ -969,7 +969,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // HTTP
                 //
-                Protocol = WorkingLink.Left(7);
+                Protocol = WorkingLink.left(7);
             } else if (vbInstr(1, WorkingLink, "HTTPS://", 1) == 1) {
                 //
                 // HTTPS
@@ -1032,12 +1032,12 @@ namespace Contensive.Processor.Controllers {
                     //
                     // quick - virtual hosted and link starts at AppRootPath
                     //
-                } else if ((!VirtualHosted) && (url.Left(1) == "/") && (url.IndexOf(appRootPath, System.StringComparison.OrdinalIgnoreCase) + 1 == 1)) {
+                } else if ((!VirtualHosted) && (url.left(1) == "/") && (url.IndexOf(appRootPath, System.StringComparison.OrdinalIgnoreCase) + 1 == 1)) {
                     //
                     // quick - not virtual hosted and link starts at Root
                     //
                 } else {
-                    urlDetailsClass urlDetails = splitUrl(url);
+                    UrlDetailsClass urlDetails = splitUrl(url);
                     string path = urlDetails.unixPath();
                     //splitUrl(Link, ref Protocol, ref Host, ref Path, ref Page, ref QueryString);
                     if (VirtualHosted) {
@@ -1056,7 +1056,7 @@ namespace Contensive.Processor.Controllers {
                         // Root hosted site, remove virtual path if it is there
                         //
                         if (vbInstr(1, path, appRootPath, 1) != 0) {
-                            path = vbReplace(path, appRootPath, "/");
+                            path = strReplace(path, appRootPath, "/");
                         }
                     }
                     result = urlDetails.protocol + urlDetails.host + path + urlDetails.filename + urlDetails.queryString;
@@ -1092,10 +1092,10 @@ namespace Contensive.Processor.Controllers {
                     tempGetLinkedText = iAnchorText;
                     LinkPosition = UcaseAnchorText.LastIndexOf("</LINK>") + 1;
                     while (LinkPosition > 1) {
-                        tempGetLinkedText = tempGetLinkedText.Left(LinkPosition - 1) + "</A>" + tempGetLinkedText.Substring(LinkPosition + 6);
+                        tempGetLinkedText = tempGetLinkedText.left(LinkPosition - 1) + "</A>" + tempGetLinkedText.Substring(LinkPosition + 6);
                         LinkPosition = UcaseAnchorText.LastIndexOf("<LINK>", LinkPosition - 2) + 1;
                         if (LinkPosition != 0) {
-                            tempGetLinkedText = tempGetLinkedText.Left(LinkPosition - 1) + iAnchorTag + tempGetLinkedText.Substring(LinkPosition + 5);
+                            tempGetLinkedText = tempGetLinkedText.left(LinkPosition - 1) + iAnchorTag + tempGetLinkedText.Substring(LinkPosition + 5);
                         }
                         LinkPosition = UcaseAnchorText.LastIndexOf("</LINK>", LinkPosition - 1) + 1;
                     }
@@ -1118,7 +1118,7 @@ namespace Contensive.Processor.Controllers {
                 int SegMax = SegSplit.GetUpperBound(0);
                 if (SegMax >= 0) {
                     for (int SegPtr = 0; SegPtr <= SegMax; SegPtr++) {
-                        SegSplit[SegPtr] = vbUCase(SegSplit[SegPtr].Left(1)) + vbLCase(SegSplit[SegPtr].Substring(1));
+                        SegSplit[SegPtr] = vbUCase(SegSplit[SegPtr].left(1)) + vbLCase(SegSplit[SegPtr].Substring(1));
                     }
                 }
                 result = string.Join(" ", SegSplit);
@@ -1139,11 +1139,11 @@ namespace Contensive.Processor.Controllers {
                 string LastCharacter = result.Substring(result.Length - 1);
                 UpperCase = (LastCharacter == LastCharacter.ToUpper());
                 if (vbUCase(result.Substring(result.Length - 3)) == "IES") {
-                    result = result.Left(result.Length - 3) + (UpperCase ? "Y" : "y");
+                    result = result.left(result.Length - 3) + (UpperCase ? "Y" : "y");
                 } else if (vbUCase(result.Substring(result.Length - 2)) == "SS") {
                     // nothing
                 } else if (vbUCase(result.Substring(result.Length - 1)) == "S") {
-                    result = result.Left(result.Length - 1);
+                    result = result.left(result.Length - 1);
                 }
             }
             return result;
@@ -1156,7 +1156,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="Source"></param>
         /// <returns></returns>
-        public static string EncodeJavascriptStringSingleQuote(string Source) {
+        public static string encodeJavascriptStringSingleQuote(string Source) {
             return HttpUtility.JavaScriptStringEncode(Source);
         }
         //
@@ -1168,7 +1168,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ListOfItems"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static int GetListIndex(string Item, string ListOfItems) {
+        public static int getListIndex(string Item, string ListOfItems) {
             int tempGetListIndex = 0;
             //
             string[] Items = null;
@@ -1180,7 +1180,7 @@ namespace Contensive.Processor.Controllers {
             if (!string.IsNullOrEmpty(ListOfItems)) {
                 LcaseItem = vbLCase(Item);
                 LcaseList = vbLCase(ListOfItems);
-                Items = SplitDelimited(LcaseList, ",");
+                Items = splitDelimited(LcaseList, ",");
                 for (Ptr = 0; Ptr <= Items.GetUpperBound(0); Ptr++) {
                     if (Items[Ptr] == LcaseItem) {
                         tempGetListIndex = Ptr + 1;
@@ -1197,12 +1197,9 @@ namespace Contensive.Processor.Controllers {
         public static int encodeInteger(object expression) {
             if (expression == null) { return 0; }
             string trialString = expression.ToString();
-            int trialInt;
-            if (int.TryParse(trialString, out trialInt)) { return trialInt; }
-            double trialDbl;
-            if (double.TryParse(trialString, out trialDbl)) { return (int)trialDbl; }
-            bool trialBool;
-            if (bool.TryParse(trialString, out trialBool)) { return (trialBool) ? 1 : 0; }
+            if (int.TryParse(trialString, out int trialInt)) { return trialInt; }
+            if (double.TryParse(trialString, out double trialDbl)) { return (int)trialDbl; }
+            if (bool.TryParse(trialString, out bool trialBool)) { return (trialBool) ? 1 : 0; }
             return 0;
         }
         //
@@ -1216,10 +1213,8 @@ namespace Contensive.Processor.Controllers {
         public static double encodeNumber(object expression) {
             if (expression == null) { return 0; }
             string trialString = expression.ToString();
-            double trialDbl;
-            if (double.TryParse(trialString, out trialDbl)) { return trialDbl; }
-            bool trialBool;
-            if (bool.TryParse(trialString, out trialBool)) { return (trialBool) ? 1 : 0; }
+            if (double.TryParse(trialString, out double trialDbl)) { return trialDbl; }
+            if (bool.TryParse(trialString, out bool trialBool)) { return (trialBool) ? 1 : 0; }
             return 0;
         }
         //
@@ -1239,7 +1234,7 @@ namespace Contensive.Processor.Controllers {
                 tempEncodeBoolean = false;
             } else if (Expression is bool) {
                 tempEncodeBoolean = (bool)Expression;
-            } else if (Expression.IsNumeric()) {
+            } else if (Expression.isNumeric()) {
                 tempEncodeBoolean = (encodeText(Expression) != "0");
             } else if (Expression is string) {
                 switch (Expression.ToString().ToLowerInvariant().Trim()) {
@@ -1262,7 +1257,7 @@ namespace Contensive.Processor.Controllers {
                 // this is a terrible hack, but to be compatible with current software, "#12:00:00 AM#" must return mindate 
                 if ((String)Expression == "12:00:00 AM") { return DateTime.MinValue; }
             }
-            if (GenericController.IsDate(Expression)) { return Convert.ToDateTime(Expression); }
+            if (GenericController.isDate(Expression)) { return Convert.ToDateTime(Expression); }
             return DateTime.MinValue;
         }
         //
@@ -1303,7 +1298,7 @@ namespace Contensive.Processor.Controllers {
                         EOL = NextLF - 1;
                         BOL = NextLF + 1;
                     }
-                    returnFirstLine = Body.Left(EOL);
+                    returnFirstLine = Body.left(EOL);
                     Body = Body.Substring(BOL - 1);
                 } else {
                     returnFirstLine = Body;
@@ -1346,18 +1341,18 @@ namespace Contensive.Processor.Controllers {
         public static string encodeNvaArgument(string Arg) {
             string a = Arg;
             if (!string.IsNullOrEmpty(a)) {
-                a = vbReplace(a, Environment.NewLine, "#0013#");
-                a = vbReplace(a, "\n", "#0013#");
-                a = vbReplace(a, "\r", "#0013#");
-                a = vbReplace(a, "&", "#0038#");
-                a = vbReplace(a, "=", "#0061#");
-                a = vbReplace(a, ",", "#0044#");
-                a = vbReplace(a, "\"", "#0034#");
-                a = vbReplace(a, "'", "#0039#");
-                a = vbReplace(a, "|", "#0124#");
-                a = vbReplace(a, "[", "#0091#");
-                a = vbReplace(a, "]", "#0093#");
-                a = vbReplace(a, ":", "#0058#");
+                a = strReplace(a, Environment.NewLine, "#0013#");
+                a = strReplace(a, "\n", "#0013#");
+                a = strReplace(a, "\r", "#0013#");
+                a = strReplace(a, "&", "#0038#");
+                a = strReplace(a, "=", "#0061#");
+                a = strReplace(a, ",", "#0044#");
+                a = strReplace(a, "\"", "#0034#");
+                a = strReplace(a, "'", "#0039#");
+                a = strReplace(a, "|", "#0124#");
+                a = strReplace(a, "[", "#0091#");
+                a = strReplace(a, "]", "#0093#");
+                a = strReplace(a, ":", "#0058#");
             }
             return a;
         }
@@ -1371,16 +1366,16 @@ namespace Contensive.Processor.Controllers {
             string a;
             //
             a = EncodedArg;
-            a = vbReplace(a, "#0058#", ":");
-            a = vbReplace(a, "#0093#", "]");
-            a = vbReplace(a, "#0091#", "[");
-            a = vbReplace(a, "#0124#", "|");
-            a = vbReplace(a, "#0039#", "'");
-            a = vbReplace(a, "#0034#", "\"");
-            a = vbReplace(a, "#0044#", ",");
-            a = vbReplace(a, "#0061#", "=");
-            a = vbReplace(a, "#0038#", "&");
-            a = vbReplace(a, "#0013#", Environment.NewLine);
+            a = strReplace(a, "#0058#", ":");
+            a = strReplace(a, "#0093#", "]");
+            a = strReplace(a, "#0091#", "[");
+            a = strReplace(a, "#0124#", "|");
+            a = strReplace(a, "#0039#", "'");
+            a = strReplace(a, "#0034#", "\"");
+            a = strReplace(a, "#0044#", ",");
+            a = strReplace(a, "#0061#", "=");
+            a = strReplace(a, "#0038#", "&");
+            a = strReplace(a, "#0013#", Environment.NewLine);
             return a;
         }
         //
@@ -1472,7 +1467,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public static bool IsNull(object source) {
+        public static bool isNull(object source) {
             return (source == null);
         }
         //
@@ -1595,11 +1590,11 @@ namespace Contensive.Processor.Controllers {
                 if (route.Equals("/")) {
                     return string.Empty;
                 }
-                if (normalizedRoute.Left(1).Equals("/")) {
+                if (normalizedRoute.left(1).Equals("/")) {
                     normalizedRoute = normalizedRoute.Substring(1);
                 }
                 if (normalizedRoute.Substring(normalizedRoute.Length - 1, 1).Equals("/")) {
-                    normalizedRoute = normalizedRoute.Left(normalizedRoute.Length - 1);
+                    normalizedRoute = normalizedRoute.left(normalizedRoute.Length - 1);
                 }
                 return normalizedRoute;
             } catch (Exception ex) {
@@ -1621,14 +1616,14 @@ namespace Contensive.Processor.Controllers {
             // this routine was originally written to handle modes that were not adopted (content file absolute and relative URLs)
             // leave it here as a simple slash converter in case other conversions are needed later
             //
-            return vbReplace(cdnUrl, "/", "\\");
+            return strReplace(cdnUrl, "/", "\\");
         }
         //
         //==============================================================================
         public static bool isGuid(string Source) {
             bool returnValue = false;
             try {
-                if ((Source.Length == 38) && (Source.Left(1) == "{") && (Source.Substring(Source.Length - 1) == "}")) {
+                if ((Source.Length == 38) && (Source.left(1) == "{") && (Source.Substring(Source.Length - 1) == "}")) {
                     //
                     // Good to go
                     //
@@ -1729,11 +1724,11 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public static string vbReplace(string expression, string find, int replacement) { return vbReplace(expression, find, replacement.ToString()); }
+        public static string vbReplace(string expression, string find, int replacement) { return strReplace(expression, find, replacement.ToString()); }
         //
         // ====================================================================================================
         //
-        public static string vbReplace(string expression, string find, string replacement) { return vbReplace(expression, find, replacement, 1, 9999, 1); }
+        public static string strReplace(string expression, string find, string replacement) { return vbReplace(expression, find, replacement, 1, 9999, 1); }
         //
         //====================================================================================================
         /// <summary>
@@ -1816,18 +1811,18 @@ namespace Contensive.Processor.Controllers {
             string a = "";
             if (!string.IsNullOrEmpty(Arg)) {
                 a = Arg;
-                a = GenericController.vbReplace(a, Environment.NewLine, "#0013#");
-                a = GenericController.vbReplace(a, "\n", "#0013#");
-                a = GenericController.vbReplace(a, "\r", "#0013#");
-                a = GenericController.vbReplace(a, "&", "#0038#");
-                a = GenericController.vbReplace(a, "=", "#0061#");
-                a = GenericController.vbReplace(a, ",", "#0044#");
-                a = GenericController.vbReplace(a, "\"", "#0034#");
-                a = GenericController.vbReplace(a, "'", "#0039#");
-                a = GenericController.vbReplace(a, "|", "#0124#");
-                a = GenericController.vbReplace(a, "[", "#0091#");
-                a = GenericController.vbReplace(a, "]", "#0093#");
-                a = GenericController.vbReplace(a, ":", "#0058#");
+                a = GenericController.strReplace(a, Environment.NewLine, "#0013#");
+                a = GenericController.strReplace(a, "\n", "#0013#");
+                a = GenericController.strReplace(a, "\r", "#0013#");
+                a = GenericController.strReplace(a, "&", "#0038#");
+                a = GenericController.strReplace(a, "=", "#0061#");
+                a = GenericController.strReplace(a, ",", "#0044#");
+                a = GenericController.strReplace(a, "\"", "#0034#");
+                a = GenericController.strReplace(a, "'", "#0039#");
+                a = GenericController.strReplace(a, "|", "#0124#");
+                a = GenericController.strReplace(a, "[", "#0091#");
+                a = GenericController.strReplace(a, "]", "#0093#");
+                a = GenericController.strReplace(a, ":", "#0058#");
             }
             return a;
         }
@@ -1841,7 +1836,7 @@ namespace Contensive.Processor.Controllers {
         public static bool common_isGuid(string guid) {
             bool returnIsGuid = false;
             try {
-                returnIsGuid = (guid.Length == 38) && (guid.Left(1) == "{") && (guid.Substring(guid.Length - 1) == "}");
+                returnIsGuid = (guid.Length == 38) && (guid.left(1) == "{") && (guid.Substring(guid.Length - 1) == "}");
             } catch (Exception ex) {
                 throw (ex);
             }
@@ -1884,16 +1879,16 @@ namespace Contensive.Processor.Controllers {
             //
             if ((!string.IsNullOrEmpty(NameValueString)) && (!string.IsNullOrEmpty(Name))) {
                 while (GenericController.vbInstr(1, NameValueStringWorking, " =") != 0) {
-                    NameValueStringWorking = GenericController.vbReplace(NameValueStringWorking, " =", "=");
+                    NameValueStringWorking = GenericController.strReplace(NameValueStringWorking, " =", "=");
                 }
                 while (GenericController.vbInstr(1, NameValueStringWorking, "= ") != 0) {
-                    NameValueStringWorking = GenericController.vbReplace(NameValueStringWorking, "= ", "=");
+                    NameValueStringWorking = GenericController.strReplace(NameValueStringWorking, "= ", "=");
                 }
                 while (GenericController.vbInstr(1, NameValueStringWorking, "& ") != 0) {
-                    NameValueStringWorking = GenericController.vbReplace(NameValueStringWorking, "& ", "&");
+                    NameValueStringWorking = GenericController.strReplace(NameValueStringWorking, "& ", "&");
                 }
                 while (GenericController.vbInstr(1, NameValueStringWorking, " &") != 0) {
-                    NameValueStringWorking = GenericController.vbReplace(NameValueStringWorking, " &", "&");
+                    NameValueStringWorking = GenericController.strReplace(NameValueStringWorking, " &", "&");
                 }
                 NameValueStringWorking = NameValueString + "&";
                 UcaseNameValueStringWorking = GenericController.vbUCase(NameValueStringWorking);
@@ -1925,13 +1920,13 @@ namespace Contensive.Processor.Controllers {
         //
         public static string getCdnFileLink(CoreController core, string virtualFile) {
             string returnLink = virtualFile;
-            returnLink = GenericController.vbReplace(returnLink, "\\", "/");
+            returnLink = GenericController.strReplace(returnLink, "\\", "/");
             if (GenericController.vbInstr(1, returnLink, "://") != 0) {
                 //
                 // icon is an Absolute URL - leave it
                 //
                 return returnLink;
-            } else if (returnLink.Left(1) == "/") {
+            } else if (returnLink.left(1) == "/") {
                 //
                 // icon is Root Relative, leave it
                 //
@@ -1964,10 +1959,10 @@ namespace Contensive.Processor.Controllers {
                     result = iAnchorText;
                     LinkPosition = UcaseAnchorText.LastIndexOf("</LINK>") + 1;
                     while (LinkPosition > 1) {
-                        result = result.Left(LinkPosition - 1) + "</a>" + result.Substring(LinkPosition + 6);
+                        result = result.left(LinkPosition - 1) + "</a>" + result.Substring(LinkPosition + 6);
                         LinkPosition = UcaseAnchorText.LastIndexOf("<LINK>", LinkPosition - 2) + 1;
                         if (LinkPosition != 0) {
-                            result = result.Left(LinkPosition - 1) + iAnchorTag + result.Substring(LinkPosition + 5);
+                            result = result.left(LinkPosition - 1) + iAnchorTag + result.Substring(LinkPosition + 5);
                         }
                         LinkPosition = UcaseAnchorText.LastIndexOf("</LINK>", LinkPosition - 1) + 1;
                     }
@@ -1982,7 +1977,7 @@ namespace Contensive.Processor.Controllers {
             string requestFormSerialized = "";
             if (nameValueDict.Count > 0) {
                 foreach (KeyValuePair<string, string> kvp in nameValueDict) {
-                    requestFormSerialized += "&" + encodeURL(kvp.Key.Left(255)) + "=" + encodeURL(kvp.Value.Left(255));
+                    requestFormSerialized += "&" + encodeURL(kvp.Key.left(255)) + "=" + encodeURL(kvp.Value.left(255));
                     if (requestFormSerialized.Length > 255) {
                         break;
                     }
@@ -1999,7 +1994,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getShortDateString(DateTime srcDate) {
             string returnString = "";
-            DateTime workingDate = srcDate.MinValueIfOld();
+            DateTime workingDate = srcDate.minValueIfOld();
             if (!srcDate.isOld()) {
                 returnString = workingDate.ToShortDateString();
             }
@@ -2025,7 +2020,7 @@ namespace Contensive.Processor.Controllers {
                             int firstPos = key.IndexOf('=');
                             string value = string.Empty;
                             if (firstPos >= 0) {
-                                key = key.Left(firstPos).Trim(' ');
+                                key = key.left(firstPos).Trim(' ');
                                 value = decodeNvaArgument(option.Substring(firstPos + 1).Trim(' '));
                             }
                             key = decodeNvaArgument(key);
@@ -2065,7 +2060,7 @@ namespace Contensive.Processor.Controllers {
                             Pos = GenericController.vbInstr(1, key, "=");
                             if (Pos > 0) {
                                 value = key.Substring(Pos);
-                                key = key.Left(Pos - 1);
+                                key = key.left(Pos - 1);
                             }
                             returnList.Add(key, value);
                         }
@@ -2085,7 +2080,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="Copy"></param>
         /// <returns></returns>
-        public static string TextDeScramble(CoreController core, string Copy) {
+        public static string textDeScramble(CoreController core, string Copy) {
             string result = "";
             try {
                 result = SecurityController.twoWayDecrypt(core, Copy);
@@ -2115,7 +2110,7 @@ namespace Contensive.Processor.Controllers {
                         // First characger must be _
                         // Second character is the scramble version 'a' is the starting system
                         //
-                        if (Source.Left(2) != "_a") {
+                        if (Source.left(2) != "_a") {
                             result = Copy;
                         } else {
                             Source = Source.Substring(2);
@@ -2143,7 +2138,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             if ((crc % 9).ToString() != Source.Substring(Source.Length - 1, 1)) {
                                 //
-                                // Nope - set it back to the input
+                                // do nothinge - set it back to the input
                                 //
                                 result = Copy;
                             }
@@ -2159,7 +2154,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=============================================================================
         // 
-        public static string TextScramble(CoreController core, string Copy) {
+        public static string textScramble(CoreController core, string Copy) {
             return SecurityController.twoWayEncrypt(core, Copy);
         }
         //
@@ -2177,7 +2172,7 @@ namespace Contensive.Processor.Controllers {
                 if (EndPos != 0) {
                     EndPos = GenericController.vbInstr(EndPos, result, ">", 1);
                     if (EndPos != 0) {
-                        result = result.Left(StartPos - 1) + result.Substring(EndPos);
+                        result = result.left(StartPos - 1) + result.Substring(EndPos);
                     }
                 }
             }
@@ -2204,12 +2199,13 @@ namespace Contensive.Processor.Controllers {
         public static string executeCommandSync(string command) {
             string result = "";
             try {
-                System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo("%comspec%", "/c " + command);
-                procStartInfo.RedirectStandardOutput = true;
-                procStartInfo.UseShellExecute = false;
-                procStartInfo.CreateNoWindow = true;
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                proc.StartInfo = procStartInfo;
+                Process proc = new System.Diagnostics.Process {
+                    StartInfo = new ProcessStartInfo("%comspec%", "/c " + command) {
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
                 proc.Start();
                 result = proc.StandardOutput.ReadToEnd();
             } catch (Exception) { }
@@ -2230,12 +2226,9 @@ namespace Contensive.Processor.Controllers {
                 return (source1.ToLowerInvariant() == source2.ToLowerInvariant());
             }
         }
-        public static bool IsDate(object expression) {
-            if (expression == null)
-                return false;
-
-            DateTime testDate;
-            return DateTime.TryParse(expression.ToString(), out testDate);
+        public static bool isDate(object expression) {
+            if (expression == null) return false;
+            return DateTime.TryParse(expression.ToString(), out DateTime testDate);
         }
         //
         //====================================================================================================

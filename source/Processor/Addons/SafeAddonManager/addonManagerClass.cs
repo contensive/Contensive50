@@ -23,7 +23,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
         //
         // constructor sets cp from argument for use in calls to other objects, then core because cp cannot be uses since that would be a circular depenancy
         //
-        private CoreController core;
+        private readonly CoreController core;
         //
         //==================================================================================================================================
         /// <summary>
@@ -31,7 +31,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public AddonManagerClass(CoreController core) : base() {
+        public AddonManagerClass(CoreController core) {
             this.core = core;
         }
         //
@@ -116,7 +116,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                         Content.Add(AdminUIController.getFormBodyAdminOnly());
                     } else {
                         //
-                        InstallFolder = "temp\\CollectionUpload" + encodeText(GenericController.GetRandomInteger(core));
+                        InstallFolder = "temp\\CollectionUpload" + encodeText(GenericController.getRandomInteger(core));
                         privateFilesInstallPath = InstallFolder + "\\";
                         if (Button == Constants.ButtonOK) {
                             //
@@ -377,7 +377,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                                                                 // Version
                                                                 //
                                                                 CollectionLastChangeDate = CollectionNode.InnerText;
-                                                                if (GenericController.IsDate(CollectionLastChangeDate)) {
+                                                                if (GenericController.isDate(CollectionLastChangeDate)) {
                                                                     DateValue = DateTime.Parse(CollectionLastChangeDate);
                                                                     CollectionLastChangeDate = DateValue.ToShortDateString();
                                                                 }
@@ -387,7 +387,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                                                                 break;
                                                             }
                                                         default: {
-                                                                // nop
+                                                                // do nothing
                                                                 break;
                                                             }
                                                     }
@@ -461,7 +461,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                                                 break;
                                             }
                                         default: {
-                                                // nop
+                                                // do nothing
                                                 break;
                                             }
                                     }
@@ -714,7 +714,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                         ParentNameSpace = "";
                     } else {
                         ParentName = menuNameSpace.Substring(Pos);
-                        ParentNameSpace = menuNameSpace.Left(Pos - 1);
+                        ParentNameSpace = menuNameSpace.left(Pos - 1);
                     }
                     if (string.IsNullOrEmpty(ParentNameSpace)) {
                         using (var csData = new CsModel(core)) {

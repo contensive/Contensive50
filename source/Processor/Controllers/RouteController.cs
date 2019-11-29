@@ -190,7 +190,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                             case FormTypeSiteStyleEditor: {
                                     //
-                                    result = (new Contensive.Processor.Addons.Primitives.processSiteStyleEditorClass()).Execute(core.cpParent).ToString();
+                                    result = (new Contensive.Processor.Addons.Primitives.ProcessSiteStyleEditorClass()).Execute(core.cpParent).ToString();
                                     break;
                                 }
                             case FormTypeHelpBubbleEditor: {
@@ -296,7 +296,7 @@ namespace Contensive.Processor.Controllers {
                         if (routeTest.IndexOf("/") < 0) {
                             break;
                         }
-                        routeTest = routeTest.Left(routeTest.LastIndexOf("/"));
+                        routeTest = routeTest.left(routeTest.LastIndexOf("/"));
                         routeCnt -= 1;
                     } while ((routeCnt > 0) && (!routeFound));
                     //

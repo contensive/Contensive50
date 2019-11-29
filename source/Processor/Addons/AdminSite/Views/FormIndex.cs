@@ -272,7 +272,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     }
                                 }
                                 string ButtonFace = adminData.adminContent.fields[FieldName.ToLowerInvariant()].caption;
-                                ButtonFace = GenericController.vbReplace(ButtonFace, " ", "&nbsp;");
+                                ButtonFace = GenericController.strReplace(ButtonFace, " ", "&nbsp;");
                                 string SortTitle = "Sort A-Z";
                                 //
                                 if (IndexConfig.sorts.ContainsKey(FieldName)) {
@@ -1005,7 +1005,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             string GroupName = IndexConfig.groupList[Ptr];
                             if (!string.IsNullOrEmpty(GroupName)) {
                                 int GroupID = MetadataController.getRecordIdByUniqueName(core, "Groups", GroupName);
-                                if (GroupID == 0 && GroupName.IsNumeric()) {
+                                if (GroupID == 0 && GroupName.isNumeric()) {
                                     GroupID = GenericController.encodeInteger(GroupName);
                                 }
                                 string groupTableAlias = "GroupFilter" + Ptr;
@@ -1040,7 +1040,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                 int Pos = GenericController.vbInstr(1, ListSplit[Ptr], ")");
                                 if (Pos > 0) {
-                                    int ContentId = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
+                                    int ContentId = GenericController.encodeInteger(ListSplit[Ptr].left(Pos - 1));
                                     if (ContentId > 0 && (ContentId != adminData.adminContent.id) & AdminDataModel.userHasContentAccess(core, ContentId)) {
                                         SubQuery = SubQuery + "OR(" + adminData.adminContent.tableName + ".ContentControlID=" + ContentId + ")";
                                         return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentId + "\">" + MetadataController.getContentNameByID(core, ContentId) + "</a>'";
@@ -1102,7 +1102,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     //
                                     // found it, add it in the sql
                                     return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + adminData.wherePair[0, WCount] + "=";
-                                    if (adminData.wherePair[1, WCount].IsNumeric()) {
+                                    if (adminData.wherePair[1, WCount].isNumeric()) {
                                         return_SQLWhere += adminData.wherePair[1, WCount] + ")";
                                     } else {
                                         return_SQLWhere += "'" + adminData.wherePair[1, WCount] + "')";
@@ -1199,7 +1199,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             //
                                             // Date
                                             DateTime findDate = DateTime.MinValue;
-                                            if (GenericController.IsDate(FindWordValue)) {
+                                            if (GenericController.isDate(FindWordValue)) {
                                                 findDate = DateTime.Parse(FindWordValue);
                                             }
                                             switch (FindMatchOption) {
@@ -1430,7 +1430,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             GroupName = IndexConfig.groupList[Ptr];
                             if (IndexConfig.groupList[Ptr] != "") {
                                 if (GroupName.Length > 30) {
-                                    GroupName = GroupName.Left(15) + "..." + GroupName.Substring(GroupName.Length - 15);
+                                    GroupName = GroupName.left(15) + "..." + GroupName.Substring(GroupName.Length - 15);
                                 }
                                 QS = RQS;
                                 QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveGroup", IndexConfig.groupList[Ptr]);
@@ -1574,7 +1574,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     }
                                 }
                                 if (Caption.Length > 30) {
-                                    Caption = Caption.Left(15) + "..." + Caption.Substring(Caption.Length - 15);
+                                    Caption = Caption.left(15) + "..." + Caption.Substring(Caption.Length - 15);
                                 }
                                 Caption = "<span style=\"white-space:nowrap;\">" + Caption + "</span>";
                                 QS = RQS;
@@ -1678,7 +1678,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         case CPContentBaseClass.FieldTypeIdEnum.File:
                         case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
                                 string filename = csData.getText(field.nameLc);
-                                filename = GenericController.vbReplace(filename, "\\", "/");
+                                filename = GenericController.strReplace(filename, "\\", "/");
                                 Pos = filename.LastIndexOf("/") + 1;
                                 if (Pos != 0) {
                                     filename = filename.Substring(Pos);
@@ -1731,7 +1731,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         case CPContentBaseClass.FieldTypeIdEnum.HTML: {
                                 string fieldValueText = csData.getText(field.nameLc);
                                 if (fieldValueText.Length > 50) {
-                                    fieldValueText = fieldValueText.Left(50) + "[more]";
+                                    fieldValueText = fieldValueText.left(50) + "[more]";
                                 }
                                 Stream.Add(fieldValueText);
                                 break;

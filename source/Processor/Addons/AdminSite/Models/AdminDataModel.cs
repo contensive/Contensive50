@@ -613,7 +613,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         for (QSPointer = 0; QSPointer <= QSSplit.GetUpperBound(0); QSPointer++) {
                             string NameValue = QSSplit[QSPointer];
                             if (!string.IsNullOrEmpty(NameValue)) {
-                                if ((NameValue.Left(1) == "(") && (NameValue.Substring(NameValue.Length - 1) == ")") && (NameValue.Length > 2)) {
+                                if ((NameValue.left(1) == "(") && (NameValue.Substring(NameValue.Length - 1) == ")") && (NameValue.Length > 2)) {
                                     NameValue = NameValue.Substring(1, NameValue.Length - 2);
                                 }
                                 string[] NVSplit = NameValue.Split('=');
@@ -652,7 +652,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         adminForm = AdminFormEdit;
                         int Pos = GenericController.vbInstr(1, fieldEditorPreference, ":");
                         if (Pos > 0) {
-                            int fieldEditorFieldId = GenericController.encodeInteger(fieldEditorPreference.Left(Pos - 1));
+                            int fieldEditorFieldId = GenericController.encodeInteger(fieldEditorPreference.left(Pos - 1));
                             int fieldEditorAddonId = GenericController.encodeInteger(fieldEditorPreference.Substring(Pos));
                             if (fieldEditorFieldId != 0) {
                                 bool editorOk = true;
@@ -842,7 +842,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         editRecord.fieldsLc.Add(field.nameLc, editRecordField);
                     }
                     defaultValue = field.defaultValue;
-                    if (field.active & !GenericController.IsNull(defaultValue)) {
+                    if (field.active & !GenericController.isNull(defaultValue)) {
                         switch (field.fieldTypeId) {
                             case CPContentBaseClass.FieldTypeIdEnum.Integer:
                             case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
@@ -870,7 +870,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
                                     DefaultValueText = encodeText(field.defaultValue);
                                     if (!string.IsNullOrEmpty(DefaultValueText)) {
-                                        if (DefaultValueText.IsNumeric()) {
+                                        if (DefaultValueText.isNumeric()) {
                                             editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
                                         } else {
                                             if (field.lookupContentId != 0) {
@@ -917,7 +917,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 break;
                             }
                         default: {
-                                // nop
+                                // do nothing
                                 break;
                             }
                     }
@@ -1103,7 +1103,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // Check for required and null case loading error
                                 //
-                                if (CheckUserErrors && adminContentcontent.required & (GenericController.IsNull(DBValueVariant))) {
+                                if (CheckUserErrors && adminContentcontent.required & (GenericController.isNull(DBValueVariant))) {
                                     //
                                     // if required and null
                                     //
@@ -1193,7 +1193,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             break;
                                         }
                                     default: {
-                                            // nop
+                                            // do nothing
                                             break;
                                         }
                                 }
@@ -1421,8 +1421,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     //
                                     ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
                                     if (!ResponseFieldIsEmpty) {
-                                        if (ResponseFieldValueText.IsNumeric()) {
-                                        } else {
+                                        if (!ResponseFieldValueText.isNumeric()) {
                                             Processor.Controllers.ErrorController.addUserError(core, "The record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a numeric value.");
                                             ResponseFieldValueIsOKToSave = false;
                                         }
@@ -1436,7 +1435,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     //
                                     ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
                                     if (!ResponseFieldIsEmpty) {
-                                        if (ResponseFieldValueText.IsNumeric()) {
+                                        if (ResponseFieldValueText.isNumeric()) {
                                         } else {
                                             Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a numeric value.");
                                             ResponseFieldValueIsOKToSave = false;
@@ -1450,7 +1449,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     //
                                     ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
                                     if (!ResponseFieldIsEmpty) {
-                                        if (ResponseFieldValueText.IsNumeric()) {
+                                        if (ResponseFieldValueText.isNumeric()) {
                                         } else {
                                             Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " had an invalid selection.");
                                             ResponseFieldValueIsOKToSave = false;
@@ -1464,7 +1463,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     //
                                     ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
                                     if (!ResponseFieldIsEmpty) {
-                                        if (!GenericController.IsDate(ResponseFieldValueText)) {
+                                        if (!GenericController.isDate(ResponseFieldValueText)) {
                                             Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a date And/Or time in the form mm/dd/yy 0000 AM(PM).");
                                             ResponseFieldValueIsOKToSave = false;
                                         }
@@ -1483,7 +1482,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     // ----- Link field - if it starts with 'www.', add the http:// automatically
                                     //
                                     ResponseFieldValueText = GenericController.encodeText(ResponseFieldValueText);
-                                    if (ResponseFieldValueText.ToLowerInvariant().Left(4) == "www.") {
+                                    if (ResponseFieldValueText.ToLowerInvariant().left(4) == "www.") {
                                         ResponseFieldValueText = "http//" + ResponseFieldValueText;
                                     }
                                     break;
@@ -1504,8 +1503,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     //
                                     if (!field.htmlContent) {
                                         string lcaseCopy = GenericController.vbLCase(ResponseFieldValueText);
-                                        lcaseCopy = GenericController.vbReplace(lcaseCopy, "\r", "");
-                                        lcaseCopy = GenericController.vbReplace(lcaseCopy, "\n", "");
+                                        lcaseCopy = GenericController.strReplace(lcaseCopy, "\r", "");
+                                        lcaseCopy = GenericController.strReplace(lcaseCopy, "\n", "");
                                         lcaseCopy = lcaseCopy.Trim(' ');
                                         if ((lcaseCopy == HTMLEditorDefaultCopyNoCr) || (lcaseCopy == HTMLEditorDefaultCopyNoCr2)) {
                                             //
@@ -1517,8 +1516,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                 //
                                                 // if the default copy was editing, remote the markers
                                                 //
-                                                ResponseFieldValueText = GenericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyStartMark, "");
-                                                ResponseFieldValueText = GenericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyEndMark, "");
+                                                ResponseFieldValueText = GenericController.strReplace(ResponseFieldValueText, HTMLEditorDefaultCopyStartMark, "");
+                                                ResponseFieldValueText = GenericController.strReplace(ResponseFieldValueText, HTMLEditorDefaultCopyEndMark, "");
                                             }
                                             //
                                             // If the response is only white space, remove it
@@ -1551,21 +1550,20 @@ namespace Contensive.Processor.Addons.AdminSite {
                         if (field.nameLc == "parentid") {
                             //
                             // check circular reference on all parentid fields
-                            int ParentId = GenericController.encodeInteger(ResponseFieldValueText);
+                            int ParentId = encodeInteger(ResponseFieldValueText);
                             int LoopPtr = 0;
-                            string UsedIDs = editRecord.id.ToString();
+                            List<int> usedIdList = new List<int> { editRecord.id };
                             const int LoopPtrMax = 100;
-                            while ((LoopPtr < LoopPtrMax) && (ParentId != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentId + ",") == -1)) {
-                                UsedIDs = UsedIDs + "," + ParentId.ToString();
+                            while ((LoopPtr < LoopPtrMax) && (ParentId != 0) && !usedIdList.Contains(ParentId)) {
+                                usedIdList.Add(ParentId);
                                 using (var csData = new CsModel(core)) {
-                                    csData.open(adminContent.name, "ID=" + ParentId, "", true, 0, "ParentID");
-                                    if (!csData.ok()) {
+                                    if (!csData.open(adminContent.name, "ID=" + ParentId.ToString(), "", true, 0, "ParentID")) {
                                         ParentId = 0;
-                                    } else {
-                                        ParentId = csData.getInteger("ParentID");
+                                        break;
                                     }
+                                    ParentId = csData.getInteger("ParentID");
                                 }
-                                LoopPtr = LoopPtr + 1;
+                                LoopPtr += 1;
                             }
                             if (LoopPtr == LoopPtrMax) {
                                 //

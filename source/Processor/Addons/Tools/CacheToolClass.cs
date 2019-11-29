@@ -17,10 +17,10 @@ namespace Contensive.Processor.Addons.Tools {
     //
     public class CacheToolClass : Contensive.BaseClasses.AddonBaseClass {
         //
-        private static string ButtonCacheGet = "Get Cache";
-        private static string ButtonCacheStore = "Store Cache";
-        private static string ButtonCacheInvalidate = "Invalidate Cache";
-        private static string ButtonCacheInvalidateAll = "Invalidate All Cache";
+        private static readonly string ButtonCacheGet = "Get Cache";
+        private static readonly string ButtonCacheStore = "Store Cache";
+        private static readonly string ButtonCacheInvalidate = "Invalidate Cache";
+        private static readonly string ButtonCacheInvalidateAll = "Invalidate All Cache";
         //
         //====================================================================================================
         /// <summary>

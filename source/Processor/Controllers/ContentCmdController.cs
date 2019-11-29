@@ -353,14 +353,14 @@ namespace Contensive.Processor.Controllers {
                     trimming = false;
                     int trimLen = cmdSrc.Length;
                     if (trimLen > 0) {
-                        string leftChr = cmdSrc.Left(1);
+                        string leftChr = cmdSrc.left(1);
                         string rightChr = cmdSrc.Substring(cmdSrc.Length - 1);
                         if (GenericController.vbInstr(1, whiteChrs, leftChr) != 0) {
                             cmdSrc = cmdSrc.Substring(1);
                             trimming = true;
                         }
                         if (GenericController.vbInstr(1, whiteChrs, rightChr) != 0) {
-                            cmdSrc = cmdSrc.Left(cmdSrc.Length - 1);
+                            cmdSrc = cmdSrc.left(cmdSrc.Length - 1);
                             trimming = true;
                         }
                     }
@@ -375,7 +375,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // +++++
                     cmdCollection = new List<object>();
-                    if ((cmdSrc.Left(1) == "{") && (cmdSrc.Substring(cmdSrc.Length - 1) == "}")) {
+                    if ((cmdSrc.left(1) == "{") && (cmdSrc.Substring(cmdSrc.Length - 1) == "}")) {
                         //
                         // JSON is a single command in the form of an object, like:
                         //   { "import": "test.html" }
@@ -403,7 +403,7 @@ namespace Contensive.Processor.Controllers {
                                 cmdCollection.Add(cmdObject);
                             }
                         }
-                    } else if ((cmdSrc.Left(1) == "[") && (cmdSrc.Substring(cmdSrc.Length - 1) == "]")) {
+                    } else if ((cmdSrc.left(1) == "[") && (cmdSrc.Substring(cmdSrc.Length - 1) == "]")) {
                         //
                         // JSON is a command list in the form of an array, like:
                         //   [ "clear" , { "import": "test.html" },{ "open" : "myfile.txt" }]
@@ -420,7 +420,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         string cmdText = cmdSrc.Trim(' ');
                         string cmdArg = "";
-                        if (cmdText.Left(1) == "\"") {
+                        if (cmdText.left(1) == "\"") {
                             //
                             // cmd is quoted
                             //   "open"
@@ -457,10 +457,10 @@ namespace Contensive.Processor.Controllers {
                             int Pos = GenericController.vbInstr(1, cmdText, " ");
                             if (Pos > 0) {
                                 cmdArg = cmdSrc.Substring(Pos);
-                                cmdText = (cmdSrc.Left(Pos - 1)).Trim(' ');
+                                cmdText = (cmdSrc.left(Pos - 1)).Trim(' ');
                             }
                         }
-                        if (cmdArg.Left(1) == "\"") {
+                        if (cmdArg.left(1) == "\"") {
                             //
                             // cmdarg is quoted
                             //
@@ -471,14 +471,14 @@ namespace Contensive.Processor.Controllers {
                                 cmdArg = cmdArg.Substring(1, Pos - 2);
                             }
                         }
-                        if ((cmdArg.Left(1) == "{") && (cmdArg.Substring(cmdArg.Length - 1) == "}")) {
+                        if ((cmdArg.left(1) == "{") && (cmdArg.Substring(cmdArg.Length - 1) == "}")) {
                             //
                             // argument is in the form of an object, like:
                             //   { "text name": "my text" }
                             //
                             object cmdDictionaryOrCollection = json.Deserialize<object>(cmdArg);
                             string cmdDictionaryOrCollectionTypeName = cmdDictionaryOrCollection.GetType().FullName.ToLowerInvariant();
-                            if (cmdDictionaryOrCollectionTypeName.Left(37) != "system.collections.generic.dictionary") {
+                            if (cmdDictionaryOrCollectionTypeName.left(37) != "system.collections.generic.dictionary") {
                                 throw new GenericException("Error parsing JSON command argument list, expected a single command, command list [" + cmdSrc + "]");
                             } else {
                                 //
@@ -526,7 +526,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             cmdText = (string)cmd;
                             cmdArgDef = new Dictionary<string, object>();
-                        } else if (cmdTypeName.Left(37) == "system.collections.generic.dictionary") {
+                        } else if (cmdTypeName.left(37) == "system.collections.generic.dictionary") {
                             //
                             // cases C-E, (0).key=cmd, (0).value = argument (might be string or object)
                             //
@@ -549,7 +549,7 @@ namespace Contensive.Processor.Controllers {
                                     cmdArgDef = new Dictionary<string, object> {
                                         { "default", cmdDef[cmdDefKey] }
                                     };
-                                } else if ((cmdDefValueTypeName == "dictionary") || (cmdDefValueTypeName == "dictionary(of string,object)") || (cmdTypeName.Left(37) == "system.collections.generic.dictionary")) {
+                                } else if ((cmdDefValueTypeName == "dictionary") || (cmdDefValueTypeName == "dictionary(of string,object)") || (cmdTypeName.left(37) == "system.collections.generic.dictionary")) {
                                     cmdArgDef = (Dictionary<string, object>)cmdDef[cmdDefKey];
                                 } else {
                                     //

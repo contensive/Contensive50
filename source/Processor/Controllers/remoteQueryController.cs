@@ -106,7 +106,7 @@ namespace Contensive.Processor.Controllers {
                         ColDelim = "";
                         for (ColPtr = 0; ColPtr <= gd.col.Count; ColPtr++) {
                             var tempVar2 = gd.col[ColPtr];
-                            s.Add(ColDelim + "{id: '" + GenericController.EncodeJavascriptStringSingleQuote(tempVar2.Id) + "', label: '" + GenericController.EncodeJavascriptStringSingleQuote(tempVar2.Label) + "', type: '" + GenericController.EncodeJavascriptStringSingleQuote(tempVar2.Type) + "'}");
+                            s.Add(ColDelim + "{id: '" + GenericController.encodeJavascriptStringSingleQuote(tempVar2.Id) + "', label: '" + GenericController.encodeJavascriptStringSingleQuote(tempVar2.Label) + "', type: '" + GenericController.encodeJavascriptStringSingleQuote(tempVar2.Type) + "'}");
                             ColDelim = ",";
                         }
                         s.Add("],rows:[");
@@ -117,7 +117,7 @@ namespace Contensive.Processor.Controllers {
                             ColDelim = "";
                             for (ColPtr = 0; ColPtr <= gd.col.Count; ColPtr++) {
                                 var tempVar3 = gd.row[RowPtr].Cell[ColPtr];
-                                s.Add(ColDelim + "{v: '" + GenericController.EncodeJavascriptStringSingleQuote(tempVar3.v) + "'}");
+                                s.Add(ColDelim + "{v: '" + GenericController.encodeJavascriptStringSingleQuote(tempVar3.v) + "'}");
                                 ColDelim = ",";
                             }
                             s.Add("]}");

@@ -72,7 +72,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     } else if (string.IsNullOrEmpty(fieldValue)) {
                         //
                         // add a set button
-                        string fieldId = "setGuid" + GenericController.GetRandomInteger(core).ToString();
+                        string fieldId = "setGuid" + GenericController.getRandomInteger(core).ToString();
                         string buttonCell = HtmlController.div(AdminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + GenericController.getGUID(true) + "';this.disabled=true;}"), "col-xs-1");
                         string inputCell = HtmlController.div(AdminUIController.getDefaultEditor_text(core, "ccguid", "", false, htmlId), "col-xs-11");
                         fieldEditor = HtmlController.div(HtmlController.div(buttonCell + inputCell, "row"), "container-fluid");

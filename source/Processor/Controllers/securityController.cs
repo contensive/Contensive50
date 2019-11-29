@@ -204,7 +204,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(sourceToDecrypt)) {
                     //
                     // -- source blank, decrypt to blank
-                } else if (!sourceToDecrypt.IsBase64String()) {
+                } else if (!sourceToDecrypt.isBase64String()) {
                     //
                     // -- source invalid, decrypt to blank
                 } else {
@@ -440,7 +440,7 @@ namespace Contensive.Processor.Controllers {
             // password based encryption, it's probably safe enough as long as
             // it is truly uncommon. Also too much work to alter this answer otherwise.
             //
-            private static byte[] _salt = Encoding.ASCII.GetBytes("notreallyrandomsalt");
+            private static readonly byte[] _salt = Encoding.ASCII.GetBytes("notreallyrandomsalt");
             //
             /// <summary>
             /// Encrypt the given string using AES.  The string can be decrypted using 
@@ -494,7 +494,7 @@ namespace Contensive.Processor.Controllers {
             /// <param name="cipherText">The text to decrypt.</param>
             /// <param name="sharedSecret">A password used to generate a key for decryption.</param>
             public static string decryptStringAES(string cipherText, string sharedSecret) {
-                if (string.IsNullOrEmpty(cipherText) || string.IsNullOrEmpty(sharedSecret) || !cipherText.IsBase64String()) {
+                if (string.IsNullOrEmpty(cipherText) || string.IsNullOrEmpty(sharedSecret) || !cipherText.isBase64String()) {
                     return "";
                 } else {
                     // Declare the RijndaelManaged object

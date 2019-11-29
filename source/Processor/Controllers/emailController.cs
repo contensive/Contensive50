@@ -353,7 +353,7 @@ namespace Contensive.Processor.Controllers {
                 SystemEmailModel email = DbBaseModel.createByUniqueName<SystemEmailModel>(core.cpParent, emailName);
                 if (email == null)
                 {
-                    if (emailName.IsNumeric())
+                    if (emailName.isNumeric())
                     {
                         //
                         // -- compatibility for really ugly legacy nonsense where old interface has argument "EmailIdOrName".
@@ -585,7 +585,7 @@ namespace Contensive.Processor.Controllers {
                         // It will be true in all cases, except a possible unforseen exception
                         //
                         EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;\">" + GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(core.webServer.requestProtocol + core.webServer.requestDomain + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
-                        EmailBody = GenericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress");
+                        EmailBody = GenericController.strReplace(EmailBody, "#member_email#", "UserEmailAddress");
                     }
                     //
                     // Confirm footer
@@ -1042,8 +1042,8 @@ namespace Contensive.Processor.Controllers {
             if (!string.IsNullOrWhiteSpace(body)) {
                 body = ActiveContentController.renderHtmlForEmail(core, body, recipientId, queryStringForLinkAppend);
                 body = GenericController.convertLinksToAbsolute(body, rootUrl);
-                body = GenericController.vbReplace(body, "#member_id#", recipientId.ToString());
-                body = GenericController.vbReplace(body, "#member_email#", recipientEmail);
+                body = GenericController.strReplace(body, "#member_id#", recipientId.ToString());
+                body = GenericController.strReplace(body, "#member_email#", recipientEmail);
             }
             //
             // -- encode and merge template
@@ -1054,7 +1054,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 template = ActiveContentController.renderHtmlForEmail(core, template, recipientId, queryStringForLinkAppend);
                 if (template.IndexOf(fpoContentBox) != -1) {
-                    body = GenericController.vbReplace(template, fpoContentBox, body);
+                    body = GenericController.strReplace(template, fpoContentBox, body);
                 } else {
                     body = template + body;
                 }

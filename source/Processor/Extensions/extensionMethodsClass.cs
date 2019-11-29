@@ -21,7 +21,7 @@ public static class ExtensionMethods {
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static string UppercaseFirstLetter(this string value) {
+    public static string uppercaseFirstLetter(this string value) {
         // Uppercase the first letter in the string.
         if (value.Length > 0) {
             char[] array = value.ToCharArray();
@@ -38,7 +38,7 @@ public static class ExtensionMethods {
     /// <param name="source"></param>
     /// <param name="maxLength"></param>
     /// <returns></returns>
-    public static string Left(this string source, int maxLength) {
+    public static string left(this string source, int maxLength) {
         if (string.IsNullOrEmpty(source)) {
             return "";
         } else if (maxLength < 0) {
@@ -57,7 +57,7 @@ public static class ExtensionMethods {
     /// <param name="source"></param>
     /// <param name="maxLength"></param>
     /// <returns></returns>
-    public static string Right(this string source, int maxLength) {
+    public static string right(this string source, int maxLength) {
         if (string.IsNullOrEmpty(source)) {
             return "";
         } else if (maxLength < 0) {
@@ -75,7 +75,7 @@ public static class ExtensionMethods {
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
-    public static bool IsNumeric(this object expression) {
+    public static bool isNumeric(this object expression) {
         try {
             if (expression == null) {
                 return false;
@@ -84,8 +84,7 @@ public static class ExtensionMethods {
             } else if ((expression is int) || (expression is Int16) || (expression is Int32) || (expression is Int64) || (expression is decimal) || (expression is float) || (expression is double) || (expression is bool)) {
                 return true;
             } else if (expression is string) {
-                double output = 0;
-                return double.TryParse((string)expression, out output);
+                return double.TryParse((string)expression, out double output);
             } else {
                 return false;
             }
@@ -106,7 +105,7 @@ public static class ExtensionMethods {
     /// </summary>
     /// <param name="srcDate"></param>
     /// <returns></returns>
-    public static DateTime MinValueIfOld(this DateTime srcDate) {
+    public static DateTime minValueIfOld(this DateTime srcDate) {
         DateTime returnDate = srcDate;
         if (srcDate < new DateTime(1900, 1, 1)) {
             returnDate = DateTime.MinValue;
@@ -123,7 +122,7 @@ public static class ExtensionMethods {
     /// <param name="newValue">New pattern to replaces old</param>
     /// <param name="comparisonType">String comparison type</param>
     /// <returns></returns>
-    public static string Replace(this string s, string oldValue, string newValue, StringComparison comparisonType) {
+    public static string replace(this string s, string oldValue, string newValue, StringComparison comparisonType) {
         if (s == null) return null;
         if (String.IsNullOrEmpty(oldValue))  return s;
         StringBuilder result = new StringBuilder(Math.Min(4096, s.Length));
@@ -141,17 +140,6 @@ public static class ExtensionMethods {
     //
     //====================================================================================================
     /// <summary>
-    /// return true/false if the string is a valid base64 encode. Use this to prevent throwing an exception on fail
-    /// </summary>
-    /// <param name="s"></param>
-    /// <returns></returns>
-    public static bool IsBase64String(this string s) {
-        s = s.Trim();
-        return (s.Length % 4 == 0) && Regex.IsMatch(s, @"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None);
-    }
-    //
-    //====================================================================================================
-    /// <summary>
     /// swap two entries in a list
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -159,7 +147,7 @@ public static class ExtensionMethods {
     /// <param name="indexA"></param>
     /// <param name="indexB"></param>
     /// <returns></returns>
-    public static IList<T> Swap<T>(this IList<T> list, int indexA, int indexB) {
+    public static IList<T> swap<T>(this IList<T> list, int indexA, int indexB) {
         if (indexB > -1 && indexB < list.Count) {
             T tmp = list[indexA];
             list[indexA] = list[indexB];
@@ -174,7 +162,7 @@ public static class ExtensionMethods {
     /// </summary>
     /// <param name="dataTable"></param>
     /// <returns></returns>
-    public static string ToCsv(this DataTable dataTable) {
+    public static string toCsv(this DataTable dataTable) {
         StringBuilder sbData = new StringBuilder();
         //
         // -- Only return Null if there is no structure.
@@ -210,7 +198,7 @@ public static class ExtensionMethods {
     /// <param name="startDate"></param>
     /// <param name="businessDays"></param>
     /// <returns></returns>
-    public static DateTime AddBusinessDays(this DateTime startDate, int businessDays) {
+    public static DateTime addBusinessDays(this DateTime startDate, int businessDays) {
         int direction = Math.Sign(businessDays);
         if (direction == 1) {
             if (startDate.DayOfWeek == DayOfWeek.Saturday) {

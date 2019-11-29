@@ -44,7 +44,7 @@ namespace Contensive.Processor.Addons.Diagnostics {
                     string testResult = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
                     if (string.IsNullOrWhiteSpace(testResult)) { return "ERROR, diagnostic [" + addon.name + "] failed, it returned an empty result." + pauseHint; }
                     if (testResult.Length < 2) { return "ERROR, diagnostic [" + addon.name + "] failed, it returned an invalid result." + pauseHint; }
-                    if (testResult.Left(2).ToLower(CultureInfo.InvariantCulture) != "ok") { return "ERROR, diagnostic [" + addon.name + "] failed, it returned [" + testResult + "]" + pauseHint; }
+                    if (testResult.left(2).ToLower(CultureInfo.InvariantCulture) != "ok") { return "ERROR, diagnostic [" + addon.name + "] failed, it returned [" + testResult + "]" + pauseHint; }
                     resultList.AppendLine(testResult);
                 }
                 return "ok, all tests passes." + Environment.NewLine + resultList.ToString();

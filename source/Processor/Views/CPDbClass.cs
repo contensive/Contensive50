@@ -51,7 +51,7 @@ namespace Contensive.Processor {
         /// but this construct makes disposing more straight forward.
         /// </summary>
         /// <param name="cpParent"></param>
-        public CPDbClass(CPClass cpParent, string dataSourceName) : base() {
+        public CPDbClass(CPClass cpParent, string dataSourceName) {
             cp = cpParent;
             db = new DbController(cp.core, dataSourceName);
         }

@@ -23,26 +23,26 @@ namespace Contensive.Processor.Controllers {
     //
     public class HttpRequestController {
         //
-        private webClientExt http;
+        private WebClientExt http;
         private System.Net.WebHeaderCollection privateRequestHeaders;
         private string privateRequestPassword;
         private string privateRequestUsername;
-        private string privateRequestUserAgent;
+        private readonly string privateRequestUserAgent;
         private string privateRequestCookie;
-        private int privateRequestTimeoutMsec;
+        private readonly int privateRequestTimeoutMsec;
         private string privateResponseFilename;
-        private string privateResponseProtocol = "HTTP/1.1"; // had to fake bc webClient removes first line of header
+        private readonly string privateResponseProtocol = "HTTP/1.1"; // had to fake bc webClient removes first line of header
         private string privateResponseStatusDescription;
         private int privateResponseStatusCode;
-        private System.Net.WebHeaderCollection privateResponseHeaders = new System.Net.WebHeaderCollection();
+        private WebHeaderCollection privateResponseHeaders = new System.Net.WebHeaderCollection();
         private int privateResponseLength = 0;
-        private string privateSocketResponse = "";
+        private readonly string privateSocketResponse = "";
         //
         //======================================================================================
         // constructor
         //======================================================================================
         //
-        public HttpRequestController() : base() {
+        public HttpRequestController() {
             // Me.core = core
             Type myType = typeof(CoreController);
             Assembly myAssembly = Assembly.GetAssembly(myType);
@@ -50,7 +50,7 @@ namespace Contensive.Processor.Controllers {
             Version myVersion = myAssemblyname.Version;
             privateRequestTimeoutMsec = 30000;
             privateRequestUserAgent = "kmaHTTP/" + myVersion.Major.ToString("0") + "." + myVersion.Minor.ToString("00") + "." + myVersion.Build.ToString("00000000");
-            http = new webClientExt();
+            http = new WebClientExt();
         }
         //
         //======================================================================================
@@ -72,13 +72,13 @@ namespace Contensive.Processor.Controllers {
                 path = Filename.Replace("/", "\\");
                 ptr = path.LastIndexOf("\\");
                 if (ptr > 0) {
-                    path = Filename.Left( ptr);
+                    path = Filename.left( ptr);
                     Directory.CreateDirectory(path);
                 }
                 File.Delete(privateResponseFilename);
                 http.password = privateRequestPassword;
                 http.username = privateRequestUsername;
-                http.UserAgent = privateRequestUserAgent;
+                http.userAgent = privateRequestUserAgent;
                 if (!string.IsNullOrEmpty(privateRequestCookie)) {
                     cookies = privateRequestCookie.Split(';');
                     for (CookiePointer = 0; CookiePointer <= cookies.GetUpperBound(0); CookiePointer++) {
@@ -88,7 +88,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 privateRequestHeaders = http.Headers;
-                http.Timeout = privateRequestTimeoutMsec;
+                http.timeout = privateRequestTimeoutMsec;
                 //
                 privateRequestHeaders = http.Headers;
                 privateResponseHeaders = new System.Net.WebHeaderCollection();
@@ -113,7 +113,7 @@ namespace Contensive.Processor.Controllers {
                     throw;
                 }
             } catch (Exception ex) {
-                throw new httpException("Error in getUrlToFile(" + URL + "," + Filename + ")", ex);
+                throw new HttpException("Error in getUrlToFile(" + URL + "," + Filename + ")", ex);
             }
         }
         //
@@ -133,7 +133,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 http.password = privateRequestPassword;
                 http.username = privateRequestUsername;
-                http.UserAgent = privateRequestUserAgent;
+                http.userAgent = privateRequestUserAgent;
                 if (!string.IsNullOrEmpty(privateRequestCookie)) {
                     cookies = privateRequestCookie.Split(';');
                     for (CookiePointer = 0; CookiePointer <= cookies.GetUpperBound(0); CookiePointer++) {
@@ -141,7 +141,7 @@ namespace Contensive.Processor.Controllers {
                         http.addCookie(CookiePart[0], CookiePart[1]);
                     }
                 }
-                http.Timeout = privateRequestTimeoutMsec;
+                http.timeout = privateRequestTimeoutMsec;
                 //
                 privateRequestHeaders = http.Headers;
                 privateResponseHeaders = new System.Net.WebHeaderCollection();
@@ -178,7 +178,7 @@ namespace Contensive.Processor.Controllers {
             get {
                 string returnString = "";
                 try {
-                    returnString = http.UserAgent;
+                    returnString = http.userAgent;
                 } catch  {
                     throw new GenericException("Error in UserAgent Property, get Method");
                 }
@@ -186,7 +186,7 @@ namespace Contensive.Processor.Controllers {
             }
             set {
                 try {
-                    http.UserAgent = value;
+                    http.userAgent = value;
                 } catch {
                     throw new GenericException("Error in UserAgent Property, set Method");
                 }
@@ -201,7 +201,7 @@ namespace Contensive.Processor.Controllers {
             get {
                 int returnTimeout = 0;
                 try {
-                    returnTimeout = encodeInteger(http.Timeout / 1000);
+                    returnTimeout = encodeInteger(http.timeout / 1000);
                 } catch {
                     throw new GenericException("Error in Timeout Property, get Method");
                 }
@@ -212,7 +212,7 @@ namespace Contensive.Processor.Controllers {
                     if (value > 65535) {
                         value = 65535;
                     }
-                    http.Timeout = value * 1000;
+                    http.timeout = value * 1000;
                 } catch {
                     throw new GenericException("Error in Timeout Property, set Method");
                 }
@@ -365,9 +365,9 @@ namespace Contensive.Processor.Controllers {
     //
     // exception classes
     //
-    public class httpException : ApplicationException {
+    public class HttpException : ApplicationException {
         //
-        public httpException(string context, Exception innerEx) : base("Unknown error in http4Class, " + context + ", innerException [" + innerEx.ToString() + "]") {
+        public HttpException(string context, Exception innerEx) : base("Unknown error in http4Class, " + context + ", innerException [" + innerEx.ToString() + "]") {
         }
     }
 

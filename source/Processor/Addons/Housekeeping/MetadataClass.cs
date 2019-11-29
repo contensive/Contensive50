@@ -66,7 +66,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 foreach (CPFileSystemBaseClass.FileDetail file in FileList) {
                                     string Filename = file.Name;
                                     string VirtualFileName = PathName + "\\" + Filename;
-                                    string VirtualLink = GenericController.vbReplace(VirtualFileName, "\\", "/");
+                                    string VirtualLink = GenericController.strReplace(VirtualFileName, "\\", "/");
                                     long FileSize = file.Size;
                                     if (FileSize == 0) {
                                         sql = "update " + TableName + " set " + FieldName + "=null where (" + FieldName + "=" + DbController.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + DbController.encodeSQLText(VirtualLink) + ")";

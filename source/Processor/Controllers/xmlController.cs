@@ -15,7 +15,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         ///  Get an XML nodes attribute based on its name
         /// </summary>
-        public static string GetXMLAttribute(CoreController core, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
+        public static string getXMLAttribute(CoreController core, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
             string returnAttr = "";
             try {
                 XmlNode ResultNode = null;
@@ -48,20 +48,20 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static double GetXMLAttributeNumber(CoreController core, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
-            return encodeNumber(GetXMLAttribute(core, Found, Node, Name, DefaultIfNotFound));
+        public static double getXMLAttributeNumber(CoreController core, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
+            return encodeNumber(getXMLAttribute(core, Found, Node, Name, DefaultIfNotFound));
         }
         //
         //====================================================================================================
         //
-        public static bool GetXMLAttributeBoolean(CoreController core, bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
-            return GenericController.encodeBoolean(GetXMLAttribute(core, Found, Node, Name, encodeText(DefaultIfNotFound)));
+        public static bool getXMLAttributeBoolean(CoreController core, bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
+            return GenericController.encodeBoolean(getXMLAttribute(core, Found, Node, Name, encodeText(DefaultIfNotFound)));
         }
         //
         //====================================================================================================
         //
-        public static int GetXMLAttributeInteger(CoreController core, bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
-            return GenericController.encodeInteger(GetXMLAttribute(core, Found, Node, Name, DefaultIfNotFound.ToString()));
+        public static int getXMLAttributeInteger(CoreController core, bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
+            return GenericController.encodeInteger(getXMLAttribute(core, Found, Node, Name, DefaultIfNotFound.ToString()));
         }
 
     }

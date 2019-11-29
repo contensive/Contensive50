@@ -64,7 +64,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var addon = AddonModel.addDefault<AddonModel>(cp, ContentMetadataModel.getDefaultValueDict(cp.core, AddonModel.tableMetadata.contentName));
-                addon.copy = "test" + GenericController.GetRandomInteger(cp.core).ToString();
+                addon.copy = "test" + GenericController.getRandomInteger(cp.core).ToString();
                 addon.save(cp);
                 // act
                 string result = cp.core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {

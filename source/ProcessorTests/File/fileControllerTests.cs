@@ -22,8 +22,8 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         public void Controllers_CdnFiles_AppendTest() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
-                string tmpFilename = "tmp" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
-                string content = GenericController.GetRandomInteger(cp.core).ToString();
+                string tmpFilename = "tmp" + GenericController.getRandomInteger(cp.core).ToString() + ".txt";
+                string content = GenericController.getRandomInteger(cp.core).ToString();
                 // act
                 cp.CdnFiles.Append(tmpFilename, content);
                 // assert
@@ -37,8 +37,8 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         public void Controllers_CdnFiles_SaveTest() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
-                string tmpFilename = "tmp" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
-                string content = GenericController.GetRandomInteger(cp.core).ToString();
+                string tmpFilename = "tmp" + GenericController.getRandomInteger(cp.core).ToString() + ".txt";
+                string content = GenericController.getRandomInteger(cp.core).ToString();
                 // act
                 cp.CdnFiles.Save(tmpFilename, content);
                 // assert
@@ -52,9 +52,9 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         public void Controllers_CdnFiles_CopyTest() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
-                string srcFilename = "src" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
-                string tmpContent = GenericController.GetRandomInteger(cp.core).ToString();
-                string dstFilename = "dst" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
+                string srcFilename = "src" + GenericController.getRandomInteger(cp.core).ToString() + ".txt";
+                string tmpContent = GenericController.getRandomInteger(cp.core).ToString();
+                string dstFilename = "dst" + GenericController.getRandomInteger(cp.core).ToString() + ".txt";
                 // act
                 cp.CdnFiles.Save(srcFilename, tmpContent);
                 cp.CdnFiles.Copy(srcFilename, dstFilename);
@@ -69,8 +69,8 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         public void Controllers_CdnFiles_DeleteTest() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
-                string srcFilename = "src" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
-                string tmpContent = GenericController.GetRandomInteger(cp.core).ToString();
+                string srcFilename = "src" + GenericController.getRandomInteger(cp.core).ToString() + ".txt";
+                string tmpContent = GenericController.getRandomInteger(cp.core).ToString();
                 // act
                 cp.CdnFiles.Save(srcFilename, tmpContent);
                 cp.CdnFiles.DeleteFile(srcFilename);

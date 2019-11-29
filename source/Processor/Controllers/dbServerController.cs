@@ -14,7 +14,7 @@ namespace Contensive.Processor.Controllers {
         //
         // objects passed in that are not disposed
         //
-        private CoreController core;
+        private readonly CoreController core;
         //
         //==========================================================================================
         /// <summary>
@@ -22,7 +22,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public DbServerController(CoreController core) : base() {
+        public DbServerController(CoreController core) {
             try {
                 this.core = core;
             } catch (Exception ex) {
@@ -52,7 +52,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 string serverUrl = core.serverConfig.defaultDataSourceAddress;
                 if (serverUrl.IndexOf(":") > 0) {
-                    serverUrl = serverUrl.Left( serverUrl.IndexOf(":"));
+                    serverUrl = serverUrl.left( serverUrl.IndexOf(":"));
                 }
                 returnConnString += ""
                     + "server=" + serverUrl + ";"
