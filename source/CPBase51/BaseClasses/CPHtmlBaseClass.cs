@@ -215,7 +215,7 @@ namespace Contensive.BaseClasses {
         public abstract string Hidden(string HtmlName, bool HtmlValue, string HtmlClass);
         //
         [Obsolete("Use html5 methods instead", false)]
-        public abstract string Hidden(string HtmlName, bool HtmlValue, string HtmlClass, string HtmlId = "");
+        public abstract string Hidden(string HtmlName, bool HtmlValue, string HtmlClass, string HtmlId);
         //
         [Obsolete("Use html5 methods instead", false)]
         public abstract string Hidden(string HtmlName, DateTime HtmlValue);
