@@ -62,7 +62,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             FormFieldCnt = core.docProperties.getInteger("fieldcnt");
                             if (FormFieldCnt > 0) {
                                 for (FormFieldPtr = 0; FormFieldPtr < FormFieldCnt; FormFieldPtr++) {
-                                    FieldName = GenericController.vbLCase(core.docProperties.getText("fieldname" + FormFieldPtr));
+                                    FieldName = GenericController.toLCase(core.docProperties.getText("fieldname" + FormFieldPtr));
                                     MatchOption = (FindWordMatchEnum)core.docProperties.getInteger("FieldMatch" + FormFieldPtr);
                                     switch (MatchOption) {
                                         case FindWordMatchEnum.MatchEquals:
@@ -147,7 +147,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         Array.Resize(ref FieldLookupContentName, FieldSize + 1);
                         Array.Resize(ref FieldLookupList, FieldSize + 1);
                     }
-                    FieldName = GenericController.vbLCase(field.nameLc);
+                    FieldName = GenericController.toLCase(field.nameLc);
                     FieldNames[FieldPtr] = FieldName;
                     FieldCaption[FieldPtr] = field.caption;
                     fieldId[FieldPtr] = field.id;

@@ -306,39 +306,39 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         //
         [TestMethod]
         public void vbInstr_test() {
-            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("d") + 1, vbInstr("abcdefgabcdefgabcdefgabcdefg", "d"));
-            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E") + 1, vbInstr("abcdefgabcdefgabcdefgabcdefg", "E"));
-            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E", 9) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E"));
-            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E", 9) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", 2));
-            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E", 9, System.StringComparison.OrdinalIgnoreCase) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", 1));
-            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("c", 9) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", 2));
-            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("c", 9, System.StringComparison.OrdinalIgnoreCase) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", 1));
+            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("d") + 1, strInstr("abcdefgabcdefgabcdefgabcdefg", "d"));
+            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E") + 1, strInstr("abcdefgabcdefgabcdefgabcdefg", "E"));
+            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E", 9) + 1, strInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E"));
+            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E", 9) + 1, strInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", 2));
+            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E", 9, System.StringComparison.OrdinalIgnoreCase) + 1, strInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", 1));
+            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("c", 9) + 1, strInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", 2));
+            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("c", 9, System.StringComparison.OrdinalIgnoreCase) + 1, strInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", 1));
             string haystack = "abcdefgabcdefgabcdefgabcdefg";
             string needle = "c";
-            Assert.AreEqual("?".IndexOf("?") + 1, vbInstr(1, "?", "?"));
+            Assert.AreEqual("?".IndexOf("?") + 1, strInstr(1, "?", "?"));
             int tempVar = haystack.Length;
             for (int ptr = 1; ptr <= tempVar; ptr++) {
-                Assert.AreEqual(haystack.IndexOf(needle, ptr - 1) + 1, vbInstr(ptr, haystack, needle, 2));
+                Assert.AreEqual(haystack.IndexOf(needle, ptr - 1) + 1, strInstr(ptr, haystack, needle, 2));
             }
         }
         //
         [TestMethod]
         public void vbUCase_test() {
-            Assert.AreEqual("AbCdEfG".ToUpper(), vbUCase("AbCdEfG"));
-            Assert.AreEqual("ABCDEFG".ToUpper(), vbUCase("ABCDEFG"));
-            Assert.AreEqual("abcdefg".ToUpper(), vbUCase("abcdefg"));
+            Assert.AreEqual("AbCdEfG".ToUpper(), toUCase("AbCdEfG"));
+            Assert.AreEqual("ABCDEFG".ToUpper(), toUCase("ABCDEFG"));
+            Assert.AreEqual("abcdefg".ToUpper(), toUCase("abcdefg"));
         }
         //
         [TestMethod]
         public void vbLCase_test() {
-            Assert.AreEqual("AbCdEfG".ToLowerInvariant(), vbLCase("AbCdEfG"));
-            Assert.AreEqual("ABCDEFG".ToLowerInvariant(), vbLCase("ABCDEFG"));
-            Assert.AreEqual("abcdefg".ToLowerInvariant(), vbLCase("abcdefg"));
+            Assert.AreEqual("AbCdEfG".ToLowerInvariant(), toLCase("AbCdEfG"));
+            Assert.AreEqual("ABCDEFG".ToLowerInvariant(), toLCase("ABCDEFG"));
+            Assert.AreEqual("abcdefg".ToLowerInvariant(), toLCase("abcdefg"));
         }
         //
         [TestMethod]
         public void vbLeft_test() {
-            Assert.AreEqual("AbCdEfG".ToLowerInvariant(), vbLCase("AbCdEfG"));
+            Assert.AreEqual("AbCdEfG".ToLowerInvariant(), toLCase("AbCdEfG"));
         }
     }
     //

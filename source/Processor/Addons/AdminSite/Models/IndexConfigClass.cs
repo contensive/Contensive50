@@ -61,7 +61,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         //
                         // check next line
                         //
-                        string ConfigListLine = GenericController.vbLCase(ConfigListLines[Ptr]);
+                        string ConfigListLine = GenericController.toLCase(ConfigListLines[Ptr]);
                         if (!string.IsNullOrEmpty(ConfigListLine)) {
                             if(ConfigListLine.Equals("columns")) {
                                 Ptr += 1;
@@ -121,7 +121,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     while (Ptr < ConfigListLines.GetUpperBound(0)) {
                         //
                         // check next line
-                        string ConfigListLine = GenericController.vbLCase(ConfigListLines[Ptr]);
+                        string ConfigListLine = GenericController.toLCase(ConfigListLines[Ptr]);
                         if (!string.IsNullOrEmpty(ConfigListLine)) {
                             switch (ConfigListLine) {
                                 case "findwordlist":

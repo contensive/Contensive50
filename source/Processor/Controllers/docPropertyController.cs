@@ -233,7 +233,7 @@ namespace Contensive.Processor.Controllers {
                 for (int Ptr = 0; Ptr < ampSplit.GetUpperBound(0) + 1; Ptr++) {
                     string nameValuePair = ampSplit[Ptr];
                     if (!string.IsNullOrEmpty(nameValuePair)) {
-                        if (GenericController.vbInstr(1, nameValuePair, "=") != 0) {
+                        if (GenericController.strInstr(1, nameValuePair, "=") != 0) {
                             string[] ValuePair = nameValuePair.Split('=');
                             string key = decodeResponseVariable(encodeText(ValuePair[0]));
                             if (!string.IsNullOrEmpty(key)) {

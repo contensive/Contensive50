@@ -1139,13 +1139,13 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 string ExpandedSelector = "";
                 Dictionary<string, string> addonInstanceProperties = new Dictionary<string, string>();
                 core.addon.buildAddonOptionLists(ref addonInstanceProperties, ref ExpandedSelector, SitePropertyName + "=" + selector, instanceOptions, "0", true);
-                int Pos = GenericController.vbInstr(1, ExpandedSelector, "[");
+                int Pos = GenericController.strInstr(1, ExpandedSelector, "[");
                 if (Pos != 0) {
                     //
                     // List of Options, might be select, radio or checkbox
                     //
-                    string LCaseOptionDefault = GenericController.vbLCase(ExpandedSelector.left(Pos - 1));
-                    int PosEqual = GenericController.vbInstr(1, LCaseOptionDefault, "=");
+                    string LCaseOptionDefault = GenericController.toLCase(ExpandedSelector.left(Pos - 1));
+                    int PosEqual = GenericController.strInstr(1, LCaseOptionDefault, "=");
 
                     if (PosEqual > 0) {
                         LCaseOptionDefault = LCaseOptionDefault.Substring(PosEqual);
@@ -1153,11 +1153,11 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
 
                     LCaseOptionDefault = GenericController.decodeNvaArgument(LCaseOptionDefault);
                     ExpandedSelector = ExpandedSelector.Substring(Pos);
-                    Pos = GenericController.vbInstr(1, ExpandedSelector, "]");
+                    Pos = GenericController.strInstr(1, ExpandedSelector, "]");
                     string OptionSuffix = "";
                     if (Pos > 0) {
                         if (Pos < ExpandedSelector.Length) {
-                            OptionSuffix = GenericController.vbLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
+                            OptionSuffix = GenericController.toLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
                         }
                         ExpandedSelector = ExpandedSelector.left(Pos - 1);
                     }
@@ -1168,7 +1168,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                     for (OptionPtr = 0; OptionPtr < OptionCnt; OptionPtr++) {
                         string OptionValue_AddonEncoded = OptionValues[OptionPtr].Trim(' ');
                         if (!string.IsNullOrEmpty(OptionValue_AddonEncoded)) {
-                            Pos = GenericController.vbInstr(1, OptionValue_AddonEncoded, ":");
+                            Pos = GenericController.strInstr(1, OptionValue_AddonEncoded, ":");
                             string OptionCaption = null;
                             string OptionValue = null;
                             if (Pos == 0) {
@@ -1183,14 +1183,14 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                                     //
                                     // Create checkbox addon_execute_getFormContent_decodeSelector
                                     //
-                                    bool selected = (GenericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + GenericController.vbLCase(OptionValue) + ",") != 0);
+                                    bool selected = (GenericController.strInstr(1, "," + LCaseOptionDefault + ",", "," + GenericController.toLCase(OptionValue) + ",") != 0);
                                     result = HtmlController.checkbox(SitePropertyName + OptionPtr, selected, "", false, "", false, OptionValue, OptionCaption);
                                     break;
                                 case "radio":
                                     //
                                     // Create Radio addon_execute_getFormContent_decodeSelector
                                     //
-                                    if (GenericController.vbLCase(OptionValue) == LCaseOptionDefault) {
+                                    if (GenericController.toLCase(OptionValue) == LCaseOptionDefault) {
                                         result += "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" checked=\"checked\" >" + OptionCaption + "</div>";
                                     } else {
                                         result += "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
@@ -1200,7 +1200,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                                     //
                                     // Create select addon_execute_result
                                     //
-                                    if (GenericController.vbLCase(OptionValue) == LCaseOptionDefault) {
+                                    if (GenericController.toLCase(OptionValue) == LCaseOptionDefault) {
                                         result += "<option value=\"" + OptionValue + "\" selected>" + OptionCaption + "</option>";
                                     } else {
                                         result += "<option value=\"" + OptionValue + "\">" + OptionCaption + "</option>";
@@ -1543,7 +1543,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 if (!allowPaste) { return result; }
                 string ClipBoard = core.visitProperty.getText("Clipboard", "");
                 if (string.IsNullOrEmpty(ClipBoard)) { return result; }
-                int Position = GenericController.vbInstr(1, ClipBoard, ".");
+                int Position = GenericController.strInstr(1, ClipBoard, ".");
                 if (Position == 0) { return result; }
                 string[] ClipBoardArray = ClipBoard.Split('.');
                 if (ClipBoardArray.GetUpperBound(0) == 0) { return result; }
@@ -1551,7 +1551,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 int ClipChildRecordId = GenericController.encodeInteger(ClipBoardArray[1]);
                 if (content.isParentOf<ContentModel>(core.cpParent, ClipboardContentId)) {
                     int ParentId = 0;
-                    if (GenericController.vbInstr(1, presetNameValueList, "PARENTID=", 1) != 0) {
+                    if (GenericController.strInstr(1, presetNameValueList, "PARENTID=", 1) != 0) {
                         //
                         // must test for main_IsChildRecord
                         //

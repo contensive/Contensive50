@@ -95,7 +95,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(return_ErrorMessage)) {
                     //
                     // continue if no errors
-                    if (Doc.DocumentElement.Name.ToLowerInvariant() != GenericController.vbLCase(DownloadFileRootNode)) {
+                    if (Doc.DocumentElement.Name.ToLowerInvariant() != GenericController.toLCase(DownloadFileRootNode)) {
                         return_ErrorMessage = "The collection file from the server was not valid for collection [" + collectionGuid + "]";
                         result = false;
                         LogController.logInfo(core, errorPrefix + "The response has a basename [" + Doc.DocumentElement.Name + "] but [" + DownloadFileRootNode + "] was expected.");
@@ -115,7 +115,7 @@ namespace Contensive.Processor.Controllers {
                                 string CollectionVersion = null;
                                 string CollectionFileLink = null;
                                 string Collectionname = null;
-                                switch (GenericController.vbLCase(metaDataSection.Name)) {
+                                switch (GenericController.toLCase(metaDataSection.Name)) {
                                     case "collection":
                                         //
                                         // Read in the interfaces and save to Add-ons
@@ -128,7 +128,7 @@ namespace Contensive.Processor.Controllers {
                                         foreach (XmlNode metaDataInterfaces in metaDataSection.ChildNodes) {
                                             int Pos = 0;
                                             string UserError = null;
-                                            switch (GenericController.vbLCase(metaDataInterfaces.Name)) {
+                                            switch (GenericController.toLCase(metaDataInterfaces.Name)) {
                                                 case "name":
                                                     Collectionname = metaDataInterfaces.InnerText;
                                                     break;
@@ -168,7 +168,7 @@ namespace Contensive.Processor.Controllers {
                                                     ResourceFilename = "";
                                                     ResourceLink = "";
                                                     foreach (XmlNode ActiveXNode in metaDataInterfaces.ChildNodes) {
-                                                        switch (GenericController.vbLCase(ActiveXNode.Name)) {
+                                                        switch (GenericController.toLCase(ActiveXNode.Name)) {
                                                             case "filename":
                                                                 ResourceFilename = ActiveXNode.InnerText;
                                                                 break;

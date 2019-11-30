@@ -210,7 +210,7 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         foreach (XmlNode metaData_NodeWithinLoop in srcXmlDom.DocumentElement.ChildNodes) {
                             XmlNode metaData_Node = metaData_NodeWithinLoop;
-                            string NodeName = GenericController.vbLCase(metaData_NodeWithinLoop.Name);
+                            string NodeName = GenericController.toLCase(metaData_NodeWithinLoop.Name);
                             bool IsNavigator = false;
                             string Name = "";
                             string MenuName = null;
@@ -294,9 +294,9 @@ namespace Contensive.Processor.Models.Domain {
                                         targetMetaData.defaultSortMethod = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "DefaultSortMethod", DefaultMetaData.defaultSortMethod);
                                         if ((targetMetaData.defaultSortMethod == null) || (targetMetaData.defaultSortMethod == "") || (targetMetaData.defaultSortMethod.ToLowerInvariant() == "name")) {
                                             targetMetaData.defaultSortMethod = "By Name";
-                                        } else if (GenericController.vbLCase(targetMetaData.defaultSortMethod) == "sortorder") {
+                                        } else if (GenericController.toLCase(targetMetaData.defaultSortMethod) == "sortorder") {
                                             targetMetaData.defaultSortMethod = "By Alpha Sort Order Field";
-                                        } else if (GenericController.vbLCase(targetMetaData.defaultSortMethod) == "date") {
+                                        } else if (GenericController.toLCase(targetMetaData.defaultSortMethod) == "date") {
                                             targetMetaData.defaultSortMethod = "By Date";
                                         }
                                         targetMetaData.developerOnly = XmlController.getXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "DeveloperOnly", DefaultMetaData.developerOnly);
@@ -456,7 +456,7 @@ namespace Contensive.Processor.Models.Domain {
                                         IsNavigator = (NodeName == "navigatorentry");
                                         string MenuKey = null;
                                         if (!IsNavigator) {
-                                            MenuKey = GenericController.vbLCase(MenuName);
+                                            MenuKey = GenericController.toLCase(MenuName);
                                         } else {
                                             MenuKey = MenuGuid;
                                         }
@@ -779,7 +779,7 @@ namespace Contensive.Processor.Models.Domain {
                                             //
                                             PosNameLineStart = PosNameLineStart + 2;
                                             string TestStyleName = (StyleLine.Substring(PosNameLineStart - 1, PosNameLineEnd - PosNameLineStart)).Trim(' ');
-                                            if (GenericController.vbLCase(TestStyleName) == GenericController.vbLCase(NewStyleName)) {
+                                            if (GenericController.toLCase(TestStyleName) == GenericController.toLCase(NewStyleName)) {
                                                 Found = true;
                                                 if (tempVar4.Overwrite) {
                                                     //
@@ -1148,8 +1148,8 @@ namespace Contensive.Processor.Models.Domain {
                     MetadataMiniCollectionModel.MiniCollectionMenuModel srcMenu = srcKvp.Value;
                     string srcName = srcMenu.name.ToLowerInvariant();
                     string srcGuid = srcMenu.Guid;
-                    string SrcParentName = GenericController.vbLCase(srcMenu.ParentName);
-                    string SrcNameSpace = GenericController.vbLCase(srcMenu.menuNameSpace);
+                    string SrcParentName = GenericController.toLCase(srcMenu.ParentName);
+                    string SrcNameSpace = GenericController.toLCase(srcMenu.menuNameSpace);
                     bool SrcIsNavigator = srcMenu.IsNavigator;
                     updateDst = false;
                     //
@@ -1164,7 +1164,7 @@ namespace Contensive.Processor.Models.Domain {
                         string dstGuid = dstMenu.Guid;
                         if (dstGuid == srcGuid) {
                             DstIsNavigator = dstMenu.IsNavigator;
-                            DstKey = GenericController.vbLCase(dstMenu.Key);
+                            DstKey = GenericController.toLCase(dstMenu.Key);
                             string SrcKey = null;
                             IsMatch = (DstKey == SrcKey) && (SrcIsNavigator == DstIsNavigator);
                             if (IsMatch) {
@@ -1180,16 +1180,16 @@ namespace Contensive.Processor.Models.Domain {
                         foreach (var dstKvp in dstCollection.menus) {
                             string dstKey = dstKvp.Key.ToLowerInvariant();
                             MetadataMiniCollectionModel.MiniCollectionMenuModel dstMenu = dstKvp.Value;
-                            dstName = GenericController.vbLCase(dstMenu.name);
+                            dstName = GenericController.toLCase(dstMenu.name);
                             if ((srcName == dstName) && (SrcIsNavigator == DstIsNavigator)) {
                                 if (SrcIsNavigator) {
                                     //
                                     // Navigator - check namespace if Dst.guid is blank (builder to new version of menu)
-                                    IsMatch = (SrcNameSpace == GenericController.vbLCase(dstMenu.menuNameSpace)) && (dstMenu.Guid == "");
+                                    IsMatch = (SrcNameSpace == GenericController.toLCase(dstMenu.menuNameSpace)) && (dstMenu.Guid == "");
                                 } else {
                                     //
                                     // AdminMenu - check parentname
-                                    IsMatch = (SrcParentName == GenericController.vbLCase(dstMenu.ParentName));
+                                    IsMatch = (SrcParentName == GenericController.toLCase(dstMenu.ParentName));
                                 }
                                 if (IsMatch) {
                                     dstMenuMatch = dstMenu;
@@ -1225,13 +1225,13 @@ namespace Contensive.Processor.Models.Domain {
                 int srcStylePtr = 0;
                 int dstStylePtr = 0;
                 for (srcStylePtr = 0; srcStylePtr < srcCollection.styleCnt; srcStylePtr++) {
-                    string srcName = GenericController.vbLCase(srcCollection.styles[srcStylePtr].Name);
+                    string srcName = GenericController.toLCase(srcCollection.styles[srcStylePtr].Name);
                     updateDst = false;
                     //
                     // Search for this name in the Dst
                     //
                     for (dstStylePtr = 0; dstStylePtr < dstCollection.styleCnt; dstStylePtr++) {
-                        dstName = GenericController.vbLCase(dstCollection.styles[dstStylePtr].Name);
+                        dstName = GenericController.toLCase(dstCollection.styles[dstStylePtr].Name);
                         if (dstName == srcName) {
                             //
                             // found a match between Src and Dst
@@ -1374,11 +1374,11 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 ParentName = menu.ParentName;
                 if (!string.IsNullOrEmpty(ParentName)) {
-                    LCaseParentName = GenericController.vbLCase(ParentName);
+                    LCaseParentName = GenericController.toLCase(ParentName);
                     foreach (var kvp in menus) {
                         MetadataMiniCollectionModel.MiniCollectionMenuModel testMenu = kvp.Value;
-                        if (GenericController.vbInstr(1, "," + UsedIDList + ",", "," + Ptr.ToString() + ",") == 0) {
-                            if (LCaseParentName == GenericController.vbLCase(testMenu.name) && (menu.IsNavigator == testMenu.IsNavigator)) {
+                        if (GenericController.strInstr(1, "," + UsedIDList + ",", "," + Ptr.ToString() + ",") == 0) {
+                            if (LCaseParentName == GenericController.toLCase(testMenu.name) && (menu.IsNavigator == testMenu.IsNavigator)) {
                                 Prefix = GetMenuNameSpace(core, menus, testMenu, UsedIDList + "," + menu.Guid);
                                 if (string.IsNullOrEmpty(Prefix)) {
                                     returnAttr = ParentName;

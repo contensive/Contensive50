@@ -355,12 +355,12 @@ namespace Contensive.Processor {
                                                             DefaultValueText = MetadataController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText).ToString();
                                                         }
                                                     } else if (field.lookupList != "") {
-                                                        string UCaseDefaultValueText = GenericController.vbUCase(DefaultValueText);
+                                                        string UCaseDefaultValueText = GenericController.toUCase(DefaultValueText);
                                                         string[] lookups = field.lookupList.Split(',');
 
                                                         int Ptr = 0;
                                                         for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
-                                                            if (UCaseDefaultValueText == GenericController.vbUCase(lookups[Ptr])) {
+                                                            if (UCaseDefaultValueText == GenericController.toUCase(lookups[Ptr])) {
                                                                 DefaultValueText = (Ptr + 1).ToString();
                                                             }
                                                         }
@@ -714,7 +714,7 @@ namespace Contensive.Processor {
                 } else if (string.IsNullOrEmpty(fieldName)) {
                     throw new ArgumentException("Fieldname Is blank");
                 } else {
-                    fieldNameUpper = GenericController.vbUCase(fieldName.Trim(' '));
+                    fieldNameUpper = GenericController.toUCase(fieldName.Trim(' '));
                     returnFilename = getRawData(fieldNameUpper);
                     if (!string.IsNullOrEmpty(returnFilename)) {
                         //
@@ -745,7 +745,7 @@ namespace Contensive.Processor {
                         // ----- no filename present, get id field
                         if (this.resultColumnCount > 0) {
                             for (var FieldPointer = 0; FieldPointer < this.resultColumnCount; FieldPointer++) {
-                                if (GenericController.vbUCase(this.fieldNames[FieldPointer]) == "ID") {
+                                if (GenericController.toUCase(this.fieldNames[FieldPointer]) == "ID") {
                                     RecordID = getInteger("ID");
                                     break;
                                 }
@@ -1142,7 +1142,7 @@ namespace Contensive.Processor {
                                             path = PathFilename.left(Pos);
                                             FilenameRev = 1;
                                             if (!fileNameNoExt.isNumeric()) {
-                                                Pos = GenericController.vbInstr(1, fileNameNoExt, ".r", 1);
+                                                Pos = GenericController.strInstr(1, fileNameNoExt, ".r", 1);
                                                 if (Pos > 0) {
                                                     FilenameRev = GenericController.encodeInteger(fileNameNoExt.Substring(Pos + 1));
                                                     FilenameRev = FilenameRev + 1;
@@ -1287,7 +1287,7 @@ namespace Contensive.Processor {
                     string sqlDelimiter = "";
                     foreach (var keyValuePair in this.writeCache) {
                         string fieldName = keyValuePair.Key;
-                        string ucaseFieldName = GenericController.vbUCase(fieldName);
+                        string ucaseFieldName = GenericController.toUCase(fieldName);
                         object writeCacheValue = keyValuePair.Value;
                         if (ucaseFieldName == "ID") {
                             //
@@ -1525,7 +1525,7 @@ namespace Contensive.Processor {
                         this.fieldNames = new String[this.resultColumnCount];
                         int ColumnPtr = 0;
                         foreach (DataColumn dc in this.dt.Columns) {
-                            this.fieldNames[ColumnPtr] = GenericController.vbUCase(dc.ColumnName);
+                            this.fieldNames[ColumnPtr] = GenericController.toUCase(dc.ColumnName);
                             ColumnPtr += 1;
                         }
                         // refactor -- convert interal storage to dt and assign -- will speedup open
@@ -1811,17 +1811,17 @@ namespace Contensive.Processor {
                 //
                 // ----- Add tablename to the front of SortFieldList fieldnames
                 sortFieldList = " " + GenericController.strReplace(sortFieldList, ",", " , ") + " ";
-                sortFieldList = GenericController.vbReplace(sortFieldList, " ID ", " ccContentWatch.ID ", 1, 99, 1);
-                sortFieldList = GenericController.vbReplace(sortFieldList, " Link ", " ccContentWatch.Link ", 1, 99, 1);
-                sortFieldList = GenericController.vbReplace(sortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ", 1, 99, 1);
-                sortFieldList = GenericController.vbReplace(sortFieldList, " SortOrder ", " ccContentWatch.SortOrder ", 1, 99, 1);
-                sortFieldList = GenericController.vbReplace(sortFieldList, " DateAdded ", " ccContentWatch.DateAdded ", 1, 99, 1);
-                sortFieldList = GenericController.vbReplace(sortFieldList, " ContentID ", " ccContentWatch.ContentID ", 1, 99, 1);
-                sortFieldList = GenericController.vbReplace(sortFieldList, " RecordID ", " ccContentWatch.RecordID ", 1, 99, 1);
-                sortFieldList = GenericController.vbReplace(sortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ", 1, 99, 1);
+                sortFieldList = GenericController.strReplace(sortFieldList, " ID ", " ccContentWatch.ID ", 1, 99, 1);
+                sortFieldList = GenericController.strReplace(sortFieldList, " Link ", " ccContentWatch.Link ", 1, 99, 1);
+                sortFieldList = GenericController.strReplace(sortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ", 1, 99, 1);
+                sortFieldList = GenericController.strReplace(sortFieldList, " SortOrder ", " ccContentWatch.SortOrder ", 1, 99, 1);
+                sortFieldList = GenericController.strReplace(sortFieldList, " DateAdded ", " ccContentWatch.DateAdded ", 1, 99, 1);
+                sortFieldList = GenericController.strReplace(sortFieldList, " ContentID ", " ccContentWatch.ContentID ", 1, 99, 1);
+                sortFieldList = GenericController.strReplace(sortFieldList, " RecordID ", " ccContentWatch.RecordID ", 1, 99, 1);
+                sortFieldList = GenericController.strReplace(sortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ", 1, 99, 1);
                 //
                 // ----- Special case
-                sortFieldList = GenericController.vbReplace(sortFieldList, " name ", " ccContentWatch.LinkLabel ", 1, 99, 1);
+                sortFieldList = GenericController.strReplace(sortFieldList, " name ", " ccContentWatch.LinkLabel ", 1, 99, 1);
                 //
                 string SQL = "SELECT"
                     + " ccContentWatch.ID AS ID"
@@ -1922,8 +1922,8 @@ namespace Contensive.Processor {
                     string[] SortFields = sqlOrderBy.Split(',');
                     for (int ptr = 0; ptr < SortFields.GetUpperBound(0) + 1; ptr++) {
                         string SortField = SortFields[ptr].ToLowerInvariant();
-                        SortField = GenericController.vbReplace(SortField, "asc", "", 1, 99, 1);
-                        SortField = GenericController.vbReplace(SortField, "desc", "", 1, 99, 1);
+                        SortField = GenericController.strReplace(SortField, "asc", "", 1, 99, 1);
+                        SortField = GenericController.strReplace(SortField, "desc", "", 1, 99, 1);
                         SortField = SortField.Trim(' ');
                         if (!contentMetaData.selectList.Contains(SortField)) { throw (new GenericException("The field [" + SortField + "] was used in sqlOrderBy for content [" + contentName + "], but the content does not include this field.")); }
                     }
@@ -1943,8 +1943,8 @@ namespace Contensive.Processor {
                 //
                 // -- Process Select Fields, make sure ContentControlID,ID,Name,Active are included
                 sqlSelectFieldList = GenericController.strReplace(sqlSelectFieldList, "\t", " ");
-                while (GenericController.vbInstr(1, sqlSelectFieldList, " ,") != 0) { sqlSelectFieldList = GenericController.strReplace(sqlSelectFieldList, " ,", ","); }
-                while (GenericController.vbInstr(1, sqlSelectFieldList, ", ") != 0) { sqlSelectFieldList = GenericController.strReplace(sqlSelectFieldList, ", ", ","); }
+                while (GenericController.strInstr(1, sqlSelectFieldList, " ,") != 0) { sqlSelectFieldList = GenericController.strReplace(sqlSelectFieldList, " ,", ","); }
+                while (GenericController.strInstr(1, sqlSelectFieldList, ", ") != 0) { sqlSelectFieldList = GenericController.strReplace(sqlSelectFieldList, ", ", ","); }
                 //
                 // -- add required fields into select list
                 if ((!string.IsNullOrEmpty(sqlSelectFieldList)) && (sqlSelectFieldList.IndexOf("*", System.StringComparison.OrdinalIgnoreCase) == -1)) {

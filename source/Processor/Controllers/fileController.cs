@@ -334,13 +334,13 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     WorkingPath = normalizeDosPath(absPath);
                     if (!Directory.Exists(WorkingPath)) {
-                        Position = GenericController.vbInstr(1, WorkingPath, "\\");
+                        Position = GenericController.strInstr(1, WorkingPath, "\\");
                         while (Position != 0) {
                             PartialPath = WorkingPath.left(Position - 1);
                             if (!Directory.Exists(PartialPath)) {
                                 Directory.CreateDirectory(PartialPath);
                             }
-                            Position = GenericController.vbInstr(Position + 1, WorkingPath, "\\");
+                            Position = GenericController.strInstr(Position + 1, WorkingPath, "\\");
                         }
                     }
                 }

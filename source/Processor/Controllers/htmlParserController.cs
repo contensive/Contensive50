@@ -116,9 +116,9 @@ namespace Contensive.Processor.Controllers {
                 Cnt = splittest.GetUpperBound(0) + 1;
                 if (Cnt > 1) {
                     for (Ptr = 1; Ptr < Cnt; Ptr++) {
-                        PosScriptEnd = GenericController.vbInstr(1, splittest[Ptr], ">");
+                        PosScriptEnd = GenericController.strInstr(1, splittest[Ptr], ">");
                         if (PosScriptEnd > 0) {
-                            PosEndScript = GenericController.vbInstr(PosScriptEnd, splittest[Ptr], "</script");
+                            PosEndScript = GenericController.strInstr(PosScriptEnd, splittest[Ptr], "</script");
                             if (PosEndScript > 0) {
                                 Array.Resize(ref Blobs, BlobCnt + 1);
                                 Blobs[BlobCnt] = splittest[Ptr].Substring(PosScriptEnd, (PosEndScript - 1) - (PosScriptEnd + 1) + 1);
@@ -136,9 +136,9 @@ namespace Contensive.Processor.Controllers {
                 Cnt = splittest.GetUpperBound(0) + 1;
                 if (Cnt > 1) {
                     for (Ptr = 1; Ptr < Cnt; Ptr++) {
-                        PosScriptEnd = GenericController.vbInstr(1, splittest[Ptr], ">");
+                        PosScriptEnd = GenericController.strInstr(1, splittest[Ptr], ">");
                         if (PosScriptEnd > 0) {
-                            PosEndScript = GenericController.vbInstr(PosScriptEnd, splittest[Ptr], "</style", 1);
+                            PosEndScript = GenericController.strInstr(PosScriptEnd, splittest[Ptr], "</style", 1);
                             if (PosEndScript > 0) {
                                 Array.Resize(ref Blobs, BlobCnt + 1);
                                 Blobs[BlobCnt] = splittest[Ptr].Substring(PosScriptEnd, (PosEndScript - 1) - (PosScriptEnd + 1) + 1);
@@ -156,7 +156,7 @@ namespace Contensive.Processor.Controllers {
                 Cnt = splittest.GetUpperBound(0) + 1;
                 if (Cnt > 1) {
                     for (Ptr = 1; Ptr < Cnt; Ptr++) {
-                        PosScriptEnd = GenericController.vbInstr(1, splittest[Ptr], "-->");
+                        PosScriptEnd = GenericController.strInstr(1, splittest[Ptr], "-->");
                         if (PosScriptEnd > 0) {
                             Array.Resize(ref Blobs, BlobCnt + 1);
                             Blobs[BlobCnt] = splittest[Ptr].left(PosScriptEnd - 1);
@@ -339,7 +339,7 @@ namespace Contensive.Processor.Controllers {
                 LoadElement(ElementPointer);
                 if (ElementPointer < elementCount) {
                     if (LocalElements[ElementPointer].AttributeCount > 0) {
-                        UcaseName = GenericController.vbUCase(Name);
+                        UcaseName = GenericController.toUCase(Name);
                         int tempVar = LocalElements[ElementPointer].AttributeCount;
                         for (AttributePointer = 0; AttributePointer < tempVar; AttributePointer++) {
                             if (LocalElements[ElementPointer].Attributes[AttributePointer].UcaseName == UcaseName) {
@@ -401,10 +401,10 @@ namespace Contensive.Processor.Controllers {
                                             LocalElements[ElementPointer].AttributeSize = LocalElements[ElementPointer].AttributeSize + 5;
                                             Array.Resize(ref LocalElements[ElementPointer].Attributes, (LocalElements[ElementPointer].AttributeSize) + 1);
                                         }
-                                        int EqualPosition = GenericController.vbInstr(1, AttrName, "=");
+                                        int EqualPosition = GenericController.strInstr(1, AttrName, "=");
                                         if (EqualPosition == 0) {
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Name = AttrName;
-                                            LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].UcaseName = GenericController.vbUCase(AttrName);
+                                            LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].UcaseName = GenericController.toUCase(AttrName);
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Value = AttrName;
                                         } else {
                                             AttrValue = AttrName.Substring(EqualPosition);
@@ -416,7 +416,7 @@ namespace Contensive.Processor.Controllers {
                                             }
                                             AttrName = AttrName.left(EqualPosition - 1);
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Name = AttrName;
-                                            LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].UcaseName = GenericController.vbUCase(AttrName);
+                                            LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].UcaseName = GenericController.toUCase(AttrName);
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Value = AttrValue;
                                         }
                                         LocalElements[ElementPointer].AttributeCount = LocalElements[ElementPointer].AttributeCount + 1;
@@ -493,7 +493,7 @@ namespace Contensive.Processor.Controllers {
                     SplitPtr = encodeInteger(ElementPtr / 2.0);
                     ElementBasePtr = SplitPtr * 2;
                     SplitSrc = SplitStore[SplitPtr];
-                    Ptr = GenericController.vbInstr(1, SplitSrc, ">");
+                    Ptr = GenericController.strInstr(1, SplitSrc, ">");
                     //
                     // replace blobs
                     //
@@ -567,11 +567,11 @@ namespace Contensive.Processor.Controllers {
             string Blob = "";
             //
             tempReplaceBlob = Src;
-            Pos = GenericController.vbInstr(1, Src, BlobSN);
+            Pos = GenericController.strInstr(1, Src, BlobSN);
             if (Pos != 0) {
-                PosEnd = GenericController.vbInstr(Pos + 1, Src, "/");
+                PosEnd = GenericController.strInstr(Pos + 1, Src, "/");
                 if (PosEnd > 0) {
-                    PosNum = GenericController.vbInstr(Pos + 1, Src, ":");
+                    PosNum = GenericController.strInstr(Pos + 1, Src, ":");
                     if (PosNum > 0) {
                         PtrText = Src.Substring(PosNum, PosEnd - PosNum - 1);
                         if (PtrText.isNumeric()) {

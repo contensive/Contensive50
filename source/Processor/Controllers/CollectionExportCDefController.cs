@@ -198,7 +198,7 @@ namespace Contensive.Processor.Controllers {
                             if (string.IsNullOrEmpty(DataSourceName)) {
                                 DataSourceName = "Default";
                             }
-                            if (GenericController.vbUCase(TableName) == "CCMENUENTRIES") {
+                            if (GenericController.toUCase(TableName) == "CCMENUENTRIES") {
                                 FoundMenuTable = true;
                             }
                             sb.Append(" AuthoringDataSourceName=\"" + encodeXMLattribute(DataSourceName) + "\"");
@@ -661,7 +661,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 if (RecordID != 0) {
-                    if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + RecordID + ",", 1) != 0) {
+                    if (GenericController.strInstr(1, "," + UsedIDString + ",", "," + RecordID + ",", 1) != 0) {
                         LogController.logError(core, "getMenuNameSpace, Circular reference found in UsedIDString [" + UsedIDString + "] getting ccMenuEntries namespace for recordid [" + RecordID + "]");
                     } else {
                         UsedIDString = UsedIDString + "," + RecordID;

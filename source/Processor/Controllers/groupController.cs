@@ -332,24 +332,24 @@ namespace Contensive.Processor.Controllers {
                 if (isAuthenticated) {
                     WorkingIDList = GroupIDList;
                     WorkingIDList = GenericController.strReplace(WorkingIDList, " ", "");
-                    while (GenericController.vbInstr(1, WorkingIDList, ",,") != 0) {
+                    while (GenericController.strInstr(1, WorkingIDList, ",,") != 0) {
                         WorkingIDList = GenericController.strReplace(WorkingIDList, ",,", ",");
                     }
                     if (!string.IsNullOrEmpty(WorkingIDList)) {
-                        if (vbMid(WorkingIDList, 1) == ",") {
-                            if (vbLen(WorkingIDList) <= 1) {
+                        if (strMid(WorkingIDList, 1) == ",") {
+                            if (strLen(WorkingIDList) <= 1) {
                                 WorkingIDList = "";
                             } else {
-                                WorkingIDList = vbMid(WorkingIDList, 2);
+                                WorkingIDList = strMid(WorkingIDList, 2);
                             }
                         }
                     }
                     if (!string.IsNullOrEmpty(WorkingIDList)) {
                         if (WorkingIDList.right(1) == ",") {
-                            if (vbLen(WorkingIDList) <= 1) {
+                            if (strLen(WorkingIDList) <= 1) {
                                 WorkingIDList = "";
                             } else {
-                                WorkingIDList = GenericController.vbMid(WorkingIDList, 1, vbLen(WorkingIDList) - 1);
+                                WorkingIDList = GenericController.strMid(WorkingIDList, 1, strLen(WorkingIDList) - 1);
                             }
                         }
                     }
@@ -376,7 +376,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // check if they are admin or in the group list
                         //
-                        if (GenericController.vbInstr(1, WorkingIDList, ",") != 0) {
+                        if (GenericController.strInstr(1, WorkingIDList, ",") != 0) {
                             Criteria = "r.GroupID in (" + WorkingIDList + ")";
                         } else {
                             Criteria = "r.GroupID=" + WorkingIDList;

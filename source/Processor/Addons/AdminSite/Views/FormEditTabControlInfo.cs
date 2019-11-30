@@ -86,7 +86,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 // ----- EID (Encoded ID)
                 {
-                    if (GenericController.vbUCase(adminData.adminContent.tableName) == GenericController.vbUCase("ccMembers")) {
+                    if (GenericController.toUCase(adminData.adminContent.tableName) == GenericController.toUCase("ccMembers")) {
                         string htmlId = "fieldGuid";
                         bool AllowEId = (core.siteProperties.getBoolean("AllowLinkLogin", true)) || (core.siteProperties.getBoolean("AllowLinkRecognize", true));
                         string fieldHelp = "";

@@ -351,7 +351,7 @@ namespace Contensive.Processor.Models.Domain {
                                 adminOnly = GenericController.encodeBoolean(contentRow[5]),
                                 allowDelete = GenericController.encodeBoolean(contentRow[6]),
                                 parentId = GenericController.encodeInteger(contentRow[7]),
-                                dropDownFieldList = GenericController.vbUCase(GenericController.encodeText(contentRow[9])),
+                                dropDownFieldList = GenericController.toUCase(GenericController.encodeText(contentRow[9])),
                                 tableName = GenericController.encodeText(contentTablename),
                                 dataSourceName = "default",
                                 allowCalendarEvents = GenericController.encodeBoolean(contentRow[15]),
@@ -1370,10 +1370,10 @@ namespace Contensive.Processor.Models.Domain {
                             foreach (DataColumn dcTableColumns in dt.Columns) {
                                 //
                                 // ----- see if the field is already in the content fields
-                                string UcaseTableColumnName = GenericController.vbUCase(dcTableColumns.ColumnName);
+                                string UcaseTableColumnName = GenericController.toUCase(dcTableColumns.ColumnName);
                                 bool ContentFieldFound = false;
                                 foreach (DataRow drContentRecords in dtFields.Rows) {
-                                    if (GenericController.vbUCase(GenericController.encodeText(drContentRecords["name"])) == UcaseTableColumnName) {
+                                    if (GenericController.toUCase(GenericController.encodeText(drContentRecords["name"])) == UcaseTableColumnName) {
                                         ContentFieldFound = true;
                                         break;
                                     }
@@ -1416,7 +1416,7 @@ namespace Contensive.Processor.Models.Domain {
         public string getContentProperty(CoreController core, string propertyName) {
             string result = "";
             //
-            switch (GenericController.vbUCase(encodeText(propertyName))) {
+            switch (GenericController.toUCase(encodeText(propertyName))) {
                 case "CONTENTCONTROLCRITERIA":
                     result = legacyContentControlCriteria;
                     break;

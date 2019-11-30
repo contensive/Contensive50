@@ -213,7 +213,7 @@ namespace Contensive.Processor.Controllers {
                 ptrLast = 1;
                 do {
                     Cmd = "";
-                    posOpen = GenericController.vbInstr(ptrLast, src, contentReplaceEscapeStart);
+                    posOpen = GenericController.strInstr(ptrLast, src, contentReplaceEscapeStart);
                     Ptr = posOpen;
                     if (Ptr == 0) {
                         //
@@ -225,7 +225,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         notFound = true;
                         do {
-                            posClose = GenericController.vbInstr(Ptr, src, contentReplaceEscapeEnd);
+                            posClose = GenericController.strInstr(Ptr, src, contentReplaceEscapeEnd);
                             if (posClose == 0) {
                                 //
                                 // brace opened but no close, forget the open and exit
@@ -235,7 +235,7 @@ namespace Contensive.Processor.Controllers {
                             } else {
                                 posDq = Ptr;
                                 do {
-                                    posDq = GenericController.vbInstr(posDq + 1, src, "\"");
+                                    posDq = GenericController.strInstr(posDq + 1, src, "\"");
                                     escape = "";
                                     if (posDq > 0) {
                                         escape = src.Substring(posDq - 2, 1);
@@ -243,7 +243,7 @@ namespace Contensive.Processor.Controllers {
                                 } while (escape == "\\");
                                 posSq = Ptr;
                                 do {
-                                    posSq = GenericController.vbInstr(posSq + 1, src, "'");
+                                    posSq = GenericController.strInstr(posSq + 1, src, "'");
                                     escape = "";
                                     if (posSq > 0) {
                                         escape = src.Substring(posSq - 2, 1);
@@ -267,7 +267,7 @@ namespace Contensive.Processor.Controllers {
                                             // skip forward to the next non-escaped sq
                                             //
                                             do {
-                                                posSq = GenericController.vbInstr(posSq + 1, src, "'");
+                                                posSq = GenericController.strInstr(posSq + 1, src, "'");
                                                 escape = "";
                                                 if (posSq > 0) {
                                                     escape = src.Substring(posSq - 2, 1);
@@ -287,7 +287,7 @@ namespace Contensive.Processor.Controllers {
                                             // skip forward to the next non-escaped dq
                                             //
                                             do {
-                                                posDq = GenericController.vbInstr(posDq + 1, src, "\"");
+                                                posDq = GenericController.strInstr(posDq + 1, src, "\"");
                                                 escape = "";
                                                 if (posDq > 0) {
                                                     escape = src.Substring(posDq - 2, 1);
@@ -355,11 +355,11 @@ namespace Contensive.Processor.Controllers {
                     if (trimLen > 0) {
                         string leftChr = cmdSrc.left(1);
                         string rightChr = cmdSrc.Substring(cmdSrc.Length - 1);
-                        if (GenericController.vbInstr(1, whiteChrs, leftChr) != 0) {
+                        if (GenericController.strInstr(1, whiteChrs, leftChr) != 0) {
                             cmdSrc = cmdSrc.Substring(1);
                             trimming = true;
                         }
-                        if (GenericController.vbInstr(1, whiteChrs, rightChr) != 0) {
+                        if (GenericController.strInstr(1, whiteChrs, rightChr) != 0) {
                             cmdSrc = cmdSrc.left(cmdSrc.Length - 1);
                             trimming = true;
                         }
@@ -427,7 +427,7 @@ namespace Contensive.Processor.Controllers {
                             //   "Open" file
                             //   "Open" "file"
                             //
-                            int Pos = GenericController.vbInstr(2, cmdText, "\"");
+                            int Pos = GenericController.strInstr(2, cmdText, "\"");
                             if (Pos <= 1) {
                                 throw new GenericException("Error parsing content command [" + cmdSrc + "], expected a close quote around position " + Pos);
                             } else {
@@ -454,7 +454,7 @@ namespace Contensive.Processor.Controllers {
                             //   open
                             //   open file
                             //
-                            int Pos = GenericController.vbInstr(1, cmdText, " ");
+                            int Pos = GenericController.strInstr(1, cmdText, " ");
                             if (Pos > 0) {
                                 cmdArg = cmdSrc.Substring(Pos);
                                 cmdText = (cmdSrc.left(Pos - 1)).Trim(' ');
@@ -464,7 +464,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // cmdarg is quoted
                             //
-                            int Pos = GenericController.vbInstr(2, cmdArg, "\"");
+                            int Pos = GenericController.strInstr(2, cmdArg, "\"");
                             if (Pos <= 1) {
                                 throw new GenericException("Error parsing JSON command list, expected a quoted command argument, command list [" + cmdSrc + "]");
                             } else {
@@ -567,7 +567,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // execute the cmd with cmdArgDef dictionary
                         //
-                        switch (GenericController.vbLCase(cmdText)) {
+                        switch (GenericController.toLCase(cmdText)) {
                             case "textbox": {
                                     //
                                     // Opens a textbox addon (patch for text box name being "text name" so it requies json)copy content record

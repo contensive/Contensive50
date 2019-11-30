@@ -236,20 +236,20 @@ namespace Contensive.Processor.Controllers {
                     if ((!IsPageNotFound) && (core.webServer.requestPathPage != "")) {
                         //
                         // build link variations needed later
-                        int PosProtocol = GenericController.vbInstr(1, core.webServer.requestPathPage, "://", 1);
+                        int PosProtocol = GenericController.strInstr(1, core.webServer.requestPathPage, "://", 1);
                         string LinkNoProtocol = "";
                         string LinkFullPath = "";
                         string LinkFullPathNoSlash = "";
                         if (PosProtocol != 0) {
                             LinkNoProtocol = core.webServer.requestPathPage.Substring(PosProtocol + 2);
-                            int Pos = GenericController.vbInstr(PosProtocol + 3, core.webServer.requestPathPage, "/", 2);
+                            int Pos = GenericController.strInstr(PosProtocol + 3, core.webServer.requestPathPage, "/", 2);
                             if (Pos != 0) {
                                 string linkDomain = core.webServer.requestPathPage.left(Pos - 1);
                                 LinkFullPath = core.webServer.requestPathPage.Substring(Pos - 1);
                                 //
                                 // strip off leading or trailing slashes, and return only the string between the leading and secton slash
                                 //
-                                if (GenericController.vbInstr(1, LinkFullPath, "/") != 0) {
+                                if (GenericController.strInstr(1, LinkFullPath, "/") != 0) {
                                     string[] LinkSplit = LinkFullPath.Split('/');
                                     LinkFullPathNoSlash = LinkSplit[0];
                                     if (string.IsNullOrEmpty(LinkFullPathNoSlash)) {
@@ -357,7 +357,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- do anonymous access blocking
                     if (!core.session.isAuthenticated) {
-                        if ((core.webServer.requestPath != "/") & GenericController.vbInstr(1, "/" + core.appConfig.adminRoute, core.webServer.requestPath, 1) != 0) {
+                        if ((core.webServer.requestPath != "/") & GenericController.strInstr(1, "/" + core.appConfig.adminRoute, core.webServer.requestPath, 1) != 0) {
                             //
                             // admin page is excluded from custom blocking
                         } else {
@@ -1520,7 +1520,7 @@ namespace Contensive.Processor.Controllers {
             string result = null;
             result = linkSrc;
             if (!string.IsNullOrEmpty(result)) {
-                if (GenericController.vbInstr(1, result, "://") != 0) {
+                if (GenericController.strInstr(1, result, "://") != 0) {
                     //
                     // protocol provided, do not fixup
                     result = GenericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
@@ -1579,15 +1579,15 @@ namespace Contensive.Processor.Controllers {
                     // Add the Referrer to the Admin Msg
                     if (core.webServer.requestReferer != "") {
                         String referer = core.webServer.requestReferrer;
-                        int Pos = GenericController.vbInstr(1, referer, "AdminWarningPageID=", 1);
+                        int Pos = GenericController.strInstr(1, referer, "AdminWarningPageID=", 1);
                         if (Pos != 0) {
                             referer = referer.left(Pos - 2);
                         }
-                        Pos = GenericController.vbInstr(1, referer, "AdminWarningMsg=", 1);
+                        Pos = GenericController.strInstr(1, referer, "AdminWarningMsg=", 1);
                         if (Pos != 0) {
                             referer = referer.left(Pos - 2);
                         }
-                        Pos = GenericController.vbInstr(1, referer, "blockcontenttracking=", 1);
+                        Pos = GenericController.strInstr(1, referer, "blockcontenttracking=", 1);
                         if (Pos != 0) {
                             referer = referer.left(Pos - 2);
                         }
@@ -1629,7 +1629,7 @@ namespace Contensive.Processor.Controllers {
                     if (string.IsNullOrEmpty(linkPathPage)) {
                         linkPathPage = "/" + getDefaultScript();
                     } else {
-                        int Pos = GenericController.vbInstr(1, linkPathPage, "?");
+                        int Pos = GenericController.strInstr(1, linkPathPage, "?");
                         if (Pos != 0) {
                             linkPathPage = linkPathPage.left(Pos - 1);
                         }
@@ -1778,7 +1778,7 @@ namespace Contensive.Processor.Controllers {
                                                     string PeopleUsername = null;
                                                     string PeoplePassword = null;
                                                     string PeopleEmail = "";
-                                                    switch (GenericController.vbUCase(formField.peopleFieldName)) {
+                                                    switch (GenericController.toUCase(formField.peopleFieldName)) {
                                                         case "NAME": {
                                                                 PeopleName = FormValue;
                                                                 csData.set(formField.peopleFieldName, FormValue);
@@ -1910,15 +1910,15 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 {
-                    int PtrFront = GenericController.vbInstr(1, Formhtml, "{{REPEATSTART", 1);
+                    int PtrFront = GenericController.strInstr(1, Formhtml, "{{REPEATSTART", 1);
                     if (PtrFront > 0) {
-                        int PtrBack = GenericController.vbInstr(PtrFront, Formhtml, "}}");
+                        int PtrBack = GenericController.strInstr(PtrFront, Formhtml, "}}");
                         if (PtrBack > 0) {
                             result.PreRepeat = Formhtml.left(PtrFront - 1);
-                            PtrFront = GenericController.vbInstr(PtrBack, Formhtml, "{{REPEATEND", 1);
+                            PtrFront = GenericController.strInstr(PtrBack, Formhtml, "{{REPEATEND", 1);
                             if (PtrFront > 0) {
                                 result.RepeatCell = Formhtml.Substring(PtrBack + 1, PtrFront - PtrBack - 2);
-                                PtrBack = GenericController.vbInstr(PtrFront, Formhtml, "}}");
+                                PtrBack = GenericController.strInstr(PtrFront, Formhtml, "}}");
                                 if (PtrBack > 0) {
                                     result.PostRepeat = Formhtml.Substring(PtrBack + 1);
                                     //
@@ -2028,8 +2028,8 @@ namespace Contensive.Processor.Controllers {
                                     csPeople.openRecord("people", core.session.user.id);
                                     if (csPeople.ok()) {
                                         Body = pageForm.RepeatCell;
-                                        Body = GenericController.vbReplace(Body, "{{CAPTION}}", CaptionSpan + Caption + "</span>", 1, 99, 1);
-                                        Body = GenericController.vbReplace(Body, "{{FIELD}}", core.html.inputCs(csPeople, "People", formField.peopleFieldName), 1, 99, 1);
+                                        Body = GenericController.strReplace(Body, "{{CAPTION}}", CaptionSpan + Caption + "</span>", 1, 99, 1);
+                                        Body = GenericController.strReplace(Body, "{{FIELD}}", core.html.inputCs(csPeople, "People", formField.peopleFieldName), 1, 99, 1);
                                         RepeatBody = RepeatBody + Body;
                                         HasRequiredFields = HasRequiredFields || formField.REquired;
                                     }
@@ -2043,7 +2043,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 GroupValue = GroupController.isMemberOfGroup(core, formField.GroupName);
                                 Body = pageForm.RepeatCell;
-                                Body = GenericController.vbReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + formField.GroupName, GroupValue), 1, 99, 1);
+                                Body = GenericController.strReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + formField.GroupName, GroupValue), 1, 99, 1);
                                 Body = GenericController.strReplace(Body, "{{FIELD}}", formField.Caption);
                                 RepeatBody = RepeatBody + Body;
                                 GroupRowPtr = GroupRowPtr + 1;
@@ -2058,7 +2058,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (HasRequiredFields) {
                     Body = pageForm.RepeatCell;
-                    Body = GenericController.vbReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, 1);
+                    Body = GenericController.strReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, 1);
                     Body = GenericController.strReplace(Body, "{{FIELD}}", "*&nbsp;Required Fields");
                     RepeatBody = RepeatBody + Body;
                 }
@@ -2097,7 +2097,7 @@ namespace Contensive.Processor.Controllers {
                         string SeeAlsoLink = csData.getText("Link");
                         if (!string.IsNullOrEmpty(SeeAlsoLink)) {
                             result += "\r<li class=\"ccListItem\">";
-                            if (GenericController.vbInstr(1, SeeAlsoLink, "://") == 0) {
+                            if (GenericController.strInstr(1, SeeAlsoLink, "://") == 0) {
                                 SeeAlsoLink = core.webServer.requestProtocol + SeeAlsoLink;
                             }
                             if (isEditingLocal) {
@@ -2274,7 +2274,7 @@ namespace Contensive.Processor.Controllers {
                 bool isAuthoring = core.session.isEditing(ContentName);
                 //
                 int ChildListCount = 0;
-                string UcaseRequestedListName = GenericController.vbUCase(RequestedListName);
+                string UcaseRequestedListName = GenericController.toUCase(RequestedListName);
                 if ((UcaseRequestedListName == "NONE") || (UcaseRequestedListName == "ORPHAN")) {
                     UcaseRequestedListName = "";
                 }
@@ -2308,7 +2308,7 @@ namespace Contensive.Processor.Controllers {
                     if (childPage.blockContent || childPage.blockPage) {
                         blockContentComposite = !core.doc.pageController.allowThroughPageBlock(core, childPage.id);
                     }
-                    string LinkedText = GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(link) + "\">", pageMenuHeadline);
+                    string LinkedText = GenericController.getLinkedText("<a href=\"" + HtmlController.encodeHtml(link) + "\">", pageMenuHeadline);
                     if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.parentListName != "") && (!isAuthoring)) {
                         //
                         // ----- Requested orphan list, and this record is in a named list, and not editing, do not display
@@ -2330,7 +2330,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Requested orphan List, Not AllowChildListDisplay, not Authoring, do not display
                         //
-                    } else if ((!string.IsNullOrEmpty(UcaseRequestedListName)) && (UcaseRequestedListName != GenericController.vbUCase(childPage.parentListName))) {
+                    } else if ((!string.IsNullOrEmpty(UcaseRequestedListName)) && (UcaseRequestedListName != GenericController.toUCase(childPage.parentListName))) {
                         //
                         // ----- requested named list and wrong RequestedListName, do not display
                         //
@@ -2629,7 +2629,7 @@ namespace Contensive.Processor.Controllers {
                             if (!string.IsNullOrEmpty(LinkLabel)) {
                                 result += "\r<li class=\"ccListItem\">";
                                 if (!string.IsNullOrEmpty(Link)) {
-                                    result += GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(core.webServer.requestPage + "?rc=" + ContentId + "&ri=" + RecordId) + "\">", LinkLabel);
+                                    result += GenericController.getLinkedText("<a href=\"" + HtmlController.encodeHtml(core.webServer.requestPage + "?rc=" + ContentId + "&ri=" + RecordId) + "\">", LinkLabel);
                                 } else {
                                     result += LinkLabel;
                                 }

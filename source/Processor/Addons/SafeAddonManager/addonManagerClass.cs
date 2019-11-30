@@ -296,9 +296,9 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                         LocalCollectionXML = CollectionFolderModel.getCollectionFolderConfigXml(core);
                         LocalCollections.LoadXml(LocalCollectionXML);
                         foreach (XmlNode CDef_Node in LocalCollections.DocumentElement.ChildNodes) {
-                            if (GenericController.vbLCase(CDef_Node.Name) == "collection") {
+                            if (GenericController.toLCase(CDef_Node.Name) == "collection") {
                                 foreach (XmlNode CollectionNode in CDef_Node.ChildNodes) {
-                                    if (GenericController.vbLCase(CollectionNode.Name) == "guid") {
+                                    if (GenericController.toLCase(CollectionNode.Name) == "guid") {
                                         OnServerGuidList += "," + CollectionNode.InnerText;
                                         break;
                                     }
@@ -319,7 +319,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                         }
                         Ptr = 0;
                         if (!parseError) {
-                            if (GenericController.vbLCase(LibCollections.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
+                            if (GenericController.toLCase(LibCollections.DocumentElement.Name) != GenericController.toLCase(CollectionListRootNode)) {
                                 UserError = "There was an error reading the Collection Library file. The '" + CollectionListRootNode + "' element was not found.";
                                 HandleClassAppendLog("AddonManager", UserError);
                                 status += "<br>" + UserError;
@@ -330,13 +330,13 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                                 //
                                 RowPtr = 0;
                                 foreach (XmlNode CDef_Node in LibCollections.DocumentElement.ChildNodes) {
-                                    switch (GenericController.vbLCase(CDef_Node.Name)) {
+                                    switch (GenericController.toLCase(CDef_Node.Name)) {
                                         case "collection": {
                                                 //
                                                 // Read the collection
                                                 //
                                                 foreach (XmlNode CollectionNode in CDef_Node.ChildNodes) {
-                                                    switch (GenericController.vbLCase(CollectionNode.Name)) {
+                                                    switch (GenericController.toLCase(CollectionNode.Name)) {
                                                         case "name": {
                                                                 //
                                                                 // Name
@@ -656,9 +656,9 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                 Found = false;
                 ResultNode = Node.Attributes.GetNamedItem(Name);
                 if (ResultNode == null) {
-                    UcaseName = GenericController.vbUCase(Name);
+                    UcaseName = GenericController.toUCase(Name);
                     foreach (XmlAttribute NodeAttribute in Node.Attributes) {
-                        if (GenericController.vbUCase(NodeAttribute.Name) == UcaseName) {
+                        if (GenericController.toUCase(NodeAttribute.Name) == UcaseName) {
                             tempGetXMLAttribute = NodeAttribute.Value;
                             Found = true;
                             break;
@@ -708,7 +708,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                 //
                 tempGetParentIDFromNameSpace = 0;
                 if (!string.IsNullOrEmpty(menuNameSpace)) {
-                    Pos = GenericController.vbInstr(1, menuNameSpace, ".");
+                    Pos = GenericController.strInstr(1, menuNameSpace, ".");
                     if (Pos == 0) {
                         ParentName = menuNameSpace;
                         ParentNameSpace = "";

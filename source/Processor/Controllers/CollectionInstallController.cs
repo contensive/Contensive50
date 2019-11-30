@@ -193,7 +193,7 @@ namespace Contensive.Processor.Controllers {
                                     loadOK = false;
                                 }
                                 if (loadOK) {
-                                    if ((Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.vbLCase(CollectionFileRootNode)) || (Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.vbLCase(CollectionFileRootNodeOld))) {
+                                    if ((Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.toLCase(CollectionFileRootNode)) || (Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.toLCase(CollectionFileRootNodeOld))) {
                                         //
                                         //------------------------------------------------------------------------------------------------------
                                         // Collection File - import from sub so it can be re-entrant
@@ -228,11 +228,11 @@ namespace Contensive.Processor.Controllers {
                                             if (string.IsNullOrEmpty(FileGuid)) {
                                                 FileGuid = CollectionName;
                                             }
-                                            if (collectionGuid.ToLowerInvariant() != GenericController.vbLCase(FileGuid)) {
+                                            if (collectionGuid.ToLowerInvariant() != GenericController.toLCase(FileGuid)) {
                                                 //
                                                 //
                                                 //
-                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], Collection file contains incorrect GUID, correct GUID [" + collectionGuid.ToLowerInvariant() + "], incorrect GUID in file [" + GenericController.vbLCase(FileGuid) + "]");
+                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], Collection file contains incorrect GUID, correct GUID [" + collectionGuid.ToLowerInvariant() + "], incorrect GUID in file [" + GenericController.toLCase(FileGuid) + "]");
                                                 return_ErrorMessage += "<P>The collection was not installed because the unique number identifying the collection, called the guid, does not match the collection requested.</P>";
                                                 return false;
                                             } else {
@@ -270,7 +270,7 @@ namespace Contensive.Processor.Controllers {
                                                                 filename = FileController.convertToDosSlash(filename);
                                                                 string SrcPath = "";
                                                                 string dstPath = resourcePath;
-                                                                int Pos = GenericController.vbInstr(1, filename, "\\");
+                                                                int Pos = GenericController.strInstr(1, filename, "\\");
                                                                 if (Pos != 0) {
                                                                     //
                                                                     // Source path is in filename
@@ -300,7 +300,7 @@ namespace Contensive.Processor.Controllers {
                                                                             wwwFileList += Environment.NewLine + dstDosPath + filename;
                                                                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.localWwwPath + dstDosPath + "].");
                                                                             core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.wwwFiles);
-                                                                            if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
+                                                                            if (GenericController.toLCase(filename.Substring(filename.Length - 4)) == ".zip") {
                                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping www file [" + core.appConfig.localWwwPath + dstDosPath + filename + "].");
                                                                                 core.wwwFiles.unzipFile(dstDosPath + filename);
                                                                             }
@@ -311,7 +311,7 @@ namespace Contensive.Processor.Controllers {
                                                                             ContentFileList += Environment.NewLine + dstDosPath + filename;
                                                                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, copying file to content, src [" + CollectionVersionFolder + SrcPath + "], dst [" + dstDosPath + "].");
                                                                             core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.cdnFiles);
-                                                                            if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
+                                                                            if (GenericController.toLCase(filename.Substring(filename.Length - 4)) == ".zip") {
                                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping content file [" + dstDosPath + filename + "].");
                                                                                 core.cdnFiles.unzipFile(dstDosPath + filename);
                                                                             }
@@ -510,7 +510,7 @@ namespace Contensive.Processor.Controllers {
                                                             }
                                                             if (loadOK) {
                                                                 foreach (XmlNode metaDataNode in NavDoc.DocumentElement.ChildNodes) {
-                                                                    switch (GenericController.vbLCase(metaDataNode.Name)) {
+                                                                    switch (GenericController.toLCase(metaDataNode.Name)) {
                                                                         case "cdef": {
                                                                                 string ContentName = XmlController.getXMLAttribute(core, IsFound, metaDataNode, "name", "");
                                                                                 //
@@ -544,14 +544,14 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     {
                                                         foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                            switch (GenericController.vbLCase(metaDataSection.Name)) {
+                                                            switch (GenericController.toLCase(metaDataSection.Name)) {
                                                                 case "data": {
                                                                         //
                                                                         // import content
                                                                         //   This can only be done with matching guid
                                                                         //
                                                                         foreach (XmlNode ContentNode in metaDataSection.ChildNodes) {
-                                                                            if (GenericController.vbLCase(ContentNode.Name) == "record") {
+                                                                            if (GenericController.toLCase(ContentNode.Name) == "record") {
                                                                                 //
                                                                                 // Data.Record node
                                                                                 //
@@ -633,7 +633,7 @@ namespace Contensive.Processor.Controllers {
                                                     //-------------------------------------------------------------------------------
                                                     //
                                                     foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                        switch (GenericController.vbLCase(metaDataSection.Name)) {
+                                                        switch (GenericController.toLCase(metaDataSection.Name)) {
                                                             case "cdef":
                                                             case "data":
                                                             case "help":
@@ -747,7 +747,7 @@ namespace Contensive.Processor.Controllers {
                                                     //-------------------------------------------------------------------------------
                                                     //
                                                     foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                        switch (GenericController.vbLCase(metaDataSection.Name)) {
+                                                        switch (GenericController.toLCase(metaDataSection.Name)) {
                                                             case "data": {
                                                                     int recordPtr = 0;
                                                                     foreach (XmlNode ContentNode in metaDataSection.ChildNodes) {
@@ -781,7 +781,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                     int FieldLookupContentId = -1;
                                                                                                     foreach (var keyValuePair in metaData.fields) {
                                                                                                         Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
-                                                                                                        if (GenericController.vbLCase(field.nameLc) == FieldName) {
+                                                                                                        if (GenericController.toLCase(field.nameLc) == FieldName) {
                                                                                                             fieldTypeId = field.fieldTypeId;
                                                                                                             FieldLookupContentId = field.lookupContentId;
                                                                                                             IsFieldFound = true;
@@ -1114,7 +1114,7 @@ namespace Contensive.Processor.Controllers {
             return_ErrorMessage = "";
             return_UpgradeOK = true;
             try {
-                string Basename = GenericController.vbLCase(AddonNode.Name);
+                string Basename = GenericController.toLCase(AddonNode.Name);
                 if ((Basename == "page") || (Basename == "process") || (Basename == "addon") || (Basename == "add-on")) {
                     bool IsFound = false;
                     string addonName = XmlController.getXMLAttribute(core, IsFound, AddonNode, "name", "No Name");
@@ -1190,7 +1190,7 @@ namespace Contensive.Processor.Controllers {
                                         string ScriptingEntryPoint = null;
                                         int ScriptingTimeout = 0;
                                         string ScriptingLanguage = null;
-                                        switch (GenericController.vbLCase(Addonfield.Name)) {
+                                        switch (GenericController.toLCase(Addonfield.Name)) {
                                             case "activexdll": {
                                                     //
                                                     // This is handled in BuildLocalCollectionFolder
@@ -1205,7 +1205,7 @@ namespace Contensive.Processor.Controllers {
                                                         //
                                                         int fieldTypeId = 0;
                                                         string fieldType = null;
-                                                        switch (GenericController.vbLCase(TriggerNode.Name)) {
+                                                        switch (GenericController.toLCase(TriggerNode.Name)) {
                                                             case "type": {
                                                                     fieldType = TriggerNode.InnerText;
                                                                     fieldTypeId = MetadataController.getRecordIdByUniqueName(core, "Content Field Types", fieldType);
@@ -1237,7 +1237,7 @@ namespace Contensive.Processor.Controllers {
                                                     // list of events that trigger a process run for this addon
                                                     //
                                                     foreach (XmlNode TriggerNode in Addonfield.ChildNodes) {
-                                                        switch (GenericController.vbLCase(TriggerNode.Name)) {
+                                                        switch (GenericController.toLCase(TriggerNode.Name)) {
                                                             case "contentchange": {
                                                                     int TriggerContentId = 0;
                                                                     string ContentNameorGuid = TriggerNode.InnerText;
@@ -1300,7 +1300,7 @@ namespace Contensive.Processor.Controllers {
                                                     cs.set("ScriptingTimeout", ScriptingTimeout);
                                                     ScriptingCode = "";
                                                     foreach (XmlNode ScriptingNode in Addonfield.ChildNodes) {
-                                                        switch (GenericController.vbLCase(ScriptingNode.Name)) {
+                                                        switch (GenericController.toLCase(ScriptingNode.Name)) {
                                                             case "code": {
                                                                     ScriptingCode += ScriptingNode.InnerText;
                                                                     break;
@@ -1416,7 +1416,7 @@ namespace Contensive.Processor.Controllers {
                                                         // Icons can be either in the root of the website or in content files
                                                         //
                                                         FieldValue = GenericController.strReplace(FieldValue, "\\", "/"); // make it a link, not a file
-                                                        if (GenericController.vbInstr(1, FieldValue, "://") != 0) {
+                                                        if (GenericController.strInstr(1, FieldValue, "://") != 0) {
                                                             //
                                                             // the link is an absolute URL, leave it link this
                                                             //
@@ -1542,7 +1542,7 @@ namespace Contensive.Processor.Controllers {
         private static string setAddonDependencies(CoreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool ReturnUpgradeOK, ref string ReturnErrorMessage) {
             string result = "";
             try {
-                string Basename = GenericController.vbLCase(AddonNode.Name);
+                string Basename = GenericController.toLCase(AddonNode.Name);
                 if ((Basename == "page") || (Basename == "process") || (Basename == "addon") || (Basename == "add-on")) {
                     bool IsFound = false;
                     string AOName = XmlController.getXMLAttribute(core, IsFound, AddonNode, "name", "No Name");
@@ -1569,7 +1569,7 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             if (AddonNode.ChildNodes.Count > 0) {
                                 foreach (XmlNode PageInterface in AddonNode.ChildNodes) {
-                                    switch (GenericController.vbLCase(PageInterface.Name)) {
+                                    switch (GenericController.toLCase(PageInterface.Name)) {
                                         case "includeaddon":
                                         case "includeadd-on":
                                         case "include addon":

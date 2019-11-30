@@ -142,14 +142,14 @@ namespace Contensive.Processor.Controllers {
                     //
                     returnSendStatus = "Email not sent because the from-address is not valid.";
                     LogController.logInfo(core, "queueAdHocEmail, NOT SENT [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
-                } else if (0 != GenericController.vbInstr(1, getBlockList(core), Environment.NewLine + toAddress + Environment.NewLine, 1)) {
+                } else if (0 != GenericController.strInstr(1, getBlockList(core), Environment.NewLine + toAddress + Environment.NewLine, 1)) {
                     //
                     returnSendStatus = "Email not sent because the to-address is blocked by this application. See the Blocked Email Report.";
                     LogController.logInfo(core, "queueAdHocEmail, NOT SENT [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
                 } else {
                     //
                     // Test for from-address / to-address matches
-                    if (GenericController.vbLCase(fromAddress) == GenericController.vbLCase(toAddress)) {
+                    if (GenericController.toLCase(fromAddress) == GenericController.toLCase(toAddress)) {
                         fromAddress = core.siteProperties.getText("EmailFromAddress", "");
                         if (string.IsNullOrEmpty(fromAddress)) {
                             //
@@ -158,7 +158,7 @@ namespace Contensive.Processor.Controllers {
                             fromAddress = toAddress;
                             returnSendStatus = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering.";
                             LogController.logInfo(core, "queueAdHocEmail, sent with warning [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
-                        } else if (GenericController.vbLCase(fromAddress) == GenericController.vbLCase(toAddress)) {
+                        } else if (GenericController.toLCase(fromAddress) == GenericController.toLCase(toAddress)) {
                             //
                             //
                             //
@@ -255,7 +255,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (!verifyEmailAddress(core, fromAddress)) {
                     //
                     userErrorMessage = "Email not sent because the from-address is not valid.";
-                } else if (0 != GenericController.vbInstr(1, getBlockList(core), Environment.NewLine + recipient.email + Environment.NewLine, 1)) {
+                } else if (0 != GenericController.strInstr(1, getBlockList(core), Environment.NewLine + recipient.email + Environment.NewLine, 1)) {
                     //
                     userErrorMessage = "Email not sent because the to-address is blocked by this application. See the Blocked Email Report.";
                 } else {
@@ -450,7 +450,7 @@ namespace Contensive.Processor.Controllers {
                     // This field is default true, and non-authorable
                     // It will be true in all cases, except a possible unforseen exception
                     //
-                    EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml("http://" + core.appConfig.domainList[0] + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                    EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + GenericController.getLinkedText("<a href=\"" + HtmlController.encodeHtml("http://" + core.appConfig.domainList[0] + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
                 }
                 string confirmationMessage = "";
                 //
@@ -584,7 +584,7 @@ namespace Contensive.Processor.Controllers {
                         // AllowSpamFooter is default true, and non-authorable
                         // It will be true in all cases, except a possible unforseen exception
                         //
-                        EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;\">" + GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(core.webServer.requestProtocol + core.webServer.requestDomain + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                        EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;\">" + GenericController.getLinkedText("<a href=\"" + HtmlController.encodeHtml(core.webServer.requestProtocol + core.webServer.requestDomain + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
                         EmailBody = GenericController.strReplace(EmailBody, "#member_email#", "UserEmailAddress");
                     }
                     //
@@ -626,7 +626,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                             }
                             int EmailLen = Emailtext.Length;
-                            int Posat = GenericController.vbInstr(1, Emailtext, "@");
+                            int Posat = GenericController.strInstr(1, Emailtext, "@");
                             int PosDot = Emailtext.LastIndexOf(".") + 1;
                             if (EmailLen < 6) {
                                 BadCnt = BadCnt + 1;
@@ -725,7 +725,7 @@ namespace Contensive.Processor.Controllers {
                 foreach (string key in core.docProperties.getKeyList()) {
                     var tempVar = core.docProperties.getProperty(key);
                     if (tempVar.propertyType == DocPropertyController.DocPropertyTypesEnum.form) {
-                        if (GenericController.vbUCase(tempVar.Value) == "ON") {
+                        if (GenericController.toUCase(tempVar.Value) == "ON") {
                             Message += tempVar.Name + ": Yes\r\n\r\n";
                         } else {
                             Message += tempVar.Name + ": " + tempVar.Value + Environment.NewLine + "\r\n";
@@ -1073,7 +1073,7 @@ namespace Contensive.Processor.Controllers {
                 string defaultPage = core.siteProperties.serverPageDefault;
                 //
                 // non-authorable, default true - leave it as an option in case there is an important exception
-                body += "<div style=\"padding:10px;\">" + GenericController.csv_GetLinkedText("<a href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailBlockRecipientEmail + "=" + recipientEmail + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                body += "<div style=\"padding:10px;\">" + GenericController.getLinkedText("<a href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailBlockRecipientEmail + "=" + recipientEmail + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
             }
 
             if (body.ToLower(CultureInfo.InvariantCulture).IndexOf("<html") >= 0) {

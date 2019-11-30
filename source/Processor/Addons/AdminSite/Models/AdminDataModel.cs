@@ -413,7 +413,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // ccpagecontent.linkalias is a control field that is not in control tab
                     //
                 } else {
-                    switch (GenericController.vbUCase(Name)) {
+                    switch (GenericController.toUCase(Name)) {
                         case "ACTIVE":
                         case "ID":
                         case "CONTENTCONTROLID":
@@ -650,7 +650,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         requestButton = "";
                         admin_Action = Constants.AdminActionEditRefresh;
                         adminForm = AdminFormEdit;
-                        int Pos = GenericController.vbInstr(1, fieldEditorPreference, ":");
+                        int Pos = GenericController.strInstr(1, fieldEditorPreference, ":");
                         if (Pos > 0) {
                             int fieldEditorFieldId = GenericController.encodeInteger(fieldEditorPreference.left(Pos - 1));
                             int fieldEditorAddonId = GenericController.encodeInteger(fieldEditorPreference.Substring(Pos));
@@ -681,7 +681,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         if (Cnt > 0) {
                                             int Ptr = 0;
                                             for (Ptr = 1; Ptr < Cnt; Ptr++) {
-                                                Pos = GenericController.vbInstr(1, Parts[Ptr], ",");
+                                                Pos = GenericController.strInstr(1, Parts[Ptr], ",");
                                                 if (Pos == 0) {
                                                     Parts[Ptr] = "";
                                                 } else if (Pos > 0) {
@@ -791,7 +791,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     // ----- Set Read Only: if non-developer tries to edit a developer record
                     //
-                    if (GenericController.vbUCase(adminContent.tableName) == GenericController.vbUCase("ccMembers")) {
+                    if (GenericController.toUCase(adminContent.tableName) == GenericController.toUCase("ccMembers")) {
                         if (!core.session.isAuthenticatedDeveloper()) {
                             if (editRecord.fieldsLc.ContainsKey("developer")) {
                                 if (GenericController.encodeBoolean(editRecord.fieldsLc["developer"].value)) {
@@ -879,10 +879,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                     editRecord.fieldsLc[field.nameLc].value = MetadataController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText);
                                                 }
                                             } else if (field.lookupList != "") {
-                                                UCaseDefaultValueText = vbUCase(DefaultValueText);
+                                                UCaseDefaultValueText = toUCase(DefaultValueText);
                                                 lookups = field.lookupList.Split(',');
                                                 for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
-                                                    if (UCaseDefaultValueText == vbUCase(lookups[Ptr])) {
+                                                    if (UCaseDefaultValueText == toUCase(lookups[Ptr])) {
                                                         editRecord.fieldsLc[field.nameLc].value = Ptr + 1;
                                                         break;
                                                     }
@@ -903,7 +903,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // process reserved fields (set defaults just makes it look good)
                     // (also, this presets readonly/devonly/adminonly fields not set to member)
                     //
-                    switch (GenericController.vbUCase(field.nameLc)) {
+                    switch (GenericController.toUCase(field.nameLc)) {
                         case "MODIFIEDBY": {
                                 editRecord.fieldsLc[field.nameLc].value = core.session.user.id;
                                 break;
@@ -1131,7 +1131,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // Save EditRecord values
                                 //
-                                switch (GenericController.vbUCase(adminContentcontent.nameLc)) {
+                                switch (GenericController.toUCase(adminContentcontent.nameLc)) {
                                     case "DATEADDED": {
                                             editRecord.dateAdded = csData.getDate(adminContentcontent.nameLc);
                                             break;
@@ -1502,7 +1502,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     }
                                     //
                                     if (!field.htmlContent) {
-                                        string lcaseCopy = GenericController.vbLCase(ResponseFieldValueText);
+                                        string lcaseCopy = GenericController.toLCase(ResponseFieldValueText);
                                         lcaseCopy = GenericController.strReplace(lcaseCopy, "\r", "");
                                         lcaseCopy = GenericController.strReplace(lcaseCopy, "\n", "");
                                         lcaseCopy = lcaseCopy.Trim(' ');
@@ -1512,7 +1512,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             //
                                             ResponseFieldValueText = "";
                                         } else {
-                                            if (GenericController.vbInstr(1, ResponseFieldValueText, HTMLEditorDefaultCopyStartMark) != 0) {
+                                            if (GenericController.strInstr(1, ResponseFieldValueText, HTMLEditorDefaultCopyStartMark) != 0) {
                                                 //
                                                 // if the default copy was editing, remote the markers
                                                 //
@@ -1602,11 +1602,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                         //
                         // special case - people records without Allowduplicateusername require username to be unique
                         //
-                        if (GenericController.vbLCase(adminContent.tableName) == "ccmembers") {
-                            if (GenericController.vbLCase(field.nameLc) == "username") {
+                        if (GenericController.toLCase(adminContent.tableName) == "ccmembers") {
+                            if (GenericController.toLCase(field.nameLc) == "username") {
                                 blockDuplicateUsername = !(core.siteProperties.getBoolean("allowduplicateusername", false));
                             }
-                            if (GenericController.vbLCase(field.nameLc) == "email") {
+                            if (GenericController.toLCase(field.nameLc) == "email") {
                                 blockDuplicateEmail = (core.siteProperties.getBoolean("allowemaillogin", false));
                             }
                         }

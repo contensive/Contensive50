@@ -119,7 +119,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 const string MenuNameFPO = "<MenuName>";
                 const string NoneCaptionFPO = "<NoneCaption>";
-                string LcaseCriteria = vbLCase(Criteria);
+                string LcaseCriteria = toLCase(Criteria);
                 return_IsEmptyList = true;
                 //
                 string CurrentValueText = CurrentValue.ToString();
@@ -186,7 +186,7 @@ namespace Contensive.Processor.Controllers {
                         string SortFieldList = "";
                         for (CharPointer = 1; CharPointer <= DropDownFieldListLength; CharPointer++) {
                             string CharTest = DropDownFieldList.Substring(CharPointer - 1, 1);
-                            if (GenericController.vbInstr(1, CharAllowed, CharTest) == 0) {
+                            if (GenericController.strInstr(1, CharAllowed, CharTest) == 0) {
                                 //
                                 // Character not allowed, delimit Field name here
                                 //
@@ -269,7 +269,7 @@ namespace Contensive.Processor.Controllers {
                                     int IDFieldPointer = 0;
                                     int ColumnPointer = 0;
                                     for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
-                                        if (UcaseFieldName == GenericController.vbUCase(RowFieldArray[ColumnPointer])) {
+                                        if (UcaseFieldName == GenericController.toUCase(RowFieldArray[ColumnPointer])) {
                                             IDFieldPointer = ColumnPointer;
                                             break;
                                         }
@@ -278,9 +278,9 @@ namespace Contensive.Processor.Controllers {
                                     // setup DropDownFieldPointer()
                                     //
                                     for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
-                                        UcaseFieldName = GenericController.vbUCase(DropDownFieldName[FieldPointer]);
+                                        UcaseFieldName = GenericController.toUCase(DropDownFieldName[FieldPointer]);
                                         for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
-                                            if (UcaseFieldName == GenericController.vbUCase(RowFieldArray[ColumnPointer])) {
+                                            if (UcaseFieldName == GenericController.toUCase(RowFieldArray[ColumnPointer])) {
                                                 DropDownFieldPointer[FieldPointer] = ColumnPointer;
                                                 break;
                                             }
@@ -446,7 +446,7 @@ namespace Contensive.Processor.Controllers {
                         string[] DropDownDelimiter = { };
                         for (int CharPointer = 1; CharPointer <= DropDownFieldList.Length; CharPointer++) {
                             string CharTest = DropDownFieldList.Substring(CharPointer - 1, 1);
-                            if (GenericController.vbInstr(1, CharAllowed, CharTest) == 0) {
+                            if (GenericController.strInstr(1, CharAllowed, CharTest) == 0) {
                                 //
                                 // Character not allowed, delimit Field name here
                                 //
@@ -543,7 +543,7 @@ namespace Contensive.Processor.Controllers {
                                     string UcaseFieldName = "ID";
                                     int IDFieldPointer = 0;
                                     for (int ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
-                                        if (UcaseFieldName == GenericController.vbUCase(RowFieldArray[ColumnPointer])) {
+                                        if (UcaseFieldName == GenericController.toUCase(RowFieldArray[ColumnPointer])) {
                                             IDFieldPointer = ColumnPointer;
                                             break;
                                         }
@@ -552,9 +552,9 @@ namespace Contensive.Processor.Controllers {
                                     // setup DropDownFieldPointer()
                                     //
                                     for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
-                                        UcaseFieldName = GenericController.vbUCase(DropDownFieldName[FieldPointer]);
+                                        UcaseFieldName = GenericController.toUCase(DropDownFieldName[FieldPointer]);
                                         for (int ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
-                                            if (UcaseFieldName == GenericController.vbUCase(RowFieldArray[ColumnPointer])) {
+                                            if (UcaseFieldName == GenericController.toUCase(RowFieldArray[ColumnPointer])) {
                                                 DropDownFieldPointer[FieldPointer] = ColumnPointer;
                                                 break;
                                             }
@@ -739,7 +739,7 @@ namespace Contensive.Processor.Controllers {
                         result += "<a href=\"" + HtmlController.encodeHtml(Link) + "\" >";
                     }
                     IconFilename = core.siteProperties.loginIconFilename;
-                    if (GenericController.vbLCase(IconFilename.left(7)) != "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/") {
+                    if (GenericController.toLCase(IconFilename.left(7)) != "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/") {
                         IconFilename = GenericController.getCdnFileLink(core, IconFilename);
                     }
                     // original  "<img alt=\"Login\" src=\"" + IconFilename + "\" border=\"0\" >"
@@ -1579,10 +1579,10 @@ namespace Contensive.Processor.Controllers {
                 string SrcSelector = SrcOptionValueSelector.Trim(' ');
                 //
                 string SrcSelectorInner = SrcSelector;
-                int PosLeft = GenericController.vbInstr(1, SrcSelector, "[");
+                int PosLeft = GenericController.strInstr(1, SrcSelector, "[");
                 string SrcSelectorSuffix = "";
                 if (PosLeft != 0) {
-                    int PosRight = GenericController.vbInstr(1, SrcSelector, "]");
+                    int PosRight = GenericController.strInstr(1, SrcSelector, "]");
                     if (PosRight != 0) {
                         if (PosRight < SrcSelector.Length) {
                             SrcSelectorSuffix = SrcSelector.Substring(PosRight);
@@ -1610,7 +1610,7 @@ namespace Contensive.Processor.Controllers {
                         int FnLen = 0;
                         string Choice = Choices[Ptr];
                         if (Pos == 0) {
-                            Pos = GenericController.vbInstr(1, Choice, ACFunctionList1 + "(", 1);
+                            Pos = GenericController.strInstr(1, Choice, ACFunctionList1 + "(", 1);
                             if (Pos > 0) {
                                 IsContentList = true;
                                 IncludeID = false;
@@ -1618,7 +1618,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         if (Pos == 0) {
-                            Pos = GenericController.vbInstr(1, Choice, ACFunctionList2 + "(", 1);
+                            Pos = GenericController.strInstr(1, Choice, ACFunctionList2 + "(", 1);
                             if (Pos > 0) {
                                 IsContentList = true;
                                 IncludeID = false;
@@ -1626,7 +1626,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         if (Pos == 0) {
-                            Pos = GenericController.vbInstr(1, Choice, ACFunctionList3 + "(", 1);
+                            Pos = GenericController.strInstr(1, Choice, ACFunctionList3 + "(", 1);
                             if (Pos > 0) {
                                 IsContentList = true;
                                 IncludeID = false;
@@ -1634,7 +1634,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         if (Pos == 0) {
-                            Pos = GenericController.vbInstr(1, Choice, ACFunctionListId + "(", 1);
+                            Pos = GenericController.strInstr(1, Choice, ACFunctionListId + "(", 1);
                             if (Pos > 0) {
                                 IsContentList = true;
                                 IncludeID = true;
@@ -1642,7 +1642,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         if (Pos == 0) {
-                            Pos = GenericController.vbInstr(1, Choice, ACFunctionList + "(", 1);
+                            Pos = GenericController.strInstr(1, Choice, ACFunctionList + "(", 1);
                             if (Pos > 0) {
                                 IsContentList = true;
                                 IncludeID = false;
@@ -1650,7 +1650,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         if (Pos == 0) {
-                            Pos = GenericController.vbInstr(1, Choice, ACFunctionListFields + "(", 1);
+                            Pos = GenericController.strInstr(1, Choice, ACFunctionListFields + "(", 1);
                             if (Pos > 0) {
                                 IsListField = true;
                                 IncludeID = false;
@@ -1744,7 +1744,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // empty list with no suffix, return with name=value
                     //
-                } else if (GenericController.vbLCase(SrcSelectorSuffix) == "resourcelink") {
+                } else if (GenericController.toLCase(SrcSelectorSuffix) == "resourcelink") {
                     //
                     // resource link, exit with empty list
                     //
@@ -1984,7 +1984,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Hardcoded Addons
                     //
-                    switch (GenericController.vbLCase(AddonName)) {
+                    switch (GenericController.toLCase(AddonName)) {
                         case "block text":
                             FoundAddon = true;
                             AddonOptionConstructor = AddonOptionConstructor_ForBlockText;
@@ -2047,7 +2047,7 @@ namespace Contensive.Processor.Controllers {
                             // Field is given, find the position
                             //
                             Copy = csData.getText(FieldName);
-                            PosACInstanceId = GenericController.vbInstr(1, Copy, "=\"" + ACInstanceId + "\" ", 1);
+                            PosACInstanceId = GenericController.strInstr(1, Copy, "=\"" + ACInstanceId + "\" ", 1);
                         } else {
                             //
                             // Find the field, then find the position
@@ -2065,7 +2065,7 @@ namespace Contensive.Processor.Controllers {
                                     case CPContentBaseClass.FieldTypeIdEnum.HTML:
                                     case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                                         Copy = csData.getText(FieldName);
-                                        PosACInstanceId = GenericController.vbInstr(1, Copy, "ACInstanceID=\"" + ACInstanceId + "\"", 1);
+                                        PosACInstanceId = GenericController.strInstr(1, Copy, "ACInstanceID=\"" + ACInstanceId + "\"", 1);
                                         if (PosACInstanceId != 0) {
                                             //
                                             // found the instance
@@ -2091,10 +2091,10 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // main_Get Addon Name to lookup Addon and main_Get most recent Argument List
                                 //
-                                PosNameStart = GenericController.vbInstr(PosStart, Copy, " name=", 1);
+                                PosNameStart = GenericController.strInstr(PosStart, Copy, " name=", 1);
                                 if (PosNameStart != 0) {
                                     PosNameStart = PosNameStart + 7;
-                                    PosNameEnd = GenericController.vbInstr(PosNameStart, Copy, "\"");
+                                    PosNameEnd = GenericController.strInstr(PosNameStart, Copy, "\"");
                                     if (PosNameEnd != 0) {
                                         AddonName = Copy.Substring(PosNameStart - 1, PosNameEnd - PosNameStart);
                                         //????? test this
@@ -2117,7 +2117,7 @@ namespace Contensive.Processor.Controllers {
                                         } else {
                                             //
                                             // -- Hardcoded Addons
-                                            switch (GenericController.vbLCase(AddonName)) {
+                                            switch (GenericController.toLCase(AddonName)) {
                                                 case "block text":
                                                     FoundAddon = true;
                                                     AddonOptionConstructor = AddonOptionConstructor_ForBlockText;
@@ -2166,11 +2166,11 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // Replace the new querystring into the AC tag in the content
                                 //
-                                PosIDStart = GenericController.vbInstr(PosStart, Copy, " querystring=", 1);
+                                PosIDStart = GenericController.strInstr(PosStart, Copy, " querystring=", 1);
                                 if (PosIDStart != 0) {
                                     PosIDStart = PosIDStart + 14;
                                     if (PosIDStart != 0) {
-                                        PosIDEnd = GenericController.vbInstr(PosIDStart, Copy, "\"");
+                                        PosIDEnd = GenericController.strInstr(PosIDStart, Copy, "\"");
                                         if (PosIDEnd != 0) {
                                             ParseOK = true;
                                             Copy = Copy.left(PosIDStart - 1) + HtmlController.encodeHtml(addonOption_String) + Copy.Substring(PosIDEnd - 1);
@@ -2211,7 +2211,7 @@ namespace Contensive.Processor.Controllers {
             //
             HelpBubbleId = core.docProperties.getText("HelpBubbleID");
             IDSplit = HelpBubbleId.Split('-');
-            switch (GenericController.vbLCase(IDSplit[0])) {
+            switch (GenericController.toLCase(IDSplit[0])) {
                 case "userfield":
                     //
                     // main_Get the id of the field, and save the input as the caption and help
@@ -2765,7 +2765,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getAddonOptionStringValue(string OptionName, string addonOptionString) {
             string result = GenericController.getSimpleNameValue(OptionName, addonOptionString, "", "&");
-            int Pos = GenericController.vbInstr(1, result, "[");
+            int Pos = GenericController.strInstr(1, result, "[");
             if (Pos > 0) {
                 result = result.left(Pos - 1);
             }
@@ -3609,12 +3609,12 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             //
             //   Indent every line by 1 tab
-            int posStart = GenericController.vbInstr(1, sourceHtml, "<![CDATA[", 1);
+            int posStart = GenericController.strInstr(1, sourceHtml, "<![CDATA[", 1);
             if (posStart == 0) {
                 //
                 // no cdata
                 //
-                posStart = GenericController.vbInstr(1, sourceHtml, "<textarea", 1);
+                posStart = GenericController.strInstr(1, sourceHtml, "<textarea", 1);
                 if (posStart == 0) {
                     //
                     // no textarea
@@ -3628,7 +3628,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // text area found, isolate it and indent before and after
                     //
-                    int posEnd = GenericController.vbInstr(posStart, sourceHtml, "</textarea>", 1);
+                    int posEnd = GenericController.strInstr(posStart, sourceHtml, "</textarea>", 1);
                     string pre = sourceHtml.left(posStart - 1);
                     string post = "";
                     string target = "";
@@ -3644,7 +3644,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // cdata found, isolate it and indent before and after
                 //
-                int posEnd = GenericController.vbInstr(posStart, sourceHtml, "]]>", 1);
+                int posEnd = GenericController.strInstr(posStart, sourceHtml, "]]>", 1);
                 string pre = sourceHtml.left(posStart - 1);
                 string post = "";
                 string target = "";

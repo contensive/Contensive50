@@ -613,7 +613,7 @@ namespace Contensive.Processor.Controllers {
                     if (csData.ok()) {
                         csData.set("NAME", name);
                         csData.set("Abbreviation", abbreviation);
-                        if (GenericController.vbLCase(name) == "united states") {
+                        if (GenericController.toLCase(name) == "united states") {
                             csData.set("DomesticShipping", "1");
                         }
                     }

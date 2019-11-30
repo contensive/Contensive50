@@ -60,7 +60,7 @@ namespace Contensive.Processor.Controllers {
                         if (Pos > 0) {
                             string FilenameExt = Filename.Substring(Pos);
                             string FilenameNoExt = Filename.left(Pos - 1);
-                            if (GenericController.vbInstr(1, "jpg,gif,png", FilenameExt, 1) != 0) {
+                            if (GenericController.strInstr(1, "jpg,gif,png", FilenameExt, 1) != 0) {
                                 ImageEditController sf = new ImageEditController();
                                 if (sf.load(FilePath + Filename, core.wwwFiles)) {
                                     //
@@ -178,7 +178,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (tableNameLower == SitePropertyModel.tableMetadata.tableNameLower) {
                     //
                     // -- Site Properties
-                    switch (GenericController.vbLCase(recordName)) {
+                    switch (GenericController.toLCase(recordName)) {
                         case "allowlinkalias":
                             PageContentModel.invalidateCacheOfTable<PageContentModel>(core.cpParent);
                             break;

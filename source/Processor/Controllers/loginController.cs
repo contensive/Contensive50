@@ -177,7 +177,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (string formKey in core.docProperties.getKeyList()) {
                         var formValue = core.docProperties.getProperty(formKey);
                         if (formValue.propertyType == DocPropertyController.DocPropertyTypesEnum.form) {
-                            switch (GenericController.vbUCase(formValue.Name)) {
+                            switch (GenericController.toUCase(formValue.Name)) {
                                 case "S":
                                 case "MA":
                                 case "MB":
@@ -288,14 +288,14 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(workingEmail)) {
                     ErrorController.addUserError(core, "Please enter your email address before requesting your username and password.");
                 } else {
-                    atPtr = GenericController.vbInstr(1, workingEmail, "@");
+                    atPtr = GenericController.strInstr(1, workingEmail, "@");
                     if (atPtr < 2) {
                         //
                         // email not valid
                         //
                         ErrorController.addUserError(core, "Please enter a valid email address before requesting your username and password.");
                     } else {
-                        EMailName = vbMid(workingEmail, 1, atPtr - 1);
+                        EMailName = strMid(workingEmail, 1, atPtr - 1);
                         //
                         LogController.addSiteActivity(core, "password request for email " + workingEmail, core.session.user.id, core.session.user.organizationId);
                         //
@@ -309,7 +309,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // valid login account for this email not found
                                 //
-                                if (encodeText(vbMid(workingEmail, atPtr + 1)).ToLowerInvariant() == "contensive.com") {
+                                if (encodeText(strMid(workingEmail, atPtr + 1)).ToLowerInvariant() == "contensive.com") {
                                     //
                                     // look for expired account to renew
                                     //
@@ -388,7 +388,7 @@ namespace Contensive.Processor.Controllers {
                                         if (string.IsNullOrEmpty(Password)) {
                                             for (Ptr = 0; Ptr <= 8; Ptr++) {
                                                 Index = encodeInteger(Microsoft.VisualBasic.VBMath.Rnd() * passwordChrsLength);
-                                                Password = Password + vbMid(passwordChrs, Index, 1);
+                                                Password = Password + strMid(passwordChrs, Index, 1);
                                             }
                                             updateUser = true;
                                         }

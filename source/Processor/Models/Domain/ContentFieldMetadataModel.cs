@@ -495,7 +495,7 @@ namespace Contensive.Processor.Models.Domain {
                     contentId = contentMetadata.id
                 };
                 //
-                switch (GenericController.vbUCase(fieldName)) {
+                switch (GenericController.toUCase(fieldName)) {
                     //
                     // --- Core fields
                     //

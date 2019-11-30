@@ -283,11 +283,11 @@ namespace Contensive.Processor.Controllers {
                         // -- setup referrer
                         if (!string.IsNullOrEmpty(core.webServer.requestReferrer)) {
                             string WorkingReferer = core.webServer.requestReferrer;
-                            int SlashPosition = GenericController.vbInstr(1, WorkingReferer, "//");
+                            int SlashPosition = GenericController.strInstr(1, WorkingReferer, "//");
                             if ((SlashPosition != 0) && (WorkingReferer.Length > (SlashPosition + 2))) {
                                 WorkingReferer = WorkingReferer.Substring(SlashPosition + 1);
                             }
-                            SlashPosition = GenericController.vbInstr(1, WorkingReferer, "/");
+                            SlashPosition = GenericController.strInstr(1, WorkingReferer, "/");
                             if (SlashPosition == 0) {
                                 resultSessionContext.visit.refererPathPage = "";
                                 resultSessionContext.visit.http_referer = WorkingReferer;
@@ -438,7 +438,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // -- test browser name
                                                 if (!string.IsNullOrEmpty(Args[1].Trim(' '))) {
-                                                    if (GenericController.vbInstr(1, core.webServer.requestBrowser, Args[1], 1) != 0) {
+                                                    if (GenericController.strInstr(1, core.webServer.requestBrowser, Args[1], 1) != 0) {
                                                         resultSessionContext.visit.name = Args[0];
                                                         visitNameFound = true;
                                                     }
@@ -447,7 +447,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // -- ip address
                                                     if (!string.IsNullOrEmpty(Args[2].Trim(' '))) {
-                                                        if (GenericController.vbInstr(1, core.webServer.requestRemoteIP, Args[2], 1) != 0) {
+                                                        if (GenericController.strInstr(1, core.webServer.requestRemoteIP, Args[2], 1) != 0) {
                                                             resultSessionContext.visit.name = Args[0];
                                                             visitNameFound = true;
                                                         }
@@ -863,7 +863,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // password login
                                     //
-                                    if (GenericController.vbLCase(csData.getText("password")) == GenericController.vbLCase(iPassword)) {
+                                    if (GenericController.toLCase(csData.getText("password")) == GenericController.toLCase(iPassword)) {
                                         returnUserId = csData.getInteger("ID");
                                     }
                                 }

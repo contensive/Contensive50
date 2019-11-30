@@ -455,7 +455,7 @@ namespace Contensive.Processor.Addons.Tools {
                 ToolsAction = core.docProperties.getInteger("dta");
                 int TargetFieldID = core.docProperties.getInteger("fi");
                 int ContentId = core.docProperties.getInteger(RequestNameToolContentId);
-                string FieldNameToAdd = GenericController.vbUCase(core.docProperties.getText(RequestNameAddField));
+                string FieldNameToAdd = GenericController.toUCase(core.docProperties.getText(RequestNameAddField));
                 int FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldId);
                 string ButtonList = ButtonCancel + "," + ButtonSelect;
                 bool ReloadCDef = core.docProperties.getBoolean("ReloadCDef");
@@ -910,7 +910,7 @@ namespace Contensive.Processor.Addons.Tools {
                             //
                             csData.goFirst();
                             while (csData.ok()) {
-                                switch (GenericController.vbUCase(csData.getText("name"))) {
+                                switch (GenericController.toUCase(csData.getText("name"))) {
                                     case "ACTIVE": {
                                             csData.set("IndexColumn", 0);
                                             csData.set("IndexWidth", 20);
@@ -1158,7 +1158,7 @@ namespace Contensive.Processor.Addons.Tools {
             EndOfList = false;
             CommandStartPosition = 1;
             while ((CommandCount < CommandPosition) && (!EndOfList)) {
-                CommandStartPosition = GenericController.vbInstr(CommandStartPosition, CommandList, ",");
+                CommandStartPosition = GenericController.strInstr(CommandStartPosition, CommandList, ",");
                 if (CommandStartPosition == 0) {
                     EndOfList = true;
                 }
@@ -1166,7 +1166,7 @@ namespace Contensive.Processor.Addons.Tools {
                 CommandCount = CommandCount + 1;
             }
             if (!EndOfList) {
-                CommandEndPosition = GenericController.vbInstr(CommandStartPosition, CommandList, ",");
+                CommandEndPosition = GenericController.strInstr(CommandStartPosition, CommandList, ",");
                 if (CommandEndPosition == 0) {
                     tempDiagArgument = CommandList.Substring(CommandStartPosition - 1);
                 } else {
@@ -1888,7 +1888,7 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 string QueryOld = ".asp?";
                 string QueryNew = GenericController.modifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, true);
-                tempGetForm_LogFiles = tempGetForm_LogFiles + GenericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew + "&", 1, 99, 1);
+                tempGetForm_LogFiles = tempGetForm_LogFiles + GenericController.strReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew + "&", 1, 99, 1);
                 //
                 tempGetForm_LogFiles = AdminUIController.getToolForm(core, tempGetForm_LogFiles, ButtonList);
             } catch (Exception ex) {
@@ -2251,7 +2251,7 @@ namespace Contensive.Processor.Addons.Tools {
                     if (RowCnt > 0) {
                         for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                             if (core.docProperties.getBoolean("Cdef" + RowPtr)) {
-                                lcName = GenericController.vbLCase(core.docProperties.getText("CDefName" + RowPtr));
+                                lcName = GenericController.toLCase(core.docProperties.getText("CDefName" + RowPtr));
                                 if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
                                     CDefList = CDefList + "," + lcName;
                                 }
@@ -2306,10 +2306,10 @@ namespace Contensive.Processor.Addons.Tools {
                     csData.open("Content");
                     while (csData.ok()) {
                         RecordName = csData.getText("Name");
-                        lcName = GenericController.vbLCase(RecordName);
+                        lcName = GenericController.toLCase(RecordName);
                         if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
                             RecordId = csData.getInteger("ID");
-                            if (GenericController.vbInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
+                            if (GenericController.strInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
                                 TopHalf = TopHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, true) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csData.getText("Name") + "</div>";
                             } else {
                                 BottomHalf = BottomHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, false) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csData.getText("Name") + "</div>";

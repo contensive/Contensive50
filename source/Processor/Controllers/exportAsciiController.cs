@@ -41,7 +41,7 @@ namespace Contensive.Processor.Controllers {
                 core.webServer.setResponseContentType("text/plain");
                 core.html.enableOutputBuffer(false);
                 TableName = DbController.getDbObjectTableName(MetadataController.getContentTablename(core, iContentName));
-                switch (GenericController.vbUCase(TableName)) {
+                switch (GenericController.toUCase(TableName)) {
                     case "CCMEMBERS":
                         //
                         // ----- People and member content export
@@ -60,7 +60,7 @@ namespace Contensive.Processor.Controllers {
                                     FieldNameVariant = csData.getFirstFieldName();
                                     while (!string.IsNullOrEmpty(FieldNameVariant)) {
                                         FieldName = GenericController.encodeText(FieldNameVariant);
-                                        UcaseFieldName = GenericController.vbUCase(FieldName);
+                                        UcaseFieldName = GenericController.toUCase(FieldName);
                                         if ((UcaseFieldName != "USERNAME") && (UcaseFieldName != "PASSWORD")) {
                                             sb.Append(Delimiter + "\"" + FieldName + "\"");
                                         }
@@ -79,7 +79,7 @@ namespace Contensive.Processor.Controllers {
                                         FieldNameVariant = csData.getFirstFieldName();
                                         while (!string.IsNullOrEmpty(FieldNameVariant)) {
                                             FieldName = GenericController.encodeText(FieldNameVariant);
-                                            UcaseFieldName = GenericController.vbUCase(FieldName);
+                                            UcaseFieldName = GenericController.toUCase(FieldName);
                                             if ((UcaseFieldName != "USERNAME") && (UcaseFieldName != "PASSWORD")) {
                                                 Copy = csData.getText(FieldName);
                                                 if (!string.IsNullOrEmpty(Copy)) {

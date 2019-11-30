@@ -143,7 +143,7 @@ namespace Contensive.Processor.Controllers {
                     errorContextMessage = "calling child page addon in quick editing editor"
                 };
                 PageList = core.addon.execute(addon, executeContext);
-                if (GenericController.vbInstr(1, PageList, "<ul", 1) == 0) {
+                if (GenericController.strInstr(1, PageList, "<ul", 1) == 0) {
                     PageList = "(there are no child pages)";
                 }
                 result += "\r<tr>"

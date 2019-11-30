@@ -34,7 +34,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     //
                     LogController.logInfo(core, "Collection.xml loaded ok");
                     //
-                    if (GenericController.vbLCase(Doc.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
+                    if (GenericController.toLCase(Doc.DocumentElement.Name) != GenericController.toLCase(CollectionListRootNode)) {
                         LogController.logInfo(core, "RegisterAddonFolder, Hint=[" + hint + "], The Collections.xml file has an invalid root node, [" + Doc.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.");
                     } else {
                         //
@@ -85,7 +85,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                     LogController.logInfo(core, "no collection path, skipping");
                                     //
                                 } else {
-                                    collectionPath = GenericController.vbLCase(collectionPath);
+                                    collectionPath = GenericController.toLCase(collectionPath);
                                     string CollectionRootPath = collectionPath;
                                     int Pos = CollectionRootPath.LastIndexOf("\\") + 1;
                                     if (Pos <= 0) {

@@ -104,7 +104,7 @@ namespace Contensive.Processor.Controllers {
                         while (ElementPointer < KmaHTML.elementCount) {
                             string Copy = KmaHTML.text(ElementPointer).ToString();
                             if (KmaHTML.isTag(ElementPointer)) {
-                                string ElementTag = GenericController.vbUCase(KmaHTML.tagName(ElementPointer));
+                                string ElementTag = GenericController.toUCase(KmaHTML.tagName(ElementPointer));
                                 string ACName = KmaHTML.elementAttribute(ElementPointer, "NAME");
                                 string ACType = "";
                                 int NotUsedId = 0;
@@ -133,11 +133,11 @@ namespace Contensive.Processor.Controllers {
                                                         string attrValue = KmaHTML.elementAttributeValue(ElementPointer, AttributePointer);
                                                         if (attrName.ToLower() == "href") {
                                                             string linkDomain = "";
-                                                            int Pos = GenericController.vbInstr(1, attrValue, "://");
+                                                            int Pos = GenericController.strInstr(1, attrValue, "://");
                                                             if (Pos > 0) {
                                                                 linkDomain = attrValue;
                                                                 linkDomain = linkDomain.Substring(Pos + 2);
-                                                                Pos = GenericController.vbInstr(1, linkDomain, "/");
+                                                                Pos = GenericController.strInstr(1, linkDomain, "/");
                                                                 if (Pos > 0) {
                                                                     linkDomain = linkDomain.left(Pos - 1);
                                                                 }
@@ -150,11 +150,11 @@ namespace Contensive.Processor.Controllers {
                                                                     // Ends in a questionmark, must be Dwayne (?)
                                                                     //
                                                                     attrValue = attrValue + AnchorQuery;
-                                                                } else if (GenericController.vbInstr(1, attrValue, "mailto:", 1) != 0) {
+                                                                } else if (GenericController.strInstr(1, attrValue, "mailto:", 1) != 0) {
                                                                     //
                                                                     // catch mailto
                                                                     //
-                                                                } else if (GenericController.vbInstr(1, attrValue, "?") == 0) {
+                                                                } else if (GenericController.strInstr(1, attrValue, "?") == 0) {
                                                                     //
                                                                     // No questionmark there, add it
                                                                     //
@@ -192,7 +192,7 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             // -- Addon for email
                                                             if (EncodeNonCachableTags) {
-                                                                switch (GenericController.vbLCase(ACName)) {
+                                                                switch (GenericController.toLCase(ACName)) {
                                                                     case "block text": {
                                                                             //
                                                                             // -- start block text
@@ -204,11 +204,11 @@ namespace Contensive.Processor.Controllers {
                                                                                 //
                                                                                 ElementPointer = ElementPointer + 1;
                                                                                 while (ElementPointer < KmaHTML.elementCount) {
-                                                                                    ElementTag = GenericController.vbUCase(KmaHTML.tagName(ElementPointer));
+                                                                                    ElementTag = GenericController.toUCase(KmaHTML.tagName(ElementPointer));
                                                                                     if (ElementTag == "AC") {
-                                                                                        ACType = GenericController.vbUCase(KmaHTML.elementAttribute(ElementPointer, "TYPE"));
+                                                                                        ACType = GenericController.toUCase(KmaHTML.elementAttribute(ElementPointer, "TYPE"));
                                                                                         if (ACType == ACTypeAggregateFunction) {
-                                                                                            if (GenericController.vbLCase(KmaHTML.elementAttribute(ElementPointer, "name")) == "block text end") {
+                                                                                            if (GenericController.toLCase(KmaHTML.elementAttribute(ElementPointer, "name")) == "block text end") {
                                                                                                 break;
                                                                                             }
                                                                                         }
@@ -283,7 +283,7 @@ namespace Contensive.Processor.Controllers {
                                                                         IconAlt = ACName;
                                                                         IconTitle = "Rendered as the Add-on [" + ACName + "]";
                                                                     } else {
-                                                                        switch (GenericController.vbLCase(ACName)) {
+                                                                        switch (GenericController.toLCase(ACName)) {
                                                                             case "block text": {
                                                                                     IconFilename = "";
                                                                                     SrcOptionList = AddonOptionConstructor_ForBlockText;
@@ -346,12 +346,12 @@ namespace Contensive.Processor.Controllers {
                                                                         }
                                                                         string SrcOptionValueSelector = "";
                                                                         string SrcOptionSelector = "";
-                                                                        int Pos = GenericController.vbInstr(1, SrcOptionName, "=");
+                                                                        int Pos = GenericController.strInstr(1, SrcOptionName, "=");
                                                                         if (Pos > 0) {
                                                                             SrcOptionValueSelector = SrcOptionName.Substring(Pos);
                                                                             SrcOptionName = SrcOptionName.left(Pos - 1);
                                                                             SrcOptionSelector = "";
-                                                                            Pos = GenericController.vbInstr(1, SrcOptionValueSelector, "[");
+                                                                            Pos = GenericController.strInstr(1, SrcOptionValueSelector, "[");
                                                                             if (Pos != 0) {
                                                                                 SrcOptionSelector = SrcOptionValueSelector.Substring(Pos - 1);
                                                                             }
@@ -474,7 +474,7 @@ namespace Contensive.Processor.Controllers {
                                 string ElementText = DHTML.text(ElementPointer).ToString();
                                 if (DHTML.isTag(ElementPointer)) {
                                     int AttributeCount = 0;
-                                    switch (GenericController.vbUCase(DHTML.tagName(ElementPointer))) {
+                                    switch (GenericController.toUCase(DHTML.tagName(ElementPointer))) {
                                         case "FORM": {
                                                 //
                                                 // User created form - add the attribute "Contensive=1"
@@ -488,12 +488,12 @@ namespace Contensive.Processor.Controllers {
                                                     string ImageSrcOriginal = DHTML.elementAttribute(ElementPointer, "src");
                                                     string VirtualFilePathBad = core.appConfig.name + "/files/";
                                                     string serverFilePath = "/" + VirtualFilePathBad;
-                                                    if (ImageSrcOriginal.ToLowerInvariant().left(VirtualFilePathBad.Length) == GenericController.vbLCase(VirtualFilePathBad)) {
+                                                    if (ImageSrcOriginal.ToLowerInvariant().left(VirtualFilePathBad.Length) == GenericController.toLCase(VirtualFilePathBad)) {
                                                         //
                                                         // if the image is from the virtual file path, but the editor did not include the root path, add it
                                                         //
-                                                        ElementText = GenericController.vbReplace(ElementText, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
-                                                        ImageSrcOriginal = GenericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
+                                                        ElementText = GenericController.strReplace(ElementText, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
+                                                        ImageSrcOriginal = GenericController.strReplace(ImageSrcOriginal, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
                                                     }
                                                     string ImageSrc = HtmlController.decodeHtml(ImageSrcOriginal);
                                                     ImageSrc = decodeURL(ImageSrc);
@@ -511,7 +511,7 @@ namespace Contensive.Processor.Controllers {
                                                     string ACQueryString = "";
                                                     int Ptr = 0;
                                                     string[] ImageIDArray = { };
-                                                    if (0 != GenericController.vbInstr(1, ImageId, ",")) {
+                                                    if (0 != GenericController.strInstr(1, ImageId, ",")) {
                                                         ImageIDArray = ImageId.Split(',');
                                                         ImageIDArrayCount = ImageIDArray.GetUpperBound(0) + 1;
                                                         if (ImageIDArrayCount > 5) {
@@ -537,7 +537,7 @@ namespace Contensive.Processor.Controllers {
                                                             }
                                                         }
                                                         if (ImageIDArrayCount > 1) {
-                                                            ACIdentifier = GenericController.vbUCase(ImageIDArray[0]);
+                                                            ACIdentifier = GenericController.toUCase(ImageIDArray[0]);
                                                             ACType = ImageIDArray[1];
                                                             if (ImageIDArrayCount > 2) {
                                                                 ACFieldName = ImageIDArray[2];
@@ -568,7 +568,7 @@ namespace Contensive.Processor.Controllers {
                                                                 string[] QSSplit = null;
                                                                 int QSPtr = 0;
                                                                 //----------------------------- change to ACType
-                                                                switch (GenericController.vbUCase(ACType)) {
+                                                                switch (GenericController.toUCase(ACType)) {
                                                                     case "IMAGE": {
                                                                             //
                                                                             // ----- AC Image, Decode Active Images to Resource Library references
@@ -594,11 +594,11 @@ namespace Contensive.Processor.Controllers {
                                                                                     int ImageStyleArrayPointer = 0;
                                                                                     for (ImageStyleArrayPointer = 0; ImageStyleArrayPointer < ImageStyleArrayCount; ImageStyleArrayPointer++) {
                                                                                         string ImageStylePair = IMageStyleArray[ImageStyleArrayPointer].Trim(' ');
-                                                                                        int PositionColon = GenericController.vbInstr(1, ImageStylePair, ":");
+                                                                                        int PositionColon = GenericController.strInstr(1, ImageStylePair, ":");
                                                                                         if (PositionColon > 1) {
                                                                                             string ImageStylePairName = (ImageStylePair.left(PositionColon - 1)).Trim(' ');
                                                                                             string ImageStylePairValue = (ImageStylePair.Substring(PositionColon)).Trim(' ');
-                                                                                            switch (GenericController.vbUCase(ImageStylePairName)) {
+                                                                                            switch (GenericController.toUCase(ImageStylePairName)) {
                                                                                                 case "WIDTH": {
                                                                                                         ImageStylePairValue = GenericController.strReplace(ImageStylePairValue, "px", "");
                                                                                                         ImageWidthText = ImageStylePairValue;
@@ -635,7 +635,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 QueryString = HtmlController.decodeHtml(QSHTMLEncoded);
                                                                                 QSSplit = QueryString.Split('&');
                                                                                 for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                                    Pos = GenericController.vbInstr(1, QSSplit[QSPtr], "[");
+                                                                                    Pos = GenericController.strInstr(1, QSSplit[QSPtr], "[");
                                                                                     if (Pos > 0) {
                                                                                         QSSplit[QSPtr] = QSSplit[QSPtr].left(Pos - 1);
                                                                                     }
@@ -684,18 +684,18 @@ namespace Contensive.Processor.Controllers {
                                                                 }
                                                             }
                                                         }
-                                                    } else if (GenericController.vbInstr(1, ImageSrc, "cclibraryfiles", 1) != 0) {
+                                                    } else if (GenericController.strInstr(1, ImageSrc, "cclibraryfiles", 1) != 0) {
                                                         bool ImageAllowSFResize = core.siteProperties.getBoolean("ImageAllowSFResize", true);
                                                         if (ImageAllowSFResize && true) {
                                                             //
                                                             // if it is a real image, check for resize
                                                             //
-                                                            Pos = GenericController.vbInstr(1, ImageSrc, "cclibraryfiles", 1);
+                                                            Pos = GenericController.strInstr(1, ImageSrc, "cclibraryfiles", 1);
                                                             if (Pos != 0) {
                                                                 string ImageVirtualFilename = ImageSrc.Substring(Pos - 1);
                                                                 string[] Paths = ImageVirtualFilename.Split('/');
                                                                 if (Paths.GetUpperBound(0) > 2) {
-                                                                    if (GenericController.vbLCase(Paths[1]) == "filename") {
+                                                                    if (GenericController.toLCase(Paths[1]) == "filename") {
                                                                         recordId = GenericController.encodeInteger(Paths[2]);
                                                                         if (recordId != 0) {
                                                                             string ImageFilename = Paths[3];
@@ -726,7 +726,7 @@ namespace Contensive.Processor.Controllers {
                                                                                         }
                                                                                     }
                                                                                 }
-                                                                                if (GenericController.vbInstr(1, sfImageExtList, ImageFilenameExt, 1) != 0) {
+                                                                                if (GenericController.strInstr(1, sfImageExtList, ImageFilenameExt, 1) != 0) {
                                                                                     //
                                                                                     // Determine ImageWidth and ImageHeight
                                                                                     //
@@ -738,18 +738,18 @@ namespace Contensive.Processor.Controllers {
                                                                                         for (Ptr = 0; Ptr <= Styles.GetUpperBound(0); Ptr++) {
                                                                                             string[] Style = Styles[Ptr].Split(':');
                                                                                             if (Style.GetUpperBound(0) > 0) {
-                                                                                                string StyleName = GenericController.vbLCase(Style[0].Trim(' '));
+                                                                                                string StyleName = GenericController.toLCase(Style[0].Trim(' '));
                                                                                                 string StyleValue = null;
                                                                                                 int StyleValueInt = 0;
                                                                                                 if (StyleName == "width") {
-                                                                                                    StyleValue = GenericController.vbLCase(Style[1].Trim(' '));
+                                                                                                    StyleValue = GenericController.toLCase(Style[1].Trim(' '));
                                                                                                     StyleValue = GenericController.strReplace(StyleValue, "px", "");
                                                                                                     StyleValueInt = GenericController.encodeInteger(StyleValue);
                                                                                                     if (StyleValueInt > 0) {
                                                                                                         ImageWidth = StyleValueInt;
                                                                                                     }
                                                                                                 } else if (StyleName == "height") {
-                                                                                                    StyleValue = GenericController.vbLCase(Style[1].Trim(' '));
+                                                                                                    StyleValue = GenericController.toLCase(Style[1].Trim(' '));
                                                                                                     StyleValue = GenericController.strReplace(StyleValue, "px", "");
                                                                                                     StyleValueInt = GenericController.encodeInteger(StyleValue);
                                                                                                     if (StyleValueInt > 0) {
@@ -821,7 +821,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                     }
                                                                                                 }
                                                                                                 if ((ImageHeight == 0) && (ImageWidth == 0) && (!string.IsNullOrEmpty(ImageFilenameAltSize))) {
-                                                                                                    Pos = GenericController.vbInstr(1, ImageFilenameAltSize, "x");
+                                                                                                    Pos = GenericController.strInstr(1, ImageFilenameAltSize, "x");
                                                                                                     if (Pos != 0) {
                                                                                                         ImageWidth = GenericController.encodeInteger(ImageFilenameAltSize.left(Pos - 1));
                                                                                                         ImageHeight = GenericController.encodeInteger(ImageFilenameAltSize.Substring(Pos));
@@ -928,10 +928,10 @@ namespace Contensive.Processor.Controllers {
                                                                                                                 //
                                                                                                                 // set HTML attributes so image properties will display
                                                                                                                 //
-                                                                                                                if (GenericController.vbInstr(1, ElementText, "height=", 1) == 0) {
+                                                                                                                if (GenericController.strInstr(1, ElementText, "height=", 1) == 0) {
                                                                                                                     ElementText = GenericController.strReplace(ElementText, ">", " height=\"" + ImageHeight + "\">");
                                                                                                                 }
-                                                                                                                if (GenericController.vbInstr(1, ElementText, "width=", 1) == 0) {
+                                                                                                                if (GenericController.strInstr(1, ElementText, "width=", 1) == 0) {
                                                                                                                     ElementText = GenericController.strReplace(ElementText, ">", " width=\"" + ImageWidth + "\">");
                                                                                                                 }
                                                                                                                 //
@@ -1062,8 +1062,8 @@ namespace Contensive.Processor.Controllers {
                             int LineEnd = 0;
                             while (result.IndexOf(StartFlag) != -1) {
                                 hint = "52";
-                                LineStart = GenericController.vbInstr(1, result, StartFlag);
-                                LineEnd = GenericController.vbInstr(LineStart, result, EndFlag);
+                                LineStart = GenericController.strInstr(1, result, StartFlag);
+                                LineEnd = GenericController.strInstr(LineStart, result, EndFlag);
                                 string Copy = "";
                                 if (LineEnd == 0) {
                                     LogController.logWarn(core, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly");
@@ -1147,16 +1147,16 @@ namespace Contensive.Processor.Controllers {
                     if ((!isEditingAnything) && (result != BlockTextStartMarker)) {
                         DoAnotherPass = true;
                         while ((result.IndexOf(BlockTextStartMarker, System.StringComparison.OrdinalIgnoreCase) != -1) && DoAnotherPass) {
-                            LineStart = GenericController.vbInstr(1, result, BlockTextStartMarker, 1);
+                            LineStart = GenericController.strInstr(1, result, BlockTextStartMarker, 1);
                             if (LineStart == 0) {
                                 DoAnotherPass = false;
                             } else {
-                                int LineEnd = GenericController.vbInstr(LineStart, result, BlockTextEndMarker, 1);
+                                int LineEnd = GenericController.strInstr(LineStart, result, BlockTextEndMarker, 1);
                                 if (LineEnd <= 0) {
                                     DoAnotherPass = false;
                                     result = result.left(LineStart - 1);
                                 } else {
-                                    LineEnd = GenericController.vbInstr(LineEnd, result, " -->");
+                                    LineEnd = GenericController.strInstr(LineEnd, result, " -->");
                                     if (LineEnd <= 0) {
                                         DoAnotherPass = false;
                                     } else {
@@ -1170,21 +1170,21 @@ namespace Contensive.Processor.Controllers {
                         if (result.IndexOf("<!-- AFScript -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
                             string Copy = AdminUIController.getEditWrapper(core, "Aggregate Script", "##MARKER##");
                             string[] Wrapper = GenericController.stringSplit(Copy, "##MARKER##");
-                            result = GenericController.vbReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, 1);
-                            result = GenericController.vbReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, 1);
+                            result = GenericController.strReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, 1);
+                            result = GenericController.strReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, 1);
                         }
                         if (result.IndexOf("<!-- AFReplacement -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
                             string Copy = AdminUIController.getEditWrapper(core, "Aggregate Replacement", "##MARKER##");
                             string[] Wrapper = GenericController.stringSplit(Copy, "##MARKER##");
-                            result = GenericController.vbReplace(result, "<!-- AFReplacement -->", Wrapper[0], 1, 99, 1);
-                            result = GenericController.vbReplace(result, "<!-- /AFReplacement -->", Wrapper[1], 1, 99, 1);
+                            result = GenericController.strReplace(result, "<!-- AFReplacement -->", Wrapper[0], 1, 99, 1);
+                            result = GenericController.strReplace(result, "<!-- /AFReplacement -->", Wrapper[1], 1, 99, 1);
                         }
                     }
                     //
                     // Process Feedback form
                     hint = "70";
-                    if (GenericController.vbInstr(1, result, FeedbackFormNotSupportedComment, 1) != 0) {
-                        result = GenericController.vbReplace(result, FeedbackFormNotSupportedComment, PageContentController.getFeedbackForm(core, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, 1);
+                    if (GenericController.strInstr(1, result, FeedbackFormNotSupportedComment, 1) != 0) {
+                        result = GenericController.strReplace(result, FeedbackFormNotSupportedComment, PageContentController.getFeedbackForm(core, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, 1);
                     }
                 }
             } catch (Exception ex) {
@@ -1217,8 +1217,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Determine if this sement is in a tag (<img src="...">) or in content (&quot...&quote)
                     // For now, skip the ones in content
-                    int TagPosEnd = GenericController.vbInstr(1, htmlContentSegment, ">");
-                    int TagPosStart = GenericController.vbInstr(1, htmlContentSegment, "<");
+                    int TagPosEnd = GenericController.strInstr(1, htmlContentSegment, ">");
+                    int TagPosStart = GenericController.strInstr(1, htmlContentSegment, "<");
                     if ((TagPosStart != 0) && (TagPosEnd < TagPosStart)) {
                         //
                         // break pathfilename off the quote to the end

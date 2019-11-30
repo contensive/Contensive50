@@ -144,11 +144,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                 // ----- determine contentType for editor
                 //
                 CPHtml5BaseClass.EditorContentType ContentType;
-                if (GenericController.vbLCase(adminData.adminContent.name) == "email templates") {
+                if (GenericController.toLCase(adminData.adminContent.name) == "email templates") {
                     ContentType = CPHtml5BaseClass.EditorContentType.contentTypeEmailTemplate;
-                } else if (GenericController.vbLCase(adminData.adminContent.tableName) == "cctemplates") {
+                } else if (GenericController.toLCase(adminData.adminContent.tableName) == "cctemplates") {
                     ContentType = CPHtml5BaseClass.EditorContentType.contentTypeWebTemplate;
-                } else if (GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail") {
+                } else if (GenericController.toLCase(adminData.adminContent.tableName) == "ccemail") {
                     ContentType = CPHtml5BaseClass.EditorContentType.contentTypeEmail;
                 } else {
                     ContentType = CPHtml5BaseClass.EditorContentType.contentTypeWeb;

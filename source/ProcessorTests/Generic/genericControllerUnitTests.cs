@@ -240,28 +240,6 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void controllers_splitUrl2_test() {
-            // arrange
-            const string url1 = "http://www.a.com/b/c.html?d=e";
-            //
-            string host = "";
-            string path = "";
-            string page = "";
-            string protocol = "";
-            string querystring = "";
-            string port = "";
-            // act
-            GenericController.splitUrl(url1, ref protocol, ref host, ref port, ref path, ref page, ref querystring);
-            // assert
-            Assert.AreEqual("http://", protocol);
-            Assert.AreEqual("www.a.com", host);
-            Assert.AreEqual("80", port);
-            Assert.AreEqual("/b/", path);
-            Assert.AreEqual("c.html", page);
-            Assert.AreEqual("?d=e", querystring);
-        }
-        //
-        [TestMethod]
         public void controllers_splitNewLine_test() {
             // arrange
             const string test1 = "1\r2\n3\r\n4";

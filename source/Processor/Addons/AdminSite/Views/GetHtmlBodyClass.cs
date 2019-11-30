@@ -140,7 +140,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         if (cp.core.doc.userErrorList.Count.Equals(0) && (adminData.requestButton.Equals(ButtonOK) || adminData.requestButton.Equals(ButtonCancel) || adminData.requestButton.Equals(ButtonDelete))) {
                             string EditReferer = cp.core.docProperties.getText("EditReferer");
                             string CurrentLink = GenericController.modifyLinkQuery(cp.core.webServer.requestUrl, "editreferer", "", false);
-                            CurrentLink = GenericController.vbLCase(CurrentLink);
+                            CurrentLink = GenericController.toLCase(CurrentLink);
                             //
                             // check if this editreferer includes cid=thisone and id=thisone -- if so, go to index form for this cid
                             //
@@ -412,7 +412,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 string helpLink = "";
                 bool FoundAddon = false;
                 //
-                if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpAddonID + ",") == 0) {
+                if (GenericController.strInstr(1, "," + UsedIDString + ",", "," + HelpAddonID + ",") == 0) {
                     using (var csData = new CsModel(cp.core)) {
                         csData.openRecord(AddonModel.tableMetadata.contentName, HelpAddonID);
                         if (csData.ok()) {
@@ -482,7 +482,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 DateTime CollectionLastUpdated = default(DateTime);
                 string IncludeHelp = "";
                 //
-                if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpCollectionID + ",") == 0) {
+                if (GenericController.strInstr(1, "," + UsedIDString + ",", "," + HelpCollectionID + ",") == 0) {
                     using (var csData = new CsModel(cp.core)) {
                         csData.openRecord("Add-on Collections", HelpCollectionID);
                         if (csData.ok()) {
@@ -815,7 +815,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                     //
                                                     // Page Content special cases
                                                     //
-                                                    if (GenericController.vbLCase(adminData.adminContent.tableName) == "ccpagecontent") {
+                                                    if (GenericController.toLCase(adminData.adminContent.tableName) == "ccpagecontent") {
                                                         if (RecordId == (cp.core.siteProperties.getInteger("PageNotFoundPageID", 0))) {
                                                             cp.core.siteProperties.getText("PageNotFoundPageID", "0");
                                                         }
@@ -1296,7 +1296,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 object fieldValueObject = editRecordField.value;
                                 string FieldValueText = GenericController.encodeText(fieldValueObject);
                                 string fieldName = field.nameLc;
-                                string UcaseFieldName = GenericController.vbUCase(fieldName);
+                                string UcaseFieldName = GenericController.toUCase(fieldName);
                                 //
                                 // ----- Handle special case fields
                                 //
@@ -1524,7 +1524,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         }
                                     }
                                     if (!NewRecord) {
-                                        switch (GenericController.vbLCase(adminData.adminContent.tableName)) {
+                                        switch (GenericController.toLCase(adminData.adminContent.tableName)) {
                                             case "ccmembers": {
                                                     //
                                                     if (ActivityLogOrganizationId < 0) {
@@ -1929,13 +1929,13 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             //
                                             // delete all templateid based editorstylerule files, build on-demand
                                             //
-                                            EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
+                                            EditorStyleRulesFilename = GenericController.strReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
                                             cp.core.cdnFiles.deleteFile(EditorStyleRulesFilename);
                                             //
                                             using (var csData = new CsModel(cp.core)) {
                                                 csData.openSql("select id from cctemplates");
                                                 while (csData.ok()) {
-                                                    EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csData.getText("ID"), 1, 99, 1);
+                                                    EditorStyleRulesFilename = GenericController.strReplace(EditorStyleRulesFilenamePattern, "$templateid$", csData.getText("ID"), 1, 99, 1);
                                                     cp.core.cdnFiles.deleteFile(EditorStyleRulesFilename);
                                                     csData.goNext();
                                                 }
@@ -2011,21 +2011,21 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     //
                     if (cp.core.doc.userErrorList.Count.Equals(0)) {
-                        if (GenericController.vbUCase(adminData.adminContent.tableName) == GenericController.vbUCase("ccMembers")) {
+                        if (GenericController.toUCase(adminData.adminContent.tableName) == GenericController.toUCase("ccMembers")) {
                             //
                             //
                             SaveEditRecord(cp, adminData);
                             SaveMemberRules(cp, editRecord.id);
-                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCEMAIL") {
+                        } else if (GenericController.toUCase(adminData.adminContent.tableName) == "CCEMAIL") {
                             //
                             //
                             SaveEditRecord(cp, adminData);
-                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCCONTENT") {
+                        } else if (GenericController.toUCase(adminData.adminContent.tableName) == "CCCONTENT") {
                             //
                             //
                             SaveEditRecord(cp, adminData);
                             LoadAndSaveGroupRules(cp, editRecord);
-                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCPAGECONTENT") {
+                        } else if (GenericController.toUCase(adminData.adminContent.tableName) == "CCPAGECONTENT") {
                             //
                             //
                             SaveEditRecord(cp, adminData);
@@ -2033,7 +2033,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             adminData.loadContentTrackingResponse(cp.core);
                             SaveLinkAlias(cp, adminData);
                             SaveContentTracking(cp, adminData);
-                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCLIBRARYFOLDERS") {
+                        } else if (GenericController.toUCase(adminData.adminContent.tableName) == "CCLIBRARYFOLDERS") {
                             //
                             //
                             SaveEditRecord(cp, adminData);
@@ -2041,7 +2041,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             adminData.loadContentTrackingResponse(cp.core);
                             cp.core.html.processCheckList("LibraryFolderRules", adminData.adminContent.name, GenericController.encodeText(editRecord.id), "Groups", "Library Folder Rules", "FolderID", "GroupID");
                             SaveContentTracking(cp, adminData);
-                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCSETUP") {
+                        } else if (GenericController.toUCase(adminData.adminContent.tableName) == "CCSETUP") {
                             //
                             // Site Properties
                             SaveEditRecord(cp, adminData);
@@ -2050,7 +2050,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     TurnOnLinkAlias(cp, UseContentWatchLink);
                                 }
                             }
-                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == GenericController.vbUCase("ccGroups")) {
+                        } else if (GenericController.toUCase(adminData.adminContent.tableName) == GenericController.toUCase("ccGroups")) {
                             //
                             //
                             SaveEditRecord(cp, adminData);
@@ -2058,14 +2058,14 @@ namespace Contensive.Processor.Addons.AdminSite {
                             adminData.loadContentTrackingResponse(cp.core);
                             LoadAndSaveContentGroupRules(cp, editRecord.id);
                             SaveContentTracking(cp, adminData);
-                        } else if (GenericController.vbUCase(adminData.adminContent.tableName) == "CCTEMPLATES") {
+                        } else if (GenericController.toUCase(adminData.adminContent.tableName) == "CCTEMPLATES") {
                             //
                             // save and clear editorstylerules for this template
                             SaveEditRecord(cp, adminData);
                             adminData.loadContentTrackingDataBase(cp.core);
                             adminData.loadContentTrackingResponse(cp.core);
                             SaveContentTracking(cp, adminData);
-                            EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString(), 1, 99, 1);
+                            EditorStyleRulesFilename = GenericController.strReplace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString(), 1, 99, 1);
                             cp.core.privateFiles.deleteFile(EditorStyleRulesFilename);
                         } else {
                             //
@@ -2151,7 +2151,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             // block fields that must be unique
                             foreach (KeyValuePair<string, Contensive.Processor.Models.Domain.ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
                                 ContentFieldMetadataModel field = keyValuePair.Value;
-                                if (GenericController.vbLCase(field.nameLc) == "email") {
+                                if (GenericController.toLCase(field.nameLc) == "email") {
                                     if ((adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") && (GenericController.encodeBoolean(cp.core.siteProperties.getBoolean("allowemaillogin", false)))) {
                                         adminData.editRecord.fieldsLc[field.nameLc].value = "";
                                     }
@@ -2639,7 +2639,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         // Throw out all the details of what happened, and add one simple error
                         //
                         ErrorList = Processor.Controllers.ErrorController.getUserError(cp.core);
-                        ErrorList = GenericController.vbReplace(ErrorList, UserErrorHeadline, "", 1, 99, 1);
+                        ErrorList = GenericController.strReplace(ErrorList, UserErrorHeadline, "", 1, 99, 1);
                         Processor.Controllers.ErrorController.addUserError(cp.core, "The following errors occurred while verifying Link Alias entries for your existing pages." + ErrorList);
                     }
                 }

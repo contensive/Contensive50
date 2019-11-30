@@ -21,10 +21,10 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 URL = "http://support.contensive.com/GetUpdates?iv=" + core.codeVersion();
                 loadOK = true;
                 Doc.Load(URL);
-                if ((Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.vbLCase("ContensiveUpdate")) && (Doc.DocumentElement.ChildNodes.Count != 0)) {
+                if ((Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.toLCase("ContensiveUpdate")) && (Doc.DocumentElement.ChildNodes.Count != 0)) {
                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
                         Copy = CDefSection.InnerText;
-                        switch (GenericController.vbLCase(CDefSection.Name)) {
+                        switch (GenericController.toLCase(CDefSection.Name)) {
                             case "mastervisitnamelist":
                                 //
                                 // Read in the interfaces and save to Add-ons

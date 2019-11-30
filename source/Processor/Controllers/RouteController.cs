@@ -212,7 +212,7 @@ namespace Contensive.Processor.Controllers {
                     // -- legacy methods=
                     string HardCodedPage = core.docProperties.getText(RequestNameHardCodedPage);
                     if (!string.IsNullOrEmpty(HardCodedPage)) {
-                        switch (GenericController.vbLCase(HardCodedPage)) {
+                        switch (GenericController.toLCase(HardCodedPage)) {
                             case HardCodedPageLogout: {
                                     //
                                     // -- logout intercept

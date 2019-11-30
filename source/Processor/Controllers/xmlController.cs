@@ -24,9 +24,9 @@ namespace Contensive.Processor.Controllers {
                 Found = false;
                 ResultNode = Node.Attributes.GetNamedItem(Name);
                 if (ResultNode == null) {
-                    UcaseName = GenericController.vbUCase(Name);
+                    UcaseName = GenericController.toUCase(Name);
                     foreach (XmlAttribute NodeAttribute in Node.Attributes) {
-                        if (GenericController.vbUCase(NodeAttribute.Name) == UcaseName) {
+                        if (GenericController.toUCase(NodeAttribute.Name) == UcaseName) {
                             returnAttr = NodeAttribute.Value;
                             Found = true;
                             break;

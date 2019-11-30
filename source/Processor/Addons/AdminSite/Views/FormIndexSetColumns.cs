@@ -42,7 +42,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 string TargetFieldName = core.docProperties.getText("FieldName");
                 int ColumnPointer = core.docProperties.getInteger("dtcn");
                 const string RequestNameAddField = "addfield";
-                string FieldNameToAdd = GenericController.vbUCase(core.docProperties.getText(RequestNameAddField));
+                string FieldNameToAdd = GenericController.toUCase(core.docProperties.getText(RequestNameAddField));
                 const string RequestNameAddFieldId = "addfieldID";
                 int FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldId);
                 bool normalizeSaveLoad = core.docProperties.getBoolean("NeedToReloadConfig");

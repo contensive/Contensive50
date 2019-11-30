@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
                     if (posStart != 0) {
                         posEnd = getTagEndPos( core, layout, posStart);
                         if (posEnd > 0) {
-                            posStart = GenericController.vbInstr(posStart + 1, layout, ">");
+                            posStart = GenericController.strInstr(posStart + 1, layout, ">");
                             if (posStart != 0) {
                                 posStart = posStart + 1;
                                 posEnd = layout.LastIndexOf("<", posEnd - 2) + 1;
@@ -112,7 +112,7 @@ namespace Contensive.Processor.Controllers {
                 if (posStart != 0) {
                     int posEnd = getTagEndPos(core, layout, posStart);
                     if (posEnd > 0) {
-                        posStart = GenericController.vbInstr(posStart + 1, layout, ">");
+                        posStart = GenericController.strInstr(posStart + 1, layout, ">");
                         if (posStart != 0) {
                             posStart = posStart + 1;
                             posEnd = layout.LastIndexOf("<", posEnd - 2) + 1;
@@ -189,17 +189,17 @@ namespace Contensive.Processor.Controllers {
                 int Ptr = 0;
                 //
                 returnValue = false;
-                Pos = GenericController.vbInstr(posStartTag, layout, ">");
+                Pos = GenericController.strInstr(posStartTag, layout, ">");
                 if (Pos > 0) {
                     returnValue = true;
                     Tag = layout.Substring(posStartTag - 1, Pos - posStartTag + 1);
-                    tagLower = GenericController.vbLCase(Tag);
+                    tagLower = GenericController.toLCase(Tag);
                     tagLength = Tag.Length;
                     //
                     // check searchId
                     //
                     if (returnValue && (!string.IsNullOrEmpty(searchId))) {
-                        Pos = GenericController.vbInstr(1, tagLower, " id=", 1);
+                        Pos = GenericController.strInstr(1, tagLower, " id=", 1);
                         if (Pos <= 0) {
                             //
                             // id required but this tag has no id attr
@@ -263,7 +263,7 @@ namespace Contensive.Processor.Controllers {
                     // check searchClass
                     //
                     if (returnValue && (!string.IsNullOrEmpty(searchClass))) {
-                        Pos = GenericController.vbInstr(1, tagLower, " class=", 1);
+                        Pos = GenericController.strInstr(1, tagLower, " class=", 1);
                         if (Pos <= 0) {
                             //
                             // class required but this tag has no class attr
@@ -355,7 +355,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 returnPos = 0;
                 workingKey = Key;
-                if (GenericController.vbInstr(1, workingKey, ">") != 0) {
+                if (GenericController.strInstr(1, workingKey, ">") != 0) {
                     //
                     // does not support > yet.
                     //
@@ -364,25 +364,25 @@ namespace Contensive.Processor.Controllers {
                 //
                 // eliminate whitespace
                 //
-                while (GenericController.vbInstr(1, workingKey, "\t") != 0) {
+                while (GenericController.strInstr(1, workingKey, "\t") != 0) {
                     workingKey = GenericController.strReplace(workingKey, "\t", " ");
                 }
                 //
-                while (GenericController.vbInstr(1, workingKey, "\r") != 0) {
+                while (GenericController.strInstr(1, workingKey, "\r") != 0) {
                     workingKey = GenericController.strReplace(workingKey, "\r", " ");
                 }
                 //
-                while (GenericController.vbInstr(1, workingKey, "\n") != 0) {
+                while (GenericController.strInstr(1, workingKey, "\n") != 0) {
                     workingKey = GenericController.strReplace(workingKey, "\n", " ");
                 }
                 //
-                while (GenericController.vbInstr(1, workingKey, "  ") != 0) {
+                while (GenericController.strInstr(1, workingKey, "  ") != 0) {
                     workingKey = GenericController.strReplace(workingKey, "  ", " ");
                 }
                 //
                 workingKey = workingKey.Trim(' ');
                 //
-                if (GenericController.vbInstr(1, workingKey, " ") != 0) {
+                if (GenericController.strInstr(1, workingKey, " ") != 0) {
                     //
                     // if there are spaces, do them sequentially
                     //
@@ -411,7 +411,7 @@ namespace Contensive.Processor.Controllers {
                         searchClass = workingKey.Substring(1);
                         searchTag = "";
                         searchId = "";
-                        Pos = GenericController.vbInstr(1, searchClass, "#");
+                        Pos = GenericController.strInstr(1, searchClass, "#");
                         if (Pos != 0) {
                             searchId = searchClass.Substring(Pos - 1);
                             searchClass = searchClass.left( Pos - 1);
@@ -425,7 +425,7 @@ namespace Contensive.Processor.Controllers {
                         searchClass = "";
                         searchTag = "";
                         searchId = workingKey.Substring(1);
-                        Pos = GenericController.vbInstr(1, searchId, ".");
+                        Pos = GenericController.strInstr(1, searchId, ".");
                         if (Pos != 0) {
                             searchClass = searchId.Substring(Pos - 1);
                             searchId = searchId.left( Pos - 1);
@@ -440,21 +440,21 @@ namespace Contensive.Processor.Controllers {
                         searchTag = workingKey;
                         searchId = "";
                         //
-                        Pos = GenericController.vbInstr(1, searchTag, "#");
+                        Pos = GenericController.strInstr(1, searchTag, "#");
                         if (Pos != 0) {
                             searchId = searchTag.Substring(Pos);
                             searchTag = searchTag.left( Pos - 1);
-                            Pos = GenericController.vbInstr(1, searchId, ".");
+                            Pos = GenericController.strInstr(1, searchId, ".");
                             if (Pos != 0) {
                                 searchClass = searchId.Substring(Pos - 1);
                                 searchId = searchId.left( Pos - 1);
                             }
                         }
-                        Pos = GenericController.vbInstr(1, searchTag, ".");
+                        Pos = GenericController.strInstr(1, searchTag, ".");
                         if (Pos != 0) {
                             searchClass = searchTag.Substring(Pos);
                             searchTag = searchTag.left( Pos - 1);
-                            Pos = GenericController.vbInstr(1, searchClass, "#");
+                            Pos = GenericController.strInstr(1, searchClass, "#");
                             if (Pos != 0) {
                                 searchId = searchClass.Substring(Pos - 1);
                                 searchClass = searchClass.left( Pos - 1);
@@ -466,7 +466,7 @@ namespace Contensive.Processor.Controllers {
                     lenSearchKey = searchKey.Length;
                     Pos = layoutStartPos;
                     do {
-                        Pos = GenericController.vbInstr(Pos, layout, searchKey);
+                        Pos = GenericController.strInstr(Pos, layout, searchKey);
                         if (Pos == 0) {
                             //
                             // not found, return empty
@@ -540,13 +540,13 @@ namespace Contensive.Processor.Controllers {
                 int posComment = 0;
                 string c = null;
                 //
-                Pos = GenericController.vbInstr(startPos, Source, "<");
+                Pos = GenericController.strInstr(startPos, Source, "<");
                 TagName = "";
                 returnValue = 0;
                 if (Pos != 0) {
                     Pos = Pos + 1;
                     while (Pos < Source.Length) {
-                        c = GenericController.vbLCase(Source.Substring(Pos - 1, 1));
+                        c = GenericController.toLCase(Source.Substring(Pos - 1, 1));
                         if ((string.CompareOrdinal(c, "a") >= 0) && (string.CompareOrdinal(c, "z") <= 0)) {
                             TagName = TagName + c;
                         } else {
@@ -558,25 +558,25 @@ namespace Contensive.Processor.Controllers {
                         endTag = "</" + TagName;
                         startTag = "<" + TagName;
                         while (Pos != 0) {
-                            posEnd = GenericController.vbInstr(Pos + 1, Source, endTag, 1);
+                            posEnd = GenericController.strInstr(Pos + 1, Source, endTag, 1);
                             if (posEnd == 0) {
                                 //
                                 // no end was found, return the tag or rest of the string
                                 //
-                                returnValue = GenericController.vbInstr(Pos + 1, Source, ">") + 1;
+                                returnValue = GenericController.strInstr(Pos + 1, Source, ">") + 1;
                                 if (posEnd == 1) {
                                     returnValue = Source.Length;
                                 }
                                 break;
                             } else {
-                                posNest = GenericController.vbInstr(Pos + 1, Source, startTag, 1);
+                                posNest = GenericController.strInstr(Pos + 1, Source, startTag, 1);
                                 if (posNest == 0) {
                                     //
                                     // no nest found, set to end
                                     //
                                     posNest = Source.Length;
                                 }
-                                posComment = GenericController.vbInstr(Pos + 1, Source, "<!--");
+                                posComment = GenericController.strInstr(Pos + 1, Source, "<!--");
                                 if (posComment == 0) {
                                     //
                                     // no comment found, set to end
@@ -599,7 +599,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // ----- there is a comment between the tag and the first tagend, skip it
                                     //
-                                    Pos = GenericController.vbInstr(posComment, Source, "-->");
+                                    Pos = GenericController.strInstr(posComment, Source, "-->");
                                     if (Pos == 0) {
                                         //
                                         // start comment with no end, exit now
@@ -611,7 +611,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // ----- end position is here, go to the end of it and exit
                                     //
-                                    Pos = GenericController.vbInstr(posEnd, Source, ">");
+                                    Pos = GenericController.strInstr(posEnd, Source, ">");
                                     if (Pos == 0) {
                                         //
                                         // no end was found, just exit
@@ -660,35 +660,35 @@ namespace Contensive.Processor.Controllers {
                 result = "";
                 Pos = 1;
                 while ((Pos > 0) && (LoopCnt < 100)) {
-                    TagStart = GenericController.vbInstr(Pos, PageSource, "<" + Tag, 1);
+                    TagStart = GenericController.strInstr(Pos, PageSource, "<" + Tag, 1);
                     if (TagStart == 0) {
                         Pos = 0;
                     } else {
                         //
                         // tag found, skip any comments that start between current position and the tag
                         //
-                        CommentPos = GenericController.vbInstr(Pos, PageSource, "<!--");
+                        CommentPos = GenericController.strInstr(Pos, PageSource, "<!--");
                         if ((CommentPos != 0) && (CommentPos < TagStart)) {
                             //
                             // skip comment and start again
                             //
-                            Pos = GenericController.vbInstr(CommentPos, PageSource, "-->");
+                            Pos = GenericController.strInstr(CommentPos, PageSource, "-->");
                         } else {
-                            ScriptPos = GenericController.vbInstr(Pos, PageSource, "<script");
+                            ScriptPos = GenericController.strInstr(Pos, PageSource, "<script");
                             if ((ScriptPos != 0) && (ScriptPos < TagStart)) {
                                 //
                                 // skip comment and start again
                                 //
-                                Pos = GenericController.vbInstr(ScriptPos, PageSource, "</script");
+                                Pos = GenericController.strInstr(ScriptPos, PageSource, "</script");
                             } else {
                                 //
                                 // Get the tags innerHTML
                                 //
-                                TagStart = GenericController.vbInstr(TagStart, PageSource, ">", 1);
+                                TagStart = GenericController.strInstr(TagStart, PageSource, ">", 1);
                                 Pos = TagStart;
                                 if (TagStart != 0) {
                                     TagStart = TagStart + 1;
-                                    TagEnd = GenericController.vbInstr(TagStart, PageSource, "</" + Tag, 1);
+                                    TagEnd = GenericController.strInstr(TagStart, PageSource, "</" + Tag, 1);
                                     if (TagEnd != 0) {
                                         result += PageSource.Substring(TagStart - 1, TagEnd - TagStart);
                                     }
@@ -697,7 +697,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         LoopCnt = LoopCnt + 1;
                         if (ReturnAll) {
-                            TagStart = GenericController.vbInstr(TagEnd, PageSource, "<" + Tag, 1);
+                            TagStart = GenericController.strInstr(TagEnd, PageSource, "<" + Tag, 1);
                         } else {
                             TagStart = 0;
                         }

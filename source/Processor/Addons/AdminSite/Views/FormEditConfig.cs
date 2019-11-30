@@ -51,7 +51,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             core.siteProperties.setProperty("Editor Background Color", core.docProperties.getText("editorbackgroundcolor"));
                             for (Ptr = 0; Ptr <= ((string[])null).GetUpperBound(0); Ptr++) {
                                 FeatureName = ((string[])null)[Ptr];
-                                if (GenericController.vbLCase(FeatureName) == "styleandformatting") {
+                                if (GenericController.toLCase(FeatureName) == "styleandformatting") {
                                     //
                                     // must always be on or it throws js error (editor bug I guess)
                                     //
@@ -73,13 +73,13 @@ namespace Contensive.Processor.Addons.AdminSite {
                             core.privateFiles.saveFile(InnovaEditorFeaturefilename, "admin:" + AdminList + Environment.NewLine + "contentmanager:" + CMList + Environment.NewLine + "public:" + PublicList);
                             //
                             // Clear the editor style rules template cache so next edit gets new background color
-                            string EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
+                            string EditorStyleRulesFilename = GenericController.strReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
                             core.privateFiles.deleteFile(EditorStyleRulesFilename);
                             //
                             using (var csData = new CsModel(core)) {
                                 csData.openSql("select id from cctemplates");
                                 while (csData.ok()) {
-                                    EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csData.getText("ID"), 1, 99, 1);
+                                    EditorStyleRulesFilename = GenericController.strReplace(EditorStyleRulesFilenamePattern, "$templateid$", csData.getText("ID"), 1, 99, 1);
                                     core.privateFiles.deleteFile(EditorStyleRulesFilename);
                                     csData.goNext();
                                 }
@@ -111,7 +111,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             int RowPtr = 0;
                             for (Ptr = 0; Ptr <= ((string[])null).GetUpperBound(0); Ptr++) {
                                 FeatureName = ((string[])null)[Ptr];
-                                if (GenericController.vbLCase(FeatureName) == "styleandformatting") {
+                                if (GenericController.toLCase(FeatureName) == "styleandformatting") {
                                     //
                                     // hide and force on during process - editor bug I think.
                                     //

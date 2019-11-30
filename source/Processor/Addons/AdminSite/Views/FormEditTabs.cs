@@ -102,7 +102,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         //
                         // Read only Special Cases
                         if (IsLandingPage) {
-                            switch (GenericController.vbLCase(field.nameLc)) {
+                            switch (GenericController.toLCase(field.nameLc)) {
                                 case "active":
                                 //
                                 // if active, it is read only -- if inactive, let them set it active.
@@ -125,7 +125,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                         //
                         if (IsRootPage) {
-                            switch (GenericController.vbLCase(field.nameLc)) {
+                            switch (GenericController.toLCase(field.nameLc)) {
                                 case "dateexpires":
                                 case "pubdate":
                                 case "datearchive":
@@ -144,7 +144,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         //
                         // Special Case - ccemail table Alloweid should be disabled if siteproperty AllowLinkLogin is false
                         //
-                        if (GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail" && GenericController.vbLCase(field.nameLc) == "allowlinkeid") {
+                        if (GenericController.toLCase(adminData.adminContent.tableName) == "ccemail" && GenericController.toLCase(field.nameLc) == "allowlinkeid") {
                             if (!(core.siteProperties.getBoolean("AllowLinkLogin", true))) {
                                 fieldValueObject = "0";
                                 fieldForceReadOnly = true;
@@ -206,9 +206,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         //   this button causes a 'refresh' action, reloads fields with stream without save
                                         //
                                         string tmpList = core.userProperty.getText("editorPreferencesForContent:" + adminData.adminContent.id, "");
-                                        int PosStart = GenericController.vbInstr(1, "," + tmpList, "," + field.id + ":");
+                                        int PosStart = GenericController.strInstr(1, "," + tmpList, "," + field.id + ":");
                                         if (PosStart > 0) {
-                                            int PosEnd = GenericController.vbInstr(PosStart + 1, "," + tmpList, ",");
+                                            int PosEnd = GenericController.strInstr(PosStart + 1, "," + tmpList, ",");
                                             if (PosEnd == 0) {
                                                 tmpList = tmpList.left(PosStart - 1);
                                             } else {
@@ -619,7 +619,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         string HelpMsgDefault = "";
                         string HelpMsgCustom = "";
                         string EditorHelp = "";
-                        string LcaseName = GenericController.vbLCase(field.nameLc);
+                        string LcaseName = GenericController.toLCase(field.nameLc);
                         if (AllowHelpMsgCustom) {
                             HelpMsgDefault = field.helpDefault;
                             HelpMsgCustom = field.helpCustom;

@@ -326,12 +326,12 @@ namespace Contensive.Processor.Controllers {
                                     int PosStart = 0;
                                     HttpRequestController kmaHTTP = new HttpRequestController();
                                     string RemoteAssetContent = kmaHTTP.getURL(ref RemoteAssetLink);
-                                    int Pos = GenericController.vbInstr(1, RemoteAssetContent, "<body", 1);
+                                    int Pos = GenericController.strInstr(1, RemoteAssetContent, "<body", 1);
                                     if (Pos > 0) {
-                                        Pos = GenericController.vbInstr(Pos, RemoteAssetContent, ">");
+                                        Pos = GenericController.strInstr(Pos, RemoteAssetContent, ">");
                                         if (Pos > 0) {
                                             PosStart = Pos + 1;
-                                            Pos = GenericController.vbInstr(Pos, RemoteAssetContent, "</body", 1);
+                                            Pos = GenericController.strInstr(Pos, RemoteAssetContent, "</body", 1);
                                             if (Pos > 0) {
                                                 RemoteAssetContent = RemoteAssetContent.Substring(PosStart - 1, Pos - PosStart);
                                             }
@@ -581,7 +581,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // data is OK
                             //
-                            if (GenericController.vbLCase(Doc.DocumentElement.Name) != "form") {
+                            if (GenericController.toLCase(Doc.DocumentElement.Name) != "form") {
                                 //
                                 // error - Need a way to reach the user that submitted the file
                                 //
@@ -611,7 +611,7 @@ namespace Contensive.Processor.Controllers {
                                                         FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                         FieldValue = core.docProperties.getText(FieldName);
                                                         fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
-                                                        switch (GenericController.vbLCase(fieldType)) {
+                                                        switch (GenericController.toLCase(fieldType)) {
                                                             case "integer":
                                                                 //
                                                                 if (!string.IsNullOrEmpty(FieldValue)) {
@@ -780,7 +780,7 @@ namespace Contensive.Processor.Controllers {
                                     string TabDescription = "";
                                     string TabHeading = "";
                                     StringBuilderLegacyController TabCell = null;
-                                    switch (GenericController.vbLCase(SettingNode.Name)) {
+                                    switch (GenericController.toLCase(SettingNode.Name)) {
                                         case "description":
                                             Description = SettingNode.InnerText;
                                             break;
@@ -798,7 +798,7 @@ namespace Contensive.Processor.Controllers {
                                                 string FieldDescription = null;
                                                 string FieldDefaultValue = null;
                                                 string FieldCaption = null;
-                                                switch (GenericController.vbLCase(TabNode.Name)) {
+                                                switch (GenericController.toLCase(TabNode.Name)) {
                                                     case "heading":
                                                         //
                                                         // Heading
@@ -842,7 +842,7 @@ namespace Contensive.Processor.Controllers {
                                                             } else {
                                                                 //
                                                                 // Use default editor for each field type
-                                                                switch (GenericController.vbLCase(fieldType)) {
+                                                                switch (GenericController.toLCase(fieldType)) {
                                                                     case "integer":
                                                                         //
                                                                         Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
@@ -1597,11 +1597,11 @@ namespace Contensive.Processor.Controllers {
                         ConstructorName = ConstructorNameValues[ConstructorPtr];
                         ConstructorSelector = "";
                         ConstructorValue = "";
-                        int Pos = GenericController.vbInstr(1, ConstructorName, "=");
+                        int Pos = GenericController.strInstr(1, ConstructorName, "=");
                         if (Pos > 1) {
                             ConstructorValue = ConstructorName.Substring(Pos);
                             ConstructorName = (ConstructorName.left(Pos - 1)).Trim(' ');
-                            Pos = GenericController.vbInstr(1, ConstructorValue, "[");
+                            Pos = GenericController.strInstr(1, ConstructorValue, "[");
                             if (Pos > 0) {
                                 ConstructorSelector = ConstructorValue.Substring(Pos - 1);
                                 ConstructorValue = ConstructorValue.left(Pos - 1);
@@ -1625,7 +1625,7 @@ namespace Contensive.Processor.Controllers {
                         // if the name is not in the Constructor, add it
                         if (ConstructorCnt > 0) {
                             for (ConstructorPtr = 0; ConstructorPtr < ConstructorCnt; ConstructorPtr++) {
-                                if (GenericController.vbLCase(InstanceName) == GenericController.vbLCase(ConstructorNames[ConstructorPtr])) {
+                                if (GenericController.toLCase(InstanceName) == GenericController.toLCase(ConstructorNames[ConstructorPtr])) {
                                     break;
                                 }
                             }
@@ -1728,7 +1728,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         string Copy = csData.getText("stylesfilename");
                         if (!string.IsNullOrEmpty(Copy)) {
-                            if (GenericController.vbInstr(1, Copy, "://") != 0) {
+                            if (GenericController.strInstr(1, Copy, "://") != 0) {
                             } else if (Copy.left(1) == "/") {
                             } else {
                                 Copy = GenericController.getCdnFileLink(core, Copy);
@@ -1737,9 +1737,9 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         if (!string.IsNullOrEmpty(Wrapper)) {
-                            int Pos = GenericController.vbInstr(1, Wrapper, TargetString, 1);
+                            int Pos = GenericController.strInstr(1, Wrapper, TargetString, 1);
                             if (Pos != 0) {
-                                result = GenericController.vbReplace(Wrapper, TargetString, result, 1, 99, 1);
+                                result = GenericController.strReplace(Wrapper, TargetString, result, 1, 99, 1);
                             } else {
                                 result = ""
                                     + "<!-- the selected wrapper does not include the Target String marker to locate the position of the content. -->"
@@ -1764,9 +1764,9 @@ namespace Contensive.Processor.Controllers {
                 Found = false;
                 XmlNode ResultNode = Node.Attributes.GetNamedItem(Name);
                 if (ResultNode == null) {
-                    string UcaseName = GenericController.vbUCase(Name);
+                    string UcaseName = GenericController.toUCase(Name);
                     foreach (XmlAttribute NodeAttribute in Node.Attributes) {
-                        if (GenericController.vbUCase(NodeAttribute.Name) == UcaseName) {
+                        if (GenericController.toUCase(NodeAttribute.Name) == UcaseName) {
                             result = NodeAttribute.Value;
                             Found = true;
                             break;
@@ -1801,7 +1801,7 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrEmpty(ArgumentList)) {
                     ArgumentList += Environment.NewLine;
                 }
-                if (GenericController.vbLCase(AddonGuid) == GenericController.vbLCase(addonGuidContentBox)) {
+                if (GenericController.toLCase(AddonGuid) == GenericController.toLCase(addonGuidContentBox)) {
                     ArgumentList += AddonOptionConstructor_BlockNoAjax;
                 } else if (IsInline) {
                     ArgumentList += AddonOptionConstructor_Inline;
@@ -1828,7 +1828,7 @@ namespace Contensive.Processor.Controllers {
                         // split on equal
                         //
                         NameValue = GenericController.strReplace(NameValue, "\\=", Environment.NewLine);
-                        int Pos = GenericController.vbInstr(1, NameValue, "=");
+                        int Pos = GenericController.strInstr(1, NameValue, "=");
                         if (Pos == 0) {
                             OptionName = NameValue;
                         } else {
@@ -1841,7 +1841,7 @@ namespace Contensive.Processor.Controllers {
                         // split optionvalue on [
                         //
                         OptionValue = GenericController.strReplace(OptionValue, "\\[", Environment.NewLine);
-                        Pos = GenericController.vbInstr(1, OptionValue, "[");
+                        Pos = GenericController.strInstr(1, OptionValue, "[");
                         if (Pos != 0) {
                             OptionSelector = OptionValue.Substring(Pos - 1);
                             OptionValue = OptionValue.left(Pos - 1);
@@ -1860,7 +1860,7 @@ namespace Contensive.Processor.Controllers {
                         string NameValuePair = core.html.getAddonSelector(OptionName, OptionValue, OptionSelector);
                         NameValuePair = GenericController.encodeJavascriptStringSingleQuote(NameValuePair);
                         result += "&" + NameValuePair;
-                        if (GenericController.vbInstr(1, NameValuePair, "=") == 0) {
+                        if (GenericController.strInstr(1, NameValuePair, "=") == 0) {
                             result += "=";
                         }
                     }
@@ -2021,7 +2021,7 @@ namespace Contensive.Processor.Controllers {
                         IconHeight = 59;
                         IconSprites = 4;
                     }
-                } else if (vbInstr(1, IconFilename, "://") != 0) {
+                } else if (strInstr(1, IconFilename, "://") != 0) {
                     //
                     // icon is an Absolute URL - leave it
                     //

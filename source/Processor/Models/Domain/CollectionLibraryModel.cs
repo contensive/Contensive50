@@ -38,7 +38,7 @@ namespace Contensive.Processor.Models.Domain {
                     ErrorController.addUserError(core, UserError);
                     return null;
                 }
-                if (GenericController.vbLCase(LibCollections.DocumentElement.Name) != GenericController.vbLCase(Constants.CollectionListRootNode)) {
+                if (GenericController.toLCase(LibCollections.DocumentElement.Name) != GenericController.toLCase(Constants.CollectionListRootNode)) {
                     string UserError = "There was an error reading the Collection Library file. The '" + Constants.CollectionListRootNode + "' element was not found.";
                     LogController.logInfo(core, UserError);
                     ErrorController.addUserError(core, UserError);
@@ -51,7 +51,7 @@ namespace Contensive.Processor.Models.Domain {
                         var collection = new CollectionLibraryModel();
                         result.Add(collection);
                         foreach (XmlNode CollectionNode in collectionNode.ChildNodes) {
-                            switch (GenericController.vbLCase(CollectionNode.Name)) {
+                            switch (GenericController.toLCase(CollectionNode.Name)) {
                                 case "name":
                                     collection.name = CollectionNode.InnerText;
                                     break;

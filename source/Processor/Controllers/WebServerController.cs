@@ -661,14 +661,14 @@ namespace Contensive.Processor.Controllers {
                         //
                         // normal domain, leave it
                         //
-                    } else if (GenericController.vbInstr(1, requestPathPage, "/" + core.appConfig.adminRoute, 1) != 0) {
+                    } else if (GenericController.strInstr(1, requestPathPage, "/" + core.appConfig.adminRoute, 1) != 0) {
                         //
                         // forwarding does not work in the admin site
                         //
                     } else if ((core.domain.typeId == 2) && (core.domain.forwardUrl != "")) {
                         //
                         // forward to a URL
-                        if (GenericController.vbInstr(1, core.domain.forwardUrl, "://") == 0) {
+                        if (GenericController.strInstr(1, core.domain.forwardUrl, "://") == 0) {
                             core.domain.forwardUrl = "http://" + core.domain.forwardUrl;
                         }
                         redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this URL", false, false);
@@ -726,7 +726,7 @@ namespace Contensive.Processor.Controllers {
                     adminMessage = "For more information, please contact the <a href=\"mailto:" + core.siteProperties.emailAdmin + "?subject=Re: " + requestDomain + "\">Site Administrator</A>.";
                     //
                     // todo ???? this is always false
-                    if (requestDomain.ToLowerInvariant() != GenericController.vbLCase(requestDomain)) {
+                    if (requestDomain.ToLowerInvariant() != GenericController.toLCase(requestDomain)) {
                         string Copy = "Redirecting to domain [" + requestDomain + "] because this site is configured to run on the current domain [" + requestDomain + "]";
                         if (requestQueryString != "") {
                             redirect(requestProtocol + requestDomain + requestPath + requestPage + "?" + requestQueryString, Copy, false, false);
@@ -1226,7 +1226,7 @@ namespace Contensive.Processor.Controllers {
                         // ----- handle content special cases (prevent redirect to deleted records)
                         //
                         NonEncodedLink = GenericController.decodeResponseVariable(EncodedLink);
-                        switch (GenericController.vbUCase(iContentName)) {
+                        switch (GenericController.toUCase(iContentName)) {
                             case "CONTENT WATCH": {
                                     //
                                     // ----- special case
@@ -1299,21 +1299,21 @@ namespace Contensive.Processor.Controllers {
         public static string getBrowserAcceptLanguage(CoreController core) {
             try {
                 string AcceptLanguageString = (core.webServer.serverEnvironment.ContainsKey("HTTP_ACCEPT_LANGUAGE")) ? core.webServer.serverEnvironment["HTTP_ACCEPT_LANGUAGE"] : "";
-                int CommaPosition = GenericController.vbInstr(1, AcceptLanguageString, ",");
+                int CommaPosition = GenericController.strInstr(1, AcceptLanguageString, ",");
                 while (CommaPosition != 0) {
                     string AcceptLanguage = (AcceptLanguageString.left(CommaPosition - 1)).Trim(' ');
                     AcceptLanguageString = AcceptLanguageString.Substring(CommaPosition);
                     if (AcceptLanguage.Length > 0) {
-                        int DashPosition = GenericController.vbInstr(1, AcceptLanguage, "-");
+                        int DashPosition = GenericController.strInstr(1, AcceptLanguage, "-");
                         if (DashPosition > 1) {
                             AcceptLanguage = AcceptLanguage.left(DashPosition - 1);
                         }
-                        DashPosition = GenericController.vbInstr(1, AcceptLanguage, ";");
+                        DashPosition = GenericController.strInstr(1, AcceptLanguage, ";");
                         if (DashPosition > 1) {
                             return AcceptLanguage.left(DashPosition - 1);
                         }
                     }
-                    CommaPosition = GenericController.vbInstr(1, AcceptLanguageString, ",");
+                    CommaPosition = GenericController.strInstr(1, AcceptLanguageString, ",");
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

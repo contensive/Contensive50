@@ -129,8 +129,8 @@ namespace Contensive.Processor.Controllers {
                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, error reading collection [" + sourcePrivateFolderPathFilename + "]");
                                 continue;
                             }
-                            string CollectionFileBaseName = GenericController.vbLCase(CollectionFile.DocumentElement.Name);
-                            if ((CollectionFileBaseName != "contensivecdef") && (CollectionFileBaseName != CollectionFileRootNode) && (CollectionFileBaseName != GenericController.vbLCase(CollectionFileRootNodeOld))) {
+                            string CollectionFileBaseName = GenericController.toLCase(CollectionFile.DocumentElement.Name);
+                            if ((CollectionFileBaseName != "contensivecdef") && (CollectionFileBaseName != CollectionFileRootNode) && (CollectionFileBaseName != GenericController.toLCase(CollectionFileRootNodeOld))) {
                                 //
                                 // -- Not a problem, this is just not a collection file
                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, xml base name wrong [" + CollectionFileBaseName + "]");
@@ -175,7 +175,7 @@ namespace Contensive.Processor.Controllers {
                                     string ChildCollectionGUID = null;
                                     string ChildCollectionName = null;
                                     bool Found = false;
-                                    switch (GenericController.vbLCase(metaDataSection.Name)) {
+                                    switch (GenericController.toLCase(metaDataSection.Name)) {
                                         case "resource":
                                             break;
                                         case "getcollection":
@@ -190,7 +190,7 @@ namespace Contensive.Processor.Controllers {
                                             ChildCollectionGUID = GenericController.normalizeGuid(ChildCollectionGUID);
                                             string statusMsg = "Installing collection [" + ChildCollectionName + ", " + ChildCollectionGUID + "] referenced from collection [" + Collectionname + "]";
                                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" + ChildCollectionName + "], childCollectionGuid [" + ChildCollectionGUID + "]");
-                                            if (GenericController.vbInstr(1, CollectionVersionFolder, ChildCollectionGUID, 1) == 0) {
+                                            if (GenericController.strInstr(1, CollectionVersionFolder, ChildCollectionGUID, 1) == 0) {
                                                 if (string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                     //
                                                     // -- Needs a GUID to install
@@ -357,7 +357,7 @@ namespace Contensive.Processor.Controllers {
                         if (localGuid.Equals(collectionGuid.ToLower(CultureInfo.InvariantCulture))) {
                             collectionFound = true;
                             foreach (XmlNode collectionNode in localListNode.ChildNodes) {
-                                switch (GenericController.vbLCase(collectionNode.Name)) {
+                                switch (GenericController.toLCase(collectionNode.Name)) {
                                     case "name":
                                         collectionNode.InnerText = collectionname;
                                         break;
@@ -434,7 +434,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // This is an upgrade
                 //
-                int Pos = GenericController.vbInstr(1, CollectionVersionFolderName, "\\");
+                int Pos = GenericController.strInstr(1, CollectionVersionFolderName, "\\");
                 if (Pos > 0) {
                     CollectionFolderName = CollectionVersionFolderName.left(Pos - 1);
                 }

@@ -181,7 +181,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (store.ArrayPointer < (store.ArrayCount - 1)) {
                     store.ArrayPointer = store.ArrayPointer + 1;
-                    UcaseKey = GenericController.vbUCase(Key);
+                    UcaseKey = GenericController.toUCase(Key);
                     if (store.UcaseKeyArray[store.ArrayPointer] == UcaseKey) {
                         nextPointerMatch = GenericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
                     } else {

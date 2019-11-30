@@ -340,7 +340,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             if (FieldUsedInColumns.ContainsKey(columnNameLc)) {
                                                 if (FieldUsedInColumns[columnNameLc]) {
                                                     DataTableRows.Append((Environment.NewLine + "<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal));
-                                                    DataTableRows.Append(getForm_Index_GetCell(core, adminData, column.Name, csData, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail"));
+                                                    DataTableRows.Append(getForm_Index_GetCell(core, adminData, column.Name, csData, IsLookupFieldValid[columnNameLc], GenericController.toLCase(adminData.adminContent.tableName) == "ccemail"));
                                                     DataTableRows.Append(("&nbsp;</span></td>"));
                                                 }
                                             }
@@ -398,7 +398,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             int ColumnPointer = 0;
                             foreach (var column in IndexConfig.columns) {
                                 int ColumnWidth = column.Width;
-                                string FieldName = GenericController.vbLCase(column.Name);
+                                string FieldName = GenericController.toLCase(column.Name);
                                 string FindWordValue = "";
                                 if (IndexConfig.findWords.ContainsKey(FieldName)) {
                                     var tempVar = IndexConfig.findWords[FieldName];
@@ -1038,7 +1038,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         int Cnt = ListSplit.GetUpperBound(0) + 1;
                         if (Cnt > 0) {
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
-                                int Pos = GenericController.vbInstr(1, ListSplit[Ptr], ")");
+                                int Pos = GenericController.strInstr(1, ListSplit[Ptr], ")");
                                 if (Pos > 0) {
                                     int ContentId = GenericController.encodeInteger(ListSplit[Ptr].left(Pos - 1));
                                     if (ContentId > 0 && (ContentId != adminData.adminContent.id) & AdminDataModel.userHasContentAccess(core, ContentId)) {
@@ -1098,7 +1098,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         if (adminData.adminContent.fields.Count > 0) {
                             foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
                                 ContentFieldMetadataModel field = keyValuePair.Value;
-                                if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(adminData.wherePair[0, WCount])) {
+                                if (GenericController.toUCase(field.nameLc) == GenericController.toUCase(adminData.wherePair[0, WCount])) {
                                     //
                                     // found it, add it in the sql
                                     return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + adminData.wherePair[0, WCount] + "=";
@@ -1120,7 +1120,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         IndexConfigClass.IndexConfigFindWordClass findword = kvp.Value;
                         int FindMatchOption = (int)findword.MatchOption;
                         if (FindMatchOption != (int)FindWordMatchEnum.MatchIgnore) {
-                            string FindWordName = GenericController.vbLCase(findword.Name);
+                            string FindWordName = GenericController.toLCase(findword.Name);
                             string FindWordValue = findword.Value;
                             //
                             // Get FieldType
@@ -1130,7 +1130,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     //
                                     // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                                     FieldPtr = field.id;
-                                    if (GenericController.vbLCase(field.nameLc) == FindWordName) {
+                                    if (GenericController.toLCase(field.nameLc) == FindWordName) {
                                         switch (field.fieldTypeId) {
                                             case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
                                             case CPContentBaseClass.FieldTypeIdEnum.Integer:
@@ -1326,7 +1326,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 string orderByDelim = " ";
                 foreach (var kvp in IndexConfig.sorts) {
                     IndexConfigClass.IndexConfigSortClass sort = kvp.Value;
-                    string SortFieldName = GenericController.vbLCase(sort.fieldName);
+                    string SortFieldName = GenericController.toLCase(sort.fieldName);
                     //
                     // Get FieldType
                     if (adminData.adminContent.fields.ContainsKey(sort.fieldName)) {
@@ -1551,7 +1551,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 // people filters
                 //
                 SubFilterList = "";
-                if (adminData.adminContent.tableName.ToLower(CultureInfo.InvariantCulture) == GenericController.vbLCase("ccmembers")) {
+                if (adminData.adminContent.tableName.ToLower(CultureInfo.InvariantCulture) == GenericController.toLCase("ccmembers")) {
                     using (var csData = new CsModel(core)) {
                         csData.openSql(core.db.getSQLSelect("ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
                         while (csData.ok()) {

@@ -34,7 +34,7 @@ namespace Contensive.Processor.Models.Domain {
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", Error loading CollectionFolderConfig file.");
                     return null;
                 }
-                if (doc.DocumentElement.Name.ToLower(CultureInfo.InvariantCulture) != GenericController.vbLCase(Constants.CollectionListRootNode)) {
+                if (doc.DocumentElement.Name.ToLower(CultureInfo.InvariantCulture) != GenericController.toLCase(Constants.CollectionListRootNode)) {
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", The Collections.xml file has an invalid root node");
                     return null;
                 }
@@ -49,7 +49,7 @@ namespace Contensive.Processor.Models.Domain {
                             lastChangeDate = DateTime.Now
                         };
                         foreach (XmlNode collectionNode in configNode.ChildNodes) {
-                            switch (GenericController.vbLCase(collectionNode.Name)) {
+                            switch (GenericController.toLCase(collectionNode.Name)) {
                                 case "name":
                                     result.name = collectionNode.InnerText;
                                     break;
@@ -105,7 +105,7 @@ namespace Contensive.Processor.Models.Domain {
                         foreach (FolderDetail folder in FolderList) {
                             FolderName = folder.Name;
                             if (FolderName.Length > 34) {
-                                if (GenericController.vbLCase(FolderName.left(4)) != "temp") {
+                                if (GenericController.toLCase(FolderName.left(4)) != "temp") {
                                     CollectionGuid = FolderName.Substring(FolderName.Length - 32);
                                     Collectionname = FolderName.left(FolderName.Length - CollectionGuid.Length - 1);
                                     CollectionGuid = CollectionGuid.left(8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
@@ -174,7 +174,7 @@ namespace Contensive.Processor.Models.Domain {
                         returnOk = false;
                     }
                     if (returnOk) {
-                        if (GenericController.vbLCase(LocalCollections.DocumentElement.Name) != GenericController.vbLCase(Constants.CollectionListRootNode)) {
+                        if (GenericController.toLCase(LocalCollections.DocumentElement.Name) != GenericController.toLCase(Constants.CollectionListRootNode)) {
                             string Copy = "The addons\\Collections.xml has an invalid root node, [" + LocalCollections.DocumentElement.Name + "] was received and [" + Constants.CollectionListRootNode + "] was expected.";
                             LogController.logInfo(core, Copy);
                             return_ErrorMessage += "<P>" + Copy + "</P>";
@@ -183,9 +183,9 @@ namespace Contensive.Processor.Models.Domain {
                             //
                             // Get a list of the collection guids on this server
                             //
-                            if (GenericController.vbLCase(LocalCollections.DocumentElement.Name) == "collectionlist") {
+                            if (GenericController.toLCase(LocalCollections.DocumentElement.Name) == "collectionlist") {
                                 foreach (XmlNode LocalListNode in LocalCollections.DocumentElement.ChildNodes) {
-                                    switch (GenericController.vbLCase(LocalListNode.Name)) {
+                                    switch (GenericController.toLCase(LocalListNode.Name)) {
                                         case "collection":
                                             var collection = new CollectionLibraryModel();
                                             localCollectionStoreList.Add(collection);

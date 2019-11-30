@@ -259,10 +259,21 @@ namespace Contensive.Processor {
         /// <param name="Page"></param>
         /// <param name="QueryString"></param>
         public override void SeparateURL(string SourceURL, ref string Protocol, ref string Host, ref string Path, ref string Page, ref string QueryString) {
-            GenericController.splitUrl(SourceURL, ref Protocol, ref Host, ref Path, ref Page, ref QueryString);
+            GenericController.UrlDetailsClass urlDetails = GenericController.splitUrl(SourceURL);
+            Protocol = urlDetails.protocol;
+            Host = urlDetails.host;
+            Path = string.Join("\"", urlDetails.pathSegments);
+            Page = urlDetails.filename;
+            QueryString = urlDetails.queryString;
         }
         public override void SeparateURL(string SourceURL, ref string Protocol, ref string Host, ref string port, ref string Path, ref string Page, ref string QueryString) {
-            GenericController.splitUrl(SourceURL, ref Protocol, ref Host, ref port, ref Path, ref Page, ref QueryString);
+            GenericController.UrlDetailsClass urlDetails = GenericController.splitUrl(SourceURL);
+            Protocol = urlDetails.protocol;
+            Host = urlDetails.host;
+            port = urlDetails.port;
+            Path = string.Join("\"", urlDetails.pathSegments);
+            Page = urlDetails.filename;
+            QueryString = urlDetails.queryString;
         }
         //
         // ====================================================================================================

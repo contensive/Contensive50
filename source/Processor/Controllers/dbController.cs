@@ -516,7 +516,7 @@ namespace Contensive.Processor.Controllers {
                     // tablename required
                     //
                     throw new ArgumentException("Tablename can not be blank.");
-                } else if (GenericController.vbInstr(1, tableName, ".") != 0) {
+                } else if (GenericController.strInstr(1, tableName, ".") != 0) {
                     //
                     // Remote table -- remote system controls remote tables
                     //
@@ -584,7 +584,7 @@ namespace Contensive.Processor.Controllers {
                 if ((fieldType == CPContentBaseClass.FieldTypeIdEnum.Redirect) || (fieldType == CPContentBaseClass.FieldTypeIdEnum.ManyToMany)) { return; }
                 if (string.IsNullOrEmpty(tableName)) { throw new ArgumentException("Table Name cannot be blank."); }
                 if (fieldType == 0) { throw new ArgumentException("invalid fieldtype [" + fieldType + "]"); }
-                if (GenericController.vbInstr(1, tableName, ".") != 0) { throw new ArgumentException("Table name cannot include a period(.)"); }
+                if (GenericController.strInstr(1, tableName, ".") != 0) { throw new ArgumentException("Table name cannot include a period(.)"); }
                 if (string.IsNullOrEmpty(fieldName)) { throw new ArgumentException("Field name cannot be blank"); }
                 if (!isSQLTableField(tableName, fieldName)) {
                     //
@@ -897,7 +897,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public CPContentBaseClass.FieldTypeIdEnum getFieldTypeIdFromFieldTypeName(string FieldTypeName) {
             try {
-                switch (GenericController.vbLCase(FieldTypeName)) {
+                switch (GenericController.toLCase(FieldTypeName)) {
                     case Constants.FieldTypeNameLcaseBoolean: {
                             return CPContentBaseClass.FieldTypeIdEnum.Boolean;
                         }

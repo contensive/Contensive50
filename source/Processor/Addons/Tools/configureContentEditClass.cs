@@ -430,8 +430,8 @@ namespace Contensive.Processor.Addons.Tools {
                                 streamRow.Add(DbBaseModel.getRecordName<ContentFieldTypeModel>(core.cpParent, (int)fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, (int)fieldsort.field.fieldTypeId));
                             } else {
                                 string TypeSelect = TypeSelectTemplate;
-                                TypeSelect = GenericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);
-                                TypeSelect = GenericController.vbReplace(TypeSelect, "=\"" + fieldsort.field.fieldTypeId + "\"", "=\"" + fieldsort.field.fieldTypeId + "\" selected", 1, 99, 1);
+                                TypeSelect = GenericController.strReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);
+                                TypeSelect = GenericController.strReplace(TypeSelect, "=\"" + fieldsort.field.fieldTypeId + "\"", "=\"" + fieldsort.field.fieldTypeId + "\" selected", 1, 99, 1);
                                 streamRow.Add(TypeSelect);
                             }
                             streamRow.Add("</nobr></td>");
