@@ -132,7 +132,7 @@ function hideselect(hiddenIn) {
             } else {
                 //var wmodeSet=false;
                 var p = objs[i].getElementsByTagName("param");
-                for (pi = 0; pi < p.length; pi++) {
+                for (var pi = 0; pi < p.length; pi++) {
                     paramName = p[pi].name.toLowerCase();
                     if (paramName === "wmode") {
                         wmode = p[pi].value;
@@ -192,34 +192,37 @@ function hideselect(hiddenIn) {
 //
 // ----- Browser Detect
 //
-function BrowserType() {
-    var ua, s, i;
-    this.isIE = false;  // Internet Explorer
-    this.isNS = false;  // Netscape
-    //this.version = null;
-    this.isMac = false;
-    ua = navigator.userAgent;
-    s = "MSIE";
-    this.version = 0.0;
-    if (navigator.appVersion.indexOf("Mac") !== -1) {
-        this.isMac = true;
-    }
-    if ((i = ua.indexOf(s)) >= 0) {
-        this.isIE = true;
-        this.version = parseFloat(ua.substr(i + s.length));
-        return;
-    }
-    s = "Netscape6/";
-    if ((i = ua.indexOf(s)) >= 0) {
-        this.isNS = true;
-        this.version = parseFloat(ua.substr(i + s.length));
-        return;
-    }
-    s = "Gecko";
-    if ((i = ua.indexOf(s)) >= 0) {
-        this.isNS = true;
-        this.version = 6.1;
-        return;
+class BrowserType {
+    constructor() {
+        this.isIE = false; // Internet Explorer
+        this.isNS = false; // Netscape
+        this.isMac = false;
+        this.version = 0.0;
+        if (navigator.appVersion.indexOf("Mac") !== -1) {
+            this.isMac = true;
+        }
+        var s = "MSIE";
+        var ua = navigator.userAgent;
+        var i = ua.indexOf(s)
+        if (i >= 0) {
+            this.isIE = true;
+            this.version = parseFloat(ua.substr(i + s.length));
+            return;
+        }
+        s = "Netscape6/";
+        i = ua.indexOf(s)
+        if (i >= 0) {
+            this.isNS = true;
+            this.version = parseFloat(ua.substr(i + s.length));
+            return;
+        }
+        s = "Gecko";
+        i = ua.indexOf(s)
+        if (i >= 0) {
+            this.isNS = true;
+            this.version = 6.1;
+            return;
+        }
     }
 }
 var browser = new BrowserType();
@@ -285,6 +288,43 @@ function setAnchorTagsToColor(classToFind, colorToSet) {
         if (hasClassName(aTags[i], classToFind)) {
             aTags[i].style.color = colorToSet;
         }
+    }
+}
+//
+// -----
+//
+function removeClassNameAfter(el, name) {
+    var i, curList, newList;
+    if (el.className == null) { return; }
+    curList = el.className.split(" ");
+    newList = "";
+    for (i = 0; i < curList.length; i++)
+        if (curList[i] !== name) {
+            newList = newList + " " + curList[i];
+        } else {
+            // newList=newList+" "+curList[i];
+            el.className = newList;
+            return;
+        }
+}
+//
+// -----
+//
+function resetButton(button) {
+    if (button) {
+        removeClassNameAfter(button, "kmaMenuDown");
+        if (button.menu != null) {
+            closeSubMenu(button.menu);
+            button.menu.style.visibility = "hidden";
+        }
+    }
+}
+//
+// -----
+//
+function activateButton(button) {
+    if (button.menu != null) {
+        button.menu.style.visibility = "visible";
     }
 }
 //
@@ -384,26 +424,6 @@ function ccFlyoutButtonHover(event, menuId, position) {
         button = event.currentTarget;
     if (activeButton !== null && activeButton !== button)
         ccFlyoutButtonClick(event, menuId, position);
-}
-//
-// -----
-//
-function resetButton(button) {
-    if (button) {
-        removeClassNameAfter(button, "kmaMenuDown");
-        if (button.menu != null) {
-            closeSubMenu(button.menu);
-            button.menu.style.visibility = "hidden";
-        }
-    }
-}
-//
-// -----
-//
-function activateButton(button) {
-    if (button.menu != null) {
-        button.menu.style.visibility = "visible";
-    }
 }
 //
 // -----
@@ -568,23 +588,6 @@ function removeClassName(el, name) {
             newList = newList + " " + curList[i];
         } else {
             //newList=newList+" "+curList[i];
-            el.className = newList;
-            return;
-        }
-}
-//
-// -----
-//
-function removeClassNameAfter(el, name) {
-    var i, curList, newList;
-    if (el.className == null) { return; }
-    curList = el.className.split(" ");
-    newList = "";
-    for (i = 0; i < curList.length; i++)
-        if (curList[i] !== name) {
-            newList = newList + " " + curList[i];
-        } else {
-            // newList=newList+" "+curList[i];
             el.className = newList;
             return;
         }
@@ -2851,4 +2854,3 @@ jQuery(document).ready(function () {
     document.addEventListener("mousedown", PageClick, true);
     document.addEventListener("mouseclick", BodyOnClick, true);
 })
-
