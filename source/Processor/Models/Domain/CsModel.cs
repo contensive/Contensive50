@@ -881,10 +881,10 @@ namespace Contensive.Processor {
             try {
                 //
                 // -- opened with openForUpdate. can be written but not read
-                if (this.createdWithMetaData & !this.readable) { return this.isOpen; }
+                if (this.createdWithMetaData && !this.readable) { return this.isOpen; }
                 //
                 // -- normal open
-                return this.isOpen & (this.readCacheRowPtr >= 0) && (this.readCacheRowPtr < this.readCacheRowCnt);
+                return this.isOpen && (this.readCacheRowPtr >= 0) && (this.readCacheRowPtr < this.readCacheRowCnt);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -1403,7 +1403,7 @@ namespace Contensive.Processor {
                                         }
                                     }
                                 }
-                                if (field.uniqueName & (GenericController.encodeText(writeCacheValue) != "")) {
+                                if (field.uniqueName && (GenericController.encodeText(writeCacheValue) != "")) {
                                     //
                                     // ----- set up for unique name check
                                     //

@@ -692,7 +692,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="clearMetaCache"></param>
         public void createSQLIndex(string TableName, string IndexName, string FieldNames, bool clearMetaCache = false) {
             try {
-                if (!(string.IsNullOrEmpty(TableName) && string.IsNullOrEmpty(IndexName) & string.IsNullOrEmpty(FieldNames))) {
+                if (!(string.IsNullOrEmpty(TableName) && string.IsNullOrEmpty(IndexName) && string.IsNullOrEmpty(FieldNames))) {
                     TableSchemaModel ts = TableSchemaModel.getTableSchema(core, TableName, dataSourceName);
                     if (ts != null) {
                         if (null == ts.indexes.Find(x => x.index_name.ToLowerInvariant() == IndexName.ToLowerInvariant())) {

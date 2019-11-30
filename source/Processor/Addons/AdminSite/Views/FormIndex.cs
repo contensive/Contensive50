@@ -1,8 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Processor;
-
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
@@ -47,7 +45,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     // No Fields
                     Stream.Add(AdminErrorController.get(core, "This content [" + adminData.adminContent.name + "] cannot be accessed because it has no fields. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
-                } else if (adminData.adminContent.developerOnly & (!core.session.isAuthenticatedDeveloper())) {
+                } else if (adminData.adminContent.developerOnly && (!core.session.isAuthenticatedDeveloper())) {
                     //
                     // Developer Content and not developer
                     Stream.Add(AdminErrorController.get(core, "Access to this content [" + adminData.adminContent.name + "] requires developer permissions. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
@@ -102,7 +100,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         Dictionary<string, bool> FieldUsedInColumns = new Dictionary<string, bool>(); // used to prevent select SQL from being sorted by a field that does not appear
                         Dictionary<string, bool> IsLookupFieldValid = new Dictionary<string, bool>();
                         setIndexSQL(core, adminData, IndexConfig, ref AllowAccessToContent, ref sqlFieldList, ref sqlFrom, ref sqlWhere, ref sqlOrderBy, ref IsLimitedToSubContent, ref ContentAccessLimitMessage, ref FieldUsedInColumns, IsLookupFieldValid);
-                        bool AllowAdd = adminData.adminContent.allowAdd & (!IsLimitedToSubContent) && (userContentPermissions.allowAdd);
+                        bool AllowAdd = adminData.adminContent.allowAdd && (!IsLimitedToSubContent) && (userContentPermissions.allowAdd);
                         bool AllowDelete = (adminData.adminContent.allowDelete) && (userContentPermissions.allowDelete);
                         if ((!userContentPermissions.allowEdit) || (!AllowAccessToContent)) {
                             //
@@ -1053,7 +1051,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 int Pos = GenericController.strInstr(1, ListSplit[Ptr], ")");
                                 if (Pos > 0) {
                                     int ContentId = GenericController.encodeInteger(ListSplit[Ptr].left(Pos - 1));
-                                    if (ContentId > 0 && (ContentId != adminData.adminContent.id) & AdminDataModel.userHasContentAccess(core, ContentId)) {
+                                    if (ContentId > 0 && (ContentId != adminData.adminContent.id) && AdminDataModel.userHasContentAccess(core, ContentId)) {
                                         SubQuery = SubQuery + "OR(" + adminData.adminContent.tableName + ".ContentControlID=" + ContentId + ")";
                                         return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentId + "\">" + MetadataController.getContentNameByID(core, ContentId) + "</a>'";
                                         string SubContactList = "";

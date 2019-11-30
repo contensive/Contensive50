@@ -1,13 +1,10 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Processor;
-
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using Contensive.Processor.Addons.Tools;
 using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor.Addons.AdminSite.Controllers;
@@ -1105,7 +1102,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 int ContentId = 0;
                 int ContentWatchId = 0;
                 //
-                if (adminData.adminContent.allowContentTracking & (!editRecord.userReadOnly)) {
+                if (adminData.adminContent.allowContentTracking && (!editRecord.userReadOnly)) {
                     //
                     // ----- Set default content watch link label
                     //
@@ -1302,7 +1299,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             break;
                                         }
                                     case "CCGUID": {
-                                            if (NewRecord & string.IsNullOrEmpty(FieldValueText)) {
+                                            if (NewRecord && string.IsNullOrEmpty(FieldValueText)) {
                                                 //
                                                 // if new record and edit form returns empty, preserve the guid used to create the record.
                                             } else {

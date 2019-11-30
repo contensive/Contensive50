@@ -27,7 +27,7 @@ namespace Contensive.Processor.Addons.Primitives {
             string result = "";
             try {
                 CoreController core = ((CPClass)cp).core;
-                if (core.session.isAuthenticated & core.session.isAuthenticatedAdmin()) {
+                if (core.session.isAuthenticated && core.session.isAuthenticatedAdmin()) {
                     //
                     // Save the site sites
                     //

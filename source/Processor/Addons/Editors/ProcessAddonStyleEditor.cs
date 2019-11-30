@@ -30,7 +30,7 @@ namespace Contensive.Processor.Addons.Primitives {
                 CoreController core = ((CPClass)cp).core;
                 //
                 // save custom styles
-                if (core.session.isAuthenticated & core.session.isAuthenticatedAdmin()) {
+                if (core.session.isAuthenticated && core.session.isAuthenticatedAdmin()) {
                     int addonId = core.docProperties.getInteger("AddonID");
                     if (addonId > 0) {
                        AddonModel styleAddon =DbBaseModel.create<AddonModel>(core.cpParent, addonId);

@@ -1,17 +1,12 @@
 ﻿
 using System;
-using System.Collections.Generic;
-using System.Data;
-
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
-using Contensive.Processor.Exceptions;
 using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
-using Contensive.Processor;
 using Contensive.Models.Db;
 
 namespace Contensive.Processor.Addons.AdminSite {
@@ -30,7 +25,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 bool AllowajaxTabs = (core.siteProperties.getBoolean("AllowAjaxEditTabBeta", false));
                 var adminMenu = new TabController();
                 //
-                if ((!core.doc.userErrorList.Count.Equals(0)) & adminData.editRecord.Loaded) {
+                if ((!core.doc.userErrorList.Count.Equals(0)) && adminData.editRecord.Loaded) {
                     //
                     // block load if there was a user error and it is already loaded (assume error was from response )
                 } else if (adminData.adminContent.id <= 0) {
@@ -38,7 +33,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // Invalid Content
                     Processor.Controllers.ErrorController.addUserError(core, "There was a problem identifying the content you requested. Please return to the previous form and verify your selection.");
                     return "";
-                } else if (adminData.editRecord.Loaded & !adminData.editRecord.Saved) {
+                } else if (adminData.editRecord.Loaded && !adminData.editRecord.Saved) {
                     //
                     //   File types need to be reloaded from the Db, because...
                     //       LoadDb - sets them to the path-page
@@ -118,7 +113,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 var userContentPermissions = PermissionController.getUserContentPermissions(core, adminData.adminContent);
                 bool allowAdd = adminData.adminContent.allowAdd && userContentPermissions.allowAdd;
-                bool AllowDelete = adminData.adminContent.allowDelete & userContentPermissions.allowDelete & (adminData.editRecord.id != 0);
+                bool AllowDelete = adminData.adminContent.allowDelete && userContentPermissions.allowDelete && (adminData.editRecord.id != 0);
                 bool allowSave = userContentPermissions.allowSave;
                 bool AllowRefresh = true;
                 //
@@ -172,9 +167,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                     } else {
                         string EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, new EditButtonBarInfoClass() {
                             allowActivate = false,
-                            allowAdd = (allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd),
+                            allowAdd = (allowAdd && adminData.adminContent.allowAdd && adminData.editRecord.AllowUserAdd),
                             allowCancel = true,
-                            allowCreateDuplicate = (allowSave && adminData.editRecord.AllowUserSave & (adminData.editRecord.id != 0)),
+                            allowCreateDuplicate = (allowSave && adminData.editRecord.AllowUserSave && (adminData.editRecord.id != 0)),
                             allowDelete = AllowDelete && adminData.editRecord.AllowUserDelete,
                             allowMarkReviewed = false,
                             allowRefresh = AllowRefresh,
@@ -224,9 +219,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                         string EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, new EditButtonBarInfoClass() {
                             allowActivate = false,
-                            allowAdd = (allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd),
+                            allowAdd = (allowAdd && adminData.adminContent.allowAdd && adminData.editRecord.AllowUserAdd),
                             allowCancel = true,
-                            allowCreateDuplicate = (allowSave && adminData.editRecord.AllowUserSave & (adminData.editRecord.id != 0)),
+                            allowCreateDuplicate = (allowSave && adminData.editRecord.AllowUserSave && (adminData.editRecord.id != 0)),
                             allowDelete = AllowDelete && adminData.editRecord.AllowUserDelete && core.session.isAuthenticatedDeveloper(),
                             allowMarkReviewed = false,
                             allowRefresh = AllowRefresh,
@@ -252,9 +247,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                         //
                         string EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, new EditButtonBarInfoClass() {
-                            allowActivate = !EmailSubmitted & ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest),
+                            allowActivate = !EmailSubmitted && ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest),
                             allowDeactivate = EmailSubmitted,
-                            allowAdd = allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd,
+                            allowAdd = allowAdd && adminData.adminContent.allowAdd && adminData.editRecord.AllowUserAdd,
                             allowCancel = true,
                             allowCreateDuplicate = allowAdd && (adminData.editRecord.id != 0),
                             allowDelete = AllowDelete && adminData.editRecord.AllowUserDelete && core.session.isAuthenticatedDeveloper(),
@@ -283,14 +278,14 @@ namespace Contensive.Processor.Addons.AdminSite {
                         string EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, new EditButtonBarInfoClass() {
                             allowActivate = false,
                             allowDeactivate = false,
-                            allowAdd = allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd,
+                            allowAdd = allowAdd && adminData.adminContent.allowAdd && adminData.editRecord.AllowUserAdd,
                             allowCancel = true,
                             allowCreateDuplicate = allowAdd && (adminData.editRecord.id != 0),
-                            allowDelete = !EmailSubmitted & (AllowDelete && adminData.editRecord.AllowUserDelete),
+                            allowDelete = !EmailSubmitted && (AllowDelete && adminData.editRecord.AllowUserDelete),
                             allowMarkReviewed = false,
                             allowRefresh = AllowRefresh,
-                            allowSave = !EmailSubmitted & (allowSave && adminData.editRecord.AllowUserSave),
-                            allowSend = !EmailSubmitted & ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest),
+                            allowSave = !EmailSubmitted && (allowSave && adminData.editRecord.AllowUserSave),
+                            allowSend = !EmailSubmitted && ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest),
                             allowSendTest = !EmailSubmitted,
                             hasChildRecords = false,
                             isPageContent = false,
@@ -312,9 +307,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                     } else {
                         string EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, new EditButtonBarInfoClass() {
                             allowActivate = false,
-                            allowAdd = (allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd),
+                            allowAdd = (allowAdd && adminData.adminContent.allowAdd && adminData.editRecord.AllowUserAdd),
                             allowCancel = true,
-                            allowCreateDuplicate = (allowSave && adminData.editRecord.AllowUserSave & (adminData.editRecord.id != 0)),
+                            allowCreateDuplicate = (allowSave && adminData.editRecord.AllowUserSave && (adminData.editRecord.id != 0)),
                             allowDelete = AllowDelete && adminData.editRecord.AllowUserDelete,
                             allowMarkReviewed = false,
                             allowRefresh = AllowRefresh,
@@ -342,9 +337,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                     int TableId = MetadataController.getRecordIdByUniqueName(core, "Tables", "ccPageContent");
                     string EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
-                        allowAdd = (allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd),
+                        allowAdd = (allowAdd && adminData.adminContent.allowAdd && adminData.editRecord.AllowUserAdd),
                         allowCancel = true,
-                        allowCreateDuplicate = (allowSave && adminData.editRecord.AllowUserSave & (adminData.editRecord.id != 0)),
+                        allowCreateDuplicate = (allowSave && adminData.editRecord.AllowUserSave && (adminData.editRecord.id != 0)),
                         allowDelete = AllowDelete && adminData.editRecord.AllowUserDelete,
                         allowMarkReviewed = false,
                         allowRefresh = AllowRefresh,
@@ -373,9 +368,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                     bool AllowMarkReviewed = core.db.isSQLTableField(adminData.adminContent.tableName, "DateReviewed");
                     string EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
-                        allowAdd = (allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd),
+                        allowAdd = (allowAdd && adminData.adminContent.allowAdd && adminData.editRecord.AllowUserAdd),
                         allowCancel = true,
-                        allowCreateDuplicate = (allowSave && adminData.editRecord.AllowUserSave & (adminData.editRecord.id != 0)),
+                        allowCreateDuplicate = (allowSave && adminData.editRecord.AllowUserSave && (adminData.editRecord.id != 0)),
                         allowDelete = AllowDelete && adminData.editRecord.AllowUserDelete,
                         allowMarkReviewed = AllowMarkReviewed,
                         allowRefresh = AllowRefresh,

@@ -1,10 +1,7 @@
 ﻿
 using System;
-
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
-using Contensive.Processor.Models.Domain;
-using Contensive.Processor;
 using Contensive.Models.Db;
 
 namespace Contensive.Processor.Addons.AdminSite {

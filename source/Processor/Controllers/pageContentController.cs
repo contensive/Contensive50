@@ -357,7 +357,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- do anonymous access blocking
                     if (!core.session.isAuthenticated) {
-                        if ((core.webServer.requestPath != "/") & GenericController.strInstr(1, "/" + core.appConfig.adminRoute, core.webServer.requestPath, 1) != 0) {
+                        if ((core.webServer.requestPath != "/") && GenericController.strInstr(1, "/" + core.appConfig.adminRoute, core.webServer.requestPath, 1) != 0) {
                             //
                             // admin page is excluded from custom blocking
                         } else {
@@ -760,7 +760,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // Register Form
                                     //
-                                    if (!core.session.isAuthenticated & core.session.isRecognized()) {
+                                    if (!core.session.isAuthenticated && core.session.isRecognized()) {
                                         //
                                         // -- Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
                                         core.session.logout();
@@ -1018,7 +1018,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- Add admin warning to the top of the content
-                if (core.session.isAuthenticatedAdmin() & core.doc.adminWarning != "") {
+                if (core.session.isAuthenticatedAdmin() && core.doc.adminWarning != "") {
                     if (core.doc.adminWarningPageID != 0) {
                         core.doc.adminWarning += "</p>" + AdminUIController.getRecordEditAndCutLink(core, "Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID) + "&nbsp;Edit the page<p>";
                         core.doc.adminWarningPageID = 0;
@@ -1132,12 +1132,12 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- Allow More Info
-                if ((core.doc.pageController.page.contactMemberId != 0) & core.doc.pageController.page.allowMoreInfo) {
+                if ((core.doc.pageController.page.contactMemberId != 0) && core.doc.pageController.page.allowMoreInfo) {
                     result.Append(getMoreInfoHtml(core, core.doc.pageController.page.contactMemberId));
                 }
                 //
                 // -- Last Modified line
-                if ((core.doc.pageController.page.modifiedDate != DateTime.MinValue) & core.doc.pageController.page.allowLastModifiedFooter) {
+                if ((core.doc.pageController.page.modifiedDate != DateTime.MinValue) && core.doc.pageController.page.allowLastModifiedFooter) {
                     result.Append("\r<p>This page was last modified " + encodeDate(core.doc.pageController.page.modifiedDate).ToString("G"));
                     if (core.session.isAuthenticatedAdmin()) {
                         if (core.doc.pageController.page.modifiedBy == 0) {
@@ -1155,7 +1155,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- Last Reviewed line
-                if ((core.doc.pageController.page.dateReviewed != DateTime.MinValue) & core.doc.pageController.page.allowReviewedFooter) {
+                if ((core.doc.pageController.page.dateReviewed != DateTime.MinValue) && core.doc.pageController.page.allowReviewedFooter) {
                     result.Append("\r<p>This page was last reviewed " + encodeDate(core.doc.pageController.page.dateReviewed).ToString(""));
                     if (core.session.isAuthenticatedAdmin()) {
                         if (core.doc.pageController.page.reviewedBy == 0) {
@@ -1729,7 +1729,7 @@ namespace Contensive.Processor.Controllers {
                     // Load the instructions
                     //
                     pageForm = loadFormPageInstructions(core, FormInstructions, Formhtml);
-                    if (pageForm.AuthenticateOnFormProcess & !core.session.isAuthenticated & core.session.isRecognized()) {
+                    if (pageForm.AuthenticateOnFormProcess && !core.session.isAuthenticated && core.session.isRecognized()) {
                         //
                         // If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
                         //
@@ -1754,7 +1754,7 @@ namespace Contensive.Processor.Controllers {
                                     var peopleFieldMeta = Models.Domain.ContentMetadataModel.getField(core, peopleMeta, formField.peopleFieldName);
                                     if (peopleFieldMeta != null) {
                                         FormValue = core.docProperties.getText(formField.peopleFieldName);
-                                        if ((!string.IsNullOrEmpty(FormValue)) & peopleFieldMeta.uniqueName) {
+                                        if ((!string.IsNullOrEmpty(FormValue)) && peopleFieldMeta.uniqueName) {
                                             using (var csData = new CsModel(core)) {
                                                 string SQL = "select count(*) from ccMembers where " + formField.peopleFieldName + "=" + DbController.encodeSQLText(FormValue);
                                                 csData.openSql(SQL);
@@ -1842,7 +1842,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Create People Name
                     //
-                    if (string.IsNullOrWhiteSpace(PeopleName) && !string.IsNullOrWhiteSpace(PeopleFirstName) & !string.IsNullOrWhiteSpace(PeopleLastName)) {
+                    if (string.IsNullOrWhiteSpace(PeopleName) && !string.IsNullOrWhiteSpace(PeopleFirstName) && !string.IsNullOrWhiteSpace(PeopleLastName)) {
                         using (var csData = new CsModel(core)) {
                             if (csData.openRecord("people", core.session.user.id)) {
                                 csData.set("name", PeopleFirstName + " " + PeopleLastName);
@@ -2425,7 +2425,7 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrEmpty(activeList + inactiveList)) {
                     result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + activeList + inactiveList + "\r</ul>";
                 }
-                if ((!string.IsNullOrEmpty(UcaseRequestedListName)) && (ChildListCount == 0) & isAuthoring) {
+                if ((!string.IsNullOrEmpty(UcaseRequestedListName)) && (ChildListCount == 0) && isAuthoring) {
                     result = "[Child Page List with no pages]</p><p>" + result;
                 }
             } catch (Exception ex) {

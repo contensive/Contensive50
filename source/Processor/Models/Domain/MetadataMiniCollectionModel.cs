@@ -421,7 +421,7 @@ namespace Contensive.Processor.Models.Domain {
                                         bool removeDup = false;
                                         MetadataMiniCollectionModel.MiniCollectionSQLIndexModel dupToRemove = new MetadataMiniCollectionModel.MiniCollectionSQLIndexModel();
                                         foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel index in result.sqlIndexes) {
-                                            if (textMatch(index.IndexName, IndexName) & textMatch(index.TableName, TableName) & textMatch(index.DataSourceName, DataSourceName)) {
+                                            if (textMatch(index.IndexName, IndexName) && textMatch(index.TableName, TableName) && textMatch(index.DataSourceName, DataSourceName)) {
                                                 dupToRemove = index;
                                                 removeDup = true;
                                                 break;

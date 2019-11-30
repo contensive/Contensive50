@@ -338,7 +338,7 @@ namespace Contensive.Processor.Controllers {
                                 //} else {
                                 //
                                 // -- if successful, now test for autologin (authentication)
-                                if (core.siteProperties.allowAutoLogin & resultSessionContext.user.autoLogin & resultSessionContext.visit.cookieSupport) {
+                                if (core.siteProperties.allowAutoLogin && resultSessionContext.user.autoLogin && resultSessionContext.visit.cookieSupport) {
                                     //
                                     // -- they allow it, now Check if they were logged in on their last visit
                                     VisitModel lastVisit = VisitModel.getLastVisitByVisitor(core.cpParent, resultSessionContext.visit.id, resultSessionContext.visitor.id);
@@ -616,7 +616,7 @@ namespace Contensive.Processor.Controllers {
         public bool isAuthenticatedAdmin() {
             bool result = false;
             try {
-                result = visit.visitAuthenticated & (user.admin || user.developer);
+                result = visit.visitAuthenticated && (user.admin || user.developer);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -633,7 +633,7 @@ namespace Contensive.Processor.Controllers {
         public bool isAuthenticatedDeveloper() {
             bool result = false;
             try {
-                result = visit.visitAuthenticated & (user.admin || user.developer);
+                result = visit.visitAuthenticated && (user.admin || user.developer);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

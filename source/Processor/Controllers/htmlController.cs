@@ -843,7 +843,7 @@ namespace Contensive.Processor.Controllers {
         public static string inputText_Legacy(CoreController core, string htmlName, string defaultValue = "", int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false, string placeholder = "") {
             string result = "";
             try {
-                if ((heightRows > 1) & !passwordField) {
+                if ((heightRows > 1) && !passwordField) {
                     result = inputTextarea(core, htmlName, defaultValue, heightRows, widthCharacters, htmlId, true, readOnly, htmlClass, disabled, maxLength);
                 } else {
                     defaultValue = HtmlController.encodeHtml(defaultValue);

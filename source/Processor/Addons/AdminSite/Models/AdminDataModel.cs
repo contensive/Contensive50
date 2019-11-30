@@ -839,7 +839,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         editRecord.fieldsLc.Add(field.nameLc, editRecordField);
                     }
                     defaultValue = field.defaultValue;
-                    if (field.active & !GenericController.isNull(defaultValue)) {
+                    if (field.active && !GenericController.isNull(defaultValue)) {
                         switch (field.fieldTypeId) {
                             case CPContentBaseClass.FieldTypeIdEnum.Integer:
                             case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
@@ -936,7 +936,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 foreach (var keyValuePair in adminContent.fields) {
                     ContentFieldMetadataModel field = keyValuePair.Value;
                     DefaultValueText = getWherePairValue(field.nameLc);
-                    if (field.active & (!string.IsNullOrEmpty(DefaultValueText))) {
+                    if (field.active && (!string.IsNullOrEmpty(DefaultValueText))) {
                         switch (field.fieldTypeId) {
                             case CPContentBaseClass.FieldTypeIdEnum.Integer:
                             case CPContentBaseClass.FieldTypeIdEnum.Lookup:
@@ -1100,7 +1100,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // Check for required and null case loading error
                                 //
-                                if (CheckUserErrors && adminContentcontent.required & (GenericController.isNull(DBValueVariant))) {
+                                if (CheckUserErrors && adminContentcontent.required && (GenericController.isNull(DBValueVariant))) {
                                     //
                                     // if required and null
                                     //
@@ -1262,7 +1262,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     if (allowAdminFieldCheck(core) && (FormFieldLcListToBeLoaded.Count > 0)) {
                         Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The following fields where not found [" + string.Join(",", FormFieldLcListToBeLoaded) + "].");
-                        throw (new GenericException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
+                        throw (new GenericException("Unexpected exception")); 
                     }
                 }
             } catch (Exception ex) {
@@ -1311,7 +1311,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // Add user error only for the first missing field
                                 Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try again, taking care not to submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" + field.nameLc + " not found]. There may have been others.");
                             }
-                            throw (new GenericException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but not found In the response stream.")
+                            throw (new GenericException("Unexpected exception")); 
                         }
                     }
                     if (GenericController.encodeInteger(ResponseFieldValueText) != GenericController.encodeInteger(editRecord.fieldsLc[field.nameLc].value)) {
@@ -1389,7 +1389,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         // non-developer and developer only field, leave current value
                         //
                         ResponseFieldValueIsOKToSave = false;
-                    } else if ((field.readOnly) || (field.notEditable & (editRecord.id != 0))) {
+                    } else if ((field.readOnly) || (field.notEditable && (editRecord.id != 0))) {
                         //
                         // read only field, leave current
                         //

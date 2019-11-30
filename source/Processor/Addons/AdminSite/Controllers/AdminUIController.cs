@@ -1069,7 +1069,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         //
         public static string getDefaultEditor_memberSelect(CoreController core, string htmlName, int selectedRecordId, int groupId, string groupName, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
             string EditorString = "";
-            if ((groupId > 0) & (string.IsNullOrWhiteSpace(groupName))) {
+            if ((groupId > 0) && (string.IsNullOrWhiteSpace(groupName))) {
                 var group = DbBaseModel.create<GroupModel>(core.cpParent, groupId);
                 if (group != null) {
                     groupName = "Group " + group.id.ToString();

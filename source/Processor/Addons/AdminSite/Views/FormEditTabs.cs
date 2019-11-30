@@ -2,16 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
-using Contensive.Processor;
 using Contensive.Models.Db;
 
 namespace Contensive.Processor.Addons.AdminSite {
@@ -152,7 +149,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             }
                         }
                         string EditorString = "";
-                        bool editorReadOnly = (record_readOnly || field.readOnly || (editRecord.id != 0 & field.notEditable) || (fieldForceReadOnly));
+                        bool editorReadOnly = (record_readOnly || field.readOnly || (editRecord.id != 0 && field.notEditable) || (fieldForceReadOnly));
                         AddonModel editorAddon = null;
                         int fieldTypeDefaultEditorAddonId = 0;
                         var fieldEditor = adminData.fieldTypeEditors.Find(x => (x.fieldTypeId == (int)field.fieldTypeId));

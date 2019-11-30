@@ -459,7 +459,7 @@ namespace Contensive.Processor.Controllers {
                                             // first line of a new index description
                                             // save previous line
                                             //
-                                            if (!string.IsNullOrEmpty(IndexName) & !string.IsNullOrEmpty(IndexFields)) {
+                                            if (!string.IsNullOrEmpty(IndexName) && !string.IsNullOrEmpty(IndexFields)) {
                                                 sb.Append("<SQLIndex");
                                                 sb.Append(" Indexname=\"" + encodeXMLattribute(IndexName) + "\"");
                                                 sb.Append(" DataSourceName=\"" + encodeXMLattribute(DataSourceName) + "\"");

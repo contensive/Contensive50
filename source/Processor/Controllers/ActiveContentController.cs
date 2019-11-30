@@ -627,9 +627,6 @@ namespace Contensive.Processor.Controllers {
                                                                             //
                                                                             QueryString = "";
                                                                             if (!string.IsNullOrEmpty(ACQueryString)) {
-                                                                                // I added this because single stepping through it I found it split on the & in &amp;
-                                                                                // I had added an Add-on and was saving
-                                                                                // I find it VERY odd that this could be the case
                                                                                 //
                                                                                 string QSHTMLEncoded = GenericController.encodeText(ACQueryString);
                                                                                 QueryString = HtmlController.decodeHtml(QSHTMLEncoded);
@@ -719,7 +716,7 @@ namespace Contensive.Processor.Controllers {
                                                                                     if (SizeTest.GetUpperBound(0) != 1) {
                                                                                         ImageFilenameAltSize = "";
                                                                                     } else {
-                                                                                        if ((SizeTest[0].isNumeric() & SizeTest[1].isNumeric())) {
+                                                                                        if ((SizeTest[0].isNumeric() && SizeTest[1].isNumeric())) {
                                                                                             ImageFilenameNoExt = ImageFilenameNoExt.left(Pos - 1);
                                                                                         } else {
                                                                                             ImageFilenameAltSize = "";
@@ -795,7 +792,7 @@ namespace Contensive.Processor.Controllers {
                                                                                         //
                                                                                         // continue only if we have record width and height
                                                                                         //
-                                                                                        if (RecordWidth != 0 & RecordHeight != 0) {
+                                                                                        if (RecordWidth != 0 && RecordHeight != 0) {
                                                                                             //
                                                                                             // set ImageWidth and ImageHeight if one of them is missing
                                                                                             //

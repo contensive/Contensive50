@@ -1,7 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
@@ -305,17 +304,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                 Content = returnForm;
                 //
                 // Assemble LiveWindowTable
-                //Stream.Add(Environment.NewLine + htmlController.form_start(core));
                 Stream.Add(ButtonBar);
                 Stream.Add(TitleBar);
                 Stream.Add(Content);
                 Stream.Add(ButtonBar);
                 Stream.Add("<input type=hidden name=fieldcnt VALUE=" + FieldCnt + ">");
-                //Stream.Add( "<input type=hidden name=af VALUE=" & AdminFormIndex & ">")
                 Stream.Add("<input type=hidden name=" + RequestNameAdminSubForm + " VALUE=" + AdminFormIndex_SubFormAdvancedSearch + ">");
-                //Stream.Add("</form>");
-                //        Stream.Add( CloseLiveWindowTable)
-                //
                 returnForm = HtmlController.form(core, Stream.Text);
                 core.html.addTitle(adminData.adminContent.name + " Advanced Search");
             } catch (Exception ex) {

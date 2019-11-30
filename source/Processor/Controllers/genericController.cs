@@ -910,7 +910,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string removeUrlPrefix(string url, string urlPrefix) {
             string result = url;
-            if (!string.IsNullOrEmpty(url) & !string.IsNullOrEmpty(urlPrefix)) {
+            if (!string.IsNullOrEmpty(url) && !string.IsNullOrEmpty(urlPrefix)) {
                 if (strInstr(1, result, urlPrefix, 1) == 1) {
                     result = result.Substring(urlPrefix.Length);
                 }
