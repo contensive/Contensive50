@@ -1,6 +1,4 @@
-﻿
-using Contensive.Processor.Controllers;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 //
 namespace Contensive.Processor.Models.Domain {
     //

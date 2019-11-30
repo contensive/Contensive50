@@ -1,6 +1,5 @@
 ﻿
 using System;
-using Contensive.Processor;
 using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor.Addons.AdminSite {

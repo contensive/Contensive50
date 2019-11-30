@@ -2,9 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Contensive.BaseModels;
-using Contensive.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Constants;
 using static Newtonsoft.Json.JsonConvert;
 
 namespace Contensive.Processor.Models.Domain {

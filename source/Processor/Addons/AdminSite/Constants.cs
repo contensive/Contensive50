@@ -1,7 +1,4 @@
 ﻿
-using System;
-using System.Collections.Generic;
-
 namespace Contensive.Processor.Addons.AdminSite {
     public static class Constants {
         //

@@ -1,62 +1,19 @@
 ﻿
-using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
-//
 namespace Contensive.Processor.Models.Domain {
     [System.Serializable]
     public class UploadFileModel {
         //
-        internal string filename {
-            get {
-                return _fileName;
-            }
-            set {
-                _fileName = value;
-            }
-        } private string _fileName;
+        internal string filename { get; set; }
         //
-        public int fileSize {
-            get {
-                return _fileSize;
-            }
-            set {
-                _fileSize = value;
-            }
-        } private int _fileSize;
+        public int fileSize { get; set; }
         //
-        public byte[] value {
-            get {
-                return _value;
-            }
-            set {
-                _value = value;
-            }
-        } private byte[] _value;
+        public byte[] value { get; set; }
         //
-        public string contentType {
-            get {
-                return _contentType;
-            }
-            set {
-                _contentType = value;
-            }
-        } private string _contentType;
+        public string contentType { get; set; }
         //
         public bool isFile {
             get {
-                if (!string.IsNullOrEmpty(_fileName)) { return true; }
+                if (!string.IsNullOrEmpty(filename)) { return true; }
                 return false;
             }
         }

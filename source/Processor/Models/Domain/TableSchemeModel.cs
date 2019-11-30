@@ -1,18 +1,9 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Domain {
     /// <summary>
@@ -36,6 +27,7 @@ namespace Contensive.Processor.Models.Domain {
         public string tableName { get; set; }
         public bool dirty { get; set; }
         public List<ColumnSchemaModel> columns { get; set; }
+        //
         // list of all indexes, with the field it covers
         public List<IndexSchemaModel> indexes { get; set; }
         //
@@ -69,10 +61,11 @@ namespace Contensive.Processor.Models.Domain {
                                 tableSchema = null;
                             } else {
                                 isInDb = true;
-                                tableSchema = new Models.Domain.TableSchemaModel();
-                                tableSchema.columns = new List<ColumnSchemaModel>();
-                                tableSchema.indexes = new List<IndexSchemaModel>();
-                                tableSchema.tableName = lowerTablename;
+                                tableSchema = new Models.Domain.TableSchemaModel {
+                                    columns = new List<ColumnSchemaModel>(),
+                                    indexes = new List<IndexSchemaModel>(),
+                                    tableName = lowerTablename
+                                };
                                 //
                                 // load columns
                                 //
