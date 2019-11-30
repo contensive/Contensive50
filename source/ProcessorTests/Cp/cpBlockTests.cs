@@ -6,7 +6,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using Contensive.BaseClasses;
-using static Tests.testConstants;
+using static Tests.TestConstants;
 
 namespace Contensive.ProcessorTests.UnitTests.ViewTests {
     [TestClass()]
@@ -269,15 +269,6 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
             // act
             // assert
             Assert.AreEqual(true, true);
-        }
-        //
-        [TestMethod]
-        public void dateToSeconds_unit() {
-            // arrange
-            // act
-            // assert
-            Assert.AreEqual(dateToSeconds(new DateTime(1900, 1, 1)), 0);
-            Assert.AreEqual(dateToSeconds(new DateTime(1900, 1, 2)), 86400);
         }
         //
         [TestMethod]

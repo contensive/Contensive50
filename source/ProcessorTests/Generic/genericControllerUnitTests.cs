@@ -3,7 +3,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
-using static Tests.testConstants;
+using static Tests.TestConstants;
 using System.Collections.Generic;
 using static Newtonsoft.Json.JsonConvert;
 
@@ -64,7 +64,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             // act
             string result1 = GenericController.getLinkedText("<a href=\"goHere\">", "abc<link>zzzz</link>def");
             // assert
-            Assert.AreEqual("abc<a href=\"goHere\">zzzz</A>def", result1);
+            Assert.AreEqual("abc<a href=\"goHere\">zzzz</a>def", result1);
         }
         //
         [TestMethod]
@@ -224,19 +224,29 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         public void controllers_splitUrl_test() {
             // arrange
             const string test1 = "http://www.a.com/b/c.html?d=e";
-            //
-            string expect1 = SerializeObject( new GenericController.UrlDetailsClass() {
+            string expect1 = SerializeObject(new GenericController.UrlDetailsClass() {
                 filename = "c.html",
                 host = "www.a.com",
                 port = "80",
-                pathSegments  = new List<string>() { "b" },
+                pathSegments = new List<string>() { "b" },
                 protocol = "http://",
+                queryString = "?d=e"
+            });
+            const string test2 = "https://a.org/b/c/d?d=e";
+            string expect2 = SerializeObject(new GenericController.UrlDetailsClass() {
+                filename = "d",
+                host = "a.org",
+                port = "80",
+                pathSegments = new List<string>() { "b","c" },
+                protocol = "https://",
                 queryString = "?d=e"
             });
             // act
             string result1 = SerializeObject(GenericController.splitUrl(test1));
+            string result2 = SerializeObject(GenericController.splitUrl(test2));
             // assert
             Assert.AreEqual(expect1, result1);
+            Assert.AreEqual(expect2, result2);
         }
         //
         [TestMethod]

@@ -532,8 +532,7 @@ namespace Contensive.Processor.Controllers {
                 queryString = filename.Substring(pos - 1);
                 filename = filename.left(pos - 1);
             }
-            var pathSegments = new List<string>();
-            pathSegments.AddRange(path.Split('/'));
+            List<string> pathSegments = path.Split('/').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
             return new UrlDetailsClass {
                 protocol = protocol,
                 host = host,
@@ -1373,17 +1372,7 @@ namespace Contensive.Processor.Controllers {
         public static bool isMissing(object source) {
             return false;
         }
-        //
-        // ====================================================================================================
-        // convert date to number of seconds since 1/1/1000
-        //
-        public static int dateToSeconds(DateTime sourceDate) {
-            DateTime oldDate = new DateTime(1000, 1, 1);
-            if (sourceDate.CompareTo(oldDate) > 0) {
-                return encodeInteger(sourceDate.Subtract(oldDate).TotalSeconds);
-            }
-            return 0;
-        }
+
         //
         // ====================================================================================================
         /// <summary>

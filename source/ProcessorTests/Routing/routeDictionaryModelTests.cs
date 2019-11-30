@@ -1,7 +1,7 @@
 ﻿
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Tests.testConstants;
+using static Tests.TestConstants;
 using Contensive.Processor;
 using Contensive.Processor.Models.Domain;
 

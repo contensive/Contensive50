@@ -64,12 +64,12 @@
     <Reference Include="ClearScript, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ClearScript.5.6.0\lib\net45\ClearScript.dll</HintPath>
     </Reference>
-    <Reference Include="ContensiveDbModels, Version=5.19.1129.7, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.5.19.1129.7\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.19.1130.4, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.5.19.1130.4\lib\net461\ContensiveDbModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1129.7\lib\net472\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1130.4\lib\net472\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -176,6 +176,13 @@
     <Compile Include="Addons\Personalization\FirstName.cs" />
     <Compile Include="Addons\Email\Download.cs" />
     <Compile Include="Addons\Tools\manualQueryClass.cs" />
+    <Compile Include="Addons\Tools\CreateGUIDToolClass.cs" />
+    <Compile Include="Addons\Tools\IISResetToolClass.cs" />
+    <Compile Include="Addons\Tools\FindAndReplaceToolClass.cs" />
+    <Compile Include="Addons\Tools\WebsiteFileManagerToolClass.cs" />
+    <Compile Include="Addons\Tools\ContentFileManagerToolClass.cs" />
+    <Compile Include="Addons\Tools\DbSchemaToolClass.cs" />
+    <Compile Include="Addons\Tools\_empty.cs" />
     <Compile Include="Controllers\CollectionFolderController.cs" />
     <Compile Include="Controllers\CollectionLibraryController.cs" />
     <Compile Include="Controllers\CollectionExportController.cs" />
@@ -211,9 +218,8 @@
     <Compile Include="Addons\AdminSite\Views\FormIndexSetColumns.cs" />
     <Compile Include="Addons\ExportSql\ExportCsvClass.cs" />
     <Compile Include="Addons\PageManager\getChildPageList.cs" />
-    <Compile Include="Addons\Tools\MetakeywordToolClass.cs" />
     <Compile Include="Addons\Tools\DefineContentFieldsFromTable.cs" />
-    <Compile Include="Addons\Tools\_blankTool.cs" />
+    <Compile Include="Addons\Tools\_sample.cs" />
     <Compile Include="Addons\Tools\CacheToolClass.cs" />
     <Compile Include="Addons\_blank.cs" />
     <Compile Include="Addons\SafeAddonManager\AddonManagerClass.cs" />
@@ -259,7 +265,6 @@
     <Compile Include="Addons\PageManager\saveChildPageListDraggableClass.cs" />
     <Compile Include="Addons\PageManager\getHtmlBodyClass.cs" />
     <Compile Include="Addons\Tools\configureContentEditClass.cs" />
-    <Compile Include="Addons\Tools\legacyToolsClass.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Controllers\AddonController.cs" />
     <Compile Include="Controllers\CollectionInstallController.cs" />

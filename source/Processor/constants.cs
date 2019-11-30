@@ -697,7 +697,7 @@ namespace Contensive.Processor {
         internal const int AdminFormBuilderCollection = 44;
         internal const int AdminFormClearCache = 45;
         internal const int AdminFormMobileBrowserControl = 46;
-        internal const int AdminFormMetaKeywordTool = 47;
+        //internal const int AdminFormMetaKeywordTool = 47;
         internal const int AdminFormIndex_SubFormExport = 48;
         //
         // ----- AdminFormTools (11,100-199)

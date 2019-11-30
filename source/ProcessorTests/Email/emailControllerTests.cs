@@ -2,7 +2,7 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Contensive.Processor.Controllers;
-using static Tests.testConstants;
+using static Tests.TestConstants;
 using System.Linq;
 using Contensive.Processor;
 using Contensive.Processor.Models.Domain;

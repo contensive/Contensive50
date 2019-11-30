@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Contensive.Processor.Controllers;
 
-using static Tests.testConstants;
+using static Tests.TestConstants;
 using Contensive.Processor;
 
 namespace Contensive.ProcessorTests.UnitTests.ControllerTests {

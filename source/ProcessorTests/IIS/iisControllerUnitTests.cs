@@ -3,7 +3,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
-using static Tests.testConstants;
+using static Tests.TestConstants;
 using Microsoft.Web.Administration;
 
 namespace Contensive.ProcessorTests.UnitTests.ControllerTests {

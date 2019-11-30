@@ -256,8 +256,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                             adminBody = GetForm_BuildCollection(cp);
                         } else if (adminData.adminForm == AdminFormSecurityControl) {
                             AddonGuid = Constants.AddonGuidPreferences;
-                        } else if (adminData.adminForm == AdminFormMetaKeywordTool) {
-                            adminBody = (new Contensive.Processor.Addons.Tools.MetakeywordToolClass()).Execute(cp) as string;
                         } else if ((adminData.adminForm == AdminFormMobileBrowserControl) || (adminData.adminForm == AdminFormPageControl) || (adminData.adminForm == AdminFormEmailControl)) {
                             adminBody = cp.core.addon.execute(Constants.AddonGuidPreferences, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
@@ -284,9 +282,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                             adminBody = (GetContentChildTool(cp));
                         } else if (adminData.adminForm == AdminformHousekeepingControl) {
                             adminBody = (GetForm_HouseKeepingControl(cp));
-                        } else if ((adminData.adminForm == AdminFormTools) || (adminData.adminForm >= 100 && adminData.adminForm <= 199)) {
-                            LegacyToolsClass Tools = new LegacyToolsClass(cp.core);
-                            adminBody = Tools.getToolsList();
                         } else if (adminData.adminForm == AdminFormDownloads) {
                             adminBody = (ToolDownloads.GetForm_Downloads(cp.core));
                         } else if (adminData.adminForm == AdminformRSSControl) {

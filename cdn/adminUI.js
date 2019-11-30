@@ -203,21 +203,21 @@ class BrowserType {
         }
         var s = "MSIE";
         var ua = navigator.userAgent;
-        var i = ua.indexOf(s)
+        var i = ua.indexOf(s);
         if (i >= 0) {
             this.isIE = true;
             this.version = parseFloat(ua.substr(i + s.length));
             return;
         }
         s = "Netscape6/";
-        i = ua.indexOf(s)
+        i = ua.indexOf(s);
         if (i >= 0) {
             this.isNS = true;
             this.version = parseFloat(ua.substr(i + s.length));
             return;
         }
         s = "Gecko";
-        i = ua.indexOf(s)
+        i = ua.indexOf(s);
         if (i >= 0) {
             this.isNS = true;
             this.version = 6.1;
@@ -483,8 +483,9 @@ function ccFlyoutPanelButtonHover(event, menuId, StyleSheetPrefix) {
     }
     maxX -= item.subMenu.offsetWidth;
     maxY -= item.subMenu.offsetHeight;
-    if (x > maxX)
+    if (x > maxX) {
         x = Math.max(0, x - item.offsetWidth - item.subMenu.offsetWidth + (menu.offsetWidth - item.offsetWidth));
+    }
     y = Math.max(0, Math.min(y, maxY));
     item.subMenu.style.left = x + "px";
     if (browser.isMac) {
@@ -495,26 +496,24 @@ function ccFlyoutPanelButtonHover(event, menuId, StyleSheetPrefix) {
         item.subMenu.style.top = y + "px";
     }
     item.subMenu.style.visibility = "visible";
-    if (browser.isIE)
+    if (browser.isIE) {
         window.event.cancelBubble = true;
-    else
+    } else {
         event.stopPropagation();
+    }
 }
 //
 // -----
 //
 function closeSubMenu(menu) {
-    if (!menu)
-        return;
-    if (menu.activeItem == null)
-        return;
+    if (!menu) { return; }
+    if (menu.activeItem == null) { return; }
     if (menu.activeItem.subMenu) {
         closeSubMenu(menu.activeItem.subMenu);
         menu.activeItem.subMenu.style.visibility = "hidden";
         menu.activeItem.subMenu = null;
     }
     removeClassNameAfter(menu.activeItem, "kmaMenuDown");
-    //removeClassName(menu.activeItem, "ccFlyoutPanelButtonDown");
     menu.activeItem = null;
 }
 //
@@ -528,7 +527,6 @@ function menuInit(menu) {
     var i, j;
     itemList = menu.getElementsByTagName("A");
     if (itemList.length === 0) {
-        //menu.title = "Select One";
         menu.activeItem = null
         return false;
     }
@@ -539,7 +537,6 @@ function menuInit(menu) {
         w -= dw;
         itemList[0].style.width = w + "px";
     }
-    //menu.title = "Select One";
     menu.activeItem = null
 }
 //
@@ -547,9 +544,9 @@ function menuInit(menu) {
 //
 function getContainerWith(node, tagName, className) {
     while (node != null) {
-        if (node.tagName != null && node.tagName === tagName &&
-            hasClassName(node, className))
+        if (node.tagName != null && node.tagName === tagName && hasClassName(node, className)) {
             return node;
+        }
         node = node.parentNode;
     }
     return node;
@@ -559,8 +556,9 @@ function getContainerWith(node, tagName, className) {
 //
 function getContainer(node, tagName) {
     while (node != null) {
-        if (node.tagName != null && node.tagName === tagName)
+        if (node.tagName != null && node.tagName === tagName) {
             return node;
+        }
         node = node.parentNode;
     }
     return node;
@@ -569,25 +567,23 @@ function getContainer(node, tagName) {
 // -----
 //
 function hasClassName(el, name) {
-    var i, list;
-    list = el.className.split(" ");
-    for (i = 0; i < list.length; i++)
+    var list = el.className.split(" ");
+    for (var i = 0; i < list.length; i++) {
         if (list[i] === name) { return true; }
+    }
     return false;
 }
 //
 // -----
 //
 function removeClassName(el, name) {
-    var i, curList, newList;
+    var i, newList;
     if (el.className == null) { return; }
-    //newList = new Array();
-    curList = el.className.split(" ");
+    var curList = el.className.split(" ");
     for (i = 0; i < curList.length; i++)
         if (curList[i] !== name) {
-            newList = newList + " " + curList[i];
+            newList += " " + curList[i];
         } else {
-            //newList=newList+" "+curList[i];
             el.className = newList;
             return;
         }

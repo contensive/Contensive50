@@ -4,7 +4,7 @@ using Contensive.BaseClasses;
 using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Tests.testConstants;
+using static Tests.TestConstants;
 using Contensive.Models.Db;
 
 namespace Contensive.ProcessorTests.UnitTests.ViewTests {
