@@ -15,7 +15,7 @@ using Contensive.Models.Db;
 using System.Globalization;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public class FormIndex {
+    public static class FormIndex {
         //
         //========================================================================
         /// <summary>
@@ -63,15 +63,22 @@ namespace Contensive.Processor.Addons.AdminSite {
                     int SubForm = core.docProperties.getInteger(RequestNameAdminSubForm);
                     if (SubForm != 0) {
                         switch (SubForm) {
-                            case AdminFormIndex_SubFormExport:
-                            Copy = FormIndexExport.get(core, adminData);
-                            break;
-                            case AdminFormIndex_SubFormSetColumns:
-                            Copy = FormIndexSetColumnsClass.get(cp, core, adminData);
-                            break;
-                            case AdminFormIndex_SubFormAdvancedSearch:
-                            Copy = FormIndexAdvancedSearchClass.get(cp, core, adminData);
-                            break;
+                            case AdminFormIndex_SubFormExport: {
+                                    Copy = FormIndexExport.get(core, adminData);
+                                    break;
+                                }
+                            case AdminFormIndex_SubFormSetColumns: {
+                                    Copy = FormIndexSetColumnsClass.get(cp, core, adminData);
+                                    break;
+                                }
+                            case AdminFormIndex_SubFormAdvancedSearch: {
+                                    Copy = FormIndexAdvancedSearchClass.get(cp, core, adminData);
+                                    break;
+                                }
+                            default: {
+                                    // empty
+                                    break;
+                                }
                         }
                     }
                     Stream.Add(Copy);
@@ -219,16 +226,16 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 }
                                 ColumnWidthTotal += column.Width;
                             }
-                            string DataTable_HdrRow = "<tr>";
+                            var DataTable_HdrRow = new StringBuilder("<tr>");
                             //
                             // Edit Column
-                            DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\">Edit</td>";
+                            DataTable_HdrRow.Append("<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\">Edit</td>");
                             //
                             // Delete Select Box Columns
                             if (!AllowDelete) {
-                                DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\"><input TYPE=CheckBox disabled=\"disabled\"></td>";
+                                DataTable_HdrRow.Append("<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\"><input TYPE=CheckBox disabled=\"disabled\"></td>");
                             } else {
-                                DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\"><input TYPE=CheckBox OnClick=\"CheckInputs('DelCheck',this.checked);\"></td>";
+                                DataTable_HdrRow.Append("<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\"><input TYPE=CheckBox OnClick=\"CheckInputs('DelCheck',this.checked);\"></td>");
                             }
                             //
                             // field columns
@@ -241,23 +248,24 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // if this is a current sort ,add the reverse flag
                                 //
-                                string ButtonHref = "/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormIndex + "&SetSortField=" + FieldName + "&RT=0&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.titleExtension) + "&cid=" + adminData.adminContent.id + "&ad=" + adminData.ignore_legacyMenuDepth;
-                                foreach (var sortKvp in IndexConfig.sorts) {
-                                    IndexConfigClass.IndexConfigSortClass sort = sortKvp.Value;
-
-                                }
+                                StringBuilder ButtonHref = new StringBuilder();
+                                ButtonHref.Append("/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormIndex + "&SetSortField=" + FieldName + "&RT=0&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.titleExtension) + "&cid=" + adminData.adminContent.id + "&ad=" + adminData.ignore_legacyMenuDepth);
                                 if (!IndexConfig.sorts.ContainsKey(FieldName)) {
-                                    ButtonHref += "&SetSortDirection=1";
+                                    ButtonHref.Append("&SetSortDirection=1");
                                 } else {
                                     switch (IndexConfig.sorts[FieldName].direction) {
-                                        case 1:
-                                        ButtonHref += "&SetSortDirection=2";
-                                        break;
-                                        case 2:
-                                        ButtonHref += "&SetSortDirection=0";
-                                        break;
-                                        default:
-                                        break;
+                                        case 1: {
+                                                ButtonHref.Append("&SetSortDirection=2");
+                                                break;
+                                            }
+                                        case 2: {
+                                                ButtonHref.Append("&SetSortDirection=0");
+                                                break;
+                                            }
+                                        default: {
+                                                // nothing
+                                                break;
+                                            }
                                     }
                                 }
                                 //
@@ -266,8 +274,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 if (adminData.wherePairCount > 0) {
                                     for (int WhereCount = 0; WhereCount < adminData.wherePairCount; WhereCount++) {
                                         if (adminData.wherePair[0, WhereCount] != "") {
-                                            ButtonHref += "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[0, WhereCount]);
-                                            ButtonHref += "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[1, WhereCount]);
+                                            ButtonHref.Append("&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[0, WhereCount]));
+                                            ButtonHref.Append("&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[1, WhereCount]));
                                         }
                                     }
                                 }
@@ -278,22 +286,28 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 if (IndexConfig.sorts.ContainsKey(FieldName)) {
                                     string sortSuffix = ((IndexConfig.sorts.Count < 2) ? "" : IndexConfig.sorts[FieldName].order.ToString());
                                     switch (IndexConfig.sorts[FieldName].direction) {
-                                        case 1:
-                                        ButtonFace = iconArrowDown + sortSuffix + "&nbsp;" + ButtonFace;
-                                        SortTitle = "Sort Z-A";
-                                        break;
-                                        case 2:
-                                        ButtonFace = iconArrowUp + sortSuffix + "&nbsp;" + ButtonFace;
-                                        SortTitle = "Remove Sort";
-                                        break;
+                                        case 1: {
+                                                ButtonFace = iconArrowDown + sortSuffix + "&nbsp;" + ButtonFace;
+                                                SortTitle = "Sort Z-A";
+                                                break;
+                                            }
+                                        case 2: {
+                                                ButtonFace = iconArrowUp + sortSuffix + "&nbsp;" + ButtonFace;
+                                                SortTitle = "Remove Sort";
+                                                break;
+                                            }
+                                        default: {
+                                                // nothing
+                                                break;
+                                            }
                                     }
                                 }
                                 adminData.buttonObjectCount += 1;
-                                DataTable_HdrRow += "<td width=\"" + ColumnWidth + "%\" valign=bottom align=left class=\"small ccAdminListCaption\">";
-                                DataTable_HdrRow += ("<a title=\"" + SortTitle + "\" href=\"" + HtmlController.encodeHtml(ButtonHref) + "\" class=\"ccAdminListCaption\">" + ButtonFace + "</A>");
-                                DataTable_HdrRow += ("</td>");
+                                DataTable_HdrRow.Append("<td width=\"" + ColumnWidth + "%\" valign=bottom align=left class=\"small ccAdminListCaption\">");
+                                DataTable_HdrRow.Append("<a title=\"" + SortTitle + "\" href=\"" + HtmlController.encodeHtml(ButtonHref.ToString()) + "\" class=\"ccAdminListCaption\">" + ButtonFace + "</A>");
+                                DataTable_HdrRow.Append("</td>");
                             }
-                            DataTable_HdrRow += ("</tr>");
+                            DataTable_HdrRow.Append("</tr>");
                             //
                             //   select and print Records
                             //
@@ -386,18 +400,17 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // Add another header to the data rows
                                 //
-                                DataTableRows.Append(DataTable_HdrRow);
+                                DataTableRows.Append(DataTable_HdrRow.ToString());
                             }
                             //
                             // ----- DataTable_FindRow
                             //
-                            string DataTable_FindRow = "<tr><td colspan=" + (2 + IndexConfig.columns.Count) + " style=\"background-color:black;height:1;\"></td></tr>";
-                            DataTable_FindRow += "<tr>";
-                            DataTable_FindRow += "<td valign=\"middle\" colspan=2 width=\"60\" class=\"ccPanel\" align=center style=\"vertical-align:middle;padding:8px;text-align:center ! important;\">";
-                            DataTable_FindRow += AdminUIController.getButtonPrimary(ButtonFind, "", false, "FindButton") + "</td>";
+                            var DataTable_FindRow  = new StringBuilder( "<tr><td colspan=" + (2 + IndexConfig.columns.Count) + " style=\"background-color:black;height:1;\"></td></tr>");
+                            DataTable_FindRow.Append("<tr>");
+                            DataTable_FindRow.Append("<td valign=\"middle\" colspan=2 width=\"60\" class=\"ccPanel\" align=center style=\"vertical-align:middle;padding:8px;text-align:center ! important;\">");
+                            DataTable_FindRow.Append(AdminUIController.getButtonPrimary(ButtonFind, "", false, "FindButton") + "</td>");
                             int ColumnPointer = 0;
                             foreach (var column in IndexConfig.columns) {
-                                int ColumnWidth = column.Width;
                                 string FieldName = GenericController.toLCase(column.Name);
                                 string FindWordValue = "";
                                 if (IndexConfig.findWords.ContainsKey(FieldName)) {
@@ -410,19 +423,19 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         FindWordValue = "false";
                                     }
                                 }
-                                DataTable_FindRow += Environment.NewLine + "<td valign=\"middle\" align=\"center\" class=\"ccPanel3DReverse\" style=\"padding:8px;\">"
+                                DataTable_FindRow.Append(Environment.NewLine + "<td valign=\"middle\" align=\"center\" class=\"ccPanel3DReverse\" style=\"padding:8px;\">"
                                     + "<input type=hidden name=\"FindName" + ColumnPointer + "\" value=\"" + FieldName + "\">"
                                     + "<input class=\"form-control findInput\"  onkeypress=\"KeyCheck(event);\"  type=text id=\"F" + ColumnPointer + "\" name=\"FindValue" + ColumnPointer + "\" value=\"" + FindWordValue + "\" style=\"width:98%\">"
-                                    + "</td>";
+                                    + "</td>");
                                 ColumnPointer += 1;
                             }
-                            DataTable_FindRow += "</tr>";
+                            DataTable_FindRow.Append("</tr>");
                             //
                             // Assemble DataTable
                             //
                             string grid = ""
                                 + "<table ID=\"DataTable\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"Background-Color:white;\">"
-                                + DataTable_HdrRow + DataTableRows.ToString() + DataTable_FindRow + "</table>";
+                                + DataTable_HdrRow + DataTableRows + DataTable_FindRow + "</table>";
                             string formContent = ""
                                 + "<table ID=\"DataFilterTable\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"Background-Color:white;\">"
                                 + "<tr>"
@@ -442,7 +455,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                             Stream.Add(AdminUIController.getSectionHeader(core, "", titleRow));
                             Stream.Add(formContent);
                             Stream.Add(ButtonBar);
-                            //Stream.Add(core.html.getPanel("<img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" width=\"1\", height=\"10\" >"));
                             Stream.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormIndex));
                             Stream.Add(HtmlController.inputHidden("cid", adminData.adminContent.id));
                             Stream.Add(HtmlController.inputHidden("indexGoToPage", ""));
@@ -471,9 +483,9 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <param name="ContentAccessLimitMessage"></param>
         /// <returns></returns>
         public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, ContentMetadataModel content, int recordCnt, string ContentAccessLimitMessage) {
-            string filterLine = "";
+            var filterLine = new StringBuilder();
             if (IndexConfig.activeOnly) {
-                filterLine += ", active records";
+                filterLine.Append( ", active records");
             }
             string filterLastEdited = "";
             if (IndexConfig.lastEditedByMe) {
@@ -489,7 +501,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 filterLastEdited = filterLastEdited + " today";
             }
             if (!string.IsNullOrEmpty(filterLastEdited)) {
-                filterLine += ", last edited" + filterLastEdited;
+                filterLine.Append( ", last edited" + filterLastEdited);
             }
             foreach (var kvp in IndexConfig.findWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
@@ -499,28 +511,28 @@ namespace Contensive.Processor.Addons.AdminSite {
                         string FieldCaption = fieldMeta.caption;
                         switch (findWord.MatchOption) {
                             case FindWordMatchEnum.MatchEmpty:
-                            filterLine += ", " + FieldCaption + " is empty";
+                            filterLine.Append( ", " + FieldCaption + " is empty");
                             break;
                             case FindWordMatchEnum.MatchEquals:
-                            filterLine += ", " + FieldCaption + " = '" + findWord.Value + "'";
+                            filterLine.Append( ", " + FieldCaption + " = '" + findWord.Value + "'");
                             break;
                             case FindWordMatchEnum.MatchFalse:
-                            filterLine += ", " + FieldCaption + " is false";
+                            filterLine.Append( ", " + FieldCaption + " is false");
                             break;
                             case FindWordMatchEnum.MatchGreaterThan:
-                            filterLine += ", " + FieldCaption + " &gt; '" + findWord.Value + "'";
+                            filterLine.Append( ", " + FieldCaption + " &gt; '" + findWord.Value + "'");
                             break;
                             case FindWordMatchEnum.matchincludes:
-                            filterLine += ", " + FieldCaption + " includes '" + findWord.Value + "'";
+                            filterLine.Append( ", " + FieldCaption + " includes '" + findWord.Value + "'");
                             break;
                             case FindWordMatchEnum.MatchLessThan:
-                            filterLine += ", " + FieldCaption + " &lt; '" + findWord.Value + "'";
+                            filterLine.Append( ", " + FieldCaption + " &lt; '" + findWord.Value + "'");
                             break;
                             case FindWordMatchEnum.MatchNotEmpty:
-                            filterLine += ", " + FieldCaption + " is not empty";
+                            filterLine.Append( ", " + FieldCaption + " is not empty");
                             break;
                             case FindWordMatchEnum.MatchTrue:
-                            filterLine += ", " + FieldCaption + " is true";
+                            filterLine.Append( ", " + FieldCaption + " is true");
                             break;
                         }
 
@@ -530,7 +542,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             if (IndexConfig.subCDefID > 0) {
                 string ContentName = MetadataController.getContentNameByID(core, IndexConfig.subCDefID);
                 if (!string.IsNullOrEmpty(ContentName)) {
-                    filterLine += ", in Sub-content '" + ContentName + "'";
+                    filterLine.Append( ", in Sub-content '" + ContentName + "'");
                 }
             }
             //
@@ -546,16 +558,16 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (!string.IsNullOrEmpty(GroupList)) {
                     string[] Groups = GroupList.Split('\t');
                     if (Groups.GetUpperBound(0) == 0) {
-                        filterLine += ", in group '" + Groups[0] + "'";
+                        filterLine.Append( ", in group '" + Groups[0] + "'");
                     } else if (Groups.GetUpperBound(0) == 1) {
-                        filterLine += ", in groups '" + Groups[0] + "' and '" + Groups[1] + "'";
+                        filterLine.Append( ", in groups '" + Groups[0] + "' and '" + Groups[1] + "'");
                     } else {
                         int Ptr;
                         string filterGroups = "";
                         for (Ptr = 0; Ptr < Groups.GetUpperBound(0); Ptr++) {
                             filterGroups += ", '" + Groups[Ptr] + "'";
                         }
-                        filterLine += ", in groups" + filterGroups.Substring(1) + " and '" + Groups[Ptr] + "'";
+                        filterLine.Append( ", in groups" + filterGroups.Substring(1) + " and '" + Groups[Ptr] + "'");
                     }
 
                 }
@@ -579,9 +591,9 @@ namespace Contensive.Processor.Addons.AdminSite {
             //
             string Title = HtmlController.div("<strong>" + content.name + "</strong><div style=\"float:right;\">" + pageNavigation + "</div>");
             int TitleRows = 0;
-            if (!string.IsNullOrEmpty(filterLine)) {
+            if (!filterLine.Length.Equals(0)) {
                 string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexFilterRemoveAll=1";
-                Title += HtmlController.div(getDeleteLink(link) + "&nbsp;Filter: " + HtmlController.encodeHtml(filterLine.Substring(2)));
+                Title += HtmlController.div(getDeleteLink(link) + "&nbsp;Filter: " + HtmlController.encodeHtml(filterLine.ToString()));
                 TitleRows = TitleRows + 1;
             }
             if (!string.IsNullOrEmpty(sortLine)) {
