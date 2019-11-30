@@ -42,6 +42,13 @@ namespace Contensive.Processor {
         //
         internal const int codeVersion = 0;
         //
+        // to update cdn
+        // source is in the /cdn folder of the repository
+        // edit the upload script and set the datestring
+        // create the folder on the cdn
+        // run the upload script
+        // change this const
+        // update the URLs in the base5.xml file
         public const string cdnPrefix = "https://s3.amazonaws.com/cdn.contensive.com/assets/20191130/";
         //
         //========================================================================

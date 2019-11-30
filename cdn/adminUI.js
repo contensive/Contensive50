@@ -87,11 +87,9 @@ function DeletePageCheck() {
 //----------
 //
 function CheckInputs(TargetID, SetValue) {
-    var ptr;
-    var inputList = document.getElementsByTagName("input");
-    inputList.forEach(function(input){
+    for (let input of document.getElementsByTagName("input")) {
         if (input.id === TargetID) { input.checked = SetValue; }
-      });
+    }
 }
 //
 //----------
