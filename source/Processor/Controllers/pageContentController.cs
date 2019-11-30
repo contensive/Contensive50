@@ -866,7 +866,7 @@ namespace Contensive.Processor.Controllers {
                                     emailBody.Append("<h1>Page Hit Notification.</h1>");
                                     emailBody.Append("<p>This email was sent to you as a notification of the following viewing details.</p>");
                                     emailBody.Append(HtmlController.tableStart(4, 1, 1));
-                                    emailBody.Append("<tr><td align=\"right\" width=\"150\" Class=\"ccPanelHeader\">Description<br><img alt=\"image\" src=\"http://" + core.webServer.requestDomain + "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" width=\"150\" height=\"1\"></td><td align=\"left\" width=\"100%\" Class=\"ccPanelHeader\">Value</td></tr>");
+                                    emailBody.Append("<tr><td align=\"right\" width=\"150\" Class=\"ccPanelHeader\">Description<br><img alt=\"image\" src=\"http://" + core.webServer.requestDomain + "" + cdnPrefix + "images/spacer.gif\" width=\"150\" height=\"1\"></td><td align=\"left\" width=\"100%\" Class=\"ccPanelHeader\">Value</td></tr>");
                                     emailBody.Append(get2ColumnTableRow("Domain", core.webServer.requestDomain, true));
                                     emailBody.Append(get2ColumnTableRow("Link", core.webServer.requestUrl, false));
                                     emailBody.Append(get2ColumnTableRow("Page Name", PageName, true));

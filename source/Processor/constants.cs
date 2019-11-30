@@ -42,6 +42,8 @@ namespace Contensive.Processor {
         //
         internal const int codeVersion = 0;
         //
+        public const string cdnPrefix = "https://s3.amazonaws.com/cdn.contensive.com/assets/20191130/";
+        //
         //========================================================================
         // Sql/Db
         //

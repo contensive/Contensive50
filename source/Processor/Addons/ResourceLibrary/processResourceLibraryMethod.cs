@@ -37,13 +37,13 @@ namespace Contensive.Processor.Addons.Primitives {
                     // Open a page compatible with a dialog
                     //
                     core.doc.addRefreshQueryString("EditorObjectName", EditorObjectName);
-                    core.html.addScriptLinkSrc("https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/ClientSide/dialogs.js", "Resource Library");
+                    core.html.addScriptLinkSrc("" + cdnPrefix + "ClientSide/dialogs.js", "Resource Library");
                     core.doc.setMetaContent(0, 0);
                     core.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Resource Library");
                     string Copy = core.html.getResourceLibrary("", true, EditorObjectName, LinkObjectName, true);
                     string htmlBody = ""
                         + GenericController.nop(core.html.getPanelHeader("Contensive Resource Library")) + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>"
-                        + cr2 + "<div style=\"border-top:1px solid white;border-bottom:1px solid black;height:2px\"><img alt=\"spacer\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" width=1 height=1></div>"
+                        + cr2 + "<div style=\"border-top:1px solid white;border-bottom:1px solid black;height:2px\"><img alt=\"spacer\" src=\"" + cdnPrefix + "images/spacer.gif\" width=1 height=1></div>"
                         + GenericController.nop(Copy) + "\r</td></tr>"
                         + "\r<tr><td>"
                         + GenericController.nop(core.html.getHtmlBodyEnd(false, false)) + "\r</td></tr></table>"
@@ -56,7 +56,7 @@ namespace Contensive.Processor.Addons.Primitives {
                     //
                     // Open a page compatible with a dialog
                     core.doc.addRefreshQueryString("LinkObjectName", LinkObjectName);
-                    core.html.addScriptLinkSrc("https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/ClientSide/dialogs.js", "Resource Library");
+                    core.html.addScriptLinkSrc("" + cdnPrefix + "ClientSide/dialogs.js", "Resource Library");
                     core.doc.setMetaContent(0, 0);
                     core.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Resource Library");
                     string htmlBody = ""

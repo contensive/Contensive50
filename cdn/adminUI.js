@@ -87,11 +87,11 @@ function DeletePageCheck() {
 //----------
 //
 function CheckInputs(TargetID, SetValue) {
-    var e, ptr;
-    e = document.getElementsByTagName("input");
-    for (ptr = 0; ptr < e.length; ptr++) {
-        if (e[ptr].id === TargetID) { e[ptr].checked = SetValue; }
-    }
+    var ptr;
+    var inputList = document.getElementsByTagName("input");
+    inputList.forEach(function(input){
+        if (input.id === TargetID) { input.checked = SetValue; }
+      });
 }
 //
 //----------

@@ -739,7 +739,7 @@ namespace Contensive.Processor.Controllers {
                         result += "<a href=\"" + HtmlController.encodeHtml(Link) + "\" >";
                     }
                     IconFilename = core.siteProperties.loginIconFilename;
-                    if (GenericController.toLCase(IconFilename.left(7)) != "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/") {
+                    if (GenericController.toLCase(IconFilename.left(7)) != "" + cdnPrefix + "") {
                         IconFilename = GenericController.getCdnFileLink(core, IconFilename);
                     }
                     // original  "<img alt=\"Login\" src=\"" + IconFilename + "\" border=\"0\" >"
@@ -1392,14 +1392,14 @@ namespace Contensive.Processor.Controllers {
                             //   Need a more consistant solution later
                             //
                             IconIDControlString = "AC," + ACTypeTemplateContent + ",0,Template Content,";
-                            IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 64, 0, false, IconIDControlString, "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/ACTemplateContentIcon.gif", core.appConfig.cdnFileUrl, "Content Box", "Renders as the content for a template", "", 0);
+                            IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 64, 0, false, IconIDControlString, "" + cdnPrefix + "images/ACTemplateContentIcon.gif", core.appConfig.cdnFileUrl, "Content Box", "Renders as the content for a template", "", 0);
                             IconImg = GenericController.encodeJavascriptStringSingleQuote(IconImg);
                             Items[ItemsCnt] = "['Content Box','" + IconImg + "']";
                             Index.setPtr("Content Box", ItemsCnt);
                             ItemsCnt += 1;
                             //
                             IconIDControlString = "AC," + ACTypeTemplateText + ",0,Template Text,Name=Default";
-                            IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 52, 0, false, IconIDControlString, "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/ACTemplateTextIcon.gif", core.appConfig.cdnFileUrl, "Template Text", "Renders as a template text block", "", 0);
+                            IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 52, 0, false, IconIDControlString, "" + cdnPrefix + "images/ACTemplateTextIcon.gif", core.appConfig.cdnFileUrl, "Template Text", "Renders as a template text block", "", 0);
                             IconImg = GenericController.encodeJavascriptStringSingleQuote(IconImg);
                             Items[ItemsCnt] = "['Template Text','" + IconImg + "']";
                             Index.setPtr("Template Text", ItemsCnt);
@@ -2733,8 +2733,8 @@ namespace Contensive.Processor.Controllers {
                         //
                         DebugPanel += "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                             + cr2 + "<tr>"
-                            + cr3 + "<td width=\"100\" class=\"ccPanel\"><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" width=\"100\" height=\"1\" ></td>"
-                            + cr3 + "<td width=\"100%\" class=\"ccPanel\"><img alt=\"space\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" width=\"1\" height=\"1\" ></td>"
+                            + cr3 + "<td width=\"100\" class=\"ccPanel\"><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100\" height=\"1\" ></td>"
+                            + cr3 + "<td width=\"100%\" class=\"ccPanel\"><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"1\" height=\"1\" ></td>"
                             + cr2 + "</tr>";
                         DebugPanel += "</table>";
                         //

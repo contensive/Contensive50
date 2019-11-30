@@ -42,7 +42,7 @@ namespace Contensive.Processor.Controllers {
                 int childListSortMethodId = core.doc.pageController.page.childListSortMethodId;
                 int contactMemberId = core.doc.pageController.page.contactMemberId;
                 int rootPageId = core.doc.pageController.pageToRootList.Last().id;
-                core.html.addStyleLink("https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/quickEditor/styles.css", "Quick Editor");
+                core.html.addStyleLink("" + cdnPrefix + "quickEditor/styles.css", "Quick Editor");
                 //
                 // -- First Active Record - Output Quick Editor form
                 Models.Domain.ContentMetadataModel cdef = Models.Domain.ContentMetadataModel.createByUniqueName(core, PageContentModel.tableMetadata.contentName);

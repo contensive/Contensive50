@@ -43,7 +43,7 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     //
                     LogController.logDebug(core, "Restarting IIS");
-                    core.webServer.redirect("https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Popup/WaitForIISReset.htm", "Redirect to iis reset");
+                    core.webServer.redirect("" + cdnPrefix + "Popup/WaitForIISReset.htm", "Redirect to iis reset");
                     Thread.Sleep(2000);
                     var cmdDetail = new TaskModel.CmdDetailClass {
                         addonId = 0,

@@ -45,7 +45,7 @@ namespace Contensive.Processor.Addons.Primitives {
                             log.visitId = cp.Visit.Id;
                             log.save(cp);
                         }
-                        core.webServer.redirect(NonEncodedLink: "https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif", RedirectReason: "Group Email Open hit, redirecting to a dummy image", IsPageNotFound: false, allowDebugMessage: false);
+                        core.webServer.redirect(NonEncodedLink: "" + cdnPrefix + "images/spacer.gif", RedirectReason: "Group Email Open hit, redirecting to a dummy image", IsPageNotFound: false, allowDebugMessage: false);
                     }
                 }
             } catch (Exception ex) {

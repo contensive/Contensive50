@@ -297,8 +297,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                 }
                 returnForm = returnForm + HtmlController.tableRowStart();
-                returnForm = returnForm + HtmlController.tableCellStart("120", 1, RowEven, "right") + "<img src=https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif width=120 height=1></td>";
-                returnForm = returnForm + HtmlController.tableCellStart("99%", 1, RowEven, "left") + "<img src=https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif width=1 height=1></td>";
+                returnForm = returnForm + HtmlController.tableCellStart("120", 1, RowEven, "right") + "<img src=" + cdnPrefix + "images/spacer.gif width=120 height=1></td>";
+                returnForm = returnForm + HtmlController.tableCellStart("99%", 1, RowEven, "left") + "<img src=" + cdnPrefix + "images/spacer.gif width=1 height=1></td>";
                 returnForm = returnForm + kmaEndTableRow;
                 returnForm = returnForm + "</table>";
                 Content = returnForm;
