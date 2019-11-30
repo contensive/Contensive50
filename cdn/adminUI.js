@@ -31,9 +31,8 @@ var currentPanel;
 var ButtonObjectCount = 0;
 var MenuObjectCount = 0;
 var MenuHideBlock = false;
-var isNS = (navigator.appName == "Netscape");
+var isNS = (navigator.appName === "Netscape");
 var isMacIE = ((navigator.userAgent.indexOf("IE 4") > -1) && (navigator.userAgent.indexOf("Mac") > -1));
-var browser = new BrowserType();
 var RLMediaType = "";
 //
 //	build admin site workspace
@@ -44,14 +43,12 @@ var AFinnerHTML;
 // cross browser window size function
 //
 window.size = function () {
-    console.log("contensive.base.window.size");
     var w = 0;
     var h = 0;
-
     //IE
     if (!window.innerWidth) {
         //strict mode
-        if (!(document.documentElement.clientWidth == 0)) {
+        if (!(document.documentElement.clientWidth === 0)) {
             w = document.documentElement.clientWidth;
             h = document.documentElement.clientHeight;
         }
@@ -72,19 +69,19 @@ window.size = function () {
 //----------
 //
 function DeleteCheck() {
-    return confirm("This action will delete this record.\n\nAre you sure you would like to delete this record?\n\n")
+    return confirm("This action will delete this record.\n\nAre you sure you would like to delete this record?\n\n");
 }
 //
 //----------
 //
 function DeleteCheckWithChildren() {
-    return confirm("This action will delete this record and its child records.\n\nAre you sure you would like to delete this record?\n\n")
+    return confirm("This action will delete this record and its child records.\n\nAre you sure you would like to delete this record?\n\n");
 }
 //
 //----------
 //
 function DeletePageCheck() {
-    return confirm("This action will delete this page and its child pages.\n\nAre you sure you would like to delete this page?\n\n")
+    return confirm("This action will delete this page and its child pages.\n\nAre you sure you would like to delete this page?\n\n");
 }
 //
 //----------
@@ -93,14 +90,15 @@ function CheckInputs(TargetID, SetValue) {
     var e, ptr;
     e = document.getElementsByTagName("input");
     for (ptr = 0; ptr < e.length; ptr++) {
-        if (e[ptr].id === TargetID) { e[ptr].checked = SetValue }
+        if (e[ptr].id === TargetID) { e[ptr].checked = SetValue; }
     }
 }
 //
 //----------
 //
 function SetFieldName(FieldName) {
-    document.all["fn"].value = FieldName; return true;
+    document.all["fn"].value = FieldName; 
+    return true;
 }
 //
 // ----- hide select menus
@@ -112,7 +110,7 @@ function hideselect(hiddenIn) {
         menuClicks++;
     }
     //
-    if (!hiddenIn && menuClicks == 0 && !selectsHidden) {
+    if (!hiddenIn && menuClicks === 0 && !selectsHidden) {
         return;
     }
     // Hide MS Selects
@@ -120,7 +118,7 @@ function hideselect(hiddenIn) {
         //alert("ie");
         objs = document.getElementsByTagName("SELECT");
         for (i = 0; i < objs.length; i++) {
-            if (selectsHidden && menuClicks == 0) {
+            if (selectsHidden && menuClicks === 0) {
                 objs[i].style.visibility = "";
             } else {
                 objs[i].style.visibility = "hidden";
@@ -129,22 +127,22 @@ function hideselect(hiddenIn) {
         // Hide Objects if no <Param name=wmode> for ie
         objs = document.getElementsByTagName("OBJECT");
         for (i = 0; i < objs.length; i++) {
-            if (selectsHidden && menuClicks == 0) {
+            if (selectsHidden && menuClicks === 0) {
                 objs[i].style.visibility = "";
             } else {
                 //var wmodeSet=false;
                 var p = objs[i].getElementsByTagName("param");
                 for (pi = 0; pi < p.length; pi++) {
                     paramName = p[pi].name.toLowerCase();
-                    if (paramName == "wmode") {
+                    if (paramName === "wmode") {
                         wmode = p[pi].value;
                         if (wmode) {
                             wmode = wmode.toLowerCase();
-                            if (wmode == "opaque") {
+                            if (wmode === "opaque") {
                                 // it hides itself
-                            } else if (wmode == "transparent") {
+                            } else if (wmode === "transparent") {
                                 // it hides itself
-                            } else if (wmode == "window") {
+                            } else if (wmode === "window") {
                                 // it hides itself
                                 objs[i].style.visibility = "hidden";
                             } else {
@@ -159,18 +157,18 @@ function hideselect(hiddenIn) {
         // Hide MS Embeds for Mozilla
         objs = document.getElementsByTagName("EMBED");
         for (i = 0; i < objs.length; i++) {
-            if (selectsHidden && menuClicks == 0) {
+            if (selectsHidden && menuClicks === 0) {
                 objs[i].style.visibility = "";
             } else {
                 wmode = objs[i].getAttribute("wmode")
                 if (wmode) {
                     wmode = wmode.toLowerCase();
                 }
-                if (wmode == "opaque") {
+                if (wmode === "opaque") {
                     // it hides itself
-                } else if (wmode == "transparent") {
+                } else if (wmode === "transparent") {
                     // it hides itself
-                } else if (wmode == "window") {
+                } else if (wmode === "window") {
                     // it hides itself
                 } else {
                     objs[i].style.visibility = "hidden";
@@ -179,11 +177,11 @@ function hideselect(hiddenIn) {
         }
     }
     //
-    if (selectsHidden && menuClicks == 0) {
+    if (selectsHidden && menuClicks === 0) {
         selectsHidden = false;
     }
     //
-    else if (selectsHidden && menuClicks != 0 && clickButton != 2) {
+    else if (selectsHidden && menuClicks !== 0 && clickButton !== 2) {
         menuClicks--;
     }
     //
@@ -203,7 +201,7 @@ function BrowserType() {
     ua = navigator.userAgent;
     s = "MSIE";
     this.version = 0.0;
-    if (navigator.appVersion.indexOf("Mac") != -1) {
+    if (navigator.appVersion.indexOf("Mac") !== -1) {
         this.isMac = true;
     }
     if ((i = ua.indexOf(s)) >= 0) {
@@ -224,6 +222,7 @@ function BrowserType() {
         return;
     }
 }
+var browser = new BrowserType();
 //
 // ----- Code for handling the menu bar and active button.
 //
@@ -235,7 +234,7 @@ function PageClick(event) {
     else
         el = (event.target.tagName ? event.target : event.target.parentNode);
 
-    if (el == activeButton)
+    if (el === activeButton)
         return;
     if (getContainerWith(el, "DIV", "kmaMenu") == null) {
         resetButton(activeButton);
@@ -255,10 +254,10 @@ function ClearMenu() {
 //
 function ccFlyoutHoverMode(val) {
     flag = val;
-    if (val == 0) {
+    if (val === 0) {
         setTimeout(timerEvent, 1000);
     }
-    if (val == 1) {
+    if (val === 1) {
         updated = 1;
     }
     return;
@@ -267,7 +266,7 @@ function ccFlyoutHoverMode(val) {
 // -----
 //
 function timerEvent() {
-    if (flag == 0) {
+    if (flag === 0) {
         resetFlag = 1;
         resetButton(activeButton);
         menuClicks = 0;
@@ -296,8 +295,7 @@ function ccFlyoutButtonClick(event, menuId, position, StyleSheetPrefix, OpenOnHo
     var x, y;
     var offY;
     //
-    if ((!(clickButton == 2 && outOfContext))) {
-        //if ((!(clickButton == 2 && outOfContext)) && browser.isIE) {
+    if ((!(clickButton === 2 && outOfContext))) {
         hideselect(true);
     }
     if (browser.isIE) {
@@ -306,38 +304,38 @@ function ccFlyoutButtonClick(event, menuId, position, StyleSheetPrefix, OpenOnHo
     } else {
         button = event.currentTarget;
     }
-    if (button.tagName != "A") {
+    if (button.tagName !== "A") {
         button = getContainer(button, "A")
-        if (button == null) { return false; }
+        if (button === null) { return false; }
     }
-    if (menuId == "") { return false; }
+    if (menuId === "") { return false; }
     width = document.body.scrollWidth;
     height = document.body.scrollHeight;
     button.blur();
     if (button.menu == null) {
         button.menu = document.getElementById(menuId);
-        if (button.menu.title == "")
+        if (button.menu.title === "")
             menuInit(button.menu);
     }
     if (activeButton != null)
         resetButton(activeButton);
-    if (button != activeButton || updated == 1) {
+    if (button != activeButton || updated === 1) {
         updated = 0;
         // Update the button"s style so it looks down
-        if (clickButton != 2) {
+        if (clickButton !== 2) {
             button.className += " kmaMenuDown " + StyleSheetPrefix + "ButtonDown";
         }
         //button.className += " ccFlyoutButtonDown";
         // put menu under button
-        if (position == 1) {
+        if (position === 1) {
             // Flyout to the right
             x = getPageOffsetLeft(button) + button.offsetWidth;
             y = getPageOffsetTop(button);
-        } else if (position == 2) {
+        } else if (position === 2) {
             // Flyout up
             x = getPageOffsetLeft(button);
             y = getPageOffsetTop(button) - button.menu.offsetHeight;
-        } else if (position == 3) {
+        } else if (position === 3) {
             // Flyout to the left
             x = getPageOffsetLeft(button) - button.menu.offsetWidth;
             y = getPageOffsetTop(button);
@@ -348,7 +346,7 @@ function ccFlyoutButtonClick(event, menuId, position, StyleSheetPrefix, OpenOnHo
 
         }
 
-        if (clickButton == 2) {
+        if (clickButton === 2) {
             x = event.clientX;
             y = event.clientY;
             if (document.body) {
@@ -384,7 +382,7 @@ function ccFlyoutButtonHover(event, menuId, position) {
         button = window.event.srcElement;
     else
         button = event.currentTarget;
-    if (activeButton != null && activeButton != button)
+    if (activeButton !== null && activeButton !== button)
         ccFlyoutButtonClick(event, menuId, position);
 }
 //
@@ -417,7 +415,7 @@ function ccFlyoutPanelHover(event, StyleSheetPrefix) {
     //menu = getContainerWith(window.event.srcElement, "DIV", "ccFlyoutPanel");
     else
         menu = event.currentTarget;
-    if (menu.title != "") {
+    if (menu.title !== "") {
         if (menu.activeItem == null) {
             // do nothing
         } else {
@@ -443,13 +441,12 @@ function ccFlyoutPanelButtonHover(event, menuId, StyleSheetPrefix) {
         closeSubMenu(menu);
     }
     if (!(menuId)) { return false }
-    if (menuId == "") { return false; }
+    if (menuId === "") { return false; }
     menu.activeItem = item;
     item.className += " kmaMenuDown " + StyleSheetPrefix + "PanelButtonDown";
     if (item.subMenu == null) {
         item.subMenu = document.getElementById(menuId);
-        if (item.subMenu.title == "")
-            //if (item.subMenu.isInitialized == null)
+        if (item.subMenu.title === "")
             menuInit(item.subMenu);
     }
     x = getPageOffsetLeft(item) + item.offsetWidth;
@@ -459,10 +456,10 @@ function ccFlyoutPanelButtonHover(event, menuId, StyleSheetPrefix) {
         maxY = window.scrollY + window.innerHeight;
     }
     if (browser.isIE) {
-        maxX = (document.documentElement.scrollLeft != 0 ? document.documentElement.scrollLeft : document.body.scrollLeft)
-            + (document.documentElement.clientWidth != 0 ? document.documentElement.clientWidth : document.body.clientWidth);
-        maxY = (document.documentElement.scrollTop != 0 ? document.documentElement.scrollTop : document.body.scrollTop)
-            + (document.documentElement.clientHeight != 0 ? document.documentElement.clientHeight : document.body.clientHeight);
+        maxX = (document.documentElement.scrollLeft !== 0 ? document.documentElement.scrollLeft : document.body.scrollLeft)
+            + (document.documentElement.clientWidth !== 0 ? document.documentElement.clientWidth : document.body.clientWidth);
+        maxY = (document.documentElement.scrollTop !== 0 ? document.documentElement.scrollTop : document.body.scrollTop)
+            + (document.documentElement.clientHeight !== 0 ? document.documentElement.clientHeight : document.body.clientHeight);
     }
     maxX -= item.subMenu.offsetWidth;
     maxY -= item.subMenu.offsetHeight;
@@ -510,7 +507,7 @@ function menuInit(menu) {
     var w, dw;
     var i, j;
     itemList = menu.getElementsByTagName("A");
-    if (itemList.length == 0) {
+    if (itemList.length === 0) {
         //menu.title = "Select One";
         menu.activeItem = null
         return false;
@@ -530,7 +527,7 @@ function menuInit(menu) {
 //
 function getContainerWith(node, tagName, className) {
     while (node != null) {
-        if (node.tagName != null && node.tagName == tagName &&
+        if (node.tagName != null && node.tagName === tagName &&
             hasClassName(node, className))
             return node;
         node = node.parentNode;
@@ -542,7 +539,7 @@ function getContainerWith(node, tagName, className) {
 //
 function getContainer(node, tagName) {
     while (node != null) {
-        if (node.tagName != null && node.tagName == tagName)
+        if (node.tagName != null && node.tagName === tagName)
             return node;
         node = node.parentNode;
     }
@@ -555,7 +552,7 @@ function hasClassName(el, name) {
     var i, list;
     list = el.className.split(" ");
     for (i = 0; i < list.length; i++)
-        if (list[i] == name) { return true; }
+        if (list[i] === name) { return true; }
     return false;
 }
 //
@@ -567,7 +564,7 @@ function removeClassName(el, name) {
     //newList = new Array();
     curList = el.className.split(" ");
     for (i = 0; i < curList.length; i++)
-        if (curList[i] != name) {
+        if (curList[i] !== name) {
             newList = newList + " " + curList[i];
         } else {
             //newList=newList+" "+curList[i];
@@ -584,7 +581,7 @@ function removeClassNameAfter(el, name) {
     curList = el.className.split(" ");
     newList = "";
     for (i = 0; i < curList.length; i++)
-        if (curList[i] != name) {
+        if (curList[i] !== name) {
             newList = newList + " " + curList[i];
         } else {
             // newList=newList+" "+curList[i];
@@ -620,7 +617,7 @@ function updateClipboardLinks() {
     SelectedObject = document.selection;
     TextRange = SelectedObject.createRange();
     if (TextRange.text) {
-        if (TextRange.text.length != 0) {
+        if (TextRange.text.length !== 0) {
             if (!lastSelCheck) {
                 setAnchorTagsToColor("ccSelect", "#000000");
                 lastSelCheck = true;
@@ -711,7 +708,7 @@ function InsertTag(OpenTag, CloseTag) {
     //
     SelectionObject = document.selection;
     SelectionObjectType = SelectionObject.type;
-    if (SelectionObjectType == "Control") {
+    if (SelectionObjectType === "Control") {
         ControlRangeCollection = SelectionObject.createRange();
         for (Pointer = 0; Pointer < ControlRangeCollection.length; Pointer++) {
             ControlRange = ControlRangeCollection(Pointer);
@@ -788,8 +785,8 @@ function InsertImage(Name, Src, Alt, Width, Height, ObjectName) {
     var tag
     tag = "<IMG SRC=\"" + Src + "\""
     tag += "name=\"" + Name + "\" ID=\"" + Name + "\""
-    if (Width != 0) tag += " WIDTH=\"" + Width + "\""
-    if (Height != 0) tag += " HEIGHT=\"" + Height + "\""
+    if (Width !== 0) tag += " WIDTH=\"" + Width + "\""
+    if (Height !== 0) tag += " HEIGHT=\"" + Height + "\""
     tag += " BORDER=0>"
     oUtil.obj.insertHTML(tag);
 }
@@ -815,13 +812,13 @@ function InsertActiveContentPlus(ACType, ACSubType, ACArg1, ObjectName) {
     ExecCmdPlus("InsertImage", false, "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/AC" + ACType + ACSubType + ".gif", ObjectName);
     SelectionObject = document.selection;
     SelectionObjectType = SelectionObject.type;
-    if (SelectionObjectType != "Control") {
+    if (SelectionObjectType !== "Control") {
         // 
     } else {
         ControlRangeObject = SelectionObject.createRange();
         for (Pointer = 0; Pointer < ControlRangeObject.length; Pointer++) {
             ImageObject = ControlRangeObject(Pointer);
-            if (ImageObject.tagName == "IMG") {
+            if (ImageObject.tagName === "IMG") {
                 ImageObject.id = "AC," + ACType + "," + ACSubType + "," + ACArg1;
             } else {
                 // Non-Image found in Control Object
@@ -853,17 +850,17 @@ function OpenPropertiesWindowPlus(ObjectName) {
     // Locate the object being clicked 
     SelectionObject = document.selection;
 
-    if (SelectionObject.type == "Text") {
+    if (SelectionObject.type === "Text") {
         // Text Object Found
-    } else if (SelectionObject.type == "Control") {
+    } else if (SelectionObject.type === "Control") {
         ControlRangeObject = SelectionObject.createRange();
         for (Pointer = 0; Pointer < ControlRangeObject.length; Pointer++) {
             ElementObject = ControlRangeObject(Pointer);
-            if (ElementObject.tagName == "IMG") {
-                if (ElementObject.id.substring(0, 3) == "AC,") {
-                    if (ElementObject.id.substring(0, 8) == "AC,IMAGE") {
+            if (ElementObject.tagName === "IMG") {
+                if (ElementObject.id.substring(0, 3) === "AC,") {
+                    if (ElementObject.id.substring(0, 8) === "AC,IMAGE") {
                         OpenImagePropertyWindow(document.all[ObjectName], ElementObject);
-                    } else if (ElementObject.id.substring(0, 20) == "AC,AGGREGATEFUNCTION") {
+                    } else if (ElementObject.id.substring(0, 20) === "AC,AGGREGATEFUNCTION") {
                         OpenAggregateFunctionPropertyWindow(document.all[ObjectName], ElementObject);
                     } else {
                         OpenACPropertyWindow(document.all[ObjectName], ElementObject);
@@ -872,7 +869,7 @@ function OpenPropertiesWindowPlus(ObjectName) {
                     OpenImagePropertyWindow(document.all[ObjectName], ElementObject);
                 }
             }
-            else if (ElementObject.tagName == "TABLE") {
+            else if (ElementObject.tagName === "TABLE") {
                 var tBody = ElementObject.getElementsByTagName("TBODY");
                 OpenTablePropertyWindow(ObjectName, ElementObject, tBody[0]);
             }
@@ -913,10 +910,10 @@ function tdDialog(tabIndex, fieldName) {
 function createTable() {
     var HTMLEditor = document.all[tableDialogEditor]
     var CellWidth;
-    if (rtNumRows == "" || rtNumRows == "0") {
+    if (rtNumRows === "" || rtNumRows === "0") {
         rtNumRows = "1";
     }
-    if (rtNumCols == "" || rtNumCols == "0") {
+    if (rtNumCols === "" || rtNumCols === "0") {
         rtNumCols = "1";
     }
     var rttrnum = 1;
@@ -980,12 +977,12 @@ function highlightTDs(ObjectName, num, CellDataHolder) {
     var col;
     var row;
     var i;
-    if (num == 0) {
+    if (num === 0) {
         col = 1;
     }
     else {
         col = (num + 1) % tableWidth;
-        if (col == 0) {
+        if (col === 0) {
             col = tableWidth;
         }
     }
@@ -1014,12 +1011,12 @@ function rowVal(num, tableWidth) {
 //
 function colVal(num, tableWidth) {
     var retVal;
-    if (num == 0) {
+    if (num === 0) {
         retVal = 1;
     }
     else {
         retVal = (num + 1) % tableWidth;
-        if (retVal == 0) {
+        if (retVal === 0) {
             retVal = tableWidth;
         }
     }
@@ -1041,13 +1038,13 @@ function editorRightClick(prefix, divName) {
         var clickType = 1;
         if (navigator.appName == "Netscape") clickType = e.which;
         else clickType = event.button;
-        if (clickType != 1) {
+        if (clickType !== 1) {
             var SelectedObject;
             var tRange;
             SelectedObject = document.selection;
             tRange = SelectedObject.createRange();
 
-            if (SelectedObject.type == "Control") {
+            if (SelectedObject.type === "Control") {
                 if (tRange.length >= 1) {
                     var selectedEl = tRange(0);
                 }
@@ -1055,25 +1052,25 @@ function editorRightClick(prefix, divName) {
             else {
                 var selectedEl = tRange.parentElement();
             }
-            if (selectedEl.tagName != "TD") {
+            if (selectedEl.tagName !== "TD") {
                 selectedEl = document.elementFromPoint(event.x, event.y);
             }
 
-            if (selectedEl.tagName != "TD") {
+            if (selectedEl.tagName !== "TD") {
                 possibleTableElement = findTagAmongstParents(selectedEl, "TD", divName);
             }
 
             if (possibleTableElement != null) {
                 selectedEl = possibleTableElement;
             }
-            if (selectedEl.tagName == "TD") {
+            if (selectedEl.tagName === "TD") {
                 var tempEl2 = selectedEl.parentElement;
                 do {
-                    if (tempEl2.tagName == "TR") {
+                    if (tempEl2.tagName === "TR") {
                         TableRowPropertyObject = tempEl2;
                     }
                     tempEl2 = tempEl2.parentElement;
-                } while (tempEl2.tagName != "TBODY");
+                } while (tempEl2.tagName !== "TBODY");
 
                 TableCellPropertyObject = selectedEl;
                 TableBodyPropertyObject = tempEl2;
@@ -1082,13 +1079,12 @@ function editorRightClick(prefix, divName) {
                 outOfContext = false;
                 return prefix + "TableMenu";
 
-            } // if (selectedEl.tagName == "TD")
-            else {
+            } else {
                 outOfContext = true;
                 return "";
             }
-        } // if (clickType!=1)
-    } // if (parseInt(navigator.appVersion)>3)
+        } 
+    } 
 }
 //
 //----------
@@ -1097,15 +1093,15 @@ function findTagAmongstParents(startingElement, tagName, divName) {
     var found;
     var currEl;
     found = false;
-    if ((startingElement.tagName == "DIV") && (startingElement.name == divName)) {
+    if ((startingElement.tagName === "DIV") && (startingElement.name === divName)) {
         return null;
     }
     currEl = startingElement.parentElement;
     while (currEl != null && !found) {
-        if ((currEl.tagName == "DIV") && (currEl.name == divName)) {
+        if ((currEl.tagName === "DIV") && (currEl.name === divName)) {
             return null;
         }
-        if (currEl.tagName == tagName) {
+        if (currEl.tagName === tagName) {
             found = true;
         }
         else {
@@ -1121,7 +1117,7 @@ function hideRightMenu(ObjectName) {
     var i;
     var tableMenu = document.all[ObjectName];
     for (i = 0; i < tableMenu.childNodes.length; i++) {
-        if (tableMenu.childNodes[i].tagName == "DIV") {
+        if (tableMenu.childNodes[i].tagName === "DIV") {
             tableMenu.childNodes[i].style.visibility = "hidden";
         }
     }
@@ -1167,7 +1163,7 @@ function insertRowAfter() {
 function findColumn() {
     var i;
     for (i = 0; i < TableRowPropertyObject.childNodes.length; i++) {
-        if (TableRowPropertyObject.childNodes[i] == TableCellPropertyObject) {
+        if (TableRowPropertyObject.childNodes[i] === TableCellPropertyObject) {
             return i;
         }
     }
@@ -1180,7 +1176,7 @@ function insertColLeft() {
     var tRows = TableBodyPropertyObject.getElementsByTagName("TR");
     for (i = 0; i < tRows.length; i++) {
         if (tRows[i].childNodes[colIndex]) {
-            if (tRows[i].childNodes[colIndex].tagName == "TD") {
+            if (tRows[i].childNodes[colIndex].tagName === "TD") {
                 var newTD = tRows[i].insertCell(colIndex);
                 newTD.insertAdjacentText("afterBegin", " ");
                 newTD.style.width = Math.round(50 / tRows[i].childNodes.length) + "%";
@@ -1197,7 +1193,7 @@ function deleteColumn() {
     var tRows = TableBodyPropertyObject.getElementsByTagName("TR");
     for (i = 0; i < tRows.length; i++) {
         if (tRows[i].childNodes[colIndex]) {
-            if (tRows[i].childNodes[colIndex].tagName == "TD") {
+            if (tRows[i].childNodes[colIndex].tagName === "TD") {
                 tRows[i].childNodes[colIndex].removeNode(true);
             }
         }
@@ -1212,7 +1208,7 @@ function insertColRight() {
     var tRows = TableBodyPropertyObject.getElementsByTagName("TR");
     for (i = 0; i < tRows.length; i++) {
         if (tRows[i].childNodes[colIndex]) {
-            if (tRows[i].childNodes[colIndex].tagName == "TD") {
+            if (tRows[i].childNodes[colIndex].tagName === "TD") {
                 var newTD = tRows[i].insertCell(colIndex + 1);
                 newTD.insertAdjacentText("afterBegin", " ");
                 newTD.style.width = Math.round(50 / tRows[i].childNodes.length) + "%";
@@ -1251,7 +1247,7 @@ function hidePanel() {
 //----------
 //
 function setState(tabNum) {
-    if (tabNum == currentPanel) {
+    if (tabNum === currentPanel) {
         document.getElementById("tab" + tabNum).style.backgroundColor = "#ddddff";
         document.getElementById("tab" + tabNum).style.color = "red";
     } else {
@@ -1313,7 +1309,7 @@ function HelpBubbleOn(BubbleID, Source) {
     HelpBubbleOff(LastBubbleID);
     DivTarget = document.getElementById(BubbleID);
     if (DivTarget) {
-        if (navigator.appName == "Microsoft Internet Explorer") {
+        if (navigator.appName === "Microsoft Internet Explorer") {
             pageYOffset = window.document.body.scrollTop;
         } else {
             pageYOffset = window.pageYOffset;
@@ -1473,7 +1469,7 @@ function RLRowClick(IsChecked, RowID) {
 //
 var DPanel = "0";
 function ToggleToolPanelDev() {
-    if (DPanel == "0") {
+    if (DPanel === "0") {
         DPanel = "1";
         document.all["ToolPanelDev"].style.visibility = "visible";
     } else {
@@ -1491,7 +1487,7 @@ function SubmitToolsPanel() {
     SelectedObject = document.selection;
     TextRange = SelectedObject.createRange();
     if (TextRange.text) {
-        if (TextRange.text.length != 0) {
+        if (TextRange.text.length !== 0) {
             document.all["ToolsPanelSelection"].value = TextRange.htmlText;
         }
     }
@@ -1511,14 +1507,14 @@ function switchContentFolderDiv(ShowID, HideID, ContentCaptionDivID, ContentCapt
     var ShowDiv, HideDiv, CaptionDiv, EmptyDiv, ptr;
     var HiddenInput, Hit;
     //
-    if (ShowID == HideID) { return false; }
+    if (ShowID === HideID) { return false; }
     //
     // hide old content
     //
     Hit = false;
     HideDiv = document.getElementById(HideID);
     if (HideDiv) {
-        if (HideDiv.id == HideID) {
+        if (HideDiv.id === HideID) {
             HideDiv.style.display = "none";
             Hit = true;
         }
@@ -1543,7 +1539,7 @@ function switchContentFolderDiv(ShowID, HideID, ContentCaptionDivID, ContentCapt
     Hit = false;
     ShowDiv = document.getElementById(ShowID);
     if (ShowDiv) {
-        if (ShowDiv.id == ShowID) {
+        if (ShowDiv.id === ShowID) {
             //ShowDiv.style.visibility = "hidden";
             ShowDiv.style.display = "block";
             //ShowDiv.style.visibility = "visible";
@@ -1606,14 +1602,14 @@ function OpenTextArea(TextAreaID) {
     var h;
     to.value = tc.value;
     document.body.style.overflow = "hidden";
-    if (document.compatMode && document.compatMode != "BackCompat") {
+    if (document.compatMode && document.compatMode !== "BackCompat") {
         //using doctype
         document.body.style.height = "100%";
         h = window.size().height;
         w = window.size().width;
         document.body.style.height = "";
     } else {
-        if (document.body.style.overflow == "hidden") {
+        if (document.body.style.overflow === "hidden") {
             w = document.body.offsetWidth;
         } else {
             w = document.body.offsetWidth - 22;
@@ -1643,7 +1639,7 @@ function OpenTextArea(TextAreaID) {
 // Disable all buttons on the page
 //
 function processSubmit(e) {
-    if (typeof (docLoaded) != "undefined") {
+    if (typeof (docLoaded) !== "undefined") {
         if (!docLoaded) {
             alert("This page has not loaded completed. Please wait for the page to load before submitting the form. If the page has loaded, there may have been an error. Please refresh the page.");
             return false;
@@ -1651,7 +1647,7 @@ function processSubmit(e) {
     }
     var x = document.getElementsByTagName("input");
     for (var i = 0; i < x.length; i++) {
-        if ((x[i].type == "submit") && (x[i] != e)) {
+        if ((x[i].type === "submit") && (x[i] !== e)) {
             x[i].disabled = true;
         }
     }
@@ -1696,7 +1692,7 @@ function DecodeAddonOptionArgument(EncodedArg) {
 //
 function cjAddLoadEvent(func) {
     var oldonload = window.onload;
-    if (typeof window.onload != "function") {
+    if (typeof window.onload !== "function") {
         window.onload = func;
     } else {
         window.onload = function () {
@@ -1774,7 +1770,7 @@ function cjSetFrameHeight(frameId) {
 //
 
 function cjEncodeTextAreaKey(sender, e) {
-    if (e.keyCode == 9) {
+    if (e.keyCode === 9) {
         if (e.srcElement) {
             sender.selection = document.selection.createRange();
             sender.selection.text = "\t";
@@ -1826,9 +1822,9 @@ function cjAjaxURL(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowID
         }
     }
     xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+        if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
             serverResponse = xmlHttp.responseText;
-            if ((serverResponse != "") && (DestinationID != "")) {
+            if ((serverResponse !== "") && (DestinationID !== "")) {
                 if (document.getElementById) {
                     var el1 = document.getElementById(DestinationID);
                 } else if (document.all) {
@@ -1857,7 +1853,7 @@ function cjAjaxURL(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowID
                     }
                 }
             }
-            if (serverResponse == "") {
+            if (serverResponse === "") {
                 if (document.getElementById(onEmptyHideID)) { document.getElementById(onEmptyHideID).style.display = "none" }
                 if (document.getElementById(onEmptyShowID)) { document.getElementById(onEmptyShowID).style.display = "block" }
             }
@@ -1866,17 +1862,17 @@ function cjAjaxURL(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowID
     // get host from document url
     url = document.URL;
     pos = url.indexOf("#");
-    if (pos != -1) { url = url.substr(0, pos) }
+    if (pos !== -1) { url = url.substr(0, pos) }
     pos = url.indexOf("?");
-    if (pos != -1) { url = url.substr(0, pos) }
+    if (pos !== -1) { url = url.substr(0, pos) }
     pos = url.indexOf("://");
-    if (pos != -1) {
+    if (pos !== -1) {
         pos = url.indexOf("/", pos + 3);
-        if (pos != -1) { url = url.substr(0, pos) }
+        if (pos !== -1) { url = url.substr(0, pos) }
     }
     url += LocalURL;
     pos = url.indexOf("?")
-    if (pos == -1) { url += "?" } else { url += "&" }
+    if (pos === -1) { url += "?" } else { url += "&" }
     url += "nocache=" + Math.random();
     fo = document.getElementById(FormID);
     if (fo) {
@@ -1884,8 +1880,8 @@ function cjAjaxURL(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowID
             for (i = 0; i < fo.elements.length; i++) {
                 e = fo.elements[i];
                 ret = "";
-                if (e.type == "select-multiple") {
-                    while (e.selectedIndex != -1) {
+                if (e.type === "select-multiple") {
+                    while (e.selectedIndex !== -1) {
                         eSelected.push(e.selectedIndex);
                         if (ret) ret += ",";
                         ret += e.options[e.selectedIndex].value;
@@ -1895,12 +1891,12 @@ function cjAjaxURL(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowID
                         e.options[eSelected.pop()].selected = true;
                     }
                     url += "&" + escape(e.name) + "=" + escape(ret)
-                } else if (e.type == "radio") {
+                } else if (e.type === "radio") {
                     if (e.checked) {
                         ret = e.value;
                         url += "&" + escape(e.name) + "=" + escape(ret)
                     }
-                } else if (e.type == "checkbox") {
+                } else if (e.type === "checkbox") {
                     if (e.checked) {
                         ret = e.value;
                         url += "&" + escape(e.name) + "=" + escape(ret)
@@ -1921,7 +1917,6 @@ function cjAjaxURL(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowID
 //----------
 //
 function GetURLAjax(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowID) {
-    console.log("base.GetURLAjax");
     cjAjaxURL(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowID);
 }
 //
@@ -1946,17 +1941,17 @@ function cjAjaxAddon(AddonName, QueryString, FormID, DestinationID, onEmptyHideI
     var url, pos;
     url = document.URL;
     pos = url.indexOf("#");
-    if (pos != -1) { url = url.substr(0, pos) }
+    if (pos !== -1) { url = url.substr(0, pos) }
     pos = url.indexOf("?");
-    if (pos != -1) { url = url.substr(0, pos) }
+    if (pos !== -1) { url = url.substr(0, pos) }
     pos = url.indexOf("://");
-    if (pos != -1) {
+    if (pos !== -1) {
         pos = url.indexOf("/", pos + 3);
-        if (pos != -1) { url = url.substr(pos) }
+        if (pos !== -1) { url = url.substr(pos) }
     }
     url += "?nocache=0";
-    if (AddonName != "") { url += "&remotemethodaddon=" + AddonName }
-    if (QueryString != "") { url += "&" + QueryString }
+    if (AddonName !== "") { url += "&remotemethodaddon=" + AddonName }
+    if (QueryString !== "") { url += "&" + QueryString }
     cjAjaxURL(url, FormID, DestinationID, onEmptyHideID, onEmptyShowID);
 }
 //
@@ -1965,7 +1960,6 @@ function cjAjaxAddon(AddonName, QueryString, FormID, DestinationID, onEmptyHideI
 //----------
 //
 function GetAjax(AddonName, QueryString, FormID, DestinationID, onEmptyHideID, onEmptyShowID) {
-    console.log("base.GetAjax");
     cjAjaxAddon(AddonName, QueryString, FormID, DestinationID, onEmptyHideID, onEmptyShowID);
 }
 //
@@ -2003,12 +1997,12 @@ function cjAjaxAddonCallback(AddonName, QueryString, Callback, CallbackArg) {
     }
     xmlHttp.onreadystatechange = function () {
         var serverResponse, sLen, i, scripts, sLen, srcArray, codeArray;
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+        if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
             serverResponse = xmlHttp.responseText;
             var isSrcArray = new Array();
             var codeArray = new Array();
             var oldOnLoad = window.onload;
-            if (serverResponse != "") {
+            if (serverResponse !== "") {
                 // remove embedded scripts
                 var e = document.createElement("div");
                 if (e) {
@@ -2060,17 +2054,17 @@ function cjAjaxAddonCallback(AddonName, QueryString, Callback, CallbackArg) {
     // create LocalURL
     url = document.URL;
     pos = url.indexOf("#");
-    if (pos != -1) { url = url.substr(0, pos) }
+    if (pos !== -1) { url = url.substr(0, pos) }
     pos = url.indexOf("?");
-    if (pos != -1) { url = url.substr(0, pos) }
+    if (pos !== -1) { url = url.substr(0, pos) }
     pos = url.indexOf("://");
-    if (pos != -1) {
+    if (pos !== -1) {
         pos = url.indexOf("/", pos + 3);
-        if (pos != -1) { url = url.substr(pos) }
+        if (pos !== -1) { url = url.substr(pos) }
     }
     url += "?nocache=" + Math.random()
-    if (AddonName != "") { url += "&remotemethodaddon=" + AddonName; }
-    if (QueryString != "") { url += "&" + QueryString; }
+    if (AddonName !== "") { url += "&remotemethodaddon=" + AddonName; }
+    if (QueryString !== "") { url += "&" + QueryString; }
     xmlHttp.open("GET", url, true);
     xmlHttp.send(null);
 }
@@ -2092,16 +2086,16 @@ function cjAjaxQs(QueryString, FormID, DestinationID, onEmptyHideID, onEmptyShow
     // create LocalURL
     url = document.URL;
     pos = url.indexOf("#");
-    if (pos != -1) { url = url.substr(0, pos) }
+    if (pos !== -1) { url = url.substr(0, pos) }
     pos = url.indexOf("?");
-    if (pos != -1) { url = url.substr(0, pos) }
+    if (pos !== -1) { url = url.substr(0, pos) }
     pos = url.indexOf("://");
-    if (pos != -1) {
+    if (pos !== -1) {
         pos = url.indexOf("/", pos + 3);
-        if (pos != -1) { url = url.substr(pos) }
+        if (pos !== -1) { url = url.substr(pos) }
     }
     url += "?nocache=" + Math.random()
-    if (QueryString != "") { url += "&" + QueryString; }
+    if (QueryString !== "") { url += "&" + QueryString; }
     cjAjaxURL(url, FormID, DestinationID, onEmptyHideID, onEmptyShowID);
 }
 //
@@ -2142,24 +2136,24 @@ function cjAjaxData(handler, queryKey, args, pageSize, pageNumber, responseForma
         }
     }
     xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+        if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
             response = xmlHttp.responseText;
             var str = response.toLowerCase();
             pos = str.indexOf("</data>");
-            if (pos != -1) { response = response.substr(0, pos) }
+            if (pos !== -1) { response = response.substr(0, pos) }
             pos = str.indexOf("<data>")
-            if (pos != -1) { response = response.substr(pos + 6) }
+            if (pos !== -1) { response = response.substr(pos + 6) }
             if (handler) { handler(response) }
         }
     }
     // get url w/o QS
     url = document.URL;
     pos = url.indexOf("#");
-    if (pos != -1) { url = url.substr(0, pos) }
+    if (pos !== -1) { url = url.substr(0, pos) }
     pos = url.indexOf("://");
-    if (pos != -1) {
+    if (pos !== -1) {
         pos = url.indexOf("/", pos + 3);
-        if (pos != -1) { url = url.substr(0, pos + 1) }
+        if (pos !== -1) { url = url.substr(0, pos + 1) }
     }
     pos = url.indexOf("?")
     if (pos = -1) { url += "?" } else { url += "&" }
@@ -2243,7 +2237,7 @@ function cjAjaxUpdate(handler, queryKey, criteria, setPairs) {
 //
 function cjAddListener(element, event, listener, bubble) {
     if (element.addEventListener) {
-        if (typeof (bubble) == "undefined") bubble = false;
+        if (typeof (bubble) === "undefined") bubble = false;
         element.addEventListener(event, listener, bubble);
     } else if (this.attachEvent) {
         element.attachEvent("on" + event, listener);
@@ -2335,10 +2329,10 @@ function cjSetSpinner(destinationID, message, destinationHeight) {
 //-------------------------------------------------------------------------
 //
 function cjXMLLoadString(txt) {
-    if (typeof DOMParser != "undefined") {
+    if (typeof DOMParser !== "undefined") {
         // Mozilla, Firefox, and related browsers 
         return (new DOMParser()).parseFromString(text, "application/xml");
-    } else if (typeof ActiveXObject != "undefined") {
+    } else if (typeof ActiveXObject !== "undefined") {
         // Internet Explorer. 
         var doc = XML.newDocument();  // Create an empty document 
         doc.loadXML(text);            // Parse text into it 
@@ -2364,21 +2358,21 @@ function cjAdminSaveEmptyFieldList(targetFieldId) {
     var e = document.getElementById(targetFieldId);
     var c = document.getElementsByTagName("input");
     for (i = 0; i < c.length; i++) {
-        if (c[i].type == "checkbox") {
-            if (c[i].checked == false) {
+        if (c[i].type === "checkbox") {
+            if (c[i].checked === false) {
                 e.value += c[i].name + ","
             }
-        } else if (c[i].type == "radio") {
-            if (c[i].checked == false) {
+        } else if (c[i].type === "radio") {
+            if (c[i].checked === false) {
                 e.value += c[i].name + ","
             }
-        } else if (c[i].value == "") {
+        } else if (c[i].value === "") {
             e.value += c[i].name + ","
         }
     }
     c = document.getElementsByTagName("select");
     for (i = 0; i < c.length; i++) {
-        if (c[i].value == "") {
+        if (c[i].value === "") {
             e.value += c[i].name + ","
         }
     }
@@ -2451,13 +2445,13 @@ function cjRemote(options) {
     else {
         url = document.URL;
         pos = url.indexOf("#");
-        if (pos != -1) { url = url.substr(0, pos) }
+        if (pos !== -1) { url = url.substr(0, pos) }
         pos = url.indexOf("?");
-        if (pos != -1) { url = url.substr(0, pos) }
+        if (pos !== -1) { url = url.substr(0, pos) }
         pos = url.indexOf("://");
-        if (pos != -1) {
+        if (pos !== -1) {
             pos = url.indexOf("/", pos + 3);
-            if (pos != -1) { url = url.substr(pos) }
+            if (pos !== -1) { url = url.substr(pos) }
         }
     }
     url += "?nocache=" + Math.random()
@@ -2470,8 +2464,8 @@ function cjRemote(options) {
                 for (ptr = 0; ptr < fo.elements.length; ptr++) {
                     e = fo.elements[ptr];
                     ret = "";
-                    if (e.type == "select-multiple") {
-                        while (e.selectedIndex != -1) {
+                    if (e.type === "select-multiple") {
+                        while (e.selectedIndex !== -1) {
                             eSelected.push(e.selectedIndex);
                             if (ret) ret += ",";
                             ret += e.options[e.selectedIndex].value;
@@ -2482,13 +2476,13 @@ function cjRemote(options) {
                         }
                         url += "&" + escape(e.name) + "=" + escape(ret)
                     }
-                    else if (e.type == "radio") {
+                    else if (e.type === "radio") {
                         if (e.checked) {
                             ret = e.value;
                             url += "&" + escape(e.name) + "=" + escape(ret)
                         }
                     }
-                    else if (e.type == "checkbox") {
+                    else if (e.type === "checkbox") {
                         if (e.checked) {
                             ret = e.value;
                             url += "&" + escape(e.name) + "=" + escape(ret)
@@ -2508,7 +2502,7 @@ function cjRemote(options) {
             var isSrcArray = new Array();
             var codeArray = new Array();
             var oldOnLoad = window.onload;
-            if (serverResponse == "") {
+            if (serverResponse === "") {
                 if (options.onEmptyHideId) {
                     e = document.getElementById(options.onEmptyHideId);
                     if (e) {
@@ -2531,7 +2525,7 @@ function cjRemote(options) {
                     // where the scripts collection is 0ed after the first eval
                     window.onload = "";
                     e.innerHTML = serverResponse;
-                    if ((serverResponse != "") && (e.innerHTML == "")) {
+                    if ((serverResponse !== "") && (e.innerHTML === "")) {
                         //ie7-8,blocks scripts in response
                         test = serverResponse;
                         start = test.indexOf("<script");
@@ -2698,7 +2692,7 @@ $(function () {
 * Admin List, submit FindButton if enter while find input field focus 
 */
 jQuery(".findInput").keypress(function (e) {
-    if (e.which == 13) {
+    if (e.which === 13) {
         e.stopPropagation();
         e.preventDefault();
         jQuery("#FindButton").click();
@@ -2717,7 +2711,7 @@ var ContentHeight = 0;
 function TabInit() {
     var i;
     return false;
-    if (initialized == 0) {
+    if (initialized === 0) {
         initialized = 1;
         var AllContentDivs = document.getElementsByTagName("div");
         var ContentTop = 999;
@@ -2725,8 +2719,8 @@ function TabInit() {
         var FirstTop = 0;
         //
         for (i = 0; i < AllContentDivs.length; i++) {
-            if (AllContentDivs[i].className == "ccAdminTabBody") {
-                if (AllContentDivs[i].style.display == "block") {
+            if (AllContentDivs[i].className === "ccAdminTabBody") {
+                if (AllContentDivs[i].style.display === "block") {
                     FirstTop = getTop(AllContentDivs[i]);
                 } else {
                 }
@@ -2756,7 +2750,7 @@ function switchLiveTab2(ContentDivID, ClickedTab, TabTableID, StylePrefix, TabWr
     var StyleHeight;
     var width;
     //
-    if (ActiveTabTableID == TabTableID) { return false; }
+    if (ActiveTabTableID === TabTableID) { return false; }
     NewContentDiv = document.getElementById(ContentDivID);
     OldContentDiv = document.getElementById(ActiveContentDivID);
     TabWrapper = document.getElementById(TabWrapperID);
@@ -2773,12 +2767,12 @@ function switchLiveTab2(ContentDivID, ClickedTab, TabTableID, StylePrefix, TabWr
     TabTable = document.getElementById(ActiveTabTableID)
     for (TCnt = 0; TCnt < TabTable.childNodes.length; TCnt++) {
         TBodyNode = TabTable.childNodes[TCnt];
-        if (TBodyNode.tagName == "TBODY") {
+        if (TBodyNode.tagName === "TBODY") {
             for (BCnt = 0; BCnt < TBodyNode.childNodes.length; BCnt++) {
                 TRNode = TBodyNode.childNodes[BCnt];
                 for (RCnt = 0; RCnt < TRNode.childNodes.length; RCnt++) {
                     TDNode = TRNode.childNodes[RCnt];
-                    if (TDNode.className == StylePrefix + "Hit") {
+                    if (TDNode.className === StylePrefix + "Hit") {
                         TDNode.className = StylePrefix;
                     }
                 }
@@ -2790,12 +2784,12 @@ function switchLiveTab2(ContentDivID, ClickedTab, TabTableID, StylePrefix, TabWr
     TabTable = document.getElementById(TabTableID)
     for (TCnt = 0; TCnt < TabTable.childNodes.length; TCnt++) {
         TBodyNode = TabTable.childNodes[TCnt];
-        if (TBodyNode.tagName == "TBODY") {
+        if (TBodyNode.tagName === "TBODY") {
             for (BCnt = 0; BCnt < TBodyNode.childNodes.length; BCnt++) {
                 TRNode = TBodyNode.childNodes[BCnt];
                 for (RCnt = 0; RCnt < TRNode.childNodes.length; RCnt++) {
                     TDNode = TRNode.childNodes[RCnt];
-                    if (TDNode.className == StylePrefix) {
+                    if (TDNode.className === StylePrefix) {
                         TDNode.className = StylePrefix + "Hit";
                     }
                 }
@@ -2805,7 +2799,7 @@ function switchLiveTab2(ContentDivID, ClickedTab, TabTableID, StylePrefix, TabWr
     // toggle tab links
     var tabLinks = document.getElementsByName("tabLink");
     for (i = 0; i < tabLinks.length; i++) {
-        if (tabLinks[i] != ClickedTab) {
+        if (tabLinks[i] !== ClickedTab) {
             tabLinks[i].className = StylePrefix + "Link";
             tabLinks[i].blur();
         }
