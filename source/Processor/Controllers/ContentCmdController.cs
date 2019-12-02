@@ -249,54 +249,79 @@ namespace Contensive.Processor.Controllers {
                                         escape = src.Substring(posSq - 2, 1);
                                     }
                                 } while (escape == "\\");
-                                switch (getFirstNonZeroInteger(posSq, posDq)) {
-                                    case 0:
-                                        //
-                                        // both 0, posClose is OK as-is
-                                        //
+                                int posNextQuote = getFirstNonZeroInteger(posSq, posDq);
+                                if (posNextQuote==0) {
+                                    notFound = false;
+                                } else {
+                                    //
+                                    // posSq is before posDq
+                                    //
+                                    string nextQuoteChr = (posNextQuote == posSq) ? "'" : "\"";
+                                    if (posNextQuote > posClose) {
                                         notFound = false;
-                                        break;
-                                    case 1:
+                                    } else {
                                         //
-                                        // posSq is before posDq
+                                        // skip forward to the next non-escaped sq
                                         //
-                                        if (posSq > posClose) {
-                                            notFound = false;
-                                        } else {
-                                            //
-                                            // skip forward to the next non-escaped sq
-                                            //
-                                            do {
-                                                posSq = GenericController.strInstr(posSq + 1, src, "'");
-                                                escape = "";
-                                                if (posSq > 0) {
-                                                    escape = src.Substring(posSq - 2, 1);
-                                                }
-                                            } while (escape == "\\");
-                                            Ptr = posSq + 1;
-                                        }
-                                        break;
-                                    default:
-                                        //
-                                        // posDq is before posSq
-                                        //
-                                        if (posDq > posClose) {
-                                            notFound = false;
-                                        } else {
-                                            //
-                                            // skip forward to the next non-escaped dq
-                                            //
-                                            do {
-                                                posDq = GenericController.strInstr(posDq + 1, src, "\"");
-                                                escape = "";
-                                                if (posDq > 0) {
-                                                    escape = src.Substring(posDq - 2, 1);
-                                                }
-                                            } while (escape == "\\");
-                                            Ptr = posDq + 1;
-                                        }
-                                        break;
+                                        do {
+                                            posNextQuote = GenericController.strInstr(posNextQuote + 1, src, nextQuoteChr);
+                                            escape = "";
+                                            if (posNextQuote > 0) {
+                                                escape = src.Substring(posNextQuote - 2, 1);
+                                            }
+                                        } while (escape == "\\");
+                                        Ptr = posNextQuote + 1;
+                                    }
+                                    break;
                                 }
+                                //switch (getFirstNonZeroInteger(posSq, posDq)) {
+                                //    case 0:
+                                //        //
+                                //        // both 0, posClose is OK as-is
+                                //        //
+                                //        notFound = false;
+                                //        break;
+                                //    case 1:
+                                //        //
+                                //        // posSq is before posDq
+                                //        //
+                                //        if (posSq > posClose) {
+                                //            notFound = false;
+                                //        } else {
+                                //            //
+                                //            // skip forward to the next non-escaped sq
+                                //            //
+                                //            do {
+                                //                posSq = GenericController.strInstr(posSq + 1, src, "'");
+                                //                escape = "";
+                                //                if (posSq > 0) {
+                                //                    escape = src.Substring(posSq - 2, 1);
+                                //                }
+                                //            } while (escape == "\\");
+                                //            Ptr = posSq + 1;
+                                //        }
+                                //        break;
+                                //    default:
+                                //        //
+                                //        // posDq is before posSq
+                                //        //
+                                //        if (posDq > posClose) {
+                                //            notFound = false;
+                                //        } else {
+                                //            //
+                                //            // skip forward to the next non-escaped dq
+                                //            //
+                                //            do {
+                                //                posDq = GenericController.strInstr(posDq + 1, src, "\"");
+                                //                escape = "";
+                                //                if (posDq > 0) {
+                                //                    escape = src.Substring(posDq - 2, 1);
+                                //                }
+                                //            } while (escape == "\\");
+                                //            Ptr = posDq + 1;
+                                //        }
+                                //        break;
+                                //}
                             }
                         } while (notFound);
                     }
