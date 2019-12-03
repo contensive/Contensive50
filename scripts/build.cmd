@@ -250,6 +250,15 @@ cd ..\scripts
 
 rem ==============================================================
 rem
+rem hack - copy aoBase51.xml file from processor project to cli setup
+rem because I wasted 4 hrs trying to get nuget to install it as a content file
+rem
+
+xcopy ..\source\Processor\aoBase51.xml ..\Cli\*.* /Y
+pause
+
+rem ==============================================================
+rem
 rem build cli setup
 rem
 cd ..\source

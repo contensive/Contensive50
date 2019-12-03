@@ -1,11 +1,8 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Processor;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-using Contensive.Processor.Models;
-
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Addons.AdminSite.Controllers;
@@ -14,7 +11,7 @@ using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Addons.Tools {
     //
-    public class ConfigureContentEditClass : Contensive.BaseClasses.AddonBaseClass {
+    public class ConfigureContentEditClass : AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
@@ -26,10 +23,12 @@ namespace Contensive.Processor.Addons.Tools {
             return configureContentEdit((CPClass)cpBase);
         }
         //
-        //=============================================================================
-        //   Get the Configure Edit
-        //=============================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// Get the Configure Edit
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <returns></returns>
         public static string configureContentEdit(CPClass cp) {
             CoreController core = cp.core;
             try {
@@ -448,50 +447,50 @@ namespace Contensive.Processor.Addons.Tools {
                             //
                             // active
                             //
-                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaActive." + RecordCount, fieldsort.field.active, fieldsort.field.inherited));
+                            streamRow.Add(configureEdit_CheckBox("dtfaActive." + RecordCount, fieldsort.field.active, fieldsort.field.inherited));
                             //
                             // read only
                             //
-                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaReadOnly." + RecordCount, fieldsort.field.readOnly, fieldsort.field.inherited));
+                            streamRow.Add(configureEdit_CheckBox("dtfaReadOnly." + RecordCount, fieldsort.field.readOnly, fieldsort.field.inherited));
                             //
                             // authorable
                             //
-                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaAuthorable." + RecordCount, fieldsort.field.authorable, fieldsort.field.inherited));
+                            streamRow.Add(configureEdit_CheckBox("dtfaAuthorable." + RecordCount, fieldsort.field.authorable, fieldsort.field.inherited));
                             //
                             // required
                             //
-                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaRequired." + RecordCount, fieldsort.field.required, fieldsort.field.inherited));
+                            streamRow.Add(configureEdit_CheckBox("dtfaRequired." + RecordCount, fieldsort.field.required, fieldsort.field.inherited));
                             //
                             // UniqueName
                             //
-                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaUniqueName." + RecordCount, fieldsort.field.uniqueName, fieldsort.field.inherited));
+                            streamRow.Add(configureEdit_CheckBox("dtfaUniqueName." + RecordCount, fieldsort.field.uniqueName, fieldsort.field.inherited));
                             //
                             // text buffered
                             //
-                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaTextBuffered." + RecordCount, fieldsort.field.textBuffered, fieldsort.field.inherited));
+                            streamRow.Add(configureEdit_CheckBox("dtfaTextBuffered." + RecordCount, fieldsort.field.textBuffered, fieldsort.field.inherited));
                             //
                             // password
                             //
-                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaPassword." + RecordCount, fieldsort.field.password, fieldsort.field.inherited));
+                            streamRow.Add(configureEdit_CheckBox("dtfaPassword." + RecordCount, fieldsort.field.password, fieldsort.field.inherited));
                             //
                             // scramble
                             //
-                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaScramble." + RecordCount, fieldsort.field.scramble, fieldsort.field.inherited));
+                            streamRow.Add(configureEdit_CheckBox("dtfaScramble." + RecordCount, fieldsort.field.scramble, fieldsort.field.inherited));
                             //
                             // HTML Content
                             //
-                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaHTMLContent." + RecordCount, fieldsort.field.htmlContent, fieldsort.field.inherited));
+                            streamRow.Add(configureEdit_CheckBox("dtfaHTMLContent." + RecordCount, fieldsort.field.htmlContent, fieldsort.field.inherited));
                             //
                             // Admin Only
                             //
                             if (core.session.isAuthenticatedAdmin()) {
-                                streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaAdminOnly." + RecordCount, fieldsort.field.adminOnly, fieldsort.field.inherited));
+                                streamRow.Add(configureEdit_CheckBox("dtfaAdminOnly." + RecordCount, fieldsort.field.adminOnly, fieldsort.field.inherited));
                             }
                             //
                             // Developer Only
                             //
                             if (core.session.isAuthenticatedDeveloper()) {
-                                streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, fieldsort.field.developerOnly, fieldsort.field.inherited));
+                                streamRow.Add(configureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, fieldsort.field.developerOnly, fieldsort.field.inherited));
                             }
                             //
                             streamRow.Add("</tr>");
@@ -528,9 +527,15 @@ namespace Contensive.Processor.Addons.Tools {
             }
         }
         //
-        //
-        //
-        public static string getForm_ConfigureEdit_CheckBox(string htmlName, bool selected, bool Inherited) {
+        //====================================================================================================
+        /// <summary>
+        /// get checkbox
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="selected"></param>
+        /// <param name="Inherited"></param>
+        /// <returns></returns>
+        public static string configureEdit_CheckBox(string htmlName, bool selected, bool Inherited) {
             string result = "<td class=\"ccPanelInput\" align=\"center\"><nobr>";
             if (Inherited) {
                 result += SpanClassAdminSmall + getYesNo(selected) + "</SPAN>";
@@ -540,6 +545,10 @@ namespace Contensive.Processor.Addons.Tools {
             return result + "</nobr></td>";
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// domain class
+        /// </summary>
         private class FieldSortClass {
             public string sort;
             public Processor.Models.Domain.ContentFieldMetadataModel field;

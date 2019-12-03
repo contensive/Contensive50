@@ -12,6 +12,7 @@ using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using System.Globalization;
 using Contensive.Processor.Addons.AdminSite.Models;
+using Contensive.Processor.Addons.Tools;
 
 namespace Contensive.Processor.Addons.AdminSite {
     public class GetHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
@@ -249,58 +250,85 @@ namespace Contensive.Processor.Addons.AdminSite {
                         //
                         // No content so far, try the forms
                         // todo - convert this to switch
-                        if (adminData.adminForm == AdminFormBuilderCollection) {
-                            adminBody = GetForm_BuildCollection(cp);
-                        } else if (adminData.adminForm == AdminFormSecurityControl) {
-                            AddonGuid = Constants.AddonGuidPreferences;
-                        } else if ((adminData.adminForm == AdminFormMobileBrowserControl) || (adminData.adminForm == AdminFormPageControl) || (adminData.adminForm == AdminFormEmailControl)) {
-                            adminBody = cp.core.addon.execute(Constants.AddonGuidPreferences, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
-                                addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                                errorContextMessage = "get Preferences for Admin"
-                            });
-                        } else if (adminData.adminForm == AdminFormClearCache) {
-                            adminBody = ToolClearCache.getForm_ClearCache(cp.core);
-                        } else if (adminData.adminForm == AdminFormSpiderControl) {
-                            adminBody = cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, "Content Spider Control"), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
-                                addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                                errorContextMessage = "get Content Spider Control for Admin"
-                            });
-                        } else if (adminData.adminForm == AdminFormResourceLibrary) {
-                            adminBody = cp.core.html.getResourceLibrary("", false, "", "", true);
-                        } else if (adminData.adminForm == AdminFormQuickStats) {
-                            adminBody = (FormQuickStats.GetForm_QuickStats(cp.core));
-                        } else if (adminData.adminForm == AdminFormIndex) {
-                            adminBody = FormIndex.get(cp, cp.core, adminData, (adminData.adminContent.tableName.ToLowerInvariant() == "ccemail"));
-                        } else if (adminData.adminForm == AdminFormEdit) {
-                            adminBody = FormEdit.get(cp.core, adminData);
-                        } else if (adminData.adminForm == AdminFormClose) {
-                            Stream.Add("<Script Language=\"JavaScript\" type=\"text/javascript\"> window.close(); </Script>");
-                        } else if (adminData.adminForm == AdminFormContentChildTool) {
-                            adminBody = (GetContentChildTool(cp));
-                        } else if (adminData.adminForm == AdminformHousekeepingControl) {
-                            adminBody = (GetForm_HouseKeepingControl(cp));
-                        } else if (adminData.adminForm == AdminFormDownloads) {
-                            adminBody = (ToolDownloads.GetForm_Downloads(cp.core));
-                        } else if (adminData.adminForm == AdminformRSSControl) {
-                            adminBody = cp.core.webServer.redirect("?cid=" + ContentMetadataModel.getContentId(cp.core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
-                        } else if (adminData.adminForm == AdminFormImportWizard) {
-                            adminBody = cp.core.addon.execute(addonGuidImportWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
-                                addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                                errorContextMessage = "get Import Wizard for Admin"
-                            });
-                        } else if (adminData.adminForm == AdminFormCustomReports) {
-                            adminBody = ToolCustomReports.getForm_CustomReports(cp.core);
-                        } else if (adminData.adminForm == AdminFormFormWizard) {
-                            adminBody = cp.core.addon.execute(addonGuidFormWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
-                                addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                                errorContextMessage = "get Form Wizard for Admin"
-                            });
-                        } else if (adminData.adminForm == AdminFormLegacyAddonManager) {
-                            adminBody = AddonController.getAddonManager(cp.core);
-                        } else if (adminData.adminForm == AdminFormEditorConfig) {
-                            adminBody = FormEditConfig.getForm_EditConfig(cp.core);
-                        } else {
-                            adminBody = "<p>The form requested is not supported</p>";
+                        switch (adminData.adminForm) {
+                            case AdminFormToolConfigureEdit: {
+                                    adminBody = ConfigureContentEditClass.configureContentEdit(cp);
+                                    break;
+                                }
+                            case AdminFormToolConfigureListing: {
+                                    adminBody = 
+                                    break;
+                                }
+                            case AdminFormClearCache: {
+                                    adminBody = ToolClearCache.getForm_ClearCache(cp.core);
+                                    break;
+                                }
+                            case AdminFormResourceLibrary: {
+                                    adminBody = cp.core.html.getResourceLibrary("", false, "", "", true);
+                                    break;
+                                }
+                            case AdminFormQuickStats: {
+                                    adminBody = (FormQuickStats.GetForm_QuickStats(cp.core));
+                                    break;
+                                }
+                            case AdminFormIndex: {
+                                    adminBody = FormIndex.get(cp, cp.core, adminData, (adminData.adminContent.tableName.ToLowerInvariant() == "ccemail"));
+                                    break;
+                                }
+                            case AdminFormEdit: {
+                                    adminBody = FormEdit.get(cp.core, adminData);
+                                    break;
+                                }
+                            case AdminFormClose: {
+                                    Stream.Add("<Script Language=\"JavaScript\" type=\"text/javascript\"> window.close(); </Script>");
+                                    break;
+                                }
+                            case AdminFormContentChildTool: {
+                                    adminBody = (GetContentChildTool(cp));
+                                    break;
+                                }
+                            case AdminformHousekeepingControl: {
+                                    adminBody = (GetForm_HouseKeepingControl(cp));
+                                    break;
+                                }
+                            case AdminFormDownloads: {
+                                    adminBody = (ToolDownloads.GetForm_Downloads(cp.core));
+                                    break;
+                                }
+                            case AdminformRSSControl: {
+                                    adminBody = cp.core.webServer.redirect("?cid=" + ContentMetadataModel.getContentId(cp.core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
+                                    break;
+                                }
+                            case AdminFormImportWizard: {
+                                    adminBody = cp.core.addon.execute(addonGuidImportWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                                        addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
+                                        errorContextMessage = "get Import Wizard for Admin"
+                                    });
+                                    break;
+                                }
+                            case AdminFormCustomReports: {
+                                    adminBody = ToolCustomReports.getForm_CustomReports(cp.core);
+                                    break;
+                                }
+                            case AdminFormFormWizard: {
+                                    adminBody = cp.core.addon.execute(addonGuidFormWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                                        addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
+                                        errorContextMessage = "get Form Wizard for Admin"
+                                    });
+                                    break;
+                                }
+                            case AdminFormLegacyAddonManager: {
+                                    adminBody = AddonController.getAddonManager(cp.core);
+                                    break;
+                                }
+                            case AdminFormEditorConfig: {
+                                    adminBody = FormEditConfig.getForm_EditConfig(cp.core);
+                                    break;
+                                }
+                            default: {
+                                    adminBody = "<p>The form requested is not supported</p>";
+                                    break;
+                                }
                         }
                     } else if ((addonId != 0) || (!string.IsNullOrEmpty(AddonGuid)) || (!string.IsNullOrEmpty(AddonName))) {
                         //
@@ -2638,84 +2666,6 @@ namespace Contensive.Processor.Addons.AdminSite {
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
             }
-        }
-        //
-        //========================================================================
-        // Page Content Settings Page
-        //========================================================================
-        //
-        private string GetForm_BuildCollection(CPClass cp) {
-            string tempGetForm_BuildCollection = null;
-            try {
-                string Description = null;
-                StringBuilderLegacyController Content = new StringBuilderLegacyController();
-                string Button = null;
-                string ButtonList = null;
-                bool AllowAutoLogin = false;
-                string Copy = null;
-                Button = cp.core.docProperties.getText(RequestNameButton);
-                if (Button == ButtonCancel) {
-                    //
-                    // Cancel just exits with no content
-                    //
-                    return tempGetForm_BuildCollection;
-                } else if (!cp.core.session.isAuthenticatedAdmin()) {
-                    //
-                    // Not Admin Error
-                    //
-                    ButtonList = ButtonCancel;
-                    Content.Add(AdminUIController.getFormBodyAdminOnly());
-                } else {
-                    string tableBody = "";
-                    //
-                    // Set defaults
-                    //
-                    AllowAutoLogin = (cp.core.siteProperties.getBoolean("AllowAutoLogin", true));
-                    //
-                    // Process Requests
-                    //
-                    switch (Button) {
-                        case ButtonSave:
-                        case ButtonOK:
-                        //
-                        //
-                        //
-                        AllowAutoLogin = cp.core.docProperties.getBoolean("AllowAutoLogin");
-                        //
-                        cp.core.siteProperties.setProperty("AllowAutoLogin", GenericController.encodeText(AllowAutoLogin));
-                        break;
-                    }
-                    if (Button == ButtonOK) {
-                        //
-                        // Exit on OK or cancel
-                        //
-                        return tempGetForm_BuildCollection;
-                    }
-                    //
-                    // List Add-ons to include
-                    //
-
-                    Copy = HtmlController.checkbox("AllowAutoLogin", AllowAutoLogin);
-                    Copy += "<div>When checked, returning users are automatically logged-in, without requiring a username or password. This is very convenient, but creates a high security risk. Each time you login, you will be given the option to not allow Auto-Login from that computer.</div>";
-                    tableBody += (AdminUIController.getEditRowLegacy(cp.core, Copy, "Allow Auto Login", "", false, false, ""));
-                    //
-                    // Buttons
-                    //
-                    ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK;
-                    //
-                    // Close Tables
-                    //
-                    Content.Add(AdminUIController.editTable(tableBody));
-                    Content.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormBuilderCollection));
-                }
-                //
-                Description = "Use this tool to modify the site security settings";
-                tempGetForm_BuildCollection = AdminUIController.getToolBody(cp.core, "Security Settings", ButtonList, "", true, true, Description, "", 0, Content.Text);
-                Content = null;
-            } catch (Exception ex) {
-                LogController.logError(cp.core, ex);
-            }
-            return tempGetForm_BuildCollection;
         }
         //
         //=================================================================================
