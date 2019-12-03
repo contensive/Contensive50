@@ -251,12 +251,20 @@ namespace Contensive.Processor.Addons.AdminSite {
                         // No content so far, try the forms
                         // todo - convert this to switch
                         switch (adminData.adminForm) {
+                            case AdminFormIndex: {
+                                    adminBody = FormIndex.get(cp, cp.core, adminData, (adminData.adminContent.tableName.ToLowerInvariant() == "ccemail"));
+                                    break;
+                                }
+                            case AdminFormEdit: {
+                                    adminBody = FormEdit.get(cp.core, adminData);
+                                    break;
+                                }
                             case AdminFormToolConfigureEdit: {
-                                    adminBody = ConfigureContentEditClass.configureContentEdit(cp);
+                                    adminBody = ConfigureEditClass.configureContentEdit(cp);
                                     break;
                                 }
                             case AdminFormToolConfigureListing: {
-                                    adminBody = 
+                                    adminBody = ConfigureEditClass.configureContentEdit(cp);
                                     break;
                                 }
                             case AdminFormClearCache: {
@@ -269,14 +277,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 }
                             case AdminFormQuickStats: {
                                     adminBody = (FormQuickStats.GetForm_QuickStats(cp.core));
-                                    break;
-                                }
-                            case AdminFormIndex: {
-                                    adminBody = FormIndex.get(cp, cp.core, adminData, (adminData.adminContent.tableName.ToLowerInvariant() == "ccemail"));
-                                    break;
-                                }
-                            case AdminFormEdit: {
-                                    adminBody = FormEdit.get(cp.core, adminData);
                                     break;
                                 }
                             case AdminFormClose: {

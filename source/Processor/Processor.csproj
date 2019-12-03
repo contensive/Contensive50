@@ -64,12 +64,12 @@
     <Reference Include="ClearScript, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ClearScript.5.6.0\lib\net45\ClearScript.dll</HintPath>
     </Reference>
-    <Reference Include="ContensiveDbModels, Version=5.19.1202.10, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.5.19.1202.10\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.19.1203.1, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.5.19.1203.1\lib\net461\ContensiveDbModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1202.10\lib\net472\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1203.1\lib\net472\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -182,6 +182,13 @@
     <Compile Include="Addons\Tools\WebsiteFileManagerToolClass.cs" />
     <Compile Include="Addons\Tools\ContentFileManagerToolClass.cs" />
     <Compile Include="Addons\Tools\DbSchemaToolClass.cs" />
+    <Compile Include="Addons\Tools\ConfigureListClass.cs" />
+    <Compile Include="Addons\Tools\CreateContentDefinitionClass.cs" />
+    <Compile Include="Addons\Tools\CreateChildContentDefinitionClass.cs" />
+    <Compile Include="Addons\Tools\SyncTablesClass.cs" />
+    <Compile Include="Addons\Tools\DbIndexToolClass.cs" />
+    <Compile Include="Addons\Tools\ContentSchemaToolClass.cs" />
+    <Compile Include="Addons\Tools\LogFileToolClass.cs" />
     <Compile Include="Addons\Tools\_empty.cs" />
     <Compile Include="Controllers\CollectionFolderController.cs" />
     <Compile Include="Controllers\CollectionLibraryController.cs" />
@@ -264,7 +271,7 @@
     <Compile Include="Addons\Authentication\GetLoginPageClass.cs" />
     <Compile Include="Addons\PageManager\saveChildPageListDraggableClass.cs" />
     <Compile Include="Addons\PageManager\getHtmlBodyClass.cs" />
-    <Compile Include="Addons\Tools\ConfigureContentEditClass.cs" />
+    <Compile Include="Addons\Tools\ConfigureEditClass.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Controllers\AddonController.cs" />
     <Compile Include="Controllers\CollectionInstallController.cs" />
