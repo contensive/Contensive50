@@ -13,7 +13,7 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <param name="core"></param>
         /// <param name="adminData"></param>
         /// <returns></returns>
-        public static string get(CoreController core, AdminDataModel adminData) {
+        public static string get(CoreController core, AdminDataModel adminData, EditorEnvironmentModel editorEnv) {
             string tempGetForm_Edit_ContentTracking = null;
             try {
                 Contensive.Processor.Addons.AdminSite.Models.EditRecordModel editRecord = adminData.editRecord;

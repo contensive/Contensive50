@@ -6,6 +6,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Processor.Addons.AdminSite.Controllers;
 using System.Net;
 using Contensive.Models.Db;
+using System.Collections.Generic;
 
 namespace Contensive.Processor.Addons.AdminSite {
     public class FormEditTabControlInfo {
@@ -17,7 +18,7 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <param name="core"></param>
         /// <param name="adminData"></param>
         /// <returns></returns>
-        public static string get(CoreController core, AdminDataModel adminData) {
+        public static string get(CoreController core, AdminDataModel adminData, EditorEnvironmentModel editorEnv) {
             string result = null;
             try {
                 bool disabled = false;
@@ -40,6 +41,15 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 // ----- Authoring status
                 bool FieldRequired = false;
+
+
+                List<string> TabsFound = new List<string>();
+                foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
+                    ContentFieldMetadataModel field = keyValuePair.Value;
+                    if ((field.editTabName.ToLowerInvariant().Equals("control info")) && (field.authorable) && (field.active)) {
+                        tabPanel.Add(EditorRowClass.getEditorRow(core, field, adminData, editorEnv));
+                    }
+                }
                 //
                 // ----- RecordID
                 {
@@ -164,11 +174,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                     string fieldValue = "";
                     if (adminData.editRecord == null) {
                         fieldValue = "(not set)";
-                    } else if (adminData.editRecord.id == 0 )  {
+                    } else if (adminData.editRecord.id == 0) {
                         fieldValue = "(available after save)";
-                    } else if (adminData.editRecord.createdBy == null ) {
+                    } else if (adminData.editRecord.createdBy == null) {
                         fieldValue = "(not set)";
-                    } else { 
+                    } else {
                         int FieldValueInteger = adminData.editRecord.createdBy.id;
                         if (FieldValueInteger == 0) {
                             fieldValue = "(not set)";
