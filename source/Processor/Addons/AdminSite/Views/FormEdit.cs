@@ -160,9 +160,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                     IsRootPage = IsRootPage,
                     needUniqueEmailMessage = false,
                     record_readOnly = adminData.editRecord.userReadOnly,
-                    tabFieldList = "",
                     styleList = styleList,
-                    styleOptionList = ""
+                    styleOptionList = "",
+                    formFieldList = ""
                 };
                 //
                 LogController.logTrace(core, "getFormEdit, adminInfo.editRecord.contentControlId [" + adminData.editRecord.contentControlId + "]");
@@ -402,6 +402,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                     Stream.Add(EditSectionButtonBar);
                 }
+                Stream.Add(HtmlController.inputHidden("FormFieldList", editorEnv.formFieldList));
                 Stream.Add("</form>");
                 returnHtml = Stream.Text;
                 if (adminData.editRecord.id == 0) {

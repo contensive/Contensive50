@@ -131,7 +131,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (useEditorAddon) {
                     //
                     // -- editor worked
-                    editorEnv.tabFieldList += "," + field.nameLc;
+                    editorEnv.formFieldList += "," + field.nameLc;
                 } else {
                     //
                     // -- editor failed, determine if it is missing (or inactive). If missing, remove it from the members preferences
@@ -203,353 +203,381 @@ namespace Contensive.Processor.Addons.AdminSite {
                     switch (fieldTypeId) {
                         case CPContentBaseClass.FieldTypeIdEnum.Text:
                         case CPContentBaseClass.FieldTypeIdEnum.Link:
-                        case CPContentBaseClass.FieldTypeIdEnum.ResourceLink:
-                        //
-                        // ----- Text Type
-                        EditorString += AdminUIController.getDefaultEditor_text(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId);
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                        //
-                        // ----- Boolean ReadOnly
-                        EditorString += AdminUIController.getDefaultEditor_bool(core, field.nameLc, GenericController.encodeBoolean(fieldValueObject), editorReadOnly, fieldHtmlId);
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                        //
-                        // ----- Lookup, readonly
-                        if (field.lookupContentId != 0) {
-                            EditorString = AdminUIController.getDefaultEditor_lookupContent(core, field.nameLc, GenericController.encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
-                            editorEnv.tabFieldList += "," + field.nameLc;
-                        } else if (field.lookupList != "") {
-                            EditorString = AdminUIController.getDefaultEditor_lookupList(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(','), editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
-                            editorEnv.tabFieldList += "," + field.nameLc;
-                        } else {
-                            //
-                            // -- log exception but dont throw
-                            LogController.logWarn(core, new GenericException("Field [" + adminData.adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
-                            EditorString += "[Selection not configured]";
-                        }
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.Date:
-                        //
-                        // ----- date, readonly
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        EditorString = AdminUIController.getDefaultEditor_dateTime(core, field.nameLc, encodeDate(fieldValueObject), editorReadOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
-                        //
-                        // ----- Member Select ReadOnly
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        EditorString = AdminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValueObject), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), editorReadOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
-                        //
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                        //
-                        //   Placeholder
-                        EditorString = AdminUIController.getDefaultEditor_manyToMany(core, field, "field" + field.id, fieldValue_text, editRecord.id, editorReadOnly, WhyReadOnlyMsg);
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                        //
-                        // ----- Currency ReadOnly
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        FieldValueNumber = GenericController.encodeNumber(fieldValueObject);
-                        EditorString += (HtmlController.inputHidden(field.nameLc, GenericController.encodeText(FieldValueNumber)));
-                        EditorString += (HtmlController.inputNumber(core, field.nameLc, FieldValueNumber, fieldHtmlId, "text form-control", editorReadOnly, false));
-                        EditorString += WhyReadOnlyMsg;
-                        //
-                        break;
+                        case CPContentBaseClass.FieldTypeIdEnum.ResourceLink: {
+                                //
+                                // ----- Text Type
+                                EditorString += AdminUIController.getDefaultEditor_text(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId);
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                                //
+                                // ----- Boolean ReadOnly
+                                EditorString += AdminUIController.getDefaultEditor_bool(core, field.nameLc, GenericController.encodeBoolean(fieldValueObject), editorReadOnly, fieldHtmlId);
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
+                                //
+                                // ----- Lookup, readonly
+                                if (field.lookupContentId != 0) {
+                                    EditorString = AdminUIController.getDefaultEditor_lookupContent(core, field.nameLc, GenericController.encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                    editorEnv.formFieldList += "," + field.nameLc;
+                                } else if (field.lookupList != "") {
+                                    EditorString = AdminUIController.getDefaultEditor_lookupList(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(','), editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                    editorEnv.formFieldList += "," + field.nameLc;
+                                } else {
+                                    //
+                                    // -- log exception but dont throw
+                                    LogController.logWarn(core, new GenericException("Field [" + adminData.adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
+                                    EditorString += "[Selection not configured]";
+                                }
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                                //
+                                // ----- date, readonly
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                EditorString = AdminUIController.getDefaultEditor_dateTime(core, field.nameLc, encodeDate(fieldValueObject), editorReadOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
+                                //
+                                // ----- Member Select ReadOnly
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                EditorString = AdminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValueObject), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), editorReadOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                //
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                                //
+                                //   Placeholder
+                                EditorString = AdminUIController.getDefaultEditor_manyToMany(core, field, "field" + field.id, fieldValue_text, editRecord.id, editorReadOnly, WhyReadOnlyMsg);
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.Currency: {
+                                //
+                                // ----- Currency ReadOnly
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                FieldValueNumber = GenericController.encodeNumber(fieldValueObject);
+                                EditorString += (HtmlController.inputHidden(field.nameLc, GenericController.encodeText(FieldValueNumber)));
+                                EditorString += (HtmlController.inputNumber(core, field.nameLc, FieldValueNumber, fieldHtmlId, "text form-control", editorReadOnly, false));
+                                EditorString += WhyReadOnlyMsg;
+                                //
+                                break;
+                            }
                         case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
                         case CPContentBaseClass.FieldTypeIdEnum.Float:
-                        case CPContentBaseClass.FieldTypeIdEnum.Integer:
-                        //
-                        // ----- number readonly
-                        //
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        FieldValueNumber = GenericController.encodeNumber(fieldValueObject);
-                        EditorString += (HtmlController.inputHidden(field.nameLc, fieldValue_text));
-                        EditorString += (HtmlController.inputNumber(core, field.nameLc, FieldValueNumber, fieldHtmlId, "text form-control", editorReadOnly, false));
-                        EditorString += WhyReadOnlyMsg;
-                        //
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.HTML:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                        //
-                        // ----- HTML types readonly
-                        if (field.htmlContent) {
-                            //
-                            // edit html as html (see the code)
-                            editorEnv.tabFieldList += "," + field.nameLc;
-                            EditorString += HtmlController.inputHidden(field.nameLc, fieldValue_text);
-                            FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                            EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, editorReadOnly, "form-control");
-                        } else {
-                            //
-                            // edit html as wysiwyg readonly
-                            editorEnv.tabFieldList += "," + field.nameLc;
-                            EditorString += AdminUIController.getDefaultEditor_Html(core, field.nameLc, fieldValue_text, editorEnv.editorAddonListJSON, editorEnv.styleList, editorEnv.styleOptionList, editorReadOnly, fieldHtmlId);
-                        }
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileText:
-                        //
-                        // ----- LongText, TextFile
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        EditorString += HtmlController.inputHidden(field.nameLc, fieldValue_text);
-                        FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                        EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, editorReadOnly, " form-control");
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.File:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileImage:
-                        //
-                        // ----- File ReadOnly
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        NonEncodedLink = GenericController.getCdnFileLink(core, fieldValue_text);
-                        EncodedLink = System.Net.WebUtility.HtmlEncode(NonEncodedLink);
-                        EditorString += (HtmlController.inputHidden(field.nameLc, ""));
-                        if (string.IsNullOrEmpty(fieldValue_text)) {
-                            EditorString += ("[no file]");
-                        } else {
-                            string filename = "";
-                            string path = "";
-                            core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
-                            EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + Processor.Constants.SpanClassAdminSmall + "[" + filename + "]</A>");
-                        }
-                        EditorString += WhyReadOnlyMsg;
-                        //
-                        break;
-                        default:
-                        //
-                        // ----- Legacy text type -- not used unless something was missed
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        EditorString += HtmlController.inputHidden(field.nameLc, fieldValue_text);
-                        if (field.password) {
-                            //
-                            // Password forces simple text box
-                            EditorString += HtmlController.inputText_Legacy(core, field.nameLc, "*****", 0, 0, fieldHtmlId, true, true, "password form-control");
-                        } else if (!field.htmlContent) {
-                            //
-                            // not HTML capable, textarea with resizing
-                            if ((fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Text) && (fieldValue_text.IndexOf("\n") == -1) && (fieldValue_text.Length < 40)) {
+                        case CPContentBaseClass.FieldTypeIdEnum.Integer: {
                                 //
-                                // text field shorter then 40 characters without a CR
-                                EditorString += HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 0, fieldHtmlId, false, true, "text form-control");
-                            } else {
+                                // ----- number readonly
                                 //
-                                // longer text data, or text that contains a CR
-                                EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, fieldHtmlId, false, true, " form-control");
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                FieldValueNumber = GenericController.encodeNumber(fieldValueObject);
+                                EditorString += (HtmlController.inputHidden(field.nameLc, fieldValue_text));
+                                EditorString += (HtmlController.inputNumber(core, field.nameLc, FieldValueNumber, fieldHtmlId, "text form-control", editorReadOnly, false));
+                                EditorString += WhyReadOnlyMsg;
+                                //
+                                break;
                             }
-                        } else if (field.htmlContent) {
-                            //
-                            // HTMLContent true, and prefered
-                            FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".PixelHeight", 500));
-                            EditorString += core.html.getFormInputHTML(field.nameLc, fieldValue_text, "500", "", false, true, editorEnv.editorAddonListJSON, editorEnv.styleList, editorEnv.styleOptionList);
-                            EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
-                        } else {
-                            //
-                            // HTMLContent true, but text editor selected
-                            FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                            EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, editorReadOnly);
-                        }
-                        break;
+                        case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                                //
+                                // ----- HTML types readonly
+                                if (field.htmlContent) {
+                                    //
+                                    // edit html as html (see the code)
+                                    editorEnv.formFieldList += "," + field.nameLc;
+                                    EditorString += HtmlController.inputHidden(field.nameLc, fieldValue_text);
+                                    FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                    EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, editorReadOnly, "form-control");
+                                } else {
+                                    //
+                                    // edit html as wysiwyg readonly
+                                    editorEnv.formFieldList += "," + field.nameLc;
+                                    EditorString += AdminUIController.getDefaultEditor_Html(core, field.nameLc, fieldValue_text, editorEnv.editorAddonListJSON, editorEnv.styleList, editorEnv.styleOptionList, editorReadOnly, fieldHtmlId);
+                                }
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.LongText:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileText: {
+                                //
+                                // ----- LongText, TextFile
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                EditorString += HtmlController.inputHidden(field.nameLc, fieldValue_text);
+                                FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, editorReadOnly, " form-control");
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.File:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
+                                //
+                                // ----- File ReadOnly
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                NonEncodedLink = GenericController.getCdnFileLink(core, fieldValue_text);
+                                EncodedLink = System.Net.WebUtility.HtmlEncode(NonEncodedLink);
+                                EditorString += (HtmlController.inputHidden(field.nameLc, ""));
+                                if (string.IsNullOrEmpty(fieldValue_text)) {
+                                    EditorString += ("[no file]");
+                                } else {
+                                    string filename = "";
+                                    string path = "";
+                                    core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
+                                    EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + Processor.Constants.SpanClassAdminSmall + "[" + filename + "]</A>");
+                                }
+                                EditorString += WhyReadOnlyMsg;
+                                //
+                                break;
+                            }
+                        default: {
+                                //
+                                // ----- Legacy text type -- not used unless something was missed
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                EditorString += HtmlController.inputHidden(field.nameLc, fieldValue_text);
+                                if (field.password) {
+                                    //
+                                    // Password forces simple text box
+                                    EditorString += HtmlController.inputText_Legacy(core, field.nameLc, "*****", 0, 0, fieldHtmlId, true, true, "password form-control");
+                                } else if (!field.htmlContent) {
+                                    //
+                                    // not HTML capable, textarea with resizing
+                                    if ((fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Text) && (fieldValue_text.IndexOf("\n") == -1) && (fieldValue_text.Length < 40)) {
+                                        //
+                                        // text field shorter then 40 characters without a CR
+                                        EditorString += HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 0, fieldHtmlId, false, true, "text form-control");
+                                    } else {
+                                        //
+                                        // longer text data, or text that contains a CR
+                                        EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, fieldHtmlId, false, true, " form-control");
+                                    }
+                                } else if (field.htmlContent) {
+                                    //
+                                    // HTMLContent true, and prefered
+                                    FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".PixelHeight", 500));
+                                    EditorString += core.html.getFormInputHTML(field.nameLc, fieldValue_text, "500", "", false, true, editorEnv.editorAddonListJSON, editorEnv.styleList, editorEnv.styleOptionList);
+                                    EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
+                                } else {
+                                    //
+                                    // HTMLContent true, but text editor selected
+                                    FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                    EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, editorReadOnly);
+                                }
+                                break;
+                            }
                     }
                 } else {
                     //
                     // -- Not Read Only - Display fields as form elements to be modified
                     switch (fieldTypeId) {
-                        case CPContentBaseClass.FieldTypeIdEnum.Text:
-                        //
-                        // ----- Text Type
-                        if (field.password) {
-                            EditorString += AdminUIController.getDefaultEditor_Password(core, field.nameLc, fieldValue_text, false, fieldHtmlId);
-                        } else {
-                            EditorString += AdminUIController.getDefaultEditor_text(core, field.nameLc, fieldValue_text, false, fieldHtmlId);
-                        }
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                        //
-                        // ----- Boolean
-                        EditorString += AdminUIController.getDefaultEditor_bool(core, field.nameLc, GenericController.encodeBoolean(fieldValueObject), false, fieldHtmlId);
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                        //
-                        // ----- Lookup
-                        if (field.lookupContentId != 0) {
-                            EditorString = AdminUIController.getDefaultEditor_lookupContent(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
-                            editorEnv.tabFieldList += "," + field.nameLc;
-                        } else if (field.lookupList != "") {
-                            EditorString = AdminUIController.getDefaultEditor_lookupList(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(','), field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
-                            editorEnv.tabFieldList += "," + field.nameLc;
-                        } else {
-                            //
-                            // -- log exception but dont throw
-                            LogController.logWarn(core, new GenericException("Field [" + adminData.adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
-                            EditorString += "[Selection not configured]";
-                        }
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.Date:
-                        //
-                        // ----- Date
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        EditorString = AdminUIController.getDefaultEditor_dateTime(core, field.nameLc, GenericController.encodeDate(fieldValueObject), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
-                        //
-                        // ----- Member Select
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        EditorString = AdminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValueObject), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                        //
-                        //   Placeholder
-                        EditorString = AdminUIController.getDefaultEditor_manyToMany(core, field, "field" + field.id, fieldValue_text, editRecord.id, false, WhyReadOnlyMsg);
-                        break;
+                        case CPContentBaseClass.FieldTypeIdEnum.Text: {
+                                //
+                                // ----- Text Type
+                                if (field.password) {
+                                    EditorString += AdminUIController.getDefaultEditor_Password(core, field.nameLc, fieldValue_text, false, fieldHtmlId);
+                                } else {
+                                    EditorString += AdminUIController.getDefaultEditor_text(core, field.nameLc, fieldValue_text, false, fieldHtmlId);
+                                }
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                                //
+                                // ----- Boolean
+                                EditorString += AdminUIController.getDefaultEditor_bool(core, field.nameLc, GenericController.encodeBoolean(fieldValueObject), false, fieldHtmlId);
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
+                                //
+                                // ----- Lookup
+                                if (field.lookupContentId != 0) {
+                                    EditorString = AdminUIController.getDefaultEditor_lookupContent(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                    editorEnv.formFieldList += "," + field.nameLc;
+                                } else if (field.lookupList != "") {
+                                    EditorString = AdminUIController.getDefaultEditor_lookupList(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(','), field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                    editorEnv.formFieldList += "," + field.nameLc;
+                                } else {
+                                    //
+                                    // -- log exception but dont throw
+                                    LogController.logWarn(core, new GenericException("Field [" + adminData.adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
+                                    EditorString += "[Selection not configured]";
+                                }
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                                //
+                                // ----- Date
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                EditorString = AdminUIController.getDefaultEditor_dateTime(core, field.nameLc, GenericController.encodeDate(fieldValueObject), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
+                                //
+                                // ----- Member Select
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                EditorString = AdminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValueObject), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                                //
+                                //   Placeholder
+                                EditorString = AdminUIController.getDefaultEditor_manyToMany(core, field, "field" + field.id, fieldValue_text, editRecord.id, false, WhyReadOnlyMsg);
+                                break;
+                            }
                         case CPContentBaseClass.FieldTypeIdEnum.File:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileImage:
-                        //
-                        // ----- File
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        if (string.IsNullOrEmpty(fieldValue_text)) {
-                            EditorString += (core.html.inputFile(field.nameLc, "", "file form-control"));
-                        } else {
-                            NonEncodedLink = GenericController.getCdnFileLink(core, fieldValue_text);
-                            EncodedLink = HtmlController.encodeHtml(NonEncodedLink);
-                            string filename = "";
-                            string path = "";
-                            core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
-                            EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
-                            EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + HtmlController.checkbox(field.nameLc + ".DeleteFlag", false));
-                            EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(field.nameLc, fieldHtmlId, "file form-control"));
-                        }
-                        //
-                        break;
+                        case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
+                                //
+                                // ----- File
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                if (string.IsNullOrEmpty(fieldValue_text)) {
+                                    EditorString += (core.html.inputFile(field.nameLc, "", "file form-control"));
+                                } else {
+                                    NonEncodedLink = GenericController.getCdnFileLink(core, fieldValue_text);
+                                    EncodedLink = HtmlController.encodeHtml(NonEncodedLink);
+                                    string filename = "";
+                                    string path = "";
+                                    core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
+                                    EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
+                                    EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + HtmlController.checkbox(field.nameLc + ".DeleteFlag", false));
+                                    EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(field.nameLc, fieldHtmlId, "file form-control"));
+                                }
+                                //
+                                break;
+                            }
                         case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
                         case CPContentBaseClass.FieldTypeIdEnum.Currency:
                         case CPContentBaseClass.FieldTypeIdEnum.Float:
-                        case CPContentBaseClass.FieldTypeIdEnum.Integer:
-                        //
-                        // ----- Others that simply print
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        if (field.password) {
-                            EditorString += (HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, true, false, "password form-control"));
-                        } else {
-                            if (string.IsNullOrEmpty(fieldValue_text)) {
-                                EditorString += (HtmlController.inputNumber(core, field.nameLc, null, fieldHtmlId, "text form-control", editorReadOnly, false));
-                            } else {
-                                EditorString += (HtmlController.inputNumber(core, field.nameLc, encodeNumber(fieldValue_text), fieldHtmlId, "text form-control", editorReadOnly, false));
+                        case CPContentBaseClass.FieldTypeIdEnum.Integer: {
+                                //
+                                // ----- Others that simply print
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                if (field.password) {
+                                    EditorString += (HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, true, false, "password form-control"));
+                                } else {
+                                    if (string.IsNullOrEmpty(fieldValue_text)) {
+                                        EditorString += (HtmlController.inputNumber(core, field.nameLc, null, fieldHtmlId, "text form-control", editorReadOnly, false));
+                                    } else {
+                                        EditorString += (HtmlController.inputNumber(core, field.nameLc, encodeNumber(fieldValue_text), fieldHtmlId, "text form-control", editorReadOnly, false));
+                                    }
+                                }
+                                break;
                             }
-                        }
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.Link:
-                        //
-                        // ----- Link (href value
-                        //
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        EditorString = ""
-                            + HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"" + cdnPrefix + "images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
-                            + "&nbsp;<a href=\"#\" onClick=\"OpenSiteExplorerWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"" + cdnPrefix + "images/PageLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a page\" title=\"Link to a page\"></a>";
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.ResourceLink:
-                        //
-                        // ----- Resource Link (src value)
-                        //
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        EditorString = HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"" + cdnPrefix + "images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
-                        break;
+                        case CPContentBaseClass.FieldTypeIdEnum.Link: {
+                                //
+                                // ----- Link (href value
+                                //
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                EditorString = ""
+                                    + HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"" + cdnPrefix + "images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
+                                    + "&nbsp;<a href=\"#\" onClick=\"OpenSiteExplorerWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"" + cdnPrefix + "images/PageLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a page\" title=\"Link to a page\"></a>";
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.ResourceLink: {
+                                //
+                                // ----- Resource Link (src value)
+                                //
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                EditorString = HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"" + cdnPrefix + "images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
+                                break;
+                            }
                         case CPContentBaseClass.FieldTypeIdEnum.HTML:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                        //
-                        // content is html
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        if (field.htmlContent) {
-                            //
-                            // View the content as Html, not wysiwyg
-                            EditorString = AdminUIController.getDefaultEditor_TextArea(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId);
-                        } else {
-                            //
-                            // wysiwyg editor
-                            EditorString = AdminUIController.getDefaultEditor_Html(core, field.nameLc, fieldValue_text, editorEnv.editorAddonListJSON, editorEnv.styleList, editorEnv.styleOptionList, editorReadOnly, fieldHtmlId);
-                        }
-                        //
-                        break;
+                        case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                                //
+                                // content is html
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                if (field.htmlContent) {
+                                    //
+                                    // View the content as Html, not wysiwyg
+                                    EditorString = AdminUIController.getDefaultEditor_TextArea(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId);
+                                } else {
+                                    //
+                                    // wysiwyg editor
+                                    EditorString = AdminUIController.getDefaultEditor_Html(core, field.nameLc, fieldValue_text, editorEnv.editorAddonListJSON, editorEnv.styleList, editorEnv.styleOptionList, editorReadOnly, fieldHtmlId);
+                                }
+                                //
+                                break;
+                            }
                         case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileText:
-                        //
-                        // -- Long Text, use text editor
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, false, "text form-control");
-                        //
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
-                        //
-                        // ----- CSS field
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, fieldHtmlId, false, false, "styles form-control");
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                        //
-                        // ----- Javascript field
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, false, "text form-control");
-                        //
-                        break;
-                        case CPContentBaseClass.FieldTypeIdEnum.FileXML:
-                        //
-                        // ----- xml field
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, false, "text form-control");
-                        //
-                        break;
-                        default:
-                        //
-                        // ----- Legacy text type -- not used unless something was missed
-                        //
-                        editorEnv.tabFieldList += "," + field.nameLc;
-                        if (field.password) {
-                            //
-                            // Password forces simple text box
-                            EditorString = HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, true, false, "password form-control");
-                        } else if (!field.htmlContent) {
-                            //
-                            // not HTML capable, textarea with resizing
-                            //
-                            if ((fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Text) && (fieldValue_text.IndexOf("\n") == -1) && (fieldValue_text.Length < 40)) {
+                        case CPContentBaseClass.FieldTypeIdEnum.FileText: {
                                 //
-                                // text field shorter then 40 characters without a CR
+                                // -- Long Text, use text editor
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, false, "text form-control");
                                 //
-                                EditorString = HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, -1, fieldHtmlId, false, false, "text form-control");
-                            } else {
-                                //
-                                // longer text data, or text that contains a CR
-                                //
-                                EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, fieldHtmlId, false, false, "text form-control");
+                                break;
                             }
-                        } else if (field.htmlContent) {
-                            //
-                            // HTMLContent true, and prefered
-                            //
-                            if (string.IsNullOrEmpty(fieldValue_text)) {
+                        case CPContentBaseClass.FieldTypeIdEnum.FileCSS: {
                                 //
-                                // editor needs a starting p tag to setup correctly
-                                //
-                                fieldValue_text = HTMLEditorDefaultCopyNoCr;
+                                // ----- CSS field
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, fieldHtmlId, false, false, "styles form-control");
+                                break;
                             }
-                            FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".PixelHeight", 500));
-                            EditorString += core.html.getFormInputHTML(field.nameLc, fieldValue_text, "500", "", false, true, editorEnv.editorAddonListJSON, editorEnv.styleList, editorEnv.styleOptionList);
-                            EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
-                        } else {
-                            //
-                            // HTMLContent true, but text editor selected
-                            FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                            EditorString = HtmlController.inputTextarea(core, field.nameLc, HtmlController.encodeHtml(fieldValue_text), FieldRows, -1, fieldHtmlId, false, false, "text");
-                        }
-                        break;
+                        case CPContentBaseClass.FieldTypeIdEnum.FileJavascript: {
+                                //
+                                // ----- Javascript field
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, false, "text form-control");
+                                //
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.FileXML: {
+                                //
+                                // ----- xml field
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, false, "text form-control");
+                                //
+                                break;
+                            }
+                        default: {
+                                //
+                                // ----- Legacy text type -- not used unless something was missed
+                                //
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                if (field.password) {
+                                    //
+                                    // Password forces simple text box
+                                    EditorString = HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, true, false, "password form-control");
+                                } else if (!field.htmlContent) {
+                                    //
+                                    // not HTML capable, textarea with resizing
+                                    //
+                                    if ((fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Text) && (fieldValue_text.IndexOf("\n") == -1) && (fieldValue_text.Length < 40)) {
+                                        //
+                                        // text field shorter then 40 characters without a CR
+                                        //
+                                        EditorString = HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, -1, fieldHtmlId, false, false, "text form-control");
+                                    } else {
+                                        //
+                                        // longer text data, or text that contains a CR
+                                        //
+                                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, fieldHtmlId, false, false, "text form-control");
+                                    }
+                                } else if (field.htmlContent) {
+                                    //
+                                    // HTMLContent true, and prefered
+                                    //
+                                    if (string.IsNullOrEmpty(fieldValue_text)) {
+                                        //
+                                        // editor needs a starting p tag to setup correctly
+                                        //
+                                        fieldValue_text = HTMLEditorDefaultCopyNoCr;
+                                    }
+                                    FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".PixelHeight", 500));
+                                    EditorString += core.html.getFormInputHTML(field.nameLc, fieldValue_text, "500", "", false, true, editorEnv.editorAddonListJSON, editorEnv.styleList, editorEnv.styleOptionList);
+                                    EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
+                                } else {
+                                    //
+                                    // HTMLContent true, but text editor selected
+                                    FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                    EditorString = HtmlController.inputTextarea(core, field.nameLc, HtmlController.encodeHtml(fieldValue_text), FieldRows, -1, fieldHtmlId, false, false, "text");
+                                }
+                                break;
+                            }
                     }
                 }
             }
@@ -710,12 +738,10 @@ namespace Contensive.Processor.Addons.AdminSite {
         public bool IsLandingPage;
         public bool IsRootPage;
         public bool record_readOnly;
-        public string tabFieldList;
         public string editorAddonListJSON;
         public string styleList;
         public string styleOptionList;
-        //public string RequestNameTitleExtension;
-        //public string RequestNameAdminDepth;
         public bool AllowHelpMsgCustom;
+        public string formFieldList;
     }
 }

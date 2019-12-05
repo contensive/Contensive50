@@ -162,10 +162,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                     editorEnv.AllowHelpMsgCustom = true;
                 }
                 //
-                string FormFieldList = ",";
+                //string FormFieldList = ",";
                 List<string> TabsFound = new List<string>();
                 foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
-                    editorEnv.tabFieldList = "";
+                    //editorEnv.tabFieldList = "";
                     ContentFieldMetadataModel field = keyValuePair.Value;
                     if ((!field.editTabName.ToLowerInvariant().Equals("control info")) && (field.authorable) && (field.active) && (!TabsFound.Contains(field.editTabName.ToLowerInvariant()))) {
                         TabsFound.Add(field.editTabName.ToLowerInvariant());
@@ -175,10 +175,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                         if (!string.IsNullOrEmpty(tabContent)) {
                             returnHtml += addTab(core, adminMenu, editTabCaption, tabContent, adminData.allowAdminTabs);
                         }
-                        if (!string.IsNullOrEmpty(editorEnv.tabFieldList)) { FormFieldList = editorEnv.tabFieldList + FormFieldList; }
+                        //if (!string.IsNullOrEmpty(editorEnv.tabFieldList)) { editorEnv.FormFieldList = editorEnv.tabFieldList + editorEnv.FormFieldList; }
                     }
                 }
-                returnHtml += HtmlController.inputHidden("FormFieldList", FormFieldList);
+                //returnHtml += HtmlController.inputHidden("FormFieldList", FormFieldList);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
