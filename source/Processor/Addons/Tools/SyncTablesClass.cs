@@ -21,14 +21,14 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
-            return GetForm_SyncTables(((CPClass)cpBase).core);
+            return get(((CPClass)cpBase).core);
         }
         //=============================================================================
         /// <summary>
         /// Go through all Content Definitions and create appropriate tables and fields.
         /// </summary>
         /// <returns></returns>
-        private string GetForm_SyncTables(CoreController core) {
+        public static string get(CoreController core) {
             string returnValue = "";
             try {
                 Processor.Models.Domain.ContentMetadataModel metadata = null;

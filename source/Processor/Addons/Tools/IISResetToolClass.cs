@@ -21,12 +21,12 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
-            return GetForm_IISReset(((CPClass)cpBase).core);
+            return get(((CPClass)cpBase).core);
         }
 
         //=============================================================================
         // todo change iisreset to an addon
-        private string GetForm_IISReset(CoreController core) {
+        public static string get(CoreController core) {
             string result = "";
             try {
                 string Button = null;

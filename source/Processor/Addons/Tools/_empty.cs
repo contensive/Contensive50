@@ -21,7 +21,7 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
-            return getTool(((CPClass)cpBase).core);
+            return get(((CPClass)cpBase).core);
         }
         //
         /// <summary>
@@ -30,7 +30,7 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         //
-        public static string getTool(CoreController core) {
+        public static string get(CoreController core) {
 
             return string.Empty;
 

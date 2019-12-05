@@ -21,20 +21,12 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
-            return GetForm_CreateContentDefinition(((CPClass)cpBase).core);
+            return get(((CPClass)cpBase).core);
         }
         //
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <returns></returns>
+        //====================================================================================================
         //
-        //=============================================================================
-        // Create a Content Definition from a table
-        //=============================================================================
-        //
-        private string GetForm_CreateContentDefinition(CoreController core ) {
+        public static string get(CoreController core ) {
             string result = "";
             try {
                 //

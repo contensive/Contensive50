@@ -1482,6 +1482,13 @@ div.ccDialogPageNotFound {
     border-radius: 6px; 
     box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.15);
 }
+.iconDefault i {
+    font-size: 30px;
+    line-height: 60px;
+    background-color: #54b752;
+    color: white ! important;
+}
+
 .iconContentDefault {
     display: inline-block;
     font-size: 30px;
@@ -1493,6 +1500,12 @@ div.ccDialogPageNotFound {
     border-radius: 6px; 
     box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.15);
 }
+.iconContentDefault i {
+    font-size: 30px;
+    line-height: 60px;
+    background-color: #54b752;
+    color: white ! important;
+}
 .iconAddonDefault {
     display: inline-block;
     font-size: 30px;
@@ -1503,7 +1516,14 @@ div.ccDialogPageNotFound {
     height: 60px;
     border-radius: 6px; 
     box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.15);
-    }
+}
+.iconAddonDefault i {
+    font-size: 30px;
+    line-height: 60px;
+    background-color: #54b752;
+    color: white ! important;
+}
+
 /*
 * pagemanager quick edit mode
 */

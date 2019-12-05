@@ -19,14 +19,14 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
-            return getTool(((CPClass)cpBase).core);
+            return get(((CPClass)cpBase).core);
         }
         //
         //=============================================================================
         // GUID Tools
         //=============================================================================
         //
-        private string getTool(CoreController core) {
+        public static string get(CoreController core) {
             string result = "";
             try {
                 string Button = null;

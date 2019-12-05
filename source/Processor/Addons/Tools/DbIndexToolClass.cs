@@ -22,13 +22,13 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
-            return GetForm_DbIndex(((CPClass)cpBase).core);
+            return get(((CPClass)cpBase).core);
         }
         //=============================================================================
         //   Print the manual query form
         //=============================================================================
         //
-        private string GetForm_DbIndex(CoreController core ) {
+        public static string get(CoreController core ) {
             string result = null;
             try {
                 //

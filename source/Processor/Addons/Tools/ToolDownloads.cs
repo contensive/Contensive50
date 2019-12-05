@@ -12,7 +12,7 @@ namespace Contensive.Processor.Addons.AdminSite {
         //
         //========================================================================
         //
-        public static string GetForm_Downloads(CoreController core) {
+        public static string get(CoreController core) {
             string tempGetForm_Downloads = null;
             try {
                 //

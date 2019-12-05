@@ -6,13 +6,9 @@ using static Contensive.Processor.Constants;
 namespace Contensive.Processor.Addons.AdminSite {
     public class FormQuickStats {
         //
-        //========================================================================
+        //====================================================================================================
         //
-        //========================================================================
-        //   Print the root form
-        //========================================================================
-        //
-        public static string GetForm_QuickStats( CoreController core )  {
+        public static string get( CoreController core )  {
             string tempGetForm_QuickStats = null;
             try {
                 string sql = null;
@@ -24,8 +20,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 //
                 // --- Start a form to make a refresh button
-                //
-                //Stream.Add(htmlController.form_start(core));
                 Stream.Add(core.html.getPanelButtons(ButtonCancel + "," + ButtonRefresh));
                 Stream.Add("<input TYPE=\"hidden\" NAME=\"asf\" VALUE=\"" + AdminFormQuickStats + "\">");
                 Stream.Add(core.html.getPanel(" "));
@@ -40,11 +34,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 Stream.Add("<h2>Visits Today</h2>");
                 Stream.Add("<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\" style=\"background-color:white;border-top:1px solid #888;\">");
-                //Stream.Add( "<tr"">")
-                //Stream.Add( "<td width=""150""><img alt=""space"" src=""" + cdnPrefix + "images/spacer.gif"" width=""140"" height=""1"" ></td>")
-                //Stream.Add( "<td width=""150""><img alt=""space"" src=""" + cdnPrefix + "images/spacer.gif"" width=""140"" height=""1"" ></td>")
-                //Stream.Add( "<td width=""100%""><img alt=""space"" src=""" + cdnPrefix + "images/spacer.gif"" width=""100%"" height=""1"" ></td>")
-                //Stream.Add( "</tr>")
                 //
                 // ----- All Visits Today
                 //

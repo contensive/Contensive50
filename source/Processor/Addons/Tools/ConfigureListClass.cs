@@ -25,14 +25,12 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
-            return getForm_ConfigureListing(((CPClass)cpBase).core);
+            return get(((CPClass)cpBase).core);
         }
         //
-        //=============================================================================
-        //   Print the Configure Listing Page
-        //=============================================================================
+        //====================================================================================================
         //
-        public static  string getForm_ConfigureListing(CoreController core) {
+        public static  string get(CoreController core) {
             string result = "";
             try {
                 string Button = core.docProperties.getText("Button");

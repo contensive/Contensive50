@@ -22,7 +22,7 @@ namespace Contensive.Processor.Addons.Primitives {
         //
         //====================================================================================================
         /// <summary>
-        /// getFieldEditorPreference remote method
+        /// Process Login
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
@@ -39,7 +39,7 @@ namespace Contensive.Processor.Addons.Primitives {
                     addonType = CPUtilsBaseClass.addonContext.ContextPage,
                     argumentKeyValuePairs = addonArguments,
                     forceHtmlDocument = true,
-                     errorContextMessage = "get field editor preference remote"
+                     errorContextMessage = "Process Login"
                 });
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

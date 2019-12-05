@@ -6,12 +6,9 @@ using Contensive.Processor.Controllers;
 namespace Contensive.Processor.Addons.AdminSite {
     class ToolClearCache {
         //
+        //====================================================================================================
         //
-        //========================================================================
-        //
-        //========================================================================
-        //
-        public static string getForm_ClearCache(CoreController core) {
+        public static string get(CoreController core) {
             string returnHtml = "";
             try {
                 StringBuilderLegacyController Content = new StringBuilderLegacyController();

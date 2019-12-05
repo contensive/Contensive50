@@ -251,6 +251,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         // No content so far, try the forms
                         // todo - convert this to switch
                         switch (adminData.adminForm) {
+                            //
                             case AdminFormIndex: {
                                     adminBody = FormIndex.get(cp, cp.core, adminData, (adminData.adminContent.tableName.ToLowerInvariant() == "ccemail"));
                                     break;
@@ -259,16 +260,56 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     adminBody = FormEdit.get(cp.core, adminData);
                                     break;
                                 }
+                            case AdminFormToolSyncTables: {
+                                    adminBody = SyncTablesClass.get(cp.core);
+                                    break;
+                                }
+                            case AdminFormToolSchema: {
+                                    adminBody = DbSchemaToolClass.get(cp.core);
+                                    break;
+                                }
+                            case AdminFormToolDbIndex: {
+                                    adminBody = DbIndexToolClass.get( cp.core );
+                                    break;
+                                }
+                            case AdminformToolFindAndReplace: {
+                                    adminBody = FindAndReplaceToolClass.get( cp.core) ;
+                                    break;
+                                }
+                            case AdminformToolCreateGUID: {
+                                    adminBody = CreateGUIDToolClass.get( cp.core );
+                                    break;
+                                }
+                            case AdminformToolIISReset: {
+                                    adminBody = IISResetToolClass.get(cp.core);
+                                    break;
+                                }
+                            case AdminFormToolContentSchema: {
+                                    adminBody = ContentSchemaToolClass.get(cp.core);
+                                    break;
+                                }
+                            case AdminFormToolManualQuery: {
+                                    adminBody = ManualQueryClass.get(cp);
+                                    break;
+                                }
+                            case AdminFormToolDefineContentFieldsFromTable: {
+                                    adminBody = DefineContentFieldsFromTableClass.get(cp.core);
+                                    break;
+                                }
+                            case AdminFormToolCreateContentDefinition: {
+                                    adminBody = CreateContentDefinitionClass.get(cp.core);
+                                    break;
+                                }
                             case AdminFormToolConfigureEdit: {
-                                    adminBody = ConfigureEditClass.configureContentEdit(cp);
+                                    adminBody = ConfigureEditClass.get(cp);
                                     break;
                                 }
                             case AdminFormToolConfigureListing: {
-                                    adminBody = ConfigureEditClass.configureContentEdit(cp);
+                                    adminBody = ConfigureListClass.get(cp.core);
                                     break;
                                 }
                             case AdminFormClearCache: {
-                                    adminBody = ToolClearCache.getForm_ClearCache(cp.core);
+                                    adminBody = ToolClearCache.get(cp.core);
                                     break;
                                 }
                             case AdminFormResourceLibrary: {
@@ -276,7 +317,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 }
                             case AdminFormQuickStats: {
-                                    adminBody = (FormQuickStats.GetForm_QuickStats(cp.core));
+                                    adminBody = FormQuickStats.get(cp.core);
                                     break;
                                 }
                             case AdminFormClose: {
@@ -284,19 +325,15 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 }
                             case AdminFormContentChildTool: {
-                                    adminBody = (GetContentChildTool(cp));
+                                    adminBody = ContentChildToolClass.get(cp);
                                     break;
                                 }
                             case AdminformHousekeepingControl: {
-                                    adminBody = (GetForm_HouseKeepingControl(cp));
+                                    adminBody = HouseKeepingControlClass.get(cp);
                                     break;
                                 }
                             case AdminFormDownloads: {
-                                    adminBody = (ToolDownloads.GetForm_Downloads(cp.core));
-                                    break;
-                                }
-                            case AdminformRSSControl: {
-                                    adminBody = cp.core.webServer.redirect("?cid=" + ContentMetadataModel.getContentId(cp.core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
+                                    adminBody = (ToolDownloads.get(cp.core));
                                     break;
                                 }
                             case AdminFormImportWizard: {
@@ -307,7 +344,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 }
                             case AdminFormCustomReports: {
-                                    adminBody = ToolCustomReports.getForm_CustomReports(cp.core);
+                                    adminBody = ToolCustomReports.get(cp.core);
                                     break;
                                 }
                             case AdminFormFormWizard: {
@@ -322,7 +359,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 }
                             case AdminFormEditorConfig: {
-                                    adminBody = FormEditConfig.getForm_EditConfig(cp.core);
+                                    adminBody = FormEditConfig.get(cp.core);
                                     break;
                                 }
                             default: {
@@ -2279,342 +2316,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 LogController.logError(cp.core, ex);
             }
         }
-        //
-        //=============================================================================
-        // Create a child content
-        //=============================================================================
-        //
-        private string GetContentChildTool(CPClass cp) {
-            string result = "";
-            try {
-                //
-                bool IsEmptyList = false;
-                int ParentContentId = 0;
-                string ChildContentName = "";
-                int ChildContentId = 0;
-                bool AddAdminMenuEntry = false;
-                StringBuilderLegacyController Content = new StringBuilderLegacyController();
-                string FieldValue = null;
-                bool NewGroup = false;
-                int GroupId = 0;
-                string NewGroupName = "";
-                string Button = null;
-                string Caption = null;
-                string Description = "";
-                string ButtonList = "";
-                bool BlockForm = false;
-                //
-                Button = cp.core.docProperties.getText(RequestNameButton);
-                if (Button == ButtonCancel) {
-                    //
-                    //
-                    //
-                    return cp.core.webServer.redirect("/" + cp.core.appConfig.adminRoute, "GetContentChildTool, Cancel Button Pressed");
-                } else if (!cp.core.session.isAuthenticatedAdmin()) {
-                    //
-                    //
-                    //
-                    ButtonList = ButtonCancel;
-                    Content.Add(AdminUIController.getFormBodyAdminOnly());
-                } else {
-                    //
-                    if (Button != ButtonOK) {
-                        //
-                        // Load defaults
-                        //
-                        ParentContentId = cp.core.docProperties.getInteger("ParentContentID");
-                        if (ParentContentId == 0) {
-                            ParentContentId = ContentMetadataModel.getContentId(cp.core, "Page Content");
-                        }
-                        AddAdminMenuEntry = true;
-                        GroupId = 0;
-                    } else {
-                        //
-                        // Process input
-                        //
-                        ParentContentId = cp.core.docProperties.getInteger("ParentContentID");
-                        var parentContentMetadata = ContentMetadataModel.create(cp.core, ParentContentId);
-                        ChildContentName = cp.core.docProperties.getText("ChildContentName");
-                        AddAdminMenuEntry = cp.core.docProperties.getBoolean("AddAdminMenuEntry");
-                        GroupId = cp.core.docProperties.getInteger("GroupID");
-                        NewGroup = cp.core.docProperties.getBoolean("NewGroup");
-                        NewGroupName = cp.core.docProperties.getText("NewGroupName");
-                        //
-                        if ((parentContentMetadata == null) || (string.IsNullOrEmpty(ChildContentName))) {
-                            Processor.Controllers.ErrorController.addUserError(cp.core, "You must select a parent and provide a child name.");
-                        } else {
-                            //
-                            // Create Definition
-                            //
-                            Description = Description + "<div>&nbsp;</div>"
-                                + "<div>Creating content [" + ChildContentName + "] from [" + parentContentMetadata.name + "]</div>";
-                            var childContentMetadata = parentContentMetadata.createContentChild(cp.core, ChildContentName, cp.core.session.user.id);
-
-                            ChildContentId = ContentMetadataModel.getContentId(cp.core, ChildContentName);
-                            //
-                            // Create Group and Rule
-                            //
-                            if (NewGroup && (!string.IsNullOrEmpty(NewGroupName))) {
-                                using (var csData = new CsModel(cp.core)) {
-                                    csData.open("Groups", "name=" + DbController.encodeSQLText(NewGroupName));
-                                    if (csData.ok()) {
-                                        Description = Description + "<div>Group [" + NewGroupName + "] already exists, using existing group.</div>";
-                                        GroupId = csData.getInteger("ID");
-                                    } else {
-                                        Description = Description + "<div>Creating new group [" + NewGroupName + "]</div>";
-                                        csData.close();
-                                        csData.insert("Groups");
-                                        if (csData.ok()) {
-                                            GroupId = csData.getInteger("ID");
-                                            csData.set("Name", NewGroupName);
-                                            csData.set("Caption", NewGroupName);
-                                        }
-                                    }
-                                }
-                            }
-                            if (GroupId != 0) {
-                                using (var csData = new CsModel(cp.core)) {
-                                    csData.insert("Group Rules");
-                                    if (csData.ok()) {
-                                        Description = Description + "<div>Assigning group [" + MetadataController.getRecordName(cp.core, "Groups", GroupId) + "] to edit content [" + ChildContentName + "].</div>";
-                                        csData.set("GroupID", GroupId);
-                                        csData.set("ContentID", ChildContentId);
-                                    }
-                                }
-                            }
-                            //
-                            // Add Admin Menu Entry
-                            //
-                            if (AddAdminMenuEntry) {
-                                //
-                                // Add Navigator entries
-                            }
-                            //
-                            Description = Description + "<div>&nbsp;</div>"
-                                + "<div>Your new content is ready. <a href=\"?" + rnAdminForm + "=22\">Click here</a> to create another Content Definition, or hit [Cancel] to return to the main menu.</div>";
-                            ButtonList = ButtonCancel;
-                            BlockForm = true;
-                        }
-                        cp.core.clearMetaData();
-                        cp.core.cache.invalidateAll();
-                    }
-                    //
-                    // Get the form
-                    //
-                    if (!BlockForm) {
-                        string tableBody = "";
-                        //
-                        FieldValue = "<select size=\"1\" name=\"ParentContentID\" ID=\"\"><option value=\"\">Select One</option>";
-                        FieldValue = FieldValue + GetContentChildTool_Options(cp, 0, ParentContentId);
-                        FieldValue = FieldValue + "</select>";
-                        tableBody += AdminUIController.getEditRowLegacy(cp.core, FieldValue, "Parent Content Name", "", false, false, "");
-                        //
-                        FieldValue = HtmlController.inputText_Legacy(cp.core, "ChildContentName", ChildContentName, 1, 40);
-                        tableBody += AdminUIController.getEditRowLegacy(cp.core, FieldValue, "New Child Content Name", "", false, false, "");
-                        //
-                        FieldValue = ""
-                            + cp.core.html.inputRadio("NewGroup", false.ToString(), NewGroup.ToString()) + cp.core.html.selectFromContent("GroupID", GroupId, "Groups", "", "", "", ref IsEmptyList) + "(Select a current group)"
-                            + "<br>" + cp.core.html.inputRadio("NewGroup", true.ToString(), NewGroup.ToString()) + HtmlController.inputText_Legacy(cp.core, "NewGroupName", NewGroupName) + "(Create a new group)";
-                        tableBody += AdminUIController.getEditRowLegacy(cp.core, FieldValue, "Content Manager Group", "", false, false, "");
-                        //
-                        Content.Add(AdminUIController.editTable(tableBody));
-                        Content.Add("</td></tr>" + kmaEndTable);
-                        //
-                        ButtonList = ButtonOK + "," + ButtonCancel;
-                    }
-                    Content.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormContentChildTool));
-                }
-                //
-                Caption = "Create Content Definition";
-                Description = "<div>This tool is used to create content definitions that help segregate your content into authorable segments.</div>" + Description;
-                result = AdminUIController.getToolBody(cp.core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
-            } catch (Exception ex) {
-                LogController.logError(cp.core, ex);
-            }
-            return result;
-        }
-        //
-        //=============================================================================
-        // Create a child content
-        //=============================================================================
-        //
-        private string GetContentChildTool_Options(CPClass cp, int ParentId, int DefaultValue) {
-            string returnOptions = "";
-            try {
-                //
-                string SQL = null;
-                int RecordId = 0;
-                string RecordName = null;
-                //
-                if (ParentId == 0) {
-                    SQL = "select Name, ID from ccContent where ((ParentID<1)or(Parentid is null)) and (AllowContentChildTool<>0);";
-                } else {
-                    SQL = "select Name, ID from ccContent where ParentID=" + ParentId + " and (AllowContentChildTool<>0) and not (allowcontentchildtool is null);";
-                }
-                using (var csData = new CsModel(cp.core)) {
-                    csData.openSql(SQL);
-                    while (csData.ok()) {
-                        RecordName = csData.getText("Name");
-                        RecordId = csData.getInteger("ID");
-                        if (RecordId == DefaultValue) {
-                            returnOptions = returnOptions + "<option value=\"" + RecordId + "\" selected>" + csData.getText("name") + "</option>";
-                        } else {
-                            returnOptions = returnOptions + "<option value=\"" + RecordId + "\" >" + csData.getText("name") + "</option>";
-                        }
-                        returnOptions = returnOptions + GetContentChildTool_Options(cp, RecordId, DefaultValue);
-                        csData.goNext();
-                    }
-                    csData.close();
-                }
-            } catch (Exception ex) {
-                LogController.logError(cp.core, ex);
-                throw;
-            }
-            return returnOptions;
-        }
-        //
-        //
-        //========================================================================
-        //
-        //========================================================================
-        //
-        private string GetForm_HouseKeepingControl(CPClass cp) {
-            string tempGetForm_HouseKeepingControl = null;
-            try {
-                //
-                StringBuilderLegacyController Content = new StringBuilderLegacyController();
-                string Copy = null;
-                string SQL = null;
-                string Button = null;
-                int PagesTotal = 0;
-                string Caption = null;
-                DateTime DateValue = default(DateTime);
-                string AgeInDays = null;
-                int ArchiveRecordAgeDays = 0;
-                string ArchiveTimeOfDay = null;
-                bool ArchiveAllowFileClean = false;
-                string ButtonList = "";
-                string Description = null;
-                //
-                Button = cp.core.docProperties.getText(RequestNameButton);
-                if (Button == ButtonCancel) {
-                    //
-                    //
-                    //
-                    return cp.core.webServer.redirect("/" + cp.core.appConfig.adminRoute, "HouseKeepingControl, Cancel Button Pressed");
-                } else if (!cp.core.session.isAuthenticatedAdmin()) {
-                    //
-                    //
-                    //
-                    ButtonList = ButtonCancel;
-                    Content.Add(AdminUIController.getFormBodyAdminOnly());
-                } else {
-                    //
-                    string tableBody = "";
-                    //
-                    // Set defaults
-                    //
-                    ArchiveRecordAgeDays = (cp.core.siteProperties.getInteger("ArchiveRecordAgeDays", 0));
-                    ArchiveTimeOfDay = cp.core.siteProperties.getText("ArchiveTimeOfDay", "12:00:00 AM");
-                    ArchiveAllowFileClean = (cp.core.siteProperties.getBoolean("ArchiveAllowFileClean", false));
-                    //
-                    // Process Requests
-                    //
-                    switch (Button) {
-                        case ButtonOK:
-                        case ButtonSave:
-                        //
-                        ArchiveRecordAgeDays = cp.core.docProperties.getInteger("ArchiveRecordAgeDays");
-                        cp.core.siteProperties.setProperty("ArchiveRecordAgeDays", GenericController.encodeText(ArchiveRecordAgeDays));
-                        //
-                        ArchiveTimeOfDay = cp.core.docProperties.getText("ArchiveTimeOfDay");
-                        cp.core.siteProperties.setProperty("ArchiveTimeOfDay", ArchiveTimeOfDay);
-                        //
-                        ArchiveAllowFileClean = cp.core.docProperties.getBoolean("ArchiveAllowFileClean");
-                        cp.core.siteProperties.setProperty("ArchiveAllowFileClean", GenericController.encodeText(ArchiveAllowFileClean));
-                        break;
-                    }
-                    //
-                    if (Button == ButtonOK) {
-                        return cp.core.webServer.redirect("/" + cp.core.appConfig.adminRoute, "StaticPublishControl, OK Button Pressed");
-                    }
-                    //
-                    // ----- Status
-                    //
-                    tableBody += HtmlController.tableRowStart() + "<td colspan=\"3\" class=\"ccPanel3D ccAdminEditSubHeader\"><b>Status</b>" + tableCellEnd + kmaEndTableRow;
-                    //
-                    // ----- Visits Found
-                    //
-                    PagesTotal = 0;
-                    SQL = "SELECT Count(ID) as Result FROM ccVisits;";
-                    using (var csData = new CsModel(cp.core)) {
-                        csData.openSql(SQL);
-                        if (csData.ok()) {
-                            PagesTotal = csData.getInteger("Result");
-                        }
-                    }
-                    tableBody += AdminUIController.getEditRowLegacy(cp.core, SpanClassAdminNormal + PagesTotal, "Visits Found", "", false, false, "");
-                    //
-                    // ----- Oldest Visit
-                    //
-                    Copy = "unknown";
-                    AgeInDays = "unknown";
-                    using (var csData = new CsModel(cp.core)) {
-                        SQL = cp.core.db.getSQLSelect("ccVisits", "DateAdded", "", "ID", "", 1);
-                        csData.openSql(SQL);
-                        if (csData.ok()) {
-                            DateValue = csData.getDate("DateAdded");
-                            if (DateValue != DateTime.MinValue) {
-                                Copy = GenericController.encodeText(DateValue);
-                                AgeInDays = GenericController.encodeText(encodeInteger(Math.Floor(encodeNumber(cp.core.doc.profileStartTime - DateValue))));
-                            }
-                        }
-                    }
-                    tableBody += (AdminUIController.getEditRowLegacy(cp.core, SpanClassAdminNormal + Copy + " (" + AgeInDays + " days)", "Oldest Visit", "", false, false, ""));
-                    //
-                    // ----- Viewings Found
-                    //
-                    PagesTotal = 0;
-                    SQL = "SELECT Count(ID) as result  FROM ccViewings;";
-                    using (var csData = new CsModel(cp.core)) {
-                        csData.openSql(SQL);
-                        if (csData.ok()) {
-                            PagesTotal = csData.getInteger("Result");
-                        }
-                        csData.close();
-                    }
-                    tableBody += (AdminUIController.getEditRowLegacy(cp.core, SpanClassAdminNormal + PagesTotal, "Viewings Found", "", false, false, ""));
-                    //
-                    tableBody += (HtmlController.tableRowStart() + "<td colspan=\"3\" class=\"ccPanel3D ccAdminEditSubHeader\"><b>Options</b>" + tableCellEnd + kmaEndTableRow);
-                    //
-                    Caption = "Archive Age";
-                    Copy = HtmlController.inputText_Legacy(cp.core, "ArchiveRecordAgeDays", ArchiveRecordAgeDays.ToString(), -1, 20) + "&nbsp;Number of days to keep visit records. 0 disables housekeeping.";
-                    tableBody += (AdminUIController.getEditRowLegacy(cp.core, Copy, Caption));
-                    //
-                    Caption = "Housekeeping Time";
-                    Copy = HtmlController.inputText_Legacy(cp.core, "ArchiveTimeOfDay", ArchiveTimeOfDay, -1, 20) + "&nbsp;The time of day when record deleting should start.";
-                    tableBody += (AdminUIController.getEditRowLegacy(cp.core, Copy, Caption));
-                    //
-                    Caption = "Purge Content Files";
-                    Copy = HtmlController.checkbox("ArchiveAllowFileClean", ArchiveAllowFileClean) + "&nbsp;Delete Contensive content files with no associated database record.";
-                    tableBody += (AdminUIController.getEditRowLegacy(cp.core, Copy, Caption));
-                    //
-                    Content.Add(AdminUIController.editTable(tableBody));
-                    Content.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminformHousekeepingControl));
-                    ButtonList = ButtonCancel + ",Refresh," + ButtonSave + "," + ButtonOK;
-                }
-                //
-                Caption = "Data Housekeeping Control";
-                Description = "This tool is used to control the database record housekeeping process. This process deletes visit history records, so care should be taken before making any changes.";
-                tempGetForm_HouseKeepingControl = AdminUIController.getToolBody(cp.core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
-                //
-                cp.core.html.addTitle(Caption);
-            } catch (Exception ex) {
-                LogController.logError(cp.core, ex);
-            }
-            return tempGetForm_HouseKeepingControl;
-        }
-        //
         ////
         //========================================================================
         //

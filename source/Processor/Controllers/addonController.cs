@@ -55,10 +55,18 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         /// 
         public string executeDependency(AddonModel addon, CPUtilsBaseClass.addonExecuteContext context) {
-            bool saveContextIsIncludeAddon = context.isIncludeAddon;
+            CPUtilsBaseClass.addonExecuteContext contextParent = new CPUtilsBaseClass.addonExecuteContext {
+                forceHtmlDocument = context.forceHtmlDocument,
+                isIncludeAddon = context.isIncludeAddon,
+                wrapperID = context.wrapperID
+            };
             context.isIncludeAddon = true;
+            context.forceHtmlDocument = false;
+            context.wrapperID = 0;
             string result = execute(addon, context);
-            context.isIncludeAddon = saveContextIsIncludeAddon;
+            context.wrapperID = contextParent.wrapperID;
+            context.forceHtmlDocument = contextParent.forceHtmlDocument;
+            context.isIncludeAddon = contextParent.isIncludeAddon;
             return result;
         }
         //

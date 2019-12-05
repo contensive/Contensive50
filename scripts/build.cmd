@@ -255,7 +255,6 @@ rem because I wasted 4 hrs trying to get nuget to install it as a content file
 rem
 
 xcopy ..\source\Processor\aoBase51.xml ..\Cli\*.* /Y
-pause
 
 rem ==============================================================
 rem

@@ -24,14 +24,16 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
-            return getForm_ManualQuery((CPClass)cpBase);
+            return get((CPClass)cpBase);
         }
         //
-        //=============================================================================
-        //   Print the manual query form
-        //=============================================================================
-        //
-        public static string getForm_ManualQuery(CPClass cp) {
+        //====================================================================================================
+        /// <summary>
+        /// Run manual query
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <returns></returns>
+        public static string get(CPClass cp) {
             string returnHtml = "";
             CoreController core = cp.core;
             try {

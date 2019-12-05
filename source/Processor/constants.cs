@@ -663,83 +663,42 @@ namespace Contensive.Processor {
         //
         internal const int AdminFormRoot = 0; // intro page
         internal const int AdminFormIndex = 1; // record list page
-        internal const int AdminFormHelp = 2; // popup help window
-        internal const int AdminFormUpload = 3; // encoded file upload form
         internal const int AdminFormEdit = 4; // Edit form for system format records
-        internal const int AdminFormEditSystem = 5; // Edit form for system format records
-        internal const int AdminFormEditNormal = 6; // record edit page
-        internal const int AdminFormEditEmail = 7; // Edit form for Email format records
-        internal const int AdminFormEditMember = 8; // Edit form for Member format records
-        internal const int AdminFormEditPaths = 9; // Edit form for Paths format records
         internal const int AdminFormClose = 10; // Special Case - do a window close instead of displaying a form
         internal const int AdminFormReports = 12; // Call Reports form (admin only)
-        internal const int AdminFormEditContent = 14; // Edit form for Content records
-        internal const int AdminFormDHTMLEdit = 15; // ActiveX DHTMLEdit form
-        internal const int AdminFormEditPageContent = 16;
         internal const int AdminFormPublishing = 17; // Workflow Authoring Publish Control form
         internal const int AdminFormQuickStats = 18; // Quick Stats (from Admin root)
         internal const int AdminFormResourceLibrary = 19; // Resource Library without Selects
-        internal const int AdminFormEDGControl = 20; // Control Form for the EDG publishing controls
-        internal const int AdminFormSpiderControl = 21; // Control Form for the Content Spider
         internal const int AdminFormContentChildTool = 22; // Admin Create Content Child tool
-        internal const int AdminformPageContentMap = 23; // Map all content to a single map
         internal const int AdminformHousekeepingControl = 24; // Housekeeping control
-        internal const int AdminFormCommerceControl = 25;
-        internal const int AdminFormContactManager = 26;
         internal const int AdminFormStyleEditor = 27;
-        internal const int AdminFormEmailControl = 28;
-        internal const int AdminFormCommerceInterface = 29;
         internal const int AdminFormDownloads = 30;
-        internal const int AdminformRSSControl = 31;
-        internal const int AdminFormMeetingSmart = 32;
-        internal const int AdminFormMemberSmart = 33;
-        internal const int AdminFormEmailWizard = 34;
         internal const int AdminFormImportWizard = 35;
         internal const int AdminFormCustomReports = 36;
         internal const int AdminFormFormWizard = 37;
         internal const int AdminFormLegacyAddonManager = 38;
         internal const int AdminFormIndex_SubFormAdvancedSearch = 39;
         internal const int AdminFormIndex_SubFormSetColumns = 40;
-        internal const int AdminFormPageControl = 41;
         internal const int AdminFormSecurityControl = 42;
         internal const int AdminFormEditorConfig = 43;
-        internal const int AdminFormBuilderCollection = 44;
         internal const int AdminFormClearCache = 45;
-        internal const int AdminFormMobileBrowserControl = 46;
-        //internal const int AdminFormMetaKeywordTool = 47;
         internal const int AdminFormIndex_SubFormExport = 48;
         //
         // ----- AdminFormTools (11,100-199)
         //
-        internal const int AdminFormTools = 11; // Call Tools form (developer only)
-        internal const int AdminFormToolRoot = 11; // These should match for compatibility
         internal const int AdminFormToolCreateContentDefinition = 101;
-        internal const int AdminFormToolContentTest = 102;
-        internal const int AdminFormToolConfigureMenu = 103;
         internal const int AdminFormToolConfigureListing = 104;
         internal const int AdminFormToolConfigureEdit = 105;
         internal const int AdminFormToolManualQuery = 106;
-        internal const int AdminFormToolWriteUpdateMacro = 107;
-        internal const int AdminFormToolDuplicateContent = 108;
-        internal const int AdminFormToolDuplicateDataSource = 109;
         internal const int AdminFormToolDefineContentFieldsFromTable = 110;
-        internal const int AdminFormToolContentDiagnostic = 111;
-        internal const int AdminFormToolCreateChildContent = 112;
-        internal const int AdminFormToolClearContentWatchLink = 113;
         internal const int AdminFormToolSyncTables = 114;
-        internal const int AdminFormToolBenchmark = 115;
         internal const int AdminFormToolSchema = 116;
-        internal const int AdminFormToolContentFileView = 117;
         internal const int AdminFormToolDbIndex = 118;
-        internal const int AdminFormToolContentDbSchema = 119;
+        internal const int AdminFormToolContentSchema = 119;
         internal const int AdminFormToolLogFileView = 120;
-        internal const int AdminFormToolLoadCDef = 121;
-        internal const int AdminFormToolLoadTemplates = 122;
         internal const int AdminformToolFindAndReplace = 123;
         internal const int AdminformToolCreateGUID = 124;
         internal const int AdminformToolIISReset = 125;
-        internal const int AdminFormToolRestart = 126;
-        internal const int AdminFormToolWebsiteFileView = 127;
         //
         // ----- Define the index column structure
         //       IndexColumnVariant( 0, n ) is the first column on the left

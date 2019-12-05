@@ -20,7 +20,7 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
-            return configureContentEdit((CPClass)cpBase);
+            return get((CPClass)cpBase);
         }
         //
         //====================================================================================================
@@ -29,7 +29,7 @@ namespace Contensive.Processor.Addons.Tools {
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
-        public static string configureContentEdit(CPClass cp) {
+        public static string get(CPClass cp) {
             CoreController core = cp.core;
             try {
                 KeyPtrController Index = new KeyPtrController();

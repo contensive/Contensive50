@@ -19,7 +19,7 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
-            return GetForm_DefineContentFieldsFromTable(((CPClass)cpBase).core);
+            return get(((CPClass)cpBase).core);
         }
         //
         //=============================================================================
@@ -29,14 +29,11 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="core"></param>
         /// <returns></returns>
         //
-        private string GetForm_DefineContentFieldsFromTable(CoreController core) {
+        public static string get(CoreController core) {
             string result = "";
             try {
                 string Button = core.docProperties.getText("Button");
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                //
-                Stream.Add(SpanClassAdminNormal + "<strong><A href=\"" + core.webServer.requestPage + "?af=" + AdminFormToolRoot + "\">Tools</A></strong></SPAN>");
-                Stream.Add(SpanClassAdminNormal + ":Create Content Fields from Table</SPAN>");
                 //
                 //   print out the submit form
                 //

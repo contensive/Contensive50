@@ -21,14 +21,14 @@ namespace Contensive.Processor.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
-            return GetForm_FindAndReplace(((CPClass)cpBase).core);
+            return get(((CPClass)cpBase).core);
         }
         //
         //=============================================================================
         // Find and Replace launch tool
         //=============================================================================
         //
-        private string GetForm_FindAndReplace(CoreController core) {
+        public static string get(CoreController core) {
             string result = "";
             try {
                 //
