@@ -11,6 +11,7 @@ using Contensive.BaseClasses;
 using System.Text;
 using Contensive.Models.Db;
 using System.Globalization;
+using System.Linq;
 
 namespace Contensive.Processor.Addons.AdminSite {
     public static class FormIndex {
@@ -403,23 +404,27 @@ namespace Contensive.Processor.Addons.AdminSite {
                             //
                             // ----- DataTable_FindRow
                             //
-                            var DataTable_FindRow  = new StringBuilder( "<tr><td colspan=" + (2 + IndexConfig.columns.Count) + " style=\"background-color:black;height:1;\"></td></tr>");
+                            var DataTable_FindRow = new StringBuilder("<tr><td colspan=" + (2 + IndexConfig.columns.Count) + " style=\"background-color:black;height:1;\"></td></tr>");
                             DataTable_FindRow.Append("<tr>");
                             DataTable_FindRow.Append("<td valign=\"middle\" colspan=2 width=\"60\" class=\"ccPanel\" align=center style=\"vertical-align:middle;padding:8px;text-align:center ! important;\">");
                             DataTable_FindRow.Append(AdminUIController.getButtonPrimary(ButtonFind, "", false, "FindButton") + "</td>");
                             int ColumnPointer = 0;
+                            var listOfMatches = new List<FindWordMatchEnum> { FindWordMatchEnum.matchincludes, FindWordMatchEnum.MatchEquals, FindWordMatchEnum.MatchTrue, FindWordMatchEnum.MatchFalse };
                             foreach (var column in IndexConfig.columns) {
                                 string FieldName = GenericController.toLCase(column.Name);
                                 string FindWordValue = "";
                                 if (IndexConfig.findWords.ContainsKey(FieldName)) {
-                                    var tempVar = IndexConfig.findWords[FieldName];
-                                    if ((tempVar.MatchOption == FindWordMatchEnum.matchincludes) || (tempVar.MatchOption == FindWordMatchEnum.MatchEquals)) {
-                                        FindWordValue = tempVar.Value;
-                                    } else if (tempVar.MatchOption == FindWordMatchEnum.MatchTrue) {
-                                        FindWordValue = "true";
-                                    } else if (tempVar.MatchOption == FindWordMatchEnum.MatchFalse) {
-                                        FindWordValue = "false";
+                                    var findWord = IndexConfig.findWords[FieldName];
+                                    if (listOfMatches.Any(s => findWord.MatchOption.Equals(s))) {
+                                        FindWordValue = findWord.Value;
                                     }
+                                    //if ((findWord.MatchOption == FindWordMatchEnum.matchincludes) || (findWord.MatchOption == FindWordMatchEnum.MatchEquals)) {
+                                    //    FindWordValue = findWord.Value;
+                                    //} else if (findWord.MatchOption == FindWordMatchEnum.MatchTrue) {
+                                    //    FindWordValue = findWord.Value;
+                                    //} else if (findWord.MatchOption == FindWordMatchEnum.MatchFalse) {
+                                    //    FindWordValue = findWord.Value;
+                                    //}
                                 }
                                 DataTable_FindRow.Append(Environment.NewLine + "<td valign=\"middle\" align=\"center\" class=\"ccPanel3DReverse\" style=\"padding:8px;\">"
                                     + "<input type=hidden name=\"FindName" + ColumnPointer + "\" value=\"" + FieldName + "\">"
@@ -482,9 +487,7 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <returns></returns>
         public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, ContentMetadataModel content, int recordCnt, string ContentAccessLimitMessage) {
             var filterLine = new StringBuilder();
-            if (IndexConfig.activeOnly) {
-                filterLine.Append( ", active records");
-            }
+            filterLine.Append((IndexConfig.activeOnly) ? "Active and inactive records" : "Active records");
             string filterLastEdited = "";
             if (IndexConfig.lastEditedByMe) {
                 filterLastEdited = filterLastEdited + " by " + core.session.user.name;
@@ -499,7 +502,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 filterLastEdited = filterLastEdited + " today";
             }
             if (!string.IsNullOrEmpty(filterLastEdited)) {
-                filterLine.Append( ", last edited" + filterLastEdited);
+                filterLine.Append(", last edited" + filterLastEdited);
             }
             foreach (var kvp in IndexConfig.findWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
@@ -508,30 +511,42 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (fieldMeta != null) {
                         string FieldCaption = fieldMeta.caption;
                         switch (findWord.MatchOption) {
-                            case FindWordMatchEnum.MatchEmpty:
-                            filterLine.Append( ", " + FieldCaption + " is empty");
-                            break;
-                            case FindWordMatchEnum.MatchEquals:
-                            filterLine.Append( ", " + FieldCaption + " = '" + findWord.Value + "'");
-                            break;
-                            case FindWordMatchEnum.MatchFalse:
-                            filterLine.Append( ", " + FieldCaption + " is false");
-                            break;
-                            case FindWordMatchEnum.MatchGreaterThan:
-                            filterLine.Append( ", " + FieldCaption + " &gt; '" + findWord.Value + "'");
-                            break;
-                            case FindWordMatchEnum.matchincludes:
-                            filterLine.Append( ", " + FieldCaption + " includes '" + findWord.Value + "'");
-                            break;
-                            case FindWordMatchEnum.MatchLessThan:
-                            filterLine.Append( ", " + FieldCaption + " &lt; '" + findWord.Value + "'");
-                            break;
-                            case FindWordMatchEnum.MatchNotEmpty:
-                            filterLine.Append( ", " + FieldCaption + " is not empty");
-                            break;
-                            case FindWordMatchEnum.MatchTrue:
-                            filterLine.Append( ", " + FieldCaption + " is true");
-                            break;
+                            case FindWordMatchEnum.MatchFalse: {
+                                    filterLine.Append(", " + FieldCaption + " is '" + findWord.Value + "' (false)");
+                                    break;
+                                }
+                            case FindWordMatchEnum.MatchTrue: {
+                                    filterLine.Append(", " + FieldCaption + " is '" + findWord.Value + "' (true)");
+                                    break;
+                                }
+                            case FindWordMatchEnum.MatchEmpty: {
+                                    filterLine.Append(", " + FieldCaption + " is empty");
+                                    break;
+                                }
+                            case FindWordMatchEnum.MatchEquals: {
+                                    filterLine.Append(", " + FieldCaption + " = '" + findWord.Value + "'");
+                                    break;
+                                }
+                            case FindWordMatchEnum.MatchGreaterThan: {
+                                    filterLine.Append(", " + FieldCaption + " &gt; '" + findWord.Value + "'");
+                                    break;
+                                }
+                            case FindWordMatchEnum.matchincludes: {
+                                    filterLine.Append(", " + FieldCaption + " includes '" + findWord.Value + "'");
+                                    break;
+                                }
+                            case FindWordMatchEnum.MatchLessThan: {
+                                    filterLine.Append(", " + FieldCaption + " &lt; '" + findWord.Value + "'");
+                                    break;
+                                }
+                            case FindWordMatchEnum.MatchNotEmpty: {
+                                    filterLine.Append(", " + FieldCaption + " is not empty");
+                                    break;
+                                }
+                            default: {
+                                    // no match
+                                    break;
+                                }
                         }
 
                     }
@@ -540,7 +555,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             if (IndexConfig.subCDefID > 0) {
                 string ContentName = MetadataController.getContentNameByID(core, IndexConfig.subCDefID);
                 if (!string.IsNullOrEmpty(ContentName)) {
-                    filterLine.Append( ", in Sub-content '" + ContentName + "'");
+                    filterLine.Append(", in Sub-content '" + ContentName + "'");
                 }
             }
             //
@@ -556,16 +571,16 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (!string.IsNullOrEmpty(GroupList)) {
                     string[] Groups = GroupList.Split('\t');
                     if (Groups.GetUpperBound(0) == 0) {
-                        filterLine.Append( ", in group '" + Groups[0] + "'");
+                        filterLine.Append(", in group '" + Groups[0] + "'");
                     } else if (Groups.GetUpperBound(0) == 1) {
-                        filterLine.Append( ", in groups '" + Groups[0] + "' and '" + Groups[1] + "'");
+                        filterLine.Append(", in groups '" + Groups[0] + "' and '" + Groups[1] + "'");
                     } else {
                         int Ptr;
                         string filterGroups = "";
                         for (Ptr = 0; Ptr < Groups.GetUpperBound(0); Ptr++) {
                             filterGroups += ", '" + Groups[Ptr] + "'";
                         }
-                        filterLine.Append( ", in groups" + filterGroups.Substring(1) + " and '" + Groups[Ptr] + "'");
+                        filterLine.Append(", in groups" + filterGroups.Substring(1) + " and '" + Groups[Ptr] + "'");
                     }
 
                 }
@@ -704,35 +719,38 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                 //
                                                 // -- nonblank find, store it
                                                 if (IndexConfig.findWords.ContainsKey(FindName)) {
-                                                    IndexConfig.findWords[FindName].Value = FindValue;
-                                                } else {
-                                                    ContentFieldMetadataModel field = adminData.adminContent.fields[FindName.ToLowerInvariant()];
-                                                    var findWord = new IndexConfigClass.IndexConfigFindWordClass {
-                                                        Name = FindName,
-                                                        Value = FindValue
-                                                    };
-                                                    switch (field.fieldTypeId) {
-                                                        case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
-                                                        case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                                                        case CPContentBaseClass.FieldTypeIdEnum.Float:
-                                                        case CPContentBaseClass.FieldTypeIdEnum.Integer:
-                                                        case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
-                                                        case CPContentBaseClass.FieldTypeIdEnum.Date:
-                                                        findWord.MatchOption = FindWordMatchEnum.MatchEquals;
-                                                        break;
-                                                        case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                                                        if (encodeBoolean(FindValue)) {
-                                                            findWord.MatchOption = FindWordMatchEnum.MatchTrue;
-                                                        } else {
-                                                            findWord.MatchOption = FindWordMatchEnum.MatchFalse;
-                                                        }
-                                                        break;
-                                                        default:
-                                                        findWord.MatchOption = FindWordMatchEnum.matchincludes;
-                                                        break;
-                                                    }
-                                                    IndexConfig.findWords.Add(FindName, findWord);
+                                                    IndexConfig.findWords.Remove(FindName);
+
                                                 }
+                                                ContentFieldMetadataModel field = adminData.adminContent.fields[FindName.ToLowerInvariant()];
+                                                var findWord = new IndexConfigClass.IndexConfigFindWordClass {
+                                                    Name = FindName,
+                                                    Value = FindValue
+                                                };
+                                                switch (field.fieldTypeId) {
+                                                    case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
+                                                    case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                                                    case CPContentBaseClass.FieldTypeIdEnum.Float:
+                                                    case CPContentBaseClass.FieldTypeIdEnum.Integer:
+                                                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
+                                                    case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                                                            findWord.MatchOption = FindWordMatchEnum.MatchEquals;
+                                                            break;
+                                                        }
+                                                    case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                                                            if (encodeBoolean(FindValue)) {
+                                                                findWord.MatchOption = FindWordMatchEnum.MatchTrue;
+                                                            } else {
+                                                                findWord.MatchOption = FindWordMatchEnum.MatchFalse;
+                                                            }
+                                                            break;
+                                                        }
+                                                    default: {
+                                                            findWord.MatchOption = FindWordMatchEnum.matchincludes;
+                                                            break;
+                                                        }
+                                                }
+                                                IndexConfig.findWords.Add(FindName, findWord);
                                             }
                                         }
                                     }

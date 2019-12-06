@@ -578,7 +578,7 @@ namespace Contensive.Processor.Models.Domain {
                             }
                             //
                             // ----- Create the LegacyContentControlCriteria. For compatibility, if support=false, return (1=1)
-                            result.legacyContentControlCriteria = (result.parentId <= 0) ? "(1=1)" : getLegacyContentControlCriteria(core, result.id, result.tableName, result.dataSourceName, new List<int>());
+                            result.legacyContentControlCriteria = (result.parentId <= 0) ? "(1=1)" : getLegacyContentControlCriteria(core, result.id, result.tableName, result.dataSourceName, new List<int> { result.parentId });
                             //
                             create_setAdminColumns(core, result);
                         }

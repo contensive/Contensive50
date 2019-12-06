@@ -2799,8 +2799,8 @@
     <Category>Personalization</Category>
     <DotNetClass>Contensive.Processor.Addons.Personalization.NameClass</DotNetClass>
     <ArgumentList></ArgumentList>
-    <Content>Yes</Content>
-    <Template>Yes</Template>
+    <Content>No</Content>
+    <Template>No</Template>
     <Email>Yes</Email>
     <IsInline>Yes</IsInline>
   </Addon>
