@@ -321,7 +321,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 }
                             case AdminFormClose: {
-                                    Stream.Add("<Script Language=\"JavaScript\" type=\"text/javascript\"> window.close(); </Script>");
+                                    Stream.add("<Script Language=\"JavaScript\" type=\"text/javascript\"> window.close(); </Script>");
                                     break;
                                 }
                             case AdminFormContentChildTool: {
@@ -434,12 +434,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (!cp.core.doc.userErrorList.Count.Equals(0)) {
                         adminBody = HtmlController.div(Processor.Controllers.ErrorController.getUserError(cp.core), "ccAdminMsg") + adminBody;
                     }
-                    Stream.Add(getAdminHeader(cp, adminData));
-                    Stream.Add(adminBody);
-                    Stream.Add(adminData.adminFooter);
+                    Stream.add(getAdminHeader(cp, adminData));
+                    Stream.add(adminBody);
+                    Stream.add(adminData.adminFooter);
                     adminData.javaScriptString += "ButtonObjectCount = " + adminData.buttonObjectCount + ";";
                     cp.core.html.addScriptCode(adminData.javaScriptString, "Admin Site");
-                    result = Stream.Text;
+                    result = Stream.text;
                 }
                 if (cp.core.session.user.developer) {
                     result = Processor.Controllers.ErrorController.getDocExceptionHtmlList(cp.core) + result;
@@ -1665,7 +1665,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 // Assemble header
                 //
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                Stream.Add(AdminUIController.getHeader(cp.core, leftSide, rightSide, rightSideNavHtml));
+                Stream.add(AdminUIController.getHeader(cp.core, leftSide, rightSide, rightSideNavHtml));
                 //
                 // --- Content Definition
                 adminData.adminFooter = "";
@@ -1676,10 +1676,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                     errorContextMessage = "executing Admin Navigator in Admin"
                 });
                 //
-                Stream.Add("<table border=0 cellpadding=0 cellspacing=0><tr>\r<td class=\"ccToolsCon\" valign=top>" + AdminNavFull + "</td>\r<td id=\"desktop\" class=\"ccContentCon\" valign=top>");
+                Stream.add("<table border=0 cellpadding=0 cellspacing=0><tr>\r<td class=\"ccToolsCon\" valign=top>" + AdminNavFull + "</td>\r<td id=\"desktop\" class=\"ccContentCon\" valign=top>");
                 adminData.adminFooter = adminData.adminFooter + "</td></tr></table>";
                 //
-                result = Stream.Text;
+                result = Stream.text;
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
                 throw;

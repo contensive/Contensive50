@@ -212,16 +212,16 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 //   Print Output
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                Stream.Add(AdminUIController.getHeaderTitleDescription("Manage Admin Edit Fields", "Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field."));
+                Stream.add(AdminUIController.getHeaderTitleDescription("Manage Admin Edit Fields", "Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field."));
                 //
                 // -- status of last operation
                 if (!string.IsNullOrEmpty(StatusMessage)) {
-                    Stream.Add(AdminUIController.getToolFormRow(core, "<UL>" + StatusMessage + "</UL>"));
+                    Stream.add(AdminUIController.getToolFormRow(core, "<UL>" + StatusMessage + "</UL>"));
                 }
                 //
                 // -- errors with last operations
                 if (!string.IsNullOrEmpty(ErrorMessage)) {
-                    Stream.Add(HtmlController.div("There was a problem saving these changes" + "<UL>" + ErrorMessage + "</UL>", "ccError"));
+                    Stream.add(HtmlController.div("There was a problem saving these changes" + "<UL>" + ErrorMessage + "</UL>", "ccError"));
                 }
                 if (ReloadCDef) {
                     contentMetadata = Processor.Models.Domain.ContentMetadataModel.create(core, ContentId, true, true);
@@ -231,18 +231,18 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     // content tables that have edit forms to Configure
                     bool isEmptyList = false;
-                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_lookupContent(core, RequestNameToolContentId, ContentId, ContentMetadataModel.getContentId(core, "Content"), ref isEmptyList)));
+                    Stream.add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_lookupContent(core, RequestNameToolContentId, ContentId, ContentMetadataModel.getContentId(core, "Content"), ref isEmptyList)));
                 } else {
                     //
                     // Configure edit form
-                    Stream.Add(HtmlController.inputHidden(RequestNameToolContentId, ContentId));
-                    Stream.Add(core.html.getPanelTop());
+                    Stream.add(HtmlController.inputHidden(RequestNameToolContentId, ContentId));
+                    Stream.add(core.html.getPanelTop());
                     ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK + "," + ButtonAdd;
                     //
                     // Get a new copy of the content definition
                     //
-                    Stream.Add(SpanClassAdminNormal + "<P><B>" + contentMetadata.name + "</b></P>");
-                    Stream.Add("<table border=\"0\" cellpadding=\"1\" cellspacing=\"1\" width=\"100%\">");
+                    Stream.add(SpanClassAdminNormal + "<P><B>" + contentMetadata.name + "</b></P>");
+                    Stream.add("<table border=\"0\" cellpadding=\"1\" cellspacing=\"1\" width=\"100%\">");
                     //
                     int ParentContentId = contentMetadata.parentId;
                     bool AllowCDefInherit = false;
@@ -259,32 +259,32 @@ namespace Contensive.Processor.Addons.Tools {
                     if (contentMetadata.fields.Count > 0) {
                         //
                         // -- header row
-                        Stream.Add("<tr>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\"></td>");
+                        Stream.add("<tr>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\"></td>");
                         if (!AllowCDefInherit) {
-                            Stream.Add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Inherited*</b></span></td>");
+                            Stream.add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Inherited*</b></span></td>");
                             NeedFootNote1 = true;
                         } else {
-                            Stream.Add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Inherited</b></span></td>");
+                            Stream.add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Inherited</b></span></td>");
                         }
-                        Stream.Add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Field</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Caption</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Edit Tab</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Default</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Type</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b>Edit<br>Order</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Active</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b>Read<br>Only</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Auth</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Req</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Unique</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b>Text<br>Buffer</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Pass</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b>Text<br>Scrm</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>HTML</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b>Admin<br>Only</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b>Dev<br>Only</b></span></td>");
-                        Stream.Add("</tr>");
+                        Stream.add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Field</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Caption</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Edit Tab</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Default</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Type</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b>Edit<br>Order</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Active</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b>Read<br>Only</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Auth</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Req</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Unique</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b>Text<br>Buffer</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Pass</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b>Text<br>Scrm</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>HTML</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b>Admin<br>Only</b></span></td>");
+                        Stream.add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b>Dev<br>Only</b></span></td>");
+                        Stream.add("</tr>");
                         RecordCount = 0;
                         //
                         // Build a select template for Type
@@ -328,12 +328,12 @@ namespace Contensive.Processor.Addons.Tools {
                             // put the menu into the current menu format
                             //
                             formFieldId = fieldsort.field.id;
-                            streamRow.Add(HtmlController.inputHidden("dtfaID." + RecordCount, formFieldId));
-                            streamRow.Add("<tr>");
+                            streamRow.add(HtmlController.inputHidden("dtfaID." + RecordCount, formFieldId));
+                            streamRow.add("<tr>");
                             //
                             // edit button
                             //
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\">" + AdminUIController.getRecordEditLink(core, contentFieldsCdef, formFieldId) + "</td>");
+                            streamRow.add("<td class=\"ccPanelInput\" align=\"left\">" + AdminUIController.getRecordEditLink(core, contentFieldsCdef, formFieldId) + "</td>");
                             //
                             // Inherited
                             //
@@ -341,12 +341,12 @@ namespace Contensive.Processor.Addons.Tools {
                                 //
                                 // no parent
                                 //
-                                streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "False</span></td>");
+                                streamRow.add("<td class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "False</span></td>");
                             } else if (fieldsort.field.inherited) {
                                 //
                                 // inherited property
                                 //
-                                streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + HtmlController.checkbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
+                                streamRow.add("<td class=\"ccPanelInput\" align=\"center\">" + HtmlController.checkbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
                             } else {
                                 Processor.Models.Domain.ContentFieldMetadataModel parentField = null;
                                 //
@@ -361,10 +361,10 @@ namespace Contensive.Processor.Addons.Tools {
                                     }
                                 }
                                 if (parentField == null) {
-                                    streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "False**</span></td>");
+                                    streamRow.add("<td class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "False**</span></td>");
                                     NeedFootNote2 = true;
                                 } else {
-                                    streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + HtmlController.checkbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
+                                    streamRow.add("<td class=\"ccPanelInput\" align=\"center\">" + HtmlController.checkbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
                                 }
                             }
                             //
@@ -372,155 +372,155 @@ namespace Contensive.Processor.Addons.Tools {
                             //
                             bool tmpValue = string.IsNullOrEmpty(fieldsort.field.nameLc);
                             rowValid = rowValid && !tmpValue;
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
+                            streamRow.add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
                             if (fieldsort.field.inherited) {
-                                streamRow.Add(SpanClassAdminSmall + fieldsort.field.nameLc + "&nbsp;</SPAN>");
+                                streamRow.add(SpanClassAdminSmall + fieldsort.field.nameLc + "&nbsp;</SPAN>");
                             } else if (FieldLocked) {
-                                streamRow.Add(SpanClassAdminSmall + fieldsort.field.nameLc + "&nbsp;</SPAN><input type=hidden name=dtfaName." + RecordCount + " value=\"" + fieldsort.field.nameLc + "\">");
+                                streamRow.add(SpanClassAdminSmall + fieldsort.field.nameLc + "&nbsp;</SPAN><input type=hidden name=dtfaName." + RecordCount + " value=\"" + fieldsort.field.nameLc + "\">");
                             } else {
-                                streamRow.Add(HtmlController.inputText_Legacy(core, "dtfaName." + RecordCount, fieldsort.field.nameLc, 1, 10));
+                                streamRow.add(HtmlController.inputText_Legacy(core, "dtfaName." + RecordCount, fieldsort.field.nameLc, 1, 10));
                             }
-                            streamRow.Add("</nobr></td>");
+                            streamRow.add("</nobr></td>");
                             //
                             // caption
                             //
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
+                            streamRow.add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
                             if (fieldsort.field.inherited) {
-                                streamRow.Add(SpanClassAdminSmall + fieldsort.field.caption + "</SPAN>");
+                                streamRow.add(SpanClassAdminSmall + fieldsort.field.caption + "</SPAN>");
                             } else {
-                                streamRow.Add(HtmlController.inputText_Legacy(core, "dtfaCaption." + RecordCount, fieldsort.field.caption, 1, 10));
+                                streamRow.add(HtmlController.inputText_Legacy(core, "dtfaCaption." + RecordCount, fieldsort.field.caption, 1, 10));
                             }
-                            streamRow.Add("</nobr></td>");
+                            streamRow.add("</nobr></td>");
                             //
                             // Edit Tab
                             //
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
+                            streamRow.add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
                             if (fieldsort.field.inherited) {
-                                streamRow.Add(SpanClassAdminSmall + fieldsort.field.editTabName + "</SPAN>");
+                                streamRow.add(SpanClassAdminSmall + fieldsort.field.editTabName + "</SPAN>");
                             } else {
-                                streamRow.Add(HtmlController.inputText_Legacy(core, "dtfaEditTab." + RecordCount, fieldsort.field.editTabName, 1, 10));
+                                streamRow.add(HtmlController.inputText_Legacy(core, "dtfaEditTab." + RecordCount, fieldsort.field.editTabName, 1, 10));
                             }
-                            streamRow.Add("</nobr></td>");
+                            streamRow.add("</nobr></td>");
                             //
                             // default
                             //
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
+                            streamRow.add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
                             if (fieldsort.field.inherited) {
-                                streamRow.Add(SpanClassAdminSmall + GenericController.encodeText(fieldsort.field.defaultValue) + "</SPAN>");
+                                streamRow.add(SpanClassAdminSmall + GenericController.encodeText(fieldsort.field.defaultValue) + "</SPAN>");
                             } else {
-                                streamRow.Add(HtmlController.inputText_Legacy(core, "dtfaDefaultValue." + RecordCount, GenericController.encodeText(fieldsort.field.defaultValue), 1, 10));
+                                streamRow.add(HtmlController.inputText_Legacy(core, "dtfaDefaultValue." + RecordCount, GenericController.encodeText(fieldsort.field.defaultValue), 1, 10));
                             }
-                            streamRow.Add("</nobr></td>");
+                            streamRow.add("</nobr></td>");
                             //
                             // type
                             //
                             rowValid = rowValid && (fieldsort.field.fieldTypeId > 0);
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
+                            streamRow.add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
                             if (fieldsort.field.inherited) {
                                 using (var csData = new CsModel(core)) {
                                     csData.openRecord("Content Field Types", (int)fieldsort.field.fieldTypeId);
                                     if (!csData.ok()) {
-                                        streamRow.Add(SpanClassAdminSmall + "Unknown[" + fieldsort.field.fieldTypeId + "]</SPAN>");
+                                        streamRow.add(SpanClassAdminSmall + "Unknown[" + fieldsort.field.fieldTypeId + "]</SPAN>");
                                     } else {
-                                        streamRow.Add(SpanClassAdminSmall + csData.getText("Name") + "</SPAN>");
+                                        streamRow.add(SpanClassAdminSmall + csData.getText("Name") + "</SPAN>");
                                     }
                                 }
                             } else if (FieldLocked) {
-                                streamRow.Add(DbBaseModel.getRecordName<ContentFieldTypeModel>(core.cpParent, (int)fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, (int)fieldsort.field.fieldTypeId));
+                                streamRow.add(DbBaseModel.getRecordName<ContentFieldTypeModel>(core.cpParent, (int)fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, (int)fieldsort.field.fieldTypeId));
                             } else {
                                 string TypeSelect = TypeSelectTemplate;
                                 TypeSelect = GenericController.strReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);
                                 TypeSelect = GenericController.strReplace(TypeSelect, "=\"" + fieldsort.field.fieldTypeId + "\"", "=\"" + fieldsort.field.fieldTypeId + "\" selected", 1, 99, 1);
-                                streamRow.Add(TypeSelect);
+                                streamRow.add(TypeSelect);
                             }
-                            streamRow.Add("</nobr></td>");
+                            streamRow.add("</nobr></td>");
                             //
                             // sort priority
                             //
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
+                            streamRow.add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
                             if (fieldsort.field.inherited) {
-                                streamRow.Add(SpanClassAdminSmall + fieldsort.field.editSortPriority + "</SPAN>");
+                                streamRow.add(SpanClassAdminSmall + fieldsort.field.editSortPriority + "</SPAN>");
                             } else {
-                                streamRow.Add(HtmlController.inputText_Legacy(core, "dtfaEditSortPriority." + RecordCount, fieldsort.field.editSortPriority.ToString(), 1, 10));
+                                streamRow.add(HtmlController.inputText_Legacy(core, "dtfaEditSortPriority." + RecordCount, fieldsort.field.editSortPriority.ToString(), 1, 10));
                             }
-                            streamRow.Add("</nobr></td>");
+                            streamRow.add("</nobr></td>");
                             //
                             // active
                             //
-                            streamRow.Add(configureEdit_CheckBox("dtfaActive." + RecordCount, fieldsort.field.active, fieldsort.field.inherited));
+                            streamRow.add(configureEdit_CheckBox("dtfaActive." + RecordCount, fieldsort.field.active, fieldsort.field.inherited));
                             //
                             // read only
                             //
-                            streamRow.Add(configureEdit_CheckBox("dtfaReadOnly." + RecordCount, fieldsort.field.readOnly, fieldsort.field.inherited));
+                            streamRow.add(configureEdit_CheckBox("dtfaReadOnly." + RecordCount, fieldsort.field.readOnly, fieldsort.field.inherited));
                             //
                             // authorable
                             //
-                            streamRow.Add(configureEdit_CheckBox("dtfaAuthorable." + RecordCount, fieldsort.field.authorable, fieldsort.field.inherited));
+                            streamRow.add(configureEdit_CheckBox("dtfaAuthorable." + RecordCount, fieldsort.field.authorable, fieldsort.field.inherited));
                             //
                             // required
                             //
-                            streamRow.Add(configureEdit_CheckBox("dtfaRequired." + RecordCount, fieldsort.field.required, fieldsort.field.inherited));
+                            streamRow.add(configureEdit_CheckBox("dtfaRequired." + RecordCount, fieldsort.field.required, fieldsort.field.inherited));
                             //
                             // UniqueName
                             //
-                            streamRow.Add(configureEdit_CheckBox("dtfaUniqueName." + RecordCount, fieldsort.field.uniqueName, fieldsort.field.inherited));
+                            streamRow.add(configureEdit_CheckBox("dtfaUniqueName." + RecordCount, fieldsort.field.uniqueName, fieldsort.field.inherited));
                             //
                             // text buffered
                             //
-                            streamRow.Add(configureEdit_CheckBox("dtfaTextBuffered." + RecordCount, fieldsort.field.textBuffered, fieldsort.field.inherited));
+                            streamRow.add(configureEdit_CheckBox("dtfaTextBuffered." + RecordCount, fieldsort.field.textBuffered, fieldsort.field.inherited));
                             //
                             // password
                             //
-                            streamRow.Add(configureEdit_CheckBox("dtfaPassword." + RecordCount, fieldsort.field.password, fieldsort.field.inherited));
+                            streamRow.add(configureEdit_CheckBox("dtfaPassword." + RecordCount, fieldsort.field.password, fieldsort.field.inherited));
                             //
                             // scramble
                             //
-                            streamRow.Add(configureEdit_CheckBox("dtfaScramble." + RecordCount, fieldsort.field.scramble, fieldsort.field.inherited));
+                            streamRow.add(configureEdit_CheckBox("dtfaScramble." + RecordCount, fieldsort.field.scramble, fieldsort.field.inherited));
                             //
                             // HTML Content
                             //
-                            streamRow.Add(configureEdit_CheckBox("dtfaHTMLContent." + RecordCount, fieldsort.field.htmlContent, fieldsort.field.inherited));
+                            streamRow.add(configureEdit_CheckBox("dtfaHTMLContent." + RecordCount, fieldsort.field.htmlContent, fieldsort.field.inherited));
                             //
                             // Admin Only
                             //
                             if (core.session.isAuthenticatedAdmin()) {
-                                streamRow.Add(configureEdit_CheckBox("dtfaAdminOnly." + RecordCount, fieldsort.field.adminOnly, fieldsort.field.inherited));
+                                streamRow.add(configureEdit_CheckBox("dtfaAdminOnly." + RecordCount, fieldsort.field.adminOnly, fieldsort.field.inherited));
                             }
                             //
                             // Developer Only
                             //
                             if (core.session.isAuthenticatedDeveloper()) {
-                                streamRow.Add(configureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, fieldsort.field.developerOnly, fieldsort.field.inherited));
+                                streamRow.add(configureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, fieldsort.field.developerOnly, fieldsort.field.inherited));
                             }
                             //
-                            streamRow.Add("</tr>");
+                            streamRow.add("</tr>");
                             RecordCount = RecordCount + 1;
                             //
                             // rows are built - put the blank rows at the top
                             //
                             if (!rowValid) {
-                                Stream.Add(streamRow.Text);
+                                Stream.add(streamRow.text);
                             } else {
-                                StreamValidRows.Add(streamRow.Text);
+                                StreamValidRows.add(streamRow.text);
                             }
                         }
-                        Stream.Add(StreamValidRows.Text);
-                        Stream.Add(HtmlController.inputHidden("dtfaRecordCount", RecordCount));
+                        Stream.add(StreamValidRows.text);
+                        Stream.add(HtmlController.inputHidden("dtfaRecordCount", RecordCount));
                     }
-                    Stream.Add("</table>");
+                    Stream.add("</table>");
                     //
-                    Stream.Add(core.html.getPanelBottom());
+                    Stream.add(core.html.getPanelBottom());
                     if (NeedFootNote1) {
-                        Stream.Add("<br>*Field Inheritance is not allowed because this Content Definition has no parent.");
+                        Stream.add("<br>*Field Inheritance is not allowed because this Content Definition has no parent.");
                     }
                     if (NeedFootNote2) {
-                        Stream.Add("<br>**This field can not be inherited because the Parent Content Definition does not have a field with the same name.");
+                        Stream.add("<br>**This field can not be inherited because the Parent Content Definition does not have a field with the same name.");
                     }
                 }
-                Stream.Add(HtmlController.inputHidden("ReloadCDef", ReloadCDef));
+                Stream.add(HtmlController.inputHidden("ReloadCDef", ReloadCDef));
                 //
                 // -- assemble form
-                return AdminUIController.getToolForm(core, Stream.Text, ButtonList);
+                return AdminUIController.getToolForm(core, Stream.text, ButtonList);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 return toolExceptionMessage;

@@ -304,13 +304,13 @@ namespace Contensive.Processor.Addons.AdminSite {
                 Content = returnForm;
                 //
                 // Assemble LiveWindowTable
-                Stream.Add(ButtonBar);
-                Stream.Add(TitleBar);
-                Stream.Add(Content);
-                Stream.Add(ButtonBar);
-                Stream.Add("<input type=hidden name=fieldcnt VALUE=" + FieldCnt + ">");
-                Stream.Add("<input type=hidden name=" + RequestNameAdminSubForm + " VALUE=" + AdminFormIndex_SubFormAdvancedSearch + ">");
-                returnForm = HtmlController.form(core, Stream.Text);
+                Stream.add(ButtonBar);
+                Stream.add(TitleBar);
+                Stream.add(Content);
+                Stream.add(ButtonBar);
+                Stream.add("<input type=hidden name=fieldcnt VALUE=" + FieldCnt + ">");
+                Stream.add("<input type=hidden name=" + RequestNameAdminSubForm + " VALUE=" + AdminFormIndex_SubFormAdvancedSearch + ">");
+                returnForm = HtmlController.form(core, Stream.text);
                 core.html.addTitle(adminData.adminContent.name + " Advanced Search");
             } catch (Exception ex) {
                 LogController.logError(core, ex);

@@ -59,7 +59,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     }
                                 }
                                 //
-                                FastString.Add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Include in " + CSLists.getText("name"), "When true, this Content Record can be included in the '" + CSLists.getText("name") + "' list", false, false, ""));
+                                FastString.add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Include in " + CSLists.getText("name"), "When true, this Content Record can be included in the '" + CSLists.getText("name") + "' list", false, false, ""));
                                 CSLists.goNext();
                                 RecordCount = RecordCount + 1;
                             }
@@ -71,7 +71,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             } else {
                                 HTMLFieldString = HtmlController.inputText_Legacy(core, "ContentWatchLinkLabel", adminData.contentWatchLinkLabel, 1, core.siteProperties.defaultFormInputWidth);
                             }
-                            FastString.Add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Caption", "This caption is displayed on all Content Watch Lists, linked to the location on the web site where this content is displayed. RSS feeds created from Content Watch Lists will use this caption as the record title if not other field is selected in the Content Definition.", false, true, "ContentWatchLinkLabel"));
+                            FastString.add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Caption", "This caption is displayed on all Content Watch Lists, linked to the location on the web site where this content is displayed. RSS feeds created from Content Watch Lists will use this caption as the record title if not other field is selected in the Content Definition.", false, true, "ContentWatchLinkLabel"));
                             //
                             // ----- Whats New Expiration
                             //
@@ -80,7 +80,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             } else {
                                 HTMLFieldString = AdminUIController.getDefaultEditor_dateTime(core, "ContentWatchExpires", adminData.contentWatchExpires, false, "", false, "");
                             }
-                            FastString.Add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", false, false, ""));
+                            FastString.add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", false, false, ""));
                             //
                             // ----- Public Link (read only)
                             //
@@ -88,10 +88,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                             if (string.IsNullOrEmpty(HTMLFieldString)) {
                                 HTMLFieldString = "(must first be viewed on public site)";
                             }
-                            FastString.Add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Location on Site", "The public site URL where this content was last viewed.", false, false, ""));
+                            FastString.add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Location on Site", "The public site URL where this content was last viewed.", false, false, ""));
                             //
                             string s = ""
-                                + AdminUIController.editTable(FastString.Text)
+                                + AdminUIController.editTable(FastString.text)
                                 + HtmlController.inputHidden("WhatsNewResponse", "-1")
                                 + HtmlController.inputHidden("contentwatchrecordid", adminData.contentWatchRecordID.ToString());
                             tempGetForm_Edit_ContentTracking = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Content Tracking", "Include in Content Watch Lists", s);

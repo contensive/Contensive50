@@ -54,8 +54,8 @@ namespace Contensive.Processor.Addons.Tools {
                     ContentName = core.docProperties.getText("ContentName");
                     TableName = core.docProperties.getText("TableName");
                     //
-                    Stream.Add(SpanClassAdminSmall);
-                    Stream.Add("<P>Creating content [" + ContentName + "] on table [" + TableName + "] on Datasource [" + datasource.name + "].</P>");
+                    Stream.add(SpanClassAdminSmall);
+                    Stream.add("<P>Creating content [" + ContentName + "] on table [" + TableName + "] on Datasource [" + datasource.name + "].</P>");
                     if ((!string.IsNullOrEmpty(ContentName)) && (!string.IsNullOrEmpty(TableName)) && (!string.IsNullOrEmpty(datasource.name))) {
                         using (var db = new DbController(core, datasource.name)) {
                             db.createSQLTable(TableName);
@@ -88,24 +88,24 @@ namespace Contensive.Processor.Addons.Tools {
                             }
                         }
                         ContentId = ContentMetadataModel.getContentId(core, ContentName);
-                        Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=\"?af=105&ContentID=" + ContentId + "\">Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>");
+                        Stream.add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=\"?af=105&ContentID=" + ContentId + "\">Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>");
                     } else {
-                        Stream.Add("<P>Error, a required field is missing. Content not created.</P>");
+                        Stream.add("<P>Error, a required field is missing. Content not created.</P>");
                     }
-                    Stream.Add("</SPAN>");
+                    Stream.add("</SPAN>");
                 }
-                Stream.Add(SpanClassAdminNormal);
-                Stream.Add("Data Source<br>");
-                Stream.Add(core.html.selectFromContent("DataSourceID", datasource.id, "Data Sources", "", "Default"));
-                Stream.Add("<br><br>");
-                Stream.Add("Content Name<br>");
-                Stream.Add(HtmlController.inputText_Legacy(core, "ContentName", ContentName, 1, 40));
-                Stream.Add("<br><br>");
-                Stream.Add("Table Name<br>");
-                Stream.Add(HtmlController.inputText_Legacy(core, "TableName", TableName, 1, 40));
-                Stream.Add("<br><br>");
-                Stream.Add("</SPAN>");
-                result = AdminUIController.getToolBody(core, Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
+                Stream.add(SpanClassAdminNormal);
+                Stream.add("Data Source<br>");
+                Stream.add(core.html.selectFromContent("DataSourceID", datasource.id, "Data Sources", "", "Default"));
+                Stream.add("<br><br>");
+                Stream.add("Content Name<br>");
+                Stream.add(HtmlController.inputText_Legacy(core, "ContentName", ContentName, 1, 40));
+                Stream.add("<br><br>");
+                Stream.add("Table Name<br>");
+                Stream.add(HtmlController.inputText_Legacy(core, "TableName", TableName, 1, 40));
+                Stream.add("<br><br>");
+                Stream.add("</SPAN>");
+                result = AdminUIController.getToolBody(core, Caption, ButtonList, "", false, false, Description, "", 10, Stream.text);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

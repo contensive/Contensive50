@@ -73,15 +73,15 @@ namespace Contensive.Processor.Addons.AdminSite {
                     foreach (var kvp in sortingFields) {
                         ContentFieldMetadataModel field = kvp.Value;
                         string editorRow = EditorRowClass.getEditorRow(core, field, adminData, editorEnv);
-                        resultBody.Add("<tr><td colspan=2>" + editorRow + "</td></tr>");
+                        resultBody.add("<tr><td colspan=2>" + editorRow + "</td></tr>");
                     }
                     //
                     // ----- add the *Required Fields footer
-                    resultBody.Add("<tr><td colspan=2 style=\"padding-top:10px;font-size:70%\"><div>* Field is required.</div><div>** Field must be unique.</div>");
+                    resultBody.add("<tr><td colspan=2 style=\"padding-top:10px;font-size:70%\"><div>* Field is required.</div><div>** Field must be unique.</div>");
                     if (needUniqueEmailMessage) {
-                        resultBody.Add("<div>*** Field must be unique because this site allows login by email.</div>");
+                        resultBody.add("<div>*** Field must be unique because this site allows login by email.</div>");
                     }
-                    resultBody.Add("</td></tr>");
+                    resultBody.add("</td></tr>");
                     //
                     // ----- close the panel
                     if (string.IsNullOrEmpty(EditTab)) {
@@ -90,7 +90,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         fieldCaption = "Content Fields - " + EditTab;
                     }
                     adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
-                    returnHtml = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), fieldCaption, "", AdminUIController.editTable(resultBody.Text));
+                    returnHtml = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), fieldCaption, "", AdminUIController.editTable(resultBody.text));
                     adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
                     resultBody = null;
                 }

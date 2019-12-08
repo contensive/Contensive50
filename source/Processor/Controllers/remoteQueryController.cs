@@ -65,69 +65,69 @@ namespace Contensive.Processor.Controllers {
                     //
                     //
                     //
-                    s.Add("{");
+                    s.add("{");
                     if (!gd.IsEmpty) {
                         ColDelim = "";
                         for (ColPtr = 0; ColPtr <= gd.col.Count; ColPtr++) {
-                            s.Add(ColDelim + gd.col[ColPtr].Id + ":'" + gd.row[0].Cell[ColPtr].v + "'");
+                            s.add(ColDelim + gd.col[ColPtr].Id + ":'" + gd.row[0].Cell[ColPtr].v + "'");
                             ColDelim = ",";
                         }
                     }
-                    s.Add("}");
+                    s.add("}");
                     break;
                 case RemoteFormatEnum.RemoteFormatJsonNameArray:
                     //
                     //
                     //
-                    s.Add("{");
+                    s.add("{");
                     if (!gd.IsEmpty) {
                         ColDelim = "";
                         for (ColPtr = 0; ColPtr <= gd.col.Count; ColPtr++) {
-                            s.Add(ColDelim + gd.col[ColPtr].Id + ":[");
+                            s.add(ColDelim + gd.col[ColPtr].Id + ":[");
                             ColDelim = ",";
                             RowDelim = "";
                             for (RowPtr = 0; RowPtr <= gd.row.Count ; RowPtr++) {
                                 var tempVar = gd.row[RowPtr].Cell[ColPtr];
-                                s.Add(RowDelim + "'" + tempVar.v + "'");
+                                s.add(RowDelim + "'" + tempVar.v + "'");
                                 RowDelim = ",";
                             }
-                            s.Add("]");
+                            s.add("]");
                         }
                     }
-                    s.Add("}");
+                    s.add("}");
                     break;
                 case RemoteFormatEnum.RemoteFormatJsonTable:
                     //
                     //
                     //
-                    s.Add("{");
+                    s.add("{");
                     if (!gd.IsEmpty) {
-                        s.Add("cols: [");
+                        s.add("cols: [");
                         ColDelim = "";
                         for (ColPtr = 0; ColPtr <= gd.col.Count; ColPtr++) {
                             var tempVar2 = gd.col[ColPtr];
-                            s.Add(ColDelim + "{id: '" + GenericController.encodeJavascriptStringSingleQuote(tempVar2.Id) + "', label: '" + GenericController.encodeJavascriptStringSingleQuote(tempVar2.Label) + "', type: '" + GenericController.encodeJavascriptStringSingleQuote(tempVar2.Type) + "'}");
+                            s.add(ColDelim + "{id: '" + GenericController.encodeJavascriptStringSingleQuote(tempVar2.Id) + "', label: '" + GenericController.encodeJavascriptStringSingleQuote(tempVar2.Label) + "', type: '" + GenericController.encodeJavascriptStringSingleQuote(tempVar2.Type) + "'}");
                             ColDelim = ",";
                         }
-                        s.Add("],rows:[");
+                        s.add("],rows:[");
                         RowDelim = "";
                         for (RowPtr = 0; RowPtr <= gd.row.Count; RowPtr++) {
-                            s.Add(RowDelim + "{c:[");
+                            s.add(RowDelim + "{c:[");
                             RowDelim = ",";
                             ColDelim = "";
                             for (ColPtr = 0; ColPtr <= gd.col.Count; ColPtr++) {
                                 var tempVar3 = gd.row[RowPtr].Cell[ColPtr];
-                                s.Add(ColDelim + "{v: '" + GenericController.encodeJavascriptStringSingleQuote(tempVar3.v) + "'}");
+                                s.add(ColDelim + "{v: '" + GenericController.encodeJavascriptStringSingleQuote(tempVar3.v) + "'}");
                                 ColDelim = ",";
                             }
-                            s.Add("]}");
+                            s.add("]}");
                         }
-                        s.Add("]");
+                        s.add("]");
                     }
-                    s.Add("}");
+                    s.add("}");
                     break;
             }
-            return s.Text;
+            return s.text;
             //
         }
         //

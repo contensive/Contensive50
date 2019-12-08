@@ -113,7 +113,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                         // ----- Put up error message
                         //
                         ButtonList = Constants.ButtonCancel;
-                        Content.Add(AdminUIController.getFormBodyAdminOnly());
+                        Content.add(AdminUIController.getFormBodyAdminOnly());
                     } else {
                         //
                         InstallFolder = "temp\\CollectionUpload" + encodeText(GenericController.getRandomInteger(core));
@@ -555,7 +555,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                         //
                         Body = new StringBuilderLegacyController();
                         if (!DbUpToDate) {
-                            Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>");
+                            Body.add("<p>Add-on upload is disabled because your site database needs to be updated.</p>");
                         } else {
                             FormInput = ""
                                 + "<table id=\"UploadInsert\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
@@ -564,21 +564,21 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                                 + "<tr><td align=\"left\"><a href=\"#\" onClick=\"InsertUpload(); return false;\">+ Add more files</a></td></tr>"
                                 + "</table>"
                                 + HtmlController.inputHidden("UploadCount", 1, "", "UploadCount") + "";
-                            Body.Add(AdminUIController.editTable(""
+                            Body.add(AdminUIController.editTable(""
                                 + AdminUIController.getEditRowLegacy(core, core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, "")
                                 + AdminUIController.getEditRowLegacy(core, FormInput, "&nbsp;", "", true, false, "")
                                 ));
                         }
-                        adminMenu.addEntry("Add&nbsp;Manually", AdminUIController.getEditPanel(core, true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
+                        adminMenu.addEntry("Add&nbsp;Manually", AdminUIController.getEditPanel(core, true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.text), "ccAdminTab");
                         //
                         // --------------------------------------------------------------------------------
                         // Build Page from tabs
                         // --------------------------------------------------------------------------------
                         //
-                        Content.Add(adminMenu.getTabs(core));
+                        Content.add(adminMenu.getTabs(core));
                         //
                         ButtonList = ButtonCancel + "," + ButtonOK;
-                        Content.Add(HtmlController.inputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));
+                        Content.add(HtmlController.inputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));
                     }
                     //
                     // Output the Add-on
@@ -598,7 +598,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                     if (!string.IsNullOrEmpty(status)) {
                         Description = Description + "<div style=\"Margin-left:50px\">" + status + "</div>";
                     }
-                    addonManager = AdminUIController.getToolBody(core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
+                    addonManager = AdminUIController.getToolBody(core, Caption, ButtonList, "", false, false, Description, "", 0, Content.text);
                     core.html.addTitle("Add-on Manager");
                 }
             } catch (Exception ex) {

@@ -253,8 +253,8 @@ namespace Contensive.Processor.Controllers {
                                 TagId = " ID=\"" + htmlId + "\"";
                             }
                             StringBuilderLegacyController FastString = new StringBuilderLegacyController();
-                            FastString.Add("<select size=\"1\" name=\"" + MenuNameFPO + "\"" + TagId + ">");
-                            FastString.Add("<option value=\"\">" + NoneCaptionFPO + "</option>");
+                            FastString.add("<select size=\"1\" name=\"" + MenuNameFPO + "\"" + TagId + ">");
+                            FastString.add("<option value=\"\">" + NoneCaptionFPO + "</option>");
                             //
                             // ----- select values
                             using (var csData = new CsModel(core)) {
@@ -302,9 +302,9 @@ namespace Contensive.Processor.Controllers {
                                         if (string.IsNullOrEmpty(Copy)) {
                                             Copy = "no name";
                                         }
-                                        FastString.Add(Environment.NewLine + "<option value=\"" + RecordID + "\" ");
+                                        FastString.add(Environment.NewLine + "<option value=\"" + RecordID + "\" ");
                                         if (RecordID == CurrentValue) {
-                                            FastString.Add("selected");
+                                            FastString.add("selected");
                                             SelectedFound = true;
                                         }
                                         if (core.siteProperties.selectFieldWidthLimit != 0) {
@@ -312,7 +312,7 @@ namespace Contensive.Processor.Controllers {
                                                 Copy = Copy.left(core.siteProperties.selectFieldWidthLimit) + "...+";
                                             }
                                         }
-                                        FastString.Add(">" + HtmlController.encodeHtml(Copy) + "</option>");
+                                        FastString.add(">" + HtmlController.encodeHtml(Copy) + "</option>");
                                     }
                                     if (!SelectedFound && (CurrentValue != 0)) {
                                         csData.close();
@@ -333,20 +333,20 @@ namespace Contensive.Processor.Controllers {
                                             if (string.IsNullOrEmpty(Copy)) {
                                                 Copy = "no name";
                                             }
-                                            FastString.Add(Environment.NewLine + "<option value=\"" + RecordID + "\" selected");
+                                            FastString.add(Environment.NewLine + "<option value=\"" + RecordID + "\" selected");
                                             SelectedFound = true;
                                             if (core.siteProperties.selectFieldWidthLimit != 0) {
                                                 if (Copy.Length > core.siteProperties.selectFieldWidthLimit) {
                                                     Copy = Copy.left(core.siteProperties.selectFieldWidthLimit) + "...+";
                                                 }
                                             }
-                                            FastString.Add(">" + HtmlController.encodeHtml(Copy) + "</option>");
+                                            FastString.add(">" + HtmlController.encodeHtml(Copy) + "</option>");
                                         }
                                     }
                                 }
                             }
-                            FastString.Add("</select>");
-                            SelectRaw = FastString.Text;
+                            FastString.add("</select>");
+                            SelectRaw = FastString.text;
                         }
                     }
                     //
@@ -517,8 +517,8 @@ namespace Contensive.Processor.Controllers {
                                 TagId = " ID=\"" + GenericController.encodeEmpty(HtmlId, "") + "\"";
                             }
                             //
-                            FastString.Add("<select size=\"1\" name=\"" + MenuNameFPO + "\"" + TagId + TagClass + ">");
-                            FastString.Add("<option value=\"\">" + NoneCaptionFPO + "</option>");
+                            FastString.add("<select size=\"1\" name=\"" + MenuNameFPO + "\"" + TagId + TagClass + ">");
+                            FastString.add("<option value=\"\">" + NoneCaptionFPO + "</option>");
                             //
                             // ----- select values
                             //
@@ -574,23 +574,23 @@ namespace Contensive.Processor.Controllers {
                                             if (string.IsNullOrEmpty(Copy)) {
                                                 Copy = "no name";
                                             }
-                                            FastString.Add(Environment.NewLine + "<option value=\"" + RecordID + "\" ");
+                                            FastString.add(Environment.NewLine + "<option value=\"" + RecordID + "\" ");
                                             if (RecordID == currentValue) {
-                                                FastString.Add("selected");
+                                                FastString.add("selected");
                                             }
                                             if (core.siteProperties.selectFieldWidthLimit != 0) {
                                                 if (Copy.Length > core.siteProperties.selectFieldWidthLimit) {
                                                     Copy = Copy.left(core.siteProperties.selectFieldWidthLimit) + "...+";
                                                 }
                                             }
-                                            FastString.Add(">" + Copy + "</option>");
+                                            FastString.add(">" + Copy + "</option>");
                                             LastRecordId = RecordID;
                                         }
                                     }
                                 }
                             }
-                            FastString.Add("</select>");
-                            SelectRaw = FastString.Text;
+                            FastString.add("</select>");
+                            SelectRaw = FastString.text;
                         }
                     }
                     //
@@ -628,24 +628,24 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 StringBuilderLegacyController FastString = new StringBuilderLegacyController();
-                FastString.Add("<select size=1 ");
-                if (!string.IsNullOrEmpty(htmlId)) FastString.Add("id=\"" + htmlId + "\" ");
-                if (!string.IsNullOrEmpty(HtmlClass)) FastString.Add("class=\"" + HtmlClass + "\" ");
-                if (!string.IsNullOrEmpty(MenuName)) FastString.Add("name=\"" + MenuName + "\" ");
+                FastString.add("<select size=1 ");
+                if (!string.IsNullOrEmpty(htmlId)) FastString.add("id=\"" + htmlId + "\" ");
+                if (!string.IsNullOrEmpty(HtmlClass)) FastString.add("class=\"" + HtmlClass + "\" ");
+                if (!string.IsNullOrEmpty(MenuName)) FastString.add("name=\"" + MenuName + "\" ");
                 if (!string.IsNullOrEmpty(NoneCaption)) {
-                    FastString.Add("><option value=\"\">" + NoneCaption + "</option>");
+                    FastString.add("><option value=\"\">" + NoneCaption + "</option>");
                 } else {
-                    FastString.Add("><option value=\"\">Select One</option>");
+                    FastString.add("><option value=\"\">Select One</option>");
                 }
                 //
                 // ----- select values
                 string CurrentValueLower = CurrentValue.ToLowerInvariant();
                 foreach (NameValueModel nameValue in lookupList) {
                     string selected = (nameValue.value.ToLowerInvariant() == CurrentValueLower) ? " selected" : "";
-                    FastString.Add("<option value=\"" + nameValue.value + "\" " + selected + ">" + nameValue.name + "</option>");
+                    FastString.add("<option value=\"" + nameValue.value + "\" " + selected + ">" + nameValue.name + "</option>");
                 }
-                FastString.Add("</select>");
-                result = FastString.Text;
+                FastString.add("</select>");
+                result = FastString.text;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
@@ -681,11 +681,11 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Start select box
                 //
-                FastString.Add("<select id=\"" + htmlId + "\" class=\"" + HtmlClass + "\" size=\"1\" name=\"" + MenuName + "\">");
+                FastString.add("<select id=\"" + htmlId + "\" class=\"" + HtmlClass + "\" size=\"1\" name=\"" + MenuName + "\">");
                 if (!string.IsNullOrEmpty(NoneCaption)) {
-                    FastString.Add("<option value=\"\">" + NoneCaption + "</option>");
+                    FastString.add("<option value=\"\">" + NoneCaption + "</option>");
                 } else {
-                    FastString.Add("<option value=\"\">Select One</option>");
+                    FastString.add("<option value=\"\">Select One</option>");
                 }
                 //
                 // ----- select values
@@ -694,18 +694,18 @@ namespace Contensive.Processor.Controllers {
                     RecordID = Ptr + 1;
                     Copy = lookups[Ptr];
                     if (!string.IsNullOrEmpty(Copy)) {
-                        FastString.Add(Environment.NewLine + "<option value=\"" + RecordID + "\" ");
+                        FastString.add(Environment.NewLine + "<option value=\"" + RecordID + "\" ");
                         if (RecordID == CurrentValue) {
-                            FastString.Add("selected");
+                            FastString.add("selected");
                         }
                         if (Copy.Length > SelectFieldWidthLimit) {
                             Copy = Copy.left(SelectFieldWidthLimit) + "...+";
                         }
-                        FastString.Add(">" + Copy + "</option>");
+                        FastString.add(">" + Copy + "</option>");
                     }
                 }
-                FastString.Add("</select>");
-                result = FastString.Text;
+                FastString.add("</select>");
+                result = FastString.text;
                 //
                 //
                 // ----- Error Trap
@@ -2563,26 +2563,26 @@ namespace Contensive.Processor.Controllers {
                     //
                     // --- Link Panel - used for both Legacy Tools Panel, and without it
                     StringBuilderLegacyController LinkPanel = new StringBuilderLegacyController();
-                    LinkPanel.Add(SpanClassAdminSmall);
-                    LinkPanel.Add("Contensive " + core.codeVersion() + " | ");
-                    LinkPanel.Add(core.doc.profileStartTime.ToString("G") + " | ");
-                    LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"http://support.Contensive.com/\">Support</A> | ");
-                    LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + HtmlController.encodeHtml("/" + core.appConfig.adminRoute) + "\">Admin Home</A> | ");
-                    LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + HtmlController.encodeHtml("http://" + core.webServer.requestDomain) + "\">Public Home</A> | ");
-                    LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"" + HtmlController.encodeHtml("/" + core.appConfig.adminRoute + "?" + RequestNameHardCodedPage + "=" + HardCodedPageMyProfile) + "\">My Profile</A> | ");
+                    LinkPanel.add(SpanClassAdminSmall);
+                    LinkPanel.add("Contensive " + core.codeVersion() + " | ");
+                    LinkPanel.add(core.doc.profileStartTime.ToString("G") + " | ");
+                    LinkPanel.add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"http://support.Contensive.com/\">Support</A> | ");
+                    LinkPanel.add("<a class=\"ccAdminLink\" href=\"" + HtmlController.encodeHtml("/" + core.appConfig.adminRoute) + "\">Admin Home</A> | ");
+                    LinkPanel.add("<a class=\"ccAdminLink\" href=\"" + HtmlController.encodeHtml("http://" + core.webServer.requestDomain) + "\">Public Home</A> | ");
+                    LinkPanel.add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"" + HtmlController.encodeHtml("/" + core.appConfig.adminRoute + "?" + RequestNameHardCodedPage + "=" + HardCodedPageMyProfile) + "\">My Profile</A> | ");
                     if (core.siteProperties.getBoolean("AllowMobileTemplates", false)) {
                         string QS;
                         if (core.session.visit.mobile) {
                             QS = core.doc.refreshQueryString;
                             QS = GenericController.modifyQueryString(QS, "method", "forcenonmobile");
-                            LinkPanel.Add("<a class=\"ccAdminLink\" href=\"?" + QS + "\">Non-Mobile Version</A> | ");
+                            LinkPanel.add("<a class=\"ccAdminLink\" href=\"?" + QS + "\">Non-Mobile Version</A> | ");
                         } else {
                             QS = core.doc.refreshQueryString;
                             QS = GenericController.modifyQueryString(QS, "method", "forcemobile");
-                            LinkPanel.Add("<a class=\"ccAdminLink\" href=\"?" + QS + "\">Mobile Version</A> | ");
+                            LinkPanel.add("<a class=\"ccAdminLink\" href=\"?" + QS + "\">Mobile Version</A> | ");
                         }
                     }
-                    LinkPanel.Add("</span>");
+                    LinkPanel.add("</span>");
                     //
                     if (ShowLegacyToolsPanel) {
                         StringBuilderLegacyController ToolsPanel = new StringBuilderLegacyController();
@@ -2591,7 +2591,7 @@ namespace Contensive.Processor.Controllers {
                         // ----- Tools Panel Caption
                         string helpLink = "";
                         result += getPanelHeader("Contensive Tools Panel" + helpLink);
-                        ToolsPanel.Add(HtmlController.inputHidden("Type", FormTypeToolsPanel));
+                        ToolsPanel.add(HtmlController.inputHidden("Type", FormTypeToolsPanel));
                         string TagID = null;
                         string OptionsPanel = "";
                         //
@@ -2709,9 +2709,9 @@ namespace Contensive.Processor.Controllers {
                         Copy = ""
                             + "\r<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
                             + GenericController.nop(Copy) + "\r</table>";
-                        ToolsPanel.Add(getPanelInput(Copy, "100%"));
-                        result += getPanel(HtmlController.form(core, ToolsPanel.Text), "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
-                        result += getPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
+                        ToolsPanel.add(getPanelInput(Copy, "100%"));
+                        result += getPanel(HtmlController.form(core, ToolsPanel.text), "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
+                        result += getPanel(LinkPanel.text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         LinkPanel = null;
                         ToolsPanel = null;
                     }
@@ -2721,14 +2721,14 @@ namespace Contensive.Processor.Controllers {
                         //
                         // --- Debug Panel Header
                         LinkPanel = new StringBuilderLegacyController();
-                        LinkPanel.Add(SpanClassAdminSmall);
-                        LinkPanel.Add("Contensive " + core.codeVersion() + " | ");
-                        LinkPanel.Add(core.doc.profileStartTime.ToString("G") + " | ");
-                        LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"http://support.Contensive.com/\">Support</A> | ");
-                        LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + HtmlController.encodeHtml("/" + core.appConfig.adminRoute) + "\">Admin Home</A> | ");
-                        LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + HtmlController.encodeHtml("http://" + core.webServer.requestDomain) + "\">Public Home</A> | ");
-                        LinkPanel.Add("Render " + (Convert.ToSingle(core.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec | ");
-                        LinkPanel.Add("</span>");
+                        LinkPanel.add(SpanClassAdminSmall);
+                        LinkPanel.add("Contensive " + core.codeVersion() + " | ");
+                        LinkPanel.add(core.doc.profileStartTime.ToString("G") + " | ");
+                        LinkPanel.add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"http://support.Contensive.com/\">Support</A> | ");
+                        LinkPanel.add("<a class=\"ccAdminLink\" href=\"" + HtmlController.encodeHtml("/" + core.appConfig.adminRoute) + "\">Admin Home</A> | ");
+                        LinkPanel.add("<a class=\"ccAdminLink\" href=\"" + HtmlController.encodeHtml("http://" + core.webServer.requestDomain) + "\">Public Home</A> | ");
+                        LinkPanel.add("Render " + (Convert.ToSingle(core.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec | ");
+                        LinkPanel.add("</span>");
                         string DebugPanel = "";
                         //
                         DebugPanel += "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
@@ -2745,7 +2745,7 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             //
                             // Debug Panel without Legacy Tools panel
-                            result += getPanelHeader("Debug Panel") + getPanel(LinkPanel.Text) + getPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
+                            result += getPanelHeader("Debug Panel") + getPanel(LinkPanel.text) + getPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         }
                     }
                     result = "\r<div class=\"ccCon\">" + GenericController.nop(result) + "\r</div>";

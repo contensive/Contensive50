@@ -54,7 +54,7 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
-                Stream.Add(AdminUIController.getHeaderTitleDescription("Query Database Schema", "This tool examines the database schema for all tables available."));
+                Stream.add(AdminUIController.getHeaderTitleDescription("Query Database Schema", "This tool examines the database schema for all tables available."));
                 //
                 StatusOK = true;
                 if ((core.docProperties.getText("button")) != ButtonRun) {
@@ -69,31 +69,31 @@ namespace Contensive.Processor.Addons.Tools {
                     TableName = core.docProperties.getText("TableName");
                     //
                     // Run the SQL
-                    Stream.Add(SpanClassAdminSmall + "<br><br>");
-                    Stream.Add(DateTime.Now + " Opening Table Schema on DataSource [" + datasource.name + "]<br>");
+                    Stream.add(SpanClassAdminSmall + "<br><br>");
+                    Stream.add(DateTime.Now + " Opening Table Schema on DataSource [" + datasource.name + "]<br>");
                     //
                     RSSchema = core.db.getTableSchemaData(TableName);
-                    Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
+                    Stream.add(DateTime.Now + " GetSchema executed successfully<br>");
                     if (!DbController.isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
                         //
-                        Stream.Add(DateTime.Now + " A schema was returned, but it contains no records.<br>");
+                        Stream.add(DateTime.Now + " A schema was returned, but it contains no records.<br>");
                     } else {
                         //
                         // ----- print results
                         //
-                        Stream.Add(DateTime.Now + " The following results were returned<br>");
+                        Stream.add(DateTime.Now + " The following results were returned<br>");
                         //
                         // --- Create the Fields for the new table
                         //
                         FieldCount = RSSchema.Columns.Count;
-                        Stream.Add("<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\" width=\"100%\">");
-                        Stream.Add("<tr>");
+                        Stream.add("<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\" width=\"100%\">");
+                        Stream.add("<tr>");
                         foreach (DataColumn RecordField in RSSchema.Columns) {
-                            Stream.Add("<TD><B>" + SpanClassAdminSmall + RecordField.ColumnName + "</b></SPAN></td>");
+                            Stream.add("<TD><B>" + SpanClassAdminSmall + RecordField.ColumnName + "</b></SPAN></td>");
                         }
-                        Stream.Add("</tr>");
+                        Stream.add("</tr>");
                         //
                         arrayOfSchema = core.db.convertDataTabletoArray(RSSchema);
                         //
@@ -104,22 +104,22 @@ namespace Contensive.Processor.Addons.Tools {
                         ColumnStart = "<td class=\"ccadminsmall\">";
                         ColumnEnd = "</td>";
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                            Stream.Add(RowStart);
+                            Stream.add(RowStart);
                             for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                 CellData = arrayOfSchema[ColumnPointer, RowPointer];
                                 if (isNull(CellData)) {
-                                    Stream.Add(ColumnStart + "[null]" + ColumnEnd);
+                                    Stream.add(ColumnStart + "[null]" + ColumnEnd);
                                 } else if ((CellData == null)) {
-                                    Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
+                                    Stream.add(ColumnStart + "[empty]" + ColumnEnd);
                                 } else if (string.IsNullOrEmpty(CellData)) {
-                                    Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
+                                    Stream.add(ColumnStart + "[empty]" + ColumnEnd);
                                 } else {
-                                    Stream.Add(ColumnStart + CellData + ColumnEnd);
+                                    Stream.add(ColumnStart + CellData + ColumnEnd);
                                 }
                             }
-                            Stream.Add(RowEnd);
+                            Stream.add(RowEnd);
                         }
-                        Stream.Add("</TABLE>");
+                        Stream.add("</TABLE>");
                         RSSchema.Dispose();
                         RSSchema = null;
                     }
@@ -127,30 +127,30 @@ namespace Contensive.Processor.Addons.Tools {
                     // Index Schema
                     //
                     //    RSSchema = DataSourceConnectionObjs(DataSourcePointer).Conn.OpenSchema(SchemaEnum.adSchemaColumns, Array(Empty, Empty, TableName, Empty))
-                    Stream.Add(SpanClassAdminSmall + "<br><br>");
-                    Stream.Add(DateTime.Now + " Opening Index Schema<br>");
+                    Stream.add(SpanClassAdminSmall + "<br><br>");
+                    Stream.add(DateTime.Now + " Opening Index Schema<br>");
                     //
                     RSSchema = core.db.getIndexSchemaData(TableName);
                     if (!DbController.isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
                         //
-                        Stream.Add(DateTime.Now + " A schema was returned, but it contains no records.<br>");
+                        Stream.add(DateTime.Now + " A schema was returned, but it contains no records.<br>");
                     } else {
                         //
                         // ----- print results
                         //
-                        Stream.Add(DateTime.Now + " The following results were returned<br>");
+                        Stream.add(DateTime.Now + " The following results were returned<br>");
                         //
                         // --- Create the Fields for the new table
                         //
                         FieldCount = RSSchema.Columns.Count;
-                        Stream.Add("<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\" width=\"100%\">");
-                        Stream.Add("<tr>");
+                        Stream.add("<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\" width=\"100%\">");
+                        Stream.add("<tr>");
                         foreach (DataColumn RecordField in RSSchema.Columns) {
-                            Stream.Add("<TD><B>" + SpanClassAdminSmall + RecordField.ColumnName + "</b></SPAN></td>");
+                            Stream.add("<TD><B>" + SpanClassAdminSmall + RecordField.ColumnName + "</b></SPAN></td>");
                         }
-                        Stream.Add("</tr>");
+                        Stream.add("</tr>");
                         //
 
                         arrayOfSchema = core.db.convertDataTabletoArray(RSSchema);
@@ -162,53 +162,53 @@ namespace Contensive.Processor.Addons.Tools {
                         ColumnStart = "<td class=\"ccadminsmall\">";
                         ColumnEnd = "</td>";
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                            Stream.Add(RowStart);
+                            Stream.add(RowStart);
                             for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                 CellData = arrayOfSchema[ColumnPointer, RowPointer];
                                 if (isNull(CellData)) {
-                                    Stream.Add(ColumnStart + "[null]" + ColumnEnd);
+                                    Stream.add(ColumnStart + "[null]" + ColumnEnd);
                                 } else if ((CellData == null)) {
-                                    Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
+                                    Stream.add(ColumnStart + "[empty]" + ColumnEnd);
                                 } else if (string.IsNullOrEmpty(CellData)) {
-                                    Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
+                                    Stream.add(ColumnStart + "[empty]" + ColumnEnd);
                                 } else {
-                                    Stream.Add(ColumnStart + CellData + ColumnEnd);
+                                    Stream.add(ColumnStart + CellData + ColumnEnd);
                                 }
                             }
-                            Stream.Add(RowEnd);
+                            Stream.add(RowEnd);
                         }
-                        Stream.Add("</TABLE>");
+                        Stream.add("</TABLE>");
                         RSSchema.Dispose();
                         RSSchema = null;
                     }
                     //
                     // Column Schema
                     //
-                    Stream.Add(SpanClassAdminSmall + "<br><br>");
-                    Stream.Add(DateTime.Now + " Opening Column Schema<br>");
+                    Stream.add(SpanClassAdminSmall + "<br><br>");
+                    Stream.add(DateTime.Now + " Opening Column Schema<br>");
                     //
                     RSSchema = core.db.getColumnSchemaData(TableName);
-                    Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
+                    Stream.add(DateTime.Now + " GetSchema executed successfully<br>");
                     if (DbController.isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
                         //
-                        Stream.Add(DateTime.Now + " A schema was returned, but it contains no records.<br>");
+                        Stream.add(DateTime.Now + " A schema was returned, but it contains no records.<br>");
                     } else {
                         //
                         // ----- print results
                         //
-                        Stream.Add(DateTime.Now + " The following results were returned<br>");
+                        Stream.add(DateTime.Now + " The following results were returned<br>");
                         //
                         // --- Create the Fields for the new table
                         //
                         FieldCount = RSSchema.Columns.Count;
-                        Stream.Add("<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\" width=\"100%\">");
-                        Stream.Add("<tr>");
+                        Stream.add("<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\" width=\"100%\">");
+                        Stream.add("<tr>");
                         foreach (DataColumn RecordField in RSSchema.Columns) {
-                            Stream.Add("<TD><B>" + SpanClassAdminSmall + RecordField.ColumnName + "</b></SPAN></td>");
+                            Stream.add("<TD><B>" + SpanClassAdminSmall + RecordField.ColumnName + "</b></SPAN></td>");
                         }
-                        Stream.Add("</tr>");
+                        Stream.add("</tr>");
                         //
                         arrayOfSchema = core.db.convertDataTabletoArray(RSSchema);
                         //
@@ -219,46 +219,46 @@ namespace Contensive.Processor.Addons.Tools {
                         ColumnStart = "<td class=\"ccadminsmall\">";
                         ColumnEnd = "</td>";
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                            Stream.Add(RowStart);
+                            Stream.add(RowStart);
                             for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                 CellData = arrayOfSchema[ColumnPointer, RowPointer];
                                 if (isNull(CellData)) {
-                                    Stream.Add(ColumnStart + "[null]" + ColumnEnd);
+                                    Stream.add(ColumnStart + "[null]" + ColumnEnd);
                                 } else if ((CellData == null)) {
-                                    Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
+                                    Stream.add(ColumnStart + "[empty]" + ColumnEnd);
                                 } else if (string.IsNullOrEmpty(CellData)) {
-                                    Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
+                                    Stream.add(ColumnStart + "[empty]" + ColumnEnd);
                                 } else {
-                                    Stream.Add(ColumnStart + CellData + ColumnEnd);
+                                    Stream.add(ColumnStart + CellData + ColumnEnd);
                                 }
                             }
-                            Stream.Add(RowEnd);
+                            Stream.add(RowEnd);
                         }
-                        Stream.Add("</TABLE>");
+                        Stream.add("</TABLE>");
                         RSSchema.Dispose();
                         RSSchema = null;
                     }
                     if (!StatusOK) {
-                        Stream.Add("There was a problem executing this query that may have prevented the results from printing.");
+                        Stream.add("There was a problem executing this query that may have prevented the results from printing.");
                     }
-                    Stream.Add(DateTime.Now + " Done</SPAN>");
+                    Stream.add(DateTime.Now + " Done</SPAN>");
                 }
                 //
                 // Display form
                 //
-                Stream.Add(SpanClassAdminNormal);
+                Stream.add(SpanClassAdminNormal);
                 //
-                Stream.Add("<br>");
-                Stream.Add("Table Name<br>");
-                Stream.Add(HtmlController.inputText_Legacy(core, "Tablename", TableName));
+                Stream.add("<br>");
+                Stream.add("Table Name<br>");
+                Stream.add(HtmlController.inputText_Legacy(core, "Tablename", TableName));
                 //
-                Stream.Add("<br><br>");
-                Stream.Add("Data Source<br>");
-                Stream.Add(core.html.selectFromContent("DataSourceID", datasource.id, "Data Sources", "", "Default"));
+                Stream.add("<br><br>");
+                Stream.add("Data Source<br>");
+                Stream.add(core.html.selectFromContent("DataSourceID", datasource.id, "Data Sources", "", "Default"));
                 //
-                Stream.Add("</SPAN>");
+                Stream.add("</SPAN>");
                 //
-                result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
+                result = AdminUIController.getToolForm(core, Stream.text, ButtonList);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

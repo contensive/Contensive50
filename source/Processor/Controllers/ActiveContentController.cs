@@ -425,11 +425,11 @@ namespace Contensive.Processor.Controllers {
                             //
                             // ----- Output the results
                             //
-                            Stream.Add(Copy);
+                            Stream.add(Copy);
                             ElementPointer = ElementPointer + 1;
                         }
                     }
-                    result = Stream.Text;
+                    result = Stream.text;
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -969,10 +969,10 @@ namespace Contensive.Processor.Controllers {
                                             }
                                     }
                                 }
-                                Stream.Add(ElementText);
+                                Stream.add(ElementText);
                             }
                         }
-                        result = Stream.Text;
+                        result = Stream.text;
                     }
                 }
             } catch (Exception ex) {

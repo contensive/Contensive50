@@ -47,7 +47,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
                     ContentFieldMetadataModel field = keyValuePair.Value;
                     if ((field.editTabName.ToLowerInvariant().Equals("control info")) && (field.authorable) && (field.active)) {
-                        tabPanel.Add(EditorRowClass.getEditorRow(core, field, adminData, editorEnv));
+                        tabPanel.add(EditorRowClass.getEditorRow(core, field, adminData, editorEnv));
                     }
                 }
                 //
@@ -56,7 +56,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     string fieldValue = (adminData.editRecord.id == 0) ? "(available after save)" : adminData.editRecord.id.ToString();
                     string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore", fieldValue, true, "");
                     string fieldHelp = "This is the unique number that identifies this record within this content.";
-                    tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Record Number", fieldHelp, true, false, ""));
+                    tabPanel.add(AdminUIController.getEditRow(core, fieldEditor, "Record Number", fieldHelp, true, false, ""));
                 }
                 //
                 // -- Active
@@ -64,7 +64,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     string htmlId = "fieldActive";
                     string fieldEditor = HtmlController.checkbox("active", adminData.editRecord.active, htmlId, disabled, "", adminData.editRecord.userReadOnly);
                     string fieldHelp = "When unchecked, add-ons can ignore this record as if it was temporarily deleted.";
-                    tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Active", fieldHelp, false, false, htmlId));
+                    tabPanel.add(AdminUIController.getEditRow(core, fieldEditor, "Active", fieldHelp, false, false, htmlId));
                 }
                 //
                 // -- GUID
@@ -89,7 +89,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         // field is read-only except for developers
                         fieldEditor = AdminUIController.getDefaultEditor_text(core, "ccguid", fieldValue, !core.session.isAuthenticatedDeveloper(), htmlId);
                     }
-                    tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "GUID", FieldHelp, false, false, htmlId));
+                    tabPanel.add(AdminUIController.getEditRow(core, fieldEditor, "GUID", FieldHelp, false, false, htmlId));
                 }
                 //
                 // ----- EID (Encoded ID)
@@ -115,7 +115,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             fieldHelp += "<br>For example: " + sampleUrl;
                             fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_eid", eidQueryString, true, htmlId);
                         }
-                        tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Member Link Login Querystring", fieldHelp, true, false, htmlId));
+                        tabPanel.add(AdminUIController.getEditRow(core, fieldEditor, "Member Link Login Querystring", fieldHelp, true, false, htmlId));
                     }
                 }
                 //
@@ -165,7 +165,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (string.IsNullOrEmpty(HTMLFieldString)) {
                         HTMLFieldString = adminData.editRecord.contentControlId_Name;
                     }
-                    tabPanel.Add(AdminUIController.getEditRow(core, HTMLFieldString, "Controlling Content", FieldHelp, FieldRequired, false, ""));
+                    tabPanel.add(AdminUIController.getEditRow(core, HTMLFieldString, "Controlling Content", FieldHelp, FieldRequired, false, ""));
                 }
                 //
                 // ----- Created By
@@ -198,7 +198,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                     }
                     string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_createdBy", fieldValue, true, "");
-                    tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Created By", FieldHelp, FieldRequired, false, ""));
+                    tabPanel.add(AdminUIController.getEditRow(core, fieldEditor, "Created By", FieldHelp, FieldRequired, false, ""));
                 }
                 //
                 // ----- Created Date
@@ -217,7 +217,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                     }
                     string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_createdDate", fieldValue, true, "");
-                    tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Created Date", FieldHelp, FieldRequired, false, ""));
+                    tabPanel.add(AdminUIController.getEditRow(core, fieldEditor, "Created Date", FieldHelp, FieldRequired, false, ""));
                 }
                 //
                 // ----- Modified By
@@ -250,7 +250,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                     }
                     string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_modifiedBy", fieldValue, true, "");
-                    tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Modified By", FieldHelp, FieldRequired, false, ""));
+                    tabPanel.add(AdminUIController.getEditRow(core, fieldEditor, "Modified By", FieldHelp, FieldRequired, false, ""));
                 }
                 //
                 // ----- Modified Date
@@ -269,9 +269,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                     }
                     string fieldEditor = AdminUIController.getDefaultEditor_text(core, "ignore_modifiedBy", fieldValue, true, "");
-                    tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Modified Date", FieldHelp, false, false, ""));
+                    tabPanel.add(AdminUIController.getEditRow(core, fieldEditor, "Modified Date", FieldHelp, false, false, ""));
                 }
-                string s = AdminUIController.editTable(tabPanel.Text);
+                string s = AdminUIController.editTable(tabPanel.text);
                 result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Control Information", "", s);
                 adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
                 tabPanel = null;

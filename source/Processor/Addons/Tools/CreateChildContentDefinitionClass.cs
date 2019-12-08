@@ -37,7 +37,7 @@ namespace Contensive.Processor.Addons.Tools {
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList = ButtonCancel + "," + ButtonRun;
                 //
-                Stream.Add(AdminUIController.getHeaderTitleDescription("Create a Child Content from a Content Definition", "This tool creates a Content Definition based on another Content Definition."));
+                Stream.add(AdminUIController.getHeaderTitleDescription("Create a Child Content from a Content Definition", "This tool creates a Content Definition based on another Content Definition."));
                 //
                 //   print out the submit form
                 if (core.docProperties.getText("Button") != "") {
@@ -49,41 +49,41 @@ namespace Contensive.Processor.Addons.Tools {
                     ChildContentName = core.docProperties.getText("ChildContentName");
                     AddAdminMenuEntry = core.docProperties.getBoolean("AddAdminMenuEntry");
                     //
-                    Stream.Add(SpanClassAdminSmall);
+                    Stream.add(SpanClassAdminSmall);
                     if ((parentContentMetadata == null) || (string.IsNullOrEmpty(ChildContentName))) {
-                        Stream.Add("<p>You must select a parent and provide a child name.</p>");
+                        Stream.add("<p>You must select a parent and provide a child name.</p>");
                     } else {
                         //
                         // Create Definition
                         //
-                        Stream.Add("<P>Creating content [" + ChildContentName + "] from [" + parentContentMetadata + "]");
+                        Stream.add("<P>Creating content [" + ChildContentName + "] from [" + parentContentMetadata + "]");
                         var childContentMetadata = parentContentMetadata.createContentChild(core, ChildContentName, core.session.user.id);
                         //
-                        Stream.Add("<br>Reloading Content Definitions...");
+                        Stream.add("<br>Reloading Content Definitions...");
                         core.cache.invalidateAll();
                         core.clearMetaData();
-                        Stream.Add("<br>Finished</P>");
+                        Stream.add("<br>Finished</P>");
                     }
-                    Stream.Add("</SPAN>");
+                    Stream.add("</SPAN>");
                 }
-                Stream.Add(SpanClassAdminNormal);
+                Stream.add(SpanClassAdminNormal);
                 //
-                Stream.Add("Parent Content Name<br>");
-                Stream.Add(core.html.selectFromContent("ParentContentID", ParentContentId, "Content", ""));
-                Stream.Add("<br><br>");
+                Stream.add("Parent Content Name<br>");
+                Stream.add(core.html.selectFromContent("ParentContentID", ParentContentId, "Content", ""));
+                Stream.add("<br><br>");
                 //
-                Stream.Add("Child Content Name<br>");
-                Stream.Add(HtmlController.inputText_Legacy(core, "ChildContentName", ChildContentName, 1, 40));
-                Stream.Add("<br><br>");
+                Stream.add("Child Content Name<br>");
+                Stream.add(HtmlController.inputText_Legacy(core, "ChildContentName", ChildContentName, 1, 40));
+                Stream.add("<br><br>");
                 //
-                Stream.Add("Add Admin Menu Entry under Parent's Menu Entry<br>");
-                Stream.Add(HtmlController.checkbox("AddAdminMenuEntry", AddAdminMenuEntry));
-                Stream.Add("<br><br>");
+                Stream.add("Add Admin Menu Entry under Parent's Menu Entry<br>");
+                Stream.add(HtmlController.checkbox("AddAdminMenuEntry", AddAdminMenuEntry));
+                Stream.add("<br><br>");
                 //
                 //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
-                Stream.Add("</SPAN>");
+                Stream.add("</SPAN>");
                 //
-                result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
+                result = AdminUIController.getToolForm(core, Stream.text, ButtonList);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

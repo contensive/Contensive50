@@ -49,7 +49,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string Title = "Set Columns: " + adminContent.name;
                 string Description = "Use the icons to add, remove and modify your personal column prefernces for this content (" + adminContent.name + "). Hit OK when complete. Hit Reset to restore your column preferences for this content to the site's default column preferences.";
-                Stream.Add(AdminUIController.getHeaderTitleDescription(Title, Description));
+                Stream.add(AdminUIController.getHeaderTitleDescription(Title, Description));
                 //
                 //--------------------------------------------------------------------------------
                 // Process actions
@@ -246,34 +246,34 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //   Display the form
                     //--------------------------------------------------------------------------------
                     //
-                    Stream.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
-                    Stream.Add("<td width=\"5%\">&nbsp;</td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>10%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>20%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>30%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>40%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>50%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>60%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>70%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>80%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>90%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>100%</nobr></td>");
-                    Stream.Add("<td width=\"4%\" align=\"center\">&nbsp;</td>");
-                    Stream.Add("</tr></table>");
+                    Stream.add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
+                    Stream.add("<td width=\"5%\">&nbsp;</td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>10%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>20%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>30%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>40%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>50%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>60%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>70%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>80%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>90%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>100%</nobr></td>");
+                    Stream.add("<td width=\"4%\" align=\"center\">&nbsp;</td>");
+                    Stream.add("</tr></table>");
                     //
-                    Stream.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("</tr></table>");
+                    Stream.add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
+                    Stream.add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><img src=\"" + cdnPrefix + "images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.add("</tr></table>");
                     //
                     // print the column headers
                     //
@@ -287,10 +287,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                             ColumnWidthTotal += column.Width;
                         }
                         if (ColumnWidthTotal > 0) {
-                            Stream.Add("<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"90%\">");
+                            Stream.add("<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"90%\">");
                             //
                             // -- header
-                            Stream.Add("<tr>");
+                            Stream.add("<tr>");
                             int ColumnWidth = 0;
                             int fieldId = 0;
                             string Caption = null;
@@ -306,12 +306,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     Caption = Caption + "*";
                                     InheritedFieldCount = InheritedFieldCount + 1;
                                 }
-                                Stream.Add("<td class=\"small\" width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\" style=\"background-color:white;border: 1px solid #555;\">" + Caption + "</td>");
+                                Stream.add("<td class=\"small\" width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\" style=\"background-color:white;border: 1px solid #555;\">" + Caption + "</td>");
                             }
-                            Stream.Add("</tr>");
+                            Stream.add("</tr>");
                             //
                             // -- body
-                            Stream.Add("<tr>");
+                            Stream.add("<tr>");
                             foreach (var column in IndexConfig.columns) {
                                 //
                                 // print column headers - anchored so they sort columns
@@ -326,29 +326,29 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 }
                                 int ColumnPtr = 0;
                                 string link = "?" + core.doc.refreshQueryString + "&FieldName=" + HtmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns; 
-                                Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">");
-                                Stream.Add(HtmlController.div(AdminUIController.getDeleteLink(link + "&dta=" + ToolsActionRemoveField),"text-center"));
-                                Stream.Add(HtmlController.div(AdminUIController.getArrowRightLink(link + "&dta=" + ToolsActionMoveFieldRight), "text-center"));
-                                Stream.Add(HtmlController.div(AdminUIController.getArrowLeftLink(link + "&dta=" + ToolsActionMoveFieldLeft), "text-center"));
-                                Stream.Add(HtmlController.div(AdminUIController.getExpandLink(link + "&dta=" + ToolsActionExpand), "text-center"));
-                                Stream.Add(HtmlController.div(AdminUIController.getContractLink(link + "&dta=" + ToolsActionContract), "text-center"));
-                                Stream.Add("</td>");
+                                Stream.add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">");
+                                Stream.add(HtmlController.div(AdminUIController.getDeleteLink(link + "&dta=" + ToolsActionRemoveField),"text-center"));
+                                Stream.add(HtmlController.div(AdminUIController.getArrowRightLink(link + "&dta=" + ToolsActionMoveFieldRight), "text-center"));
+                                Stream.add(HtmlController.div(AdminUIController.getArrowLeftLink(link + "&dta=" + ToolsActionMoveFieldLeft), "text-center"));
+                                Stream.add(HtmlController.div(AdminUIController.getExpandLink(link + "&dta=" + ToolsActionExpand), "text-center"));
+                                Stream.add(HtmlController.div(AdminUIController.getContractLink(link + "&dta=" + ToolsActionContract), "text-center"));
+                                Stream.add("</td>");
                             }
-                            Stream.Add("</tr>");
-                            Stream.Add("</table>");
+                            Stream.add("</tr>");
+                            Stream.add("</table>");
                         }
                     }
                     //
                     // ----- If anything was inherited, put up the message
                     //
                     if (InheritedFieldCount > 0) {
-                        Stream.Add("<p class=\"ccNormal\">* This field was inherited from the Content Definition's Parent. Inherited fields will automatically change when the field in the parent is changed. If you alter these settings, this connection will be broken, and the field will no longer inherit it's properties.</P class=\"ccNormal\">");
+                        Stream.add("<p class=\"ccNormal\">* This field was inherited from the Content Definition's Parent. Inherited fields will automatically change when the field in the parent is changed. If you alter these settings, this connection will be broken, and the field will no longer inherit it's properties.</P class=\"ccNormal\">");
                     }
                     //
                     // ----- now output a list of fields to add
                     //
                     if (CDef.fields.Count == 0) {
-                        Stream.Add(SpanClassAdminNormal + "This Content Definition has no fields</span><br>");
+                        Stream.add(SpanClassAdminNormal + "This Content Definition has no fields</span><br>");
                     } else {
                         foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminContent.fields) {
                             ContentFieldMetadataModel field = keyValuePair.Value;
@@ -358,52 +358,52 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.File) {
                                     //
                                     // file can not be search
-                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (file field)"));
+                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (file field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileText) {
                                     //
                                     // filename can not be search
-                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (text file field)"));
+                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (text file field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileHTML) {
                                     //
                                     // filename can not be search
-                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (html file field)"));
+                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (html file field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileCSS) {
                                     //
                                     // css filename can not be search
-                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (css file field)"));
+                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (css file field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileXML) {
                                     //
                                     // xml filename can not be search
-                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (xml file field)"));
+                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (xml file field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileJavascript) {
                                     //
                                     // javascript filename can not be search
-                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (javascript file field)"));
+                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (javascript file field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.LongText) {
                                     //
                                     // long text can not be search
-                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
+                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.HTML) {
                                     //
                                     // long text can not be search
-                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
+                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileImage) {
                                     //
                                     // long text can not be search
-                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (image field)"));
+                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (image field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Redirect) {
                                     //
                                     // long text can not be search
-                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (redirect field)"));
+                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (redirect field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.ManyToMany) {
                                     //
                                     // many to many can not be search
-                                    Stream.Add(HtmlController.div( iconNotAvailable + "&nbsp;" + field.caption + " (many-to-many field)"));
+                                    Stream.add(HtmlController.div( iconNotAvailable + "&nbsp;" + field.caption + " (many-to-many field)"));
                                 } else {
                                     //
                                     // can be used as column header
                                     string link = "?" + core.doc.refreshQueryString + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldId + "=" + field.id + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
-                                    Stream.Add(HtmlController.div(AdminUIController.getPlusLink(link, "&nbsp;" + field.caption)));
+                                    Stream.add(HtmlController.div(AdminUIController.getPlusLink(link, "&nbsp;" + field.caption)));
                                 }
                             }
                         }
@@ -416,7 +416,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 core.siteProperties.setProperty("AllowContentAutoLoad", GenericController.encodeText(AllowContentAutoLoad));
                 string Content = ""
-                    + Stream.Text
+                    + Stream.text
                     + HtmlController.inputHidden("cid", adminContent.id.ToString())
                     + HtmlController.inputHidden(rnAdminForm, "1")
                     + HtmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns)

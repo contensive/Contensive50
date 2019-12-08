@@ -38,7 +38,7 @@ namespace Contensive.Processor.Addons.Tools {
             CoreController core = cp.core;
             try {
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                Stream.Add(AdminUIController.getHeaderTitleDescription("Run Manual Query", "This tool runs an SQL statement on a selected datasource. If there is a result set, the set is printed in a table."));
+                Stream.add(AdminUIController.getHeaderTitleDescription("Run Manual Query", "This tool runs an SQL statement on a selected datasource. If there is a result set, the set is printed in a table."));
                 //
                 // Get the members SQL Queue
                 //
@@ -94,46 +94,46 @@ namespace Contensive.Processor.Addons.Tools {
                     string errBefore = ErrorController.getDocExceptionHtmlList(core);
                     if (!string.IsNullOrWhiteSpace(errBefore)) {
                         // -- error in interface, should be fixed before attempting query
-                        Stream.Add("<br>" + DateTime.Now + " SQL NOT executed. The following errors were detected before execution");
-                        Stream.Add(errBefore);
+                        Stream.add("<br>" + DateTime.Now + " SQL NOT executed. The following errors were detected before execution");
+                        Stream.add(errBefore);
                     } else {
-                        Stream.Add("<p>" + DateTime.Now + " Executing sql [" + SQL + "] on DataSource [" + datasource.name + "]");
+                        Stream.add("<p>" + DateTime.Now + " Executing sql [" + SQL + "] on DataSource [" + datasource.name + "]");
                         DataTable dt = null;
                         try {
                             dt = core.db.executeQuery(SQL, PageSize * (PageNumber - 1), PageSize);
                         } catch (Exception ex) {
                             //
                             // ----- error
-                            Stream.Add("<br>" + DateTime.Now + " SQL execution returned the following error");
-                            Stream.Add("<br>" + ex.Message);
+                            Stream.add("<br>" + DateTime.Now + " SQL execution returned the following error");
+                            Stream.add("<br>" + ex.Message);
                         }
                         string errSql = ErrorController.getDocExceptionHtmlList(core);
                         if (!string.IsNullOrWhiteSpace(errSql)) {
-                            Stream.Add("<br>" + DateTime.Now + " SQL execution returned the following error");
-                            Stream.Add("<br>" + errSql);
+                            Stream.add("<br>" + DateTime.Now + " SQL execution returned the following error");
+                            Stream.add("<br>" + errSql);
                             core.doc.errorList.Clear();
                         } else {
-                            Stream.Add("<br>" + DateTime.Now + " SQL executed successfully");
+                            Stream.add("<br>" + DateTime.Now + " SQL executed successfully");
                             if (dt == null) {
-                                Stream.Add("<br>" + DateTime.Now + " SQL returned invalid data.");
+                                Stream.add("<br>" + DateTime.Now + " SQL returned invalid data.");
                             } else if (dt.Rows == null) {
-                                Stream.Add("<br>" + DateTime.Now + " SQL returned invalid data rows.");
+                                Stream.add("<br>" + DateTime.Now + " SQL returned invalid data rows.");
                             } else if (dt.Rows.Count == 0) {
-                                Stream.Add("<br>" + DateTime.Now + " The SQL returned no data.");
+                                Stream.add("<br>" + DateTime.Now + " The SQL returned no data.");
                             } else {
                                 //
                                 // ----- print results
                                 //
-                                Stream.Add("<br>" + DateTime.Now + " The following results were returned");
-                                Stream.Add("<br></p>");
+                                Stream.add("<br>" + DateTime.Now + " The following results were returned");
+                                Stream.add("<br></p>");
                                 //
                                 // --- Create the Fields for the new table
                                 //
                                 int FieldCount = dt.Columns.Count;
-                                Stream.Add("<table class=\"table table-bordered table-hover table-sm table-striped\">");
-                                Stream.Add("<thead class=\"thead - inverse\"><tr>");
-                                foreach (DataColumn dc in dt.Columns) Stream.Add("<th>" + dc.ColumnName + "</th>");
-                                Stream.Add("</tr></thead>");
+                                Stream.add("<table class=\"table table-bordered table-hover table-sm table-striped\">");
+                                Stream.add("<thead class=\"thead - inverse\"><tr>");
+                                foreach (DataColumn dc in dt.Columns) Stream.add("<th>" + dc.ColumnName + "</th>");
+                                Stream.add("</tr></thead>");
                                 //
                                 string[,] resultArray = core.db.convertDataTabletoArray(dt);
                                 //
@@ -145,25 +145,25 @@ namespace Contensive.Processor.Addons.Tools {
                                 string ColumnEnd = "</td>";
                                 int RowPointer = 0;
                                 for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                                    Stream.Add(RowStart);
+                                    Stream.add(RowStart);
                                     int ColumnPointer = 0;
                                     for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                         string CellData = resultArray[ColumnPointer, RowPointer];
                                         if (isNull(CellData)) {
-                                            Stream.Add(ColumnStart + "[null]" + ColumnEnd);
+                                            Stream.add(ColumnStart + "[null]" + ColumnEnd);
                                         } else if (string.IsNullOrEmpty(CellData)) {
-                                            Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
+                                            Stream.add(ColumnStart + "[empty]" + ColumnEnd);
                                         } else {
-                                            Stream.Add(ColumnStart + HtmlController.encodeHtml(GenericController.encodeText(CellData)) + ColumnEnd);
+                                            Stream.add(ColumnStart + HtmlController.encodeHtml(GenericController.encodeText(CellData)) + ColumnEnd);
                                         }
                                     }
-                                    Stream.Add(RowEnd);
+                                    Stream.add(RowEnd);
                                 }
-                                Stream.Add("</table>");
+                                Stream.add("</table>");
                             }
                         }
                     }
-                    Stream.Add("<p>" + DateTime.Now + " Done</p>");
+                    Stream.add("<p>" + DateTime.Now + " Done</p>");
                 }
                 //
                 // Display form
@@ -176,13 +176,13 @@ namespace Contensive.Processor.Addons.Tools {
                     } else {
                         core.userProperty.setProperty("ManualQueryInputRows", SQLRows.ToString());
                     }
-                    Stream.Add(AdminUIController.getDefaultEditor_TextArea(core, "SQL", SQL, false, "SQL"));
-                    Stream.Add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"SQLRows\" SIZE=\"3\" VALUE=\"" + SQLRows + "\" ID=\"\"  onchange=\"SQL.rows=SQLRows.value; return true\"> Rows");
+                    Stream.add(AdminUIController.getDefaultEditor_TextArea(core, "SQL", SQL, false, "SQL"));
+                    Stream.add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"SQLRows\" SIZE=\"3\" VALUE=\"" + SQLRows + "\" ID=\"\"  onchange=\"SQL.rows=SQLRows.value; return true\"> Rows");
                 }
                 //
                 // -- data source
                 bool isEmptyList = false;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_lookupContent(core, "DataSourceID", datasource.id, ContentMetadataModel.getContentId(core, "data sources"), ref isEmptyList)));
+                Stream.add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_lookupContent(core, "DataSourceID", datasource.id, ContentMetadataModel.getContentId(core, "data sources"), ref isEmptyList)));
                 {
                     //
                     // -- sql list
@@ -195,23 +195,23 @@ namespace Contensive.Processor.Addons.Tools {
 
                     string inputSelect = AdminUIController.getDefaultEditor_LookupList(core, "SQLList", "0" , lookupList,false, "SQLList");
                     inputSelect = inputSelect.Replace("<select ", "<select onChange=\"SQL.value=SQLList.value\" ");
-                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Previous Queries", inputSelect));
+                    Stream.add(AdminUIController.getToolFormInputRow(core, "Previous Queries", inputSelect));
                 }
                 //
                 // -- page size
                 if (isNull(PageSize)) PageSize = 100;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Page Size", AdminUIController.getDefaultEditor_text(core, "PageSize", PageSize.ToString())));
+                Stream.add(AdminUIController.getToolFormInputRow(core, "Page Size", AdminUIController.getDefaultEditor_text(core, "PageSize", PageSize.ToString())));
                 //
                 // -- page number
                 if (isNull(PageNumber)) PageNumber = 1;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Page Number", AdminUIController.getDefaultEditor_text(core, "PageNumber", PageNumber.ToString())));
+                Stream.add(AdminUIController.getToolFormInputRow(core, "Page Number", AdminUIController.getDefaultEditor_text(core, "PageNumber", PageNumber.ToString())));
                 //
                 // -- timeout
                 if (isNull(Timeout)) Timeout = 30;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Timeout (sec)", AdminUIController.getDefaultEditor_text(core, "Timeout", Timeout.ToString())));
+                Stream.add(AdminUIController.getToolFormInputRow(core, "Timeout (sec)", AdminUIController.getDefaultEditor_text(core, "Timeout", Timeout.ToString())));
                 //
                 // -- assemble form
-                returnHtml = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonRun);
+                returnHtml = AdminUIController.getToolForm(core, Stream.text, ButtonCancel + "," + ButtonRun);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

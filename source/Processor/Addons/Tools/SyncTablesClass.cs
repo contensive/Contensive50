@@ -40,26 +40,26 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
-                Stream.Add(AdminUIController.getHeaderTitleDescription("Synchronize Tables to Content Definitions", "This tools goes through all Content Definitions and creates any necessary Tables and Table Fields to support the Definition."));
+                Stream.add(AdminUIController.getHeaderTitleDescription("Synchronize Tables to Content Definitions", "This tools goes through all Content Definitions and creates any necessary Tables and Table Fields to support the Definition."));
                 //
                 if (core.docProperties.getText("Button") != "") {
                     //
                     //   Run Tools
                     //
-                    Stream.Add("Synchronizing Tables to Content Definitions<br>");
+                    Stream.add("Synchronizing Tables to Content Definitions<br>");
                     using (var csData = new CsModel(core)) {
                         csData.open("Content", "", "", false, 0, "id");
                         if (csData.ok()) {
                             do {
                                 metadata = Processor.Models.Domain.ContentMetadataModel.create(core, csData.getInteger("id"));
                                 TableName = metadata.tableName;
-                                Stream.Add("Synchronizing Content " + metadata.name + " to table " + TableName + "<br>");
+                                Stream.add("Synchronizing Content " + metadata.name + " to table " + TableName + "<br>");
                                 using (var db = new DbController(core, metadata.dataSourceName)) {
                                     db.createSQLTable(TableName);
                                     if (metadata.fields.Count > 0) {
                                         foreach (var keyValuePair in metadata.fields) {
                                             ContentFieldMetadataModel field = keyValuePair.Value;
-                                            Stream.Add("...Field " + field.nameLc + "<br>");
+                                            Stream.add("...Field " + field.nameLc + "<br>");
                                             db.createSQLTableField(TableName, field.nameLc, field.fieldTypeId);
                                         }
                                     }
@@ -71,7 +71,7 @@ namespace Contensive.Processor.Addons.Tools {
                         }
                     }
                 }
-                returnValue = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
+                returnValue = AdminUIController.getToolForm(core, Stream.text, ButtonList);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

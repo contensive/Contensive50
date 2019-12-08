@@ -134,12 +134,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                     }
                     StringBuilderLegacyController Tab0 = new StringBuilderLegacyController();
-                    Tab0.Add(HtmlController.inputHidden("RowCnt", RowPointer));
+                    Tab0.add(HtmlController.inputHidden("RowCnt", RowPointer));
                     string PreTableCopy = "";
                     string PostTableCopy = "";
                     string Cell = AdminUIController.getReport(core, RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
-                    Tab0.Add(Cell);
-                    Content = Tab0.Text;
+                    Tab0.add(Cell);
+                    Content = Tab0.text;
                     ButtonListLeft = ButtonCancel + "," + ButtonRefresh + "," + ButtonDelete;
                     ButtonListRight = "";
                     Content = Content + HtmlController.inputHidden(rnAdminSourceForm, AdminFormDownloads);

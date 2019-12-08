@@ -573,7 +573,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Not Admin Error
                     ButtonList = ButtonCancel;
-                    Content.Add(AdminUIController.getFormBodyAdminOnly());
+                    Content.add(AdminUIController.getFormBodyAdminOnly());
                 } else {
                     {
                         bool loadOK = true;
@@ -582,7 +582,7 @@ namespace Contensive.Processor.Controllers {
                             Doc.LoadXml(FormXML);
                         } catch (Exception) {
                             ButtonList = ButtonCancel;
-                            Content.Add("<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">There was a problem with the Setting Page you requested.</div>");
+                            Content.add("<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">There was a problem with the Setting Page you requested.</div>");
                             loadOK = false;
                         }
                         if (loadOK) {
@@ -594,7 +594,7 @@ namespace Contensive.Processor.Controllers {
                                 // error - Need a way to reach the user that submitted the file
                                 //
                                 ButtonList = ButtonCancel;
-                                Content.Add("<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">There was a problem with the Setting Page you requested.</div>");
+                                Content.add("<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">There was a problem with the Setting Page you requested.</div>");
                             } else {
                                 // todo - move locals
                                 string fieldfilename = "";
@@ -811,7 +811,7 @@ namespace Contensive.Processor.Controllers {
                                                         //
                                                         // Heading
                                                         FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-                                                        TabCell.Add(AdminUIController.getEditSubheadRow(core, FieldCaption));
+                                                        TabCell.add(AdminUIController.getEditSubheadRow(core, FieldCaption));
                                                         break;
                                                     case "siteproperty":
                                                         //
@@ -925,7 +925,7 @@ namespace Contensive.Processor.Controllers {
                                                                         break;
                                                                 }
                                                             }
-                                                            TabCell.Add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "copycontent":
@@ -962,7 +962,7 @@ namespace Contensive.Processor.Controllers {
                                                             } else {
                                                                 Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
                                                             }
-                                                            TabCell.Add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "filecontent":
@@ -987,7 +987,7 @@ namespace Contensive.Processor.Controllers {
                                                         } else {
                                                             Copy = AdminUIController.getDefaultEditor_TextArea(core, FieldName, FieldValue, FieldReadOnly);
                                                         }
-                                                        TabCell.Add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                     case "dbquery":
                                                     case "querydb":
@@ -1098,11 +1098,11 @@ namespace Contensive.Processor.Controllers {
                                                                 }
                                                             }
                                                         }
-                                                        TabCell.Add(AdminUIController.getEditRow(core, Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.add(AdminUIController.getEditRow(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                 }
                                             }
-                                            Copy = AdminUIController.getEditPanel(core, true, TabHeading, TabDescription, AdminUIController.editTable(TabCell.Text));
+                                            Copy = AdminUIController.getEditPanel(core, true, TabHeading, TabDescription, AdminUIController.editTable(TabCell.text));
                                             if (!string.IsNullOrEmpty(Copy)) {
                                                 adminMenu.addEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
@@ -1116,13 +1116,13 @@ namespace Contensive.Processor.Controllers {
                                 // Buttons
                                 //
                                 ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK;
-                                if (TabCnt > 0) { Content.Add(adminMenu.getTabs(core)); }
+                                if (TabCnt > 0) { Content.add(adminMenu.getTabs(core)); }
                             }
                         }
                     }
                 }
                 //
-                result = AdminUIController.getToolBody(core, Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
+                result = AdminUIController.getToolBody(core, Name, ButtonList, "", true, true, Description, "", 0, Content.text);
                 Content = null;
             } catch (Exception ex) {
                 LogController.logError(core, ex);

@@ -33,23 +33,23 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (adminData.adminContent.id == 0) {
                     //
                     // Bad content id
-                    Stream.Add(AdminErrorController.get(core, "This form requires a valid content definition, and one was not found for content ID [" + adminData.adminContent.id + "].", "No content definition was specified [ContentID=0]. Please contact your application developer for more assistance."));
+                    Stream.add(AdminErrorController.get(core, "This form requires a valid content definition, and one was not found for content ID [" + adminData.adminContent.id + "].", "No content definition was specified [ContentID=0]. Please contact your application developer for more assistance."));
                 } else if (string.IsNullOrEmpty(adminData.adminContent.name)) {
                     //
                     // Bad content name
-                    Stream.Add(AdminErrorController.get(core, "No content definition could be found for ContentID [" + adminData.adminContent.id + "]. This could be a menu error. Please contact your application developer for more assistance.", "No content definition for ContentID [" + adminData.adminContent.id + "] could be found."));
+                    Stream.add(AdminErrorController.get(core, "No content definition could be found for ContentID [" + adminData.adminContent.id + "]. This could be a menu error. Please contact your application developer for more assistance.", "No content definition for ContentID [" + adminData.adminContent.id + "] could be found."));
                 } else if (adminData.adminContent.tableName == "") {
                     //
                     // No tablename
-                    Stream.Add(AdminErrorController.get(core, "The content definition [" + adminData.adminContent.name + "] is not associated with a valid database table. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] ContentTablename is empty."));
+                    Stream.add(AdminErrorController.get(core, "The content definition [" + adminData.adminContent.name + "] is not associated with a valid database table. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] ContentTablename is empty."));
                 } else if (adminData.adminContent.fields.Count == 0) {
                     //
                     // No Fields
-                    Stream.Add(AdminErrorController.get(core, "This content [" + adminData.adminContent.name + "] cannot be accessed because it has no fields. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
+                    Stream.add(AdminErrorController.get(core, "This content [" + adminData.adminContent.name + "] cannot be accessed because it has no fields. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
                 } else if (adminData.adminContent.developerOnly && (!core.session.isAuthenticatedDeveloper())) {
                     //
                     // Developer Content and not developer
-                    Stream.Add(AdminErrorController.get(core, "Access to this content [" + adminData.adminContent.name + "] requires developer permissions. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
+                    Stream.add(AdminErrorController.get(core, "Access to this content [" + adminData.adminContent.name + "] requires developer permissions. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
                 } else {
                     List<string> tmp = new List<string> { };
                     DataSourceModel datasource = DataSourceModel.create(core.cpParent, adminData.adminContent.dataSourceId, ref tmp);
@@ -80,7 +80,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 }
                         }
                     }
-                    Stream.Add(Copy);
+                    Stream.add(Copy);
                     if (string.IsNullOrEmpty(Copy)) {
                         //
                         // If subforms return empty, go to parent form
@@ -454,19 +454,19 @@ namespace Contensive.Processor.Addons.AdminSite {
                             //
                             // Assemble LiveWindowTable
                             //
-                            Stream.Add(ButtonBar);
-                            Stream.Add(AdminUIController.getSectionHeader(core, "", titleRow));
-                            Stream.Add(formContent);
-                            Stream.Add(ButtonBar);
-                            Stream.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormIndex));
-                            Stream.Add(HtmlController.inputHidden("cid", adminData.adminContent.id));
-                            Stream.Add(HtmlController.inputHidden("indexGoToPage", ""));
-                            Stream.Add(HtmlController.inputHidden("Columncnt", IndexConfig.columns.Count));
+                            Stream.add(ButtonBar);
+                            Stream.add(AdminUIController.getSectionHeader(core, "", titleRow));
+                            Stream.add(formContent);
+                            Stream.add(ButtonBar);
+                            Stream.add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormIndex));
+                            Stream.add(HtmlController.inputHidden("cid", adminData.adminContent.id));
+                            Stream.add(HtmlController.inputHidden("indexGoToPage", ""));
+                            Stream.add(HtmlController.inputHidden("Columncnt", IndexConfig.columns.Count));
                             core.html.addTitle(adminData.adminContent.name);
                         }
                     }
                 }
-                result = HtmlController.form(core, Stream.Text, "", "adminForm");
+                result = HtmlController.form(core, Stream.text, "", "adminForm");
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1699,7 +1699,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (field.password) {
                     //
                     // -- do not list password fields
-                    Stream.Add("****");
+                    Stream.add("****");
                 } else {
                     int Pos = 0;
                     switch (field.fieldTypeId) {
@@ -1711,48 +1711,48 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 if (Pos != 0) {
                                     filename = filename.Substring(Pos);
                                 }
-                                Stream.Add(filename);
+                                Stream.add(filename);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
                                 if (IsLookupFieldValid) {
-                                    Stream.Add(csData.getText("LookupTable" + field.id + "Name"));
+                                    Stream.add(csData.getText("LookupTable" + field.id + "Name"));
                                 } else if (field.lookupList != "") {
                                     string[] lookups = field.lookupList.Split(',');
                                     int LookupPtr = csData.getInteger(field.nameLc) - 1;
                                     if (LookupPtr <= lookups.GetUpperBound(0)) {
                                         if (LookupPtr >= 0) {
-                                            Stream.Add(lookups[LookupPtr]);
+                                            Stream.add(lookups[LookupPtr]);
                                         }
                                     }
                                 } else {
-                                    Stream.Add(" ");
+                                    Stream.add(" ");
                                 }
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
                                 if (IsLookupFieldValid) {
-                                    Stream.Add(csData.getText("LookupTable" + field.id + "Name"));
+                                    Stream.add(csData.getText("LookupTable" + field.id + "Name"));
                                 } else {
-                                    Stream.Add(csData.getText(field.nameLc));
+                                    Stream.add(csData.getText(field.nameLc));
                                 }
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
                                 if (csData.getBoolean(field.nameLc)) {
-                                    Stream.Add("yes");
+                                    Stream.add("yes");
                                 } else {
-                                    Stream.Add("no");
+                                    Stream.add("no");
                                 }
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Currency: {
                                 string fieldValueText = csData.getText(field.nameLc);
                                 if (string.IsNullOrWhiteSpace(fieldValueText)) {
-                                    Stream.Add(fieldValueText);
+                                    Stream.add(fieldValueText);
                                     break;
                                 }
-                                Stream.Add(string.Format("{0:C}", csData.getNumber(field.nameLc)));
+                                Stream.add(string.Format("{0:C}", csData.getNumber(field.nameLc)));
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.LongText:
@@ -1761,7 +1761,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 if (fieldValueText.Length > 50) {
                                     fieldValueText = fieldValueText.left(50) + "[more]";
                                 }
-                                Stream.Add(fieldValueText);
+                                Stream.add(fieldValueText);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.FileText:
@@ -1772,13 +1772,13 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 string filename = csData.getText(field.nameLc);
                                 if (!string.IsNullOrEmpty(filename)) {
                                     string Copy = core.cdnFiles.readFileText(filename);
-                                    Stream.Add(Copy);
+                                    Stream.add(Copy);
                                 }
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Redirect:
                         case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
-                                Stream.Add("n/a");
+                                Stream.add("n/a");
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Date: {
@@ -1786,26 +1786,26 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // -- if minvalue, use blank, if no time-part, do short-date
                                 DateTime cellValueDate = csData.getDate(field.nameLc);
                                 if (cellValueDate.Equals(DateTime.MinValue)) {
-                                    Stream.Add("");
+                                    Stream.add("");
                                 } else if (cellValueDate.Equals(cellValueDate.Date)) {
-                                    Stream.Add(cellValueDate.ToShortDateString());
+                                    Stream.add(cellValueDate.ToShortDateString());
                                 } else {
-                                    Stream.Add(cellValueDate.ToString());
+                                    Stream.add(cellValueDate.ToString());
                                 }
                                 break;
                             }
                         default: {
                                 string valueString = csData.getText(field.nameLc);
                                 if (string.IsNullOrWhiteSpace(valueString)) {
-                                    Stream.Add(valueString);
+                                    Stream.add(valueString);
                                     break;
                                 }
-                                Stream.Add(csData.getText(field.nameLc));
+                                Stream.add(csData.getText(field.nameLc));
                                 break;
                             }
                     }
                 }
-                return HtmlController.encodeHtml(Stream.Text);
+                return HtmlController.encodeHtml(Stream.text);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

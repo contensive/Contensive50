@@ -1,27 +1,13 @@
-﻿
-using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
+﻿//
 using System.Text;
 //
 namespace Contensive.Processor.Controllers {
     public class StringBuilderLegacyController {
-        private StringBuilder builder = new StringBuilder();
-        public void Add(string NewString) {
+        private readonly StringBuilder builder = new StringBuilder();
+        public void add(string NewString) {
             builder.Append(NewString);
         }
-        public string Text {
+        public string text {
             get {
                 return builder.ToString();
             }

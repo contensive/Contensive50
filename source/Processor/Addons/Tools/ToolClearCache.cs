@@ -27,7 +27,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // Not Admin Error
                     //
                     ButtonList = Processor.Constants.ButtonCancel;
-                    Content.Add(AdminUIController.getFormBodyAdminOnly());
+                    Content.add(AdminUIController.getFormBodyAdminOnly());
                 } else {
                     //
                     // Process Requests
@@ -54,12 +54,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     // Close Tables
                     //
-                    Content.Add(AdminUIController.editTable("<p>Click OK or Apply to invalidate all local and remote cache data.</p>"));
-                    Content.Add(HtmlController.inputHidden(Processor.Constants.rnAdminSourceForm, Processor.Constants.AdminFormClearCache));
+                    Content.add(AdminUIController.editTable("<p>Click OK or Apply to invalidate all local and remote cache data.</p>"));
+                    Content.add(HtmlController.inputHidden(Processor.Constants.rnAdminSourceForm, Processor.Constants.AdminFormClearCache));
                 }
                 //
                 Description = "Hit Apply or OK to clear all current content caches";
-                returnHtml = AdminUIController.getToolBody(core, "Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                returnHtml = AdminUIController.getToolBody(core, "Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.text);
                 Content = null;
             } catch (Exception ex) {
                 LogController.logError(core, ex);

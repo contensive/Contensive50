@@ -104,8 +104,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                     expiresInput = "",
                     relatedButtonList = "",
                 });
-                body.Add(Render.StringToString(Resources.GroupRuleEditorRow2, groupRuleEditor));
-                result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Group Membership", "", body.Text );
+                body.add(Render.StringToString(Resources.GroupRuleEditorRow2, groupRuleEditor));
+                result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Group Membership", "", body.text );
                 adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
             } catch (Exception ex) {
                 LogController.logError(core, ex);

@@ -32,7 +32,7 @@ namespace Contensive.Processor.Addons.Tools {
                 string Button = null;
                 StringBuilderLegacyController s = new StringBuilderLegacyController();
                 //
-                s.Add(AdminUIController.getHeaderTitleDescription("IIS Reset", "Reset the webserver."));
+                s.add(AdminUIController.getHeaderTitleDescription("IIS Reset", "Reset the webserver."));
                 //
                 // Process the form
                 //
@@ -55,7 +55,7 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 // Display form
                 //
-                result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonIISReset);
+                result = AdminUIController.getToolForm(core, s.text, ButtonCancel + "," + ButtonIISReset);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

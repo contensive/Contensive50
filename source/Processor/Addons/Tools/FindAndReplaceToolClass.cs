@@ -50,7 +50,7 @@ namespace Contensive.Processor.Addons.Tools {
                 int FindRows = 0;
                 string lcName = null;
                 //
-                Stream.Add(AdminUIController.getHeaderTitleDescription("Find and Replace", "This tool runs a find and replace operation on content throughout the site."));
+                Stream.add(AdminUIController.getHeaderTitleDescription("Find and Replace", "This tool runs a find and replace operation on content throughout the site."));
                 //
                 // Process the form
                 //
@@ -80,7 +80,7 @@ namespace Contensive.Processor.Addons.Tools {
                             args = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, QS)
                         };
                         TaskSchedulerController.addTaskToQueue(core, cmdDetail, false);
-                        Stream.Add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
+                        Stream.add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
                     }
                 } else {
                     CDefList = "Page Content,Copy Content,Page Templates";
@@ -103,15 +103,15 @@ namespace Contensive.Processor.Addons.Tools {
                     core.userProperty.setProperty("FindAndReplaceReplaceRows", ReplaceRows.ToString());
                 }
                 //
-                Stream.Add("<div>Find</div>");
-                Stream.Add("<TEXTAREA NAME=\"FindText\" ROWS=\"" + FindRows + "\" ID=\"FindText\" STYLE=\"width: 800px;\">" + FindText + "</TEXTAREA>");
-                Stream.Add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"FindTextRows\" SIZE=\"3\" VALUE=\"" + FindRows + "\" ID=\"\"  onchange=\"FindText.rows=FindTextRows.value; return true\"> Rows");
-                Stream.Add("<br><br>");
+                Stream.add("<div>Find</div>");
+                Stream.add("<TEXTAREA NAME=\"FindText\" ROWS=\"" + FindRows + "\" ID=\"FindText\" STYLE=\"width: 800px;\">" + FindText + "</TEXTAREA>");
+                Stream.add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"FindTextRows\" SIZE=\"3\" VALUE=\"" + FindRows + "\" ID=\"\"  onchange=\"FindText.rows=FindTextRows.value; return true\"> Rows");
+                Stream.add("<br><br>");
                 //
-                Stream.Add("<div>Replace it with</div>");
-                Stream.Add("<TEXTAREA NAME=\"ReplaceText\" ROWS=\"" + ReplaceRows + "\" ID=\"ReplaceText\" STYLE=\"width: 800px;\">" + ReplaceText + "</TEXTAREA>");
-                Stream.Add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"ReplaceTextRows\" SIZE=\"3\" VALUE=\"" + ReplaceRows + "\" ID=\"\"  onchange=\"ReplaceText.rows=ReplaceTextRows.value; return true\"> Rows");
-                Stream.Add("<br><br>");
+                Stream.add("<div>Replace it with</div>");
+                Stream.add("<TEXTAREA NAME=\"ReplaceText\" ROWS=\"" + ReplaceRows + "\" ID=\"ReplaceText\" STYLE=\"width: 800px;\">" + ReplaceText + "</TEXTAREA>");
+                Stream.add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"ReplaceTextRows\" SIZE=\"3\" VALUE=\"" + ReplaceRows + "\" ID=\"\"  onchange=\"ReplaceText.rows=ReplaceTextRows.value; return true\"> Rows");
+                Stream.add("<br><br>");
                 //
                 using (var csData = new CsModel(core)) {
                     csData.open("Content");
@@ -130,9 +130,9 @@ namespace Contensive.Processor.Addons.Tools {
                         RowPtr = RowPtr + 1;
                     }
                 }
-                Stream.Add(TopHalf + BottomHalf + HtmlController.inputHidden("CDefRowCnt", RowPtr));
+                Stream.add(TopHalf + BottomHalf + HtmlController.inputHidden("CDefRowCnt", RowPtr));
                 //
-                result = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonFindAndReplace);
+                result = AdminUIController.getToolForm(core, Stream.text, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

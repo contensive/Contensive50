@@ -1,8 +1,7 @@
-﻿
+﻿//
 using System;
 using System.Collections.Generic;
 using System.Text;
-using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>

@@ -20,20 +20,20 @@ namespace Contensive.Processor.Addons.AdminSite {
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 //
                 // --- Start a form to make a refresh button
-                Stream.Add(core.html.getPanelButtons(ButtonCancel + "," + ButtonRefresh));
-                Stream.Add("<input TYPE=\"hidden\" NAME=\"asf\" VALUE=\"" + AdminFormQuickStats + "\">");
-                Stream.Add(core.html.getPanel(" "));
+                Stream.add(core.html.getPanelButtons(ButtonCancel + "," + ButtonRefresh));
+                Stream.add("<input TYPE=\"hidden\" NAME=\"asf\" VALUE=\"" + AdminFormQuickStats + "\">");
+                Stream.add(core.html.getPanel(" "));
                 //
 
                 // --- Indented part (Title Area plus page)
                 //
-                Stream.Add("<table border=\"0\" cellpadding=\"20\" cellspacing=\"0\" width=\"100%\"><tr><td>" + SpanClassAdminNormal);
-                Stream.Add("<h1>Real-Time Activity Report</h1>");
+                Stream.add("<table border=\"0\" cellpadding=\"20\" cellspacing=\"0\" width=\"100%\"><tr><td>" + SpanClassAdminNormal);
+                Stream.add("<h1>Real-Time Activity Report</h1>");
                 //
                 // --- set column width
                 //
-                Stream.Add("<h2>Visits Today</h2>");
-                Stream.Add("<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\" style=\"background-color:white;border-top:1px solid #888;\">");
+                Stream.add("<h2>Visits Today</h2>");
+                Stream.add("<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\" style=\"background-color:white;border-top:1px solid #888;\">");
                 //
                 // ----- All Visits Today
                 //
@@ -43,11 +43,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (csData.ok()) {
                         VisitCount = csData.getInteger("VisitCount");
                         PageCount = csData.getNumber("pageCount");
-                        Stream.Add("<tr>");
-                        Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "All Visits</span></td>");
-                        Stream.Add("<td style=\"width:150px;border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + core.doc.profileStartTime + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
-                        Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This includes all visitors to the website, including guests, bots and administrators. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
-                        Stream.Add("</tr>");
+                        Stream.add("<tr>");
+                        Stream.add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "All Visits</span></td>");
+                        Stream.add("<td style=\"width:150px;border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + core.doc.profileStartTime + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
+                        Stream.add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This includes all visitors to the website, including guests, bots and administrators. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
+                        Stream.add("</tr>");
                     }
                 }
                 //
@@ -59,11 +59,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (csData.ok()) {
                         VisitCount = csData.getInteger("VisitCount");
                         PageCount = csData.getNumber("pageCount");
-                        Stream.Add("<tr>");
-                        Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "Non-bot Visits</span></td>");
-                        Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + core.doc.profileStartTime.ToShortDateString() + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
-                        Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This excludes hits from visitors identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
-                        Stream.Add("</tr>");
+                        Stream.add("<tr>");
+                        Stream.add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "Non-bot Visits</span></td>");
+                        Stream.add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + core.doc.profileStartTime.ToShortDateString() + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
+                        Stream.add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This excludes hits from visitors identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
+                        Stream.add("</tr>");
                     }
                 }
                 //
@@ -75,22 +75,22 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (csData.ok()) {
                         VisitCount = csData.getInteger("VisitCount");
                         PageCount = csData.getNumber("pageCount");
-                        Stream.Add("<tr>");
-                        Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "Visits by New Visitors</span></td>");
-                        Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=3&ExcludeOldVisitors=1&DateFrom=" + core.doc.profileStartTime.ToShortDateString() + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
-                        Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This includes only new visitors not identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
-                        Stream.Add("</tr>");
+                        Stream.add("<tr>");
+                        Stream.add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "Visits by New Visitors</span></td>");
+                        Stream.add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=3&ExcludeOldVisitors=1&DateFrom=" + core.doc.profileStartTime.ToShortDateString() + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
+                        Stream.add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This includes only new visitors not identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
+                        Stream.add("</tr>");
                     }
                     csData.close();
                 }
                 //
-                Stream.Add("</table>");
+                Stream.add("</table>");
                 //
                 // ----- Visits currently online
                 //
                 {
                     Panel = "";
-                    Stream.Add("<h2>Current Visits</h2>");
+                    Stream.add("<h2>Current Visits</h2>");
                     using (var csData = new CsModel(core)) {
                         sql = "SELECT ccVisits.HTTP_REFERER as referer,ccVisits.remote_addr as Remote_Addr, ccVisits.LastVisitTime as LastVisitTime, ccVisits.PageVisits as PageVisits, ccMembers.Name as MemberName, ccVisits.ID as VisitID, ccMembers.ID as MemberID"
                             + " FROM ccVisits LEFT JOIN ccMembers ON ccVisits.memberId = ccMembers.ID"
@@ -129,12 +129,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                         csData.close();
                     }
-                    Stream.Add(core.html.getPanel(Panel, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 0));
+                    Stream.add(core.html.getPanel(Panel, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 0));
                 }
-                Stream.Add("</td></tr></table>");
+                Stream.add("</td></tr></table>");
                 //Stream.Add(htmlController.form_end());
                 //
-                tempGetForm_QuickStats = HtmlController.form(core, Stream.Text);
+                tempGetForm_QuickStats = HtmlController.form(core, Stream.text);
                 core.html.addTitle("Quick Stats");
                 return tempGetForm_QuickStats;
                 //

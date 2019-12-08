@@ -1,5 +1,4 @@
-﻿
-//
+﻿//
 namespace Contensive.Processor.Addons.Login {
     public class GetLoginButtonFormClass : Contensive.BaseClasses.AddonBaseClass {
         //

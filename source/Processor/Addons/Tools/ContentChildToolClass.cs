@@ -59,7 +59,7 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     //
                     ButtonList = ButtonCancel;
-                    Content.Add(AdminUIController.getFormBodyAdminOnly());
+                    Content.add(AdminUIController.getFormBodyAdminOnly());
                 } else {
                     //
                     if (Button != ButtonOK) {
@@ -161,17 +161,17 @@ namespace Contensive.Processor.Addons.Tools {
                             + "<br>" + cp.core.html.inputRadio("NewGroup", true.ToString(), NewGroup.ToString()) + HtmlController.inputText_Legacy(cp.core, "NewGroupName", NewGroupName) + "(Create a new group)";
                         tableBody += AdminUIController.getEditRowLegacy(cp.core, FieldValue, "Content Manager Group", "", false, false, "");
                         //
-                        Content.Add(AdminUIController.editTable(tableBody));
-                        Content.Add("</td></tr>" + kmaEndTable);
+                        Content.add(AdminUIController.editTable(tableBody));
+                        Content.add("</td></tr>" + kmaEndTable);
                         //
                         ButtonList = ButtonOK + "," + ButtonCancel;
                     }
-                    Content.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormContentChildTool));
+                    Content.add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormContentChildTool));
                 }
                 //
                 Caption = "Create Content Definition";
                 Description = "<div>This tool is used to create content definitions that help segregate your content into authorable segments.</div>" + Description;
-                result = AdminUIController.getToolBody(cp.core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
+                result = AdminUIController.getToolBody(cp.core, Caption, ButtonList, "", false, false, Description, "", 0, Content.text);
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
             }

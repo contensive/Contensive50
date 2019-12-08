@@ -57,7 +57,7 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     //
                     ButtonList = ButtonCancel;
-                    Content.Add(AdminUIController.getFormBodyAdminOnly());
+                    Content.add(AdminUIController.getFormBodyAdminOnly());
                 } else {
                     //
                     string tableBody = "";
@@ -149,14 +149,14 @@ namespace Contensive.Processor.Addons.Tools {
                     Copy = HtmlController.checkbox("ArchiveAllowFileClean", ArchiveAllowFileClean) + "&nbsp;Delete Contensive content files with no associated database record.";
                     tableBody += (AdminUIController.getEditRowLegacy(cp.core, Copy, Caption));
                     //
-                    Content.Add(AdminUIController.editTable(tableBody));
-                    Content.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminformHousekeepingControl));
+                    Content.add(AdminUIController.editTable(tableBody));
+                    Content.add(HtmlController.inputHidden(rnAdminSourceForm, AdminformHousekeepingControl));
                     ButtonList = ButtonCancel + ",Refresh," + ButtonSave + "," + ButtonOK;
                 }
                 //
                 Caption = "Data Housekeeping Control";
                 Description = "This tool is used to control the database record housekeeping process. This process deletes visit history records, so care should be taken before making any changes.";
-                tempGetForm_HouseKeepingControl = AdminUIController.getToolBody(cp.core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
+                tempGetForm_HouseKeepingControl = AdminUIController.getToolBody(cp.core, Caption, ButtonList, "", false, false, Description, "", 0, Content.text);
                 //
                 cp.core.html.addTitle(Caption);
             } catch (Exception ex) {

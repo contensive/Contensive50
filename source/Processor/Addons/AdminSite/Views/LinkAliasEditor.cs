@@ -39,25 +39,25 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (adminData.adminContent.fields.ContainsKey("linkalias")) {
                         linkAlias = GenericController.encodeText(editRecord.fieldsLc["linkalias"].value);
                     }
-                    f.Add("<tr><td class=\"ccAdminEditCaption\">" + SpanClassAdminSmall + "Link Alias</td>");
-                    f.Add("<td class=\"ccAdminEditField\" align=\"left\" colspan=\"2\">" + SpanClassAdminNormal);
+                    f.add("<tr><td class=\"ccAdminEditCaption\">" + SpanClassAdminSmall + "Link Alias</td>");
+                    f.add("<td class=\"ccAdminEditField\" align=\"left\" colspan=\"2\">" + SpanClassAdminNormal);
                     if (readOnlyField) {
-                        f.Add(linkAlias);
+                        f.add(linkAlias);
                     } else {
-                        f.Add(HtmlController.inputText_Legacy(core, "LinkAlias", linkAlias));
+                        f.add(HtmlController.inputText_Legacy(core, "LinkAlias", linkAlias));
                     }
-                    f.Add("</span></td></tr>");
+                    f.add("</span></td></tr>");
                     //
                     // Override Duplicates
                     //
-                    f.Add("<tr><td class=\"ccAdminEditCaption\">" + SpanClassAdminSmall + "Override Duplicates</td>");
-                    f.Add("<td class=\"ccAdminEditField\" align=\"left\" colspan=\"2\">" + SpanClassAdminNormal);
+                    f.add("<tr><td class=\"ccAdminEditCaption\">" + SpanClassAdminSmall + "Override Duplicates</td>");
+                    f.add("<td class=\"ccAdminEditField\" align=\"left\" colspan=\"2\">" + SpanClassAdminNormal);
                     if (readOnlyField) {
-                        f.Add("No");
+                        f.add("No");
                     } else {
-                        f.Add(HtmlController.checkbox("OverrideDuplicate", false));
+                        f.add(HtmlController.checkbox("OverrideDuplicate", false));
                     }
-                    f.Add("</span></td></tr>");
+                    f.add("</span></td></tr>");
                     //
                     // Table of old Link Aliases
                     //
@@ -71,12 +71,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                     }
                     if (LinkCnt > 0) {
-                        f.Add("<tr><td class=\"ccAdminEditCaption\">" + SpanClassAdminSmall + "Previous Link Alias List</td>");
-                        f.Add("<td class=\"ccAdminEditField\" align=\"left\" colspan=\"2\">" + SpanClassAdminNormal);
-                        f.Add(LinkList);
-                        f.Add("</span></td></tr>");
+                        f.add("<tr><td class=\"ccAdminEditCaption\">" + SpanClassAdminSmall + "Previous Link Alias List</td>");
+                        f.add("<td class=\"ccAdminEditField\" align=\"left\" colspan=\"2\">" + SpanClassAdminNormal);
+                        f.add(LinkList);
+                        f.add("</span></td></tr>");
                     }
-                    tabContent = AdminUIController.editTable(f.Text);
+                    tabContent = AdminUIController.editTable(f.text);
                 }
                 //
                 tempGetForm_Edit_LinkAliases = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Link Aliases", TabDescription, tabContent);

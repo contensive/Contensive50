@@ -43,7 +43,7 @@ namespace Contensive.Processor.Addons.Tools {
                 const string RequestNameAddField = "addfield";
                 const string RequestNameAddFieldId = "addfieldID";
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                Stream.Add(AdminUIController.getHeaderTitleDescription("Configure Admin Listing", "Configure the Administration Content Listing Page."));
+                Stream.add(AdminUIController.getHeaderTitleDescription("Configure Admin Listing", "Configure the Administration Content Listing Page."));
                 //
                 //   Load Request
                 int ToolsAction = core.docProperties.getInteger("dta");
@@ -291,36 +291,36 @@ namespace Contensive.Processor.Addons.Tools {
                     //--------------------------------------------------------------------------------
                     //
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        Stream.Add("<br><br><B>" + ContentName + "</b><br>");
+                        Stream.add("<br><br><B>" + ContentName + "</b><br>");
                     }
-                    Stream.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
-                    Stream.Add("<td width=\"5%\">&nbsp;</td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>10%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>20%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>30%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>40%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>50%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>60%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>70%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>80%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>90%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>100%</nobr></td>");
-                    Stream.Add("<td width=\"4%\" align=\"center\">&nbsp;</td>");
-                    Stream.Add("</tr></TABLE>");
+                    Stream.add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
+                    Stream.add("<td width=\"5%\">&nbsp;</td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>10%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>20%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>30%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>40%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>50%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>60%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>70%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>80%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>90%</nobr></td>");
+                    Stream.add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>100%</nobr></td>");
+                    Stream.add("<td width=\"4%\" align=\"center\">&nbsp;</td>");
+                    Stream.add("</tr></TABLE>");
                     //
-                    Stream.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.Add("</tr></TABLE>");
+                    Stream.add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("</tr></TABLE>");
                     //
                     // print the column headers
                     //
@@ -334,7 +334,7 @@ namespace Contensive.Processor.Addons.Tools {
                             ColumnWidthTotal += kvp.Value.Width;
                         }
                         if (ColumnWidthTotal > 0) {
-                            Stream.Add("<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"90%\">");
+                            Stream.add("<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"90%\">");
                             int ColumnCount = 0;
                             foreach (KeyValuePair<string, Processor.Models.Domain.ContentMetadataModel.MetaAdminColumnClass> kvp in CDef.adminColumns) {
                                 //
@@ -350,35 +350,35 @@ namespace Contensive.Processor.Addons.Tools {
                                     InheritedFieldCount = InheritedFieldCount + 1;
                                 }
                                 string AStart = "<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentId + "=" + ContentId + "&af=" + AdminFormToolConfigureListing + "&fi=" + fieldId + "&dtcn=" + ColumnCount;
-                                Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br>");
-                                Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.GIF\" width=\"100%\" height=\"1\">");
-                                Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionSetAZ + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonSortazUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionSetZA + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonSortzaUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionExpand + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionContract + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A>");
-                                Stream.Add("</SPAN></td>");
+                                Stream.add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br>");
+                                Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/black.GIF\" width=\"100%\" height=\"1\">");
+                                Stream.add(AStart + "&dta=" + ToolsActionRemoveField + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.add(AStart + "&dta=" + ToolsActionSetAZ + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonSortazUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.add(AStart + "&dta=" + ToolsActionSetZA + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonSortzaUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.add(AStart + "&dta=" + ToolsActionExpand + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.add(AStart + "&dta=" + ToolsActionContract + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A>");
+                                Stream.add("</SPAN></td>");
                                 ColumnCount += 1;
                             }
-                            Stream.Add("</tr>");
-                            Stream.Add("</TABLE>");
+                            Stream.add("</tr>");
+                            Stream.add("</TABLE>");
                         }
                     }
                     //
                     // ----- If anything was inherited, put up the message
                     //
                     if (InheritedFieldCount > 0) {
-                        Stream.Add("<P class=\"ccNormal\">* This field was inherited from the Content Definition's Parent. Inherited fields will automatically change when the field in the parent is changed. If you alter these settings, this connection will be broken, and the field will no longer inherit it's properties.</P class=\"ccNormal\">");
+                        Stream.add("<P class=\"ccNormal\">* This field was inherited from the Content Definition's Parent. Inherited fields will automatically change when the field in the parent is changed. If you alter these settings, this connection will be broken, and the field will no longer inherit it's properties.</P class=\"ccNormal\">");
                     }
                     //
                     // ----- now output a list of fields to add
                     //
                     if (CDef.fields.Count == 0) {
-                        Stream.Add(SpanClassAdminNormal + "This Content Definition has no fields</SPAN><br>");
+                        Stream.add(SpanClassAdminNormal + "This Content Definition has no fields</SPAN><br>");
                     } else {
-                        Stream.Add(SpanClassAdminNormal + "<br>");
+                        Stream.add(SpanClassAdminNormal + "<br>");
                         bool skipField = false;
                         foreach (KeyValuePair<string, Processor.Models.Domain.ContentFieldMetadataModel> keyValuePair in CDef.fields) {
                             Processor.Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
@@ -402,42 +402,42 @@ namespace Contensive.Processor.Addons.Tools {
                                     //
                                     // text filename can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (text file field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (text file field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileCSS) {
                                     //
                                     // text filename can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (css file field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (css file field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileXML) {
                                     //
                                     // text filename can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (xml file field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (xml file field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileJavascript) {
                                     //
                                     // text filename can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (javascript file field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (javascript file field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.LongText) {
                                     //
                                     // long text can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (long text field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (long text field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileImage) {
                                     //
                                     // long text can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (image field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (image field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Redirect) {
                                     //
                                     // long text can not be search
                                     //
-                                    Stream.Add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (redirect field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (redirect field)<br>");
                                 } else {
                                     //
                                     // can be used as column header
                                     //
-                                    Stream.Add("<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentId + "=" + ContentId + "&af=" + AdminFormToolConfigureListing + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldId + "=" + field.id + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonAddUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A> " + field.caption + "<br>");
+                                    Stream.add("<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentId + "=" + ContentId + "&af=" + AdminFormToolConfigureListing + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldId + "=" + field.id + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/LibButtonAddUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A> " + field.caption + "<br>");
                                 }
                             }
                         }
@@ -450,10 +450,10 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 string FormPanel = SpanClassAdminNormal + "Select a Content Definition to Configure its Listing Page<br>";
                 FormPanel = FormPanel + core.html.selectFromContent("ContentID", ContentId, "Content");
-                Stream.Add(core.html.getPanel(FormPanel));
+                Stream.add(core.html.getPanel(FormPanel));
                 core.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
-                Stream.Add(HtmlController.inputHidden("ReloadCDef", ReloadCDef));
-                result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
+                Stream.add(HtmlController.inputHidden("ReloadCDef", ReloadCDef));
+                result = AdminUIController.getToolForm(core, Stream.text, ButtonList);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

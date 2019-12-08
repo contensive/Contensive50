@@ -32,15 +32,15 @@ namespace Contensive.Processor.Addons.Tools {
                 string Button = null;
                 StringBuilderLegacyController s;
                 s = new StringBuilderLegacyController();
-                s.Add(AdminUIController.getHeaderTitleDescription("Create GUID", "Use this tool to create a GUID. This is useful when creating new Addons."));
+                s.add(AdminUIController.getHeaderTitleDescription("Create GUID", "Use this tool to create a GUID. This is useful when creating new Addons."));
                 //
                 // Process the form
                 Button = core.docProperties.getText("button");
                 //
-                s.Add(HtmlController.inputText_Legacy(core, "GUID", GenericController.getGUID(), 1, 80));
+                s.add(HtmlController.inputText_Legacy(core, "GUID", GenericController.getGUID(), 1, 80));
                 //
                 // Display form
-                result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonCreateGUId);
+                result = AdminUIController.getToolForm(core, s.text, ButtonCancel + "," + ButtonCreateGUId);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

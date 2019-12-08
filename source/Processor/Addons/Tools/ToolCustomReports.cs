@@ -129,7 +129,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     // Build Tab0
                     //
-                    Tab0.Add("<p>The following is a list of available custom reports.</p>");
+                    Tab0.add("<p>The following is a list of available custom reports.</p>");
                     //
                     RQS = core.doc.refreshQueryString;
                     PageSize = core.docProperties.getInteger(RequestNamePageSize);
@@ -192,32 +192,32 @@ namespace Contensive.Processor.Addons.AdminSite {
                         csData.close();
                     }
                     string Cell = null;
-                    Tab0.Add(HtmlController.inputHidden("RowCnt", RowPointer));
+                    Tab0.add(HtmlController.inputHidden("RowCnt", RowPointer));
                     Cell = AdminUIController.getReport(core, RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
-                    Tab0.Add("<div>" + Cell + "</div>");
+                    Tab0.add("<div>" + Cell + "</div>");
                     //
                     // Build RequestContent Form
                     //
-                    Tab1.Add("<p>Use this form to create a new custom report. Enter the SQL Query for the report, and a name that will be used as a caption.</p>");
+                    Tab1.add("<p>Use this form to create a new custom report. Enter the SQL Query for the report, and a name that will be used as a caption.</p>");
                     //
-                    Tab1.Add("<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">");
+                    Tab1.add("<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">");
                     //
-                    Tab1.Add("<tr>");
-                    Tab1.Add("<td align=right>Name</td>");
-                    Tab1.Add("<td>" + HtmlController.inputText_Legacy(core, "Name", "", 1, 40) + "</td>");
-                    Tab1.Add("</tr>");
+                    Tab1.add("<tr>");
+                    Tab1.add("<td align=right>Name</td>");
+                    Tab1.add("<td>" + HtmlController.inputText_Legacy(core, "Name", "", 1, 40) + "</td>");
+                    Tab1.add("</tr>");
                     //
-                    Tab1.Add("<tr>");
-                    Tab1.Add("<td align=right>SQL Query</td>");
-                    Tab1.Add("<td>" + HtmlController.inputText_Legacy(core, SQLFieldName, "", 8, 40) + "</td>");
-                    Tab1.Add("</tr>");
+                    Tab1.add("<tr>");
+                    Tab1.add("<td align=right>SQL Query</td>");
+                    Tab1.add("<td>" + HtmlController.inputText_Legacy(core, SQLFieldName, "", 8, 40) + "</td>");
+                    Tab1.add("</tr>");
                     //
-                    Tab1.Add("<tr><td width=\"120\"><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"120\" height=\"1\"></td><td width=\"100%\">&nbsp;</td></tr></table>");
+                    Tab1.add("<tr><td width=\"120\"><img alt=\"space\" src=\"" + cdnPrefix + "images/spacer.gif\" width=\"120\" height=\"1\"></td><td width=\"100%\">&nbsp;</td></tr></table>");
                     //
                     // Build and add tabs
                     //
-                    adminMenu.addEntry("Custom&nbsp;Reports", Tab0.Text, "ccAdminTab");
-                    adminMenu.addEntry("Request&nbsp;New&nbsp;Report", Tab1.Text, "ccAdminTab");
+                    adminMenu.addEntry("Custom&nbsp;Reports", Tab0.text, "ccAdminTab");
+                    adminMenu.addEntry("Request&nbsp;New&nbsp;Report", Tab1.text, "ccAdminTab");
                     Content = adminMenu.getTabs(core);
                     //
                 }
