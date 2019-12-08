@@ -1,18 +1,6 @@
-﻿
+﻿//
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
 using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Addons.Primitives {
@@ -30,7 +18,7 @@ namespace Contensive.Processor.Addons.Primitives {
                 CoreController core = ((CPClass)cp).core;
                 //
                 // save custom styles
-                if (core.session.isAuthenticated && core.session.isAuthenticatedAdmin()) {
+                if (core.session.isAuthenticatedAdmin()) {
                     int addonId = core.docProperties.getInteger("AddonID");
                     if (addonId > 0) {
                        AddonModel styleAddon =DbBaseModel.create<AddonModel>(core.cpParent, addonId);

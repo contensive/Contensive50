@@ -418,13 +418,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     if (listOfMatches.Any(s => findWord.MatchOption.Equals(s))) {
                                         FindWordValue = findWord.Value;
                                     }
-                                    //if ((findWord.MatchOption == FindWordMatchEnum.matchincludes) || (findWord.MatchOption == FindWordMatchEnum.MatchEquals)) {
-                                    //    FindWordValue = findWord.Value;
-                                    //} else if (findWord.MatchOption == FindWordMatchEnum.MatchTrue) {
-                                    //    FindWordValue = findWord.Value;
-                                    //} else if (findWord.MatchOption == FindWordMatchEnum.MatchFalse) {
-                                    //    FindWordValue = findWord.Value;
-                                    //}
                                 }
                                 DataTable_FindRow.Append(Environment.NewLine + "<td valign=\"middle\" align=\"center\" class=\"ccPanel3DReverse\" style=\"padding:8px;\">"
                                     + "<input type=hidden name=\"FindName" + ColumnPointer + "\" value=\"" + FieldName + "\">"
@@ -630,22 +623,12 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <param name="IndexConfig"></param>
         public static void setIndexSQL_ProcessIndexConfigRequests(CoreController core, AdminDataModel adminData, ref IndexConfigClass IndexConfig) {
             try {
-                //
-                int TestInteger = 0;
-                string VarText = null;
-                string FindName = null;
-                string FindValue = null;
-                int Ptr = 0;
-                int ColumnCnt = 0;
-                int ColumnPtr = 0;
-                string Button = null;
                 if (!IndexConfig.loaded) {
                     IndexConfig = IndexConfigClass.get(core, adminData);
                 }
                 //
                 // ----- Page number
-                //
-                VarText = core.docProperties.getText("rt");
+                string VarText = core.docProperties.getText("rt");
                 if (!string.IsNullOrEmpty(VarText)) {
                     IndexConfig.recordTop = GenericController.encodeInteger(VarText);
                 }
@@ -659,37 +642,34 @@ namespace Contensive.Processor.Addons.AdminSite {
                 }
                 IndexConfig.pageNumber = encodeInteger(1 + Math.Floor(IndexConfig.recordTop / (double)IndexConfig.recordsPerPage));
                 //
-                // ----- Process indexGoToPage value
                 //
-                TestInteger = core.docProperties.getInteger("indexGoToPage");
+                // ----- Process indexGoToPage value
+                int TestInteger = core.docProperties.getInteger("indexGoToPage");
                 if (TestInteger > 0) {
                     IndexConfig.pageNumber = TestInteger;
                     IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
                 } else {
                     //
                     // ----- Read filter changes and First/Next/Previous from form
-                    //
-                    Button = core.docProperties.getText(RequestNameButton);
+                    string Button = core.docProperties.getText(RequestNameButton);
                     if (!string.IsNullOrEmpty(Button)) {
+                        int ColumnCnt = 0;
                         switch (adminData.requestButton) {
                             case ButtonFirst:
                             //
                             // Force to first page
-                            //
                             IndexConfig.pageNumber = 1;
                             IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
                             break;
                             case ButtonNext:
                             //
                             // Go to next page
-                            //
                             IndexConfig.pageNumber = IndexConfig.pageNumber + 1;
                             IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
                             break;
                             case ButtonPrevious:
                             //
                             // Go to previous page
-                            //
                             IndexConfig.pageNumber = IndexConfig.pageNumber - 1;
                             if (IndexConfig.pageNumber <= 0) {
                                 IndexConfig.pageNumber = 1;
@@ -699,16 +679,16 @@ namespace Contensive.Processor.Addons.AdminSite {
                             case ButtonFind:
                             //
                             // Find (change search criteria and go to first page)
-                            //
                             IndexConfig.pageNumber = 1;
                             IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
                             ColumnCnt = core.docProperties.getInteger("ColumnCnt");
                             if (ColumnCnt > 0) {
+                                int ColumnPtr = 0;
                                 for (ColumnPtr = 0; ColumnPtr < ColumnCnt; ColumnPtr++) {
-                                    FindName = core.docProperties.getText("FindName" + ColumnPtr).ToLowerInvariant();
+                                    string FindName = core.docProperties.getText("FindName" + ColumnPtr).ToLowerInvariant();
                                     if (!string.IsNullOrEmpty(FindName)) {
                                         if (adminData.adminContent.fields.ContainsKey(FindName.ToLowerInvariant())) {
-                                            FindValue = encodeText(core.docProperties.getText("FindValue" + ColumnPtr)).Trim(' ');
+                                            string FindValue = encodeText(core.docProperties.getText("FindValue" + ColumnPtr)).Trim(' ');
                                             if (string.IsNullOrEmpty(FindValue)) {
                                                 //
                                                 // -- find blank, if name in list, remove it
@@ -762,11 +742,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                 }
                 //
                 // Process Filter form
-                //
                 if (core.docProperties.getBoolean("IndexFilterRemoveAll")) {
                     //
                     // Remove all filters
-                    //
                     IndexConfig.findWords = new Dictionary<string, IndexConfigClass.IndexConfigFindWordClass>();
                     IndexConfig.groupListCnt = 0;
                     IndexConfig.subCDefID = 0;
@@ -779,7 +757,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     int VarInteger;
                     //
                     // Add CDef
-                    //
                     VarInteger = core.docProperties.getInteger("IndexFilterAddCDef");
                     if (VarInteger != 0) {
                         IndexConfig.subCDefID = VarInteger;
@@ -787,7 +764,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                     //
                     // Remove CDef
-                    //
                     VarInteger = core.docProperties.getInteger("IndexFilterRemoveCDef");
                     if (VarInteger != 0) {
                         IndexConfig.subCDefID = 0;
@@ -795,8 +771,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                     //
                     // Add Groups
-                    //
                     VarText = core.docProperties.getText("IndexFilterAddGroup").ToLowerInvariant();
+                    int Ptr = 0;
                     if (!string.IsNullOrEmpty(VarText)) {
                         if (IndexConfig.groupListCnt > 0) {
                             for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
@@ -814,7 +790,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                     //
                     // Remove Groups
-                    //
                     VarText = core.docProperties.getText("IndexFilterRemoveGroup").ToLowerInvariant();
                     if (!string.IsNullOrEmpty(VarText)) {
                         if (IndexConfig.groupListCnt > 0) {
@@ -829,7 +804,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                     //
                     // Remove FindWords
-                    //
                     VarText = core.docProperties.getText("IndexFilterRemoveFind").ToLowerInvariant();
                     if (!string.IsNullOrEmpty(VarText)) {
                         if (IndexConfig.findWords.ContainsKey(VarText)) {
@@ -838,7 +812,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                     //
                     // Read ActiveOnly
-                    //
                     VarText = core.docProperties.getText("IndexFilterActiveOnly");
                     if (!string.IsNullOrEmpty(VarText)) {
                         IndexConfig.activeOnly = GenericController.encodeBoolean(VarText);
@@ -846,7 +819,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                     //
                     // Read LastEditedByMe
-                    //
                     VarText = core.docProperties.getText("IndexFilterLastEditedByMe");
                     if (!string.IsNullOrEmpty(VarText)) {
                         IndexConfig.lastEditedByMe = GenericController.encodeBoolean(VarText);
@@ -854,7 +826,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                     //
                     // Last Edited Past 30 Days
-                    //
                     VarText = core.docProperties.getText("IndexFilterLastEditedPast30Days");
                     if (!string.IsNullOrEmpty(VarText)) {
                         IndexConfig.lastEditedPast30Days = GenericController.encodeBoolean(VarText);
@@ -864,7 +835,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     } else {
                         //
                         // Past 7 Days
-                        //
                         VarText = core.docProperties.getText("IndexFilterLastEditedPast7Days");
                         if (!string.IsNullOrEmpty(VarText)) {
                             IndexConfig.lastEditedPast30Days = false;
@@ -874,7 +844,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                         } else {
                             //
                             // Read LastEditedToday
-                            //
                             VarText = core.docProperties.getText("IndexFilterLastEditedToday");
                             if (!string.IsNullOrEmpty(VarText)) {
                                 IndexConfig.lastEditedPast30Days = false;
@@ -886,7 +855,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                     //
                     // Read IndexFilterOpen
-                    //
                     VarText = core.docProperties.getText("IndexFilterOpen");
                     if (!string.IsNullOrEmpty(VarText)) {
                         IndexConfig.open = GenericController.encodeBoolean(VarText);
@@ -1148,201 +1116,244 @@ namespace Contensive.Processor.Addons.AdminSite {
                         IndexConfigClass.IndexConfigFindWordClass findword = kvp.Value;
                         int FindMatchOption = (int)findword.MatchOption;
                         if (FindMatchOption != (int)FindWordMatchEnum.MatchIgnore) {
-                            string FindWordName = GenericController.toLCase(findword.Name);
+                            string FindWordNameLc = GenericController.toLCase(findword.Name);
                             string FindWordValue = findword.Value;
                             //
                             // Get FieldType
                             if (adminData.adminContent.fields.Count > 0) {
+                                bool exitFor = false;
                                 foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
                                     ContentFieldMetadataModel field = keyValuePair.Value;
                                     //
                                     // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                                     FieldPtr = field.id;
-                                    if (GenericController.toLCase(field.nameLc) == FindWordName) {
+                                    if (GenericController.toLCase(field.nameLc) == FindWordNameLc) {
                                         switch (field.fieldTypeId) {
                                             case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
-                                            case CPContentBaseClass.FieldTypeIdEnum.Integer:
-                                            //
-                                            // integer
-                                            //
-                                            int FindWordValueInteger = GenericController.encodeInteger(FindWordValue);
-                                            switch (FindMatchOption) {
-                                                case (int)FindWordMatchEnum.MatchEmpty:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchEquals:
-                                                case (int)FindWordMatchEnum.matchincludes:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchGreaterThan:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchLessThan:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
-                                                break;
-                                            }
-                                            goto ExitLabel1;
-
-                                            case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                                            case CPContentBaseClass.FieldTypeIdEnum.Float:
-                                            //
-                                            // double
-                                            double FindWordValueDouble = GenericController.encodeNumber(FindWordValue);
-                                            switch (FindMatchOption) {
-                                                case (int)FindWordMatchEnum.MatchEmpty:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchEquals:
-                                                case (int)FindWordMatchEnum.matchincludes:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchGreaterThan:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchLessThan:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
-                                                break;
-                                            }
-                                            goto ExitLabel1;
-                                            case CPContentBaseClass.FieldTypeIdEnum.File:
-                                            case CPContentBaseClass.FieldTypeIdEnum.FileImage:
-                                            //
-                                            // Date
-                                            switch (FindMatchOption) {
-                                                case (int)FindWordMatchEnum.MatchEmpty:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
-                                                break;
-                                            }
-                                            goto ExitLabel1;
-                                            case CPContentBaseClass.FieldTypeIdEnum.Date:
-                                            //
-                                            // Date
-                                            DateTime findDate = DateTime.MinValue;
-                                            if (GenericController.isDate(FindWordValue)) {
-                                                findDate = DateTime.Parse(FindWordValue);
-                                            }
-                                            switch (FindMatchOption) {
-                                                case (int)FindWordMatchEnum.MatchEmpty:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchEquals:
-                                                case (int)FindWordMatchEnum.matchincludes:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLDate(findDate) + ")";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchGreaterThan:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + DbController.encodeSQLDate(findDate) + ")";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchLessThan:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLDate(findDate) + ")";
-                                                break;
-                                            }
-                                            goto ExitLabel1;
-                                            case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                                            case CPContentBaseClass.FieldTypeIdEnum.MemberSelect:
-                                            //
-                                            // Lookup
-                                            if (IsLookupFieldValid[field.nameLc]) {
-                                                //
-                                                // Content Lookup
-                                                switch (FindMatchOption) {
-                                                    case (int)FindWordMatchEnum.MatchEmpty:
-                                                    return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is null)";
-                                                    break;
-                                                    case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                    return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is not null)";
-                                                    break;
-                                                    case (int)FindWordMatchEnum.MatchEquals:
-                                                    return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name=" + DbController.encodeSQLText(FindWordValue) + ")";
-                                                    break;
-                                                    case (int)FindWordMatchEnum.matchincludes:
-                                                    return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name LIKE " + DbController.encodeSQLText("%" + FindWordValue + "%") + ")";
+                                            case CPContentBaseClass.FieldTypeIdEnum.Integer: {
+                                                    //
+                                                    // integer
+                                                    //
+                                                    int FindWordValueInteger = GenericController.encodeInteger(FindWordValue);
+                                                    switch (FindMatchOption) {
+                                                        case (int)FindWordMatchEnum.MatchEmpty: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is null)";
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.MatchNotEmpty: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is not null)";
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.MatchEquals:
+                                                        case (int)FindWordMatchEnum.matchincludes: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + "=" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.MatchGreaterThan: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + ">" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.MatchLessThan: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + "<" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                                break;
+                                                            }
+                                                    }
+                                                    exitFor = true;
                                                     break;
                                                 }
-                                            } else if (field.lookupList != "") {
-                                                string LookupQuery = null;
-                                                //
-                                                int LookupPtr = 0;
-                                                string[] lookups = null;
-                                                //
-                                                // LookupList
-                                                switch (FindMatchOption) {
-                                                    case (int)FindWordMatchEnum.MatchEmpty:
-                                                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
+                                            case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                                            case CPContentBaseClass.FieldTypeIdEnum.Float: {
+                                                    //
+                                                    // double
+                                                    double FindWordValueDouble = GenericController.encodeNumber(FindWordValue);
+                                                    switch (FindMatchOption) {
+                                                        case (int)FindWordMatchEnum.MatchEmpty: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is null)";
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.MatchNotEmpty: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is not null)";
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.MatchGreaterThan: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + ">" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.MatchLessThan: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + "<" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                                break;
+                                                            }
+                                                        default: {
+                                                                // (int)FindWordMatchEnum.MatchEquals:
+                                                                // (int)FindWordMatchEnum.matchincludes:
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + "=" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                                break;
+                                                            }
+                                                    }
+                                                    exitFor = true;
                                                     break;
-                                                    case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
+                                                }
+                                            case CPContentBaseClass.FieldTypeIdEnum.File:
+                                            case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
+                                                    //
+                                                    // Date
+                                                    switch (FindMatchOption) {
+                                                        case (int)FindWordMatchEnum.MatchEmpty: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is null)";
+                                                                break;
+                                                            }
+                                                        default: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is not null)";
+                                                                break;
+                                                            }
+                                                    }
+                                                    exitFor = true;
                                                     break;
-                                                    case (int)FindWordMatchEnum.MatchEquals:
-                                                    case (int)FindWordMatchEnum.matchincludes:
-                                                    lookups = field.lookupList.ToLower(CultureInfo.InvariantCulture).Split(',');
-                                                    LookupQuery = "(1=0)";
-                                                    for (LookupPtr = 0; LookupPtr <= lookups.GetUpperBound(0); LookupPtr++) {
-                                                        if (lookups[LookupPtr].Contains(FindWordValue.ToLower(CultureInfo.InvariantCulture))) {
-                                                            LookupQuery = LookupQuery + "OR(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(LookupPtr + 1) + ")";
+                                                }
+                                            case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                                                    //
+                                                    // Date
+                                                    DateTime findDate = DateTime.MinValue;
+                                                    if (GenericController.isDate(FindWordValue)) { findDate = DateTime.Parse(FindWordValue); }
+                                                    switch (FindMatchOption) {
+                                                        case (int)FindWordMatchEnum.MatchEmpty: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is null)";
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.MatchNotEmpty: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is not null)";
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.MatchGreaterThan: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + ">" + DbController.encodeSQLDate(findDate) + ")";
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.MatchLessThan: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + "<" + DbController.encodeSQLDate(findDate) + ")";
+                                                                break;
+                                                            }
+                                                        default: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + "=" + DbController.encodeSQLDate(findDate) + ")";
+                                                                break;
+                                                            }
+                                                    }
+                                                    exitFor = true;
+                                                    break;
+                                                }
+                                            case CPContentBaseClass.FieldTypeIdEnum.Lookup:
+                                            case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
+                                                    //
+                                                    // Lookup
+                                                    if (IsLookupFieldValid[field.nameLc]) {
+                                                        //
+                                                        // Content Lookup
+                                                        switch (FindMatchOption) {
+                                                            case (int)FindWordMatchEnum.MatchEmpty: {
+                                                                    return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is null)";
+                                                                    break;
+                                                                }
+                                                            case (int)FindWordMatchEnum.MatchNotEmpty: {
+                                                                    return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is not null)";
+                                                                    break;
+                                                                }
+                                                            case (int)FindWordMatchEnum.MatchEquals: {
+                                                                    return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name=" + DbController.encodeSQLText(FindWordValue) + ")";
+                                                                    break;
+                                                                }
+                                                            case (int)FindWordMatchEnum.matchincludes: {
+                                                                    return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name LIKE " + DbController.encodeSQLText("%" + FindWordValue + "%") + ")";
+                                                                    break;
+                                                                }
+                                                        }
+                                                    } else if (field.lookupList != "") {
+                                                        //
+                                                        // LookupList
+                                                        switch (FindMatchOption) {
+                                                            case (int)FindWordMatchEnum.MatchEmpty: {
+                                                                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is null)";
+                                                                    break;
+                                                                }
+                                                            case (int)FindWordMatchEnum.MatchNotEmpty: {
+                                                                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is not null)";
+                                                                    break;
+                                                                }
+                                                            default: {
+                                                                    string[] lookups = field.lookupList.ToLower(CultureInfo.InvariantCulture).Split(',');
+                                                                    string LookupQuery = "(1=0)";
+                                                                    //
+                                                                    for (int LookupPtr = 0; LookupPtr <= lookups.GetUpperBound(0); LookupPtr++) {
+                                                                        if (lookups[LookupPtr].Contains(FindWordValue.ToLower(CultureInfo.InvariantCulture))) {
+                                                                            LookupQuery = LookupQuery + "OR(" + adminData.adminContent.tableName + "." + FindWordNameLc + "=" + DbController.encodeSQLNumber(LookupPtr + 1) + ")";
+                                                                        }
+                                                                    }
+                                                                    if (!string.IsNullOrEmpty(LookupQuery)) {
+                                                                        return_SQLWhere += "AND(" + LookupQuery + ")";
+                                                                    }
+                                                                    break;
+                                                                }
                                                         }
                                                     }
-                                                    if (!string.IsNullOrEmpty(LookupQuery)) {
-                                                        return_SQLWhere += "AND(" + LookupQuery + ")";
-                                                    }
+                                                    exitFor = true;
                                                     break;
                                                 }
-                                            }
-                                            goto ExitLabel1;
-                                            case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                                            //
-                                            // Boolean
-                                            switch (FindMatchOption) {
-                                                case (int)FindWordMatchEnum.matchincludes:
-                                                if (GenericController.encodeBoolean(FindWordValue)) {
-                                                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<>0)";
-                                                } else {
-                                                    return_SQLWhere += "AND((" + adminData.adminContent.tableName + "." + FindWordName + "=0)or(" + adminData.adminContent.tableName + "." + FindWordName + " is null))";
+                                            case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                                                    //
+                                                    // Boolean
+                                                    switch (FindMatchOption) {
+                                                        case (int)FindWordMatchEnum.matchincludes: {
+                                                                if (GenericController.encodeBoolean(FindWordValue)) {
+                                                                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + "<>0)";
+                                                                } else {
+                                                                    return_SQLWhere += "AND((" + adminData.adminContent.tableName + "." + FindWordNameLc + "=0)or(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is null))";
+                                                                }
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.MatchTrue: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + "<>0)";
+                                                                break;
+                                                            }
+                                                        default: {
+                                                                // FindWordMatchEnum.MatchFalse
+                                                                return_SQLWhere += "AND((" + adminData.adminContent.tableName + "." + FindWordNameLc + "=0)or(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is null))";
+                                                                break;
+                                                            }
+                                                    }
+                                                    exitFor = true;
+                                                    break;
                                                 }
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchTrue:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<>0)";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchFalse:
-                                                return_SQLWhere += "AND((" + adminData.adminContent.tableName + "." + FindWordName + "=0)or(" + adminData.adminContent.tableName + "." + FindWordName + " is null))";
-                                                break;
-                                            }
-                                            goto ExitLabel1;
-                                            default:
-                                            //
-                                            // Text (and the rest)
-                                            switch (FindMatchOption) {
-                                                case (int)FindWordMatchEnum.MatchEmpty:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is null)";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
-                                                break;
-                                                case (int)FindWordMatchEnum.matchincludes:
-                                                FindWordValue = DbController.encodeSQLText(FindWordValue);
-                                                FindWordValue = FindWordValue.Substring(1, FindWordValue.Length - 2);
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " LIKE '%" + FindWordValue + "%')";
-                                                break;
-                                                case (int)FindWordMatchEnum.MatchEquals:
-                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLText(FindWordValue) + ")";
-                                                break;
-                                            }
-                                            goto ExitLabel1;
+                                            default: {
+                                                    //
+                                                    // Text (and the rest)
+                                                    switch (FindMatchOption) {
+                                                        case (int)FindWordMatchEnum.MatchEmpty: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is null)";
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.MatchNotEmpty: {
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " is not null)";
+                                                                break;
+                                                            }
+                                                        case (int)FindWordMatchEnum.matchincludes: {
+                                                                FindWordValue = DbController.encodeSQLText(FindWordValue);
+                                                                FindWordValue = FindWordValue.Substring(1, FindWordValue.Length - 2);
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " LIKE '%" + FindWordValue + "%')";
+                                                                break;
+                                                            }
+                                                        default: {
+                                                                // FindWordMatchEnum.MatchEquals
+                                                                return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + "=" + DbController.encodeSQLText(FindWordValue) + ")";
+                                                                break;
+                                                            }
+                                                    }
+                                                    exitFor = true;
+                                                    break;
+                                                }
                                         }
                                     }
+                                    //
+                                    // -- field found, no need to keep searching
+                                    if (exitFor) { break; }
                                 }
-                            ExitLabel1:;
                             }
                         }
                     }
