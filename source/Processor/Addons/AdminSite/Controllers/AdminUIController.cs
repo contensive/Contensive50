@@ -33,20 +33,20 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         }
         //
         public class EditButtonBarInfoClass {
-            public bool allowDelete;
-            public bool allowCancel;
-            public bool allowSave;
-            public bool allowAdd;
-            public bool allowActivate;
-            public bool allowSendTest;
-            public bool allowSend;
-            public bool hasChildRecords;
-            public bool isPageContent;
-            public bool allowMarkReviewed;
-            public bool allowRefresh;
-            public bool allowCreateDuplicate;
-            public bool allowDeactivate;
-            public int contentId;
+            public bool allowDelete { get; set; }
+            public bool allowCancel { get; set; }
+            public bool allowSave { get; set; }
+            public bool allowAdd { get; set; }
+            public bool allowActivate { get; set; }
+            public bool allowSendTest { get; set; }
+            public bool allowSend { get; set; }
+            public bool hasChildRecords { get; set; }
+            public bool isPageContent { get; set; }
+            public bool allowMarkReviewed { get; set; }
+            public bool allowRefresh { get; set; }
+            public bool allowCreateDuplicate { get; set; }
+            public bool allowDeactivate { get; set; }
+            public int contentId { get; set; }
             //
             public EditButtonBarInfoClass(CoreController core,AdminDataModel adminData, bool allowDelete, bool allowRefresh, bool allowSave) {
                 allowActivate = false;
