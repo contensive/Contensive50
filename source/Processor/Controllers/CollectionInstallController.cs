@@ -2,12 +2,8 @@
 using System;
 using System.Xml;
 using System.Collections.Generic;
-
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-using System.IO;
-using System.Data;
-using System.Threading;
 using Contensive.Processor.Models.Domain;
 using System.Linq;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;

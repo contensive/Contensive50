@@ -1,6 +1,5 @@
 ﻿
 using System;
-using System.Collections.Generic;
 
 namespace Contensive.Processor {
     public class CPJSONClass : BaseClasses.CPJSONBaseClass, IDisposable {

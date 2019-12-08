@@ -1,11 +1,8 @@
-﻿
+﻿//
 using System;
-using Contensive.Processor;
-
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-using Contensive.Processor.Models.Domain;
 using Contensive.BaseClasses;
 using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
@@ -20,7 +17,6 @@ namespace Contensive.Processor.Addons.Email {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(CPBaseClass cp) {
-            string result = "";
             try {
                 //
                 // -- ok to cast cpbase to cp because they build from the same solution
@@ -39,7 +35,7 @@ namespace Contensive.Processor.Addons.Email {
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }
-            return result;
+            return "";
         }
         //
         //====================================================================================================

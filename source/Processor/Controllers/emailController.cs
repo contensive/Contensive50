@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor.Models.Domain;

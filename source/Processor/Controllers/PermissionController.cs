@@ -1,7 +1,7 @@
 ﻿
-using Contensive.Processor.Models.Domain;
 using System;
 using System.Collections.Generic;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Processor.Controllers {
     //

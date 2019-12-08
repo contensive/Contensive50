@@ -1,6 +1,5 @@
 ﻿
 using System;
-using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Controllers {

@@ -1,10 +1,7 @@
 ﻿
 using System;
-using System.Reflection;
 using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
-
-using System.Collections.Generic;
 using static Contensive.Processor.Constants;
 using static Contensive.Processor.Controllers.GenericController;
 using System.Diagnostics;

@@ -1,14 +1,9 @@
 ﻿
 using System;
 using System.Reflection;
-using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
 using System.Collections.Generic;
 using static Contensive.Processor.Constants;
-using static Contensive.Processor.Controllers.GenericController;
-using System.Diagnostics;
-using Contensive.Processor.Exceptions;
-using System.Security.Policy;
 using NLog;
 using Contensive.Models.Db;
 using Contensive.BaseModels;

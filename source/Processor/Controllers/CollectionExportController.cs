@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
-using ICSharpCode.SharpZipLib.GZip;
 using static Contensive.BaseClasses.CPContentBaseClass;
-using static Contensive.Processor.Constants;
-
 
 namespace Contensive.Processor.Controllers {
     public class CollectionExportClass {

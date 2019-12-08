@@ -1,8 +1,5 @@
 ﻿
 using System;
-using Contensive.Processor;
-
-using System.Text;
 using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Addons.Base {

@@ -3,7 +3,6 @@ using System;
 using System.Reflection;
 using System.Xml;
 using System.Collections.Generic;
-
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
@@ -1176,7 +1175,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 try {
-                    mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(core);
+                    MainCsvScriptCompatibilityClass mainCsv = new MainCsvScriptCompatibilityClass(core);
                     engine.AddHostObject("ccLib", mainCsv);
                 } catch (Exception) {
                     throw;
@@ -1252,7 +1251,7 @@ namespace Contensive.Processor.Controllers {
                     entryPoint = entryPoint.Trim() + "()";
                 }
                 try {
-                    mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(core);
+                    MainCsvScriptCompatibilityClass mainCsv = new MainCsvScriptCompatibilityClass(core);
                     engine.AddHostObject("ccLib", mainCsv);
                 } catch (Exception) {
                     throw;

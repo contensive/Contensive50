@@ -1,6 +1,5 @@
 ﻿
 using System;
-using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor {

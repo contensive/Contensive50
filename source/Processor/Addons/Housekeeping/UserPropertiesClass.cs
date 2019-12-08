@@ -1,8 +1,6 @@
 ﻿
 using System;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Processor.Addons.Housekeeping {

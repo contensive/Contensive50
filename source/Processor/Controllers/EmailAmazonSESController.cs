@@ -1,7 +1,5 @@
 ﻿
 using System;
-using System.Net.Mail;
-using System.Net.Mime;
 using System.Collections.Generic;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;

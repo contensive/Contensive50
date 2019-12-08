@@ -3,7 +3,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor {
     public class CPCacheClass : BaseClasses.CPCacheBaseClass, IDisposable {

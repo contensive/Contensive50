@@ -1,7 +1,6 @@
-﻿
+﻿//
 using System;
 using System.Collections.Generic;
-using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
 using Contensive.Models.Db;
@@ -17,13 +16,11 @@ namespace Contensive.Processor.Addons.Primitives {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
-            string result = "";
             try {
                 CoreController core = ((CPClass)cp).core;
                 //
                 // -- click spam block detected
                 {
-                    //
                     string recipientEmailToBlock = core.docProperties.getText(rnEmailBlockRecipientEmail);
                     if (!string.IsNullOrEmpty(recipientEmailToBlock)) {
                         List<PersonModel> recipientList = DbBaseModel.createList<PersonModel>(core.cpParent, "(email=" + DbController.encodeSQLText(recipientEmailToBlock) + ")");
@@ -56,7 +53,7 @@ namespace Contensive.Processor.Addons.Primitives {
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }
-            return result;
+            return "";
         }
     }
 }

@@ -1,11 +1,7 @@
-﻿
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
-using Contensive.Processor;
+﻿//
 using Contensive.Processor.Controllers;
 using System;
-using Contensive.Processor.Models.Domain;
-
+//
 namespace Contensive.Processor.Addons.Housekeeping {
     //
     public static class DailyTasksClass {

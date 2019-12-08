@@ -1,6 +1,5 @@
 ﻿
 using System;
-
 using Contensive.Processor.Controllers;
 using System.Collections.Generic;
 using Contensive.Models.Db;

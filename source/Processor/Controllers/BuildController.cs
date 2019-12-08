@@ -1,8 +1,6 @@
 ﻿
 using System;
-using System.Xml;
 using System.Collections.Generic;
-
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Data;
@@ -10,7 +8,6 @@ using System.Linq;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
-using Contensive.Models;
 using Contensive.Models.Db;
 using System.Collections.Specialized;
 

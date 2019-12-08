@@ -2,8 +2,6 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
-
-using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;

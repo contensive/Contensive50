@@ -1,11 +1,8 @@
 ﻿
 using System;
 using System.Data;
-using System.IO;
 using NLog;
 using NLog.Config;
-using NLog.Targets;
-using System.Diagnostics;
 using System.Collections.Generic;
 using NLog.AWS.Logger;
 //

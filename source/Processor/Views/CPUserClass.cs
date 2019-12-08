@@ -1,10 +1,7 @@
 ﻿
 using System;
-
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using Contensive.Processor.Models.Domain;
-using Contensive.Models.Db;
 //
 namespace Contensive.Processor {
     public class CPUserClass : BaseClasses.CPUserBaseClass, IDisposable {

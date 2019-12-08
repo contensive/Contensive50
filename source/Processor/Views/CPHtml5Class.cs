@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Contensive.BaseClasses;
 using Contensive.BaseModels;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor {
     public class CPHtml5Class : BaseClasses.CPHtml5BaseClass, IDisposable {

@@ -4,13 +4,11 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
-using Contensive.Models;
 using Contensive.Models.Db;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
