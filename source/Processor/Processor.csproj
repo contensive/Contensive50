@@ -386,6 +386,7 @@
     </Content>
     <Content Include="Resources\adminNavBarHtml.txt" />
     <Content Include="Resources\adminTemplateHtml.txt" />
+    <Content Include="Resources\ContensiveLogo-64x64.png" />
     <Content Include="Resources\defaultEmailBlockedResponsePage.html" />
     <Content Include="Resources\defaultLogin_email_html.txt" />
     <Content Include="Resources\defaultForgetPassword_html.txt" />
