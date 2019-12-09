@@ -37,7 +37,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <remarks></remarks>
-        public TaskRunnerController() {
+        public TaskRunnerController()  {
             runnerGuid = GenericController.getGUID();
         }
         //
@@ -65,7 +65,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Stop all activity through the content server, but do not unload
         /// </summary>
-        public void stopTimerEvents() {
+        public void stopTimerEvents()  {
             processTimer.Enabled = false;
         }
         //
@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="setVerbose"></param>
         /// <param name="singleThreaded"></param>
         /// <returns></returns>
-        public bool startTimerEvents() {
+        public bool startTimerEvents()  {
             bool returnStartedOk = true;
             processTimer = new System.Timers.Timer(ProcessTimerMsecPerTick);
             processTimer.Elapsed += processTimerTick;
@@ -309,11 +309,11 @@ namespace Contensive.Processor.Controllers {
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~TaskRunnerController() {
+        ~TaskRunnerController()  {
             Dispose(false);
 
 

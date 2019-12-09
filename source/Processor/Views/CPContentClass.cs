@@ -256,7 +256,7 @@ namespace Contensive.Processor {
         public override int AddContent(string contentName, string sqlTableName, string dataSourceName) {
             var tmpList = new List<string> { };
             DataSourceModel dataSource = DataSourceModel.createByUniqueName(cp, dataSourceName, ref tmpList);
-            return ContentMetadataModel.verifyContent_returnId(cp.core, new Models.Domain.ContentMetadataModel() {
+            return ContentMetadataModel.verifyContent_returnId(cp.core, new Models.Domain.ContentMetadataModel {
                 dataSourceName = dataSource.name,
                 tableName = sqlTableName,
                 name = contentName

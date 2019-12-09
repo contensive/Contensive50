@@ -1397,7 +1397,7 @@ namespace Contensive.Processor.Models.Domain {
         /// clone object
         /// </summary>
         /// <returns></returns>
-        public object Clone() {
+        public object Clone()  {
             return this.MemberwiseClone();
         }
     }

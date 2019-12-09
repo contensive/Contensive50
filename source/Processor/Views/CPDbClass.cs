@@ -51,7 +51,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override string GetConnectionString() {
+        public override string GetConnectionString()  {
             return db.getConnectionStringADONET(cp.core.appConfig.name);
         }
         //
@@ -422,12 +422,12 @@ namespace Contensive.Processor {
         }
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public override void Dispose() {
+        public override void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        ~CPDbClass() {
+        ~CPDbClass()  {
             Dispose(false);
         }
         #endregion

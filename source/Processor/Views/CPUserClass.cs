@@ -268,7 +268,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void Logout() {
+        public override void Logout()  {
             cp.core.session.logout();
         }
         //
@@ -384,7 +384,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         // todo  obsolete
         //
-        public override void Track() {
+        public override void Track()   {
             int localId = Id;
         }
         //
@@ -464,11 +464,11 @@ namespace Contensive.Processor {
         protected bool disposed_user;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~CPUserClass() {
+        ~CPUserClass()  {
             Dispose(false);
         }
         #endregion

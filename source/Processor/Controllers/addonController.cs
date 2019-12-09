@@ -837,7 +837,7 @@ namespace Contensive.Processor.Controllers {
                                                                     { "FieldValue", core.siteProperties.getText(FieldName, FieldDefaultValue) }
                                                                 };
                                                                 AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, FieldAddon);
-                                                                Copy = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                                                                Copy = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                                                                     addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
                                                                     argumentKeyValuePairs = arguments,
                                                                     errorContextMessage = "executing field addon [" + FieldAddon + "] for " + contextErrorMessage
@@ -1363,7 +1363,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- addon found, save addonsFound list and return the addon result
                         if (!core.assemblyList_AddonsFound.ContainsKey(assemblyFileDictKey)) {
-                            core.assemblyList_AddonsFound.Add(assemblyFileDictKey, new AssemblyFileDetails() {
+                            core.assemblyList_AddonsFound.Add(assemblyFileDictKey, new AssemblyFileDetails {
                                 pathFilename = testPathFilename,
                                 path = ""
                             });
@@ -1702,7 +1702,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public string getPrivateFilesAddonPath() {
+        public string getPrivateFilesAddonPath()  {
             return "addons\\";
         }
         //
@@ -1906,7 +1906,7 @@ namespace Contensive.Processor.Controllers {
                 try {
                     AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidAddonManager);
                     if (addon != null) {
-                        result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                        result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                             addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
                             errorContextMessage = "calling addon manager guid for GetAddonManager method"
                         });
@@ -2127,13 +2127,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose() {
+        public void Dispose()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~AddonController() {
+        ~AddonController()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }

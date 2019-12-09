@@ -128,7 +128,7 @@ namespace Contensive.Processor.Controllers {
                     string sql = "select contentfieldtypeid, max(addonId) as editorAddonId from ccAddonContentFieldTypeRules group by contentfieldtypeid";
                     DataTable dt = core.db.executeQuery(sql);
                     foreach (DataRow row in dt.Rows) {
-                        result.Add(new FieldTypeEditorAddonModel() {
+                        result.Add(new FieldTypeEditorAddonModel {
                             fieldTypeId = encodeInteger(row["contentfieldtypeid"]),
                             editorAddonId = encodeInteger(row["editorAddonId"])
                         });
@@ -147,7 +147,7 @@ namespace Contensive.Processor.Controllers {
                     DataTable dt = core.db.executeQuery(sql);
                     foreach (DataRow dr in dt.Rows) {
                         int fieldTypeId = GenericController.encodeInteger(dr["contentfieldtypeid"]);
-                        result.Add(new FieldTypeEditorAddonModel() {
+                        result.Add(new FieldTypeEditorAddonModel {
                             fieldTypeId = fieldTypeId,
                             editorAddonId = GenericController.encodeInteger(dr["editorAddonId"])
                         });
@@ -171,13 +171,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose() {
+        public void Dispose()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~EditorController() {
+        ~EditorController()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
 

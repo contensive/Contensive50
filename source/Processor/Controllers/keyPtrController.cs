@@ -45,7 +45,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        public string exportPropertyBag() {
+        public string exportPropertyBag()  {
             string returnBag = "";
             try {
                 returnBag = SerializeObject(store);
@@ -199,7 +199,7 @@ namespace Contensive.Processor.Controllers {
         //   returns empty if there are no Pointers indexed
         //========================================================================
         //
-        public int getFirstPtr() {
+        public int getFirstPtr()  {
             int firstPointer = -1;
             try {
                 if (store.ArrayDirty) {
@@ -223,7 +223,7 @@ namespace Contensive.Processor.Controllers {
         //   Returns empty if the index is at the end
         //========================================================================
         //
-        public int getNextPtr() {
+        public int getNextPtr()  {
             int nextPointer = -1;
             try {
                 if (store.ArrayDirty) {
@@ -244,7 +244,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        private void BubbleSort() {
+        private void BubbleSort()  {
             try {
                 string TempUcaseKey = null;
                 string tempPtrString = null;
@@ -289,7 +289,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        private void QuickSort() {
+        private void QuickSort()  {
             try {
                 if (store.ArrayCount >= 2) {
                     QuickSort_Segment(store.UcaseKeyArray, store.PointerArray, 0, store.ArrayCount - 1);
@@ -350,7 +350,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        private void Sort() {
+        private void Sort()  {
             try {
                 QuickSort();
                 store.ArrayDirty = false;
@@ -365,7 +365,7 @@ namespace Contensive.Processor.Controllers {
 
     public class IndexException : System.Exception, System.Runtime.Serialization.ISerializable {
 
-        public IndexException() {
+        public IndexException()  {
             // Add implementation.
         }
 

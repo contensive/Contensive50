@@ -20,7 +20,7 @@ namespace Contensive.Processor.Models.Domain {
         }
         private List<TabType> Tabs;
         //
-        public EditTabModel() {
+        public EditTabModel()  {
             Tabs = new List<TabType>();
         }
         //
@@ -36,7 +36,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="ContainerClass"></param>
         public void addEntry(string Caption, string Link, string AjaxLink, string LiveBody, bool IsHit, string ContainerClass) {
             try {
-                Tabs.Add(new TabType() {
+                Tabs.Add(new TabType {
                     AjaxLink = AjaxLink,
                     caption = Caption,
                     ContainerClass = (String.IsNullOrWhiteSpace(ContainerClass)) ? ContainerClass : "ccLiveTab",

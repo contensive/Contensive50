@@ -613,7 +613,7 @@ namespace Contensive.Processor.Controllers {
                         fileName = fileName.Substring(pos + 1);
                     }
                     if (unixPath.Equals(keyPath)) {
-                        returnFileList.Add(new FileDetail() {
+                        returnFileList.Add(new FileDetail {
                             Attributes = 0,
                             Type = "",
                             DateCreated = file.LastModified,
@@ -648,7 +648,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (var file in di.GetFiles()) {
                         //
                         // -- create a fileDetail for each file found
-                        returnFileList.Add(new FileDetail() {
+                        returnFileList.Add(new FileDetail {
                             Attributes = (int)file.Attributes,
                             DateCreated = file.CreationTime,
                             DateLastAccessed = file.LastAccessTime,
@@ -736,7 +736,7 @@ namespace Contensive.Processor.Controllers {
                     subFolder = subFolder.Substring(0, subFolder.Length - 1);
                     // -- skip subfolders as they match the ends-with-a-slash query
                     if (subFolder.Contains("/")) { continue; }
-                    returnFolders.Add(new FolderDetail() {
+                    returnFolders.Add(new FolderDetail {
                         Attributes = 0,
                         Type = "",
                         DateCreated = DateTime.MinValue,
@@ -762,7 +762,7 @@ namespace Contensive.Processor.Controllers {
                     string localPath = convertRelativeToLocalAbsPath(path);
                     DirectoryInfo di = new DirectoryInfo(localPath);
                     foreach (var folder in di.GetDirectories()) {
-                        returnFolders.Add(new FolderDetail() {
+                        returnFolders.Add(new FolderDetail {
                             Attributes = (int)folder.Attributes,
                             Type = "",
                             DateCreated = folder.CreationTime,
@@ -974,7 +974,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// getDriveFreeSpace
         /// </summary>
-        public double getDriveFreeSpace() {
+        public double getDriveFreeSpace()  {
             double returnSize = 0;
             try {
                 if (!isLocal) {
@@ -1780,7 +1780,7 @@ namespace Contensive.Processor.Controllers {
                 string absDosPathFilename = convertRelativeToLocalAbsPath(dosPathFilename);
                 FileInfo fileInfo = new FileInfo(absDosPathFilename);
                 if (!fileInfo.Exists) { return null; }
-                return new FileDetail() {
+                return new FileDetail {
                     Attributes = (int)fileInfo.Attributes,
                     DateCreated = fileInfo.CreationTime,
                     DateLastAccessed = fileInfo.LastAccessTime,
@@ -1826,7 +1826,7 @@ namespace Contensive.Processor.Controllers {
                         fileName = fileName.Substring(pos + 1);
                     }
                     if (unixPath.Equals(keyPath)) {
-                        return new FileDetail() {
+                        return new FileDetail {
                             Attributes = 0,
                             Type = "",
                             DateCreated = s3File.LastModified,
@@ -1958,11 +1958,11 @@ namespace Contensive.Processor.Controllers {
         }
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~FileController() {
+        ~FileController()  {
             Dispose(false);
 
 

@@ -114,7 +114,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public List<string> getKeyList() {
+        public List<string> getKeyList()  {
             List<string> keyList = new List<string>();
             foreach (KeyValuePair<string, DocPropertiesClass> kvp in docPropertiesDict) {
                 keyList.Add(kvp.Key);
@@ -258,7 +258,7 @@ namespace Contensive.Processor.Controllers {
         /// return the docProperties collection as the legacy optionString
         /// </summary>
         /// <returns></returns>
-        public string getLegacyOptionStringFromVar() {
+        public string getLegacyOptionStringFromVar()  {
             string returnString = "";
             try {
                 foreach (string key in getKeyList()) {

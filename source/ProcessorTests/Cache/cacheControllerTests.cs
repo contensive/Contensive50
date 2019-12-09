@@ -22,7 +22,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_cache_blank() {
+        public void Controllers_cache_blank()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 // act
@@ -34,7 +34,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_cache_SetGetString() {
+        public void Controllers_cache_SetGetString()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 string key = "test" + GenericController.getRandomInteger(cp.core).ToString();
@@ -58,7 +58,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_cache_SetGetObjectDefault() {
+        public void Controllers_cache_SetGetObjectDefault()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var srcTest = new cacheTestClass();
@@ -72,10 +72,10 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_cache_SetGetObjectNonDefault() {
+        public void Controllers_cache_SetGetObjectNonDefault()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
-                var srcTest = new cacheTestClass() {
+                var srcTest = new cacheTestClass {
                     prop1 = "b",
                     prop2 = 22,
                     prop3 = new DateTime(2003, 8, 5),
@@ -92,7 +92,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_cache_SetGetObjectWithDependency() {
+        public void Controllers_cache_SetGetObjectWithDependency()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -114,7 +114,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_cache_SetGetObjectWithDependencyList() {
+        public void Controllers_cache_SetGetObjectWithDependencyList()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -139,7 +139,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_cache_SetGetObjectWithInvalidationDate() {
+        public void Controllers_cache_SetGetObjectWithInvalidationDate()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -159,7 +159,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_cache_SetGetObjectWithInvalidate() {
+        public void Controllers_cache_SetGetObjectWithInvalidate()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -181,7 +181,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// set a key with a dependency on a content. insert a record into content, key should be invalidated
         /// </summary>
         [TestMethod]
-        public void Controllers_cache_SetGetAlias() {
+        public void Controllers_cache_SetGetAlias()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -200,7 +200,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// if you invalidate a key, any alias pointing to it should be invalidated
         /// </summary>
         [TestMethod]
-        public void Controllers_cache_SetGetAliasInvalidateKey() {
+        public void Controllers_cache_SetGetAliasInvalidateKey()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -222,7 +222,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// if you invalidate an alias, the parent key should be invalidated
         /// </summary>
         [TestMethod]
-        public void Controllers_cache_SetGetAliasInvalidateAlias() {
+        public void Controllers_cache_SetGetAliasInvalidateAlias()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();

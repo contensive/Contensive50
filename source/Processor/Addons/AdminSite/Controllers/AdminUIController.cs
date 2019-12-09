@@ -733,7 +733,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
             if (!string.IsNullOrEmpty(ButtonList.Trim(' '))) {
                 foreach (string buttonValue in ButtonList.Split(',')) {
                     string buttonValueTrim = buttonValue.Trim();
-                    result.Add(new ButtonMetadata() {
+                    result.Add(new ButtonMetadata {
                         name = "button",
                         value = buttonValue,
                         isAdd = buttonValueTrim.Equals(ButtonAdd),

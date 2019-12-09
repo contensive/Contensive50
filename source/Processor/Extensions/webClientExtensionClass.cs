@@ -38,7 +38,7 @@ public class WebClientExt : WebClient {
 
     public int timeout { get; set; }
 
-    public WebClientExt() {
+    public WebClientExt()  {
         timeout = -1;
         userAgent = "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727)";
         cookieContainer = new CookieContainer();
@@ -61,7 +61,7 @@ public class WebClientExt : WebClient {
         return request;
     }
 
-    private void RefreshUserAgent() {
+    private void RefreshUserAgent()  {
         List<string> UserAgents = new List<string> {
             "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727)",
             "Mozilla/4.0 (compatible; MSIE 8.0; AOL 9.5; AOLBuild 4337.43; Windows NT 6.0; Trident/4.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.5.21022; .NET CLR 3.5.30729; .NET CLR 3.0.30618)",

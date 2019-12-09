@@ -75,7 +75,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         returnHtml = returnHtml + "<div style=\"clear:both;margin-top:20px;\">&nbsp;</div>"
                         + "<div style=\"clear:both;margin-top:20px;\">" + Processor.Controllers.ErrorController.getUserError(core) + "</div>";
                     }
-                    returnHtml += core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                    returnHtml += core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                         errorContextMessage = "executing addon id:" + addonId + " set as Admin Root addon"
                     });

@@ -23,7 +23,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Constructor
         /// </summary>
-        public PageContentController() {
+        public PageContentController()  {
             page = new PageContentModel();
             pageToRootList = new List<PageContentModel>();
             template = new PageTemplateModel();
@@ -84,11 +84,11 @@ namespace Contensive.Processor.Controllers {
                     loadPage(core, core.docProperties.getInteger(rnPageId), core.doc.domain);
                     //
                     // -- create context object to use for page and template dependencies
-                    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                         addonType = CPUtilsBaseClass.addonContext.ContextSimple,
                         cssContainerClass = "",
                         cssContainerId = "",
-                        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext {
                             contentName = PageContentModel.tableMetadata.contentName,
                             fieldName = "copyfilename",
                             recordId = core.doc.pageController.page.id
@@ -365,7 +365,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // -- block with login
                                         core.doc.continueProcessing = false;
-                                        return core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
+                                        return core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext {
                                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                             errorContextMessage = "calling login page addon [" + addonGuidLoginPage + "] because page is blocked"
                                         });
@@ -482,7 +482,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- OnBodyStart add-ons
                 foreach (AddonModel addon in core.addonCache.getOnBodyStartAddonList()) {
-                    CPUtilsBaseClass.addonExecuteContext bodyStartContext = new CPUtilsBaseClass.addonExecuteContext() {
+                    CPUtilsBaseClass.addonExecuteContext bodyStartContext = new CPUtilsBaseClass.addonExecuteContext {
                         addonType = CPUtilsBaseClass.addonContext.ContextOnBodyStart,
                         errorContextMessage = "calling onBodyStart addon [" + addon.name + "] in HtmlBodyTemplate"
                     };
@@ -524,7 +524,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- OnBodyEnd add-ons
                 foreach (var addon in core.addonCache.getOnBodyEndAddonList()) {
-                    CPUtilsBaseClass.addonExecuteContext bodyEndContext = new CPUtilsBaseClass.addonExecuteContext() {
+                    CPUtilsBaseClass.addonExecuteContext bodyEndContext = new CPUtilsBaseClass.addonExecuteContext {
                         addonType = CPUtilsBaseClass.addonContext.ContextFilter,
                         errorContextMessage = "calling onBodyEnd addon [" + addon.name + "] in HtmlBodyTemplate"
                     };
@@ -567,7 +567,7 @@ namespace Contensive.Processor.Controllers {
                 // -- OnPageStart Event
                 Dictionary<string, string> instanceArguments = new Dictionary<string, string> { { "CSPage", "-1" } };
                 foreach (var addon in core.addonCache.getOnPageStartAddonList()) {
-                    CPUtilsBaseClass.addonExecuteContext pageStartContext = new CPUtilsBaseClass.addonExecuteContext() {
+                    CPUtilsBaseClass.addonExecuteContext pageStartContext = new CPUtilsBaseClass.addonExecuteContext {
                         instanceGuid = "-1",
                         argumentKeyValuePairs = instanceArguments,
                         addonType = CPUtilsBaseClass.addonContext.ContextOnPageStart,
@@ -829,9 +829,9 @@ namespace Contensive.Processor.Controllers {
                                 result = result + core.html.getAdminHintWrapper("<p>Child page list display is disabled for this page. To enable the child page list, edit this page and check 'Display Child Pages' in the navigation tab.</p>");
                             }
                             AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidChildList);
-                            CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                            CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                                 addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                                hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext {
                                     contentName = PageContentModel.tableMetadata.contentName,
                                     fieldName = "",
                                     recordId = core.doc.pageController.page.id
@@ -964,7 +964,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     core.doc.bodyContent = result;
                     foreach (AddonModel addon in core.addonCache.getOnPageEndAddonList()) {
-                        CPUtilsBaseClass.addonExecuteContext pageEndContext = new CPUtilsBaseClass.addonExecuteContext() {
+                        CPUtilsBaseClass.addonExecuteContext pageEndContext = new CPUtilsBaseClass.addonExecuteContext {
                             instanceGuid = "-1",
                             argumentKeyValuePairs = instanceArguments,
                             addonType = CPUtilsBaseClass.addonContext.ContextOnPageEnd,
@@ -1069,7 +1069,7 @@ namespace Contensive.Processor.Controllers {
                     if (core.siteProperties.getBoolean("Allow AddonList Editor For Quick Editor")) {
                         core.docProperties.setProperty("contentid", ContentMetadataModel.getContentId(core, PageContentModel.tableMetadata.contentName));
                         core.docProperties.setProperty("recordid", core.doc.pageController.page.id);
-                        resultContent.Append(core.addon.execute("{92B75A6A-E84B-4551-BBF3-849E91D084BC}", new CPUtilsBaseClass.addonExecuteContext() {
+                        resultContent.Append(core.addon.execute("{92B75A6A-E84B-4551-BBF3-849E91D084BC}", new CPUtilsBaseClass.addonExecuteContext {
                             addonType = CPUtilsBaseClass.addonContext.ContextSimple
                         }));
                     } else {
@@ -1097,7 +1097,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // -- execute PageBuilder RenderAddonList
                                     core.docProperties.setProperty("addonList", core.doc.pageController.page.addonList);
-                                    htmlPageContent += core.addon.execute(addonListRender, new CPUtilsBaseClass.addonExecuteContext() {
+                                    htmlPageContent += core.addon.execute(addonListRender, new CPUtilsBaseClass.addonExecuteContext {
                                         addonType = CPUtilsBaseClass.addonContext.ContextPage
                                     });
                                 }
@@ -1704,7 +1704,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        internal static string getDefaultScript() { return "default.aspx"; }
+        internal static string getDefaultScript()  { return "default.aspx"; }
         //
         //
         //
@@ -2808,13 +2808,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose() {
-            // do not add code here. Use the Dispose(disposing) overload
+        public void Dispose()  {
+            // do not add code  here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~PageContentController() {
+        ~PageContentController()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
 

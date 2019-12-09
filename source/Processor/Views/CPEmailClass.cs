@@ -133,43 +133,43 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void sendGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
-            EmailController.queueGroupEmail(cp.core, new List<string>() { groupName }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<string> { groupName }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
         }
         //
         public override void sendGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
             string userErrorMessage = "";
-            EmailController.queueGroupEmail(cp.core, new List<string>() { groupName }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<string> { groupName }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
         }
         //
         public override void sendGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately) {
             string userErrorMessage = "";
-            EmailController.queueGroupEmail(cp.core, new List<string>() { groupName }, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<string> { groupName }, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
         }
         //
         public override void sendGroup(string groupName, string fromAddress, string subject, string body) {
             string userErrorMessage = "";
-            EmailController.queueGroupEmail(cp.core, new List<string>() { groupName }, fromAddress, subject, body, true, true, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<string> { groupName }, fromAddress, subject, body, true, true, ref userErrorMessage);
         }
         //
         //====================================================================================================
         //
         public override void sendGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml, ref string userErrorMessage) {
-            EmailController.queueGroupEmail(cp.core, new List<int>() { groupId }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<int> { groupId }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
         }
         //
         public override void sendGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHtml) {
             string userErrorMessage = "";
-            EmailController.queueGroupEmail(cp.core, new List<int>() { groupId }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<int> { groupId }, fromAddress, subject, body, sendImmediately, bodyIsHtml, ref userErrorMessage);
         }
         //
         public override void sendGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately) {
             string userErrorMessage = "";
-            EmailController.queueGroupEmail(cp.core, new List<int>() { groupId }, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<int> { groupId }, fromAddress, subject, body, sendImmediately, true, ref userErrorMessage);
         }
         //
         public override void sendGroup(int groupId, string fromAddress, string subject, string body) {
             string userErrorMessage = "";
-            EmailController.queueGroupEmail(cp.core, new List<int>() { groupId }, fromAddress, subject, body, true, true, ref userErrorMessage);
+            EmailController.queueGroupEmail(cp.core, new List<int> { groupId }, fromAddress, subject, body, true, true, ref userErrorMessage);
         }
         //
         //====================================================================================================
@@ -323,11 +323,11 @@ namespace Contensive.Processor {
         }
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~CPEmailClass() {
+        ~CPEmailClass()  {
             Dispose(false);
         }
         protected bool disposed_email;

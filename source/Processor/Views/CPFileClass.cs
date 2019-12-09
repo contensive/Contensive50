@@ -305,11 +305,11 @@ namespace Contensive.Processor {
             }
             disposed_file = true;
         }
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~CPFileClass() {
+        ~CPFileClass()  {
             Dispose(false);
         }
         #endregion

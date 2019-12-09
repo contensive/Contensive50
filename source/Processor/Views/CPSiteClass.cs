@@ -275,10 +275,10 @@ namespace Contensive.Processor {
         }
         //
         [Obsolete("Deprecated.", false)]
-        public override bool IsTesting() { return false; }
+        public override bool IsTesting()  { return false; }
         //
         [Obsolete("Use GetInteger(LandingPageID)", false)]
-        public override int LandingPageId() {
+        public override int LandingPageId()  {
             return GetInteger("LandingPageID", 0);
         }
         //
@@ -327,12 +327,12 @@ namespace Contensive.Processor {
         protected bool disposed_site;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        ~CPSiteClass() {
+        ~CPSiteClass()  {
             Dispose(false);
         }
         #endregion

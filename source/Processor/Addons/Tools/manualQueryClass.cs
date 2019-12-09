@@ -187,7 +187,7 @@ namespace Contensive.Processor.Addons.Tools {
                     string[] delimiters = new string[] { Environment.NewLine };
                     List<string> SqlArchiveList = SQLArchive.Split( delimiters,StringSplitOptions.RemoveEmptyEntries).ToList();
                     foreach( string sql in SqlArchiveList) {
-                        lookupList.Add(new NameValueModel() { name = sql, value=sql });
+                        lookupList.Add(new NameValueModel { name = sql, value=sql });
                     }
 
                     string inputSelect = AdminUIController.getDefaultEditor_LookupList(core, "SQLList", "0" , lookupList,false, "SQLList");

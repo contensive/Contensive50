@@ -148,7 +148,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void InvalidateAll() {
+        public override void InvalidateAll()  {
             cp.core.cache.invalidateAll();
         }
         //

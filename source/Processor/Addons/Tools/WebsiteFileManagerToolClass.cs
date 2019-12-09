@@ -29,7 +29,7 @@ namespace Contensive.Processor.Addons.Tools {
             try {
                 string InstanceOptionString = "AdminLayout=1&filesystem=website files";
                 AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
-                string Content = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                string Content = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                     addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                     argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, InstanceOptionString),
                     instanceGuid = "-2",

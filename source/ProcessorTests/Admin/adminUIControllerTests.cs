@@ -19,7 +19,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //
         //====================================================================================================
         // todo - write out tests
-        public void Controllers_Addon_blank() {
+        public void Controllers_Addon_blank()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 // act

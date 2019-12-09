@@ -351,7 +351,7 @@ namespace Contensive.Processor.Controllers {
                     // Save the SelectRaw
                     //
                     if (!return_IsEmptyList) {
-                        core.doc.inputSelectCache.Add(new Constants.CacheInputSelectClass() {
+                        core.doc.inputSelectCache.Add(new Constants.CacheInputSelectClass {
                             ContentName = ContentName,
                             Criteria = Criteria,
                             CurrentValue = CurrentValue.ToString(),
@@ -594,7 +594,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Save the SelectRaw
                     //
-                    core.doc.inputSelectCache.Add(new Constants.CacheInputSelectClass() {
+                    core.doc.inputSelectCache.Add(new Constants.CacheInputSelectClass {
                         ContentName = "Group:" + GroupID,
                         Criteria = sqlCriteria,
                         CurrentValue = currentValue.ToString(),
@@ -719,7 +719,7 @@ namespace Contensive.Processor.Controllers {
         /// Display an icon with a link to the login form/cclib.net/admin area
         /// </summary>
         /// <returns></returns>
-        public string getLoginLink() {
+        public string getLoginLink()  {
             string result = "";
             try {
                 //
@@ -1792,7 +1792,7 @@ namespace Contensive.Processor.Controllers {
                         { "editorStyleOptions", styleOptionList }
                     };
                     var addon = DbBaseModel.create<AddonModel>(core.cpParent, FieldEditorAddonId);
-                    returnHtml = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                    returnHtml = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                         addonType = CPUtilsBaseClass.addonContext.ContextEditor,
                         argumentKeyValuePairs = arguments,
                         errorContextMessage = "calling editor addon for text field type, addon [" + FieldEditorAddonId + "]"
@@ -1865,7 +1865,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public void processAddonSettingsEditor() {
+        public void processAddonSettingsEditor()  {
             //
             string constructor = null;
             bool ParseOK = false;
@@ -2198,7 +2198,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public void processHelpBubbleEditor() {
+        public void processHelpBubbleEditor()  {
             //
             string SQL = null;
             string HelpBubbleId = null;
@@ -2522,7 +2522,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public string getPanelBottom() {
+        public string getPanelBottom()  {
             return ""
                 + cr6 + "</td>"
                 + cr5 + "</tr>"
@@ -2553,7 +2553,7 @@ namespace Contensive.Processor.Controllers {
         /// standard tool panel at the bottom of every page
         /// </summary>
         /// <returns></returns>
-        public string getToolsPanel() {
+        public string getToolsPanel()  {
             string result = "";
             try {
                 if (core.session.user.allowToolsPanel) {
@@ -2803,7 +2803,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public string getHtmlHead() {
+        public string getHtmlHead()  {
             List<string> headList = new List<string>();
             try {
                 //
@@ -2913,7 +2913,7 @@ namespace Contensive.Processor.Controllers {
         public void addScriptCode_onLoad(string code, string addedByMessage) {
             try {
                 if (!string.IsNullOrEmpty(code)) {
-                    core.doc.htmlAssetList.Add(new HtmlAssetClass() {
+                    core.doc.htmlAssetList.Add(new HtmlAssetClass {
                         assetType = HtmlAssetTypeEnum.scriptOnLoad,
                         addedByMessage = addedByMessage,
                         isLink = false,
@@ -2941,7 +2941,7 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // add to list
-                        core.doc.htmlAssetList.Add(new HtmlAssetClass() {
+                        core.doc.htmlAssetList.Add(new HtmlAssetClass {
                             assetType = HtmlAssetTypeEnum.script,
                             inHead = forceHead,
                             addedByMessage = addedByMessage,
@@ -2996,7 +2996,7 @@ namespace Contensive.Processor.Controllers {
         public void addTitle(string pageTitle, string addedByMessage) {
             try {
                 if (!string.IsNullOrEmpty(pageTitle.Trim())) {
-                    core.doc.htmlMetaContent_TitleList.Add(new HtmlMetaClass() {
+                    core.doc.htmlMetaContent_TitleList.Add(new HtmlMetaClass {
                         addedByMessage = addedByMessage,
                         content = pageTitle
                     });
@@ -3013,7 +3013,7 @@ namespace Contensive.Processor.Controllers {
         public void addMetaDescription(string MetaDescription, string addedByMessage) {
             try {
                 if (!string.IsNullOrEmpty(MetaDescription.Trim())) {
-                    core.doc.htmlMetaContent_Description.Add(new HtmlMetaClass() {
+                    core.doc.htmlMetaContent_Description.Add(new HtmlMetaClass {
                         addedByMessage = addedByMessage,
                         content = MetaDescription
                     });
@@ -3030,7 +3030,7 @@ namespace Contensive.Processor.Controllers {
         public void addStyleLink(string StyleSheetLink, string addedByMessage) {
             try {
                 if (!string.IsNullOrEmpty(StyleSheetLink.Trim())) {
-                    core.doc.htmlAssetList.Add(new HtmlAssetClass() {
+                    core.doc.htmlAssetList.Add(new HtmlAssetClass {
                         addedByMessage = addedByMessage,
                         assetType = HtmlAssetTypeEnum.style,
                         inHead = true,
@@ -3049,7 +3049,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 foreach (string keyword in metaKeywordList.Split(',')) {
                     if (!string.IsNullOrEmpty(keyword)) {
-                        core.doc.htmlMetaContent_KeyWordList.Add(new HtmlMetaClass() {
+                        core.doc.htmlMetaContent_KeyWordList.Add(new HtmlMetaClass {
                             addedByMessage = addedByMessage,
                             content = keyword
                         });
@@ -3067,7 +3067,7 @@ namespace Contensive.Processor.Controllers {
         public void addHeadTag(string headTag, string addedByMessage) {
             try {
                 if (!string.IsNullOrWhiteSpace(headTag)) {
-                    core.doc.htmlMetaContent_OtherTags.Add(new HtmlMetaClass() {
+                    core.doc.htmlMetaContent_OtherTags.Add(new HtmlMetaClass {
                         addedByMessage = addedByMessage,
                         content = headTag
                     });
@@ -3147,7 +3147,7 @@ namespace Contensive.Processor.Controllers {
                 { "SelectLinkObjectName", SelectLinkObjectName },
                 { "AllowGroupAdd", AllowGroupAdd.ToString() }
             };
-            return core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidResourceLibrary), new CPUtilsBaseClass.addonExecuteContext() {
+            return core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidResourceLibrary), new CPUtilsBaseClass.addonExecuteContext {
                 addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
                 argumentKeyValuePairs = arguments,
                 errorContextMessage = "calling resource library addon [" + addonGuidResourceLibrary + "] from internal method"
@@ -3496,7 +3496,7 @@ namespace Contensive.Processor.Controllers {
         /// return a row start (tr tag)
         /// </summary>
         /// <returns></returns>
-        public static string tableRowStart() {
+        public static string tableRowStart()  {
             return "<tr>";
         }
         //

@@ -309,7 +309,7 @@ namespace Contensive.Processor.Controllers {
                                         LogController.logError(core, new GenericException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
                                         return "The default admin site addon could not be found. Please run an upgrade on this application to restore default services (command line> cc -a appName -r )";
                                     } else {
-                                        return core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                                        return core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                                             addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
                                             errorContextMessage = "calling admin route [" + addonGuidAdminSite + "] during execute route method"
                                         });
@@ -323,11 +323,11 @@ namespace Contensive.Processor.Controllers {
                                         LogController.logError(core, new GenericException("The addon for remoteMethodAddonId [" + route.remoteMethodAddonId + "] could not be opened."));
                                         return "";
                                     } else {
-                                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                                             addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson,
                                             cssContainerClass = "",
                                             cssContainerId = "",
-                                            hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                            hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext {
                                                 contentName = core.docProperties.getText("hostcontentname"),
                                                 fieldName = "",
                                                 recordId = core.docProperties.getInteger("HostRecordID")
@@ -390,11 +390,11 @@ namespace Contensive.Processor.Controllers {
                     if (defaultAddonId > 0) {
                         //
                         // -- default route is run if no other route is found, which includes the route=defaultPage (default.aspx)
-                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                             cssContainerClass = "",
                             cssContainerId = "",
-                            hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                            hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext {
                                 contentName = "",
                                 fieldName = "",
                                 recordId = 0

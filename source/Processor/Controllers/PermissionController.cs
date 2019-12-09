@@ -16,7 +16,7 @@ namespace Contensive.Processor.Controllers {
         /// Permissions this user has for this content.
         /// </summary>
         public static UserContentPermissions getUserContentPermissions(CoreController core, ContentMetadataModel cdef) {
-            var result = new UserContentPermissions() {
+            var result = new UserContentPermissions {
                 allowDelete = false,
                 allowAdd = false,
                 allowSave = false,
@@ -68,7 +68,7 @@ namespace Contensive.Processor.Controllers {
         //========================================================================
         //
         private static UserContentPermissions getUserAuthoringPermissions_ContentManager(CoreController core, ContentMetadataModel cdef, List<int> usedContentIdList) {
-            var result = new UserContentPermissions() {
+            var result = new UserContentPermissions {
                 allowAdd = false,
                 allowDelete = false,
                 allowEdit = false,
@@ -187,13 +187,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose() {
+        public void Dispose()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~PermissionController() {
+        ~PermissionController()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }

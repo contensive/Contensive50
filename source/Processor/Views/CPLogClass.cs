@@ -67,13 +67,13 @@ namespace Contensive.Processor {
         }
         //
         protected bool disposed_log;
-        public override void Dispose() {
+        public override void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
         //
-        ~CPLogClass() {
+        ~CPLogClass()  {
             Dispose(false);
         }
         #endregion

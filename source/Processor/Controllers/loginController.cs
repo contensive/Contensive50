@@ -118,7 +118,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- Custom Login
                         AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, loginAddonId);
-                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                             errorContextMessage = "calling login form addon [" + loginAddonId + "] from internal method"
                         };

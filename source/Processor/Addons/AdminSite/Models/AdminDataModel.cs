@@ -814,7 +814,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 editRecord.active = true;
                 editRecord.contentControlId = adminContent.id;
                 editRecord.contentControlId_Name = adminContent.name;
-                editRecord.EditLock = new WorkflowController.editLockClass() { editLockByMemberId = 0, editLockByMemberName = "", editLockExpiresDate = DateTime.MinValue, isEditLocked = false };
+                editRecord.EditLock = new WorkflowController.editLockClass { editLockByMemberId = 0, editLockByMemberName = "", editLockExpiresDate = DateTime.MinValue, isEditLocked = false };
                 editRecord.Loaded = false;
                 editRecord.Saved = false;
                 foreach (var keyValuePair in adminContent.fields) {
@@ -1125,11 +1125,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     case "CREATEDBY": {
                                             int createdByPersonId = csData.getInteger(adminContentcontent.nameLc);
                                             if (createdByPersonId == 0) {
-                                                editRecord.createdBy = new PersonModel() { name = "system" };
+                                                editRecord.createdBy = new PersonModel { name = "system" };
                                             } else {
                                                 editRecord.createdBy = DbBaseModel.create<PersonModel>(core.cpParent, createdByPersonId);
                                                 if (editRecord.createdBy == null) {
-                                                    editRecord.createdBy = new PersonModel() { name = "deleted #" + createdByPersonId.ToString() };
+                                                    editRecord.createdBy = new PersonModel { name = "deleted #" + createdByPersonId.ToString() };
                                                 }
                                             }
                                             break;
@@ -1137,11 +1137,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     case "MODIFIEDBY": {
                                             int modifiedByPersonId = csData.getInteger(adminContentcontent.nameLc);
                                             if (modifiedByPersonId == 0) {
-                                                editRecord.modifiedBy = new PersonModel() { name = "system" };
+                                                editRecord.modifiedBy = new PersonModel { name = "system" };
                                             } else {
                                                 editRecord.modifiedBy = DbBaseModel.create<PersonModel>(core.cpParent, modifiedByPersonId);
                                                 if (editRecord.modifiedBy == null) {
-                                                    editRecord.modifiedBy = new PersonModel() { name = "deleted #" + modifiedByPersonId.ToString() };
+                                                    editRecord.modifiedBy = new PersonModel { name = "deleted #" + modifiedByPersonId.ToString() };
                                                 }
                                             }
                                             break;

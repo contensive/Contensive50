@@ -52,7 +52,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void Clear() {
+        public override void Clear()  {
             cp.core.webServer.clearResponseBuffer();
         }
         //
@@ -70,7 +70,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void Flush() {
+        public override void Flush()  {
             cp.core.webServer.flushStream();
         }
         //
@@ -176,11 +176,11 @@ namespace Contensive.Processor {
         protected bool disposed_res;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~CPResponseClass() {
+        ~CPResponseClass()  {
             Dispose(false);
             
             

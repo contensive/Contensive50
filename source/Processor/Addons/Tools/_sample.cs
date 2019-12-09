@@ -39,7 +39,7 @@ namespace Contensive.Processor.Addons.Tools {
                 string button = cp.Doc.GetText("button");
                 string PageSize = cp.Doc.GetText("pageSize");
                 int countryId = cp.Doc.GetInteger("countryId");
-                var buttonList = new List<string>() { ButtonCancel };
+                var buttonList = new List<string> { ButtonCancel };
                 if (button == ButtonCancel) {
                     //
                     // Cancel just exits with no content

@@ -126,7 +126,7 @@ namespace Contensive.Processor.Controllers {
                 AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidChildList);
                 CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                     addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                    hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                    hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext {
                         contentName = PageContentModel.tableMetadata.contentName,
                         fieldName = "",
                         recordId = core.doc.pageController.page.id
@@ -197,13 +197,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose() {
+        public void Dispose()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~QuickEditController() {
+        ~QuickEditController()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
 

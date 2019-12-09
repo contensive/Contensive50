@@ -226,11 +226,11 @@ namespace Contensive.Processor.Controllers {
                                                                     default: {
                                                                             //
                                                                             // -- addons
-                                                                            CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                                                            CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                                                                                 addonType = CPUtilsBaseClass.addonContext.ContextEmail,
                                                                                 cssContainerClass = "",
                                                                                 cssContainerId = "",
-                                                                                hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                                                                hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext {
                                                                                     contentName = ContextContentName,
                                                                                     fieldName = "",
                                                                                     recordId = ContextRecordID
@@ -1100,11 +1100,11 @@ namespace Contensive.Processor.Controllers {
                                             }
                                             // dont have any way of getting fieldname yet
                                             hint = "56";
-                                            CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                            CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                                                 addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                                 cssContainerClass = "",
                                                 cssContainerId = "",
-                                                hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                                hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext {
                                                     contentName = ContextContentName,
                                                     fieldName = "",
                                                     recordId = ContextRecordID

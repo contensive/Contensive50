@@ -19,7 +19,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //
         //====================================================================================================
         //
-        public void controllers_blank() {
+        public void controllers_blank()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 // act

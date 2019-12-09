@@ -92,7 +92,7 @@ namespace Contensive.Processor.Controllers {
         internal Dictionary<string, int> _contentNameIdDictionary = null;
         //
         // -- assembly files to skip
-        public List<string> assemblyList_NonAddonsInstalled = new List<string>() {
+        public List<string> assemblyList_NonAddonsInstalled = new List<string> {
             "\\cpbase.dll",
             "\\awssdk.core.dll",
             "\\awssdk.s3.dll",
@@ -135,7 +135,7 @@ namespace Contensive.Processor.Controllers {
                 return _assemblyFileDict;
             }
         }
-        public void assemblyList_AddonsFound_save() {
+        public void assemblyList_AddonsFound_save()  {
             var dependentKeyList = new List<string> {
                 CacheController.createCacheKey_LastRecordModifiedDate(AddonModel.tableMetadata.tableNameLower),
                 CacheController.createCacheKey_LastRecordModifiedDate(AddonCollectionModel.tableMetadata.tableNameLower)
@@ -438,13 +438,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// method to clear the core instance of routeMap. Explained in routeMap.
         /// </summary>
-        public void addonCacheClearNonPersistent() {
+        public void addonCacheClearNonPersistent()  {
             _addonCacheNonPersistent = null;
         }
         /// <summary>
         /// method to clear the core instance of routeMap. Explained in routeMap.
         /// </summary>
-        public void addonCacheClear() {
+        public void addonCacheClear()  {
             cache.invalidate(cacheName_addonCachePersistent);
             _addonCacheNonPersistent = null;
         }
@@ -586,7 +586,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// clear the addon cache, the persistent routeMap, and the non-persistent RouteMap
         /// </summary>
-        public void routeMapCacheClear() {
+        public void routeMapCacheClear()  {
             // 
             addonCacheClear();
             Models.Domain.RouteMapModel.invalidateCache(this);
@@ -711,7 +711,7 @@ namespace Contensive.Processor.Controllers {
         /// version for core assembly
         /// </summary>
         /// <remarks></remarks>
-        public string codeVersion() {
+        public string codeVersion()  {
             Type myType = typeof(CoreController);
             Assembly myAssembly = Assembly.GetAssembly(myType);
             AssemblyName myAssemblyname = myAssembly.GetName();
@@ -723,7 +723,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Clear all data from the metaData current instance. Next request will load from cache.
         /// </summary>
-        public void clearMetaData() {
+        public void clearMetaData()  {
             if (metaDataDictionary != null) {
                 metaDataDictionary.Clear();
             }
@@ -735,8 +735,8 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        internal void contentNameIdDictionaryClear() {
-            _contentNameIdDictionary = null;
+        internal void contentNameIdDictionaryClear()  {
+            _contentNameIdDictionary = null; 
         }
         //
         //====================================================================================================
@@ -910,13 +910,13 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        public void Dispose() {
+        public void Dispose()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~CoreController() {
+        ~CoreController()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }

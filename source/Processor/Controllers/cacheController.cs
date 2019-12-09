@@ -137,7 +137,7 @@ namespace Contensive.Processor.Controllers {
                     CacheDocumentClass dependantCacheDocument = getCacheDocument(dependentKey);
                     if (dependantCacheDocument == null) {
                         // create dummy cache to validate future cache requests, fake saveDate as last globalinvalidationdate
-                        storeCacheDocument(dependentKey, new CacheDocumentClass() {
+                        storeCacheDocument(dependentKey, new CacheDocumentClass {
                             keyPtr = null,
                             content = "",
                             saveDate = globalInvalidationDate
@@ -336,7 +336,7 @@ namespace Contensive.Processor.Controllers {
         public void storeObject(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                var cacheDocument = new CacheDocumentClass() {
+                var cacheDocument = new CacheDocumentClass {
                     content = content,
                     saveDate = DateTime.Now,
                     invalidationDate = invalidationDate,
@@ -473,7 +473,7 @@ namespace Contensive.Processor.Controllers {
         /// invalidates the entire cache (except those entires written with saveRaw)
         /// </summary>
         /// <remarks></remarks>
-        public void invalidateAll() {
+        public void invalidateAll()  {
             try {
                 string key = Regex.Replace(cacheNameGlobalInvalidationDate, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 storeCacheDocument(key, new CacheDocumentClass { saveDate = DateTime.Now });
@@ -844,13 +844,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose() {
+        public void Dispose()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~CacheController() {
+        ~CacheController()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }

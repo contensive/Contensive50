@@ -74,7 +74,7 @@ namespace Contensive.Processor.Models.Domain {
                     // -- admin route
                     string adminRoute = GenericController.normalizeRoute(core.appConfig.adminRoute);
                     if (!string.IsNullOrWhiteSpace(adminRoute)) {
-                        result.routeDictionary.Add(adminRoute, new RouteClass() {
+                        result.routeDictionary.Add(adminRoute, new RouteClass {
                             physicalRoute = physicalFile,
                             virtualRoute = adminRoute,
                             routeType = RouteTypeEnum.admin
@@ -88,7 +88,7 @@ namespace Contensive.Processor.Models.Domain {
                             if (result.routeDictionary.ContainsKey(route)) {
                                 LogController.logWarn(core, new GenericException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
                             } else {
-                                result.routeDictionary.Add(route, new RouteClass() {
+                                result.routeDictionary.Add(route, new RouteClass {
                                     physicalRoute = physicalFile,
                                     virtualRoute = route,
                                     routeType = RouteTypeEnum.remoteMethod,
@@ -105,7 +105,7 @@ namespace Contensive.Processor.Models.Domain {
                             if (result.routeDictionary.ContainsKey(route)) {
                                 LogController.logError( core,new GenericException("Link Forward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
                             } else {
-                                result.routeDictionary.Add(route, new RouteClass() {
+                                result.routeDictionary.Add(route, new RouteClass {
                                     physicalRoute = physicalFile,
                                     virtualRoute = route,
                                     routeType = RouteTypeEnum.linkForward,
@@ -122,7 +122,7 @@ namespace Contensive.Processor.Models.Domain {
                             if (result.routeDictionary.ContainsKey(route)) {
                                 LogController.logError( core,new GenericException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
                             } else {
-                                result.routeDictionary.Add(route, new RouteClass() {
+                                result.routeDictionary.Add(route, new RouteClass {
                                     physicalRoute = physicalFile,
                                     virtualRoute = route,
                                     routeType = RouteTypeEnum.linkAlias,

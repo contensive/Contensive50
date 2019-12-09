@@ -31,7 +31,7 @@ namespace Contensive.Processor.Controllers {
         // constructor
         //======================================================================================
         //
-        public HttpRequestController() {
+        public HttpRequestController()  {
             // Me.core = core
             Type myType = typeof(CoreController);
             Assembly myAssembly = Assembly.GetAssembly(myType);
@@ -342,8 +342,7 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        ~HttpRequestController() {
-            
+        ~HttpRequestController()  {           
             
             http.Dispose();
         }

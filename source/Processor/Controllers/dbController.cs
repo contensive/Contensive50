@@ -846,7 +846,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DataSourceName"></param>
         /// <returns></returns>
         //
-        public int getDataSourceType() {
+        public int getDataSourceType()  {
             return Constants.DataSourceTypeODBCSQLServer;
         }
         //
@@ -1596,11 +1596,11 @@ namespace Contensive.Processor.Controllers {
         }
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~DbController() {
+        ~DbController()  {
             Dispose(false);
         }
         #endregion

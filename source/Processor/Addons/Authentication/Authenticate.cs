@@ -25,8 +25,8 @@ namespace Contensive.Processor.Addons.Primitives {
                 if (core.session.visit.loginAttempts >= core.siteProperties.maxVisitLoginAttempts) {
                     //
                     // -- too many attempts
-                    return new AuthenticateResponse() {
-                        errors = new List<string>() { "Authentication failed." },
+                    return new AuthenticateResponse {
+                        errors = new List<string> { "Authentication failed." },
                         data = new AuthenticateResponseData()
                     };
                 }
@@ -54,8 +54,8 @@ namespace Contensive.Processor.Addons.Primitives {
                     string[] usernamePassword = Encoding.ASCII.GetString(usernamePasswordBytes).Split(':');
                     if (usernamePassword.Length != 2) {
                         cp.Response.SetStatus(WebServerController.httpResponseStatus401_Unauthorized);
-                        return new AuthenticateResponse() {
-                            errors = new List<string>() { "Basic Authentication failed." },
+                        return new AuthenticateResponse {
+                            errors = new List<string> { "Basic Authentication failed." },
                             data = new AuthenticateResponseData()
                         };
                     }
@@ -75,8 +75,8 @@ namespace Contensive.Processor.Addons.Primitives {
                 //
                 // -- user was not found
                 core.webServer.setResponseStatus(WebServerController.httpResponseStatus401_Unauthorized);
-                return new AuthenticateResponse() {
-                    errors = new List<string>() { errorPrefix + " failed." },
+                return new AuthenticateResponse {
+                    errors = new List<string> { errorPrefix + " failed." },
                     data = new AuthenticateResponseData()
                 };
             } else {
@@ -84,23 +84,23 @@ namespace Contensive.Processor.Addons.Primitives {
                     //
                     // -- username/password login failed
                     core.webServer.setResponseStatus(WebServerController.httpResponseStatus401_Unauthorized);
-                    return new AuthenticateResponse() {
-                        errors = new List<string>() { errorPrefix + " failed." },
+                    return new AuthenticateResponse {
+                        errors = new List<string> { errorPrefix + " failed." },
                         data = new AuthenticateResponseData()
                     };
                 } else {
                     var user = DbBaseModel.create<PersonModel>(core.cpParent, core.session.user.id);
                     if (user == null) {
                         core.webServer.setResponseStatus(WebServerController.httpResponseStatus401_Unauthorized);
-                        return new AuthenticateResponse() {
-                            errors = new List<string>() { errorPrefix + " user is not valid." },
+                        return new AuthenticateResponse {
+                            errors = new List<string> { errorPrefix + " user is not valid." },
                             data = new AuthenticateResponseData()
                         };
                     } else {
                         LogController.addSiteActivity(core, errorPrefix + " successful", core.session.user.id, core.session.user.organizationId);
-                        return new AuthenticateResponse() {
+                        return new AuthenticateResponse {
                             errors = new List<string>(),
-                            data = new AuthenticateResponseData() {
+                            data = new AuthenticateResponseData {
                                 firstName = user.firstName,
                                 lastName = user.lastName,
                                 email = user.email,

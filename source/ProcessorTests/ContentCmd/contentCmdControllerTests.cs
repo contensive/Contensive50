@@ -20,7 +20,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// simple syntax, one command, run addon
         /// </summary>
         [TestMethod]
-        public void contentCmdController_SimpleSyntax_runAddon() {
+        public void contentCmdController_SimpleSyntax_runAddon()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var addon = AddonModel.addEmpty<AddonModel>(cp);
@@ -40,7 +40,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// simple syntax, two commands, run addon
         /// </summary>
         [TestMethod]
-        public void contentCmdController_SimpleSyntax_mulipleContextSwitch() {
+        public void contentCmdController_SimpleSyntax_mulipleContextSwitch()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.addEmpty<AddonModel>(cp);
@@ -65,7 +65,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// Multiple Command Syntax, one command, {%[{"command1":"commandArgument"},{"command2":"commandArgument"}]%}
         /// </summary>
         [TestMethod]
-        public void contentCmdController_SimpleSyntax_CommandList() {
+        public void contentCmdController_SimpleSyntax_CommandList()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.addEmpty<AddonModel>(cp);
@@ -90,7 +90,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// Multiple Command Syntax, two commands, {%[{"command1":"commandArgument"},{"command2":"commandArgument"}]%}
         /// </summary>
         [TestMethod]
-        public void contentCmdController_SimpleSyntax_CommandList_MultipleCommands() {
+        public void contentCmdController_SimpleSyntax_CommandList_MultipleCommands()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.addEmpty<AddonModel>(cp);
@@ -115,7 +115,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// json syntax, one command, run addon
         /// </summary>
         [TestMethod]
-        public void contentCmdController_JsonSyntax() {
+        public void contentCmdController_JsonSyntax()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.addEmpty<AddonModel>(cp);
@@ -135,7 +135,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// json syntax, one command, run addon
         /// </summary>
         [TestMethod]
-        public void contentCmdController_JsonSyntax_WithArgument() {
+        public void contentCmdController_JsonSyntax_WithArgument()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.addEmpty<AddonModel>(cp);
@@ -155,7 +155,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// json syntax, one command, run addon
         /// </summary>
         [TestMethod]
-        public void Controllers_JsonSyntax_executeAddonTest_argumentReplacement() {
+        public void Controllers_JsonSyntax_executeAddonTest_argumentReplacement()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addon = AddonModel.addEmpty<AddonModel>(cp);

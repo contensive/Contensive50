@@ -72,7 +72,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         string fieldName = LineSplit[0].Trim().ToLowerInvariant();
                                         if (!string.IsNullOrWhiteSpace(fieldName)) {
                                             if (adminData.adminContent.fields.ContainsKey(fieldName)) {
-                                                returnIndexConfig.columns.Add(new IndexConfigColumnClass() {
+                                                returnIndexConfig.columns.Add(new IndexConfigColumnClass {
                                                     Name = fieldName,
                                                     Width = GenericController.encodeInteger(LineSplit[1]),
                                                     SortDirection = 0,

@@ -33,7 +33,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (!cp.core.session.isAuthenticated) {
                     //
                     // --- must be authenticated to continue. Force a local login
-                    result = cp.core.addon.execute(addonGuidLoginPage, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                    result = cp.core.addon.execute(addonGuidLoginPage, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                         errorContextMessage = "get Login Page for Html Body",
                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
                     });
@@ -337,7 +337,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 }
                             case AdminFormImportWizard: {
-                                    adminBody = cp.core.addon.execute(addonGuidImportWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                                    adminBody = cp.core.addon.execute(addonGuidImportWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                         errorContextMessage = "get Import Wizard for Admin"
                                     });
@@ -348,7 +348,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 }
                             case AdminFormFormWizard: {
-                                    adminBody = cp.core.addon.execute(addonGuidFormWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                                    adminBody = cp.core.addon.execute(addonGuidFormWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                         errorContextMessage = "get Form Wizard for Admin"
                                     });
@@ -401,7 +401,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             }
                             string InstanceOptionString = cp.core.userProperty.getText("Addon [" + AddonName + "] Options", "");
                             int DefaultWrapperId = -1;
-                            adminBody = cp.core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                            adminBody = cp.core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                 addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 instanceGuid = adminSiteInstanceId,
                                 argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(cp.core, InstanceOptionString),
@@ -423,7 +423,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     // include fancybox if it was needed
                     if (adminData.includeFancyBox) {
-                        cp.core.addon.executeDependency(DbBaseModel.create<AddonModel>(cp, addonGuidjQueryFancyBox), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                        cp.core.addon.executeDependency(DbBaseModel.create<AddonModel>(cp, addonGuidjQueryFancyBox), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                             addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                             errorContextMessage = "adding fancybox dependency in Admin"
                         });
@@ -1671,7 +1671,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 adminData.adminFooter = "";
                 //
                 // -- Admin Navigator
-                string AdminNavFull = cp.core.addon.execute(DbBaseModel.create<AddonModel>(cp, AdminNavigatorGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                string AdminNavFull = cp.core.addon.execute(DbBaseModel.create<AddonModel>(cp, AdminNavigatorGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                     errorContextMessage = "executing Admin Navigator in Admin"
                 });

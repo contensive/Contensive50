@@ -72,7 +72,7 @@ namespace Contensive.Processor.Models.Domain {
                                 dt = core.db.getColumnSchemaData(TableName);
                                 if (dt.Rows.Count > 0) {
                                     foreach (DataRow row in dt.Rows) {
-                                        tableSchema.columns.Add(new ColumnSchemaModel() {
+                                        tableSchema.columns.Add(new ColumnSchemaModel {
                                             COLUMN_NAME = GenericController.encodeText(row["COLUMN_NAME"]).ToLowerInvariant(),
                                             DATA_TYPE = GenericController.encodeText(row["DATA_TYPE"]).ToLowerInvariant(),
                                             CHARACTER_MAXIMUM_LENGTH = GenericController.encodeInteger(row["CHARACTER_MAXIMUM_LENGTH"]),
@@ -87,7 +87,7 @@ namespace Contensive.Processor.Models.Domain {
                                 if (dt.Rows.Count > 0) {
                                     foreach (DataRow row in dt.Rows) {
                                         string index_keys = GenericController.encodeText(row["index_keys"]).ToLowerInvariant();
-                                        tableSchema.indexes.Add(new IndexSchemaModel() {
+                                        tableSchema.indexes.Add(new IndexSchemaModel {
                                             index_name = GenericController.encodeText(row["INDEX_NAME"]).ToLowerInvariant(),
                                             index_keys = index_keys,
                                             indexKeyList = index_keys.Split(',').Select(s => s.Trim()).ToList()

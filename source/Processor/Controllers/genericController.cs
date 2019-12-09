@@ -445,7 +445,7 @@ namespace Contensive.Processor.Controllers {
         /// return argument for separateUrl
         /// </summary>
         public class UrlDetailsClass {
-            public UrlDetailsClass() {
+            public UrlDetailsClass()  {
                 pathSegments = new List<string>();
             }
             public string protocol { get; set; }
@@ -454,8 +454,8 @@ namespace Contensive.Processor.Controllers {
             public List<String> pathSegments { get; set; }
             public string filename { get; set; }
             public string queryString { get; set; }
-            public string unixPath() { return String.Join("/", pathSegments); }
-            public string dosPath() { return String.Join("\\", pathSegments); }
+            public string unixPath()  { return String.Join("/", pathSegments); }
+            public string dosPath()  { return String.Join("\\", pathSegments); }
         }
         //
         // ====================================================================================================
@@ -1346,7 +1346,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public static string getIpAddressList() {
+        public static string getIpAddressList()  {
             IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
             string ipAddressList = "";
             foreach (IPAddress ip in host.AddressList) {
@@ -1399,7 +1399,7 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         // the the name of the current executable
         //
-        public static string getAppExeName() {
+        public static string getAppExeName()  {
             return Path.GetFileName(System.Windows.Forms.Application.ExecutablePath);
         }
         //
@@ -2136,7 +2136,7 @@ namespace Contensive.Processor.Controllers {
         /// Return a string with class.method() > class.method() > etc.
         /// </summary>
         /// <returns></returns>
-        public static string getCallStack() {
+        public static string getCallStack()  {
             string callStack = "";
             StackTrace stackTrace = new StackTrace();
             foreach (var stackFrame in stackTrace.GetFrames()) {

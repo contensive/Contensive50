@@ -248,7 +248,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                 { "sql", customReport.sqlQuery },
                                                 { "datasource", "default" }
                                             };
-                    var cmdDetail = new TaskModel.CmdDetailClass() {
+                    var cmdDetail = new TaskModel.CmdDetailClass {
                         addonId = ExportCSVAddon.id,
                         addonName = ExportCSVAddon.name,
                         args = docProperties

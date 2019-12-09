@@ -21,7 +21,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.mockEmail) {
                     //
                     // -- for unit tests, mock interface by adding email to core.mockSmptList
-                    core.mockEmailList.Add(new MockEmailClass() {
+                    core.mockEmailList.Add(new MockEmailClass {
                         email = email
                     });
                     return true;

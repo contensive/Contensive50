@@ -81,13 +81,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose() {
+        public void Dispose()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~EmailHippoController() {
+        ~EmailHippoController()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
 

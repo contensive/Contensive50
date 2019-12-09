@@ -417,14 +417,14 @@ namespace Contensive.Processor {
         // ====================================================================================================
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
         // ====================================================================================================
         //
-        ~CPHtmlClass() {
+        ~CPHtmlClass()  {
             Dispose(false);
         }
         #endregion

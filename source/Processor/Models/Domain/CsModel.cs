@@ -227,7 +227,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// delete the current record in the dataset
         /// </summary>
-        public void deleteRecord() {
+        public void deleteRecord()  {
             try {
                 if (!ok()) { throw new ArgumentException("Cannot delete because data set is empty or at End-Of-file"); }
                 if (!createdWithMetaData) { throw new ArgumentException("Cannot delete because data set was created with a query."); }
@@ -457,7 +457,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="MemberID"></param>
         /// <returns></returns>
-        private void init() {
+        private void init()  {
             isOpen = true;
             contentName = "";
             contentMeta = null;
@@ -581,7 +581,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="ignore"></param>
         /// <returns></returns>
-        public string getFirstFieldName() {
+        public string getFirstFieldName()  {
             try {
                 if (!ok()) { throw new GenericException("data set is not valid"); }
                 this.fieldPointer = 0;
@@ -598,7 +598,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="CSPointer"></param>
         /// <returns></returns>
-        public string getNextFieldName() {
+        public string getNextFieldName()  {
             try {
                 if (!ok()) { throw new GenericException("data set is not valid"); }
                 while (this.fieldPointer < this.resultColumnCount) {
@@ -658,7 +658,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="CSPointer"></param>
         /// <returns></returns>
-        public string getSelectFieldList() {
+        public string getSelectFieldList()  {
             try {
                 if (ok()) { return string.Join(",", this.fieldNames); }
                 return string.Empty;
@@ -877,7 +877,7 @@ namespace Contensive.Processor {
         /// true if csPointer is a valid dataset, and currently points to a valid row
         /// </summary>
         /// <returns></returns>
-        public bool ok() {
+        public bool ok()  {
             try {
                 //
                 // -- opened with openForUpdate. can be written but not read
@@ -896,7 +896,7 @@ namespace Contensive.Processor {
         /// Returns the Source for the csv_ContentSet
         /// </summary>
         /// <returns></returns>
-        public string getSql() {
+        public string getSql()  {
             try {
                 if (!ok()) { throw new ArgumentException("the dataset is not valid"); }
                 return this.sqlSource;
@@ -1243,7 +1243,7 @@ namespace Contensive.Processor {
         /// rollback, or undo the changes to the current row
         /// </summary>
         /// <param name="CSPointer"></param>
-        public void rollBack() {
+        public void rollBack()  {
             try {
                 if (!ok()) { throw new ArgumentException("dataset is not valid"); }
                 this.writeCache.Clear();
@@ -1542,7 +1542,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// returns tru if the dataset is pointing past the last row
         /// </summary>
-        private bool eof() {
+        private bool eof()  {
             return (this.readCacheRowPtr >= this.readCacheRowCnt);
         }
         //
@@ -1635,7 +1635,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="CSPointer"></param>
         /// <returns></returns>
-        public string[,] getRows() {
+        public string[,] getRows()  {
             return this.readCache;
         }
         //
@@ -1644,7 +1644,7 @@ namespace Contensive.Processor {
         /// get the row count of the dataset
         /// </summary>
         /// <returns></returns>
-        public int getRowCount() {
+        public int getRowCount()  {
             if (ok()) { return this.readCacheRowCnt; }
             return 0;
         }
@@ -1656,7 +1656,7 @@ namespace Contensive.Processor {
         /// <param name="CSPointer"></param>
         /// <returns></returns>
         //
-        public string getContentName() {
+        public string getContentName()  {
             try {
                 return this.contentName;
             } catch (Exception ex) {
@@ -2064,11 +2064,11 @@ namespace Contensive.Processor {
         protected bool disposed;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~CsModel() {
+        ~CsModel()  {
             Dispose(false);
         }
         #endregion

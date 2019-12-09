@@ -18,7 +18,7 @@ namespace Contensive.Processor {
         /// constructor for server use. No application context will be available. Use to create new apps or iterate through apps.
         /// </summary>
         /// <remarks></remarks>
-        public CPClass() {
+        public CPClass()  {
             core = new CoreController(this);
         }
         //
@@ -137,7 +137,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="route"></param>
         /// <returns></returns>
-        public string executeRoute() {
+        public string executeRoute()  {
             try {
                 return RouteController.executeRoute(core);
             } catch (Exception ex) {
@@ -219,7 +219,7 @@ namespace Contensive.Processor {
         /// Create a new block object, used to manipulate html elements using htmlClass and htmlId. Alternatively create a block object with its constructor.
         /// </summary>
         /// <returns></returns>
-        public override CPBlockBaseClass BlockNew() {
+        public override CPBlockBaseClass BlockNew()  {
             return new CPBlockClass(this);
         }
         //
@@ -228,7 +228,7 @@ namespace Contensive.Processor {
         /// Create a new data set object used to run queries and open tables with soft table names (determined run-time). Alternatively create a data set object with its constructor
         /// </summary>
         /// <returns></returns>
-        public override CPCSBaseClass CSNew() {
+        public override CPCSBaseClass CSNew()  {
             return new CPCSClass(this);
         }
         //
@@ -614,7 +614,7 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         //
-        public override List<string> GetAppNameList() {
+        public override List<string> GetAppNameList()  {
             var result = new List<string>();
             foreach ( var app in core.serverConfig.apps) {
                 result.Add(app.Key);
@@ -631,7 +631,7 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         //
-        public override AppConfigBaseModel GetAppConfig() {
+        public override AppConfigBaseModel GetAppConfig()  {
             return core.appConfig;
         }
         //
@@ -660,12 +660,12 @@ namespace Contensive.Processor {
         //
         protected bool disposed_cp;
         //
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~CPClass() {
+        ~CPClass()  {
             Dispose(false);
         }
         //

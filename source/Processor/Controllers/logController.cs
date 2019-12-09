@@ -24,7 +24,7 @@ namespace Contensive.Processor.Controllers {
         public static void awsConfigure(CoreController core) {
             if (core.serverConfig == null) return;
             if (string.IsNullOrWhiteSpace(core.serverConfig.awsCloudWatchLogGroup)) return;
-            var awsTarget = new AWSTarget() {
+            var awsTarget = new AWSTarget {
                 Layout = "${longdate}|${level:uppercase=true}|${callsite}|${message}",
                 LogGroup = core.serverConfig.awsCloudWatchLogGroup,
                 Region = core.serverConfig.awsRegionName,

@@ -25,7 +25,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// constructor to setup defaults for fields required
         /// </summary>
-        public ContentMetadataModel() {
+        public ContentMetadataModel()  {
             // set defaults, create methods require name, table
             active = true;
         }
@@ -843,7 +843,7 @@ namespace Contensive.Processor.Models.Domain {
         /// create a clone of this object. Used for cases like cs copy
         /// </summary>
         /// <returns></returns>
-        public Object Clone() {
+        public Object Clone()  {
             return MemberwiseClone();
         }
         //
@@ -1350,7 +1350,7 @@ namespace Contensive.Processor.Models.Domain {
                         if (contentMetadata.id <= 0) {
                             //
                             // -- Content definition not found, create it
-                            contentMetadata.id = verifyContent_returnId(core, new ContentMetadataModel() {
+                            contentMetadata.id = verifyContent_returnId(core, new ContentMetadataModel {
                                 tableName = TableName,
                                 name = ContentName,
                                 active = true

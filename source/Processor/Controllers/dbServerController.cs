@@ -37,7 +37,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <returns>
         /// </returns>
-        public string getConnectionStringADONET() {
+        public string getConnectionStringADONET()  {
             //
             // (OLEDB) OLE DB Provider for SQL Server > "Provider=sqloledb;Data Source=MyServerName;Initial Catalog=MyDatabaseName;User Id=MyUsername;Password=MyPassword;"
             //     https://www.codeproject.com/Articles/2304/ADO-Connection-Strings#OLE%20DB%20SqlServer
@@ -159,11 +159,11 @@ namespace Contensive.Processor.Controllers {
         }
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~DbServerController() {
+        ~DbServerController()  {
             Dispose(false);
             
             

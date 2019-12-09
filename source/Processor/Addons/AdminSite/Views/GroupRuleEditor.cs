@@ -81,7 +81,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Edit", "?af=4&cid=" + Processor.Models.Domain.ContentMetadataModel.getContentId(core, "Groups") + "&id=" + GroupID);
                                 relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Members", "?af=1&cid=" + Processor.Models.Domain.ContentMetadataModel.getContentId(core, "people") + "&IndexFilterAddGroup=" + GenericController.encodeURL(GroupName));
                                 //
-                                var row = new GroupRuleEditorRowModel() {
+                                var row = new GroupRuleEditorRowModel {
                                     idHidden = HtmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID),
                                     checkboxInput = HtmlController.checkbox("MemberRules." + GroupCount, GroupActive),
                                     groupCaption = GroupCaption,
@@ -97,7 +97,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 }
                 //
                 // -- add a row for group count and Add Group button
-                groupRuleEditor.rowList.Add(new GroupRuleEditorRowModel() {
+                groupRuleEditor.rowList.Add(new GroupRuleEditorRowModel {
                     idHidden = HtmlController.inputHidden("MemberRules.RowCount", GroupCount),
                     checkboxInput = AdminUIController.getButtonPrimaryAnchor("Add Group", "?af=4&cid=" + ContentMetadataModel.getContentId(core, "Groups")),
                     groupCaption = "",

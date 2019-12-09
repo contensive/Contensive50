@@ -700,11 +700,11 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     addonArgDict.Add("cmdAccumulator", CmdAccumulator);
                                     AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, addonName);
-                                    var executeContext = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                                    var executeContext = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                         addonType = Context,
                                         cssContainerClass = "",
                                         cssContainerId = "",
-                                        hostRecord = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                        hostRecord = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext {
                                             contentName = "",
                                             fieldName = "",
                                             recordId = 0

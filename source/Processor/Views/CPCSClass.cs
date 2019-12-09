@@ -155,32 +155,32 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize, int pageNumber)
-            => OpenGroupUsers(new List<string>() { groupName }, sqlCriteria, sortFieldList, activeOnly, pageSize, pageNumber);
+            => OpenGroupUsers(new List<string> { groupName }, sqlCriteria, sortFieldList, activeOnly, pageSize, pageNumber);
         //
         //====================================================================================================
         //
         public override bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize)
-            => OpenGroupUsers(new List<string>() { groupName }, sqlCriteria, sortFieldList, activeOnly, pageSize, 1);
+            => OpenGroupUsers(new List<string> { groupName }, sqlCriteria, sortFieldList, activeOnly, pageSize, 1);
         //
         //====================================================================================================
         //
         public override bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList, bool activeOnly)
-            => OpenGroupUsers(new List<string>() { groupName }, sqlCriteria, sortFieldList, activeOnly, Constants.sqlPageSizeDefault, 1);
+            => OpenGroupUsers(new List<string> { groupName }, sqlCriteria, sortFieldList, activeOnly, Constants.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList)
-            => OpenGroupUsers(new List<string>() { groupName }, sqlCriteria, sortFieldList, true, Constants.sqlPageSizeDefault, 1);
+            => OpenGroupUsers(new List<string> { groupName }, sqlCriteria, sortFieldList, true, Constants.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool OpenGroupUsers(string groupName, string sqlCriteria)
-            => OpenGroupUsers(new List<string>() { groupName }, sqlCriteria, "", true, Constants.sqlPageSizeDefault, 1);
+            => OpenGroupUsers(new List<string> { groupName }, sqlCriteria, "", true, Constants.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool OpenGroupUsers(string groupName)
-            => OpenGroupUsers(new List<string>() { groupName }, "", "", true, Constants.sqlPageSizeDefault, 1);
+            => OpenGroupUsers(new List<string> { groupName }, "", "", true, Constants.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
@@ -216,7 +216,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void Close() {
+        public override void Close()  {
             try {
                 cs.close();
             } catch (Exception ex) {
@@ -242,7 +242,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void Delete() {
+        public override void Delete()  {
             try {
                 cs.deleteRecord();
             } catch (Exception ex) {
@@ -264,7 +264,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void GoFirst() {
+        public override void GoFirst()  {
             try {
                 cs.goFirst(false);
             } catch (Exception ex) {
@@ -378,7 +378,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override int GetRowCount() {
+        public override int GetRowCount()  {
             try {
                 return cs.getRowCount();
             } catch (Exception ex) {
@@ -389,7 +389,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override string GetSQL() {
+        public override string GetSQL()  {
             try {
                 return cs.getSql();
             } catch (Exception ex) {
@@ -422,7 +422,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void GoNext() {
+        public override void GoNext()  {
             try {
                 cs.goNext();
             } catch (Exception ex) {
@@ -433,7 +433,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override bool NextOK() {
+        public override bool NextOK()  {
             try {
                 cs.goNext();
                 return cs.ok();
@@ -445,7 +445,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override bool OK() {
+        public override bool OK()  {
             try {
                 return cs.ok();
             } catch (Exception ex) {
@@ -456,7 +456,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void Save() {
+        public override void Save()  {
             try {
                 cs.save();
             } catch (Exception ex) {
@@ -632,7 +632,7 @@ namespace Contensive.Processor {
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public override void Dispose() {
+        public override void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -655,7 +655,7 @@ namespace Contensive.Processor {
             }
             this.disposed_cs = true;
         }
-        ~CPCSClass() {
+        ~CPCSClass()  {
             Dispose(false);
         }
         protected bool disposed_cs;

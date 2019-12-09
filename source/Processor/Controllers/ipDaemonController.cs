@@ -26,7 +26,7 @@ namespace Contensive.Processor.Controllers {
         //
         //===============================================================================================
         //
-        private void thread_cmdListener() {
+        private void thread_cmdListener()  {
             //
             string cmd = null;
             string queryString = null;
@@ -168,7 +168,7 @@ namespace Contensive.Processor.Controllers {
         //   Stop listening
         //==========================================================================================
         //
-        public void stopListening() {
+        public void stopListening()  {
             try {
                 //
                 // abort sockets

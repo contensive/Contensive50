@@ -44,7 +44,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override bool OK() {
+        public override bool OK()  {
             return cp.core.doc.userErrorList.Count.Equals(0);
         }
     }

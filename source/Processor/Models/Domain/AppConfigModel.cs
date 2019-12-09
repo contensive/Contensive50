@@ -94,7 +94,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Create an empty object. needed for deserialization. Use newModel() method as constructor, includes cache
         /// </summary>
-        public AppConfigModel() {
+        public AppConfigModel()  {
             domainList = new List<string>();
             deleteProtection = true;
         }

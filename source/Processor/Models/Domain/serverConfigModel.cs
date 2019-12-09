@@ -79,7 +79,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Create an empty object. needed for deserialization. Use newModel() method as constructor, includes cache
         /// </summary>
-        public ServerConfigModel() {
+        public ServerConfigModel()  {
             name = "";
             enableLocalMemoryCache = true;
             enableLocalFileCache = false;

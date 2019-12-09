@@ -36,7 +36,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Stop all activity through the content server, but do not unload
         /// </summary>
-        public void stopTimerEvents() {
+        public void stopTimerEvents()  {
             try {
                 processTimer.Enabled = false;
                 using (CPClass cp = new CPClass()) {
@@ -56,7 +56,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="setVerbose"></param>
         /// <param name="singleThreaded"></param>
         /// <returns></returns>
-        public bool startTimerEvents() {
+        public bool startTimerEvents()  {
             bool returnStartedOk = false;
             try {
                 // todo StartServiceInProgress does nothing. windows will not call it twice
@@ -248,11 +248,11 @@ namespace Contensive.Processor.Controllers {
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~TaskSchedulerController() {
+        ~TaskSchedulerController()  {
             Dispose(false);
 
 

@@ -32,7 +32,7 @@ namespace Contensive.Processor.Models.Domain {
         /// return an new empty object. Required for cache read
         /// </summary>
         /// <param name="core"></param>
-        public AddonCacheModel() { }
+        public AddonCacheModel()  { }
         //
         //====================================================================================================
         /// <summary>
@@ -140,7 +140,7 @@ namespace Contensive.Processor.Models.Domain {
         /// return all addons marked as onBodyEnd
         /// </summary>
         /// <returns></returns>
-        public List<AddonModel> getOnBodyEndAddonList() {
+        public List<AddonModel> getOnBodyEndAddonList()  {
             return getAddonList(onBodyEndIdList);
         }
         //
@@ -149,7 +149,7 @@ namespace Contensive.Processor.Models.Domain {
         /// return all addons marked as onBodyStart
         /// </summary>
         /// <returns></returns>
-        public List<AddonModel> getOnBodyStartAddonList() {
+        public List<AddonModel> getOnBodyStartAddonList()  {
             return getAddonList(onBodyStartIdList);
         }
         //
@@ -158,7 +158,7 @@ namespace Contensive.Processor.Models.Domain {
         /// return all addons marked as onNewVisit
         /// </summary>
         /// <returns></returns>
-        public List<AddonModel> getOnNewVisitAddonList() {
+        public List<AddonModel> getOnNewVisitAddonList()  {
             return getAddonList(onNewVisitIdList);
         }
         //
@@ -167,7 +167,7 @@ namespace Contensive.Processor.Models.Domain {
         /// return all addons marked as onPageEnd
         /// </summary>
         /// <returns></returns>
-        public List<AddonModel> getOnPageEndAddonList() {
+        public List<AddonModel> getOnPageEndAddonList()  {
             return getAddonList(OnPageEndIdList);
         }
         //
@@ -176,7 +176,7 @@ namespace Contensive.Processor.Models.Domain {
         /// return all addons marked as onPageStart
         /// </summary>
         /// <returns></returns>
-        public List<AddonModel> getOnPageStartAddonList() {
+        public List<AddonModel> getOnPageStartAddonList()  {
             return getAddonList(OnPageStartIdList);
         }
         //
@@ -185,7 +185,7 @@ namespace Contensive.Processor.Models.Domain {
         /// return all addons marked as remote methods
         /// </summary>
         /// <returns></returns>
-        public List<AddonModel> getRemoteMethodAddonList() {
+        public List<AddonModel> getRemoteMethodAddonList()  {
             return getAddonList(remoteMethodIdList);
         }
         //

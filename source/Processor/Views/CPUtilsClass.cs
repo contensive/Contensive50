@@ -53,7 +53,7 @@ namespace Contensive.Processor {
         /// Create a new guid in the systems format (registry format "{...}")
         /// </summary>
         /// <returns></returns>
-        public override string CreateGuid() {
+        public override string CreateGuid()  {
             return GenericController.getGUID();
         }
         //
@@ -65,7 +65,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override void IISReset() {
+        public override void IISReset()  {
             {
                 cp.core.webServer.reset();
             }
@@ -148,7 +148,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override int GetRandomInteger() {
+        public override int GetRandomInteger()  {
             return GenericController.getRandomInteger(cp.core);
         }
         //
@@ -308,7 +308,7 @@ namespace Contensive.Processor {
                 if (ExportCSVAddon == null) {
                     LogController.logError(cp.core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
                 } else {
-                    var cmdDetail = new TaskModel.CmdDetailClass() {
+                    var cmdDetail = new TaskModel.CmdDetailClass {
                         addonId = ExportCSVAddon.id,
                         addonName = ExportCSVAddon.name,
                         args = new Dictionary<string, string> {
@@ -393,17 +393,17 @@ namespace Contensive.Processor {
         }
         //
         [Obsolete("deprecated", false)]
-        public override string GetPleaseWaitEnd() {
+        public override string GetPleaseWaitEnd()  {
             return cp.core.programFiles.readFileText("resources\\WaitPageClose.htm");
         }
         //
         [Obsolete("deprecated", false)]
-        public override string GetPleaseWaitStart() {
+        public override string GetPleaseWaitStart()  {
             return cp.core.programFiles.readFileText("Resources\\WaitPageOpen.htm");
         }
         //
         public string executeAddon(string addonIDGuidOrName, int wrapperId, addonContext context) {
-            addonExecuteContext executeContext = new addonExecuteContext() {
+            addonExecuteContext executeContext = new addonExecuteContext {
                 addonType = context,
                 instanceGuid = cp.core.docProperties.getText("instanceId"),
                 wrapperID = wrapperId
@@ -510,7 +510,7 @@ namespace Contensive.Processor {
         }
         //
         [Obsolete("Deprecated.", false)]
-        public override int GetProcessID() {
+        public override int GetProcessID()  {
             return Process.GetCurrentProcess().Id;
         }
         //
@@ -611,12 +611,12 @@ namespace Contensive.Processor {
         protected bool dispose_utils;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        ~CPUtilsClass() {
+        ~CPUtilsClass()  {
             Dispose(false);
         }
         #endregion

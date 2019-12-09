@@ -57,7 +57,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void Clear() {
+        public override void Clear()  {
             try {
                 accum = "";
             } catch (Exception ex) {
@@ -68,7 +68,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override string GetHtml() {
+        public override string GetHtml()  {
             return accum;
         }
         //
@@ -103,7 +103,7 @@ namespace Contensive.Processor {
                         headTags = HtmlParseStaticController.getTagInnerHTML(accum, "head", false);
                         if (!string.IsNullOrEmpty(headTags)) {
                             foreach (string asset in stringSplit( headTags, Environment.NewLine )) {
-                                cp.core.doc.htmlMetaContent_OtherTags.Add(new HtmlMetaClass() {
+                                cp.core.doc.htmlMetaContent_OtherTags.Add(new HtmlMetaClass {
                                     addedByMessage = "block.importFile",
                                     content = asset
                                 });
@@ -246,12 +246,12 @@ namespace Contensive.Processor {
         //
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public override void Dispose() {
+        public override void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~CPBlockClass() {
+        ~CPBlockClass()  {
             Dispose(false);
         }
         #endregion

@@ -20,13 +20,13 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void controllers_Addon_simpleDoNothingAddon() {
+        public void controllers_Addon_simpleDoNothingAddon()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var addon = AddonModel.addDefault<AddonModel>(cp, ContentMetadataModel.getDefaultValueDict(cp.core, AddonModel.tableMetadata.contentName));
                 addon.save(cp);
                 // act
-                string result = cp.core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                string result = cp.core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                     addonType = CPUtilsBaseClass.addonContext.ContextSimple,
                     backgroundProcess = false,
                     cssContainerClass = "",
@@ -34,7 +34,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                     errorContextMessage = "",
                     forceHtmlDocument = false,
                     forceJavascriptToHead = false,
-                    hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                    hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext {
                         contentName = "",
                         fieldName = "",
                         recordId = 0
@@ -60,14 +60,14 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //
         //====================================================================================================
         //
-        public void controllers_Addon_copy() {
+        public void controllers_Addon_copy()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var addon = AddonModel.addDefault<AddonModel>(cp, ContentMetadataModel.getDefaultValueDict(cp.core, AddonModel.tableMetadata.contentName));
                 addon.copy = "test" + GenericController.getRandomInteger(cp.core).ToString();
                 addon.save(cp);
                 // act
-                string result = cp.core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                string result = cp.core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                     addonType = CPUtilsBaseClass.addonContext.ContextSimple,
                     backgroundProcess = false,
                     cssContainerClass = "",
@@ -75,7 +75,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                     errorContextMessage = "",
                     forceHtmlDocument = false,
                     forceJavascriptToHead = false,
-                    hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                    hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext {
                         contentName = "",
                         fieldName = "",
                         recordId = 0

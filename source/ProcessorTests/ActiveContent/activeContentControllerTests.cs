@@ -20,7 +20,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_ActiveContent_Content() {
+        public void Controllers_ActiveContent_Content()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 string source = "<ac Type=\"content\">";

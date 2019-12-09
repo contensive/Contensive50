@@ -23,7 +23,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         // unit test - cp.blockNew
         //
         [TestMethod]
-        public void views_cpBlock_InnerOuterTest() {
+        public void views_cpBlock_InnerOuterTest()  {
             // arrange
             CPClass cpApp = new CPClass(testAppName);
             CPBlockBaseClass block = cpApp.BlockNew();
@@ -84,7 +84,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         /// test block load and clear
         /// </summary>
         [TestMethod]
-        public void views_cpBlock_ClearTest() {
+        public void views_cpBlock_ClearTest()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 CPBlockBaseClass block = cp.BlockNew();
                 // act
@@ -101,7 +101,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         /// test block import
         /// </summary>
         [TestMethod]
-        public void views_cpBlock_ImportFileTest() {
+        public void views_cpBlock_ImportFileTest()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 string filename = "cpBlockTest" + getRandomInteger(cp.core).ToString() + ".html";
                 try {
@@ -124,7 +124,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         /// test block openCopy
         /// </summary>
         [TestMethod]
-        public void views_cpBlock_OpenCopyTest() {
+        public void views_cpBlock_OpenCopyTest()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 string recordName = "cpBlockTest" + getRandomInteger(cp.core).ToString();
                 int recordId = 0;
@@ -154,7 +154,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         /// test block openFile
         /// </summary>
         [TestMethod]
-        public void views_cpBlock_OpenFileTest() {
+        public void views_cpBlock_OpenFileTest()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 string filename = "cpBlockTest" + getRandomInteger(cp.core).ToString() + ".html";
                 // act
@@ -172,7 +172,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         /// test block openCopy
         /// </summary>
         [TestMethod]
-        public void views_cpBlock_OpenLayoutTest() {
+        public void views_cpBlock_OpenLayoutTest()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 string recordName = "cpBlockTest" + getRandomInteger(cp.core).ToString();
                 int recordId = 0;
@@ -198,7 +198,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         // unit test - cp.blockNew
         //
         [TestMethod]
-        public void views_cpBlock_AppendPrependTest() {
+        public void views_cpBlock_AppendPrependTest()  {
             // arrange
             CPClass cpApp = new CPClass(testAppName);
             CPBlockBaseClass block = cpApp.BlockNew();
@@ -226,7 +226,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
     public class CoreCommonTests {
         //
         [TestMethod]
-        public void normalizePath_unit() {
+        public void normalizePath_unit()  {
             // arrange
             // act
             // assert
@@ -242,7 +242,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         }
         //
         [TestMethod]
-        public void normalizeRoute_unit() {
+        public void normalizeRoute_unit()  {
             // arrange
             // act
             // assert
@@ -264,7 +264,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
         }
         //
         [TestMethod]
-        public void sample_unit() {
+        public void sample_unit()  {
             // arrange
             // act
             // assert

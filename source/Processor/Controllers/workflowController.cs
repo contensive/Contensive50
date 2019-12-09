@@ -110,7 +110,7 @@ namespace Contensive.Processor.Controllers {
                     var authoringControlList = DbBaseModel.createList<AuthoringControlModel>(core.cpParent, criteria, "dateexpires desc");
                     if (authoringControlList.Count > 0) {
                         var person = DbBaseModel.create<PersonModel>(core.cpParent, GenericController.encodeInteger(authoringControlList.First().createdBy));
-                        return new editLockClass() {
+                        return new editLockClass {
                             isEditLocked = true,
                             editLockExpiresDate = authoringControlList.First().dateExpires,
                             editLockByMemberId = (person == null) ? 0 : person.id,
@@ -121,7 +121,7 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            return new editLockClass() { isEditLocked = false };
+            return new editLockClass { isEditLocked = false };
         }
         //
         //========================================================================
@@ -223,7 +223,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="RecordID"></param>
         /// <returns></returns>
         public static recordWorkflowStatusClass getWorkflowStatus(CoreController core, string ContentName, int RecordID) {
-            recordWorkflowStatusClass result = new recordWorkflowStatusClass() {
+            recordWorkflowStatusClass result = new recordWorkflowStatusClass {
                 isEditLocked = false,
                 editLockByMemberName = "",
                 editLockExpiresDate = DateTime.MinValue,
@@ -416,11 +416,11 @@ namespace Contensive.Processor.Controllers {
         }
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public void Dispose()  {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~WorkflowController() {
+        ~WorkflowController()  {
             Dispose(false);
 
 

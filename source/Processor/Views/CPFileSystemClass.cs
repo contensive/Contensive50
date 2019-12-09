@@ -174,12 +174,12 @@ namespace Contensive.Processor {
             }
             disposed_filesystem = true;
         }
-        public void Dispose() {
+        public void Dispose()   {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        ~CPFileSystemClass() {
+        ~CPFileSystemClass()  { 
             Dispose(false);
         }
         #endregion

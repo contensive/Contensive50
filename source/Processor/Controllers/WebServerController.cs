@@ -309,7 +309,7 @@ namespace Contensive.Processor.Controllers {
         //   Must be called from a process running as admin
         //   This can be done using the command queue, which kicks off the ccCmd process from the Server
         //
-        public void reset() {
+        public void reset()  {
             try {
                 string Cmd = null;
                 string arg = null;
@@ -337,7 +337,7 @@ namespace Contensive.Processor.Controllers {
         //   Must be called from a process running as admin
         //   This can be done using the command queue, which kicks off the ccCmd process from the Server
         //
-        public void stop() {
+        public void stop()  {
             try {
                 string Cmd = null;
                 string LogFilename = null;
@@ -364,7 +364,7 @@ namespace Contensive.Processor.Controllers {
         //   This can be done using the command queue, which kicks off the ccCmd process from the Server
         //=======================================================================================
         //
-        public void start() {
+        public void start()  {
             try {
                 string Cmd = null;
                 string LogFilename = core.privateFiles.localAbsRootPath + "iisResetPipe.log";
@@ -634,7 +634,7 @@ namespace Contensive.Processor.Controllers {
                     if (core.domain.id == 0) {
                         //
                         // this is a default domain or a new domain -- add to the domain table
-                        var domain = new DomainModel() {
+                        var domain = new DomainModel {
                             name = requestDomain,
                             typeId = 1,
                             rootPageId = core.domain.rootPageId,
@@ -1005,7 +1005,7 @@ namespace Contensive.Processor.Controllers {
 
         //
         //
-        public void flushStream() {
+        public void flushStream()  {
             if (iisContext != null) {
                 iisContext.Response.Flush();
             }
@@ -1320,7 +1320,7 @@ namespace Contensive.Processor.Controllers {
             }
             return "";
         }
-        public void clearResponseBuffer() {
+        public void clearResponseBuffer()  {
             iisContext.Response.ClearHeaders();
             bufferRedirect = "";
             bufferResponseHeader = "";

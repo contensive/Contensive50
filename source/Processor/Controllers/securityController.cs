@@ -62,7 +62,7 @@ namespace Contensive.Processor.Controllers {
         public class TokenData {
             public int id { get; set; }
             public DateTime timeStamp { get; set; }
-            public TokenData() {
+            public TokenData()  {
                 id = 0;
                 timeStamp = DateTime.MinValue;
             }
@@ -434,7 +434,7 @@ namespace Contensive.Processor.Controllers {
         /// A class for creating a symetric encryption
         /// </summary>
         protected class Crypto {
-            protected Crypto() { }
+            protected Crypto()  { }
             //
             // While an app specific salt is not the best practice for
             // password based encryption, it's probably safe enough as long as

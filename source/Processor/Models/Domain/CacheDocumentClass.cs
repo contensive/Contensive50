@@ -13,7 +13,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         // ====================================================================================================
         //
-        public CacheDocumentClass() {
+        public CacheDocumentClass()  {
             dependentKeyList = new List<string>();
             saveDate = DateTime.Now;
             invalidationDate = DateTime.Now.AddDays(Constants.invalidationDaysDefault);

@@ -173,7 +173,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     string htmlBody = encodeEmailHtmlBody(core, isHTML, body, "", subject, null, "" );
                     string textBody = encodeEmailTextBody(core, isHTML, body, null);
-                    queueEmail(core, isImmediate, emailContextMessage, new EmailClass() {
+                    queueEmail(core, isImmediate, emailContextMessage, new EmailClass {
                         attempts = 0,
                         BounceAddress = bounceAddress,
                         fromAddress = fromAddress,
@@ -269,7 +269,7 @@ namespace Contensive.Processor.Controllers {
                             + ((!string.IsNullOrWhiteSpace(recipient.lastName) && !recipient.lastName.ToLower().Equals("guest")) ? recipient.lastName : string.Empty);
                     }
                     recipientName = recipientName.Trim();
-                    var email = new EmailClass() {
+                    var email = new EmailClass {
                         attempts = 0,
                         BounceAddress = bounceAddress,
                         emailId = emailId,

@@ -33,7 +33,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
         //       Eventually, this should be substituted with a "Addon Manager Addon" - so the interface can be improved with Contensive recompile
         //==========================================================================================================================================
         //
-        public string getForm_SafeModeAddonManager() {
+        public string getForm_SafeModeAddonManager()  {
             string addonManager = "";
             try {
                 var collectionsInstalledList = new List<string>();

@@ -226,7 +226,7 @@ namespace Contensive.Processor.Controllers {
                     csData.open("Add-on Content Trigger Rules", "ContentID=" + contentId, "", false, 0, "addonid");
                     string Option_String = null;
                     if (isDelete) {
-                        instanceArguments = new Dictionary<string, string>() {
+                        instanceArguments = new Dictionary<string, string> {
                             {"action","contentdelete"},
                             {"contentid",contentId.ToString()},
                             {"recordid",recordId.ToString()}
@@ -236,7 +236,7 @@ namespace Contensive.Processor.Controllers {
                             + Environment.NewLine + "contentid=" + contentId
                             + Environment.NewLine + "recordid=" + recordId + "";
                     } else {
-                        instanceArguments = new Dictionary<string, string>() {
+                        instanceArguments = new Dictionary<string, string> {
                             {"action","contentchange"},
                             {"contentid",contentId.ToString()},
                             {"recordid",recordId.ToString()}
@@ -256,7 +256,7 @@ namespace Contensive.Processor.Controllers {
                             } else {
                                 //
                                 // -- execute addon
-                                core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                                core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                                     addonType = CPUtilsBaseClass.addonContext.ContextOnContentChange,
                                     backgroundProcess = false,
                                     errorContextMessage = "",
@@ -284,13 +284,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose() {
+        public void Dispose()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~ContentController() {
+        ~ContentController()  {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }
