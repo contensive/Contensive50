@@ -1,11 +1,8 @@
 ﻿
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Domain;
 using Contensive.Processor;
-using System.Linq;
 
 namespace Contensive.CLI {
     //

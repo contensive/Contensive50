@@ -2,16 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using Contensive.Processor;
-using System.Security.Permissions;
-using System.Security;
-using System.Security.AccessControl;
-using System.Security.Principal;
-using Contensive.Processor.Models.Domain;
-using System.Reflection;
-using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 

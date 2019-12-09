@@ -2,7 +2,6 @@
 using System;
 using Contensive.Processor;
 using Amazon;
-using Contensive.Models.Db;
 
 namespace Contensive.CLI {
     class ConfigureCmd {
