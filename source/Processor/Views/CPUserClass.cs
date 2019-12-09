@@ -6,12 +6,6 @@ using static Contensive.Processor.Controllers.GenericController;
 namespace Contensive.Processor {
     public class CPUserClass : BaseClasses.CPUserBaseClass, IDisposable {
         //
-        #region COM GUIDs
-        public const string ClassId = "08EF64C6-9C51-4B32-84D9-0D3BDAF42A28";
-        public const string InterfaceId = "B1A95B1F-A00D-4AC6-B3A0-B1619568C2EA";
-        public const string EventsId = "DBE2B6CB-6339-4FFB-92D7-BE37AEA841CC";
-        #endregion
-        //
         //====================================================================================================
         /// <summary>
         /// dependencies

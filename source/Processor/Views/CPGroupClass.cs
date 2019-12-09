@@ -7,14 +7,7 @@ namespace Contensive.Processor {
     //
     // comVisible to be activeScript compatible
     //
-    //[ComVisible(true), Microsoft.VisualBasic.ComClass(CPGroupClass.ClassId, CPGroupClass.InterfaceId, CPGroupClass.EventsId)]
     public class CPGroupClass : BaseClasses.CPGroupBaseClass, IDisposable {
-        //
-        #region COM GUIDs
-        public const string ClassId = "C0000B6E-5ABF-4C67-9F22-EF52D73FC54B";
-        public const string InterfaceId = "DB74B7D9-73BE-40C1-B488-ACC098E8B9C1";
-        public const string EventsId = "B9E3C450-CDC4-4590-8BCD-FEDDF7338D4B";
-        #endregion
         //
         private Contensive.Processor.Controllers.CoreController core;
         private CPClass cp;

@@ -11,14 +11,7 @@ namespace Contensive.Processor {
     /// <summary>
     /// cpFileClass is a legacy implementation replaced with cdnFiles, appRootFiles and privateFiles. Non-Virtual calls do not limit file destination so are not scale-mode compatible
     /// </summary>
-    //[ComVisible(true), Microsoft.VisualBasic.ComClass(CPFileClass.ClassId, CPFileClass.InterfaceId, CPFileClass.EventsId)]
     public class CPFileClass : BaseClasses.CPFileBaseClass, IDisposable {
-        //
-        #region COM GUIDs
-        public const string ClassId = "E3310DFA-0ABF-4DC7-ABB5-4D294D30324B";
-        public const string InterfaceId = "44C305D8-A8C3-490D-8E79-E17F9B3D34CE";
-        public const string EventsId = "8757DE11-C04D-4765-B46B-458E281BAE19";
-        #endregion
         //
         private Contensive.Processor.Controllers.CoreController core;
         //

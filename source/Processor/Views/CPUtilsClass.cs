@@ -14,12 +14,6 @@ namespace Contensive.Processor {
     //
     public class CPUtilsClass : BaseClasses.CPUtilsBaseClass, IDisposable {
         //
-        #region COM GUIDs
-        public const string ClassId = "BAF47FF8-7D7B-4375-A5BB-06E576AB757B";
-        public const string InterfaceId = "78662206-16DF-4C5D-B25E-30292E99EC88";
-        public const string EventsId = "88D127A1-BD5C-43C6-8814-BE17CADBF7AC";
-        #endregion
-        //
         /// <summary>
         /// dependencies
         /// </summary>

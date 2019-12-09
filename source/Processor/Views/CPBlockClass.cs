@@ -8,12 +8,6 @@ using Contensive.Models.Db;
 namespace Contensive.Processor {
     public class CPBlockClass : BaseClasses.CPBlockBaseClass, IDisposable {
         //
-        #region COM GUIDs
-        public const string ClassId = "9E4DF603-A94B-4E3A-BD06-E19BB9CB1B5F";
-        public const string InterfaceId = "E4D5D9F0-DF96-492E-9CAC-1107F0187A40";
-        public const string EventsId = "5911548D-7637-4021-BD08-C7676F3E12C6";
-        #endregion
-        //
         private CPClass cp { get; set; }
         private string accum { get; set; }
         private Controllers.HtmlController htmlDoc { get; set; }

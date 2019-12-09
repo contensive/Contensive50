@@ -6,12 +6,6 @@ using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor {
     public class CPHtmlClass: CPHtmlBaseClass, IDisposable {
-        //
-        #region COM GUIDs
-        public const string ClassId = "637E3815-0DA6-4672-84E9-A319D85F2101";
-        public const string InterfaceId = "24267471-9CE4-44F9-B4BD-8E9CE357D6E6";
-        public const string EventsId = "4021B791-0F55-4841-90AE-64C7FAFB9756";
-        #endregion
         /// <summary>
         /// dependencies
         /// </summary>

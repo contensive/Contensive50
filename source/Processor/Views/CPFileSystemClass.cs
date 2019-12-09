@@ -6,12 +6,6 @@ using Contensive.Processor.Controllers;
 namespace Contensive.Processor {
     public class CPFileSystemClass : BaseClasses.CPFileSystemBaseClass, IDisposable {
         //
-        #region COM GUIDs
-        public const string ClassId = "0B73809E-F149-4262-A548-FA1E11DF63A6";
-        public const string InterfaceId = "4F8288A4-2854-4B60-9281-9A776DC101D0";
-        public const string EventsId = "987E6DDE-E9E6-46C5-9467-BAE79A129A15";
-        #endregion
-        //
         private Contensive.Processor.Controllers.CoreController core;
         /// <summary>
         /// The instance of the controller used to implement this instance. Either core.TempFiles, core.wwwFiles, core.cdnFiles, or core.appRootFiles

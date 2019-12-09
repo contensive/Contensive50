@@ -5,11 +5,6 @@ using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor {
     public class CPDocClass : BaseClasses.CPDocBaseClass, IDisposable {
-        #region COM GUIDs
-        public const string ClassId = "414BD6A9-195F-4E0F-AE24-B7BF56749CDD";
-        public const string InterfaceId = "347D06BC-4D68-4DBE-82FE-B72115E24A56";
-        public const string EventsId = "95E8786B-E778-4617-96BA-B45C53E4AFD1";
-        #endregion
         /// <summary>
         /// dependencies
         /// </summary>

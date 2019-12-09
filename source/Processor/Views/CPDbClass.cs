@@ -14,12 +14,6 @@ namespace Contensive.Processor {
     /// Other datasources are implemented with CP.DbNew(datasourceName)
     /// </summary>
     public class CPDbClass : CPDbBaseClass, IDisposable {
-        //
-        #region COM GUIDs
-        public const string ClassId = "13B707F9-190A-4ECD-8A53-49FE1D8CAE54";
-        public const string InterfaceId = "A20CF53D-1FB7-41C4-8493-3D5AC3671A5E";
-        public const string EventsId = "F68D64F0-595F-4CA2-9EC6-6DBA9A7E458B";
-        #endregion
         /// <summary>
         /// dependencies
         /// </summary>

@@ -5,12 +5,6 @@ using Contensive.Processor.Controllers;
 namespace Contensive.Processor {
     public class CPUserErrorClass : BaseClasses.CPUserErrorBaseClass, IDisposable {
         //
-        #region COM GUIDs
-        public const string ClassId = "C175C292-0130-409E-9621-B618F89F4EEC";
-        public const string InterfaceId = "C06DB080-41AE-4F1B-A477-B3CF74F61708";
-        public const string EventsId = "B784BFEF-127B-48D5-8C99-B075984227DB";
-        #endregion
-        //
         private CPClass cp;
         protected bool disposed = false;
         //

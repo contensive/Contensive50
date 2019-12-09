@@ -7,16 +7,10 @@ using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor {
     public class CPHtml5Class : BaseClasses.CPHtml5BaseClass, IDisposable {
-        //
-        #region COM GUIDs
-        public const string ClassId = "8FE3846B-80BA-4645-9388-2831825845E8";
-        public const string InterfaceId = "46584DEE-091F-4068-86DD-13CA3167F17D";
-        public const string EventsId = "E73FCC6E-BAE6-4945-93DA-9E1A74539598";
-        #endregion
         /// <summary>
         /// dependencies
         /// </summary>
-        private CPClass cp;
+        private readonly CPClass cp;
         //
         // ====================================================================================================
         /// <summary>

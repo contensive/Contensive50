@@ -7,12 +7,6 @@ using Contensive.Processor.Controllers;
 namespace Contensive.Processor {
     public class CPCacheClass : BaseClasses.CPCacheBaseClass, IDisposable {
         //
-        #region COM GUIDs
-        public const string ClassId = "D522F0F5-53DF-4C6C-88E5-75CDAB91D286";
-        public const string InterfaceId = "9FED1031-1637-4002-9B08-4A40FDF13236";
-        public const string EventsId = "11B23802-CBD3-48E6-9C3E-1DC26ED8775A";
-        #endregion
-        //
         private CPClass cp { get; set; }
         //
         //====================================================================================================

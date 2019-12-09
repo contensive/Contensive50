@@ -7,12 +7,6 @@ using Contensive.Models.Db;
 namespace Contensive.Processor {
     public class CPSiteClass : BaseClasses.CPSiteBaseClass, IDisposable {
         //
-        #region COM GUIDs
-        public const string ClassId = "7C159DA2-6677-426B-8631-3F235F24BCF0";
-        public const string InterfaceId = "50DD3209-AE54-46EF-8344-C6CD8960DD65";
-        public const string EventsId = "5E88DB23-E8D7-4CE8-9793-9C7A20F4CF3A";
-        #endregion
-        //
         private CPClass cp;
         //
         //====================================================================================================

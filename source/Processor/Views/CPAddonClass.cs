@@ -12,13 +12,6 @@ namespace Contensive.Processor {
     // not sure which is better
     public class CPAddonClass : CPAddonBaseClass, IDisposable {
         //
-        // todo remove all com guid references
-        #region COM GUIDs
-        public const string ClassId = "6F43E5CA-6367-475C-AE65-FC988234922A";
-        public const string InterfaceId = "440D19E3-47A9-4CA2-B20C-077221015525";
-        public const string EventsId = "70B800AA-148A-4338-9EDB-70C85E1ADBDD";
-        #endregion
-        //
         // ====================================================================================================
         /// <summary>
         /// dependencies

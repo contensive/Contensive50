@@ -5,12 +5,6 @@ using static Contensive.Processor.Controllers.GenericController;
 namespace Contensive.Processor {
     public class CPVisitorClass : BaseClasses.CPVisitorBaseClass, IDisposable {
         //
-        #region COM GUIDs
-        public const string ClassId = "77CCF761-0656-4B75-81F4-5AD2456F6D0F";
-        public const string InterfaceId = "07665D81-5DCD-437A-9E33-16F56DA66B29";
-        public const string EventsId = "835C660E-92B5-4055-B620-64268319E31B";
-        #endregion
-        //
         private CPClass cp;
         //
         //=======================================================================================================

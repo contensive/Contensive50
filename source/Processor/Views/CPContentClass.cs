@@ -11,12 +11,6 @@ using Contensive.Models.Db;
 namespace Contensive.Processor {
     public class CPContentClass : CPContentBaseClass, IDisposable {
         //
-        #region COM GUIDs
-        public const string ClassId = "D8D3D8F9-8459-46F7-B8AC-01B4DFAA4DB2";
-        public const string InterfaceId = "9B321DE5-D154-4EB1-B533-DBA2E5F2B5D2";
-        public const string EventsId = "6E068297-E09E-42C8-97B6-02DE591009DD";
-        #endregion
-        //
         private CPClass cp { get; set; }
         //
         //====================================================================================================

@@ -9,12 +9,6 @@ namespace Contensive.Processor {
     /// The implementation of the CPCSBaseClass interface. Base interface is exposed to addons, and this implementation is passed during run-time
     /// </summary>
     public class CPCSClass : CPCSBaseClass, IDisposable {
-        //
-        #region COM GUIDs
-        public const string ClassId = "63745D9C-795E-4C01-BD6D-4BA35FC4A843";
-        public const string InterfaceId = "3F1E7D2E-D697-47A8-A0D3-B625A906BF6A";
-        public const string EventsId = "04B8E338-ABB7-44FE-A8DF-2681A36DCA46";
-        #endregion
         /// <summary>
         /// dependancies
         /// </summary>

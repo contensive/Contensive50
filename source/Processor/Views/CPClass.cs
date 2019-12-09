@@ -10,11 +10,6 @@ using System.Collections.Generic;
 
 namespace Contensive.Processor {
     public class CPClass : CPBaseClass, IDisposable {
-        #region COM GUIDs
-        public const string ClassId = "2EF01C6F-5288-411D-A5DE-76C8923CE1D3";
-        public const string InterfaceId = "58E04B36-2C75-4D11-9A8D-22A52E8417EB";
-        public const string EventsId = "4FADD1C2-6A89-4A8E-ADD0-9850D3EB6DBC";
-        #endregion
         //
         public CoreController core { get; set; }
         //
