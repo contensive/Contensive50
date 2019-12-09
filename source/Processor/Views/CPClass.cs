@@ -427,7 +427,7 @@ namespace Contensive.Processor {
         public override CPJSONBaseClass JSON {
             get {
                 if (_jsonObj == null) {
-                    _jsonObj = new CPJSONClass(this);
+                    _jsonObj = new CPJSONClass();
                 }
                 return _jsonObj;
             }
