@@ -48,9 +48,9 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
             public bool allowDeactivate { get; set; }
             public int contentId { get; set; }
             //
-            public EditButtonBarInfoClass(CoreController core,AdminDataModel adminData, bool allowDelete, bool allowRefresh, bool allowSave) {
+            public EditButtonBarInfoClass(CoreController core,AdminDataModel adminData, bool allowDelete, bool allowRefresh, bool allowSave, bool allowAdd) {
                 allowActivate = false;
-                allowAdd = (allowAdd && adminData.adminContent.allowAdd && adminData.editRecord.AllowUserAdd);
+                this.allowAdd = (allowAdd && adminData.adminContent.allowAdd && adminData.editRecord.AllowUserAdd);
                 allowCancel = true;
                 allowCreateDuplicate = allowAdd && (adminData.editRecord.id != 0);
                 allowDeactivate = false;

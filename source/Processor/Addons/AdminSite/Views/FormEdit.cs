@@ -1,13 +1,14 @@
 ﻿//
-using System;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Addons.AdminSite.Controllers;
+using static Contensive.Processor.Controllers.GenericController;
 using Contensive.BaseClasses;
+using static Contensive.Processor.Constants;
 using Contensive.Models.Db;
+using System;
+using System.Globalization;
 
 namespace Contensive.Processor.Addons.AdminSite {
     public static class FormEdit {
@@ -22,7 +23,7 @@ namespace Contensive.Processor.Addons.AdminSite {
         public static string get(CoreController core, AdminDataModel adminData) {
             string returnHtml = "";
             try {
-                bool AllowajaxTabs = (core.siteProperties.getBoolean("AllowAjaxEditTabBeta", false));
+                bool allowajaxTabs = (core.siteProperties.getBoolean("AllowAjaxEditTabBeta", false));
                 var adminMenu = new TabController();
                 //
                 if ((!core.doc.userErrorList.Count.Equals(0)) && adminData.editRecord.Loaded) {
@@ -70,7 +71,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         EditReferer = GenericController.strReplace(EditReferer, "&af=39", "");
                         //
                         // if referer includes AdminWarningMsg (admin hint message), remove it -- this edit may fix the problem
-                        int Pos = EditReferer.IndexOf("AdminWarningMsg=");
+                        int Pos = EditReferer.IndexOf("AdminWarningMsg=", StringComparison.CurrentCulture);
                         if (Pos >= 0) {
                             EditReferer = EditReferer.left(Pos - 2);
                         }
@@ -82,8 +83,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 Stream.add(getForm_EditFormStart(core, adminData, AdminFormEdit));
                 bool IsLandingPageParent = false;
-                int TemplateIDForStyles = 0;
-                bool IsTemplateTable = (adminData.adminContent.tableName.ToLowerInvariant() == PageTemplateModel.tableMetadata.tableNameLower);
+                int templateIDForStyles = 0;
+                bool isTemplateTable = (adminData.adminContent.tableName.ToLowerInvariant() == PageTemplateModel.tableMetadata.tableNameLower);
                 bool IsPageContentTable = (adminData.adminContent.tableName.ToLowerInvariant() == PageContentModel.tableMetadata.tableNameLower);
                 bool IsEmailTable = (adminData.adminContent.tableName.ToLowerInvariant() == EmailModel.tableMetadata.tableNameLower);
                 int emailIdForStyles = IsEmailTable ? adminData.editRecord.id : 0;
@@ -97,11 +98,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                         IsRootPage = IsPageContentTable && (adminData.editRecord.parentId == 0);
                     }
                 }
-                if (IsTemplateTable) {
-                    TemplateIDForStyles = adminData.editRecord.id;
+                if (isTemplateTable) {
+                    templateIDForStyles = adminData.editRecord.id;
                 } else if (IsPageContentTable) {
+                    // do nothing
                 }
-                var headerInfo = new RecordEditHeaderInfoClass() {
+                var headerInfo = new RecordEditHeaderInfoClass {
                     recordId = adminData.editRecord.id,
                     recordLockById = adminData.editRecord.EditLock.editLockByMemberId,
                     recordLockExpiresDate = encodeDate(adminData.editRecord.EditLock.editLockExpiresDate),
@@ -113,9 +115,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 var userContentPermissions = PermissionController.getUserContentPermissions(core, adminData.adminContent);
                 bool allowAdd = adminData.adminContent.allowAdd && userContentPermissions.allowAdd;
-                bool AllowDelete = adminData.adminContent.allowDelete && userContentPermissions.allowDelete && (adminData.editRecord.id != 0);
+                bool allowDelete = adminData.adminContent.allowDelete && userContentPermissions.allowDelete && (adminData.editRecord.id != 0);
                 bool allowSave = userContentPermissions.allowSave;
-                bool AllowRefresh = true;
+                bool allowRefresh = true;
                 //
                 // ----- custom fieldEditors
                 //
@@ -138,24 +140,23 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 // ----- determine contentType for editor
                 //
-                CPHtml5BaseClass.EditorContentType ContentType;
+                CPHtml5BaseClass.EditorContentType contentType;
                 if (GenericController.toLCase(adminData.adminContent.name) == "email templates") {
-                    ContentType = CPHtml5BaseClass.EditorContentType.contentTypeEmailTemplate;
+                    contentType = CPHtml5BaseClass.EditorContentType.contentTypeEmailTemplate;
                 } else if (GenericController.toLCase(adminData.adminContent.tableName) == "cctemplates") {
-                    ContentType = CPHtml5BaseClass.EditorContentType.contentTypeWebTemplate;
+                    contentType = CPHtml5BaseClass.EditorContentType.contentTypeWebTemplate;
                 } else if (GenericController.toLCase(adminData.adminContent.tableName) == "ccemail") {
-                    ContentType = CPHtml5BaseClass.EditorContentType.contentTypeEmail;
+                    contentType = CPHtml5BaseClass.EditorContentType.contentTypeEmail;
                 } else {
-                    ContentType = CPHtml5BaseClass.EditorContentType.contentTypeWeb;
+                    contentType = CPHtml5BaseClass.EditorContentType.contentTypeWeb;
                 }
                 //
                 //-----Create edit page
-                //string styleOptionList = "";
                 string styleList = "";
                 string adminContentTableNameLower = adminData.adminContent.tableName.ToLowerInvariant();
                 EditorEnvironmentModel editorEnv = new EditorEnvironmentModel {
                     AllowHelpMsgCustom = false,
-                    editorAddonListJSON = core.html.getWysiwygAddonList(ContentType),
+                    editorAddonListJSON = core.html.getWysiwygAddonList(contentType),
                     IsLandingPage = IsLandingPage,
                     IsRootPage = IsRootPage,
                     needUniqueEmailMessage = false,
@@ -175,11 +176,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                         // Must be admin
                         Stream.add(AdminErrorController.get(core, "This edit form requires administrator access.", ""));
                     } else {
-                        var EditButtonBarInfo = new EditButtonBarInfoClass(core, adminData, AllowDelete, AllowRefresh, allowSave);
+                        var EditButtonBarInfo = new EditButtonBarInfoClass(core, adminData, allowDelete, allowRefresh, allowSave, allowAdd);
                         string EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, EditButtonBarInfo);
                         Stream.add(EditSectionButtonBar);
                         Stream.add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
-                        Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv,  ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, emailIdForStyles, IsTemplateTable));
+                        Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv, contentType, allowajaxTabs, templateIDForStyles, styleList, emailIdForStyles, isTemplateTable));
                         Stream.add(FormEditTabs.addTab(core, adminMenu, "Groups", GroupRuleEditor.get(core, adminData), adminData.allowAdminTabs));
                         Stream.add(FormEditTabs.addTab(core, adminMenu, "Control&nbsp;Info", FormEditTabControlInfo.get(core, adminData, editorEnv), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) { Stream.add(adminMenu.getTabs(core)); }
@@ -190,8 +191,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                     LogController.logTrace(core, "getFormEdit, treat as email, adminContentTableNameLower [" + adminContentTableNameLower + "]");
                     //
                     // -- email
-                    bool EmailSubmitted = false;
-                    bool EmailSent = false;
+                    bool emailSubmitted = false;
+                    bool emailSent = false;
                     DateTime LastSendTestDate = DateTime.MinValue;
                     bool AllowEmailSendWithoutTest = (core.siteProperties.getBoolean("AllowEmailSendWithoutTest", false));
                     if (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
@@ -206,7 +207,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         LogController.logTrace(core, "getFormEdit, System email");
                         //
                         // System Email
-                        EmailSubmitted = false;
+                        emailSubmitted = false;
                         if (adminData.editRecord.id != 0) {
                             if (adminData.editRecord.fieldsLc.ContainsKey("testmemberid")) {
                                 if (encodeInteger(adminData.editRecord.fieldsLc["testmemberid"].value) == 0) {
@@ -214,54 +215,54 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 }
                             }
                         }
-                        var editButtonBarInfo = new EditButtonBarInfoClass(core, adminData, AllowDelete, AllowRefresh, allowSave) {
-                            allowSave = (allowSave && adminData.editRecord.AllowUserSave && (!EmailSubmitted) && (!EmailSent)),
-                            allowSendTest = ((!EmailSubmitted) && (!EmailSent))
+                        var editButtonBarInfo = new EditButtonBarInfoClass(core, adminData, allowDelete, allowRefresh, allowSave, allowAdd) {
+                            allowSave = (allowSave && adminData.editRecord.AllowUserSave && (!emailSubmitted) && (!emailSent)),
+                            allowSendTest = ((!emailSubmitted) && (!emailSent))
                         };
                         var EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, editButtonBarInfo);
                         Stream.add(EditSectionButtonBar);
                         Stream.add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
-                        Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv,   ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, emailIdForStyles, IsTemplateTable));
+                        Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv, contentType, allowajaxTabs, templateIDForStyles, styleList, emailIdForStyles, isTemplateTable));
                         Stream.add(FormEditTabs.addTab(core, adminMenu, "Control&nbsp;Info", FormEditTabControlInfo.get(core, adminData, editorEnv), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) { Stream.add(adminMenu.getTabs(core)); }
                         Stream.add(EditSectionButtonBar);
                     } else if (adminData.adminContent.id == ContentMetadataModel.getContentId(core, "Conditional Email")) {
                         //
                         // Conditional Email
-                        EmailSubmitted = false;
-                        editorEnv.record_readOnly = adminData.editRecord.userReadOnly || EmailSubmitted;
+                        emailSubmitted = false;
+                        editorEnv.record_readOnly = adminData.editRecord.userReadOnly || emailSubmitted;
                         if (adminData.editRecord.id != 0) {
-                            if (adminData.editRecord.fieldsLc.ContainsKey("submitted")) EmailSubmitted = GenericController.encodeBoolean(adminData.editRecord.fieldsLc["submitted"].value);
+                            if (adminData.editRecord.fieldsLc.ContainsKey("submitted")) { emailSubmitted = GenericController.encodeBoolean(adminData.editRecord.fieldsLc["submitted"].value); }
                         }
-                        var editButtonBarInfo = new EditButtonBarInfoClass(core, adminData, AllowDelete, AllowRefresh, allowSave) {
-                            allowActivate = !EmailSubmitted && ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest),
-                            allowDeactivate = EmailSubmitted,
-                            allowSave = allowSave && adminData.editRecord.AllowUserSave && !EmailSubmitted
+                        var editButtonBarInfo = new EditButtonBarInfoClass(core, adminData, allowDelete, allowRefresh, allowSave, allowAdd) {
+                            allowActivate = !emailSubmitted && ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest),
+                            allowDeactivate = emailSubmitted,
+                            allowSave = allowSave && adminData.editRecord.AllowUserSave && !emailSubmitted
                         };
                         var EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, editButtonBarInfo);
                         Stream.add(EditSectionButtonBar);
                         Stream.add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
-                        Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, emailIdForStyles, IsTemplateTable));
+                        Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv, contentType, allowajaxTabs, templateIDForStyles, styleList, emailIdForStyles, isTemplateTable));
                         Stream.add(FormEditTabs.addTab(core, adminMenu, "Control&nbsp;Info", FormEditTabControlInfo.get(core, adminData, editorEnv), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) { Stream.add(adminMenu.getTabs(core)); }
                         Stream.add(EditSectionButtonBar);
                     } else {
                         //
                         // Group Email
-                        editorEnv.record_readOnly = adminData.editRecord.userReadOnly || EmailSubmitted || EmailSent;
                         if (adminData.editRecord.id != 0) {
-                            EmailSubmitted = encodeBoolean(adminData.editRecord.fieldsLc["submitted"].value);
-                            EmailSent = encodeBoolean(adminData.editRecord.fieldsLc["sent"].value);
+                            emailSubmitted = encodeBoolean(adminData.editRecord.fieldsLc["submitted"].value);
+                            emailSent = encodeBoolean(adminData.editRecord.fieldsLc["sent"].value);
                         }
-                        var editButtonBarInfo = new EditButtonBarInfoClass(core, adminData, AllowDelete, AllowRefresh, allowSave) {
-                            allowSave = !EmailSubmitted && (allowSave && adminData.editRecord.AllowUserSave),
-                            allowSend = !EmailSubmitted && ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest),
-                            allowSendTest = !EmailSubmitted
+                        var editButtonBarInfo = new EditButtonBarInfoClass(core, adminData, allowDelete, allowRefresh, allowSave, allowAdd) {
+                            allowSave = !emailSubmitted && (allowSave && adminData.editRecord.AllowUserSave),
+                            allowSend = !emailSubmitted && ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest),
+                            allowSendTest = !emailSubmitted
                         };
+                        editorEnv.record_readOnly = adminData.editRecord.userReadOnly || emailSubmitted || emailSent;
                         var EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, editButtonBarInfo);
                         Stream.add(EditSectionButtonBar);
                         Stream.add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
-                        Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv, ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, emailIdForStyles, IsTemplateTable));
+                        Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv, contentType, allowajaxTabs, templateIDForStyles, styleList, emailIdForStyles, isTemplateTable));
                         Stream.add(FormEditTabs.addTab(core, adminMenu, "Control&nbsp;Info", FormEditTabControlInfo.get(core, adminData, editorEnv), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) { Stream.add(adminMenu.getTabs(core)); }
                         Stream.add(EditSectionButtonBar);
@@ -273,11 +274,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                         //
                         Stream.add(AdminErrorController.get(core, "This edit form requires Member Administration access.", "This edit form requires Member Administration access."));
                     } else {
-                        var editButtonBarInfo = new EditButtonBarInfoClass(core, adminData, AllowDelete, AllowRefresh, allowSave);
+                        var editButtonBarInfo = new EditButtonBarInfoClass(core, adminData, allowDelete, allowRefresh, allowSave, allowAdd);
                         var EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, editButtonBarInfo);
                         Stream.add(EditSectionButtonBar);
                         Stream.add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
-                        Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv,  ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, emailIdForStyles, IsTemplateTable));
+                        Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv, contentType, allowajaxTabs, templateIDForStyles, styleList, emailIdForStyles, isTemplateTable));
                         Stream.add(FormEditTabs.addTab(core, adminMenu, "Control&nbsp;Info", FormEditTabControlInfo.get(core, adminData, editorEnv), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) {
                             Stream.add(adminMenu.getTabs(core));
@@ -289,9 +290,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     // Page Content
                     //
-                    int TableId = MetadataController.getRecordIdByUniqueName(core, "Tables", "ccPageContent");
                     editorEnv.IsLandingPage = IsLandingPage || IsLandingPageParent;
-                    var editButtonBarInfo = new EditButtonBarInfoClass(core, adminData, AllowDelete, AllowRefresh, allowSave) {
+                    var editButtonBarInfo = new EditButtonBarInfoClass(core, adminData, allowDelete, allowRefresh, allowSave, allowAdd) {
                         allowMarkReviewed = true,
                         isPageContent = true,
                         hasChildRecords = true
@@ -299,7 +299,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     var EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, editButtonBarInfo);
                     Stream.add(EditSectionButtonBar);
                     Stream.add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
-                    Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv,  ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, emailIdForStyles, IsTemplateTable));
+                    Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv, contentType, allowajaxTabs, templateIDForStyles, styleList, emailIdForStyles, isTemplateTable));
                     Stream.add(FormEditTabs.addTab(core, adminMenu, "Link Aliases", LinkAliasEditor.GetForm_Edit_LinkAliases(core, adminData, adminData.editRecord.userReadOnly), adminData.allowAdminTabs));
                     Stream.add(FormEditTabs.addTab(core, adminMenu, "Content Watch", ContentTrackingEditor.get(core, adminData, editorEnv), adminData.allowAdminTabs));
                     Stream.add(FormEditTabs.addTab(core, adminMenu, "Control Info", FormEditTabControlInfo.get(core, adminData, editorEnv), adminData.allowAdminTabs));
@@ -311,19 +311,19 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     // All other tables (User definined)
                     var pageContentMetadata = ContentMetadataModel.createByUniqueName(core, "page content");
-                    var editButtonBarInfo = new EditButtonBarInfoClass(core, adminData, AllowDelete, AllowRefresh, allowSave) {
+                    var editButtonBarInfo = new EditButtonBarInfoClass(core, adminData, allowDelete, allowRefresh, allowSave, allowAdd) {
                         isPageContent = pageContentMetadata.isParentOf(core, adminData.adminContent.id),
                         hasChildRecords = adminData.adminContent.containsField(core, "parentid"),
                         allowMarkReviewed = core.db.isSQLTableField(adminData.adminContent.tableName, "DateReviewed")
                     };
-                    var EditSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, editButtonBarInfo);
-                    Stream.add(EditSectionButtonBar);
+                    var editSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, editButtonBarInfo);
+                    Stream.add(editSectionButtonBar);
                     Stream.add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
-                    Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv,   ContentType, AllowajaxTabs, TemplateIDForStyles, styleList, emailIdForStyles, IsTemplateTable));
+                    Stream.add(FormEditTabs.getTabs(core, adminData, adminMenu, editorEnv, contentType, allowajaxTabs, templateIDForStyles, styleList, emailIdForStyles, isTemplateTable));
                     Stream.add(FormEditTabs.addTab(core, adminMenu, "Content Watch", ContentTrackingEditor.get(core, adminData, editorEnv), adminData.allowAdminTabs));
                     Stream.add(FormEditTabs.addTab(core, adminMenu, "Control Info", FormEditTabControlInfo.get(core, adminData, editorEnv), adminData.allowAdminTabs));
                     if (adminData.allowAdminTabs) { Stream.add(adminMenu.getTabs(core)); }
-                    Stream.add(EditSectionButtonBar);
+                    Stream.add(editSectionButtonBar);
                 }
                 Stream.add(HtmlController.inputHidden("FormFieldList", editorEnv.formFieldList));
                 Stream.add("</form>");
