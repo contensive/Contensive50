@@ -154,16 +154,16 @@ namespace Contensive.Processor {
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        protected bool disposed;
+        protected bool disposed_filesystem;
         //
         //==========================================================================================
         /// <summary>
         /// dispose
         /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
+        /// <param name="disposing_filesystem"></param>
+        protected virtual void Dispose(bool disposing_filesystem) {
+            if (!this.disposed_filesystem) {
+                if (disposing_filesystem) {
                     //
                     // call .dispose for managed objects
                     //
@@ -172,7 +172,7 @@ namespace Contensive.Processor {
                 // Add code here to release the unmanaged resource.
                 //
             }
-            disposed = true;
+            disposed_filesystem = true;
         }
         public void Dispose() {
             Dispose(true);

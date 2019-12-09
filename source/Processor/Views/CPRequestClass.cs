@@ -268,9 +268,9 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         // dispose
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
+        protected virtual void Dispose(bool disposing_req) {
+            if (!this.disposed_req) {
+                if (disposing_req) {
                     //
                     // call .dispose for managed objects
                     //
@@ -279,9 +279,9 @@ namespace Contensive.Processor {
                 // Add code here to release the unmanaged resource.
                 //
             }
-            this.disposed = true;
+            this.disposed_req = true;
         }
-        protected bool disposed;
+        protected bool disposed_req;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
         public void Dispose() {

@@ -226,9 +226,9 @@ namespace Contensive.Processor {
         #region  IDisposable Support 
         //
         //====================================================================================================
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
+        protected virtual void Dispose(bool disposing_block) {
+            if (!this.disposed_block) {
+                if (disposing_block) {
                     //
                     // dispose managed objects, dereference local object pointers 
                     //
@@ -239,10 +239,10 @@ namespace Contensive.Processor {
                 // Add code here to release the unmanaged resource.
                 //
             }
-            this.disposed = true;
+            this.disposed_block = true;
         }
         //
-        protected bool disposed { get; set; } = false;
+        protected bool disposed_block { get; set; } = false;
         //
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).

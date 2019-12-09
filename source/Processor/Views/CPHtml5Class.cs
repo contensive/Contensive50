@@ -7,7 +7,7 @@ using Contensive.BaseModels;
 using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor {
-    public class CPHtml5Class : BaseClasses.CPHtml5BaseClass, IDisposable {
+    public class CPHtml5Class : BaseClasses.CPHtml5BaseClass {
         /// <summary>
         /// dependencies
         /// </summary>
@@ -365,40 +365,5 @@ namespace Contensive.Processor {
         public override string SelectUser(string htmlName, int htmlValue, int groupId) {
             return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId);
         }
-        //
-        // ====================================================================================================
-        //
-        #region  IDisposable Support 
-        protected bool disposed;
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
-                    //
-                    // call .dispose for managed objects
-                    //
-                }
-                //
-                // Add code here to release the unmanaged resource.
-                //
-            }
-            this.disposed = true;
-        }
-        //
-        // ====================================================================================================
-        // Do not change or add Overridable to these methods.
-        // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        //
-        // ====================================================================================================
-        //
-        ~CPHtml5Class() {
-            Dispose(false);
-            
-            
-        }
-        #endregion
     }
 }

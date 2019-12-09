@@ -639,9 +639,9 @@ namespace Contensive.Processor {
         //
         // dispose
         //
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
+        protected virtual void Dispose(bool disposing_cs) {
+            if (!this.disposed_cs) {
+                if (disposing_cs) {
                     //
                     // ----- call .dispose for managed objects
                     if ( cs != null ) {
@@ -653,12 +653,12 @@ namespace Contensive.Processor {
                 // ----- release unmanaged resources
                 //
             }
-            this.disposed = true;
+            this.disposed_cs = true;
         }
         ~CPCSClass() {
             Dispose(false);
         }
-        protected bool disposed;
+        protected bool disposed_cs;
         #endregion
     }
 

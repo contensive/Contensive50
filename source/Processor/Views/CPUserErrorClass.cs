@@ -3,7 +3,7 @@ using System;
 using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor {
-    public class CPUserErrorClass : BaseClasses.CPUserErrorBaseClass, IDisposable {
+    public class CPUserErrorClass : BaseClasses.CPUserErrorBaseClass {
         //
         private CPClass cp;
         protected bool disposed;
@@ -47,18 +47,5 @@ namespace Contensive.Processor {
         public override bool OK() {
             return cp.core.doc.userErrorList.Count.Equals(0);
         }
-        #region  IDisposable Support 
-        // Do not change or add Overridable to these methods.
-        // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        ~CPUserErrorClass() {
-            Dispose(false);
-            
-            
-        }
-        #endregion
     }
 }

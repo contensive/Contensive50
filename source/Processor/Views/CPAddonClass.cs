@@ -10,7 +10,7 @@ namespace Contensive.Processor {
     // todo implement or deprecate. might be nice to have this convenient api, but a model does the same, costs one query but will
     // always have the model at the save version as the addon code - this cp interface will match the database, but not the addon.
     // not sure which is better
-    public class CPAddonClass : CPAddonBaseClass, IDisposable {
+    public class CPAddonClass : CPAddonBaseClass {
         //
         // ====================================================================================================
         /// <summary>
@@ -467,39 +467,5 @@ namespace Contensive.Processor {
         //
         [Obsolete("Deprecated", false)]
         public override bool Template => cp.core.doc.addonModelStack.Peek().template;
-        //
-        #region  IDisposable Support 
-        // Do not change or add Overridable to these methods.
-        // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        //
-        // ====================================================================================================
-        /// <summary>
-        /// must call to dispose
-        /// </summary>
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
-                    //
-                    // call .dispose for managed objects
-                    //
-                    cp = null;
-                }
-                //
-                // Add code here to release the unmanaged resource.
-                //
-            }
-            this.disposed = true;
-        }
-        //
-        protected bool disposed;
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        //
-        ~CPAddonClass() {
-            Dispose(false);
-        }
-        #endregion
     }
 }

@@ -658,7 +658,7 @@ namespace Contensive.Processor {
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
         //====================================================================================================
         //
-        protected bool disposed;
+        protected bool disposed_cp;
         //
         public void Dispose() {
             Dispose(true);
@@ -673,23 +673,14 @@ namespace Contensive.Processor {
         /// <summary>
         /// dispose.
         /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                this.disposed = true;
-                if (disposing) {
+        /// <param name="disposing_cp"></param>
+        protected virtual void Dispose(bool disposing_cp) {
+            if (!this.disposed_cp) {
+                this.disposed_cp = true;
+                if (disposing_cp) {
                     //
                     // call .dispose for managed objects
                     //
-                    if (_addonObj != null) {
-                        _addonObj.Dispose();
-                    }
-                    if (_cacheObj != null) {
-                        _cacheObj.Dispose();
-                    }
-                    if (_contentObj != null) {
-                        _contentObj.Dispose();
-                    }
                     if (_dbObj != null) {
                         _dbObj.Dispose();
                     }
@@ -716,9 +707,6 @@ namespace Contensive.Processor {
                     }
                     if (_siteObj != null) {
                         _siteObj.Dispose();
-                    }
-                    if (_userErrorObj != null) {
-                        _userErrorObj.Dispose();
                     }
                     if (_userObj != null) {
                         _userObj.Dispose();

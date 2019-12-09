@@ -389,16 +389,16 @@ namespace Contensive.Processor {
         ~CPDocClass() {
             Dispose(false);
         }
-        protected bool disposed;
+        protected bool disposed_doc;
         //
         //====================================================================================================
         /// <summary>
         /// destructor
         /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
+        /// <param name="disposing_doc"></param>
+        protected virtual void Dispose(bool disposing_doc) {
+            if (!this.disposed_doc) {
+                if (disposing_doc) {
                     //
                     // call .dispose for managed objects
                     //
@@ -407,7 +407,7 @@ namespace Contensive.Processor {
                 // Add code here to release the unmanaged resource.
                 //
             }
-            this.disposed = true;
+            this.disposed_doc = true;
         }
         #endregion
     }

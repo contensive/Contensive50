@@ -51,9 +51,9 @@ namespace Contensive.Processor {
         /// <summary>
         /// must call to dispose
         /// </summary>
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
+        protected virtual void Dispose(bool disposing_log) {
+            if (!this.disposed_log) {
+                if (disposing_log) {
                     //
                     // call .dispose for managed objects
                     //
@@ -63,10 +63,10 @@ namespace Contensive.Processor {
                 // Add code here to release the unmanaged resource.
                 //
             }
-            this.disposed = true;
+            this.disposed_log = true;
         }
         //
-        protected bool disposed;
+        protected bool disposed_log;
         public override void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);

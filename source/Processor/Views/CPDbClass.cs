@@ -401,15 +401,15 @@ namespace Contensive.Processor {
         //
         #region  IDisposable Support 
         //
-        protected bool disposed;
+        protected bool disposed_db;
         //====================================================================================================
         /// <summary>
         /// Dispose
         /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
+        /// <param name="disposing_db"></param>
+        protected virtual void Dispose(bool disposing_db) {
+            if (!this.disposed_db) {
+                if (disposing_db) {
                     //
                     // call .dispose for managed objects
                     //
@@ -418,7 +418,7 @@ namespace Contensive.Processor {
                 // Add code here to release the unmanaged resource.
                 //
             }
-            this.disposed = true;
+            this.disposed_db = true;
         }
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).

@@ -154,10 +154,10 @@ namespace Contensive.Processor {
         ~CPGroupClass() {
             Dispose(false);
         }
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
+        protected virtual void Dispose(bool disposing_group) {
+            if (!this.disposed_group) {
                 appendDebugLog(".dispose, dereference cp, main, csv");
-                if (disposing) {
+                if (disposing_group) {
                     //
                     // call .dispose for managed objects
                     //
@@ -166,9 +166,9 @@ namespace Contensive.Processor {
                 // Add code here to release the unmanaged resource.
                 //
             }
-            this.disposed = true;
+            this.disposed_group = true;
         }
-        protected bool disposed;
+        protected bool disposed_group;
         #endregion
     }
 }

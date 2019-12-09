@@ -399,10 +399,10 @@ namespace Contensive.Processor {
         // ====================================================================================================
         // dispose
         #region  IDisposable Support 
-        protected bool disposed;
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
+        protected bool disposed_html;
+        protected virtual void Dispose(bool disposing_html) {
+            if (!this.disposed_html) {
+                if (disposing_html) {
                     //
                     // call .dispose for managed objects
                     //
@@ -411,7 +411,7 @@ namespace Contensive.Processor {
                 // Add code here to release the unmanaged resource.
                 //
             }
-            this.disposed = true;
+            this.disposed_html = true;
         }
         //
         // ====================================================================================================

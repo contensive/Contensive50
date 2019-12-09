@@ -9,7 +9,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
 
 namespace Contensive.Processor {
-    public class CPContentClass : CPContentBaseClass, IDisposable {
+    public class CPContentClass : CPContentBaseClass {
         //
         private CPClass cp { get; set; }
         //
@@ -329,36 +329,6 @@ namespace Contensive.Processor {
             AddContentField(ContentName, FieldName, (FieldTypeIdEnum)fileTypeEnum);
             throw new NotImplementedException();
         }
-        //
-        //
-        #region  IDisposable Support 
-        //
-        //====================================================================================================
-        //
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
-                    //
-                    // call .dispose for managed objects
-                    //
-                }
-                //
-                // Add code here to release the unmanaged resource.
-                //
-            }
-            this.disposed = true;
-        }
-        protected bool disposed { get; set; } = false;
-        // Do not change or add Overridable to these methods.
-        // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
 
-        ~CPContentClass() {
-            Dispose(false);
-        }
-        #endregion
     }
 }
