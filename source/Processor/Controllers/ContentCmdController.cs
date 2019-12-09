@@ -285,7 +285,7 @@ namespace Contensive.Processor.Controllers {
                         // cmd found, process it and add the results to the dst
                         //
                         Cmd = src.Substring(posOpen + 1, (posClose - posOpen - 2));
-                        cmdResult = executeSingleCommand(core, Cmd, badCmd, Context);
+                        cmdResult = executeSingleCommand(core, Cmd, Context);
                         if (badCmd) {
                             //
                             // the command was bad, put it back in place (?) in case it was not a command
@@ -309,7 +309,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// convert a single command in the command formats to call the execute
         /// </summary>
-        private static string executeSingleCommand(CoreController core, string cmdSrc, bool return_BadCmd, CPUtilsBaseClass.addonContext Context) {
+        private static string executeSingleCommand(CoreController core, string cmdSrc, CPUtilsBaseClass.addonContext Context) {
             string returnValue = "";
             try {
                 //
@@ -349,7 +349,7 @@ namespace Contensive.Processor.Controllers {
                     cmdCollection = new List<object>();
                     if ((cmdSrc.left(1) == "{") && (cmdSrc.Substring(cmdSrc.Length - 1) == "}")) {
                         //
-                        // JSON is a single command in the form of an object, like: { "import": "test.html" }
+                        // JSON is a single command in the form of an object, like: ( "import" : "test.html" )
                         //
                         Dictionary<string, object> cmdDictionary;
                         try {
@@ -442,7 +442,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         if ((cmdArg.left(1) == "{") && (cmdArg.Substring(cmdArg.Length - 1) == "}")) {
                             //
-                            // argument is in the form of an object, like: { "text name": "my text" }
+                            // argument is in the form of an object, like: ( "text name": "my text" )
                             //
                             object cmdDictionaryOrCollection = json.Deserialize<object>(cmdArg);
                             string cmdDictionaryOrCollectionTypeName = cmdDictionaryOrCollection.GetType().FullName.ToLowerInvariant();

@@ -143,7 +143,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             HelpCustomCache[HelpPtr] = GenericController.encodeText(fieldHelpArray[2, HelpPtr]);
                         }
                     }
-                    editorEnv.AllowHelpMsgCustom = true;
+                    editorEnv.allowHelpMsgCustom = true;
                 }
                 //
                 List<string> TabsFound = new List<string>();

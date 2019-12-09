@@ -1,6 +1,5 @@
 ﻿
 using System;
-using System.Collections.Generic;
 
 namespace Contensive.BaseModels {
     //
@@ -13,10 +12,6 @@ namespace Contensive.BaseModels {
     /// </summary>
     [Serializable]
     public abstract class ServerConfigBaseModel {
-        //
-        // -- public properties
-        //
-        // -- set during installation
         /// <summary>
         /// full dos path to the contensive program file installation. 
         /// </summary>
@@ -68,11 +63,6 @@ namespace Contensive.BaseModels {
         //      - ecommerce batch should only run in production
         // todo figure out how to expose this, add it to configuration setup
         public abstract bool productionEnvironment { get; set; }
-        //
-        // -- List of all apps on this server
-        // problem. if abstract (serverconfigbase) has a dictionary (apps) referencing another abstract (appconfigbase), then when you create a concrete subclass
-        // of serverconfig, and the property is marked override, , the subsclass has to have the same 
-        //public abstract Dictionary<string, AppConfigBaseModel> apps { get; set; }
         //
         public enum DataSourceTypeEnum {
             legacy = 1,

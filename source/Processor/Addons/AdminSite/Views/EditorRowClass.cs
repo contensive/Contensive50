@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public class EditorRowClass {
+    public static class EditorRowClass {
         public static string getEditorRow(CoreController core, ContentFieldMetadataModel field, AdminDataModel adminData, EditorEnvironmentModel editorEnv) {
             string WhyReadOnlyMsg = "";
             CPContentBaseClass.FieldTypeIdEnum fieldTypeId = field.fieldTypeId;
@@ -37,49 +37,44 @@ namespace Contensive.Processor.Addons.AdminSite {
             if (field.required) {
                 fieldCaption = "&nbsp;*" + fieldCaption;
             }
-            bool IsBaseField = field.blockAccess;
             adminData.formInputCount = adminData.formInputCount + 1;
             bool fieldForceReadOnly = false;
             //
             // Read only Special Cases
-            if (editorEnv.IsRootPage) {
+            if (editorEnv.isRootPage) {
                 switch (GenericController.toLCase(field.nameLc)) {
-                    case "active":
-                    //
-                    // if active, it is read only -- if inactive, let them set it active.
-                    fieldForceReadOnly = encodeBoolean(fieldValueObject);
-                    if (fieldForceReadOnly) {
-                        WhyReadOnlyMsg = "&nbsp;(disabled because you can not mark the landing page inactive)";
-                    }
-                    break;
+                    case "active": {
+                            //
+                            // if active, it is read only -- if inactive, let them set it active.
+                            fieldForceReadOnly = encodeBoolean(fieldValueObject);
+                            if (fieldForceReadOnly) {
+                                WhyReadOnlyMsg = "&nbsp;(disabled because you can not mark the landing page inactive)";
+                            }
+                            break;
+                        }
                     case "dateexpires":
                     case "pubdate":
                     case "datearchive":
                     case "blocksection":
-                    case "hidemenu":
-                    //
-                    // These fields are read only on landing pages
-                    fieldForceReadOnly = true;
-                    WhyReadOnlyMsg = "&nbsp;(disabled for the landing page)";
-                    break;
-                }
-            }
-            //
-            if (editorEnv.IsRootPage) {
-                switch (GenericController.toLCase(field.nameLc)) {
-                    case "dateexpires":
-                    case "pubdate":
-                    case "datearchive":
                     case "archiveparentid":
-                    fieldForceReadOnly = true;
-                    WhyReadOnlyMsg = "&nbsp;(disabled for root pages)";
-                    break;
+                    case "hidemenu": {
+                            //
+                            // These fields are read only on landing pages
+                            fieldForceReadOnly = true;
+                            WhyReadOnlyMsg = "&nbsp;(disabled for the landing page)";
+                            break;
+                        }
                     case "allowinmenus":
-                    case "allowinchildlists":
-                    fieldValueObject = "1";
-                    fieldForceReadOnly = true;
-                    WhyReadOnlyMsg = "&nbsp;(disabled for root pages)";
-                    break;
+                    case "allowinchildlists": {
+                            fieldValueObject = "1";
+                            fieldForceReadOnly = true;
+                            WhyReadOnlyMsg = "&nbsp;(disabled for root pages)";
+                        }
+                        break;
+                    default: {
+                            // do nothing
+                            break;
+                        }
                 }
             }
             //
@@ -546,7 +541,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     //
                                     // not HTML capable, textarea with resizing
                                     //
-                                    if ((fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Text) && (fieldValue_text.IndexOf("\n") == -1) && (fieldValue_text.Length < 40)) {
+                                    if ((fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Text) && (fieldValue_text.IndexOf("\n",StringComparison.InvariantCulture) == -1) && (fieldValue_text.Length < 40)) {
                                         //
                                         // text field shorter then 40 characters without a CR
                                         //
@@ -588,8 +583,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             string HelpMsgDefault = "";
             string HelpMsgCustom = "";
             string EditorHelp = "";
-            string LcaseName = GenericController.toLCase(field.nameLc);
-            if (editorEnv.AllowHelpMsgCustom) {
+            if (editorEnv.allowHelpMsgCustom) {
                 HelpMsgDefault = field.helpDefault;
                 HelpMsgCustom = field.helpCustom;
             }
@@ -607,7 +601,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 HelpMsgClosed = HelpMsgClosed.left(100) + "...";
             }
             //
-            string HelpId = "helpId" + field.id;
             string HelpEditorId = "helpEditorId" + field.id;
             string HelpOpenedReadID = "HelpOpenedReadID" + field.id;
             string HelpOpenedEditId = "HelpOpenedEditID" + field.id;
@@ -734,13 +727,13 @@ namespace Contensive.Processor.Addons.AdminSite {
     }
 
     public class EditorEnvironmentModel {
-        public bool needUniqueEmailMessage;
-        public bool IsRootPage;
-        public bool record_readOnly;
-        public string editorAddonListJSON;
-        public string styleList;
-        public string styleOptionList;
-        public bool AllowHelpMsgCustom;
-        public string formFieldList;
+        public bool needUniqueEmailMessage { get; set; }
+        public bool isRootPage { get; set; }
+        public bool record_readOnly { get; set; }
+        public string editorAddonListJSON { get; set; }
+        public string styleList { get; set; }
+        public string styleOptionList { get; set; }
+        public bool allowHelpMsgCustom { get; set; }
+        public string formFieldList { get; set; }
     }
 }

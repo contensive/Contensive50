@@ -197,7 +197,7 @@ namespace Contensive.BaseClasses {
         public abstract string RadioBox(string HtmlName, int HtmlValue, int CurrentValue, string HtmlClass = "", string HtmlId = "");
         //
         [Obsolete("Use html5 methods instead", false)]
-        public abstract string InputDate(string HtmlName, string HtmlValue = "", string Width = "", string HtmlClass = "", string HtmlId = "");
+        public abstract string InputDate(string HtmlName, string HtmlValue, string Width = "", string HtmlClass = "", string HtmlId = "");
         //
         [Obsolete("Use html5 methods instead", false)]
         public abstract string Hidden(string HtmlName, int HtmlValue);
@@ -224,6 +224,6 @@ namespace Contensive.BaseClasses {
         public abstract string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass);
         //
         [Obsolete("Use html5 methods instead", false)]
-        public abstract string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass, string HtmlId = "");
+        public abstract string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass, string HtmlId);
     }
 }
