@@ -2,13 +2,13 @@
 using System;
 
 namespace Contensive.CLI {
-    class HousekeepCmd {
+    static class HousekeepCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--housekeep (-h)"
             + Environment.NewLine + "    housekeep all appications, or just one if specifid with -a"

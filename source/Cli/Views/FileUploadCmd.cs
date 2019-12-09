@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using Contensive.Processor;
 
 namespace Contensive.CLI {
-    class FileUploadCmd {
+    static class FileUploadCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--fileUpload [cdn] [www] [private]"
             + Environment.NewLine + "    Copies all local files (this machine) to the remote file system (Amazon S3). Specify one or more file locals (cdn,www, or private).  An application name is required. (-a applicationName) Use for migration to a remote file system. "

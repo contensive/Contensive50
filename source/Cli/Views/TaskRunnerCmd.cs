@@ -4,13 +4,13 @@ using Contensive.Processor.Controllers;
 
 namespace Contensive.CLI {
     //
-    class TaskRunnerCmd {
+    static class TaskRunnerCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--taskrunner run|on|off"
             + Environment.NewLine + "    Use 'run' to execute the taskrunner in the console (temporary). Use 'on' or 'off' to manage the taskrunner service."

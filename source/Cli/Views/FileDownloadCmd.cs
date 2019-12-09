@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using Contensive.Processor;
 
 namespace Contensive.CLI {
-    class FileDownloadCmd {
+    static class FileDownloadCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--fileDownload [cdn] [www] [private]"
             + Environment.NewLine + "    Copies all remote files (Amazon S3) to the local file system (this machine). Specify one or more file locals (cdn,www, or private).  An application name is required. (-a applicationName) Use for migration to a remote file system. "

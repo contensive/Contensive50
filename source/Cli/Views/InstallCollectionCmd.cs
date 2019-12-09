@@ -6,7 +6,7 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 
 namespace Contensive.CLI {
-    class InstallCmd {
+    static class InstallCmd {
         //
         // ====================================================================================================
         /// <summary>

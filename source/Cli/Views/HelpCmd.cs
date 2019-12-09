@@ -2,7 +2,7 @@
 using System;
 
 namespace Contensive.CLI {
-    class HelpCmd {
+    static class HelpCmd {
         //
         // ====================================================================================================
         /// <summary>

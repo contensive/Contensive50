@@ -3,13 +3,13 @@ using System;
 using Contensive.Processor.Models.Domain;
 
 namespace Contensive.CLI {
-    class StatusCmd {
+    static class StatusCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--status (-s)"
             + Environment.NewLine + "    display configuration status"

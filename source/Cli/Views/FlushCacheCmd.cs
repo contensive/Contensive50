@@ -2,13 +2,13 @@
 using System;
 
 namespace Contensive.CLI {
-    class FlushCacheCmd {
+    static class FlushCacheCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--flushcache"
             + Environment.NewLine + "    invalidate cache. Use with -a"

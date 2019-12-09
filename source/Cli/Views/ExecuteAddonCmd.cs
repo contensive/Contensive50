@@ -3,13 +3,13 @@ using System;
 using Contensive.Processor;
 
 namespace Contensive.CLI {
-    class ExecuteAddonCmd {
+    static class ExecuteAddonCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--execute addonGuid|addonName"
             + Environment.NewLine + "    Executes and addon by guid or name (guid attempted first). Requires a appName be set first with -a."

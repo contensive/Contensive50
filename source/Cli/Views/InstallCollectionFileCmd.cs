@@ -5,7 +5,7 @@ using Contensive.Processor;
 using Contensive.Processor.Controllers;
 
 namespace Contensive.CLI {
-    class InstallFileCmd {
+    static class InstallFileCmd {
         //
         // ====================================================================================================
         /// <summary>

@@ -2,7 +2,7 @@
 using System;
 
 namespace Contensive.CLI {
-    class GenericController {
+    static class GenericController {
         //
         public static String promptForReply(String prompt, String currentValue, String defaultValue = "") {
             String reply = "";

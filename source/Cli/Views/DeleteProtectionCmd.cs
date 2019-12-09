@@ -4,13 +4,13 @@ using Contensive.Processor;
 
 namespace Contensive.CLI {
     //
-    class DeleteProtectionCmd {
+    static class DeleteProtectionCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--deleteprotection on|off"
             + Environment.NewLine + "    Enables or Disables delete protection for an application. You must specify the application first with -a appName."

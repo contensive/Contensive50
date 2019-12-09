@@ -4,13 +4,13 @@ using Contensive.Processor;
 using Contensive.Processor.Controllers;
 
 namespace Contensive.CLI {
-    class UpgradeCmd {
+    static class UpgradeCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--upgrade (-u)"
             + Environment.NewLine + "    upgrade all applications, or just one if specified with -a"

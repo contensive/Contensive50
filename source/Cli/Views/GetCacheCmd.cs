@@ -2,7 +2,7 @@
 using System;
 
 namespace Contensive.CLI {
-    class GetCacheCmd {
+    static class GetCacheCmd {
         //
         // ====================================================================================================
         /// <summary>

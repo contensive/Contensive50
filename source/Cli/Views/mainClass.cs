@@ -6,7 +6,7 @@ using Contensive.Processor;
 
 namespace Contensive.CLI {
     //
-    class MainClass {
+    static class MainClass {
         //
         static void Main(string[] args) {
             try {

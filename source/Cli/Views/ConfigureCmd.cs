@@ -4,13 +4,13 @@ using Contensive.Processor;
 using Amazon;
 
 namespace Contensive.CLI {
-    class ConfigureCmd {
+    static class ConfigureCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--configure"
             + Environment.NewLine + "    setup or review server configuration (Sql, cache, filesystem, etc)";

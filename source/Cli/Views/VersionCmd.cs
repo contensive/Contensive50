@@ -3,13 +3,13 @@ using System;
 
 namespace Contensive.CLI {
     //
-    class VersionCmd {
+    static class VersionCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--version (-v)"
             + Environment.NewLine + "    display code version"

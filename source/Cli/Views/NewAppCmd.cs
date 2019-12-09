@@ -9,13 +9,13 @@ using Contensive.Processor.Models.Domain;
 using System.Reflection;
 
 namespace Contensive.CLI {
-    class NewAppCmd {
+    static class NewAppCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--newapp (-n)"
             + Environment.NewLine + "    new application wizard";

@@ -2,13 +2,13 @@
 using System;
 
 namespace Contensive.CLI {
-    class RepairCmd {
+    static class RepairCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--repair (-r)"
             + Environment.NewLine + "    reinstall the base collection and all it's dependancies. For all applications, or just one if specified with -a"

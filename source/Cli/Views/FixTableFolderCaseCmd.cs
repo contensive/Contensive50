@@ -7,13 +7,13 @@ using Contensive.BaseClasses;
 using Contensive.Models.Db;
 
 namespace Contensive.CLI {
-    class FixTableFolderCaseCmd {
+    static class FixTableFolderCaseCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--fixtablefoldercase"
             + Environment.NewLine + "    For local file sites only. Rename all table folders (ccTablename/fieldName) and the filenames saved in the table fields to reflect lowecase table and fields names."

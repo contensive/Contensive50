@@ -4,13 +4,13 @@ using Contensive.Processor.Controllers;
 
 namespace Contensive.CLI {
     //
-    class RunTaskCmd {
+    static class RunTaskCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--runtask guid-of-assigned-taskrunner"
             + Environment.NewLine + "    Run a task in the task table. Used internally to run tasks in other processes. Requires you first set the application with -appname."

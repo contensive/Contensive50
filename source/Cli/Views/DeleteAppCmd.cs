@@ -3,13 +3,13 @@ using System;
 using Contensive.Processor;
 
 namespace Contensive.CLI {
-    class DeleteAppCmd {
+    static class DeleteAppCmd {
         //
         // ====================================================================================================
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string  helpText = ""
+        internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--delete"
             + Environment.NewLine + "    Deletes an application. You must first specify the application first with -a appName. The application must have delete protection off."
