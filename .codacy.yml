@@ -2,9 +2,12 @@
 exclude_paths:
   - 'source/CPBase41/**' 
   - 'source/CPBase50/**' 
+  - 'source/ProcessorTests/**' 
   - 'cdn/**' 
   - 'etc/**' 
   - 'scripts/**' 
   - 'WebDeploymentPackage/**' 
+  
+  
   
   
