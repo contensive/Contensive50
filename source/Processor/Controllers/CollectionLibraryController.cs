@@ -42,10 +42,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="privateFilesDownloadPath"></param>
         /// <param name="collectionGuid"></param>
-        /// <param name="return_CollectionLastChangeDate"></param>
+        /// <param name="return_CollectionLastModifiedDate"></param>
         /// <param name="return_ErrorMessage"></param>
         /// <returns></returns>
-        internal static bool downloadCollectionFromLibrary(CoreController core, string privateFilesDownloadPath, string collectionGuid, ref DateTime return_CollectionLastChangeDate, ref string return_ErrorMessage) {
+        internal static bool downloadCollectionFromLibrary(CoreController core, string privateFilesDownloadPath, string collectionGuid, ref DateTime return_CollectionLastModifiedDate, ref string return_ErrorMessage) {
             bool result = false;
             try {
                 //
@@ -132,8 +132,8 @@ namespace Contensive.Processor.Controllers {
                                                 case "guid":
                                                     collectionGuid = metaDataInterfaces.InnerText;
                                                     break;
-                                                case "lastchangedate":
-                                                    return_CollectionLastChangeDate = GenericController.encodeDate(metaDataInterfaces.InnerText);
+                                                case "lastmodifieddate":
+                                                    return_CollectionLastModifiedDate = GenericController.encodeDate(metaDataInterfaces.InnerText);
                                                     break;
                                                 case "version":
                                                     CollectionVersion = metaDataInterfaces.InnerText;
@@ -242,8 +242,8 @@ namespace Contensive.Processor.Controllers {
                     core.privateFiles.createPath(privateFilesDownloadPath);
                     //
                     // -- download the collection file into the download path from the collectionGuid provided
-                    DateTime CollectionLastChangeDate = default(DateTime);
-                    if (CollectionLibraryController.downloadCollectionFromLibrary(core, privateFilesDownloadPath, collectionGuid, ref CollectionLastChangeDate, ref return_ErrorMessage)) {
+                    DateTime CollectionLastModifiedDate = default(DateTime);
+                    if (CollectionLibraryController.downloadCollectionFromLibrary(core, privateFilesDownloadPath, collectionGuid, ref CollectionLastModifiedDate, ref return_ErrorMessage)) {
                         //
                         // -- build the collection folders for all collection files in the download path and created a list of collection Guids that need to be installed
                         var collectionsDownloaded = new List<string>();

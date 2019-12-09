@@ -198,11 +198,11 @@ namespace Contensive.Processor.Controllers {
                                                         // If it is not already installed, download and install it also
                                                         //
                                                         string ChildWorkingPath = CollectionVersionFolder + "\\" + ChildCollectionGUID + "\\";
-                                                        DateTime libraryCollectionLastChangeDate = default(DateTime);
+                                                        DateTime libraryCollectionLastModifiedDate = default(DateTime);
                                                         try {
                                                             //
                                                             // try-finally to delete the working folder
-                                                            if (!CollectionLibraryController.downloadCollectionFromLibrary(core, ChildWorkingPath, ChildCollectionGUID, ref libraryCollectionLastChangeDate, ref return_ErrorMessage)) {
+                                                            if (!CollectionLibraryController.downloadCollectionFromLibrary(core, ChildWorkingPath, ChildCollectionGUID, ref libraryCollectionLastModifiedDate, ref return_ErrorMessage)) {
                                                                 //
                                                                 // -- did not download correctly
                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, [" + statusMsg + "], downloadCollectionFiles returned error state, message [" + return_ErrorMessage + "]");
@@ -212,7 +212,7 @@ namespace Contensive.Processor.Controllers {
                                                                     return_ErrorMessage = statusMsg + ". The installation can not continue because there was an error while downloading the necessary collection file, guid [" + ChildCollectionGUID + "]. The error was [" + return_ErrorMessage + "]";
                                                                 }
                                                             } else {
-                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, libraryCollectionLastChangeDate [" + libraryCollectionLastChangeDate.ToString() + "].");
+                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, libraryCollectionLastChangeDate [" + libraryCollectionLastModifiedDate.ToString() + "].");
                                                                 bool installDependentCollection = true;
                                                                 var localCollectionConfig = CollectionFolderModel.getCollectionFolderConfig(core, ChildCollectionGUID);
                                                                 if (localCollectionConfig == null) {
@@ -221,7 +221,7 @@ namespace Contensive.Processor.Controllers {
                                                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, collection");
                                                                 } else {
                                                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, localCollectionConfig.lastChangeDate [" + localCollectionConfig.lastChangeDate.ToString() + "].");
-                                                                    if (localCollectionConfig.lastChangeDate < libraryCollectionLastChangeDate) {
+                                                                    if (localCollectionConfig.lastChangeDate < libraryCollectionLastModifiedDate) {
                                                                         //
                                                                         // -- downloaded collection is newer than installed collection, reinstall
                                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, **** local version is older than library, needs to reinstall.");
@@ -237,7 +237,7 @@ namespace Contensive.Processor.Controllers {
                                                                     //
                                                                     // -- install the downloaded file
                                                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, collection missing or needs to be updated.");
-                                                                    if (!buildCollectionFoldersFromCollectionZips(core, contextLog, ChildWorkingPath, libraryCollectionLastChangeDate, ref collectionsDownloaded, ref return_ErrorMessage, ref collectionsInstalledList, ref collectionsBuildingFolder)) {
+                                                                    if (!buildCollectionFoldersFromCollectionZips(core, contextLog, ChildWorkingPath, libraryCollectionLastModifiedDate, ref collectionsDownloaded, ref return_ErrorMessage, ref collectionsInstalledList, ref collectionsBuildingFolder)) {
                                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, [" + statusMsg + "], BuildLocalCollectionFolder returned error state, message [" + return_ErrorMessage + "]");
                                                                         if (string.IsNullOrEmpty(return_ErrorMessage)) {
                                                                             return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error installing the included collection file, guid [" + ChildCollectionGUID + "].";
