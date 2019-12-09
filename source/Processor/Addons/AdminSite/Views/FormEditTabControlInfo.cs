@@ -272,8 +272,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                     tabPanel.add(AdminUIController.getEditRow(core, fieldEditor, "Modified Date", FieldHelp, false, false, ""));
                 }
                 string s = AdminUIController.editTable(tabPanel.text);
-                result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Control Information", "", s);
-                adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
+                result = AdminUIController.getEditPanel(core, true, "Control Information", "", s);
+                adminData.editSectionPanelCount += 1;
                 tabPanel = null;
             } catch (Exception ex) {
                 LogController.logError(core, ex);

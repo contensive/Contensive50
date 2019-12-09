@@ -27,7 +27,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + ContentMetadataModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>"
                     + "</tr>";
                 s = AdminUIController.editTable( s );
-                s = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Email Rules", "Send email to people in these groups", s);
+                s = AdminUIController.getEditPanel(core, true, "Email Rules", "Send email to people in these groups", s);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

@@ -88,7 +88,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                 List<string> nonCriticalErrorList = new List<string>();
                 string dataBuildVersion = core.siteProperties.dataBuildVersion;
                 string coreVersion = core.codeVersion();
-                var adminMenu = new TabController();
+                var adminMenu = new EditTabModel();
                 DbUpToDate = (dataBuildVersion == coreVersion);
                 //
                 Button = core.docProperties.getText(Constants.RequestNameButton);

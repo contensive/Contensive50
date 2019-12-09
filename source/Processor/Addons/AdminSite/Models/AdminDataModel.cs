@@ -142,12 +142,6 @@ namespace Contensive.Processor.Addons.AdminSite {
         //
         //====================================================================================================
         /// <summary>
-        /// true uses tab system
-        /// </summary>
-        public bool allowAdminTabs { get; set; }
-        //
-        //====================================================================================================
-        /// <summary>
         /// this is a hidden on the edit form. The popup editor preferences sets this hidden and submits
         /// </summary>
         public string fieldEditorPreference { get; set; }
@@ -514,15 +508,6 @@ namespace Contensive.Processor.Addons.AdminSite {
         public AdminDataModel(CoreController core) {
             try {
                 this.core = core;
-                //
-                // Tab Control
-                allowAdminTabs = GenericController.encodeBoolean(core.userProperty.getText("AllowAdminTabs", "1"));
-                if (core.docProperties.getText("tabs") != "") {
-                    if (core.docProperties.getBoolean("tabs") != allowAdminTabs) {
-                        allowAdminTabs = !allowAdminTabs;
-                        core.userProperty.setProperty("AllowAdminTabs", allowAdminTabs.ToString());
-                    }
-                }
                 //
                 // adminContext.content init
                 requestedContentId = core.docProperties.getInteger("cid");

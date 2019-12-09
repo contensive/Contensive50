@@ -35,8 +35,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                 f.add(AdminUIController.getEditRowLegacy(core, Copy, "Bounce Email Action", "When an email is determined to be a bounce, this action will taken against member with that email address."));
                 f.add(AdminUIController.getEditRowLegacy(core, core.siteProperties.getText("POPServerStatus"), "Last Email Retrieve Status", "This is the status of the last POP email retrieval attempted."));
                 //
-                result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Bounced Email Handling", "", AdminUIController.editTable( f.text ));
-                adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
+                result = AdminUIController.getEditPanel(core, true, "Bounced Email Handling", "", AdminUIController.editTable( f.text ));
+                adminData.editSectionPanelCount += 1;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

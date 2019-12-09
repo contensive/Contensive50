@@ -94,8 +94,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 + AdminUIController.editTable(FastString.text)
                                 + HtmlController.inputHidden("WhatsNewResponse", "-1")
                                 + HtmlController.inputHidden("contentwatchrecordid", adminData.contentWatchRecordID.ToString());
-                            tempGetForm_Edit_ContentTracking = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Content Tracking", "Include in Content Watch Lists", s);
-                            adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
+                            tempGetForm_Edit_ContentTracking = AdminUIController.getEditPanel(core, true, "Content Tracking", "Include in Content Watch Lists", s);
+                            adminData.editSectionPanelCount += 1;
                             //
                         }
                     }

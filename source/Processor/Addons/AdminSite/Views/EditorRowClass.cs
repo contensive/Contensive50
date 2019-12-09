@@ -42,12 +42,12 @@ namespace Contensive.Processor.Addons.AdminSite {
             bool fieldForceReadOnly = false;
             //
             // Read only Special Cases
-            if (editorEnv.IsLandingPage) {
+            if (editorEnv.IsRootPage) {
                 switch (GenericController.toLCase(field.nameLc)) {
                     case "active":
                     //
                     // if active, it is read only -- if inactive, let them set it active.
-                    fieldForceReadOnly = (GenericController.encodeBoolean(fieldValueObject));
+                    fieldForceReadOnly = encodeBoolean(fieldValueObject);
                     if (fieldForceReadOnly) {
                         WhyReadOnlyMsg = "&nbsp;(disabled because you can not mark the landing page inactive)";
                     }
@@ -735,7 +735,6 @@ namespace Contensive.Processor.Addons.AdminSite {
 
     public class EditorEnvironmentModel {
         public bool needUniqueEmailMessage;
-        public bool IsLandingPage;
         public bool IsRootPage;
         public bool record_readOnly;
         public string editorAddonListJSON;

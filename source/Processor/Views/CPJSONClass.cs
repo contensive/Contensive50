@@ -3,16 +3,6 @@ using System;
 
 namespace Contensive.Processor {
     public class CPJSONClass : BaseClasses.CPJSONBaseClass, IDisposable {
-
-        //
-        // ====================================================================================================
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="cpParent"></param>
-        //
-        public CPJSONClass() {
-        }
         //
         // ====================================================================================================
         //

@@ -105,8 +105,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                     relatedButtonList = "",
                 });
                 body.add(Render.StringToString(Resources.GroupRuleEditorRow2, groupRuleEditor));
-                result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Group Membership", "", body.text );
-                adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
+                result = AdminUIController.getEditPanel(core, true, "Group Membership", "", body.text );
+                adminData.editSectionPanelCount += 1;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

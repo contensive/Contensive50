@@ -6,6 +6,7 @@ using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Processor.Exceptions;
 using System.Collections.Generic;
 using Contensive.Models.Db;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Processor.Addons.AdminSite {
     public class ToolCustomReports {
@@ -46,7 +47,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 StringBuilderLegacyController Tab1 = new StringBuilderLegacyController();
                 string Content = "";
                 string SQLFieldName = null;
-                var adminMenu = new TabController();
+                var adminMenu = new EditTabModel();
                 //
                 const int ColumnCnt = 4;
                 //

@@ -28,21 +28,14 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <param name="EditTab"></param>
         /// <param name="EditorContext"></param>
         /// <param name="return_NewFieldList"></param>
-        /// <param name="TemplateIDForStyles"></param>
         /// <param name="HelpCnt"></param>
         /// <param name="HelpIDCache"></param>
         /// <param name="helpDefaultCache"></param>
         /// <param name="HelpCustomCache"></param>
         /// <param name="AllowHelpMsgCustom"></param>
         /// <param name="helpIdIndex"></param>
-        /// <param name="fieldEditorList"></param>
-        /// <param name="styleList"></param>
-        /// <param name="styleOptionList"></param>
-        /// <param name="emailIdForStyles"></param>
-        /// <param name="IsTemplateTable"></param>
-        /// <param name="editorAddonListJSON"></param>
         /// <returns></returns>
-        public static string getTab(CoreController core, AdminDataModel adminData, EditorEnvironmentModel editorEnv, int RecordID, int ContentID, string EditTab, CPHtml5BaseClass.EditorContentType EditorContext, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, KeyPtrController helpIdIndex, string styleList, int emailIdForStyles, bool IsTemplateTable) {
+        public static string getTab(CoreController core, AdminDataModel adminData, EditorEnvironmentModel editorEnv, int RecordID, int ContentID, string EditTab) {
             string returnHtml = "";
             try {
                 //
@@ -84,14 +77,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                     resultBody.add("</td></tr>");
                     //
                     // ----- close the panel
-                    if (string.IsNullOrEmpty(EditTab)) {
-                        fieldCaption = "Content Fields";
-                    } else {
-                        fieldCaption = "Content Fields - " + EditTab;
-                    }
-                    adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
-                    returnHtml = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), fieldCaption, "", AdminUIController.editTable(resultBody.text));
-                    adminData.editSectionPanelCount = adminData.editSectionPanelCount + 1;
+                    returnHtml = AdminUIController.getEditPanel(core, false, "", "", AdminUIController.editTable(resultBody.text));
+                    adminData.editSectionPanelCount += 1;
                     resultBody = null;
                 }
             } catch (Exception ex) {
@@ -111,9 +98,7 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <param name="IsLandingPage"></param>
         /// <param name="IsRootPage"></param>
         /// <param name="EditorContext"></param>
-        /// <param name="allowAjaxTabs"></param>
         /// <param name="TemplateIDForStyles"></param>
-
         /// <param name="fieldEditorList"></param>
         /// <param name="styleList"></param>
         /// <param name="styleOptionList"></param>
@@ -121,8 +106,7 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <param name="IsTemplateTable"></param>
         /// <param name="editorAddonListJSON"></param>
         /// <returns></returns>
-        public static string getTabs(CoreController core, AdminDataModel adminData, TabController adminMenu, EditorEnvironmentModel editorEnv, CPHtml5BaseClass.EditorContentType EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string styleList, int emailIdForStyles, bool IsTemplateTable) {
-            string returnHtml = "";
+        public static void addContentTabs(CoreController core, AdminDataModel adminData, EditTabModel editTabs, EditorEnvironmentModel editorEnv) {
             try {
                 // todo
                 string IDList = "";
@@ -162,28 +146,23 @@ namespace Contensive.Processor.Addons.AdminSite {
                     editorEnv.AllowHelpMsgCustom = true;
                 }
                 //
-                //string FormFieldList = ",";
                 List<string> TabsFound = new List<string>();
                 foreach (KeyValuePair<string, ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
-                    //editorEnv.tabFieldList = "";
                     ContentFieldMetadataModel field = keyValuePair.Value;
                     if ((!field.editTabName.ToLowerInvariant().Equals("control info")) && (field.authorable) && (field.active) && (!TabsFound.Contains(field.editTabName.ToLowerInvariant()))) {
                         TabsFound.Add(field.editTabName.ToLowerInvariant());
                         string editTabCaption = field.editTabName;
                         if (string.IsNullOrEmpty(editTabCaption)) { editTabCaption = "Details"; }
-                        string tabContent = getTab(core, adminData, editorEnv, adminData.editRecord.id, adminData.adminContent.id, field.editTabName, EditorContext, TemplateIDForStyles, HelpCnt, HelpIDCache, helpDefaultCache, HelpCustomCache,  helpIdIndex, styleList, emailIdForStyles, IsTemplateTable);
+                        string tabContent = getTab(core, adminData, editorEnv, adminData.editRecord.id, adminData.adminContent.id, field.editTabName);
                         if (!string.IsNullOrEmpty(tabContent)) {
-                            returnHtml += addTab(core, adminMenu, editTabCaption, tabContent, adminData.allowAdminTabs);
+                            addCustomTab(core, editTabs, editTabCaption, tabContent);
                         }
-                        //if (!string.IsNullOrEmpty(editorEnv.tabFieldList)) { editorEnv.FormFieldList = editorEnv.tabFieldList + editorEnv.FormFieldList; }
                     }
                 }
-                //returnHtml += HtmlController.inputHidden("FormFieldList", FormFieldList);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnHtml;
         }
         //
         // ====================================================================================================
@@ -193,17 +172,14 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <param name="core"></param>
         /// <param name="Caption"></param>
         /// <param name="Content"></param>
-        /// <param name="AllowAdminTabs"></param>
         /// <returns></returns>
-        public static string addTab(CoreController core, TabController adminMenu, string Caption, string Content, bool AllowAdminTabs) {
+        public static void addCustomTab(CoreController core, EditTabModel editTabs, string Caption, string Content) {
             try {
-                if (string.IsNullOrEmpty(Content)) { return string.Empty; }
-                if (!AllowAdminTabs) { return Content; }
-                adminMenu.addEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
+                if (string.IsNullOrEmpty(Content)) { return ; }
+                editTabs.addEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            return string.Empty;
         }
         //
         //

@@ -1,14 +1,15 @@
 ﻿//
+using Contensive.Processor.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Contensive.Processor.Controllers {
+namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// create admin tab system
     /// use https://www.w3schools.com/bootstrap4/bootstrap_navs.asp
     /// </summary>
-    public class TabController {
+    public class EditTabModel {
         private struct TabType {
             public string caption;
             public string Link;
@@ -19,7 +20,7 @@ namespace Contensive.Processor.Controllers {
         }
         private List<TabType> Tabs;
         //
-        public TabController() {
+        public EditTabModel() {
             Tabs = new List<TabType>();
         }
         //

@@ -780,7 +780,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 Name = xml_GetAttribute(IsFound, Doc.DocumentElement, "name", "");
                                 int TabCnt = 0;
-                                var adminMenu = new TabController();
+                                var adminMenu = new EditTabModel();
                                 foreach (XmlNode SettingNode in Doc.DocumentElement.ChildNodes) {
                                     string Copy = "";
                                     string TabName = "";
