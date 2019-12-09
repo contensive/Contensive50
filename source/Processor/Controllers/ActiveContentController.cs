@@ -36,7 +36,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="addonContext">Where this addon is being executed, like as a process, or in an email, or on a page. If not provided page context is assumed (adding assets like js and css to document)</param>
         /// <returns></returns>
         public static string renderHtmlForWeb(CoreController core, string source, string contextContentName = "", int ContextRecordId = 0, int deprecated_ContextContactPeopleId = 0, string ProtocolHostString = "", int DefaultWrapperId = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
-            string result = ContentCmdController.executeContentCommands(core, source, CPUtilsBaseClass.addonContext.ContextAdmin, core.session.user.id, core.session.visit.visitAuthenticated);
+            string result = ContentCmdController.executeContentCommands(core, source, CPUtilsBaseClass.addonContext.ContextAdmin);
             return encode(core, result, core.session.user.id, contextContentName, ContextRecordId, deprecated_ContextContactPeopleId, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperId, "", addonContext, core.session.isAuthenticated, null, core.session.isEditing());
         }
         //
@@ -1264,7 +1264,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string renderJSONForRemoteMethod(CoreController core, string Source, string ContextContentName, int ContextRecordID, int deprecated_ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
             string result = Source;
-            result = ContentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, deprecated_ContextContactPeopleID, false);
+            result = ContentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin);
             result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, deprecated_ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.session.isAuthenticated, null, core.session.isEditing());
             return result;
         }
@@ -1284,7 +1284,7 @@ namespace Contensive.Processor.Controllers {
             // -- create session context for this user and queue the email.
             using (CPClass cp = new CPClass(core.appConfig.name, core.serverConfig)) {
                 if (cp.User.LoginByID(sendToPersonId)) {
-                    result = ContentCmdController.executeContentCommands(cp.core, result, CPUtilsClass.addonContext.ContextEmail, sendToPersonId, true);
+                    result = ContentCmdController.executeContentCommands(cp.core, result, CPUtilsClass.addonContext.ContextEmail);
                     result = encode(cp.core, result, sendToPersonId, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
                 }
             };

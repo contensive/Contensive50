@@ -8,6 +8,7 @@ using Contensive.Processor.Exceptions;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Models.Db;
+using System.Text;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -188,27 +189,25 @@ namespace Contensive.Processor.Controllers {
         /// <param name="deprecated_personalizationPeopleId"></param>
         /// <param name="deprecated_personalizationIsAuthenticated"></param>
         /// <returns></returns>
-        public static string executeContentCommands(CoreController core, string src, CPUtilsBaseClass.addonContext Context, int deprecated_personalizationPeopleId, bool deprecated_personalizationIsAuthenticated) {
-            //
-            // -- exit if no src to process
-            if (string.IsNullOrWhiteSpace(src)) return src;
-            string returnValue = "";
+        public static string executeContentCommands(CoreController core, string src, CPUtilsBaseClass.addonContext Context) {
             try {
+                //
+                // -- exit if no src to process
+                if (string.IsNullOrWhiteSpace(src)) { return src; }
+                //
                 bool badCmd = false;
                 bool notFound = false;
                 int posOpen = 0;
                 int posClose = 0;
-                string Cmd = null;
+                string Cmd = "";
                 string cmdResult = null;
                 int posDq = 0;
                 int posSq = 0;
                 int Ptr = 0;
-                int ptrLast = 0;
-                string dst = null;
                 string escape = null;
                 //
-                dst = "";
-                ptrLast = 1;
+                var result = new StringBuilder();
+                int ptrLast = 1;
                 do {
                     Cmd = "";
                     posOpen = GenericController.strInstr(ptrLast, src, contentReplaceEscapeStart);
@@ -272,54 +271,6 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     break;
                                 }
-                                //switch (getFirstNonZeroInteger(posSq, posDq)) {
-                                //    case 0:
-                                //        //
-                                //        // both 0, posClose is OK as-is
-                                //        //
-                                //        notFound = false;
-                                //        break;
-                                //    case 1:
-                                //        //
-                                //        // posSq is before posDq
-                                //        //
-                                //        if (posSq > posClose) {
-                                //            notFound = false;
-                                //        } else {
-                                //            //
-                                //            // skip forward to the next non-escaped sq
-                                //            //
-                                //            do {
-                                //                posSq = GenericController.strInstr(posSq + 1, src, "'");
-                                //                escape = "";
-                                //                if (posSq > 0) {
-                                //                    escape = src.Substring(posSq - 2, 1);
-                                //                }
-                                //            } while (escape == "\\");
-                                //            Ptr = posSq + 1;
-                                //        }
-                                //        break;
-                                //    default:
-                                //        //
-                                //        // posDq is before posSq
-                                //        //
-                                //        if (posDq > posClose) {
-                                //            notFound = false;
-                                //        } else {
-                                //            //
-                                //            // skip forward to the next non-escaped dq
-                                //            //
-                                //            do {
-                                //                posDq = GenericController.strInstr(posDq + 1, src, "\"");
-                                //                escape = "";
-                                //                if (posDq > 0) {
-                                //                    escape = src.Substring(posDq - 2, 1);
-                                //                }
-                                //            } while (escape == "\\");
-                                //            Ptr = posDq + 1;
-                                //        }
-                                //        break;
-                                //}
                             }
                         } while (notFound);
                     }
@@ -327,39 +278,38 @@ namespace Contensive.Processor.Controllers {
                         //
                         // no cmd found, add from the last ptr to the end
                         //
-                        dst = dst + src.Substring(ptrLast - 1);
+                        result.Append( src.Substring(ptrLast - 1));
                         Ptr = -1;
                     } else {
                         //
                         // cmd found, process it and add the results to the dst
                         //
                         Cmd = src.Substring(posOpen + 1, (posClose - posOpen - 2));
-                        cmdResult = executeSingleCommand(core, Cmd, badCmd, Context, deprecated_personalizationPeopleId, deprecated_personalizationIsAuthenticated);
+                        cmdResult = executeSingleCommand(core, Cmd, badCmd, Context);
                         if (badCmd) {
                             //
                             // the command was bad, put it back in place (?) in case it was not a command
                             //
                             cmdResult = contentReplaceEscapeStart + Cmd + contentReplaceEscapeEnd;
                         }
-                        dst = dst + src.Substring(ptrLast - 1, posOpen - ptrLast) + cmdResult;
+                        result.Append( src.Substring(ptrLast - 1, posOpen - ptrLast) + cmdResult);
                         Ptr = posClose + 2;
                     }
                     ptrLast = Ptr;
                 } while (Ptr > 1);
                 //
-                returnValue = dst;
+                return result.ToString();
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnValue;
         }
         //
         //=================================================================================================================
         /// <summary>
         /// convert a single command in the command formats to call the execute
         /// </summary>
-        private static string executeSingleCommand(CoreController core, string cmdSrc, bool return_BadCmd, CPUtilsBaseClass.addonContext Context, int deprecated_personalizationPeopleId, bool deprecated_personalizationIsAuthenticated) {
+        private static string executeSingleCommand(CoreController core, string cmdSrc, bool return_BadCmd, CPUtilsBaseClass.addonContext Context) {
             string returnValue = "";
             try {
                 //
@@ -396,14 +346,12 @@ namespace Contensive.Processor.Controllers {
                     object itemVariant = null;
                     Dictionary<string, object> cmdObject = null;
                     //
-                    // +++++
                     cmdCollection = new List<object>();
                     if ((cmdSrc.left(1) == "{") && (cmdSrc.Substring(cmdSrc.Length - 1) == "}")) {
                         //
-                        // JSON is a single command in the form of an object, like:
-                        //   { "import": "test.html" }
+                        // JSON is a single command in the form of an object, like: { "import": "test.html" }
                         //
-                        Dictionary<string, object> cmdDictionary = new Dictionary<string, object>();
+                        Dictionary<string, object> cmdDictionary;
                         try {
                             cmdDictionary = json.Deserialize<Dictionary<string, object>>(cmdSrc);
                         } catch (Exception ex) {
@@ -413,7 +361,6 @@ namespace Contensive.Processor.Controllers {
                         //
                         dictionaryKeys = cmdDictionary.Keys;
                         foreach (string KeyWithinLoop in dictionaryKeys) {
-                            Key = KeyWithinLoop;
                             if (cmdDictionary[KeyWithinLoop] != null) {
                                 cmdObject = new Dictionary<string, object>();
                                 itemObject = cmdDictionary[KeyWithinLoop];
@@ -428,8 +375,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     } else if ((cmdSrc.left(1) == "[") && (cmdSrc.Substring(cmdSrc.Length - 1) == "]")) {
                         //
-                        // JSON is a command list in the form of an array, like:
-                        //   [ "clear" , { "import": "test.html" },{ "open" : "myfile.txt" }]
+                        // JSON is a command list in the form of an array, like: [ "clear" , { "import": "test.html" },{ "open" : "myfile.txt" }]
                         //
                         cmdCollection = json.Deserialize<List<object>>(cmdSrc);
                     } else {
@@ -496,8 +442,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         if ((cmdArg.left(1) == "{") && (cmdArg.Substring(cmdArg.Length - 1) == "}")) {
                             //
-                            // argument is in the form of an object, like:
-                            //   { "text name": "my text" }
+                            // argument is in the form of an object, like: { "text name": "my text" }
                             //
                             object cmdDictionaryOrCollection = json.Deserialize<object>(cmdArg);
                             string cmdDictionaryOrCollectionTypeName = cmdDictionaryOrCollection.GetType().FullName.ToLowerInvariant();
@@ -723,9 +668,14 @@ namespace Contensive.Processor.Controllers {
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
                                         switch (kvp.Key.ToLowerInvariant()) {
                                             case "name":
-                                            case "default":
-                                                ArgName = (string)kvp.Value;
-                                                break;
+                                            case "default": {
+                                                    ArgName = (string)kvp.Value;
+                                                    break;
+                                                }
+                                            default: {
+                                                    // do nothing
+                                                    break;
+                                                }
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
@@ -742,13 +692,10 @@ namespace Contensive.Processor.Controllers {
                                     string addonName = "";
                                     Dictionary<string, string> addonArgDict = new Dictionary<string, string>();
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        switch (kvp.Key.ToLowerInvariant()) {
-                                            case "addon":
-                                                addonName = kvp.Value.ToString();
-                                                break;
-                                            default:
-                                                addonArgDict.Add(kvp.Key, kvp.Value.ToString());
-                                                break;
+                                        if( kvp.Key.ToLowerInvariant().Equals("addon")) {
+                                            addonName = kvp.Value.ToString();
+                                        } else {
+                                            addonArgDict.Add(kvp.Key, kvp.Value.ToString());
                                         }
                                     }
                                     addonArgDict.Add("cmdAccumulator", CmdAccumulator);
@@ -780,18 +727,14 @@ namespace Contensive.Processor.Controllers {
                                     string addonName = cmdText;
                                     Dictionary<string, string> addonArgDict = new Dictionary<string, string>();
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        switch (encodeInteger(kvp.Key.ToLowerInvariant())) {
-                                            default:
-                                                addonArgDict.Add(kvp.Key, kvp.Value.ToString());
-                                                break;
-                                        }
+                                        addonArgDict.Add(kvp.Key, kvp.Value.ToString());
                                     }
                                     addonArgDict.Add("cmdAccumulator", CmdAccumulator);
-                                    var executeContext = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                                    var executeContext = new CPUtilsBaseClass.addonExecuteContext {
                                         addonType = Context,
                                         cssContainerClass = "",
                                         cssContainerId = "",
-                                        hostRecord = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext {
                                             contentName = "",
                                             fieldName = "",
                                             recordId = 0

@@ -30,7 +30,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 string cmd = "<div>{% \"" + addon.name + "\" %}</div>";
                 CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context);
                 // assert
                 Assert.AreEqual("<div>foo</div>", result);
             }
@@ -55,7 +55,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 string cmd = "<div>{% \"" + addonFoo.name + "\" %}{% \"" + addonBar.name + "\" %}+{% \"" + addonFoo.name + "\" %}\n{% \"" + addonBar.name + "\" %}</div>";
                 CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context);
                 // assert
                 Assert.AreEqual("<div>fooBar+foo\nBar</div>", result);
             }
@@ -80,7 +80,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 string cmd = "<div>{%[{\"" + addonFoo.name + "\":\"commandArgument\"}]%}</div>";
                 CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context);
                 // assert
                 Assert.AreEqual("<div>foo</div>", result);
             }
@@ -105,7 +105,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 string cmd = "<div>{%[{\"" + addonFoo.name + "\":\"commandArgument\"},{\"" + addonBar.name + "\":\"commandArgument\"}]%}</div>";
                 CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context);
                 // assert
                 Assert.AreEqual("<div>fooBar</div>", result);
             }
@@ -125,7 +125,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addonFoo.name + "\"}} %}</div>";
                 CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context);
                 // assert
                 Assert.AreEqual("<div class=\"sample\">foo</div>", result);
             }
@@ -145,7 +145,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addonFoo.name + "\",\"ReplaceMe\":\"BAR\"}} %}</div>";
                 CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context);
                 // assert
                 Assert.AreEqual("<div class=\"sample\">fooBAR</div>", result);
             }
@@ -165,7 +165,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addon.name + "\",\"insert\":\"bar\"}} %}</div>";
                 CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context);
                 // assert
                 Assert.AreEqual("<div class=\"sample\">foobar</div>", result);
             }
