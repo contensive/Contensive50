@@ -1,13 +1,10 @@
 ﻿
 using System;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Addons.AdminSite.Controllers;
-using System.Text;
 using System.Collections.Generic;
-using Contensive.Models.Db;
 using System.Data;
 using Contensive.BaseClasses;
 using System.Linq;

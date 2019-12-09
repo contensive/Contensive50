@@ -1,10 +1,8 @@
 ﻿
 using System;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Addons.AdminSite.Controllers;
-using System.Text;
 using System.Collections.Generic;
 using System.Threading;
 using Contensive.Models.Db;
