@@ -29,60 +29,66 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string Button(string htmlName, string htmlValue, string htmlClass, string htmlId) {
-            return HtmlController.inputSubmit(htmlValue, htmlName, htmlId, "", false, htmlClass);
-        }
-        //
-        public override string Button(string htmlName, string htmlValue, string htmlClass) => Button(htmlName, htmlValue, htmlClass, "");
+        public override string Button(string htmlName) => Button(htmlName, "", "", "");
         //
         public override string Button(string htmlName, string htmlValue) => Button(htmlName, htmlValue, "", "");
         //
-        public override string Button(string htmlName) => Button(htmlName, "", "", "");
+        public override string Button(string htmlName, string htmlValue, string htmlClass) => Button(htmlName, htmlValue, htmlClass, "");
+        //
+        public override string Button(string htmlName, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputSubmit(htmlValue, htmlName, htmlId, "", false, htmlClass);
         //
         // ====================================================================================================
-        //
-        public override string CheckBox(string htmlName, bool htmlValue, string htmlClass, string htmlId) {
-            return HtmlController.checkbox(htmlName, htmlValue, htmlId, false, htmlClass);
-        }
-        //
-        public override string CheckBox(string htmlName, bool htmlValue, string htmlClass) => CheckBox(htmlName, htmlValue, htmlClass, "");
-        //
-        public override string CheckBox(string htmlName, bool htmlValue) => CheckBox(htmlName, htmlValue, "", "");
         //
         public override string CheckBox(string htmlName) => CheckBox(htmlName, false, "", "");
         //
+        public override string CheckBox(string htmlName, bool htmlValue) => CheckBox(htmlName, htmlValue, "", "");
+        //
+        public override string CheckBox(string htmlName, bool htmlValue, string htmlClass) => CheckBox(htmlName, htmlValue, htmlClass, "");
+        //
+        public override string CheckBox(string htmlName, bool htmlValue, string htmlClass, string htmlId) => HtmlController.checkbox(htmlName, htmlValue, htmlId, false, htmlClass);
+        //
         // ====================================================================================================
         //
-        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName, bool isReadOnly, string htmlClass, string htmlId) {
+        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName) {
+            return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName);
+        }
+        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria) {
+            return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName, secondaryContentSelectSQLCriteria);
+        }
+        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName) {
+            return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName, secondaryContentSelectSQLCriteria, captionFieldName);
+        }
+        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName, bool isReadOnly) {
             return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName, secondaryContentSelectSQLCriteria, captionFieldName, isReadOnly);
         }
         public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName, bool isReadOnly, string htmlClass) {
             return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName, secondaryContentSelectSQLCriteria, captionFieldName, isReadOnly);
         }
-        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName, bool isReadOnly) {
+        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName, bool isReadOnly, string htmlClass, string htmlId) {
             return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName, secondaryContentSelectSQLCriteria, captionFieldName, isReadOnly);
-        }
-        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName) {
-            return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName, secondaryContentSelectSQLCriteria, captionFieldName);
-        }
-        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria) {
-            return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName, secondaryContentSelectSQLCriteria);
-        }
-        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName) {
-            return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName);
         }
         //
         // ====================================================================================================
-        //
-        public override string Div(string innerHtml, string htmlClass, string htmlId) => HtmlController.div(innerHtml, htmlClass, htmlId);
-        //
-        public override string Div(string innerHtml, string htmlClass) => HtmlController.div(innerHtml, htmlClass);
         //
         public override string Div(string innerHtml) => HtmlController.div(innerHtml);
         //
+        public override string Div(string innerHtml, string htmlClass) => HtmlController.div(innerHtml, htmlClass);
+        //
+        public override string Div(string innerHtml, string htmlClass, string htmlId) => HtmlController.div(innerHtml, htmlClass, htmlId);
+        //
         // ====================================================================================================
         //
-        public override string Form(string innerHtml, string htmlName, string htmlClass, string htmlId, string actionQueryString, string method ) {
+        public override string Form(string innerHtml) => Form(innerHtml, "", "", "", "", "post");
+        //
+        public override string Form(string innerHtml, string htmlName) => Form(innerHtml, htmlName, "", "", "", "post");
+        //
+        public override string Form(string innerHtml, string htmlName, string htmlClass) => Form(innerHtml, htmlName, htmlClass, "", "", "post");
+        //
+        public override string Form(string innerHtml, string htmlName, string htmlClass, string htmlId) => Form(innerHtml, htmlName, htmlClass, htmlId, "", "post");
+        //
+        public override string Form(string innerHtml, string htmlName, string htmlClass, string htmlId, string actionQueryString) => Form(innerHtml, htmlName, htmlClass, htmlId, actionQueryString, "post");
+        //
+        public override string Form(string innerHtml, string htmlName, string htmlClass, string htmlId, string actionQueryString, string method) {
             if (method.ToLowerInvariant() == "get") {
                 return HtmlController.form(cp.core, innerHtml, actionQueryString, htmlName, htmlId, method);
             } else {
@@ -90,63 +96,53 @@ namespace Contensive.Processor {
             }
         }
         //
-        public override string Form(string innerHtml, string htmlName, string htmlClass, string htmlId, string actionQueryString) => Form(innerHtml, htmlName, htmlClass, htmlId, actionQueryString, "post");
-        //
-        public override string Form(string innerHtml, string htmlName, string htmlClass, string htmlId) => Form(innerHtml, htmlName, htmlClass, htmlId, "", "post");
-        //
-        public override string Form(string innerHtml, string htmlName, string htmlClass) => Form(innerHtml, htmlName, htmlClass, "", "", "post");
-        //
-        public override string Form(string innerHtml, string htmlName) => Form(innerHtml, htmlName, "", "", "", "post");
-        //
-        public override string Form(string innerHtml) => Form(innerHtml, "", "", "", "", "post");
-        //
         // ==========================================================================================
-        //
-        public override string H1(string innerHtml, string htmlClass, string htmlId) => HtmlController.h1(innerHtml, htmlClass, htmlId);
-        //
-        public override string H1(string innerHtml, string htmlClass) => HtmlController.h1(innerHtml, htmlClass);
         //
         public override string H1(string innerHtml) => HtmlController.h1(innerHtml);
         //
+        public override string H1(string innerHtml, string htmlClass) => HtmlController.h1(innerHtml, htmlClass);
+        //
+        public override string H1(string innerHtml, string htmlClass, string htmlId) => HtmlController.h1(innerHtml, htmlClass, htmlId);
+        //
         // ==========================================================================================
-        //
-        public override string H2(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h2", innerHtml, htmlClass, htmlId);
-        //
-        public override string H2(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h2", innerHtml, htmlClass);
         //
         public override string H2(string innerHtml) => HtmlController.genericBlockTag("h2", innerHtml);
         //
+        public override string H2(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h2", innerHtml, htmlClass);
+        //
+        public override string H2(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h2", innerHtml, htmlClass, htmlId);
+        //
         // ==========================================================================================
-        //
-        public override string H3(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h3", innerHtml, htmlClass, htmlId);
-        //
-        public override string H3(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h3", innerHtml, htmlClass);
         //
         public override string H3(string innerHtml) => HtmlController.genericBlockTag("h3", innerHtml);
         //
+        public override string H3(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h3", innerHtml, htmlClass);
+        //
+        public override string H3(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h3", innerHtml, htmlClass, htmlId);
+        //
         // ==========================================================================================
-        //
-        public override string H4(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h4", innerHtml, htmlClass, htmlId);
-        //
-        public override string H4(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h4", innerHtml, htmlClass);
         //
         public override string H4(string innerHtml) => HtmlController.genericBlockTag("h4", innerHtml);
         //
+        public override string H4(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h4", innerHtml, htmlClass);
+        //
+        public override string H4(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h4", innerHtml, htmlClass, htmlId);
+        //
         // ==========================================================================================
-        //
-        public override string H5(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h5", innerHtml, htmlClass, htmlId);
-        //
-        public override string H5(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h5", innerHtml, htmlClass);
         //
         public override string H5(string innerHtml) => HtmlController.genericBlockTag("h5", innerHtml);
         //
+        public override string H5(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h5", innerHtml, htmlClass);
+        //
+        public override string H5(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h5", innerHtml, htmlClass, htmlId);
+        //
         // ==========================================================================================
         //
-        public override string H6(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h6", innerHtml, htmlClass, htmlId);
+        public override string H6(string innerHtml) => HtmlController.genericBlockTag("h6", innerHtml);
         //
         public override string H6(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h6", innerHtml, htmlClass);
         //
-        public override string H6(string innerHtml) => HtmlController.genericBlockTag("h6", innerHtml);
+        public override string H6(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h6", innerHtml, htmlClass, htmlId);
         //
         // ====================================================================================================
         //

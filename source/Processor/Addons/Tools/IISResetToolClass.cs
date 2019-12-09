@@ -21,21 +21,15 @@ namespace Contensive.Processor.Addons.Tools {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
             return get(((CPClass)cpBase).core);
         }
-
-        //=============================================================================
-        // todo change iisreset to an addon
+        //
         public static string get(CoreController core) {
-            string result = "";
             try {
-                string Button = null;
-                StringBuilderLegacyController s = new StringBuilderLegacyController();
-                //
-                s.add(AdminUIController.getHeaderTitleDescription("IIS Reset", "Reset the webserver."));
+                StringBuilderLegacyController result_reset = new StringBuilderLegacyController();
+                result_reset.add(AdminUIController.getHeaderTitleDescription("IIS Reset", "Reset the webserver."));
                 //
                 // Process the form
                 //
-                Button = core.docProperties.getText("button");
-                //
+                string Button = core.docProperties.getText("button");
                 if (Button == ButtonIISReset) {
                     //
                     //
@@ -53,13 +47,12 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 // Display form
                 //
-                result = AdminUIController.getToolForm(core, s.text, ButtonCancel + "," + ButtonIISReset);
+                return AdminUIController.getToolForm(core, result_reset.text, ButtonCancel + "," + ButtonIISReset);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return string.Empty;
             }
-            return result;
         }
-        //
     }
 }
 

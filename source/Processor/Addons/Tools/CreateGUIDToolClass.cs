@@ -19,29 +19,23 @@ namespace Contensive.Processor.Addons.Tools {
             return get(((CPClass)cpBase).core);
         }
         //
-        //=============================================================================
-        // GUID Tools
-        //=============================================================================
-        //
         public static string get(CoreController core) {
-            string result = "";
             try {
-                string Button = null;
-                StringBuilderLegacyController s;
-                s = new StringBuilderLegacyController();
-                s.add(AdminUIController.getHeaderTitleDescription("Create GUID", "Use this tool to create a GUID. This is useful when creating new Addons."));
+                var result_guid = new StringBuilderLegacyController();
+                result_guid.add(AdminUIController.getHeaderTitleDescription("Create GUID", "Use this tool to create a GUID. This is useful when creating new Addons."));
                 //
                 // Process the form
-                Button = core.docProperties.getText("button");
+                string Button = core.docProperties.getText("button");
+                if (Button.Equals(ButtonCancel)) { return string.Empty; }
                 //
-                s.add(HtmlController.inputText_Legacy(core, "GUID", GenericController.getGUID(), 1, 80));
+                result_guid.add(HtmlController.inputText_Legacy(core, "GUID", GenericController.getGUID(), 1, 80));
                 //
                 // Display form
-                result = AdminUIController.getToolForm(core, s.text, ButtonCancel + "," + ButtonCreateGUId);
+                return AdminUIController.getToolForm(core, result_guid.text, ButtonCancel + "," + ButtonCreateGUId);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return string.Empty;
             }
-            return result;
         }
     }
 }

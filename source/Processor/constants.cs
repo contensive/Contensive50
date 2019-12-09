@@ -618,7 +618,7 @@ namespace Contensive.Processor {
         internal const string ButtonRegister = " Register ";
         internal const string ButtonBegin = "Begin";
         internal const string ButtonAbort = "Abort";
-        internal const string ButtonCreateGUId = " Create GUID ";
+        internal const string ButtonCreateGUId = " Create New GUID ";
         internal const string ButtonEnable = " Enable ";
         internal const string ButtonDisable = " Disable ";
         internal const string ButtonMarkReviewed = " Mark Reviewed ";
