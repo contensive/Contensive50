@@ -1573,7 +1573,7 @@ namespace Contensive.Processor.Controllers {
         /// model for simplest generic recorsd
         /// </summary>
         #region  IDisposable Support 
-        protected bool disposed = false;
+        protected bool disposed;
         //
         //==========================================================================================
         /// <summary>

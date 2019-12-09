@@ -29,7 +29,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ----- Debugging
         //
-        protected bool disposed = false;
+        protected bool disposed;
         //
         //========================================================================================================
         /// <summary>

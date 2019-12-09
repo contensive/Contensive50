@@ -2061,7 +2061,7 @@ namespace Contensive.Processor {
             }
             this.disposed = true;
         }
-        protected bool disposed = false;
+        protected bool disposed;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
         public void Dispose() {

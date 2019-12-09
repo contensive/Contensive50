@@ -12,7 +12,7 @@ namespace Contensive.Processor.Controllers {
         private const int ProcessTimerMsecPerTick = 5000;
         private bool ProcessTimerInProcess;
         public bool StartServiceInProgress;
-        protected bool disposed = false;
+        protected bool disposed;
         //
         //========================================================================================================
         /// <summary>

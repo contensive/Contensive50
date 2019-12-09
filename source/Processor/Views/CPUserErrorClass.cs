@@ -6,7 +6,7 @@ namespace Contensive.Processor {
     public class CPUserErrorClass : BaseClasses.CPUserErrorBaseClass, IDisposable {
         //
         private CPClass cp;
-        protected bool disposed = false;
+        protected bool disposed;
         //
         //====================================================================================================
         //

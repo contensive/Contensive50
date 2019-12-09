@@ -658,7 +658,7 @@ namespace Contensive.Processor {
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
         //====================================================================================================
         //
-        protected bool disposed = false;
+        protected bool disposed;
         //
         public void Dispose() {
             Dispose(true);

@@ -79,7 +79,7 @@ namespace Contensive.Processor.Controllers {
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
         //====================================================================================================
         //
-        protected bool disposed = false;
+        protected bool disposed;
         //
         public void Dispose() {
             // do not add code here. Use the Dispose(disposing) overload

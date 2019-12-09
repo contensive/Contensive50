@@ -330,7 +330,7 @@ namespace Contensive.Processor {
         ~CPEmailClass() {
             Dispose(false);
         }
-        protected bool disposed = false;
+        protected bool disposed;
         #endregion
     }
 

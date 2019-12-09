@@ -1934,7 +1934,7 @@ namespace Contensive.Processor.Controllers {
         //
         #region  IDisposable Support 
         //
-        protected bool disposed = false;
+        protected bool disposed;
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
                 if (disposing) {

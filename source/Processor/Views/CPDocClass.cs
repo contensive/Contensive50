@@ -389,7 +389,7 @@ namespace Contensive.Processor {
         ~CPDocClass() {
             Dispose(false);
         }
-        protected bool disposed = false;
+        protected bool disposed;
         //
         //====================================================================================================
         /// <summary>

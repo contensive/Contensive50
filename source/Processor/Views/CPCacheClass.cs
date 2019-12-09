@@ -250,7 +250,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         // dispose
         //
-        protected bool disposed = false;
+        protected bool disposed;
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
                 if (disposing) {

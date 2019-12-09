@@ -168,7 +168,7 @@ namespace Contensive.Processor {
             }
             this.disposed = true;
         }
-        protected bool disposed = false;
+        protected bool disposed;
         #endregion
     }
 }

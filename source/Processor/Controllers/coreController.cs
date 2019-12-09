@@ -761,7 +761,7 @@ namespace Contensive.Processor.Controllers {
 
         #region  IDisposable Support 
         //
-        protected bool disposed = false;
+        protected bool disposed;
         //====================================================================================================
         /// <summary>
         /// dispose.

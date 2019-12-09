@@ -66,7 +66,7 @@ namespace Contensive.Processor {
             this.disposed = true;
         }
         //
-        protected bool disposed = false;
+        protected bool disposed;
         public override void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);

@@ -11,7 +11,7 @@ namespace Contensive.Processor.Controllers {
         private int setHeight = 0;
         //
         // dispose
-        protected bool disposed = false;
+        protected bool disposed;
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
                 if (disposing) {

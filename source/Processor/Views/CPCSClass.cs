@@ -658,7 +658,7 @@ namespace Contensive.Processor {
         ~CPCSClass() {
             Dispose(false);
         }
-        protected bool disposed = false;
+        protected bool disposed;
         #endregion
     }
 

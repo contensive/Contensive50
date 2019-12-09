@@ -133,7 +133,7 @@ namespace Contensive.Processor.Controllers {
             return returnData;
         }
         #region  IDisposable Support 
-        protected bool disposed = false;
+        protected bool disposed;
         //
         //==========================================================================================
         /// <summary>
