@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Contensive.BaseClasses;
 using Contensive.BaseModels;
 using Contensive.Processor.Controllers;
@@ -24,18 +25,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string AdminHint(string innerHtml) {
-            if (cp.core.session.isEditing() || cp.core.session.user.admin || cp.core.session.user.developer) {
-                return ""
-                    + "<div class=\"ccHintWrapper\">"
-                        + "<div  class=\"ccHintWrapperContent\">"
-                        + "<b>Administrator</b>"
-                        + "<br>"
-                        + "<br>" + GenericController.encodeText(innerHtml) + "</div>"
-                    + "</div>";
-            }
-            return string.Empty;
-        }
+        public override string AdminHint(string innerHtml) => HtmlController.adminHint(cp.core, innerHtml);
         //
         // ====================================================================================================
         //
@@ -288,21 +278,21 @@ namespace Contensive.Processor {
         public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue, currentValue, "", htmlClass);
         public override string RadioBox(string htmlName, string htmlValue, string currentValue) => cp.core.html.inputRadio(htmlName, htmlValue, currentValue);
         //
-        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), htmlId, htmlClass);
-        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), "", htmlClass);
-        public override string RadioBox(string htmlName, int htmlValue, int currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString());
+        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), htmlId, htmlClass);
+        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), "", htmlClass);
+        public override string RadioBox(string htmlName, int htmlValue, int currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture));
         //
-        public override string RadioBox(string htmlName, double htmlValue, double currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), htmlId, htmlClass);
-        public override string RadioBox(string htmlName, double htmlValue, double currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(),"",htmlClass);
-        public override string RadioBox(string htmlName, double htmlValue, double currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString());
+        public override string RadioBox(string htmlName, double htmlValue, double currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), htmlId, htmlClass);
+        public override string RadioBox(string htmlName, double htmlValue, double currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture),"",htmlClass);
+        public override string RadioBox(string htmlName, double htmlValue, double currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture));
         //
-        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), htmlId, htmlClass);
-        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), "", htmlClass);
-        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString());
+        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), htmlId, htmlClass);
+        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), "", htmlClass);
+        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture));
         //
-        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), htmlId, htmlClass);
-        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), "", htmlClass);
-        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString());
+        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), htmlId, htmlClass);
+        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), "", htmlClass);
+        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture));
         //
         // ==========================================================================================
         //
@@ -332,19 +322,19 @@ namespace Contensive.Processor {
         //
         //
         public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass, string htmlId)
-            => SelectContent(htmlName, htmlValue.ToString(), contentName, sqlCriteria, noneCaption, htmlClass, htmlId);
+            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, sqlCriteria, noneCaption, htmlClass, htmlId);
         //
         public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass)
-            => SelectContent(htmlName, htmlValue.ToString(), contentName, sqlCriteria, noneCaption, htmlClass, "");
+            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, sqlCriteria, noneCaption, htmlClass, "");
         //
         public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption)
-            => SelectContent(htmlName, htmlValue.ToString(), contentName, sqlCriteria, noneCaption, "", "");
+            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, sqlCriteria, noneCaption, "", "");
         //
         public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria)
-            => SelectContent(htmlName, htmlValue.ToString(), contentName, sqlCriteria, "", "", "");
+            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, sqlCriteria, "", "", "");
         //
         public override string SelectContent(string htmlName, int htmlValue, string contentName)
-            => SelectContent(htmlName, htmlValue.ToString(), contentName, "", "", "", "");
+            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, "", "", "", "");
         //
         // ==========================================================================================
         //

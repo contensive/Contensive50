@@ -23,30 +23,15 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override void AddEvent(string htmlId, string domEvent, string javaScript) {
-            cp.core.html.javascriptAddEvent(htmlId, domEvent, javaScript);
-        }
+        public override void AddEvent(string htmlId, string domEvent, string javaScript) => cp.core.html.javascriptAddEvent(htmlId, domEvent, javaScript);
         //
         // ====================================================================================================
         //
-        public override string adminHint(string innerHtml) {
-            if (cp.core.session.isEditing() || cp.core.session.user.admin || cp.core.session.user.developer) {
-                return ""
-                    + "<div class=\"ccHintWrapper\">"
-                        + "<div  class=\"ccHintWrapperContent\">"
-                        + "<b>Administrator</b>"
-                        + "<br>"
-                        + "<br>" + GenericController.encodeText(innerHtml) + "</div>"
-                    + "</div>";
-            }
-            return string.Empty;
-        }
+        public override string adminHint(string innerHtml) => HtmlController.adminHint(cp.core, innerHtml);
         //
         // ====================================================================================================
         //
-        public override string Button(string htmlName, string htmlValue, string htmlClass, string htmlId) {
-            return HtmlController.inputSubmit(htmlValue, htmlName, htmlId, "", false, htmlClass);
-        }
+        public override string Button(string htmlName, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputSubmit(htmlValue, htmlName, htmlId, "", false, htmlClass);
         //
         public override string Button(string htmlName, string htmlValue, string htmlClass) => Button(htmlName, htmlValue, htmlClass, "");
         //
@@ -56,9 +41,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string CheckBox(string htmlName, bool htmlValue, string htmlClass, string htmlId) {
-            return HtmlController.checkbox(htmlName, htmlValue, htmlId, false, htmlClass);
-        }
+        public override string CheckBox(string htmlName, bool htmlValue, string htmlClass, string htmlId) => HtmlController.checkbox(htmlName, htmlValue, htmlId, false, htmlClass);
         //
         public override string CheckBox(string htmlName, bool htmlValue, string htmlClass) => CheckBox(htmlName, htmlValue, htmlClass, "");
         //

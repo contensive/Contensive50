@@ -3681,5 +3681,21 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
+
+        //
+        // ====================================================================================================
+        //
+        public static string adminHint(CoreController core, string innerHtml) {
+            if (core.session.isEditing() || core.session.user.admin || core.session.user.developer) {
+                return ""
+                    + "<div class=\"ccHintWrapper\">"
+                        + "<div  class=\"ccHintWrapperContent\">"
+                        + "<b>Administrator</b>"
+                        + "<br>"
+                        + "<br>" + GenericController.encodeText(innerHtml) + "</div>"
+                    + "</div>";
+            }
+            return string.Empty;
+        }
     }
 }
