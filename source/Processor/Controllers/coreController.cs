@@ -231,15 +231,15 @@ namespace Contensive.Processor.Controllers {
         //
         //===================================================================================================
         //
-        public DocPropertyController docProperties {
+        public DocPropertiesModel docProperties {
             get {
                 if (_docProperties == null) {
-                    _docProperties = new DocPropertyController(this);
+                    _docProperties = new DocPropertiesModel(this);
                 }
                 return _docProperties;
             }
         }
-        private DocPropertyController _docProperties = null;
+        private DocPropertiesModel _docProperties = null;
         //
         //===================================================================================================
         /// <summary>

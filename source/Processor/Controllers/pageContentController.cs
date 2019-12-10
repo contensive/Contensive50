@@ -322,14 +322,14 @@ namespace Contensive.Processor.Controllers {
                                 if (linkAliasList.Count > 0) {
                                     LinkAliasModel linkAlias = linkAliasList.First();
                                     string LinkQueryString = rnPageId + "=" + linkAlias.pageId + "&" + linkAlias.queryStringSuffix;
-                                    core.docProperties.setProperty(rnPageId, linkAlias.pageId, DocPropertiesModel.DocPropertyTypesEnum.userDefined);
+                                    core.docProperties.setProperty(rnPageId, linkAlias.pageId, DocPropertyModel.DocPropertyTypesEnum.userDefined);
                                     string[] nameValuePairs = linkAlias.queryStringSuffix.Split('&');
                                     foreach (string nameValuePair in nameValuePairs) {
                                         string[] nameValueThing = nameValuePair.Split('=');
                                         if (nameValueThing.GetUpperBound(0) == 0) {
-                                            core.docProperties.setProperty(nameValueThing[0], "", DocPropertiesModel.DocPropertyTypesEnum.userDefined);
+                                            core.docProperties.setProperty(nameValueThing[0], "", DocPropertyModel.DocPropertyTypesEnum.userDefined);
                                         } else {
-                                            core.docProperties.setProperty(nameValueThing[0], nameValueThing[1], DocPropertiesModel.DocPropertyTypesEnum.userDefined);
+                                            core.docProperties.setProperty(nameValueThing[0], nameValueThing[1], DocPropertyModel.DocPropertyTypesEnum.userDefined);
                                         }
                                     }
                                 }

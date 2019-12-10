@@ -1344,9 +1344,9 @@ namespace Contensive.Processor.Controllers {
                 string key = htmlTagName.ToLowerInvariant();
                 if (core.docProperties.containsKey(key)) {
                     var docProperty = core.docProperties.getProperty(key);
-                    if ((docProperty.propertyType == DocPropertiesModel.DocPropertyTypesEnum.file) && (docProperty.Name.ToLowerInvariant() == key)) {
+                    if ((docProperty.propertyType == DocPropertyModel.DocPropertyTypesEnum.file) && (docProperty.name.ToLowerInvariant() == key)) {
                         string dosPathFilename = FileController.normalizeDosPath(path);
-                        returnFilename = encodeDosFilename(docProperty.Value);
+                        returnFilename = encodeDosFilename(docProperty.value);
                         dosPathFilename += returnFilename;
                         deleteFile(dosPathFilename);
                         if (docProperty.tempfilename != "") {

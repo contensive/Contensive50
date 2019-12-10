@@ -165,8 +165,8 @@ namespace Contensive.Processor.Controllers {
                     returnResult += HtmlController.inputHidden("Type", FormTypeSendPassword);
                     foreach (string formKey in core.docProperties.getKeyList()) {
                         var formValue = core.docProperties.getProperty(formKey);
-                        if (formValue.propertyType == DocPropertiesModel.DocPropertyTypesEnum.form) {
-                            switch (GenericController.toUCase(formValue.Name)) {
+                        if (formValue.propertyType == DocPropertyModel.DocPropertyTypesEnum.form) {
+                            switch (GenericController.toUCase(formValue.name)) {
                                 case "S":
                                 case "MA":
                                 case "MB":
@@ -176,7 +176,7 @@ namespace Contensive.Processor.Controllers {
                                 case "TYPE":
                                     break;
                                 default:
-                                    returnResult = returnResult + HtmlController.inputHidden(formValue.Name, formValue.Value);
+                                    returnResult = returnResult + HtmlController.inputHidden(formValue.name, formValue.value);
                                     break;
                             }
                         }

@@ -723,11 +723,11 @@ namespace Contensive.Processor.Controllers {
                 Message += Environment.NewLine;
                 foreach (string key in core.docProperties.getKeyList()) {
                     var tempVar = core.docProperties.getProperty(key);
-                    if (tempVar.propertyType == DocPropertiesModel.DocPropertyTypesEnum.form) {
-                        if (GenericController.toUCase(tempVar.Value) == "ON") {
-                            Message += tempVar.Name + ": Yes\r\n\r\n";
+                    if (tempVar.propertyType == DocPropertyModel.DocPropertyTypesEnum.form) {
+                        if (GenericController.toUCase(tempVar.value) == "ON") {
+                            Message += tempVar.name + ": Yes\r\n\r\n";
                         } else {
-                            Message += tempVar.Name + ": " + tempVar.Value + Environment.NewLine + "\r\n";
+                            Message += tempVar.name + ": " + tempVar.value + Environment.NewLine + "\r\n";
                         }
                     }
                 }

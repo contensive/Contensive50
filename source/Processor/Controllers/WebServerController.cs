@@ -445,7 +445,7 @@ namespace Contensive.Processor.Controllers {
                         string key = nameValues.GetKey(i);
                         if (serverEnvironment.ContainsKey(key)) { serverEnvironment.Remove(key); }
                         serverEnvironment.Add(nameValues.GetKey(i), nameValues.Get(i));
-                        core.docProperties.setProperty(nameValues.GetKey(i), nameValues.Get(i), DocPropertiesModel.DocPropertyTypesEnum.serverVariable);
+                        core.docProperties.setProperty(nameValues.GetKey(i), nameValues.Get(i), DocPropertyModel.DocPropertyTypesEnum.serverVariable);
                     }
                 }
                 //
@@ -457,7 +457,7 @@ namespace Contensive.Processor.Controllers {
                         if (string.IsNullOrWhiteSpace(key)) continue;
                         if (requestHeaders.ContainsKey(key)) { requestForm.Remove(key); }
                         requestHeaders.Add(key, nameValues.Get(i));
-                        core.docProperties.setProperty(key, nameValues.Get(i), DocPropertiesModel.DocPropertyTypesEnum.header);
+                        core.docProperties.setProperty(key, nameValues.Get(i), DocPropertyModel.DocPropertyTypesEnum.header);
                     }
                 }
                 //
@@ -470,7 +470,7 @@ namespace Contensive.Processor.Controllers {
                             string keyValue = iisContext.Request.QueryString[key];
                             if (requestQuery.ContainsKey(key)) { requestQuery.Remove(key); }
                             requestQuery.Add(key, keyValue);
-                            core.docProperties.setProperty(key, keyValue, DocPropertiesModel.DocPropertyTypesEnum.queryString);
+                            core.docProperties.setProperty(key, keyValue, DocPropertyModel.DocPropertyTypesEnum.queryString);
                             requestQueryString = GenericController.modifyQueryString(requestQueryString, key, keyValue);
                         }
                     }
@@ -483,7 +483,7 @@ namespace Contensive.Processor.Controllers {
                         string keyValue = iisContext.Request.Form[key];
                         if (requestForm.ContainsKey(key)) { requestForm.Remove(key); }
                         requestForm.Add(key, keyValue);
-                        core.docProperties.setProperty(key, keyValue, DocPropertiesModel.DocPropertyTypesEnum.form);
+                        core.docProperties.setProperty(key, keyValue, DocPropertyModel.DocPropertyTypesEnum.form);
                     }
                 }
                 //
@@ -496,17 +496,17 @@ namespace Contensive.Processor.Controllers {
                         System.Web.HttpPostedFile file = iisContext.Request.Files[key];
                         if (file != null) {
                             if ((file.ContentLength > 0) && (!string.IsNullOrEmpty(file.FileName))) {
-                                DocPropertiesModel prop = new DocPropertiesModel {
-                                    Name = key,
-                                    Value = file.FileName,
-                                    NameValue = encodeRequestVariable(key) + "=" + encodeRequestVariable(file.FileName),
+                                DocPropertyModel prop = new DocPropertyModel {
+                                    name = key,
+                                    value = file.FileName,
+                                    nameValue = encodeRequestVariable(key) + "=" + encodeRequestVariable(file.FileName),
                                     tempfilename = instanceId + "-" + filePtr.ToString() + ".bin",
-                                    propertyType = DocPropertiesModel.DocPropertyTypesEnum.file
+                                    propertyType = DocPropertyModel.DocPropertyTypesEnum.file
                                 };
                                 core.tempFiles.verifyPath(core.tempFiles.localAbsRootPath);
                                 file.SaveAs(core.tempFiles.joinPath(core.tempFiles.localAbsRootPath, prop.tempfilename));
                                 core.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename);
-                                prop.FileSize = encodeInteger(file.ContentLength);
+                                prop.fileSize = encodeInteger(file.ContentLength);
                                 core.docProperties.setProperty(key, prop);
                                 filePtr += 1;
                             }
