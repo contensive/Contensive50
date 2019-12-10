@@ -183,7 +183,7 @@ namespace Contensive.CLI {
                         Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Update host file to add domain [127.0.0.1 " + appConfig.name + "].");
                         File.AppendAllText("c:\\windows\\system32\\drivers\\etc\\hosts", System.Environment.NewLine + "127.0.0.1\t" + appConfig.name);
                     } catch (Exception ex) {
-                        Console.Write("Error attempting to update local host file:" + ex.ToString());
+                        Console.Write("Error attempting to update local host file:" + ex);
                         Console.Write("Please manually add the following line to your host file (c:\\windows\\system32\\drivers\\etc\\hosts):" + "127.0.0.1\t" + appConfig.name);
                     }
                     //
@@ -198,15 +198,8 @@ namespace Contensive.CLI {
                     ////  - this is cc running, so they are setting up new application which may or may not have a webrole here.
                     ////  - setup a basic webrole just in case this will include one -- maybe later make it an option
                     ////
-                    //Contensive.Processor.Controllers.logController.logInfo(cp.core, "Copy default site to www folder.");
-                    //cp.core.programFiles.copyFolder("resources\\iisDefaultSite\\", "\\", cp.core.appRootFiles);
-                    //
-                    // replace "appConfig.name" with blank to use iis siteName as appConfig.name, or the name of this app in the default document in the apps public folder
-                    //
-                    //Contensive.Processor.Controllers.logController.logInfo(cp.core, "Update web.config.");
-                    //string defaultContent = cp.core.appRootFiles.readFileText("web.config");
-                    //defaultContent = defaultContent.Replace("{{appName}}", appConfig.name);
-                    //cp.core.appRootFiles.saveFile("web.config", defaultContent);
+                    // - Contensive.Processor.Controllers.logController.logInfo(cp.core, "Copy default site to www folder.");
+                    // - cp.core.programFiles.copyFolder("resources\\iisDefaultSite\\", "\\", cp.core.appRootFiles);
                 }
                 //
                 // initialize the new app, use the save authentication that was used to authorize this object
@@ -227,7 +220,7 @@ namespace Contensive.CLI {
                 }
                 //
             } catch (Exception ex) {
-                Console.WriteLine("Error: [" + ex.ToString() + "]");
+                Console.WriteLine("Error: [" + ex + "]");
             }
         }
         //

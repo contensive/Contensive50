@@ -57,7 +57,7 @@ namespace Contensive.CLI {
                 cpServer.core.serverConfig.apps.Remove( appName );
                 cpServer.core.serverConfig.save(cpServer.core);
             } catch (Exception ex) {
-                Console.WriteLine("Error: [" + ex.ToString() + "]");
+                Console.WriteLine("Error: [" + ex + "]");
             }
         }
     }

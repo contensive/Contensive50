@@ -83,20 +83,8 @@ namespace Contensive.CLI {
                 //
                 //
             } catch (Exception ex) {
-                Console.WriteLine("Error: [" + ex.ToString() + "]");
+                Console.WriteLine("Error: [" + ex + "]");
             }
         }
-        //
-        //private static void  uploadPath( CPClass cp, CPFileSystemBaseClass remoteFileSystem, CPFileSystemBaseClass localFileSystem, string sourcePath ) {
-        //    foreach (var folder in localFileSystem.FolderList(sourcePath)) {
-        //        uploadPath(cp, remoteFileSystem, localFileSystem, sourcePath  + folder.Name + "\\");                 
-        //    }
-        //    foreach ( var file in localFileSystem.FileList( sourcePath)) {
-        //        DateTime rightNow = DateTime.Now;
-        //        cp.TempFiles.Append("Upload" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0') + ".log", Environment.NewLine + "Copying local file [" + sourcePath + file.Name + "] to remote public files.");
-        //        Console.WriteLine("Copying local file [" + sourcePath + file.Name + "] to remote public files.");
-        //        remoteFileSystem.CopyLocalToRemote(sourcePath + file.Name );
-        //    }
-        //}
     }
 }

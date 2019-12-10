@@ -81,7 +81,7 @@ namespace Contensive.CLI {
                     }
                 }
             } catch (Exception ex) {
-                Console.WriteLine("Error: [" + ex.ToString() + "]");
+                Console.WriteLine("Error: [" + ex + "]");
             }
         }
     }

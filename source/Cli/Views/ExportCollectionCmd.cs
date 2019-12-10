@@ -32,7 +32,7 @@ namespace Contensive.CLI {
                 //
                 throw new NotImplementedException(); 
             } catch (Exception ex) {
-                Console.WriteLine("Error: [" + ex.ToString() + "]");
+                Console.WriteLine("Error: [" + ex + "]");
             }
         }
         //

@@ -43,7 +43,7 @@ namespace Contensive.CLI {
                     installCollectionFile(appName, collectionPhysicalPathFilename);
                 }
             } catch (Exception ex) {
-                Console.WriteLine("Error: [" + ex.ToString() + "]");
+                Console.WriteLine("Error: [" + ex + "]");
             }
         }
         //

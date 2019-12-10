@@ -2,6 +2,7 @@
 using System;
 using Contensive.Processor;
 using Amazon;
+using System.Text;
 
 namespace Contensive.CLI {
     static class ConfigureCmd {
@@ -10,7 +11,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static readonly string  helpText = ""
+        internal static readonly string helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--configure"
             + Environment.NewLine + "    setup or review server configuration (Sql, cache, filesystem, etc)";
@@ -47,7 +48,7 @@ namespace Contensive.CLI {
                         Console.WriteLine("\n\nLocal File System Mode (vs Remote File System).");
                         Console.WriteLine("Local File System stores content files on the webserver. Remote File System store content in an Amazon AWS S3 bucket, using the webserver to cache files for read and write.");
                         String prompt = "Local File System (y/n)?";
-                        String defaultValue =  (cp.core.serverConfig.isLocalFileSystem) ? "y" : "n";
+                        String defaultValue = (cp.core.serverConfig.isLocalFileSystem) ? "y" : "n";
                         cp.core.serverConfig.isLocalFileSystem = Equals(GenericController.promptForReply(prompt, defaultValue).ToLowerInvariant(), "y");
                     }
                     //
@@ -55,8 +56,8 @@ namespace Contensive.CLI {
                     {
                         Console.WriteLine("\n\nFile Storage Location.");
                         Console.WriteLine("The local system is required for both local and remote file system modes.");
-                        if (string.IsNullOrEmpty(cp.core.serverConfig.localDataDriveLetter)) cp.core.serverConfig.localDataDriveLetter = "d";
-                        if (!(new System.IO.DriveInfo(cp.core.serverConfig.localDataDriveLetter).IsReady)) cp.core.serverConfig.localDataDriveLetter = "c";
+                        if (string.IsNullOrEmpty(cp.core.serverConfig.localDataDriveLetter)) { cp.core.serverConfig.localDataDriveLetter = "d"; }
+                        if (!(new System.IO.DriveInfo(cp.core.serverConfig.localDataDriveLetter).IsReady)) { cp.core.serverConfig.localDataDriveLetter = "c"; }
                         cp.core.serverConfig.localDataDriveLetter = GenericController.promptForReply("Enter the Drive letter for data storage (c/d/etc)?", cp.core.serverConfig.localDataDriveLetter);
                     }
                     //
@@ -77,13 +78,12 @@ namespace Contensive.CLI {
                     {
                         Console.WriteLine("\n\nAWS Region.");
                         Console.WriteLine("Configure the AWS region for this server. The region is used for remote files and cloudwatch logging.");
-                        string regionList = "";
+                        var regionList = new StringBuilder();
                         foreach (var region in RegionEndpoint.EnumerableAllRegions) {
-                            regionList += "," + region.SystemName;
+                            regionList.Append(region.SystemName);
                         }
-                        regionList = regionList.Substring(1);
                         do {
-                            string selectedRegion = GenericController.promptForReply("Enter the AWS region (" + regionList + ")", cp.core.serverConfig.awsRegionName).ToLowerInvariant();
+                            string selectedRegion = GenericController.promptForReply("Enter the AWS region (" + regionList.ToString() + ")", cp.core.serverConfig.awsRegionName).ToLowerInvariant();
                             cp.core.serverConfig.awsRegionName = "";
                             foreach (var region in RegionEndpoint.EnumerableAllRegions) {
                                 if (selectedRegion == region.SystemName.ToLowerInvariant()) {
@@ -111,9 +111,9 @@ namespace Contensive.CLI {
                         Console.WriteLine("\n\nCloudwatch Logging.");
                         Console.WriteLine("If enabled, logging will be sent to Amazon AWS Cloudwatch. You will be prompted for a LogGroup. The AWS Credentials must include a policy for Service: 'CloudWatch Logs', Actions: List-DescribeLogGroups, List-DescribeLogStreams, Write-CreateLogCroup, Write-CreateLogStream, Write-PutLogEvents.");
                         String prompt = "Enable CloudWatch Logging (y/n)?";
-                        String defaultValue = (string.IsNullOrWhiteSpace( cp.core.serverConfig.awsCloudWatchLogGroup)) ? "n" : "y";
+                        String defaultValue = (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsCloudWatchLogGroup)) ? "n" : "y";
                         string enableCW = GenericController.promptForReply(prompt, defaultValue);
-                        if (enableCW.ToLower()!="y") {
+                        if (enableCW.ToLowerInvariant() != "y") {
                             cp.core.serverConfig.awsCloudWatchLogGroup = "";
                         } else {
                             prompt = "AWS CloudWatch LogGroup. Leave Blank to disable";
@@ -129,9 +129,9 @@ namespace Contensive.CLI {
                     {
                         Console.WriteLine("\n\nSql Server endpoint.");
                         Console.WriteLine("Sql Server endpoint or endpoint:port. Use endpoint '(local)' for Sql Server on this machine:");
-                        if (!String.IsNullOrEmpty(cp.core.serverConfig.defaultDataSourceAddress)) Console.Write("(" + cp.core.serverConfig.defaultDataSourceAddress + ")");
+                        if (!String.IsNullOrEmpty(cp.core.serverConfig.defaultDataSourceAddress)) { Console.Write("(" + cp.core.serverConfig.defaultDataSourceAddress + ")"); }
                         string reply = Console.ReadLine();
-                        if (String.IsNullOrEmpty(reply)) reply = cp.core.serverConfig.defaultDataSourceAddress;
+                        if (String.IsNullOrEmpty(reply)) { reply = cp.core.serverConfig.defaultDataSourceAddress; }
                         cp.core.serverConfig.defaultDataSourceAddress = reply;
                     }
                     //
@@ -151,14 +151,9 @@ namespace Contensive.CLI {
                         do {
                             Console.WriteLine("\n\nCache Service.");
                             Console.WriteLine("The server requires a caching service. You can choose either the systems local memory or an AWS Elasticache (memCacheD).");
-
                             string prompt = "(l)ocal cache or (m)emcached server";
                             reply = GenericController.promptForReply(prompt, defaultCacheValue);
-
-                            //Console.WriteLine("Use (l)ocal cache or (m)emcached server?");
-                            //Console.Write("(" + defaultCacheValue + ")");
-                            //reply = Console.ReadLine().ToLowerInvariant();
-                            if (String.IsNullOrEmpty(reply)) reply = defaultCacheValue;
+                            if (String.IsNullOrEmpty(reply)) { reply = defaultCacheValue; }
                         } while ((reply != "l") && (reply != "m"));
                         if ((reply == "l")) {
                             //
@@ -166,7 +161,6 @@ namespace Contensive.CLI {
                             cp.core.serverConfig.enableLocalFileCache = false;
                             cp.core.serverConfig.enableLocalMemoryCache = true;
                             cp.core.serverConfig.enableRemoteCache = false;
-                            //cp.core.serverConfig.awsElastiCacheConfigurationEndpoint = "";
                         } else {
                             //
                             // -- remote mcached cache
@@ -176,9 +170,9 @@ namespace Contensive.CLI {
                             do {
                                 Console.WriteLine("\n\nRemote Cache Service.");
                                 Console.WriteLine("Enter the ElasticCache Configuration Endpoint (server:port):");
-                                if (!String.IsNullOrEmpty(cp.core.serverConfig.awsElastiCacheConfigurationEndpoint)) Console.Write("(" + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint + ")");
+                                if (!String.IsNullOrEmpty(cp.core.serverConfig.awsElastiCacheConfigurationEndpoint)) { Console.Write("(" + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint + ")"); }
                                 reply = Console.ReadLine();
-                                if (String.IsNullOrEmpty(reply)) reply = cp.core.serverConfig.awsElastiCacheConfigurationEndpoint;
+                                if (String.IsNullOrEmpty(reply)) { reply = cp.core.serverConfig.awsElastiCacheConfigurationEndpoint; }
                                 cp.core.serverConfig.awsElastiCacheConfigurationEndpoint = reply;
                             } while (string.IsNullOrEmpty(reply));
                             //
@@ -201,7 +195,7 @@ namespace Contensive.CLI {
                     cp.core.serverConfig.save(cp.core);
                 }
             } catch (Exception ex) {
-                Console.WriteLine("Error: [" + ex.ToString() + "]");
+                Console.WriteLine("Error: [" + ex + "]");
             }
         }
     }

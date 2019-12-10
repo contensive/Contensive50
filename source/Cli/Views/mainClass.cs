@@ -225,7 +225,7 @@ namespace Contensive.CLI {
                     }
                 };
             } catch (Exception ex) {
-                Console.WriteLine("There was an error that forced the program to close. Details follow.\n\n" + ex.ToString());
+                Console.WriteLine("There was an error that forced the program to close. Details follow.\n\n" + ex);
             }
         }
         /// <summary>
