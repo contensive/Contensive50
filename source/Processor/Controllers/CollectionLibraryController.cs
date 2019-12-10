@@ -264,16 +264,5 @@ namespace Contensive.Processor.Controllers {
             }
             return UpgradeOK;
         }
-        //
-        //======================================================================================================
-        /// <summary>
-        /// log the contextLog stack
-        /// ContextLog stack is a tool to trace the collection installation to trace recursion
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="contextLog"></param>
-        private static void traceContextLog(CoreController core, Stack<string> contextLog) {
-            logger.Log(LogLevel.Info, LogController.getMessageLine(core, string.Join(",", contextLog)));
-        }
     }
 }
