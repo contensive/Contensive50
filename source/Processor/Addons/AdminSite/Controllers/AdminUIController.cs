@@ -751,7 +751,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
             if (editDate < new DateTime(1990, 1, 1)) {
                 return "unknown date";
             }
-            string result = editDate.ToString() + ", by ";
+            string result = editDate.ToString( CultureInfo.InvariantCulture ) + ", by ";
             if (editor == null) {
                 result += "unknown user";
             } else {

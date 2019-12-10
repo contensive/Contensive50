@@ -580,11 +580,11 @@ namespace Contensive.Processor.Controllers {
                 result += getHtmlBody_ContentBox_Content(core);
                 //
                 // -- If Link field populated, do redirect
-                if (core.doc.pageController.page.pageLink != "") {
+                if (core.doc.pageController.page.link != "") {
                     core.doc.pageController.page.clicks += 1;
                     core.doc.pageController.page.save(core.cpParent);
-                    core.doc.redirectLink = core.doc.pageController.page.pageLink;
-                    core.doc.redirectReason = "Redirect required because this page (PageRecordID=" + core.doc.pageController.page.id + ") has a Link Override [" + core.doc.pageController.page.pageLink + "].";
+                    core.doc.redirectLink = core.doc.pageController.page.link;
+                    core.doc.redirectReason = "Redirect required because this page [# " + core.doc.pageController.page.id + "] has a menu link override [" + core.doc.pageController.page.link + "].";
                     core.doc.redirectBecausePageNotFound = false;
                     return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
                 }

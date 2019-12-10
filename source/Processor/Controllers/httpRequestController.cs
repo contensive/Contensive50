@@ -20,11 +20,12 @@ namespace Contensive.Processor.Controllers {
         private string privateRequestCookie;
         private readonly int privateRequestTimeoutMsec;
         private string privateResponseFilename;
-        private readonly string privateResponseProtocol = "HTTP/1.1"; // had to fake bc webClient removes first line of header
+        //
+        // had to fake bc webClient removes first line of header
+        private readonly string privateResponseProtocol = "HTTP/1.1"; 
         private string privateResponseStatusDescription;
         private int privateResponseStatusCode;
         private WebHeaderCollection privateResponseHeaders = new System.Net.WebHeaderCollection();
-        private int privateResponseLength = 0;
         private readonly string privateSocketResponse = "";
         //
         //======================================================================================
@@ -81,16 +82,11 @@ namespace Contensive.Processor.Controllers {
                 //
                 privateRequestHeaders = http.Headers;
                 privateResponseHeaders = new System.Net.WebHeaderCollection();
-                privateResponseLength = 0;
                 try {
                     http.DownloadFile(URL, privateResponseFilename);
                     privateResponseStatusCode = 200;
                     privateResponseStatusDescription = HttpStatusCode.OK.ToString();
                     privateResponseHeaders = http.ResponseHeaders;
-                    privateResponseLength = 0;
-                    if (File.Exists(privateResponseFilename)) {
-                        privateResponseLength = (int)((new FileInfo(privateResponseFilename)).Length);
-                    }
                 } catch {
                     //
                     //
@@ -98,7 +94,6 @@ namespace Contensive.Processor.Controllers {
                     privateResponseStatusCode = 0;
                     privateResponseStatusDescription = "";
                     privateResponseHeaders = new System.Net.WebHeaderCollection();
-                    privateResponseLength = 0;
                     throw;
                 }
             } catch (Exception ex) {
@@ -134,16 +129,13 @@ namespace Contensive.Processor.Controllers {
                 //
                 privateRequestHeaders = http.Headers;
                 privateResponseHeaders = new System.Net.WebHeaderCollection();
-                privateResponseLength = 0;
                 privateResponseStatusCode = 0;
                 privateResponseStatusDescription = "";
-                privateResponseLength = 0;
                 try {
                     returnString = http.DownloadString(URL);
                     privateResponseStatusCode = 200;
                     privateResponseStatusDescription = HttpStatusCode.OK.ToString();
                     privateResponseHeaders = http.ResponseHeaders;
-                    privateResponseLength = returnString.Length;
                 } catch {
                     //
                     //

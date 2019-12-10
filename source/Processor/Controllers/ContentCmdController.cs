@@ -341,7 +341,6 @@ namespace Contensive.Processor.Controllers {
                 string CmdAccumulator = "";
                 if (!string.IsNullOrEmpty(cmdSrc)) {
                     Dictionary<string, object>.KeyCollection dictionaryKeys = null;
-                    string Key = null;
                     object itemObject = null;
                     object itemVariant = null;
                     Dictionary<string, object> cmdObject = null;

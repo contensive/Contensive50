@@ -6,7 +6,6 @@ using Contensive.Processor.Controllers;
 namespace Contensive.Processor {
     public class CPFileSystemClass : BaseClasses.CPFileSystemBaseClass, IDisposable {
         //
-        private Contensive.Processor.Controllers.CoreController core;
         /// <summary>
         /// The instance of the controller used to implement this instance. Either core.TempFiles, core.wwwFiles, core.cdnFiles, or core.appRootFiles
         /// </summary>
@@ -18,7 +17,6 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="core"></param>
         public CPFileSystemClass(CPClass cp, FileController fileSystemController) {
-            core = cp.core;
             this.fileSystemController = fileSystemController;
         }
         //

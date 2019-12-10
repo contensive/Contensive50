@@ -58,7 +58,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- send email
                     try {
-                        LogController.logInfo(core, "sendSmtp, to [" + email.toAddress + "], from [" + email.fromAddress + "], subject [" + email.subject + "], BounceAddress [" + email.BounceAddress + "], replyTo [" + email.replyToAddress + "]");
+                        LogController.logInfo(core, "sendSmtp, to [" + email.toAddress + "], from [" + email.fromAddress + "], subject [" + email.subject + "], BounceAddress [" + email.bounceAddress + "], replyTo [" + email.replyToAddress + "]");
                         client.Send(mailMessage);
                         status = true;
                     } catch (Exception ex) {

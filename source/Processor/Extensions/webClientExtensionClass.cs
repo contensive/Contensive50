@@ -7,11 +7,9 @@ using System.Collections.Generic;
 public class WebClientExt : WebClient {
     private string privateUsername;
     private string privatePassword;
-    private int cookieCnt = 0;
     //
     public void addCookie(string cookieName, string cookieValue) {
         cookieContainer.Add(new Cookie(cookieName, cookieValue, "/"));
-        cookieCnt += 1;
     }
     //
     public string username {

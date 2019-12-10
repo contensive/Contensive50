@@ -1115,10 +1115,8 @@ namespace Contensive.Processor.Controllers {
                     if (core.doc.contentIsEditingList.Contains(cacheTestName)) { return true; }
                     if (core.doc.contentNotEditingList.Contains(cacheTestName)) { return false; }
                     if (core.visitProperty.getBoolean("AllowEditing") || core.visitProperty.getBoolean("AllowAdvancedEditor")) {
-                        if (!string.IsNullOrEmpty(contentNameOrId)) {
-                            if (contentNameOrId.isNumeric()) {
-                                contentNameOrId = MetadataController.getContentNameByID(core, encodeInteger(contentNameOrId));
-                            }
+                        if (contentNameOrId.isNumeric()) {
+                            contentNameOrId = MetadataController.getContentNameByID(core, encodeInteger(contentNameOrId));
                         }
                         result = isAuthenticatedContentManager(contentNameOrId);
                     }

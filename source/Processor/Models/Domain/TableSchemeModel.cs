@@ -99,7 +99,7 @@ namespace Contensive.Processor.Models.Domain {
                                 core.tableSchemaDictionary.Remove(lowerTablename);
                             } else if (isInDb && (!isInCache)) {
                                 core.tableSchemaDictionary.Add(lowerTablename, tableSchema);
-                            } else if (isInDb && isInCache) {
+                            } else {
                                 core.tableSchemaDictionary[lowerTablename] = tableSchema;
                             }
                         }

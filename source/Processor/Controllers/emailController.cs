@@ -175,7 +175,7 @@ namespace Contensive.Processor.Controllers {
                     string textBody = encodeEmailTextBody(core, isHTML, body, null);
                     queueEmail(core, isImmediate, emailContextMessage, new EmailClass {
                         attempts = 0,
-                        BounceAddress = bounceAddress,
+                        bounceAddress = bounceAddress,
                         fromAddress = fromAddress,
                         htmlBody = htmlBody,
                         replyToAddress = replyToAddress,
@@ -271,7 +271,7 @@ namespace Contensive.Processor.Controllers {
                     recipientName = recipientName.Trim();
                     var email = new EmailClass {
                         attempts = 0,
-                        BounceAddress = bounceAddress,
+                        bounceAddress = bounceAddress,
                         emailId = emailId,
                         fromAddress = fromAddress,
                         htmlBody = htmlBody,
@@ -1096,16 +1096,16 @@ namespace Contensive.Processor.Controllers {
         /// object for email queue serialization
         /// </summary>
         public class EmailClass {
-            public int toMemberId;
-            public string toAddress;
-            public string fromAddress;
-            public string BounceAddress;
-            public string replyToAddress;
-            public string subject;
-            public string textBody;
-            public string htmlBody;
-            public int attempts;
-            public int emailId;
+            public int toMemberId { get; set; }
+            public string toAddress { get; set; }
+            public string fromAddress { get; set; }
+            public string bounceAddress { get; set; }
+            public string replyToAddress { get; set; }
+            public string subject { get; set; }
+            public string textBody { get; set; }
+            public string htmlBody { get; set; }
+            public int attempts { get; set; }
+            public int emailId { get; set; }
         }
     }
 }

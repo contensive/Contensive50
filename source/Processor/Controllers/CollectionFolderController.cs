@@ -158,7 +158,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 //
                                 CollectionVersionFolderName = verifyCollectionVersionFolderName(core, collectionGuid, Collectionname);
-                                string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + CollectionVersionFolderName;
+                                string CollectionVersionFolder = AddonController.getPrivateFilesAddonPath() + CollectionVersionFolderName;
                                 //
                                 core.privateFiles.copyFolder(tmpInstallPath, CollectionVersionFolder);
                                 //
@@ -389,7 +389,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 //
                 // -- Save the result
-                string LocalFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
+                string LocalFilename = AddonController.getPrivateFilesAddonPath() + "Collections.xml";
                 core.privateFiles.saveFile(LocalFilename, Doc.OuterXml);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -442,7 +442,7 @@ namespace Contensive.Processor.Controllers {
                 CollectionFolderName = CollectionName + "_" + CollectionFolderName;
                 CollectionFolderName = CollectionFolderName.ToLowerInvariant();
             }
-            string CollectionFolder = core.addon.getPrivateFilesAddonPath() + CollectionFolderName + "\\";
+            string CollectionFolder = AddonController.getPrivateFilesAddonPath() + CollectionFolderName + "\\";
             core.privateFiles.verifyPath(CollectionFolder);
             //
             // create a collection 'version' folder for these new files
@@ -477,7 +477,7 @@ namespace Contensive.Processor.Controllers {
             }
             TimeStamp += NowPart.ToString();
             CollectionVersionFolderName = CollectionFolderName + "\\" + TimeStamp;
-            string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + CollectionVersionFolderName;
+            string CollectionVersionFolder = AddonController.getPrivateFilesAddonPath() + CollectionVersionFolderName;
             string CollectionVersionPath = CollectionVersionFolder + "\\";
             core.privateFiles.createPath(CollectionVersionPath);
             return CollectionVersionFolderName;

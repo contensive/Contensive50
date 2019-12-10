@@ -15,7 +15,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public static bool send(CoreController core, EmailController.EmailClass email, ref string reasonForFail, string awsAccessKeyId, string awsSecretAccessKey) {
             string logShortDetail = ", subject [" + email.subject + "], toMemberId [" + email.toMemberId + "], toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "]";
-            string logLongDetail = logShortDetail + ", BounceAddress [" + email.BounceAddress + "], replyToAddress [" + email.replyToAddress + "]";
+            string logLongDetail = logShortDetail + ", BounceAddress [" + email.bounceAddress + "], replyToAddress [" + email.replyToAddress + "]";
             reasonForFail = "";
             try {
                 if (core.mockEmail) {

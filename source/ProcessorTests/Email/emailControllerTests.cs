@@ -61,7 +61,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 Assert.IsTrue(string.IsNullOrEmpty(sentEmail.AttachmentFilename));
                 Assert.AreEqual("to@kma.net", getEmailPart(sentEmail.email.toAddress));
                 Assert.AreEqual("from@kma.net", getEmailPart(sentEmail.email.fromAddress));
-                Assert.AreEqual("bounce@kma.net", getEmailPart(sentEmail.email.BounceAddress));
+                Assert.AreEqual("bounce@kma.net", getEmailPart(sentEmail.email.bounceAddress));
                 Assert.AreEqual("replyTo@kma.net", getEmailPart(sentEmail.email.replyToAddress));
                 Assert.AreEqual("subject", sentEmail.email.subject);
                 Assert.AreEqual(body, sentEmail.email.textBody);
@@ -91,7 +91,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 Assert.IsTrue(string.IsNullOrEmpty(sentEmail.AttachmentFilename));
                 Assert.AreEqual(toPerson.email, getEmailPart(sentEmail.email.toAddress));
                 Assert.AreEqual("from@kma.net", getEmailPart(sentEmail.email.fromAddress));
-                Assert.AreEqual("bounce@kma.net", getEmailPart(sentEmail.email.BounceAddress));
+                Assert.AreEqual("bounce@kma.net", getEmailPart(sentEmail.email.bounceAddress));
                 Assert.AreEqual("replyTo@kma.net", getEmailPart(sentEmail.email.replyToAddress));
                 Assert.AreEqual("subject", sentEmail.email.subject);
                 Assert.AreEqual(body, sentEmail.email.textBody);
@@ -168,7 +168,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                     Assert.AreEqual(systemEmail.fromAddress, getEmailPart(sentEmail.email.fromAddress));
                     Assert.AreNotEqual(-1, sentEmail.email.htmlBody.IndexOf(htmlBody));
                     Assert.IsTrue(string.IsNullOrEmpty(sentEmail.AttachmentFilename));
-                    Assert.AreEqual("", getEmailPart(sentEmail.email.BounceAddress));
+                    Assert.AreEqual("", getEmailPart(sentEmail.email.bounceAddress));
                     Assert.AreEqual("", getEmailPart(sentEmail.email.replyToAddress));
                 }
                 {
@@ -180,7 +180,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                     Assert.AreEqual(systemEmail.fromAddress, getEmailPart(sentEmail.email.fromAddress));
                     Assert.AreEqual(systemEmail.subject, sentEmail.email.subject);
                     Assert.AreNotEqual(-1, sentEmail.email.htmlBody.IndexOf(htmlBody));
-                    Assert.AreEqual("", getEmailPart(sentEmail.email.BounceAddress));
+                    Assert.AreEqual("", getEmailPart(sentEmail.email.bounceAddress));
                     Assert.AreEqual("", getEmailPart(sentEmail.email.replyToAddress));
                 }
             }

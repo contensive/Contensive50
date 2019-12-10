@@ -1009,19 +1009,13 @@
     <Field Name="Clicks" active="1" AdminOnly="0" Authorable="1" Caption="Menu Link Override Clicks" DeveloperOnly="0" EditSortPriority="1090" FieldType="Integer" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="1" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="0" RSSTitle="" RSSDescription="" MemberSelectGroup="" EditTab="Navigation" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="">
       <HelpDefault><![CDATA[The number of clicks to navigation entries controlled by this page.]]></HelpDefault>
     </Field>
-    <Field Name="ChildPagesFound" active="1" AdminOnly="0" Authorable="1" Caption="Child Pages Found" DeveloperOnly="1" EditSortPriority="1120" FieldType="Boolean" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="1" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="1" RSSTitle="" RSSDescription="" MemberSelectGroup="" EditTab="Navigation" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="">
-      <HelpDefault><![CDATA[Internal Use. This check indicates that this page likely includes child pages.]]></HelpDefault>
-    </Field>
-    <Field Name="ChildListInstanceOptions" active="1" AdminOnly="0" Authorable="1" Caption="Child List Option String" DeveloperOnly="1" EditSortPriority="1130" FieldType="text" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroup="" EditTab="Navigation" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="">
-      <HelpDefault><![CDATA[ ]]></HelpDefault>
-    </Field>
-    <Field Name="PageLink" active="1" AdminOnly="0" Authorable="1" Caption="Page Link" DeveloperOnly="0" EditSortPriority="1140" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="1" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroup="" EditTab="Navigation" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="">
-      <HelpDefault><![CDATA[ ]]></HelpDefault>
-    </Field>
     <Field Name="menuClass" active="1" AdminOnly="0" Authorable="1" Caption="Menu class" DeveloperOnly="0" EditSortPriority="1150" FieldType="Text" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroup="" EditTab="Navigation" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
       <HelpDefault><![CDATA[Optional. For design only. When included, this text will be added as a class to the list item (generally a LI html element) created for this page.]]></HelpDefault>
     </Field>
-    
+    <Field Name="ChildPagesFound" active="1" AdminOnly="0" Authorable="0" Caption="Child Pages Found" DeveloperOnly="1" EditSortPriority="1120" FieldType="Boolean" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="1" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="1" RSSTitle="" RSSDescription="" MemberSelectGroup="" EditTab="Navigation" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="">
+      <HelpDefault><![CDATA[Internal Use. This check indicates that this page likely includes child pages.]]></HelpDefault>
+    </Field>
+
     <!-- Blocking Tab -->
     <Field Name="AllowMetaContentNoFollow" active="1" AdminOnly="0" Authorable="1" Caption="Block Search Engine Robots" DeveloperOnly="0" EditSortPriority="4010" FieldType="Boolean" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="0" RSSTitle="" RSSDescription="" MemberSelectGroup="" EditTab="Blocking" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="">
       <HelpDefault><![CDATA[When checked, this page will include meta data telling search engines not to index this page or links it contains.]]></HelpDefault>
@@ -1082,6 +1076,14 @@
       <HelpDefault><![CDATA[ ]]></HelpDefault>
     </Field>
     <Field Name="JSEndBody" active="1" AdminOnly="0" Authorable="1" Caption="Before End of Body (Legacy)" DeveloperOnly="1" EditSortPriority="9999" FieldType="LongText" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroup="" EditTab="Legacy" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="">
+      <HelpDefault><![CDATA[ ]]></HelpDefault>
+    </Field>
+    
+    <!-- deprecated -->
+    <Field Name="ChildListInstanceOptions" active="1" AdminOnly="0" Authorable="0" Caption="Child List Option String" DeveloperOnly="1" EditSortPriority="1130" FieldType="text" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroup="" EditTab="Navigation" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="">
+      <HelpDefault><![CDATA[ ]]></HelpDefault>
+    </Field>
+    <Field Name="PageLink" active="1" AdminOnly="0" Authorable="0" Caption="Page Link" DeveloperOnly="0" EditSortPriority="1140" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="1" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroup="" EditTab="Navigation" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="">
       <HelpDefault><![CDATA[ ]]></HelpDefault>
     </Field>
   </CDef>

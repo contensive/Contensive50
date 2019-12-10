@@ -92,7 +92,7 @@ namespace Contensive.Processor.Controllers {
         internal Dictionary<string, int> _contentNameIdDictionary = null;
         //
         // -- assembly files to skip
-        public List<string> assemblyList_NonAddonsInstalled = new List<string> {
+        public readonly List<string> assemblyList_NonAddonsInstalled = new List<string> {
             "\\cpbase.dll",
             "\\awssdk.core.dll",
             "\\awssdk.s3.dll",
@@ -126,7 +126,7 @@ namespace Contensive.Processor.Controllers {
                 if (_assemblyFileDict != null) { return _assemblyFileDict; }
                 //
                 // -- if remote-mode collections.xml file is updated, invalidate cache
-                if (!privateFiles.localFileStale(addon.getPrivateFilesAddonPath() + "Collections.xml")){
+                if (!privateFiles.localFileStale(AddonController.getPrivateFilesAddonPath() + "Collections.xml")){
                     _assemblyFileDict = cache.getObject<Dictionary<string, AssemblyFileDetails>>(AssemblyFileDictCacheName);
                 }
                 if (_assemblyFileDict == null) {

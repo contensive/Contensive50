@@ -21,7 +21,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 XmlDocument Doc = new XmlDocument();
                 string hint = "";
                 try {
-                    string collectionFileFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
+                    string collectionFileFilename = AddonController.getPrivateFilesAddonPath() + "Collections.xml";
                     string collectionFileContent = core.privateFiles.readFileText(collectionFileFilename);
                     Doc.LoadXml(collectionFileContent);
                 } catch (Exception) {
@@ -92,7 +92,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                         //
                                     } else {
                                         CollectionRootPath = CollectionRootPath.left(Pos - 1);
-                                        string Path = core.addon.getPrivateFilesAddonPath() + CollectionRootPath + "\\";
+                                        string Path = AddonController.getPrivateFilesAddonPath() + CollectionRootPath + "\\";
                                         List<FolderDetail> folderList = new List<FolderDetail>();
                                         if (core.privateFiles.pathExists(Path)) {
                                             folderList = core.privateFiles.getFolderList(Path);

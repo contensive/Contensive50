@@ -98,27 +98,25 @@ namespace Contensive.Processor.Controllers {
                     + cr2 + "<td class=\"qeRow qeRight\">" + HtmlController.inputText_Legacy(core, "name", core.doc.pageController.page.name, 1, 0, "", false, !userContentPermissions.allowSave) + "</td>"
                     + "\r</tr>"
                     + "";
-                string PageList = null;
+                string pageList = "&nbsp;(there are no parent pages)";
                 //
                 // ----- Parent pages
                 //
-                if (core.doc.pageController.pageToRootList.Count == 1) {
-                    PageList = "&nbsp;(there are no parent pages)";
-                } else {
-                    PageList = "<ul class=\"qeListUL\"><li class=\"qeListLI\">Current Page</li></ul>";
+                if (core.doc.pageController.pageToRootList.Count > 1) {
+                    pageList = "<ul class=\"qeListUL\"><li class=\"qeListLI\">Current Page</li></ul>";
                     foreach (PageContentModel testPage in Enumerable.Reverse(core.doc.pageController.pageToRootList)) {
-                        string Link = testPage.name;
-                        if (string.IsNullOrEmpty(Link)) {
-                            Link = "no name #" + GenericController.encodeText(testPage.id);
+                        string pageCaption = testPage.name;
+                        if (string.IsNullOrEmpty(pageCaption)) {
+                            pageCaption = "no name #" + GenericController.encodeText(testPage.id);
                         }
-                        Link = "<a href=\"" + testPage.pageLink + "\">" + Link + "</a>";
-                        PageList = "<ul class=\"qeListUL\"><li class=\"qeListLI\">" + Link + PageList + "</li></ul>";
+                        pageCaption = "<a href=\"" + PageContentController.getPageLink(core, testPage.id, "")  + "\">" + pageCaption + "</a>";
+                        pageList = "<ul class=\"qeListUL\"><li class=\"qeListLI\">" + pageCaption + pageList + "</li></ul>";
                     }
                 }
                 result += ""
                 + "\r<tr>"
                 + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:26px;\">Parent Pages</td>"
-                + cr2 + "<td class=\"qeRow qeRight\"><div class=\"qeListCon\">" + PageList + "</div></td>"
+                + cr2 + "<td class=\"qeRow qeRight\"><div class=\"qeListCon\">" + pageList + "</div></td>"
                 + "\r</tr>";
                 //
                 // ----- Child pages
@@ -135,13 +133,13 @@ namespace Contensive.Processor.Controllers {
                     instanceGuid = PageChildListInstanceId,
                     errorContextMessage = "calling child page addon in quick editing editor"
                 };
-                PageList = core.addon.execute(addon, executeContext);
-                if (GenericController.strInstr(1, PageList, "<ul", 1) == 0) {
-                    PageList = "(there are no child pages)";
+                pageList = core.addon.execute(addon, executeContext);
+                if (GenericController.strInstr(1, pageList, "<ul", 1) == 0) {
+                    pageList = "(there are no child pages)";
                 }
                 result += "\r<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:36px;\">Child Pages</td>"
-                    + cr2 + "<td class=\"qeRow qeRight\"><div class=\"qeListCon\">" + PageList + "</div></td>"
+                    + cr2 + "<td class=\"qeRow qeRight\"><div class=\"qeListCon\">" + pageList + "</div></td>"
                     + "\r</tr>";
                 result = ""
                     + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"

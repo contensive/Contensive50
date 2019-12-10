@@ -60,7 +60,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     // ----- display the record fields
                     bool AllowHelpIcon = core.visitProperty.getBoolean("AllowHelpIcon");
-                    string fieldCaption = "";
                     StringBuilderLegacyController resultBody = new StringBuilderLegacyController();
                     bool needUniqueEmailMessage = false;
                     foreach (var kvp in sortingFields) {

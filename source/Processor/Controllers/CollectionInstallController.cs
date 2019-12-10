@@ -149,7 +149,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Search Local Collection Folder for collection config file (xml file)
                     //
-                    string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + collectionFolderConfig.path + "\\";
+                    string CollectionVersionFolder = AddonController.getPrivateFilesAddonPath() + collectionFolderConfig.path + "\\";
                     List<FileDetail> srcFileInfoArray = core.privateFiles.getFileList(CollectionVersionFolder);
                     if (srcFileInfoArray.Count == 0) {
                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder is empty.");

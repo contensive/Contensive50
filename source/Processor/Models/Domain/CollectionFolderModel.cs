@@ -90,13 +90,13 @@ namespace Contensive.Processor.Models.Domain {
                 string CollectionGuid = null;
                 string Collectionname = null;
                 //
-                collectionFilePathFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
+                collectionFilePathFilename = AddonController.getPrivateFilesAddonPath() + "Collections.xml";
                 returnXml = core.privateFiles.readFileText(collectionFilePathFilename);
                 if (string.IsNullOrWhiteSpace(returnXml)) {
                     //
                     LogController.logInfo(core, "Collection Folder XML is blank, rebuild start");
                     //                     
-                    List<FolderDetail> FolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath());
+                    List<FolderDetail> FolderList = core.privateFiles.getFolderList(AddonController.getPrivateFilesAddonPath());
                     //
                     LogController.logInfo(core, "Collection Folder XML rebuild, FolderList.count [" + FolderList.Count + "]");
                     //                     
@@ -116,7 +116,7 @@ namespace Contensive.Processor.Models.Domain {
                                         LogController.logError(core, new GenericException("Add-on Collection Folder contains a mulitple collection folders with the same guid, [" + CollectionGuid + "], duplicate folder ignored [" + folder.Name + "]. Remove or Combine the mulitple instances. Then delete the collections.xml file and it will regenerate without the duplicate."));
                                     } else {
                                         collectionsFound.Add(CollectionGuid);
-                                        List<FolderDetail> SubFolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath() + FolderName + "\\");
+                                        List<FolderDetail> SubFolderList = core.privateFiles.getFolderList(AddonController.getPrivateFilesAddonPath() + FolderName + "\\");
                                         if (SubFolderList.Count > 0) {
                                             FolderDetail lastSubFolder = SubFolderList.Last<FolderDetail>();
                                             FolderName = FolderName + "\\" + lastSubFolder.Name;

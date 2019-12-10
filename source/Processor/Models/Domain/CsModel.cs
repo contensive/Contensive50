@@ -33,10 +33,6 @@ namespace Contensive.Processor {
         /// </summary>
         private bool isOpen;
         /// <summary>
-        /// The date/time this csv_ContentSet was last used
-        /// </summary>
-        private DateTime lastUsed;
-        /// <summary>
         /// Can be used to write to the record. True if opened with a content definition.
         /// </summary>
         private bool createdWithMetaData;
@@ -65,18 +61,6 @@ namespace Contensive.Processor {
         /// </summary>
         private string sqlSource;
         /// <summary>
-        /// The Datasource of the SQL that created the result set
-        /// </summary>
-        private string dataSourceName;
-        /// <summary>
-        /// Number of records in a cache page
-        /// </summary>
-        private int pageSize;
-        /// <summary>
-        /// The Page that this result starts with
-        /// </summary>
-        private int pageNumber;
-        /// <summary>
         /// 
         /// </summary>
         private int fieldPointer;
@@ -100,10 +84,6 @@ namespace Contensive.Processor {
         /// Pointer to the current result row, first row is 0, BOF is -1
         /// </summary>
         private int readCacheRowPtr;
-        /// <summary>
-        /// comma delimited list of all fields selected, in the form table.field
-        /// </summary>
-        private string sqlSelectFieldList;
         //
         //====================================================================================================
         /// <summary>
@@ -461,19 +441,14 @@ namespace Contensive.Processor {
             isOpen = true;
             contentName = "";
             contentMeta = null;
-            dataSourceName = "";
             dt = null;
             fieldNames = null;
             fieldPointer = 0;
-            lastUsed = DateTime.Now;
             userId = core.session.user.id;
-            pageNumber = 0;
-            pageSize = 0;
             readCache = null;
             readCacheRowCnt = 0;
             readCacheRowPtr = 0;
             resultColumnCount = 0;
-            sqlSelectFieldList = "";
             sqlSource = "";
             createdWithMetaData = false;
             writeCache = null;
@@ -566,7 +541,6 @@ namespace Contensive.Processor {
                             }
                         }
                     }
-                    this.lastUsed = DateTime.Now;
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1222,7 +1196,6 @@ namespace Contensive.Processor {
                     } else {
                         this.writeCache.Add(field.nameLc, rawValueForDb.ToString());
                     }
-                    this.lastUsed = DateTime.Now;
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1490,7 +1463,6 @@ namespace Contensive.Processor {
                             core.cache.store_LastRecordModifiedDate(this.contentMeta.tableName);
                         }
                     }
-                    this.lastUsed = DateTime.Now;
                 }
                 //
                 Controllers.LogController.logTrace(core, "save, exit");
@@ -1964,9 +1936,7 @@ namespace Contensive.Processor {
                     this.readable = true;
                     this.createdWithMetaData = true;
                     this.contentName = contentName;
-                    this.dataSourceName = contentMetaData.dataSourceName;
                     this.contentMeta = contentMetaData;
-                    this.sqlSelectFieldList = sqlSelectFieldList;
                     this.sqlSource = sql;
                     return true;
                 }
@@ -2013,10 +1983,6 @@ namespace Contensive.Processor {
                 this.readable = true;
                 this.createdWithMetaData = false;
                 this.contentName = "";
-                this.pageNumber = pageNumber;
-                this.pageSize = (pageSize);
-                this.dataSourceName = dataSourceName;
-                this.sqlSelectFieldList = "";
                 this.sqlSource = sql;
                 using (var db = new DbController(core, dataSourceName)) {
                     this.dt = core.db.executeQuery(sql, pageSize * (pageNumber - 1), pageSize);

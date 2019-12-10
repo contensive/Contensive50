@@ -1702,7 +1702,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public string getPrivateFilesAddonPath()  {
+        public static string getPrivateFilesAddonPath()  {
             return "addons\\";
         }
         //
@@ -1735,9 +1735,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         string Copy = csData.getText("stylesfilename");
                         if (!string.IsNullOrEmpty(Copy)) {
-                            if (GenericController.strInstr(1, Copy, "://") != 0) {
-                            } else if (Copy.left(1) == "/") {
-                            } else {
+                            if (GenericController.strInstr(1, Copy, "://").Equals(0) && (!Copy.left(1).Equals("/"))) {
                                 Copy = GenericController.getCdnFileLink(core, Copy);
                             }
                             core.html.addStyleLink(Copy, SourceComment);

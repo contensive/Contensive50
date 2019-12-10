@@ -45,9 +45,9 @@ namespace Contensive.Processor.Controllers {
         public static void addUser(CoreController core, GroupModel group, PersonModel user, DateTime dateExpires) {
             try {
                 var ruleList = DbBaseModel.createList<MemberRuleModel>(core.cpParent, "(MemberID=" + user.id.ToString() + ")and(GroupID=" + group.id.ToString() + ")");
-                if ( ruleList.Count==0) {
+                if (ruleList.Count == 0) {
                     // -- add new rule
-                    var rule = DbBaseModel.addDefault<MemberRuleModel>(core.cpParent, Models.Domain.ContentMetadataModel.getDefaultValueDict(core, "groups")) ;
+                    var rule = DbBaseModel.addDefault<MemberRuleModel>(core.cpParent, Models.Domain.ContentMetadataModel.getDefaultValueDict(core, "groups"));
                     rule.groupId = group.id;
                     rule.memberId = user.id;
                     rule.dateExpires = dateExpires;
@@ -123,13 +123,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dateExpires"></param>
         public static void addUser(CoreController core, string groupNameIdOrGuid, int userid, DateTime dateExpires) {
             GroupModel group = null;
-            if ( groupNameIdOrGuid.isNumeric()) {
+            if (groupNameIdOrGuid.isNumeric()) {
                 group = DbBaseModel.create<GroupModel>(core.cpParent, GenericController.encodeInteger(groupNameIdOrGuid));
                 if (group == null) {
                     LogController.logError(core, new GenericException("addUser called with invalid groupId [" + groupNameIdOrGuid + "]"));
                     return;
                 }
-            } else if ( GenericController.isGuid( groupNameIdOrGuid )) {
+            } else if (GenericController.isGuid(groupNameIdOrGuid)) {
                 group = DbBaseModel.create<GroupModel>(core.cpParent, groupNameIdOrGuid);
                 if (group == null) {
                     var defaultValues = ContentMetadataModel.getDefaultValueDict(core, "groups");
@@ -150,13 +150,8 @@ namespace Contensive.Processor.Controllers {
                 }
 
             }
-            if ( group == null ) {
-                // -- create group if not found
-            }
-            if (group != null) {
-                var user = DbBaseModel.create<PersonModel>(core.cpParent, userid);
-                if (user != null) addUser(core, group, user, dateExpires);
-            }
+            var user = DbBaseModel.create<PersonModel>(core.cpParent, userid);
+            if (user != null) { addUser(core, group, user, dateExpires); }
         }
         //
         //====================================================================================================
@@ -424,13 +419,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose()  {
+        public void Dispose() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~GroupController()  {
+        ~GroupController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }

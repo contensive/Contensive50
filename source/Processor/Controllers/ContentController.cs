@@ -31,7 +31,7 @@ namespace Contensive.Processor.Controllers {
                     if (string.IsNullOrEmpty(CollectionVersionFolderName)) {
                         //
                         // -- new collection
-                        string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + CollectionVersionFolderName;
+                        string CollectionVersionFolder =  AddonController.getPrivateFilesAddonPath() + CollectionVersionFolderName;
                         core.privateFiles.createPath(CollectionVersionFolder);
                         CollectionFolderController.updateCollectionFolderConfig(core, addonCollection.name, addonCollection.ccguid, DateTime.Now, CollectionVersionFolderName);
                     }
