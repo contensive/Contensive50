@@ -117,7 +117,7 @@ namespace Contensive.Processor.Controllers {
         public int inputDateCnt { get; set; } = 0;
         //
         // -- todo
-        public List<CacheInputSelectClass> inputSelectCache = new List<CacheInputSelectClass>();
+        internal List<CacheInputSelectClass> inputSelectCache = new List<CacheInputSelectClass>();
         //
         // -- todo
         public int formInputTextCnt { get; set; } = 0;
@@ -565,6 +565,55 @@ namespace Contensive.Processor.Controllers {
                 }
             }
         }
+    }
+
+    //
+    // -- htmlAssetTypes
+    public enum HtmlAssetTypeEnum {
+        script, // -- script at end of body (code or link)
+        style, // -- css style at end of body (code or link)
+        scriptOnLoad // -- special case, text is assumed to be script to run on load
+    }
+    //
+    // -- assets to be added to the head section (and end-of-body) of html documents
+    public class HtmlAssetClass {
+        /// <summary>
+        ///  the type of asset, css, js, etc
+        /// </summary>
+        public HtmlAssetTypeEnum assetType { get; set; }
+        /// <summary>
+        /// if true, asset goes in head else it goes at end of body
+        /// </summary>
+        public bool inHead { get; set; }
+        /// <summary>
+        /// if true, the content property is a link to the asset, else use the content as the asset
+        /// </summary>
+        public bool isLink { get; set; }
+        /// <summary>
+        /// either link or content depending on the isLink property
+        /// </summary>
+        public string content { get; set; }
+        /// <summary>
+        /// message used during debug to show where the asset came from
+        /// </summary>
+        public string addedByMessage { get; set; }
+        /// <summary>
+        /// if this asset was added from an addon, this is the addonId.
+        /// </summary>
+        public int sourceAddonId { get; set; }
+        public bool canBeMerged { get; set; }
+    }
+    //
+    // -- metaDescription
+    public class HtmlMetaClass {
+        /// <summary>
+        /// the description, title, etc.
+        /// </summary>
+        public string content { get; set; }
+        /// <summary>
+        /// message used during debug to show where the asset came from
+        /// </summary>
+        public string addedByMessage { get; set; }
     }
 }
 

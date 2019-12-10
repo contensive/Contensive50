@@ -1743,7 +1743,7 @@ namespace Contensive.Processor.Controllers {
                         bool IsInGroup = false;
                         bool WasInGroup = false;
                         string FormValue = null;
-                        switch (formField.Type) {
+                        switch (formField.type) {
                             case 1: {
                                     //
                                     // People Record
@@ -1761,12 +1761,12 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                             }
                                             if (!Success) {
-                                                ErrorController.addUserError(core, "The field [" + formField.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
+                                                ErrorController.addUserError(core, "The field [" + formField.caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
                                             }
                                         }
                                         if ((formField.REquired || peopleFieldMeta.required) && string.IsNullOrEmpty(FormValue)) {
                                             Success = false;
-                                            ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(formField.Caption) + "] is required.");
+                                            ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(formField.caption) + "] is required.");
                                         } else {
                                             using (var csData = new CsModel(core)) {
                                                 if (!csData.ok()) {
@@ -1941,10 +1941,10 @@ namespace Contensive.Processor.Controllers {
                                             var tempVar = result.formFieldList[IPtr];
                                             string[] IArgs = i[IPtr + IStart].Split(',');
                                             if (IArgs.GetUpperBound(0) >= main_IPosMax) {
-                                                tempVar.Caption = IArgs[main_IPosCaption];
-                                                tempVar.Type = GenericController.encodeInteger(IArgs[main_IPosType]);
+                                                tempVar.caption = IArgs[main_IPosCaption];
+                                                tempVar.type = GenericController.encodeInteger(IArgs[main_IPosType]);
                                                 tempVar.REquired = GenericController.encodeBoolean(IArgs[main_IPosRequired]);
-                                                switch (tempVar.Type) {
+                                                switch (tempVar.type) {
                                                     case 1: {
                                                             //
                                                             // People Record
@@ -2007,7 +2007,7 @@ namespace Contensive.Processor.Controllers {
                     int GroupRowPtr = 0;
                     string CaptionSpan = null;
                     string Caption = null;
-                    switch (formField.Type) {
+                    switch (formField.type) {
                         case 1: {
                                 //
                                 // People Record
@@ -2018,7 +2018,7 @@ namespace Contensive.Processor.Controllers {
                                 } else {
                                     CaptionSpan = "<span>";
                                 }
-                                Caption = formField.Caption;
+                                Caption = formField.caption;
                                 if (formField.REquired || peopleMetaField.required) {
                                     Caption = "*" + Caption;
                                 }
@@ -2042,7 +2042,7 @@ namespace Contensive.Processor.Controllers {
                                 GroupValue = GroupController.isMemberOfGroup(core, formField.GroupName);
                                 Body = pageForm.RepeatCell;
                                 Body = GenericController.strReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + formField.GroupName, GroupValue), 1, 99, 1);
-                                Body = GenericController.strReplace(Body, "{{FIELD}}", formField.Caption);
+                                Body = GenericController.strReplace(Body, "{{FIELD}}", formField.caption);
                                 RepeatBody = RepeatBody + Body;
                                 GroupRowPtr = GroupRowPtr + 1;
                                 HasRequiredFields = HasRequiredFields || formField.REquired;

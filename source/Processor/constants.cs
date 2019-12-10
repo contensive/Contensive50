@@ -189,14 +189,14 @@ namespace Contensive.Processor {
         //
         internal const string unixNewLine = "\n";
         internal const string macNewLine = "\r";
-        internal static string windowsNewLine = Environment.NewLine;
+        internal static readonly string windowsNewLine = Environment.NewLine;
         //
-        internal static string cr = Environment.NewLine + "\t";
-        internal static string cr2 = cr + "\t";
-        internal static string cr3 = cr2 + "\t";
-        internal static string cr4 = cr3 + "\t";
-        internal static string cr5 = cr4 + "\t";
-        internal static string cr6 = cr5 + "\t";
+        internal static readonly string cr = Environment.NewLine + "\t";
+        internal static readonly string cr2 = cr + "\t";
+        internal static readonly string cr3 = cr2 + "\t";
+        internal static readonly string cr4 = cr3 + "\t";
+        internal static readonly string cr5 = cr4 + "\t";
+        internal static readonly string cr6 = cr5 + "\t";
         //
         internal const string AddonOptionConstructor_BlockNoAjax = "Wrapper=[Default:0|None:-1|ListID(Wrappers)]\r\ncss Container id\r\ncss Container class";
         internal const string AddonOptionConstructor_Block = "Wrapper=[Default:0|None:-1|ListID(Wrappers)]\r\nAs Ajax=[If Add-on is Ajax:0|Yes:1]\r\ncss Container id\r\ncss Container class";
@@ -565,7 +565,6 @@ namespace Contensive.Processor {
         //
         internal const int TestPointTab = 2;
         internal const char debug_TestPointTabChr = '-';
-        public static double CPTickCountBase;
         //
         //------------------------------------------------------------------------
         //   project width button defintions
@@ -779,7 +778,7 @@ namespace Contensive.Processor {
         //
         // ----- text delimiter that divides the text and html parts of an email message stored in the queue folder
         //
-        internal static string EmailTextHTMLDelimiter = Environment.NewLine + " ----- End Text Begin HTML -----\r\n";
+        internal static readonly string EmailTextHTMLDelimiter = Environment.NewLine + " ----- End Text Begin HTML -----\r\n";
         //
         //------------------------------------------------------------------------
         //   Common RequestName Variables
@@ -910,8 +909,6 @@ namespace Contensive.Processor {
         internal const string contentReplaceEscapeStart = "{%";
         internal const string contentReplaceEscapeEnd = "%}";
         //
-        private const int TimerStackMax = 20;
-        //
         internal const string TextSearchStartTagDefault = "<!--TextSearchStart-->";
         internal const string TextSearchEndTagDefault = "<!--TextSearchEnd-->";
         //
@@ -1015,17 +1012,6 @@ namespace Contensive.Processor {
         internal const string cacheNameGlobalInvalidationDate = "global-invalidation-date";
         //
         //========================================================================
-        //   defined errors (event log eventId)
-        //       1000-1999 Contensive
-        //       2000-2999 Datatree
-        //
-        //   see kmaErrorDescription() for transations
-        //========================================================================
-        //
-        private const int Error_DataTree_RootNodeNext = 2000;
-        private const int Error_DataTree_NoGoNext = 2001;
-        //
-        //========================================================================
         //
         //========================================================================
         //
@@ -1109,54 +1095,30 @@ namespace Contensive.Processor {
         internal const int main_IPosPeopleField = 3;
         internal const int main_IPosGroupName = 3;
         //
-        public class  PageFormFieldModel {
-            public int Type;
-            public string Caption;
-            public bool REquired;
-            public string peopleFieldName;
-            public string GroupName;
+        internal class  PageFormFieldModel {
+            internal int type { get; set; }
+            internal string caption { get; set; }
+            internal bool REquired { get; set; }
+            internal string peopleFieldName { get; set; }
+            internal string GroupName { get; set; }
         }
         //
-        public class  PageFormModel {
-            public string PreRepeat;
-            public string PostRepeat;
-            public string RepeatCell;
-            public string AddGroupNameList;
-            public bool AuthenticateOnFormProcess;
-            public List<PageFormFieldModel> formFieldList = new List<PageFormFieldModel>();
+        internal class  PageFormModel {
+            internal string PreRepeat { get; set; }
+            internal string PostRepeat { get; set; }
+            internal string RepeatCell { get; set; }
+            internal string AddGroupNameList { get; set; }
+            internal bool AuthenticateOnFormProcess { get; set; }
+            internal List<PageFormFieldModel> formFieldList = new List<PageFormFieldModel>();
         }
         //
         // Cache the input selects (admin uses the same ones over and over)
         //
-        public class CacheInputSelectClass {
-            public string SelectRaw;
-            public string ContentName;
-            public string Criteria;
-            public string CurrentValue;
-        }
-        //
-        // -- htmlAssetTypes
-        public enum HtmlAssetTypeEnum {
-            script, // -- script at end of body (code or link)
-            style, // -- css style at end of body (code or link)
-            scriptOnLoad // -- special case, text is assumed to be script to run on load
-        }
-        //
-        // -- assets to be added to the head section (and end-of-body) of html documents
-        public class HtmlAssetClass {
-            public HtmlAssetTypeEnum assetType; // the type of asset, css, js, etc
-            public bool inHead; // if true, asset goes in head else it goes at end of body
-            public bool isLink; // if true, the content property is a link to the asset, else use the content as the asset
-            public string content; // either link or content depending on the isLink property
-            public string addedByMessage; // message used during debug to show where the asset came from
-            public int sourceAddonId; // if this asset was added from an addon, this is the addonId.
-            public bool canBeMerged;
-        }
-        //
-        // -- metaDescription
-        public class HtmlMetaClass {
-            public string content; // the description, title, etc.
-            public string addedByMessage; // message used during debug to show where the asset came from
+        internal class CacheInputSelectClass {
+            internal string selectRaw { get; set; }
+            internal string contentName { get; set; }
+            internal string criteria { get; set; }
+            internal string currentValue { get; set; }
         }
         //
         //====================================================================================================

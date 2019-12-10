@@ -123,8 +123,8 @@ namespace Contensive.Processor.Controllers {
                 string CurrentValueText = CurrentValue.ToString();
                 string SelectRaw = "";
                 foreach (Constants.CacheInputSelectClass inputSelect in core.doc.inputSelectCache) {
-                    if ((inputSelect.ContentName == ContentName) && (inputSelect.Criteria == null) && (inputSelect.CurrentValue == CurrentValueText)) {
-                        SelectRaw = inputSelect.SelectRaw;
+                    if ((inputSelect.contentName == ContentName) && (inputSelect.criteria == null) && (inputSelect.currentValue == CurrentValueText)) {
+                        SelectRaw = inputSelect.selectRaw;
                         return_IsEmptyList = false;
                         break;
                     }
@@ -352,10 +352,10 @@ namespace Contensive.Processor.Controllers {
                     //
                     if (!return_IsEmptyList) {
                         core.doc.inputSelectCache.Add(new Constants.CacheInputSelectClass {
-                            ContentName = ContentName,
-                            Criteria = Criteria,
-                            CurrentValue = CurrentValue.ToString(),
-                            SelectRaw = SelectRaw
+                            contentName = ContentName,
+                            criteria = Criteria,
+                            currentValue = CurrentValue.ToString(),
+                            selectRaw = SelectRaw
                         });
                     }
                 }
@@ -389,8 +389,8 @@ namespace Contensive.Processor.Controllers {
                 //
                 string SelectRaw = "";
                 foreach (Constants.CacheInputSelectClass cacheInputSelect in core.doc.inputSelectCache) {
-                    if ((cacheInputSelect.ContentName == "Group:" + GroupID) && (cacheInputSelect.Criteria == sqlCriteria) && (GenericController.encodeInteger(cacheInputSelect.CurrentValue) == currentValue)) {
-                        SelectRaw = cacheInputSelect.SelectRaw;
+                    if ((cacheInputSelect.contentName == "Group:" + GroupID) && (cacheInputSelect.criteria == sqlCriteria) && (GenericController.encodeInteger(cacheInputSelect.currentValue) == currentValue)) {
+                        SelectRaw = cacheInputSelect.selectRaw;
                         break;
                     }
                 }
@@ -595,10 +595,10 @@ namespace Contensive.Processor.Controllers {
                     // Save the SelectRaw
                     //
                     core.doc.inputSelectCache.Add(new Constants.CacheInputSelectClass {
-                        ContentName = "Group:" + GroupID,
-                        Criteria = sqlCriteria,
-                        CurrentValue = currentValue.ToString(),
-                        SelectRaw = SelectRaw
+                        contentName = "Group:" + GroupID,
+                        criteria = sqlCriteria,
+                        currentValue = currentValue.ToString(),
+                        selectRaw = SelectRaw
                     });
                 }
                 //
