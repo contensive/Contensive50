@@ -12,7 +12,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// dependancies
         /// </summary>
-        private CPClass cp;
+        private readonly CPClass cp;
         /// <summary>
         /// The dataset backing up this object
         /// </summary>

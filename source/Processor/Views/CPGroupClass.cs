@@ -10,7 +10,7 @@ namespace Contensive.Processor {
     public class CPGroupClass : BaseClasses.CPGroupBaseClass, IDisposable {
         //
         private Contensive.Processor.Controllers.CoreController core;
-        private CPClass cp;
+        private readonly CPClass cp;
         //
         //====================================================================================================
         /// <summary>

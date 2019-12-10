@@ -8,7 +8,7 @@ using Contensive.Models.Db;
 namespace Contensive.Processor {
     public class CPBlockClass : BaseClasses.CPBlockBaseClass, IDisposable {
         //
-        private CPClass cp { get; set; }
+        private readonly CPClass cp;
         private string accum { get; set; }
         private Controllers.HtmlController htmlDoc { get; set; }
         //
@@ -232,8 +232,6 @@ namespace Contensive.Processor {
                     //
                     // dispose managed objects, dereference local object pointers 
                     //
-                    htmlDoc = null;
-                    cp = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.

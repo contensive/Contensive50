@@ -7,7 +7,7 @@ using Contensive.Models.Db;
 namespace Contensive.Processor {
     public class CPSiteClass : BaseClasses.CPSiteBaseClass, IDisposable {
         //
-        private CPClass cp;
+        private readonly CPClass cp;
         //
         //====================================================================================================
         //

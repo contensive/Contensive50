@@ -5,7 +5,7 @@ using Contensive.Processor.Controllers;
 namespace Contensive.Processor {
     public class CPUserErrorClass : BaseClasses.CPUserErrorBaseClass {
         //
-        private CPClass cp;
+        private readonly CPClass cp;
         protected bool disposed;
         //
         //====================================================================================================

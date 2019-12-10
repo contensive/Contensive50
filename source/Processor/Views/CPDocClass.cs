@@ -8,7 +8,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// dependencies
         /// </summary>
-        private CPClass cp;
+        private readonly CPClass cp;
         //
         //====================================================================================================
         /// <summary>

@@ -17,7 +17,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// dependencies
         /// </summary>
-        private CPClass cp;
+        private readonly CPClass cp;
         /// <summary>
         /// All db controller calls go to this object. 
         /// If this instance was created with the default datasource, db is set the core.db

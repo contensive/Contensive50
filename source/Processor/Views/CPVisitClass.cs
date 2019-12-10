@@ -5,7 +5,7 @@ using Contensive.Processor.Controllers;
 namespace Contensive.Processor {
     public class CPVisitClass : BaseClasses.CPVisitBaseClass, IDisposable {
         //
-        private CPClass cp;
+        private readonly CPClass cp;
         //
         //=======================================================================================================
         /// <summary>

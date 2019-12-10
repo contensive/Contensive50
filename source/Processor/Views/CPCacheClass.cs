@@ -7,7 +7,7 @@ using Contensive.Processor.Controllers;
 namespace Contensive.Processor {
     public class CPCacheClass : BaseClasses.CPCacheBaseClass {
         //
-        private CPClass cp { get; set; }
+        private readonly CPClass cp;
         //
         //====================================================================================================
         /// <summary>

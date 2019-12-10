@@ -5,7 +5,7 @@ using static Contensive.Processor.Controllers.GenericController;
 namespace Contensive.Processor {
     public class CPVisitorClass : BaseClasses.CPVisitorBaseClass, IDisposable {
         //
-        private CPClass cp;
+        private readonly CPClass cp;
         //
         //=======================================================================================================
         /// <summary>

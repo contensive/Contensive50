@@ -14,7 +14,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// dependencies
         /// </summary>
-        private CPClass cp;
+        private readonly CPClass cp;
         //
         // ====================================================================================================
         /// <summary>
@@ -57,7 +57,6 @@ namespace Contensive.Processor {
                     //
                     // call .dispose for managed objects
                     //
-                    cp = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.

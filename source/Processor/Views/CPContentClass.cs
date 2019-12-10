@@ -11,7 +11,7 @@ using Contensive.Models.Db;
 namespace Contensive.Processor {
     public class CPContentClass : CPContentBaseClass {
         //
-        private CPClass cp { get; set; }
+        private readonly CPClass cp;
         //
         //====================================================================================================
         //
