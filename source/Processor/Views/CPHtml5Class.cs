@@ -146,41 +146,66 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string Hidden(string htmlName, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
-        public override string Hidden(string htmlName, string htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
         public override string Hidden(string htmlName, string htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
+        public override string Hidden(string htmlName, string htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
+        public override string Hidden(string htmlName, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
         //
-        public override string Hidden(string htmlName, int htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
-        public override string Hidden(string htmlName, int htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
         public override string Hidden(string htmlName, int htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
+        public override string Hidden(string htmlName, int htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
+        public override string Hidden(string htmlName, int htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
         //
-        public override string Hidden(string htmlName, double htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
-        public override string Hidden(string htmlName, double htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
         public override string Hidden(string htmlName, double htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
+        public override string Hidden(string htmlName, double htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
+        public override string Hidden(string htmlName, double htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
         //
-        public override string Hidden(string htmlName, bool htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
-        public override string Hidden(string htmlName, bool htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
         public override string Hidden(string htmlName, bool htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
+        public override string Hidden(string htmlName, bool htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
+        public override string Hidden(string htmlName, bool htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
         //
-        public override string Hidden(string htmlName, DateTime htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
-        public override string Hidden(string htmlName, DateTime htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
         public override string Hidden(string htmlName, DateTime htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
+        public override string Hidden(string htmlName, DateTime htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
+        public override string Hidden(string htmlName, DateTime htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
         //
         // ====================================================================================================
         //
-        public override string InputDate(string htmlName, DateTime htmlValue, string htmlClass, string htmlId) => HtmlController.inputDate(cp.core, htmlName, htmlValue, "", htmlId, htmlClass);
-        public override string InputDate(string htmlName, DateTime htmlValue, string htmlClass) => HtmlController.inputDate(cp.core, htmlName, htmlValue, "", "", htmlClass);
-        public override string InputDate(string htmlName, DateTime htmlValue) => HtmlController.inputDate(cp.core, htmlName, htmlValue);
         public override string InputDate(string htmlName) => HtmlController.inputDate(cp.core, htmlName, null);
+        public override string InputDate(string htmlName, DateTime htmlValue) => HtmlController.inputDate(cp.core, htmlName, htmlValue);
+        public override string InputDate(string htmlName, DateTime htmlValue, string htmlClass) => HtmlController.inputDate(cp.core, htmlName, htmlValue, "", "", htmlClass);
+        public override string InputDate(string htmlName, DateTime htmlValue, string htmlClass, string htmlId) => HtmlController.inputDate(cp.core, htmlName, htmlValue, "", htmlId, htmlClass);
         //
         // ====================================================================================================
         //
-        public override string InputFile(string htmlName, string htmlClass, string htmlId) => cp.core.html.inputFile(htmlName, htmlId, htmlClass);
-        public override string InputFile(string htmlName, string htmlClass) => cp.core.html.inputFile(htmlName, "", htmlClass);
         public override string InputFile(string htmlName) => cp.core.html.inputFile(htmlName);
+        public override string InputFile(string htmlName, string htmlClass) => cp.core.html.inputFile(htmlName, "", htmlClass);
+        public override string InputFile(string htmlName, string htmlClass, string htmlId) => cp.core.html.inputFile(htmlName, htmlId, htmlClass);
         //
         // ====================================================================================================
         //
+        // todo implement wysiwyg features
+        public override string InputHtml(string htmlName, int maxLength) {
+            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
+            return cp.core.html.getFormInputHTML(htmlName, "", "", "", false, true, addonListJSON, "", "", false);
+        }
+        // todo implement wysiwyg features
+        public override string InputHtml(string htmlName, int maxLength, string htmlValue) {
+            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
+            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
+        }
+        // todo implement wysiwyg features
+        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass) {
+            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
+            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
+        }
+        // todo implement wysiwyg features
+        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) {
+            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
+            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
+        }
+        // todo implement wysiwyg features
+        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId, bool viewAsHtmlCode) {
+            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
+            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
+        }
         // todo implement wysiwyg features
         public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId, EditorContentType contentType) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
@@ -191,76 +216,51 @@ namespace Contensive.Processor {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
             return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
         }
-        // todo implement wysiwyg features
-        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId, bool viewAsHtmlCode) {
-            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
-        }
-        // todo implement wysiwyg features
-        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) {
-            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
-        }
-        // todo implement wysiwyg features
-        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass) {
-            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
-        }
-        // todo implement wysiwyg features
-        public override string InputHtml(string htmlName, int maxLength, string htmlValue) {
-            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
-        }
-        // todo implement wysiwyg features
-        public override string InputHtml(string htmlName, int maxLength) {
-            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, "", "", "", false, true, addonListJSON, "", "", false);
-        }
         //
         // ====================================================================================================
         //
-        public override string InputPassword(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, htmlId, true, false, htmlClass, maxLength);
-        public override string InputPassword(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", true, false, htmlClass, maxLength);
-        public override string InputPassword(string htmlName, int maxLength, string htmlValue) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", true, false, "", maxLength);
         public override string InputPassword(string htmlName, int maxLength) => HtmlController.inputText_Legacy(cp.core, htmlName, "", -1, 20, "", true, false, "", maxLength);
+        public override string InputPassword(string htmlName, int maxLength, string htmlValue) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", true, false, "", maxLength);
+        public override string InputPassword(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", true, false, htmlClass, maxLength);
+        public override string InputPassword(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, htmlId, true, false, htmlClass, maxLength);
         //
         // ====================================================================================================
         //
-        public override string InputText(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, htmlId, false, false, htmlClass, maxLength);
-        public override string InputText(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", false, false, htmlClass, maxLength);
-        public override string InputText(string htmlName, int maxLength, string htmlValue) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", false, false, "", maxLength);
         public override string InputText(string htmlName, int maxLength) => HtmlController.inputText_Legacy(cp.core, htmlName, "", -1, 20, "", false, false, "", maxLength);
+        public override string InputText(string htmlName, int maxLength, string htmlValue) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", false, false, "", maxLength);
+        public override string InputText(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, "", false, false, htmlClass, maxLength);
+        public override string InputText(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputText_Legacy(cp.core, htmlName, htmlValue, -1, 20, htmlId, false, false, htmlClass, maxLength);
         //
         // ====================================================================================================
         //
-        public override string InputTextArea(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) =>  HtmlController.inputTextarea(cp.core, htmlName, htmlValue, 4, -1, htmlId, false, false, htmlClass, false, maxLength);
-        public override string InputTextArea(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputTextarea(cp.core, htmlName, htmlValue, 4, -1, "", false, false, htmlClass, false, maxLength);
-        public override string InputTextArea(string htmlName, int maxLength, string htmlValue) => HtmlController.inputTextarea(cp.core, htmlName, htmlValue, 4, -1, "", false, false, "", false, maxLength);
         public override string InputTextArea(string htmlName, int maxLength) => HtmlController.inputTextarea(cp.core, htmlName, "", 4, -1, "", false, false, "", false, maxLength);
+        public override string InputTextArea(string htmlName, int maxLength, string htmlValue) => HtmlController.inputTextarea(cp.core, htmlName, htmlValue, 4, -1, "", false, false, "", false, maxLength);
+        public override string InputTextArea(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputTextarea(cp.core, htmlName, htmlValue, 4, -1, "", false, false, htmlClass, false, maxLength);
+        public override string InputTextArea(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) =>  HtmlController.inputTextarea(cp.core, htmlName, htmlValue, 4, -1, htmlId, false, false, htmlClass, false, maxLength);
         //
         // ====================================================================================================
         //
-        public override string Li(string innerHtml, string htmlClass, string htmlId) => HtmlController.li(innerHtml, htmlClass, htmlId);
-        public override string Li(string innerHtml, string htmlClass) => HtmlController.li(innerHtml, htmlClass);
         public override string Li(string innerHtml) => HtmlController.li(innerHtml);
+        public override string Li(string innerHtml, string htmlClass) => HtmlController.li(innerHtml, htmlClass);
+        public override string Li(string innerHtml, string htmlClass, string htmlId) => HtmlController.li(innerHtml, htmlClass, htmlId);
         //
         // ====================================================================================================
         //
-        public override string Ol(string innerHtml, string htmlClass, string htmlId) => HtmlController.ol(innerHtml, htmlClass, htmlId);
-        public override string Ol(string innerHtml, string htmlClass) => HtmlController.ol(innerHtml, htmlClass);
         public override string Ol(string innerHtml) => HtmlController.ol(innerHtml);
+        public override string Ol(string innerHtml, string htmlClass) => HtmlController.ol(innerHtml, htmlClass);
+        public override string Ol(string innerHtml, string htmlClass, string htmlId) => HtmlController.ol(innerHtml, htmlClass, htmlId);
         //
         // ====================================================================================================
         //
-        public override string P(string innerHtml, string htmlClass, string htmlId) => HtmlController.p(innerHtml, htmlClass, htmlId);
-        public override string P(string innerHtml, string htmlClass) => HtmlController.p(innerHtml, htmlClass);
         public override string P(string innerHtml) => HtmlController.p(innerHtml);
+        public override string P(string innerHtml, string htmlClass) => HtmlController.p(innerHtml, htmlClass);
+        public override string P(string innerHtml, string htmlClass, string htmlId) => HtmlController.p(innerHtml, htmlClass, htmlId);
         //
         // ====================================================================================================
         //
-        public override string Ul(string innerHtml, string htmlClass, string htmlId) => HtmlController.ul(innerHtml, htmlClass, htmlId);
-        public override string Ul(string innerHtml, string htmlClass) => HtmlController.ul(innerHtml, htmlClass);
         public override string Ul(string innerHtml) => HtmlController.ul(innerHtml);
+        public override string Ul(string innerHtml, string htmlClass) => HtmlController.ul(innerHtml, htmlClass);
+        public override string Ul(string innerHtml, string htmlClass, string htmlId) => HtmlController.ul(innerHtml, htmlClass, htmlId);
         //
         // ====================================================================================================
         //
@@ -270,25 +270,25 @@ namespace Contensive.Processor {
         //
         // ==========================================================================================
         //
-        public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue, currentValue, htmlId, htmlClass);
-        public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue, currentValue, "", htmlClass);
         public override string RadioBox(string htmlName, string htmlValue, string currentValue) => cp.core.html.inputRadio(htmlName, htmlValue, currentValue);
+        public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue, currentValue, "", htmlClass);
+        public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue, currentValue, htmlId, htmlClass);
         //
-        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), htmlId, htmlClass);
-        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), "", htmlClass);
         public override string RadioBox(string htmlName, int htmlValue, int currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture));
+        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), "", htmlClass);
+        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), htmlId, htmlClass);
         //
-        public override string RadioBox(string htmlName, double htmlValue, double currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), htmlId, htmlClass);
-        public override string RadioBox(string htmlName, double htmlValue, double currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture),"",htmlClass);
         public override string RadioBox(string htmlName, double htmlValue, double currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture));
+        public override string RadioBox(string htmlName, double htmlValue, double currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture),"",htmlClass);
+        public override string RadioBox(string htmlName, double htmlValue, double currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), htmlId, htmlClass);
         //
-        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), htmlId, htmlClass);
-        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), "", htmlClass);
         public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture));
+        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), "", htmlClass);
+        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), htmlId, htmlClass);
         //
-        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), htmlId, htmlClass);
-        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), "", htmlClass);
         public override string RadioBox(string htmlName, bool htmlValue, bool currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture));
+        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), "", htmlClass);
+        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), currentValue.ToString(CultureInfo.InvariantCulture), htmlId, htmlClass);
         //
         // ==========================================================================================
         //
@@ -303,63 +303,59 @@ namespace Contensive.Processor {
             return result;
         }
         //
+        public override string SelectContent(string htmlName, string htmlValue, string contentName)
+            => SelectContent(htmlName, htmlValue, contentName, "", "", "", "");
+        public override string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria)
+            => SelectContent(htmlName, htmlValue, contentName, sqlCriteria, "", "", "");
+        public override string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria, string noneCaption)
+            => SelectContent(htmlName, htmlValue, contentName, sqlCriteria, noneCaption, "", "");
         public override string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass)
             => SelectContent(htmlName, htmlValue, contentName, sqlCriteria, noneCaption, htmlClass, "");
         //
-        public override string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria, string noneCaption)
-            => SelectContent(htmlName, htmlValue, contentName, sqlCriteria, noneCaption, "", "");
-        //
-        public override string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria)
-            => SelectContent(htmlName, htmlValue, contentName, sqlCriteria, "", "", "");
-        //
-        public override string SelectContent(string htmlName, string htmlValue, string contentName)
-            => SelectContent(htmlName, htmlValue, contentName, "", "", "", "");
-        //
-        //
-        //
+        public override string SelectContent(string htmlName, int htmlValue, string contentName)
+            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, "", "", "", "");
+        public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria)
+            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, sqlCriteria, "", "", "");
+        public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption)
+            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, sqlCriteria, noneCaption, "", "");
+        public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass)
+            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, sqlCriteria, noneCaption, htmlClass, "");
         public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass, string htmlId)
             => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, sqlCriteria, noneCaption, htmlClass, htmlId);
         //
-        public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass)
-            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, sqlCriteria, noneCaption, htmlClass, "");
         //
-        public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria, string noneCaption)
-            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, sqlCriteria, noneCaption, "", "");
         //
-        public override string SelectContent(string htmlName, int htmlValue, string contentName, string sqlCriteria)
-            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, sqlCriteria, "", "", "");
         //
-        public override string SelectContent(string htmlName, int htmlValue, string contentName)
-            => SelectContent(htmlName, htmlValue.ToString(CultureInfo.InvariantCulture), contentName, "", "", "", "");
         //
         // ==========================================================================================
         //
-        public override string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption, string htmlClass, string htmlId) {
-            return HtmlController.selectFromList( cp.core, htmlName, GenericController.encodeInteger( htmlValue ), optionList.Split(','), noneCaption, htmlId, htmlClass);
-        }
-        public override string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption, string htmlClass) {
-            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(','), noneCaption, "", htmlClass);
+        public override string SelectList(string htmlName, string htmlValue, string optionList) {
+            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(','), "", "");
         }
         public override string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption) {
             return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(','), noneCaption, "");
         }
-        public override string SelectList(string htmlName, string htmlValue, string optionList) {
-            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(','), "", "");
+        public override string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption, string htmlClass) {
+            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(','), noneCaption, "", htmlClass);
+        }
+        public override string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption, string htmlClass, string htmlId) {
+            return HtmlController.selectFromList( cp.core, htmlName, GenericController.encodeInteger( htmlValue ), optionList.Split(','), noneCaption, htmlId, htmlClass);
         }
         //
         // ====================================================================================================
         //
-        public override string SelectUser(string htmlName, int htmlValue, int groupId, string noneCaption, string htmlClass, string htmlId) {
-            return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId, noneCaption, htmlId);
-        }
-        public override string SelectUser(string htmlName, int htmlValue, int groupId, string noneCaption, string htmlClass) {
-            return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId, noneCaption);
+        public override string SelectUser(string htmlName, int htmlValue, int groupId) {
+            return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId);
         }
         public override string SelectUser(string htmlName, int htmlValue, int groupId, string noneCaption) {
             return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId, noneCaption);
         }
-        public override string SelectUser(string htmlName, int htmlValue, int groupId) {
-            return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId);
+        public override string SelectUser(string htmlName, int htmlValue, int groupId, string noneCaption, string htmlClass) {
+            return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId, noneCaption);
         }
+        public override string SelectUser(string htmlName, int htmlValue, int groupId, string noneCaption, string htmlClass, string htmlId) {
+            return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId, noneCaption, htmlId);
+        }
+
     }
 }

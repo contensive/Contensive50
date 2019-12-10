@@ -18,16 +18,9 @@ namespace Contensive.Processor.Addons.NewApp {
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpRootApp) {
             try {
-                var coreRootApp = ((CPClass)(cpRootApp)).core;
-
                 string appName = cpRootApp.Doc.GetText("appName");
                 string domainName = cpRootApp.Doc.GetText("domainName");
-                //
-                const string iisDefaultDoc = "default.aspx";
-                string authToken;
-                string authTokenDefault = "909903";
                 DateTime rightNow = DateTime.Now;
-                authToken = authTokenDefault;
                 //
                 using (CPClass cpServer = new CPClass()) {
                     AppConfigModel appConfig = new AppConfigModel();
@@ -50,13 +43,13 @@ namespace Contensive.Processor.Addons.NewApp {
                     appConfig.domainList.Add(domainName);
                     //
                     // -- file architectur
+                    appConfig.localWwwPath = cpServer.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\www\\";
+                    appConfig.localFilesPath = cpServer.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files\\";
+                    appConfig.localPrivatePath = cpServer.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private\\";
+                    appConfig.localTempPath = cpServer.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\temp\\";
                     if (cpServer.core.serverConfig.isLocalFileSystem) {
                         //
                         // -- no prompts, local file system
-                        appConfig.localWwwPath = cpServer.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\www\\";
-                        appConfig.localFilesPath = cpServer.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files\\";
-                        appConfig.localPrivatePath = cpServer.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private\\";
-                        appConfig.localTempPath = cpServer.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\temp\\";
                         appConfig.remoteWwwPath = "";
                         appConfig.remoteFilePath = "";
                         appConfig.remotePrivatePath = "";
@@ -64,10 +57,6 @@ namespace Contensive.Processor.Addons.NewApp {
                     } else {
                         //
                         // -- no prompts, remote file system
-                        appConfig.localWwwPath = cpServer.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\www\\";
-                        appConfig.localFilesPath = cpServer.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\files\\";
-                        appConfig.localPrivatePath = cpServer.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\private\\";
-                        appConfig.localTempPath = cpServer.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appConfig.name + "\\temp\\";
                         appConfig.remoteWwwPath = "/" + appConfig.name + "/www/";
                         appConfig.remoteFilePath = "/" + appConfig.name + "/files/";
                         appConfig.remotePrivatePath = "/" + appConfig.name + "/private/";
@@ -93,8 +82,8 @@ namespace Contensive.Processor.Addons.NewApp {
                         LogController.logInfo(cpServer.core, "Update host file to add domain [127.0.0.1 " + appConfig.name + "].");
                         File.AppendAllText("c:\\windows\\system32\\drivers\\etc\\hosts", System.Environment.NewLine + "127.0.0.1\t" + appConfig.name);
                     } catch (Exception ex) {
-                        Console.Write("Error attempting to update local host file:" + ex.ToString());
-                        Console.Write("Please manually add the following line to your host file (c:\\windows\\system32\\drivers\\etc\\hosts):" + "127.0.0.1\t" + appConfig.name);
+                        LogController.logWarn(cpServer.core, "Error attempting to update local host file:" + ex);
+                        LogController.logWarn(cpServer.core, "Please manually add the following line to your host file (c:\\windows\\system32\\drivers\\etc\\hosts):" + "127.0.0.1\t" + appConfig.name);
                     }
                     //
                     // create the database on the server
@@ -107,6 +96,8 @@ namespace Contensive.Processor.Addons.NewApp {
                 //
                 using (CPClass cp = new CPClass(appName)) {
                     LogController.logInfo(cp.core, "Verify website.");
+                    //
+                    const string iisDefaultDoc = "default.aspx";
                     WebServerController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
                     //
                     LogController.logInfo(cp.core, "Run db upgrade.");

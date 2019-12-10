@@ -5,9 +5,6 @@ namespace Contensive.CLI {
     static class HousekeepCmd {
         //
         // ====================================================================================================
-        /// <summary>
-        /// help text for this command
-        /// </summary>
         internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--housekeep (-h)"
@@ -15,11 +12,6 @@ namespace Contensive.CLI {
             + "";
         //
         // ====================================================================================================
-        /// <summary>
-        /// Upgrade a single or all apps, optionally forcing full install to include up-to-date collections (to fix broken collection addons)
-        /// </summary>
-        /// <param name="appName"></param>
-        /// <param name="repair"></param>
         public static void execute(Contensive.Processor.CPClass cpServer, string appName) {
             if (!string.IsNullOrEmpty(appName)) {
                 //
