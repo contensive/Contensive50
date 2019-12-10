@@ -1,4 +1,5 @@
 ﻿
+using Contensive.Processor.Models.Domain;
 using System;
 using System.Collections.Generic;
 using static Contensive.Processor.Controllers.GenericController;
@@ -11,18 +12,9 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class DocPropertyController {
         //
-        public enum DocPropertyTypesEnum {
-            serverVariable = 1,
-            header = 2,
-            form = 3,
-            file = 4,
-            queryString = 5,
-            userDefined = 6
-        }
-        //
         private readonly CoreController core;
         //
-        private Dictionary<string, DocPropertiesClass> docPropertiesDict = new Dictionary<string, DocPropertiesClass>();
+        private Dictionary<string, DocPropertiesModel> docPropertiesDict = new Dictionary<string, DocPropertiesModel>();
         //
         public DocPropertyController(CoreController core) {
             this.core = core;
@@ -30,55 +22,55 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public void setProperty(string key, int value, DocPropertyTypesEnum propertyType) {
+        public void setProperty(string key, int value, DocPropertiesModel.DocPropertyTypesEnum propertyType) {
             setProperty(key, value.ToString(), propertyType);
         }
         //
         public void setProperty(string key, int value) {
-            setProperty(key, value.ToString(), DocPropertyTypesEnum.userDefined);
+            setProperty(key, value.ToString(), DocPropertiesModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
         //
-        public void setProperty(string key, double value, DocPropertyTypesEnum propertyType) {
+        public void setProperty(string key, double value, DocPropertiesModel.DocPropertyTypesEnum propertyType) {
             setProperty(key, value.ToString(), propertyType);
         }
         //
         public void setProperty(string key, double value) {
-            setProperty(key, value.ToString(), DocPropertyTypesEnum.userDefined);
+            setProperty(key, value.ToString(), DocPropertiesModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
         //
-        public void setProperty(string key, DateTime value, DocPropertyTypesEnum propertyType) {
+        public void setProperty(string key, DateTime value, DocPropertiesModel.DocPropertyTypesEnum propertyType) {
             setProperty(key, value.ToString(), propertyType);
         }
         //
         public void setProperty(string key, DateTime value) {
-            setProperty(key, value.ToString(), DocPropertyTypesEnum.userDefined);
+            setProperty(key, value.ToString(), DocPropertiesModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
         //
-        public void setProperty(string key, bool value, DocPropertyTypesEnum propertyType) {
+        public void setProperty(string key, bool value, DocPropertiesModel.DocPropertyTypesEnum propertyType) {
             setProperty(key, value.ToString(), propertyType);
         }
         //
         public void setProperty(string key, bool value) {
-            setProperty(key, value.ToString(), DocPropertyTypesEnum.userDefined);
+            setProperty(key, value.ToString(), DocPropertiesModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
         //
         public void setProperty(string key, string value) {
-            setProperty(key, value, DocPropertyTypesEnum.userDefined);
+            setProperty(key, value, DocPropertiesModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
         //
-        public void setProperty(string key, string value, DocPropertyTypesEnum propertyType) {
+        public void setProperty(string key, string value, DocPropertiesModel.DocPropertyTypesEnum propertyType) {
             try {
-                DocPropertiesClass prop = new DocPropertiesClass {
+                DocPropertiesModel prop = new DocPropertiesModel {
                     NameValue = key,
                     FileSize = 0,
                     fileType = "",
@@ -96,7 +88,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public void setProperty(string key, DocPropertiesClass value) {
+        public void setProperty(string key, DocPropertiesModel value) {
             string propKey = encodeDocPropertyKey(key);
             if (!string.IsNullOrEmpty(propKey)) {
                 if (docPropertiesDict.ContainsKey(propKey)) {
@@ -116,7 +108,7 @@ namespace Contensive.Processor.Controllers {
         //
         public List<string> getKeyList()  {
             List<string> keyList = new List<string>();
-            foreach (KeyValuePair<string, DocPropertiesClass> kvp in docPropertiesDict) {
+            foreach (KeyValuePair<string, DocPropertiesModel> kvp in docPropertiesDict) {
                 keyList.Add(kvp.Key);
             }
             return keyList;
@@ -190,7 +182,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public DocPropertiesClass getProperty(string RequestName) {
+        public DocPropertiesModel getProperty(string RequestName) {
             try {
                 string Key = encodeDocPropertyKey(RequestName);
                 if (!string.IsNullOrEmpty(Key)) {
@@ -202,7 +194,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.logError( core,ex);
                 throw;
             }
-            return new DocPropertiesClass();
+            return new DocPropertiesModel();
         }
         //
         //====================================================================================================
@@ -237,9 +229,9 @@ namespace Contensive.Processor.Controllers {
                             string[] ValuePair = nameValuePair.Split('=');
                             string key = decodeResponseVariable(encodeText(ValuePair[0]));
                             if (!string.IsNullOrEmpty(key)) {
-                                DocPropertiesClass docProperty = new DocPropertiesClass {
+                                DocPropertiesModel docProperty = new DocPropertiesModel {
                                     Name = key,
-                                    propertyType = DocPropertyTypesEnum.queryString,
+                                    propertyType = DocPropertiesModel.DocPropertyTypesEnum.queryString,
                                     Value = (ValuePair.GetUpperBound(0) > 0) ? decodeResponseVariable(encodeText(ValuePair[1])) : ""
                                 };
                                 core.docProperties.setProperty(key, docProperty);

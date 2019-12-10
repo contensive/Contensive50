@@ -122,7 +122,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 string CurrentValueText = CurrentValue.ToString();
                 string SelectRaw = "";
-                foreach (Constants.CacheInputSelectClass inputSelect in core.doc.inputSelectCache) {
+                foreach (CacheInputSelectClass inputSelect in core.doc.inputSelectCache) {
                     if ((inputSelect.contentName == ContentName) && (inputSelect.criteria == null) && (inputSelect.currentValue == CurrentValueText)) {
                         SelectRaw = inputSelect.selectRaw;
                         return_IsEmptyList = false;
@@ -351,7 +351,7 @@ namespace Contensive.Processor.Controllers {
                     // Save the SelectRaw
                     //
                     if (!return_IsEmptyList) {
-                        core.doc.inputSelectCache.Add(new Constants.CacheInputSelectClass {
+                        core.doc.inputSelectCache.Add(new CacheInputSelectClass {
                             contentName = ContentName,
                             criteria = Criteria,
                             currentValue = CurrentValue.ToString(),
@@ -388,7 +388,7 @@ namespace Contensive.Processor.Controllers {
                 string sqlCriteria = "";
                 //
                 string SelectRaw = "";
-                foreach (Constants.CacheInputSelectClass cacheInputSelect in core.doc.inputSelectCache) {
+                foreach (CacheInputSelectClass cacheInputSelect in core.doc.inputSelectCache) {
                     if ((cacheInputSelect.contentName == "Group:" + GroupID) && (cacheInputSelect.criteria == sqlCriteria) && (GenericController.encodeInteger(cacheInputSelect.currentValue) == currentValue)) {
                         SelectRaw = cacheInputSelect.selectRaw;
                         break;
@@ -594,7 +594,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Save the SelectRaw
                     //
-                    core.doc.inputSelectCache.Add(new Constants.CacheInputSelectClass {
+                    core.doc.inputSelectCache.Add(new CacheInputSelectClass {
                         contentName = "Group:" + GroupID,
                         criteria = sqlCriteria,
                         currentValue = currentValue.ToString(),

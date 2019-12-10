@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>

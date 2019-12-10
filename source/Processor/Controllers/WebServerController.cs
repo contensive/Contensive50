@@ -445,7 +445,7 @@ namespace Contensive.Processor.Controllers {
                         string key = nameValues.GetKey(i);
                         if (serverEnvironment.ContainsKey(key)) { serverEnvironment.Remove(key); }
                         serverEnvironment.Add(nameValues.GetKey(i), nameValues.Get(i));
-                        core.docProperties.setProperty(nameValues.GetKey(i), nameValues.Get(i), DocPropertyController.DocPropertyTypesEnum.serverVariable);
+                        core.docProperties.setProperty(nameValues.GetKey(i), nameValues.Get(i), DocPropertiesModel.DocPropertyTypesEnum.serverVariable);
                     }
                 }
                 //
@@ -457,7 +457,7 @@ namespace Contensive.Processor.Controllers {
                         if (string.IsNullOrWhiteSpace(key)) continue;
                         if (requestHeaders.ContainsKey(key)) { requestForm.Remove(key); }
                         requestHeaders.Add(key, nameValues.Get(i));
-                        core.docProperties.setProperty(key, nameValues.Get(i), DocPropertyController.DocPropertyTypesEnum.header);
+                        core.docProperties.setProperty(key, nameValues.Get(i), DocPropertiesModel.DocPropertyTypesEnum.header);
                     }
                 }
                 //
@@ -470,7 +470,7 @@ namespace Contensive.Processor.Controllers {
                             string keyValue = iisContext.Request.QueryString[key];
                             if (requestQuery.ContainsKey(key)) { requestQuery.Remove(key); }
                             requestQuery.Add(key, keyValue);
-                            core.docProperties.setProperty(key, keyValue, DocPropertyController.DocPropertyTypesEnum.queryString);
+                            core.docProperties.setProperty(key, keyValue, DocPropertiesModel.DocPropertyTypesEnum.queryString);
                             requestQueryString = GenericController.modifyQueryString(requestQueryString, key, keyValue);
                         }
                     }
@@ -483,7 +483,7 @@ namespace Contensive.Processor.Controllers {
                         string keyValue = iisContext.Request.Form[key];
                         if (requestForm.ContainsKey(key)) { requestForm.Remove(key); }
                         requestForm.Add(key, keyValue);
-                        core.docProperties.setProperty(key, keyValue, DocPropertyController.DocPropertyTypesEnum.form);
+                        core.docProperties.setProperty(key, keyValue, DocPropertiesModel.DocPropertyTypesEnum.form);
                     }
                 }
                 //
@@ -496,12 +496,12 @@ namespace Contensive.Processor.Controllers {
                         System.Web.HttpPostedFile file = iisContext.Request.Files[key];
                         if (file != null) {
                             if ((file.ContentLength > 0) && (!string.IsNullOrEmpty(file.FileName))) {
-                                DocPropertiesClass prop = new DocPropertiesClass {
+                                DocPropertiesModel prop = new DocPropertiesModel {
                                     Name = key,
                                     Value = file.FileName,
                                     NameValue = encodeRequestVariable(key) + "=" + encodeRequestVariable(file.FileName),
                                     tempfilename = instanceId + "-" + filePtr.ToString() + ".bin",
-                                    propertyType = DocPropertyController.DocPropertyTypesEnum.file
+                                    propertyType = DocPropertiesModel.DocPropertyTypesEnum.file
                                 };
                                 core.tempFiles.verifyPath(core.tempFiles.localAbsRootPath);
                                 file.SaveAs(core.tempFiles.joinPath(core.tempFiles.localAbsRootPath, prop.tempfilename));

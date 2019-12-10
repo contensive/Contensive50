@@ -989,11 +989,6 @@ namespace Contensive.Processor {
         internal const int QueryTypeOpenContent = 2;
         internal const int QueryTypeUpdateContent = 3;
         internal const int QueryTypeInsertContent = 4;
-        public enum RemoteFormatEnum {
-            RemoteFormatJsonTable = 1,
-            RemoteFormatJsonNameArray = 2,
-            RemoteFormatJsonNameValue = 3
-        }
         internal const int maxLongValue = 2147483647;
         //
         // link forward cache
@@ -1095,62 +1090,10 @@ namespace Contensive.Processor {
         internal const int main_IPosPeopleField = 3;
         internal const int main_IPosGroupName = 3;
         //
-        internal class  PageFormFieldModel {
-            internal int type { get; set; }
-            internal string caption { get; set; }
-            internal bool REquired { get; set; }
-            internal string peopleFieldName { get; set; }
-            internal string GroupName { get; set; }
-        }
-        //
-        internal class  PageFormModel {
-            internal string PreRepeat { get; set; }
-            internal string PostRepeat { get; set; }
-            internal string RepeatCell { get; set; }
-            internal string AddGroupNameList { get; set; }
-            internal bool AuthenticateOnFormProcess { get; set; }
-            internal List<PageFormFieldModel> formFieldList = new List<PageFormFieldModel>();
-        }
-        //
-        // Cache the input selects (admin uses the same ones over and over)
-        //
-        internal class CacheInputSelectClass {
-            internal string selectRaw { get; set; }
-            internal string contentName { get; set; }
-            internal string criteria { get; set; }
-            internal string currentValue { get; set; }
-        }
-        //
         //====================================================================================================
         /// <summary>
         /// deprecated. legacy was "/" and it was used in path in front of path. Path now includes a leading slash
         /// </summary>
         internal const string appRootPath = "";
-    }
-
-    //
-    //====================================================================================================
-    //
-    public class DocPropertiesClass {
-        public string Name;
-        public string Value;
-        public string NameValue;
-        public string tempfilename;
-        public int FileSize;
-        public string fileType;
-        public DocPropertyController.DocPropertyTypesEnum propertyType;
-    }
-    //
-    // SF Resize Algorithms
-    //
-    public enum ImageResizeAlgorithms {
-        Box = 0,
-        Triangle = 1,
-        Hermite = 2,
-        Bell = 3,
-        BSpline = 4,
-        Lanczos3 = 5,
-        Mitchell = 6,
-        Stretch = 7
     }
 }

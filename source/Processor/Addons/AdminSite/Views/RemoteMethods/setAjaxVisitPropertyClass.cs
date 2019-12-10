@@ -32,7 +32,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                     core.visitProperty.setProperty(PropertyName, PropertyValue);
                 }
-                result = RemoteQueryController.main_FormatRemoteQueryOutput(core, gd, RemoteFormatEnum.RemoteFormatJsonNameValue);
+                result = RemoteQueryController.format(core, gd, RemoteQueryController.RemoteFormatEnum.RemoteFormatJsonNameValue);
                 result = HtmlController.encodeHtml(result);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

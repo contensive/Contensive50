@@ -723,7 +723,7 @@ namespace Contensive.Processor.Controllers {
                 Message += Environment.NewLine;
                 foreach (string key in core.docProperties.getKeyList()) {
                     var tempVar = core.docProperties.getProperty(key);
-                    if (tempVar.propertyType == DocPropertyController.DocPropertyTypesEnum.form) {
+                    if (tempVar.propertyType == DocPropertiesModel.DocPropertyTypesEnum.form) {
                         if (GenericController.toUCase(tempVar.Value) == "ON") {
                             Message += tempVar.Name + ": Yes\r\n\r\n";
                         } else {

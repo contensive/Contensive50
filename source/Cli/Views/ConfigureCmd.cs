@@ -83,7 +83,7 @@ namespace Contensive.CLI {
                             regionList.Append(region.SystemName);
                         }
                         do {
-                            string selectedRegion = GenericController.promptForReply("Enter the AWS region (" + regionList.ToString() + ")", cp.core.serverConfig.awsRegionName).ToLowerInvariant();
+                            string selectedRegion = GenericController.promptForReply("Enter the AWS region (" + regionList + ")", cp.core.serverConfig.awsRegionName).ToLowerInvariant();
                             cp.core.serverConfig.awsRegionName = "";
                             foreach (var region in RegionEndpoint.EnumerableAllRegions) {
                                 if (selectedRegion == region.SystemName.ToLowerInvariant()) {

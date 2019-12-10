@@ -6,6 +6,7 @@ using static Contensive.Processor.Constants;
 // todo -- should not be here
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -164,7 +165,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult += HtmlController.inputHidden("Type", FormTypeSendPassword);
                     foreach (string formKey in core.docProperties.getKeyList()) {
                         var formValue = core.docProperties.getProperty(formKey);
-                        if (formValue.propertyType == DocPropertyController.DocPropertyTypesEnum.form) {
+                        if (formValue.propertyType == DocPropertiesModel.DocPropertyTypesEnum.form) {
                             switch (GenericController.toUCase(formValue.Name)) {
                                 case "S":
                                 case "MA":

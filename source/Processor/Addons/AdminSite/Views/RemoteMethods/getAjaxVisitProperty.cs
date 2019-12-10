@@ -40,7 +40,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     cell.v = core.visitProperty.getText(ArgNameValue[0], PropertyValue);
                     gd.row[0].Cell.Add(cell);
                 }
-                result = RemoteQueryController.main_FormatRemoteQueryOutput(core, gd, RemoteFormatEnum.RemoteFormatJsonNameValue);
+                result = RemoteQueryController.format(core, gd, RemoteQueryController.RemoteFormatEnum.RemoteFormatJsonNameValue);
                 result = HtmlController.encodeHtml(result);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

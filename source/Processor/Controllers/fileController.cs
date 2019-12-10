@@ -12,6 +12,7 @@ using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
 using System.Globalization;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -1343,7 +1344,7 @@ namespace Contensive.Processor.Controllers {
                 string key = htmlTagName.ToLowerInvariant();
                 if (core.docProperties.containsKey(key)) {
                     var docProperty = core.docProperties.getProperty(key);
-                    if ((docProperty.propertyType == DocPropertyController.DocPropertyTypesEnum.file) && (docProperty.Name.ToLowerInvariant() == key)) {
+                    if ((docProperty.propertyType == DocPropertiesModel.DocPropertyTypesEnum.file) && (docProperty.Name.ToLowerInvariant() == key)) {
                         string dosPathFilename = FileController.normalizeDosPath(path);
                         returnFilename = encodeDosFilename(docProperty.Value);
                         dosPathFilename += returnFilename;

@@ -12,6 +12,12 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class RemoteQueryController : IDisposable {
         //
+        public enum RemoteFormatEnum {
+            RemoteFormatJsonTable = 1,
+            RemoteFormatJsonNameArray = 2,
+            RemoteFormatJsonNameValue = 3
+        }
+        //
         //
         //
         //
@@ -38,7 +44,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        public static string main_FormatRemoteQueryOutput(CoreController core, GoogleDataType gd, RemoteFormatEnum RemoteFormat) {
+        public static string format(CoreController core, GoogleDataType gd, RemoteFormatEnum RemoteFormat) {
             //
             StringBuilderLegacyController s = null;
             string ColDelim = null;

@@ -64,12 +64,12 @@
     <Reference Include="ClearScript, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ClearScript.5.6.0\lib\net45\ClearScript.dll</HintPath>
     </Reference>
-    <Reference Include="ContensiveDbModels, Version=5.19.1210.3, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.5.19.1210.3\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.19.1210.4, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.5.19.1210.4\lib\net461\ContensiveDbModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1210.3\lib\net472\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1210.4\lib\net472\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -282,6 +282,7 @@
     <Compile Include="Controllers\BuildController.cs" />
     <Compile Include="Controllers\CacheController.cs" />
     <Compile Include="Controllers\ContentCmdController.cs" />
+    <Compile Include="Models\Domain\DocPropertiesModel.cs" />
     <Compile Include="Models\Domain\CsModel.cs" />
     <Compile Include="Controllers\DbController.cs" />
     <Compile Include="Controllers\DbServerController.cs" />
@@ -334,6 +335,9 @@
     <Compile Include="Models\Domain\FieldEditorType.cs" />
     <Compile Include="Models\Domain\GoogleVisualizationModels.cs" />
     <Compile Include="Models\Domain\CacheDocumentClass.cs" />
+    <Compile Include="Models\Domain\CacheInputSelectClass.cs" />
+    <Compile Include="Models\Domain\PageFormModel.cs" />
+    <Compile Include="Models\Domain\PageFormFieldModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

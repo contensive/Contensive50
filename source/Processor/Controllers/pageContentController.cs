@@ -322,14 +322,14 @@ namespace Contensive.Processor.Controllers {
                                 if (linkAliasList.Count > 0) {
                                     LinkAliasModel linkAlias = linkAliasList.First();
                                     string LinkQueryString = rnPageId + "=" + linkAlias.pageId + "&" + linkAlias.queryStringSuffix;
-                                    core.docProperties.setProperty(rnPageId, linkAlias.pageId.ToString(), DocPropertyController.DocPropertyTypesEnum.userDefined);
+                                    core.docProperties.setProperty(rnPageId, linkAlias.pageId, DocPropertiesModel.DocPropertyTypesEnum.userDefined);
                                     string[] nameValuePairs = linkAlias.queryStringSuffix.Split('&');
                                     foreach (string nameValuePair in nameValuePairs) {
                                         string[] nameValueThing = nameValuePair.Split('=');
                                         if (nameValueThing.GetUpperBound(0) == 0) {
-                                            core.docProperties.setProperty(nameValueThing[0], "", DocPropertyController.DocPropertyTypesEnum.userDefined);
+                                            core.docProperties.setProperty(nameValueThing[0], "", DocPropertiesModel.DocPropertyTypesEnum.userDefined);
                                         } else {
-                                            core.docProperties.setProperty(nameValueThing[0], nameValueThing[1], DocPropertyController.DocPropertyTypesEnum.userDefined);
+                                            core.docProperties.setProperty(nameValueThing[0], nameValueThing[1], DocPropertiesModel.DocPropertyTypesEnum.userDefined);
                                         }
                                     }
                                 }
@@ -1727,7 +1727,7 @@ namespace Contensive.Processor.Controllers {
                     // Load the instructions
                     //
                     pageForm = loadFormPageInstructions(core, FormInstructions, Formhtml);
-                    if (pageForm.AuthenticateOnFormProcess && !core.session.isAuthenticated && core.session.isRecognized()) {
+                    if (pageForm.authenticateOnFormProcess && !core.session.isAuthenticated && core.session.isRecognized()) {
                         //
                         // If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
                         //
@@ -1764,7 +1764,7 @@ namespace Contensive.Processor.Controllers {
                                                 ErrorController.addUserError(core, "The field [" + formField.caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
                                             }
                                         }
-                                        if ((formField.REquired || peopleFieldMeta.required) && string.IsNullOrEmpty(FormValue)) {
+                                        if ((formField.required || peopleFieldMeta.required) && string.IsNullOrEmpty(FormValue)) {
                                             Success = false;
                                             ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(formField.caption) + "] is required.");
                                         } else {
@@ -1822,12 +1822,12 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // Group main_MemberShip
                                     //
-                                    IsInGroup = core.docProperties.getBoolean("Group" + formField.GroupName);
-                                    WasInGroup = GroupController.isMemberOfGroup(core, formField.GroupName);
+                                    IsInGroup = core.docProperties.getBoolean("Group" + formField.groupName);
+                                    WasInGroup = GroupController.isMemberOfGroup(core, formField.groupName);
                                     if (WasInGroup && !IsInGroup) {
-                                        GroupController.removeUser(core, formField.GroupName);
+                                        GroupController.removeUser(core, formField.groupName);
                                     } else if (IsInGroup && !WasInGroup) {
-                                        GroupController.addUser(core, formField.GroupName);
+                                        GroupController.addUser(core, formField.groupName);
                                     }
                                     break;
                                 }
@@ -1854,7 +1854,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Authenticate
                         //
-                        if (pageForm.AuthenticateOnFormProcess) {
+                        if (pageForm.authenticateOnFormProcess) {
                             core.session.authenticateById(core.session.user.id, core.session);
                         }
                         //
@@ -1865,8 +1865,8 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // Join Groups requested by pageform
-                        if (pageForm.AddGroupNameList != "") {
-                            string[] Groups = (encodeText(pageForm.AddGroupNameList).Trim(' ')).Split(',');
+                        if (pageForm.addGroupNameList != "") {
+                            string[] Groups = (encodeText(pageForm.addGroupNameList).Trim(' ')).Split(',');
                             for (Ptr = 0; Ptr <= Groups.GetUpperBound(0); Ptr++) {
                                 string GroupName = Groups[Ptr].Trim(' ');
                                 if (!string.IsNullOrEmpty(GroupName)) {
@@ -1912,13 +1912,13 @@ namespace Contensive.Processor.Controllers {
                     if (PtrFront > 0) {
                         int PtrBack = GenericController.strInstr(PtrFront, Formhtml, "}}");
                         if (PtrBack > 0) {
-                            result.PreRepeat = Formhtml.left(PtrFront - 1);
+                            result.preRepeat = Formhtml.left(PtrFront - 1);
                             PtrFront = GenericController.strInstr(PtrBack, Formhtml, "{{REPEATEND", 1);
                             if (PtrFront > 0) {
-                                result.RepeatCell = Formhtml.Substring(PtrBack + 1, PtrFront - PtrBack - 2);
+                                result.repeatCell = Formhtml.Substring(PtrBack + 1, PtrFront - PtrBack - 2);
                                 PtrBack = GenericController.strInstr(PtrFront, Formhtml, "}}");
                                 if (PtrBack > 0) {
-                                    result.PostRepeat = Formhtml.Substring(PtrBack + 1);
+                                    result.postRepeat = Formhtml.Substring(PtrBack + 1);
                                     //
                                     // Decode instructions and build output
                                     //
@@ -1929,8 +1929,8 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             // decode Version 1 arguments, then start instructions line at line 1
                                             //
-                                            result.AddGroupNameList = GenericController.encodeText(i[1]);
-                                            result.AuthenticateOnFormProcess = GenericController.encodeBoolean(i[2]);
+                                            result.addGroupNameList = GenericController.encodeText(i[1]);
+                                            result.authenticateOnFormProcess = GenericController.encodeBoolean(i[2]);
                                             IStart = 3;
                                         }
                                         //
@@ -1943,7 +1943,7 @@ namespace Contensive.Processor.Controllers {
                                             if (IArgs.GetUpperBound(0) >= main_IPosMax) {
                                                 tempVar.caption = IArgs[main_IPosCaption];
                                                 tempVar.type = GenericController.encodeInteger(IArgs[main_IPosType]);
-                                                tempVar.REquired = GenericController.encodeBoolean(IArgs[main_IPosRequired]);
+                                                tempVar.required = GenericController.encodeBoolean(IArgs[main_IPosRequired]);
                                                 switch (tempVar.type) {
                                                     case 1: {
                                                             //
@@ -1956,7 +1956,7 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             // Group main_MemberShip
                                                             //
-                                                            tempVar.GroupName = IArgs[main_IPosGroupName];
+                                                            tempVar.groupName = IArgs[main_IPosGroupName];
                                                             break;
                                                         }
                                                     default: {
@@ -2019,17 +2019,17 @@ namespace Contensive.Processor.Controllers {
                                     CaptionSpan = "<span>";
                                 }
                                 Caption = formField.caption;
-                                if (formField.REquired || peopleMetaField.required) {
+                                if (formField.required || peopleMetaField.required) {
                                     Caption = "*" + Caption;
                                 }
                                 using (var csPeople = new CsModel(core)) {
                                     csPeople.openRecord("people", core.session.user.id);
                                     if (csPeople.ok()) {
-                                        Body = pageForm.RepeatCell;
+                                        Body = pageForm.repeatCell;
                                         Body = GenericController.strReplace(Body, "{{CAPTION}}", CaptionSpan + Caption + "</span>", 1, 99, 1);
                                         Body = GenericController.strReplace(Body, "{{FIELD}}", core.html.inputCs(csPeople, "People", formField.peopleFieldName), 1, 99, 1);
                                         RepeatBody = RepeatBody + Body;
-                                        HasRequiredFields = HasRequiredFields || formField.REquired;
+                                        HasRequiredFields = HasRequiredFields || formField.required;
                                     }
                                 }
 
@@ -2039,13 +2039,13 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // Group main_MemberShip
                                 //
-                                GroupValue = GroupController.isMemberOfGroup(core, formField.GroupName);
-                                Body = pageForm.RepeatCell;
-                                Body = GenericController.strReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + formField.GroupName, GroupValue), 1, 99, 1);
+                                GroupValue = GroupController.isMemberOfGroup(core, formField.groupName);
+                                Body = pageForm.repeatCell;
+                                Body = GenericController.strReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + formField.groupName, GroupValue), 1, 99, 1);
                                 Body = GenericController.strReplace(Body, "{{FIELD}}", formField.caption);
                                 RepeatBody = RepeatBody + Body;
                                 GroupRowPtr = GroupRowPtr + 1;
-                                HasRequiredFields = HasRequiredFields || formField.REquired;
+                                HasRequiredFields = HasRequiredFields || formField.required;
                                 break;
                             }
                         default: {
@@ -2055,7 +2055,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 if (HasRequiredFields) {
-                    Body = pageForm.RepeatCell;
+                    Body = pageForm.repeatCell;
                     Body = GenericController.strReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, 1);
                     Body = GenericController.strReplace(Body, "{{FIELD}}", "*&nbsp;Required Fields");
                     RepeatBody = RepeatBody + Body;
@@ -2064,9 +2064,9 @@ namespace Contensive.Processor.Controllers {
                 string innerHtml = ""
                     + HtmlController.inputHidden("ContensiveFormPageID", FormPageId)
                     + HtmlController.inputHidden("SuccessID", SecurityController.encodeToken(core, GroupIDToJoinOnSuccess, core.doc.profileStartTime))
-                    + pageForm.PreRepeat
+                    + pageForm.preRepeat
                     + RepeatBody
-                    + pageForm.PostRepeat;
+                    + pageForm.postRepeat;
                 result = ""
                     + ErrorController.getUserError(core)
                     + HtmlController.formMultipart(core, innerHtml, core.doc.refreshQueryString, "", "ccForm");
