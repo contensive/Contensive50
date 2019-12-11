@@ -12,7 +12,6 @@ namespace Contensive.Processor.Addons.AdminSite {
         public static string getForm_Edit_LinkAliases(CoreController core, AdminDataModel adminData, bool readOnlyField) {
             string tempGetForm_Edit_LinkAliases = null;
             try {
-                ;
                 //
                 // Link Alias value from the admin data
                 //
@@ -54,15 +53,14 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     // Table of old Link Aliases
                     //
-                    string Link = core.doc.main_GetPageDynamicLink(adminData.editRecord.id, false);
                     // todo
                     int LinkCnt = 0;
                     string LinkList = "";
                     using (var csData = new CsModel(core)) {
                         csData.open("Link Aliases", "pageid=" + adminData.editRecord.id, "ID Desc", true, 0, "name");
                         while (csData.ok()) {
-                            LinkList = LinkList + "<div style=\"margin-left:4px;margin-bottom:4px;\">" + HtmlController.encodeHtml(csData.getText("name")) + "</div>";
-                            LinkCnt = LinkCnt + 1;
+                            LinkList += "<div style=\"margin-left:4px;margin-bottom:4px;\">" + HtmlController.encodeHtml(csData.getText("name")) + "</div>";
+                            LinkCnt += 1;
                             csData.goNext();
                         }
                     }

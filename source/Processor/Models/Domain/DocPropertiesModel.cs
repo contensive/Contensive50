@@ -3,6 +3,7 @@ using Contensive.Processor.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor.Models.Domain {
@@ -253,15 +254,11 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <returns></returns>
         public string getLegacyOptionStringFromVar()  {
-            string returnString = "";
-            try {
-                foreach (string key in getKeyList()) {
-                    returnString += "&" + GenericController.encodeLegacyOptionStringArgument(key) + "=" + encodeLegacyOptionStringArgument(getProperty(key).value);
-                }
-            } catch (Exception ex) {
-                throw (ex);
+            var returnString = new StringBuilder();
+            foreach (string key in getKeyList()) {
+                returnString.Append("&" + GenericController.encodeLegacyOptionStringArgument(key) + "=" + encodeLegacyOptionStringArgument(getProperty(key).value));
             }
-            return returnString;
+            return returnString.ToString();
         }
     }
 }

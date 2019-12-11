@@ -123,7 +123,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addons\AdminSite\Models\ButtonMetadata.cs" />
+    <Compile Include="Addons\AdminSite\SortingStateEnum.cs" />
+    <Compile Include="Addons\AdminSite\FindWordMatchEnum.cs" />
     <Compile Include="Addons\AdminSite\Constants.cs" />
+    <Compile Include="Addons\AdminSite\Models\EditButtonBarInfoClass.cs" />
+    <Compile Include="Addons\AdminSite\Models\RecordEditHeaderInfoClass.cs" />
     <Compile Include="Addons\AdminSite\Models\EditRecordFieldModel.cs" />
     <Compile Include="Addons\AdminSite\Models\EditRecordModel.cs" />
     <Compile Include="Addons\AdminSite\Models\FieldTypeEditorAddonModel.cs" />

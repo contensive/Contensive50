@@ -9,6 +9,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Models.Db;
 using System;
 using System.Globalization;
+using Contensive.Processor.Addons.AdminSite.Models;
 
 namespace Contensive.Processor.Addons.AdminSite {
     public static class FormEdit {
