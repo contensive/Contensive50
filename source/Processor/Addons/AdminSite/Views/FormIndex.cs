@@ -563,15 +563,15 @@ namespace Contensive.Processor.Addons.AdminSite {
                 }
                 if (!string.IsNullOrEmpty(GroupList)) {
                     string[] groups = GroupList.Split('\t');
-                    string filterGroups = "";
+                    var filterGroups = new StringBuilder();
                     int ptr = 0;
                     for (ptr = 0; ptr <= groups.GetUpperBound(0); ptr++) {
                         if (!string.IsNullOrWhiteSpace(groups[ptr])) {
-                            filterGroups += ", '" + groups[ptr] + "'";
+                            filterGroups.Append(", '" + groups[ptr] + "'");
                         }
                     }
-                    if (!string.IsNullOrWhiteSpace(filterGroups)) {
-                        filterLine.Append(", in group(s) " + filterGroups.Substring(1));
+                    if (!filterGroups.Length.Equals(0)) {
+                        filterLine.Append(", in group(s) " + filterGroups.ToString().Substring(1));
                     }
                 }
             }

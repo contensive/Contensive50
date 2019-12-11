@@ -1278,24 +1278,24 @@ namespace Contensive.Processor.Models.Domain {
             }
             return returnOk;
         }
-        //
-        //====================================================================================================
-        //
-        private static MetadataMiniCollectionModel getApplicationMetaDataMiniCollection(CoreController core, bool isNewBuild, string logPrefix) {
-            var result = new MetadataMiniCollectionModel();
-            try {
-                if (!isNewBuild) {
-                    //
-                    // if this is not an empty database, get the application collection, else return empty
-                    string applicationMetaDataMiniCollectionXml = CollectionExportCDefController.get(core, true);
-                    result = MetadataMiniCollectionModel.loadXML(core, applicationMetaDataMiniCollectionXml, false, false, isNewBuild, logPrefix);
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-            return result;
-        }
+        ////
+        ////====================================================================================================
+        ////
+        //private static MetadataMiniCollectionModel getApplicationMetaDataMiniCollection(CoreController core, bool isNewBuild, string logPrefix) {
+        //    var result = new MetadataMiniCollectionModel();
+        //    try {
+        //        if (!isNewBuild) {
+        //            //
+        //            // if this is not an empty database, get the application collection, else return empty
+        //            string applicationMetaDataMiniCollectionXml = CollectionExportCDefController.get(core, true);
+        //            result = MetadataMiniCollectionModel.loadXML(core, applicationMetaDataMiniCollectionXml, false, false, isNewBuild, logPrefix);
+        //        }
+        //    } catch (Exception ex) {
+        //        LogController.logError(core, ex);
+        //        throw;
+        //    }
+        //    return result;
+        //}
         //
         //====================================================================================================
         /// <summary>
