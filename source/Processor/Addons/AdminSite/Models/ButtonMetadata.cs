@@ -1,11 +1,11 @@
 ﻿
 namespace Contensive.Processor.Addons.AdminSite.Models {
     public class ButtonMetadata {
-        public string name = "button";
-        public string value = "";
-        public string classList = "";
-        public bool isDelete = false;
-        public bool isClose = false;
-        public bool isAdd = false;
+        public string name { get; set; } = "button";
+        public string value { get; set; } = "";
+        public string classList { get; set; } = "";
+        public bool isDelete { get; set; }
+        public bool isClose { get; set; }
+        public bool isAdd { get; set; }
     }
 }

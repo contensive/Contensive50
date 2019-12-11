@@ -7,22 +7,25 @@ using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController
 //
 namespace Contensive.Processor.Addons.AdminSite {
     public class IndexConfigClass {
+        //
+        internal const int groupListCntMax = 10;
+        //
         public bool loaded { get; set; }
         public int contentID { get; set; }
         public int pageNumber { get; set; }
         public int recordsPerPage { get; set; }
         public int recordTop { get; set; }
-        public Dictionary<string, IndexConfigFindWordClass> findWords = new Dictionary<string, IndexConfigFindWordClass>();
+        public Dictionary<string, IndexConfigFindWordClass> findWords { get; set; }
         public bool activeOnly { get; set; }
         public bool lastEditedByMe { get; set; }
         public bool lastEditedToday { get; set; }
         public bool lastEditedPast7Days { get; set; }
         public bool lastEditedPast30Days { get; set; }
         public bool open { get; set; }
-        public Dictionary<string, IndexConfigSortClass> sorts = new Dictionary<string, IndexConfigSortClass>();
+        public Dictionary<string, IndexConfigSortClass> sorts { get; set; }
         public int groupListCnt { get; set; }
-        public string[] groupList;
-        public List<IndexConfigColumnClass> columns = new List<IndexConfigColumnClass>();
+        public string[] groupList { get; set; }
+        public List<IndexConfigColumnClass> columns { get; set; }
         public int subCDefID { get; set; }
         //
         //=================================================================================
@@ -44,7 +47,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                 open = false,
                 pageNumber = 1,
                 recordsPerPage = Constants.RecordsPerPageDefault,
-                recordTop = 0
+                recordTop = 0,
+                groupList = new string[groupListCntMax],
+                groupListCnt = 0,
+                columns = new List<IndexConfigColumnClass>(),
+                sorts = new Dictionary<string, IndexConfigSortClass>(),
+                findWords = new Dictionary<string, IndexConfigFindWordClass>()
             };
             try {
                 //
@@ -54,7 +62,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     // load values
                     //
-                    ConfigList = ConfigList + Environment.NewLine;
+                    ConfigList += Environment.NewLine;
                     string[] ConfigListLines = GenericController.splitNewLine(ConfigList);
                     int Ptr = 0;
                     while (Ptr < ConfigListLines.GetUpperBound(0)) {
@@ -63,7 +71,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         //
                         string ConfigListLine = GenericController.toLCase(ConfigListLines[Ptr]);
                         if (!string.IsNullOrEmpty(ConfigListLine)) {
-                            if(ConfigListLine.Equals("columns")) {
+                            if (ConfigListLine.Equals("columns")) {
                                 Ptr += 1;
                                 while (!string.IsNullOrEmpty(ConfigListLines[Ptr])) {
                                     string Line = ConfigListLines[Ptr];
@@ -125,73 +133,74 @@ namespace Contensive.Processor.Addons.AdminSite {
                         if (!string.IsNullOrEmpty(ConfigListLine)) {
                             switch (ConfigListLine) {
                                 case "findwordlist":
-                                    Ptr += 1;
-                                    while (!string.IsNullOrEmpty(ConfigListLines[Ptr])) {
-                                        string Line = ConfigListLines[Ptr];
-                                        string[] LineSplit = Line.Split('\t');
-                                        if (LineSplit.GetUpperBound(0) > 1) {
-                                            returnIndexConfig.findWords.Add(LineSplit[0], new IndexConfigFindWordClass {
-                                                Name = LineSplit[0],
-                                                Value = LineSplit[1],
-                                                MatchOption = (FindWordMatchEnum)GenericController.encodeInteger(LineSplit[2])
-                                            });
-                                        }
-                                        Ptr += 1;
+                                Ptr += 1;
+                                while (!string.IsNullOrEmpty(ConfigListLines[Ptr])) {
+                                    string Line = ConfigListLines[Ptr];
+                                    string[] LineSplit = Line.Split('\t');
+                                    if (LineSplit.GetUpperBound(0) > 1) {
+                                        returnIndexConfig.findWords.Add(LineSplit[0], new IndexConfigFindWordClass {
+                                            Name = LineSplit[0],
+                                            Value = LineSplit[1],
+                                            MatchOption = (FindWordMatchEnum)GenericController.encodeInteger(LineSplit[2])
+                                        });
                                     }
-                                    break;
+                                    Ptr += 1;
+                                }
+                                break;
                                 case "grouplist":
-                                    Ptr += 1;
-                                    while (!string.IsNullOrEmpty(ConfigListLines[Ptr])) {
-                                        Array.Resize(ref returnIndexConfig.groupList, returnIndexConfig.groupListCnt + 1);
+                                Ptr += 1;
+                                while ((Ptr < ConfigListLines.GetUpperBound(0)) &&  !string.IsNullOrEmpty(ConfigListLines[Ptr])) {
+                                    if (returnIndexConfig.groupListCnt < groupListCntMax) {
                                         returnIndexConfig.groupList[returnIndexConfig.groupListCnt] = ConfigListLines[Ptr];
-                                        returnIndexConfig.groupListCnt = returnIndexConfig.groupListCnt + 1;
-                                        Ptr += 1;
+                                        returnIndexConfig.groupListCnt += 1;
                                     }
-                                    break;
+                                    Ptr += 1;
+                                }
+                                break;
                                 case "cdeflist":
-                                    Ptr += 1;
-                                    returnIndexConfig.subCDefID = GenericController.encodeInteger(ConfigListLines[Ptr]);
-                                    break;
+                                Ptr += 1;
+                                returnIndexConfig.subCDefID = GenericController.encodeInteger(ConfigListLines[Ptr]);
+                                break;
                                 case "indexfiltercategoryid":
-                                    // -- remove deprecated value
-                                    Ptr += 1;
-                                    break;
+                                // -- remove deprecated value
+                                Ptr += 1;
+                                break;
                                 case "indexfilteractiveonly":
-                                    returnIndexConfig.activeOnly = true;
-                                    break;
+                                returnIndexConfig.activeOnly = true;
+                                break;
                                 case "indexfilterlasteditedbyme":
-                                    returnIndexConfig.lastEditedByMe = true;
-                                    break;
+                                returnIndexConfig.lastEditedByMe = true;
+                                break;
                                 case "indexfilterlasteditedtoday":
-                                    returnIndexConfig.lastEditedToday = true;
-                                    break;
+                                returnIndexConfig.lastEditedToday = true;
+                                break;
                                 case "indexfilterlasteditedpast7days":
-                                    returnIndexConfig.lastEditedPast7Days = true;
-                                    break;
+                                returnIndexConfig.lastEditedPast7Days = true;
+                                break;
                                 case "indexfilterlasteditedpast30days":
-                                    returnIndexConfig.lastEditedPast30Days = true;
-                                    break;
+                                returnIndexConfig.lastEditedPast30Days = true;
+                                break;
                                 case "indexfilteropen":
-                                    returnIndexConfig.open = true;
-                                    break;
+                                returnIndexConfig.open = true;
+                                break;
                                 case "recordsperpage":
-                                    Ptr += 1;
-                                    returnIndexConfig.recordsPerPage = GenericController.encodeInteger(ConfigListLines[Ptr]);
-                                    if (returnIndexConfig.recordsPerPage <= 0) {
-                                        returnIndexConfig.recordsPerPage = 50;
-                                    }
-                                    returnIndexConfig.recordTop = ((returnIndexConfig.pageNumber - 1) * returnIndexConfig.recordsPerPage);
-                                    break;
+                                Ptr += 1;
+                                returnIndexConfig.recordsPerPage = GenericController.encodeInteger(ConfigListLines[Ptr]);
+                                if (returnIndexConfig.recordsPerPage <= 0) {
+                                    returnIndexConfig.recordsPerPage = 50;
+                                }
+                                returnIndexConfig.recordTop = ((returnIndexConfig.pageNumber - 1) * returnIndexConfig.recordsPerPage);
+                                break;
                                 case "pagenumber":
-                                    Ptr += 1;
-                                    returnIndexConfig.pageNumber = GenericController.encodeInteger(ConfigListLines[Ptr]);
-                                    if (returnIndexConfig.pageNumber <= 0) {
-                                        returnIndexConfig.pageNumber = 1;
-                                    }
-                                    returnIndexConfig.recordTop = ((returnIndexConfig.pageNumber - 1) * returnIndexConfig.recordsPerPage);
-                                    break;
+                                Ptr += 1;
+                                returnIndexConfig.pageNumber = GenericController.encodeInteger(ConfigListLines[Ptr]);
+                                if (returnIndexConfig.pageNumber <= 0) {
+                                    returnIndexConfig.pageNumber = 1;
+                                }
+                                returnIndexConfig.recordTop = ((returnIndexConfig.pageNumber - 1) * returnIndexConfig.recordsPerPage);
+                                break;
                                 default:
-                                    break;
+                                break;
                             }
                         }
                         Ptr += 1;

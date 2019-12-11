@@ -2397,10 +2397,9 @@ namespace Contensive.Processor.Addons.AdminSite {
             SubList = "";
             if (IndexConfig.groupListCnt > 0) {
                 //
-                int Ptr = 0;
-                for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
-                    if (!string.IsNullOrEmpty(IndexConfig.groupList[Ptr])) {
-                        SubList = SubList + Environment.NewLine + IndexConfig.groupList[Ptr];
+                for (int ptr = 0; ptr < IndexConfig.groupListCnt; ptr++) {
+                    if (!string.IsNullOrEmpty(IndexConfig.groupList[ptr])) {
+                        SubList = SubList + Environment.NewLine + IndexConfig.groupList[ptr];
                     }
                 }
             }

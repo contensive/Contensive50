@@ -562,20 +562,17 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                 }
                 if (!string.IsNullOrEmpty(GroupList)) {
-                    string[] Groups = GroupList.Split('\t');
-                    if (Groups.GetUpperBound(0) == 0) {
-                        filterLine.Append(", in group '" + Groups[0] + "'");
-                    } else if (Groups.GetUpperBound(0) == 1) {
-                        filterLine.Append(", in groups '" + Groups[0] + "' and '" + Groups[1] + "'");
-                    } else {
-                        int Ptr;
-                        string filterGroups = "";
-                        for (Ptr = 0; Ptr < Groups.GetUpperBound(0); Ptr++) {
-                            filterGroups += ", '" + Groups[Ptr] + "'";
+                    string[] groups = GroupList.Split('\t');
+                    string filterGroups = "";
+                    int ptr = 0;
+                    for (ptr = 0; ptr <= groups.GetUpperBound(0); ptr++) {
+                        if (!string.IsNullOrWhiteSpace(groups[ptr])) {
+                            filterGroups += ", '" + groups[ptr] + "'";
                         }
-                        filterLine.Append(", in groups" + filterGroups.Substring(1) + " and '" + Groups[Ptr] + "'");
                     }
-
+                    if (!string.IsNullOrWhiteSpace(filterGroups)) {
+                        filterLine.Append(", in group(s) " + filterGroups.Substring(1));
+                    }
                 }
             }
             //
@@ -781,10 +778,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 }
                             }
                         }
-                        if (Ptr == IndexConfig.groupListCnt) {
-                            Array.Resize(ref IndexConfig.groupList, IndexConfig.groupListCnt + 1);
+                        if ((Ptr == IndexConfig.groupListCnt) && (IndexConfig.groupListCnt < IndexConfigClass.groupListCntMax)) {
                             IndexConfig.groupList[IndexConfig.groupListCnt] = VarText;
-                            IndexConfig.groupListCnt = IndexConfig.groupListCnt + 1;
+                            IndexConfig.groupListCnt += 1;
                             IndexConfig.pageNumber = 1;
                         }
                     }
@@ -1068,17 +1064,17 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 // Where Clause: edited by me
                 if (IndexConfig.lastEditedByMe) {
-                    sqlWhere.Append("AND(" + adminData.adminContent.tableName + ".ModifiedBy=" + core.session.user.id + ")") ;
+                    sqlWhere.Append("AND(" + adminData.adminContent.tableName + ".ModifiedBy=" + core.session.user.id + ")");
                 }
                 //
                 // Where Clause: edited today
                 if (IndexConfig.lastEditedToday) {
-                    sqlWhere.Append("AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date) + ")") ;
+                    sqlWhere.Append("AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date) + ")");
                 }
                 //
                 // Where Clause: edited past week
                 if (IndexConfig.lastEditedPast7Days) {
-                    sqlWhere.Append("AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-7)) + ")") ;
+                    sqlWhere.Append("AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-7)) + ")");
                 }
                 //
                 // Where Clause: edited past month
@@ -1337,12 +1333,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                         case (int)FindWordMatchEnum.matchincludes: {
                                                                 FindWordValue = DbController.encodeSQLText(FindWordValue);
                                                                 FindWordValue = FindWordValue.Substring(1, FindWordValue.Length - 2);
-                                                                sqlWhere.Append( "AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " LIKE '%" + FindWordValue + "%')") ;
+                                                                sqlWhere.Append("AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + " LIKE '%" + FindWordValue + "%')");
                                                                 break;
                                                             }
                                                         default: {
-                                                                    // FindWordMatchEnum.MatchEquals
-                                                                    sqlWhere.Append("AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + "=" + DbController.encodeSQLText(FindWordValue) + ")");
+                                                                // FindWordMatchEnum.MatchEquals
+                                                                sqlWhere.Append("AND(" + adminData.adminContent.tableName + "." + FindWordNameLc + "=" + DbController.encodeSQLText(FindWordValue) + ")");
                                                                 break;
                                                             }
                                                     }
