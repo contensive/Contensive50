@@ -799,13 +799,13 @@ namespace Contensive.Processor.Controllers {
             int returnEntry = 0;
             try {
                 if (!string.IsNullOrEmpty(menu.name.Trim())) {
-                    if (!string.IsNullOrWhiteSpace(menu.AddonGuid)) {
+                    if (!string.IsNullOrWhiteSpace(menu.addonGuid)) {
                         returnEntry = 0;
                     }
-                    AddonModel addon = ((!string.IsNullOrWhiteSpace(menu.AddonGuid)) ? DbBaseModel.create<AddonModel>(core.cpParent, menu.AddonGuid) : null);
-                    addon = addon ?? ((!string.IsNullOrWhiteSpace(menu.AddonName)) ? DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, menu.AddonName) : null);
+                    AddonModel addon = ((!string.IsNullOrWhiteSpace(menu.addonGuid)) ? DbBaseModel.create<AddonModel>(core.cpParent, menu.addonGuid) : null);
+                    addon = addon ?? ((!string.IsNullOrWhiteSpace(menu.addonName)) ? DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, menu.addonName) : null);
                     int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menu.menuNameSpace);
-                    int contentId = ContentMetadataModel.getContentId(core, menu.ContentName);
+                    int contentId = ContentMetadataModel.getContentId(core, menu.contentName);
                     string listCriteria = "(name=" + DbController.encodeSQLText(menu.name) + ")and(Parentid=" + parentId + ")";
                     List<NavigatorEntryModel> entryList = DbBaseModel.createList<NavigatorEntryModel>(core.cpParent, listCriteria, "id");
                     NavigatorEntryModel entry = null;
@@ -821,16 +821,16 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         entry.contentId = contentId;
                     }
-                    entry.linkPage = menu.LinkPage;
-                    entry.sortOrder = menu.SortOrder;
-                    entry.adminOnly = menu.AdminOnly;
-                    entry.developerOnly = menu.DeveloperOnly;
-                    entry.newWindow = menu.NewWindow;
-                    entry.active = menu.Active;
+                    entry.linkPage = menu.linkPage;
+                    entry.sortOrder = menu.sortOrder;
+                    entry.adminOnly = menu.adminOnly;
+                    entry.developerOnly = menu.developerOnly;
+                    entry.newWindow = menu.newWindow;
+                    entry.active = menu.active;
                     entry.addonId = (addon == null) ? 0 : addon.id;
-                    entry.ccguid = menu.Guid;
-                    entry.navIconTitle = menu.NavIconTitle;
-                    entry.navIconType = getListIndex(menu.NavIconType, NavIconTypeList);
+                    entry.ccguid = menu.guid;
+                    entry.navIconTitle = menu.navIconTitle;
+                    entry.navIconType = getListIndex(menu.navIconType, NavIconTypeList);
                     entry.installedByCollectionId = InstalledByCollectionID;
                     entry.save(core.cpParent);
                     returnEntry = entry.id;

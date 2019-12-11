@@ -23,20 +23,20 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Name of miniCollection
         /// </summary>
-        public string name;
+        public string name { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// True only for the one collection created from the base file. This property does not transfer during addSrcToDst
         /// Assets created from a base collection can only be modifed by the base collection.
         /// </summary>
-        public bool isBaseCollection;
+        public bool isBaseCollection { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// Name dictionary of content definitions in the collection
         /// </summary>
-        public Dictionary<string, Models.Domain.ContentMetadataModel> metaData = new Dictionary<string, Models.Domain.ContentMetadataModel>();
+        public Dictionary<string, Models.Domain.ContentMetadataModel> metaData { get; set; } = new Dictionary<string, Models.Domain.ContentMetadataModel>();
         //
         //====================================================================================================
         /// <summary>
@@ -50,11 +50,11 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         [Serializable]
         public class MiniCollectionSQLIndexModel {
-            public string DataSourceName;
-            public string TableName;
-            public string IndexName;
-            public string FieldNameList;
-            public bool dataChanged;
+            public string dataSourceName { get; set; }
+            public string tableName { get; set; }
+            public string indexName { get; set; }
+            public string fieldNameList { get; set; }
+            public bool dataChanged { get; set; }
         }
         //
         //====================================================================================================
@@ -69,24 +69,24 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         [Serializable]
         public class MiniCollectionMenuModel {
-            public string name;
-            public bool IsNavigator;
-            public string menuNameSpace;
-            public string ParentName;
-            public string ContentName;
-            public string LinkPage;
-            public string SortOrder;
-            public bool AdminOnly;
-            public bool DeveloperOnly;
-            public bool NewWindow;
-            public bool Active;
-            public string AddonName;
-            public string AddonGuid;
-            public bool dataChanged;
-            public string Guid;
-            public string NavIconType;
-            public string NavIconTitle;
-            public string Key;
+            public string name { get; set; }
+            public bool isNavigator { get; set; }
+            public string menuNameSpace { get; set; }
+            public string parentName { get; set; }
+            public string contentName { get; set; }
+            public string linkPage { get; set; }
+            public string sortOrder { get; set; }
+            public bool adminOnly { get; set; }
+            public bool developerOnly { get; set; }
+            public bool newWindow { get; set; }
+            public bool active { get; set; }
+            public string addonName { get; set; }
+            public string addonGuid { get; set; }
+            public bool dataChanged { get; set; }
+            public string guid { get; set; }
+            public string navIconType { get; set; }
+            public string navIconTitle { get; set; }
+            public string key { get; set; }
         }
         //
         //====================================================================================================
@@ -102,10 +102,10 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         // [Obsolete("Shared styles deprecated")]
         public struct StyleType {
-            public string Name;
-            public bool Overwrite;
-            public string Copy;
-            public bool dataChanged;
+            public string name { get; set; }
+            public bool overwrite { get; set; }
+            public string copy { get; set; }
+            public bool dataChanged { get; set; }
         }
         //
         //====================================================================================================
@@ -113,7 +113,7 @@ namespace Contensive.Processor.Models.Domain {
         /// count of styles
         /// </summary>
         // [Obsolete("Shared styles deprecated")]
-        public int styleCnt;
+        public int styleCnt { get; set; }
         //
         // todo
         //====================================================================================================
@@ -121,7 +121,7 @@ namespace Contensive.Processor.Models.Domain {
         /// Site style sheet
         /// </summary>
         // [Obsolete("Shared styles deprecated")]
-        public string styleSheet;
+        public string styleSheet { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -140,21 +140,18 @@ namespace Contensive.Processor.Models.Domain {
         /// Model for page templates
         /// </summary>
         public struct PageTemplateType {
-            public string Name;
-            public string Copy;
-            public string Guid;
-            public string Style;
+            public string name { get; set; }
+            public string copy { get; set; }
+            public string guid { get; set; }
+            public string style { get; set; }
         }
         //
         //======================================================================================================
         //
         internal static void installMetaDataMiniCollectionFromXml(bool quick, CoreController core, string srcXml, bool isNewBuild, bool reinstallDependencies, bool isBaseCollection, ref List<string> nonCriticalErrorList, string logPrefix) {
             try {
-                {
-                    MetadataMiniCollectionModel newCollection = loadXML(core, srcXml, isBaseCollection, true, isNewBuild, logPrefix);
-                    installMetaDataMiniCollection_BuildDb(core, isBaseCollection, newCollection, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
-                    return;
-                }
+                MetadataMiniCollectionModel newCollection = loadXML(core, srcXml, isBaseCollection, true, isNewBuild, logPrefix);
+                installMetaDataMiniCollection_BuildDb(core, isBaseCollection, newCollection, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -421,7 +418,7 @@ namespace Contensive.Processor.Models.Domain {
                                         bool removeDup = false;
                                         MetadataMiniCollectionModel.MiniCollectionSQLIndexModel dupToRemove = new MetadataMiniCollectionModel.MiniCollectionSQLIndexModel();
                                         foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel index in result.sqlIndexes) {
-                                            if (textMatch(index.IndexName, IndexName) && textMatch(index.TableName, TableName) && textMatch(index.DataSourceName, DataSourceName)) {
+                                            if (textMatch(index.indexName, IndexName) && textMatch(index.tableName, TableName) && textMatch(index.dataSourceName, DataSourceName)) {
                                                 dupToRemove = index;
                                                 removeDup = true;
                                                 break;
@@ -431,10 +428,10 @@ namespace Contensive.Processor.Models.Domain {
                                             result.sqlIndexes.Remove(dupToRemove);
                                         }
                                         MetadataMiniCollectionModel.MiniCollectionSQLIndexModel newIndex = new MetadataMiniCollectionModel.MiniCollectionSQLIndexModel {
-                                            IndexName = IndexName,
-                                            TableName = TableName,
-                                            DataSourceName = DataSourceName,
-                                            FieldNameList = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "FieldNameList", "")
+                                            indexName = IndexName,
+                                            tableName = TableName,
+                                            dataSourceName = DataSourceName,
+                                            fieldNameList = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "FieldNameList", "")
                                         };
                                         result.sqlIndexes.Add(newIndex);
                                         break;
@@ -462,22 +459,22 @@ namespace Contensive.Processor.Models.Domain {
                                             result.menus.Add(MenuKey, new MetadataMiniCollectionModel.MiniCollectionMenuModel {
                                                 dataChanged = setAllDataChanged,
                                                 name = MenuName,
-                                                Guid = MenuGuid,
-                                                Key = MenuKey,
-                                                Active = GenericController.encodeBoolean(ActiveText),
+                                                guid = MenuGuid,
+                                                key = MenuKey,
+                                                active = GenericController.encodeBoolean(ActiveText),
                                                 menuNameSpace = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "NameSpace", ""),
-                                                ParentName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "ParentName", ""),
-                                                ContentName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentName", ""),
-                                                LinkPage = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "LinkPage", ""),
-                                                SortOrder = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "SortOrder", ""),
-                                                AdminOnly = XmlController.getXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AdminOnly", false),
-                                                DeveloperOnly = XmlController.getXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "DeveloperOnly", false),
-                                                NewWindow = XmlController.getXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "NewWindow", false),
-                                                AddonName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "AddonName", ""),
-                                                AddonGuid = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "AddonGuid", ""),
-                                                NavIconType = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "NavIconType", ""),
-                                                NavIconTitle = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "NavIconTitle", ""),
-                                                IsNavigator = IsNavigator
+                                                parentName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "ParentName", ""),
+                                                contentName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentName", ""),
+                                                linkPage = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "LinkPage", ""),
+                                                sortOrder = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "SortOrder", ""),
+                                                adminOnly = XmlController.getXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AdminOnly", false),
+                                                developerOnly = XmlController.getXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "DeveloperOnly", false),
+                                                newWindow = XmlController.getXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "NewWindow", false),
+                                                addonName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "AddonName", ""),
+                                                addonGuid = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "AddonGuid", ""),
+                                                navIconType = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "NavIconType", ""),
+                                                navIconTitle = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "NavIconTitle", ""),
+                                                isNavigator = IsNavigator
                                             });
                                         }
                                         break;
@@ -494,7 +491,7 @@ namespace Contensive.Processor.Models.Domain {
                                         Name = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
                                         if (result.styleCnt > 0) {
                                             for (Ptr = 0; Ptr < result.styleCnt; Ptr++) {
-                                                if (textMatch(result.styles[Ptr].Name, Name)) {
+                                                if (textMatch(result.styles[Ptr].name, Name)) {
                                                     break;
                                                 }
                                             }
@@ -503,12 +500,12 @@ namespace Contensive.Processor.Models.Domain {
                                             Ptr = result.styleCnt;
                                             result.styleCnt = result.styleCnt + 1;
                                             Array.Resize(ref result.styles, Ptr);
-                                            result.styles[Ptr].Name = Name;
+                                            result.styles[Ptr].name = Name;
                                         }
                                         var tempVar5 = result.styles[Ptr];
                                         tempVar5.dataChanged = setAllDataChanged;
-                                        tempVar5.Overwrite = XmlController.getXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "Overwrite", false);
-                                        tempVar5.Copy = metaData_NodeWithinLoop.InnerText;
+                                        tempVar5.overwrite = XmlController.getXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "Overwrite", false);
+                                        tempVar5.copy = metaData_NodeWithinLoop.InnerText;
                                         break;
                                     }
                                 case "stylesheet": {
@@ -522,7 +519,7 @@ namespace Contensive.Processor.Models.Domain {
                                         //
                                         if (result.pageTemplateCnt > 0) {
                                             for (Ptr = 0; Ptr < result.pageTemplateCnt; Ptr++) {
-                                                if (textMatch(result.pageTemplates[Ptr].Name, Name)) {
+                                                if (textMatch(result.pageTemplates[Ptr].name, Name)) {
                                                     break;
                                                 }
                                             }
@@ -531,12 +528,12 @@ namespace Contensive.Processor.Models.Domain {
                                             Ptr = result.pageTemplateCnt;
                                             result.pageTemplateCnt = result.pageTemplateCnt + 1;
                                             Array.Resize(ref result.pageTemplates, Ptr);
-                                            result.pageTemplates[Ptr].Name = Name;
+                                            result.pageTemplates[Ptr].name = Name;
                                         }
                                         var tempVar6 = result.pageTemplates[Ptr];
-                                        tempVar6.Copy = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Copy", "");
-                                        tempVar6.Guid = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", "");
-                                        tempVar6.Style = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "style", "");
+                                        tempVar6.copy = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Copy", "");
+                                        tempVar6.guid = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", "");
+                                        tempVar6.style = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "style", "");
                                         break;
                                     }
                                 default: {
@@ -550,7 +547,7 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         foreach (var kvp in result.menus) {
                             MetadataMiniCollectionModel.MiniCollectionMenuModel menu = kvp.Value;
-                            if (!string.IsNullOrEmpty(menu.ParentName)) {
+                            if (!string.IsNullOrEmpty(menu.parentName)) {
                                 menu.menuNameSpace = GetMenuNameSpace(core, result.menus, menu, "");
                             }
                         }
@@ -715,9 +712,9 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel index in Collection.sqlIndexes) {
                     if (index.dataChanged) {
-                        using (var db = new DbController(core, index.DataSourceName)) {
-                            LogController.logInfo(core, "creating index [" + index.IndexName + "], fields [" + index.FieldNameList + "], on table [" + index.TableName + "]");
-                            db.createSQLIndex(index.TableName, index.IndexName, index.FieldNameList);
+                        using (var db = new DbController(core, index.dataSourceName)) {
+                            LogController.logInfo(core, "creating index [" + index.indexName + "], fields [" + index.fieldNameList + "], on table [" + index.tableName + "]");
+                            db.createSQLIndex(index.tableName, index.indexName, index.fieldNameList);
                         }
                     }
                 }
@@ -731,7 +728,7 @@ namespace Contensive.Processor.Models.Domain {
                 foreach (var kvp in Collection.menus) {
                     var menu = kvp.Value;
                     if (menu.dataChanged) {
-                        LogController.logInfo(core, "creating navigator entry [" + menu.name + "], namespace [" + menu.menuNameSpace + "], guid [" + menu.Guid + "]");
+                        LogController.logInfo(core, "creating navigator entry [" + menu.name + "], namespace [" + menu.menuNameSpace + "], guid [" + menu.guid + "]");
                         BuildController.verifyNavigatorEntry(core, menu, 0);
                     }
                 }
@@ -756,8 +753,8 @@ namespace Contensive.Processor.Models.Domain {
                         bool Found = false;
                         var tempVar4 = Collection.styles[Ptr];
                         if (tempVar4.dataChanged) {
-                            string NewStyleName = tempVar4.Name;
-                            string NewStyleValue = tempVar4.Copy;
+                            string NewStyleName = tempVar4.name;
+                            string NewStyleValue = tempVar4.copy;
                             NewStyleValue = GenericController.strReplace(NewStyleValue, "}", "");
                             NewStyleValue = GenericController.strReplace(NewStyleValue, "{", "");
                             if (SiteStyleCnt > 0) {
@@ -775,11 +772,11 @@ namespace Contensive.Processor.Models.Domain {
                                             string TestStyleName = (StyleLine.Substring(PosNameLineStart - 1, PosNameLineEnd - PosNameLineStart)).Trim(' ');
                                             if (GenericController.toLCase(TestStyleName) == GenericController.toLCase(NewStyleName)) {
                                                 Found = true;
-                                                if (tempVar4.Overwrite) {
+                                                if (tempVar4.overwrite) {
                                                     //
                                                     // Found - Update style
                                                     //
-                                                    SiteStyleSplit[SiteStylePtr] = Environment.NewLine + tempVar4.Name + " {" + NewStyleValue;
+                                                    SiteStyleSplit[SiteStylePtr] = Environment.NewLine + tempVar4.name + " {" + NewStyleValue;
                                                 }
                                                 break;
                                             }
@@ -1098,7 +1095,7 @@ namespace Contensive.Processor.Models.Domain {
                 // -------------------------------------------------------------------------------------------------
                 //
                 foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel srcSqlIndex in srcCollection.sqlIndexes) {
-                    string srcName = (srcSqlIndex.DataSourceName + "-" + srcSqlIndex.TableName + "-" + srcSqlIndex.IndexName).ToLowerInvariant();
+                    string srcName = (srcSqlIndex.dataSourceName + "-" + srcSqlIndex.tableName + "-" + srcSqlIndex.indexName).ToLowerInvariant();
                     updateDst = false;
                     //
                     // Search for this name in the Dst
@@ -1106,13 +1103,13 @@ namespace Contensive.Processor.Models.Domain {
                     bool indexChanged = false;
                     MetadataMiniCollectionModel.MiniCollectionSQLIndexModel indexToUpdate = new MetadataMiniCollectionModel.MiniCollectionSQLIndexModel();
                     foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
-                        dstName = (dstSqlIndex.DataSourceName + "-" + dstSqlIndex.TableName + "-" + dstSqlIndex.IndexName).ToLowerInvariant();
+                        dstName = (dstSqlIndex.dataSourceName + "-" + dstSqlIndex.tableName + "-" + dstSqlIndex.indexName).ToLowerInvariant();
                         if (textMatch(dstName, srcName)) {
                             //
                             // found a match between Src and Dst
                             indexFound = true;
                             indexToUpdate = dstSqlIndex;
-                            indexChanged = !textMatch(dstSqlIndex.FieldNameList, srcSqlIndex.FieldNameList);
+                            indexChanged = !textMatch(dstSqlIndex.fieldNameList, srcSqlIndex.fieldNameList);
                             break;
                         }
                     }
@@ -1125,10 +1122,10 @@ namespace Contensive.Processor.Models.Domain {
                         // update dst to src
 
                         indexToUpdate.dataChanged = true;
-                        indexToUpdate.DataSourceName = srcSqlIndex.DataSourceName;
-                        indexToUpdate.FieldNameList = srcSqlIndex.FieldNameList;
-                        indexToUpdate.IndexName = srcSqlIndex.IndexName;
-                        indexToUpdate.TableName = srcSqlIndex.TableName;
+                        indexToUpdate.dataSourceName = srcSqlIndex.dataSourceName;
+                        indexToUpdate.fieldNameList = srcSqlIndex.fieldNameList;
+                        indexToUpdate.indexName = srcSqlIndex.indexName;
+                        indexToUpdate.tableName = srcSqlIndex.tableName;
                     }
                 }
                 //
@@ -1141,10 +1138,10 @@ namespace Contensive.Processor.Models.Domain {
                     string srcKey = srcKvp.Key.ToLowerInvariant();
                     MetadataMiniCollectionModel.MiniCollectionMenuModel srcMenu = srcKvp.Value;
                     string srcName = srcMenu.name.ToLowerInvariant();
-                    string srcGuid = srcMenu.Guid;
-                    string SrcParentName = GenericController.toLCase(srcMenu.ParentName);
+                    string srcGuid = srcMenu.guid;
+                    string SrcParentName = GenericController.toLCase(srcMenu.parentName);
                     string SrcNameSpace = GenericController.toLCase(srcMenu.menuNameSpace);
-                    bool SrcIsNavigator = srcMenu.IsNavigator;
+                    bool SrcIsNavigator = srcMenu.isNavigator;
                     updateDst = false;
                     //
                     // Search for match using guid
@@ -1155,10 +1152,10 @@ namespace Contensive.Processor.Models.Domain {
                     foreach (var dstKvp in dstCollection.menus) {
                         string dstKey = dstKvp.Key.ToLowerInvariant();
                         MetadataMiniCollectionModel.MiniCollectionMenuModel dstMenu = dstKvp.Value;
-                        string dstGuid = dstMenu.Guid;
+                        string dstGuid = dstMenu.guid;
                         if (dstGuid == srcGuid) {
-                            DstIsNavigator = dstMenu.IsNavigator;
-                            DstKey = GenericController.toLCase(dstMenu.Key);
+                            DstIsNavigator = dstMenu.isNavigator;
+                            DstKey = GenericController.toLCase(dstMenu.key);
                             string SrcKey = null;
                             IsMatch = (DstKey == SrcKey) && (SrcIsNavigator == DstIsNavigator);
                             if (IsMatch) {
@@ -1179,11 +1176,11 @@ namespace Contensive.Processor.Models.Domain {
                                 if (SrcIsNavigator) {
                                     //
                                     // Navigator - check namespace if Dst.guid is blank (builder to new version of menu)
-                                    IsMatch = (SrcNameSpace == GenericController.toLCase(dstMenu.menuNameSpace)) && (dstMenu.Guid == "");
+                                    IsMatch = (SrcNameSpace == GenericController.toLCase(dstMenu.menuNameSpace)) && (dstMenu.guid == "");
                                 } else {
                                     //
                                     // AdminMenu - check parentname
-                                    IsMatch = (SrcParentName == GenericController.toLCase(dstMenu.ParentName));
+                                    IsMatch = (SrcParentName == GenericController.toLCase(dstMenu.parentName));
                                 }
                                 if (IsMatch) {
                                     dstMenuMatch = dstMenu;
@@ -1193,20 +1190,20 @@ namespace Contensive.Processor.Models.Domain {
                         }
                     }
                     if (IsMatch) {
-                        updateDst |= (dstMenuMatch.Active != srcMenu.Active);
-                        updateDst |= (dstMenuMatch.AdminOnly != srcMenu.AdminOnly);
-                        updateDst |= !textMatch(dstMenuMatch.ContentName, srcMenu.ContentName);
-                        updateDst |= (dstMenuMatch.DeveloperOnly != srcMenu.DeveloperOnly);
-                        updateDst |= !textMatch(dstMenuMatch.LinkPage, srcMenu.LinkPage);
+                        updateDst |= (dstMenuMatch.active != srcMenu.active);
+                        updateDst |= (dstMenuMatch.adminOnly != srcMenu.adminOnly);
+                        updateDst |= !textMatch(dstMenuMatch.contentName, srcMenu.contentName);
+                        updateDst |= (dstMenuMatch.developerOnly != srcMenu.developerOnly);
+                        updateDst |= !textMatch(dstMenuMatch.linkPage, srcMenu.linkPage);
                         updateDst |= !textMatch(dstMenuMatch.name, srcMenu.name);
-                        updateDst |= (dstMenuMatch.NewWindow != srcMenu.NewWindow);
-                        updateDst |= !textMatch(dstMenuMatch.SortOrder, srcMenu.SortOrder);
-                        updateDst |= !textMatch(dstMenuMatch.AddonName, srcMenu.AddonName);
-                        updateDst |= !textMatch(dstMenuMatch.AddonGuid, srcMenu.AddonGuid);
-                        updateDst |= !textMatch(dstMenuMatch.NavIconType, srcMenu.NavIconType);
-                        updateDst |= !textMatch(dstMenuMatch.NavIconTitle, srcMenu.NavIconTitle);
+                        updateDst |= (dstMenuMatch.newWindow != srcMenu.newWindow);
+                        updateDst |= !textMatch(dstMenuMatch.sortOrder, srcMenu.sortOrder);
+                        updateDst |= !textMatch(dstMenuMatch.addonName, srcMenu.addonName);
+                        updateDst |= !textMatch(dstMenuMatch.addonGuid, srcMenu.addonGuid);
+                        updateDst |= !textMatch(dstMenuMatch.navIconType, srcMenu.navIconType);
+                        updateDst |= !textMatch(dstMenuMatch.navIconTitle, srcMenu.navIconTitle);
                         updateDst |= !textMatch(dstMenuMatch.menuNameSpace, srcMenu.menuNameSpace);
-                        updateDst |= !textMatch(dstMenuMatch.Guid, srcMenu.Guid);
+                        updateDst |= !textMatch(dstMenuMatch.guid, srcMenu.guid);
                         dstCollection.menus.Remove(DstKey);
                     }
                     dstCollection.menus.Add(srcKey, srcMenu);
@@ -1219,17 +1216,17 @@ namespace Contensive.Processor.Models.Domain {
                 int srcStylePtr = 0;
                 int dstStylePtr = 0;
                 for (srcStylePtr = 0; srcStylePtr < srcCollection.styleCnt; srcStylePtr++) {
-                    string srcName = GenericController.toLCase(srcCollection.styles[srcStylePtr].Name);
+                    string srcName = GenericController.toLCase(srcCollection.styles[srcStylePtr].name);
                     updateDst = false;
                     //
                     // Search for this name in the Dst
                     //
                     for (dstStylePtr = 0; dstStylePtr < dstCollection.styleCnt; dstStylePtr++) {
-                        dstName = GenericController.toLCase(dstCollection.styles[dstStylePtr].Name);
+                        dstName = GenericController.toLCase(dstCollection.styles[dstStylePtr].name);
                         if (dstName == srcName) {
                             //
                             // found a match between Src and Dst
-                            updateDst |= !textMatch(dstCollection.styles[dstStylePtr].Copy, srcCollection.styles[srcStylePtr].Copy);
+                            updateDst |= !textMatch(dstCollection.styles[dstStylePtr].copy, srcCollection.styles[srcStylePtr].copy);
                             break;
                         }
                     }
@@ -1247,8 +1244,8 @@ namespace Contensive.Processor.Models.Domain {
                         // It okToUpdateDstFromSrc, update the Dst with the Src
                         //
                         tempVar6.dataChanged = true;
-                        tempVar6.Copy = srcCollection.styles[srcStylePtr].Copy;
-                        tempVar6.Name = srcCollection.styles[srcStylePtr].Name;
+                        tempVar6.copy = srcCollection.styles[srcStylePtr].copy;
+                        tempVar6.name = srcCollection.styles[srcStylePtr].name;
                     }
                 }
                 //
@@ -1366,14 +1363,14 @@ namespace Contensive.Processor.Models.Domain {
                 string LCaseParentName = null;
 
                 //
-                ParentName = menu.ParentName;
+                ParentName = menu.parentName;
                 if (!string.IsNullOrEmpty(ParentName)) {
                     LCaseParentName = GenericController.toLCase(ParentName);
                     foreach (var kvp in menus) {
                         MetadataMiniCollectionModel.MiniCollectionMenuModel testMenu = kvp.Value;
                         if (GenericController.strInstr(1, "," + UsedIDList + ",", "," + Ptr.ToString() + ",") == 0) {
-                            if (LCaseParentName == GenericController.toLCase(testMenu.name) && (menu.IsNavigator == testMenu.IsNavigator)) {
-                                Prefix = GetMenuNameSpace(core, menus, testMenu, UsedIDList + "," + menu.Guid);
+                            if (LCaseParentName == GenericController.toLCase(testMenu.name) && (menu.isNavigator == testMenu.isNavigator)) {
+                                Prefix = GetMenuNameSpace(core, menus, testMenu, UsedIDList + "," + menu.guid);
                                 if (string.IsNullOrEmpty(Prefix)) {
                                     returnAttr = ParentName;
                                 } else {

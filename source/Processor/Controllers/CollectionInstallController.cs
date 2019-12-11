@@ -210,12 +210,12 @@ namespace Contensive.Processor.Controllers {
                                             //												Dim CollectionblockNavigatorNode_fileValueOK As Boolean
                                             bool CollectionSystem = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
                                             int Parent_NavId = BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel {
-                                                Guid = addonGuidManageAddon,
+                                                guid = addonGuidManageAddon,
                                                 name = "Manage Add-ons",
-                                                AdminOnly = false,
-                                                DeveloperOnly = false,
-                                                NewWindow = false,
-                                                Active = true,
+                                                adminOnly = false,
+                                                developerOnly = false,
+                                                newWindow = false,
+                                                active = true,
                                             }, 0);
                                             bool CollectionUpdatable = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""));
                                             string onInstallAddonGuid = XmlController.getXMLAttribute(core, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "OnInstallAddonGuid", "");
@@ -1332,13 +1332,13 @@ namespace Contensive.Processor.Controllers {
                                                         BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel {
                                                             menuNameSpace = menuNameSpace,
                                                             name = addonName,
-                                                            AdminOnly = false,
-                                                            DeveloperOnly = false,
-                                                            NewWindow = false,
-                                                            Active = true,
-                                                            AddonName = addonName,
-                                                            NavIconType = NavIconTypeString,
-                                                            NavIconTitle = addonName
+                                                            adminOnly = false,
+                                                            developerOnly = false,
+                                                            newWindow = false,
+                                                            active = true,
+                                                            addonName = addonName,
+                                                            navIconType = NavIconTypeString,
+                                                            navIconTitle = addonName
                                                         }, CollectionID);
                                                     }
                                                     break;
