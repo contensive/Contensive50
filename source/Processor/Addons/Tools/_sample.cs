@@ -87,7 +87,7 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 resultForm.Append(HtmlController.inputHidden(rnAdminSourceForm, AdminFormSecurityControl));
                 bool isEmptyList = false;
-                resultForm.Append(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_lookupContent(core, "countryId", countryId, ContentMetadataModel.getContentId(core, "countries"), ref isEmptyList)));
+                resultForm.Append(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_lookupContent(core, "countryId", countryId, ContentMetadataModel.getContentId(core, "countries"), ref isEmptyList, false, "", "", false, "")));
                 resultForm.Append(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_text(core, "PageSize", PageSize.ToString())));
                 //
                 // -- assemble form

@@ -855,13 +855,13 @@ namespace Contensive.Processor.Controllers {
                                                                         Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
                                                                         break;
                                                                     case "boolean":
-                                                                        Copy = AdminUIController.getDefaultEditor_bool(core, FieldName, GenericController.encodeBoolean(FieldValue), FieldReadOnly);
+                                                                        Copy = AdminUIController.getDefaultEditor_bool(core, FieldName, GenericController.encodeBoolean(FieldValue), FieldReadOnly,"");
                                                                         break;
                                                                     case "float":
                                                                         Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
                                                                         break;
                                                                     case "date":
-                                                                        Copy = AdminUIController.getDefaultEditor_dateTime(core, FieldName, encodeDate(FieldValue), FieldReadOnly);
+                                                                        Copy = AdminUIController.getDefaultEditor_dateTime(core, FieldName, encodeDate(FieldValue), FieldReadOnly,"",false,"");
                                                                         break;
                                                                     case "file":
                                                                     case "imagefile":

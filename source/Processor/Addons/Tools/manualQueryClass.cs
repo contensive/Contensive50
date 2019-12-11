@@ -179,7 +179,7 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 // -- data source
                 bool isEmptyList = false;
-                Stream.add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_lookupContent(core, "DataSourceID", datasource.id, ContentMetadataModel.getContentId(core, "data sources"), ref isEmptyList)));
+                Stream.add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_lookupContent(core, "DataSourceID", datasource.id, ContentMetadataModel.getContentId(core, "data sources"), ref isEmptyList, false, "", "", false, "")));
                 {
                     //
                     // -- sql list
@@ -190,7 +190,7 @@ namespace Contensive.Processor.Addons.Tools {
                         lookupList.Add(new NameValueModel { name = sql, value=sql });
                     }
 
-                    string inputSelect = AdminUIController.getDefaultEditor_LookupList(core, "SQLList", "0" , lookupList,false, "SQLList");
+                    string inputSelect = AdminUIController.getDefaultEditor_LookupList(core, "SQLList", "0" , lookupList,false, "SQLList","",false);
                     inputSelect = inputSelect.Replace("<select ", "<select onChange=\"SQL.value=SQLList.value\" ");
                     Stream.add(AdminUIController.getToolFormInputRow(core, "Previous Queries", inputSelect));
                 }

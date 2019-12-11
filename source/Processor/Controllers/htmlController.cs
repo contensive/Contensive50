@@ -2502,7 +2502,7 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public string getPanelHeader(string RightSideMessage) {
-            return AdminUIController.getHeader(core, "", RightSideMessage);
+            return AdminUIController.getHeader(core, "", RightSideMessage, "");
         }
         //
         //====================================================================================================

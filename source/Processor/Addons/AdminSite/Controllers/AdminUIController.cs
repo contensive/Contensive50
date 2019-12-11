@@ -19,7 +19,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
     /// REFACTOR - add  try-catch
     /// not IDisposable - not contained classes that need to be disposed
     /// </summary>
-    public class AdminUIController {
+    public static class AdminUIController {
         //
         //====================================================================================================
         /// <summary>
@@ -52,19 +52,19 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 //
                 string buttonsLeft = "";
                 string buttonsRight = "";
-                if (info.allowCancel) buttonsLeft += getButtonPrimary(ButtonCancel, "return processSubmit(this);");
-                if (info.allowRefresh) buttonsLeft += getButtonPrimary(ButtonRefresh);
+                if (info.allowCancel) { buttonsLeft += getButtonPrimary(ButtonCancel, "return processSubmit(this);"); }
+                if (info.allowRefresh) { buttonsLeft += getButtonPrimary(ButtonRefresh); }
                 if (info.allowSave) {
                     buttonsLeft += getButtonPrimary(ButtonOK, "return processSubmit(this);");
                     buttonsLeft += getButtonPrimary(ButtonSave, "return processSubmit(this);");
                     if (info.allowAdd) buttonsLeft += getButtonPrimary(ButtonSaveAddNew, "return processSubmit(this);");
                 }
-                if (info.allowSendTest) buttonsLeft += getButtonPrimary(ButtonSendTest, "Return processSubmit(this)");
-                if (info.allowSend) buttonsLeft += getButtonPrimary(ButtonSend, "Return processSubmit(this)");
-                if (info.allowMarkReviewed) buttonsLeft += getButtonPrimary(ButtonMarkReviewed);
-                if (info.allowCreateDuplicate) buttonsLeft += getButtonPrimary(ButtonCreateDuplicate, "return processSubmit(this)");
-                if (info.allowActivate) buttonsLeft += getButtonPrimary(ButtonActivate, "return processSubmit(this)");
-                if (info.allowDeactivate) buttonsLeft += getButtonPrimary(ButtonDeactivate, "return processSubmit(this)");
+                if (info.allowSendTest) { buttonsLeft += getButtonPrimary(ButtonSendTest, "Return processSubmit(this)"); }
+                if (info.allowSend) { buttonsLeft += getButtonPrimary(ButtonSend, "Return processSubmit(this)"); }
+                if (info.allowMarkReviewed) { buttonsLeft += getButtonPrimary(ButtonMarkReviewed); }
+                if (info.allowCreateDuplicate) { buttonsLeft += getButtonPrimary(ButtonCreateDuplicate, "return processSubmit(this)"); }
+                if (info.allowActivate) { buttonsLeft += getButtonPrimary(ButtonActivate, "return processSubmit(this)"); }
+                if (info.allowDeactivate) { buttonsLeft += getButtonPrimary(ButtonDeactivate, "return processSubmit(this)"); }
                 string JSOnClick = "if(!DeleteCheck())return false;";
                 if (info.isPageContent) {
                     JSOnClick = "if(!DeletePageCheck())return false;";
@@ -93,7 +93,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         /// <param name="leftSideMessage"></param>
         /// <param name="rightSideMessage"></param>
         /// <returns></returns>
-        public static string getHeader(CoreController core, string leftSideMessage, string rightSideMessage = "", string rightSideNavHtml = "") {
+        public static string getHeader(CoreController core, string leftSideMessage, string rightSideMessage, string rightSideNavHtml) {
             string result = Processor.Properties.Resources.adminNavBarHtml;
             result = result.Replace("{navBrand}", core.appConfig.name);
             result = result.Replace("{leftSideMessage}", leftSideMessage);
@@ -104,25 +104,25 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         //
         //====================================================================================================
         public static string getButtonHtmlFromList(CoreController core, List<ButtonMetadata> ButtonList, bool AllowDelete, bool AllowAdd) {
-            string s = "";
+            var result = new StringBuilder();
             try {
                 foreach (ButtonMetadata button in ButtonList) {
 
                     if (button.isDelete) {
-                        s += getButtonDanger(button.value, "if(!DeleteCheck()) { return false; }", !AllowDelete);
+                        result.Append(getButtonDanger(button.value, "if(!DeleteCheck()) { return false; }", !AllowDelete));
                     } else if (button.isAdd) {
-                        s += getButtonPrimary(button.value, "return processSubmit(this);", !AllowAdd);
+                        result.Append(getButtonPrimary(button.value, "return processSubmit(this);", !AllowAdd));
                     } else if (button.isClose) {
-                        s += getButtonPrimary(button.value, "window.close();");
+                        result.Append(getButtonPrimary(button.value, "window.close();"));
                     } else {
-                        s += getButtonPrimary(button.value);
+                        result.Append(getButtonPrimary(button.value));
                     }
 
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
-            return s;
+            return result.ToString();
         }
         //
         //====================================================================================================
@@ -194,7 +194,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         //
         //====================================================================================================
         public static string getForm_index_pageNavigation(CoreController core, int PageNumber, int recordsPerPage, int recordCnt, string contentName) {
-            string result = null;
             try {
                 int PageCount = 1;
                 if (recordCnt > 1) {
@@ -213,72 +212,69 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                         NavStart = 1;
                     }
                 }
-                string Nav = "";
+                var Nav = new StringBuilder();
                 if (NavStart > 1) {
-                    Nav = Nav + "<li onclick=\"bbj(this);\">1</li><li class=\"delim\">&#171;</li>";
+                    Nav.Append(cr3 + "<li onclick=\"bbj(this);\">1</li><li class=\"delim\">&#171;</li>");
                 }
                 for (int Ptr = NavStart; Ptr <= NavEnd; Ptr++) {
-                    Nav = Nav + "<li onclick=\"bbj(this);\">" + Ptr + "</li>";
+                    if (Ptr.Equals(PageNumber)) {
+                        Nav.Append(cr3 + "<li onclick=\"bbj(this);\" class=\"hit\">" + Ptr + "</li>");
+                        continue;
+                    }
+                    Nav.Append(cr3 + "<li onclick=\"bbj(this);\">" + Ptr + "</li>");
                 }
                 if (NavEnd < PageCount) {
-                    Nav = Nav + "<li class=\"delim\">&#187;</li><li onclick=\"bbj(this);\">" + PageCount + "</li>";
+                    Nav.Append(cr3 + "<li class=\"delim\">&#187;</li><li onclick=\"bbj(this);\">" + PageCount + "</li>");
                 }
-                Nav = GenericController.strReplace(Nav, ">" + PageNumber + "<", " class=\"hit\">" + PageNumber + "<");
                 string recordDetails = "";
                 switch (recordCnt) {
-                    case 0:
-                    recordDetails = "no records found";
-                    break;
-                    case 1:
-                    recordDetails = "1 record found";
-                    break;
-                    default:
-                    recordDetails = recordCnt + " records found";
-                    break;
+                    case 0: {
+                            recordDetails = "no records found";
+                            break;
+                        }
+                    case 1: {
+                            recordDetails = "1 record found";
+                            break;
+                        }
+                    default: {
+                            recordDetails = recordCnt + " records found";
+                            break;
+                        }
                 }
-                Nav = "" + "\r<script language=\"javascript\">function bbj(p){document.getElementsByName('indexGoToPage')[0].value=p.innerHTML;document.adminForm.submit();}</script>"
-                    + "\r<div class=\"ccJumpCon\">"
-                    + cr2 + "<ul><li class=\"caption\">" + recordDetails + ", page</li>"
-                    + cr3 + Nav + cr2 + "</ul>"
-                    + "\r</div>";
-                result += Nav;
+                return ""
+                    + cr + "<script language=\"javascript\">function bbj(p){document.getElementsByName('indexGoToPage')[0].value=p.innerHTML;document.adminForm.submit();}</script>"
+                    + cr + "<div class=\"ccJumpCon\">"
+                    + cr2 + "<ul>"
+                    + cr3 + "<li class=\"caption\">" + recordDetails + ", page</li>"
+                    + cr3 + Nav
+                    + cr2 + "</ul>"
+                    + cr + "</div>";
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return string.Empty;
             }
-            return result;
         }
         //
         //====================================================================================================
         public static string getToolBody(CoreController core, string title, string ButtonCommaListLeft, string ButtonCommaListRight, bool AllowAdd, bool AllowDelete, string description, string ContentSummary, int ContentPadding, string Content) {
-            string body = "";
             try {
+                //
+                // Build inner content
                 string CellContentSummary = "";
-                //
-                // Build ButtonBar
-                //
-                string LeftHtmlButtonList = "";
-                if (!string.IsNullOrEmpty(ButtonCommaListLeft.Trim(' '))) {
-                    LeftHtmlButtonList = getButtonHtmlFromCommaList(core, ButtonCommaListLeft, AllowDelete, AllowAdd, "Button");
-                }
-                string RightHtmlButtonList = "";
-                if (!string.IsNullOrEmpty(ButtonCommaListRight.Trim(' '))) {
-                    RightHtmlButtonList = getButtonHtmlFromCommaList(core, ButtonCommaListRight, AllowDelete, AllowAdd, "Button");
-                }
                 if (!string.IsNullOrEmpty(ContentSummary)) {
                     CellContentSummary = ""
                         + "\r<div class=\"ccPanelBackground\" style=\"padding:10px;\">"
                         + core.html.getPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
                         + "\r</div>";
                 }
-                body += ""
+                string body = ""
                     + getSectionHeader(core, title, description)
                     + CellContentSummary
                     + "<div style=\"padding:" + ContentPadding + "px;\">" + Content + "\r</div>"
                     + "";
                 //
                 // -- assemble form
-                body = getToolForm(core, body, ButtonCommaListLeft, ButtonCommaListRight);
-                return body;
+                return getToolForm(core, body, ButtonCommaListLeft, ButtonCommaListRight);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 return toolExceptionMessage;
@@ -328,30 +324,24 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         }
         //
         //====================================================================================================
-        private static string getReport_Cell(CoreController core, string Copy, string Align, int Columns, int RowPointer) {
-            string tempGetReport_Cell = null;
-            string iAlign = null;
-            string Style = null;
-            string CellCopy = null;
-            //
-            iAlign = encodeEmpty(Align, "left");
-            //
+        //
+        private static string getReport_Cell(string Copy, string Align, int Columns, int RowPointer) {
+            string iAlign = encodeEmpty(Align, "left");
+            string Style = "ccAdminListRowEven";
             if ((RowPointer % 2) > 0) {
                 Style = "ccAdminListRowOdd";
-            } else {
-                Style = "ccAdminListRowEven";
             }
             //
-            tempGetReport_Cell = Environment.NewLine + "<td valign=\"middle\" align=\"" + iAlign + "\" class=\"" + Style + "\"";
+            string cell = Environment.NewLine + "<td valign=\"middle\" align=\"" + iAlign + "\" class=\"" + Style + "\"";
             if (Columns > 1) {
-                tempGetReport_Cell = tempGetReport_Cell + " colspan=\"" + Columns + "\"";
+                cell = cell + " colspan=\"" + Columns + "\"";
             }
             //
-            CellCopy = Copy;
+            string CellCopy = Copy;
             if (string.IsNullOrEmpty(CellCopy)) {
                 CellCopy = "&nbsp;";
             }
-            return tempGetReport_Cell + "><span class=\"ccSmall\">" + CellCopy + "</span></td>";
+            return cell + "><span class=\"ccSmall\">" + CellCopy + "</span></td>";
         }
         //
         //====================================================================================================
@@ -390,6 +380,10 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                             string QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetza).ToString(), true);
                             QS = GenericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
                             Copy = "<a href=\"?" + QS + "\" title=\"Sort Z-A\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"" + cdnPrefix + "images/arrowdown.gif\" width=8 height=8 border=0></a>";
+                            break;
+                        }
+                    default: {
+                            // nothing to do
                             break;
                         }
                 }
@@ -470,12 +464,11 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         //
         //====================================================================================================
         public static string getReport2(CoreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle, bool[] ColSortable, int DefaultSortColumnPtr) {
-            string result = "";
+            var result = new StringBuilder();
             try {
                 string RQS = null;
                 int RowBAse = 0;
                 StringBuilderLegacyController Content = new StringBuilderLegacyController();
-                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 int ColumnCount = 0;
                 int ColumnPtr = 0;
                 string ColumnWidth = null;
@@ -487,7 +480,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 int LinkCount = 0;
                 int ReportPageNumber = 0;
                 int ReportPageSize = 0;
-                string iClassStyle = null;
                 int SortColPtr = 0;
                 int SortColType = 0;
                 //
@@ -498,11 +490,6 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 ReportPageSize = PageSize;
                 if (ReportPageSize < 1) {
                     ReportPageSize = 50;
-                }
-                //
-                iClassStyle = ClassStyle;
-                if (string.IsNullOrEmpty(iClassStyle)) {
-                    iClassStyle = "ccPanel";
                 }
                 ColumnCount = Cells.GetUpperBound(1);
                 RQS = core.doc.refreshQueryString;
@@ -541,16 +528,16 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 //
                 if (RowCount == 0) {
                     Content.add(Environment.NewLine + "<tr>");
-                    Content.add(getReport_Cell(core, (RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
-                    Content.add(getReport_Cell(core, "-- End --", "left", ColumnCount, 0));
+                    Content.add(getReport_Cell((RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
+                    Content.add(getReport_Cell("-- End --", "left", ColumnCount, 0));
                     Content.add(Environment.NewLine + "</tr>");
                 } else {
                     RowBAse = (ReportPageSize * (ReportPageNumber - 1)) + 1;
                     for (RowPointer = 0; RowPointer < RowCount; RowPointer++) {
                         Content.add(Environment.NewLine + "<tr>");
-                        Content.add(getReport_Cell(core, (RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
+                        Content.add(getReport_Cell((RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
                         for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
-                            Content.add(getReport_Cell(core, Cells[RowPointer, ColumnPtr], ColAlign[ColumnPtr], 1, RowPointer));
+                            Content.add(getReport_Cell(Cells[RowPointer, ColumnPtr], ColAlign[ColumnPtr], 1, RowPointer));
                         }
                         Content.add(Environment.NewLine + "</tr>");
                     }
@@ -559,7 +546,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                 // ----- End Table
                 //
                 Content.add(kmaEndTable);
-                result += Content.text;
+                result.Append(Content.text);
                 //
                 // ----- Post Table copy
                 //
@@ -569,7 +556,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                     PageCount = encodeInteger(DataRowCount / (double)ReportPageSize);
                 }
                 if (PageCount > 1) {
-                    result += "<br>Page " + ReportPageNumber + " (Row " + (RowBAse) + " of " + DataRowCount + ")";
+                    result.Append("<br>Page " + ReportPageNumber + " (Row " + (RowBAse) + " of " + DataRowCount + ")");
                     if (PageCount > 20) {
                         PagePointer = ReportPageNumber - 10;
                     }
@@ -577,44 +564,44 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                         PagePointer = 1;
                     }
                     if (PageCount > 1) {
-                        result += "<br>Go to Page ";
+                        result.Append("<br>Go to Page ");
                         if (PagePointer != 1) {
                             WorkingQS = core.doc.refreshQueryString;
                             WorkingQS = GenericController.modifyQueryString(WorkingQS, "GotoPage", "1", true);
-                            result += "<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">1</A>...&nbsp;";
+                            result.Append("<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">1</A>...&nbsp;");
                         }
                         WorkingQS = core.doc.refreshQueryString;
                         WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageSize, ReportPageSize.ToString(), true);
                         while ((PagePointer <= PageCount) && (LinkCount < 20)) {
                             if (PagePointer == ReportPageNumber) {
-                                result += PagePointer + "&nbsp;";
+                                result.Append(PagePointer + "&nbsp;");
                             } else {
                                 WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageNumber, PagePointer.ToString(), true);
-                                result += "<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PagePointer + "</A>&nbsp;";
+                                result.Append("<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PagePointer + "</A>&nbsp;");
                             }
                             PagePointer = PagePointer + 1;
                             LinkCount = LinkCount + 1;
                         }
                         if (PagePointer < PageCount) {
                             WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageNumber, PageCount.ToString(), true);
-                            result += "...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PageCount + "</A>&nbsp;";
+                            result.Append("...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PageCount + "</A>&nbsp;");
                         }
                         if (ReportPageNumber < PageCount) {
                             WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageNumber, (ReportPageNumber + 1).ToString(), true);
-                            result += "...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">next</A>&nbsp;";
+                            result.Append("...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">next</A>&nbsp;");
                         }
-                        result += "<br>&nbsp;";
+                        result.Append("<br>&nbsp;");
                     }
                 }
                 //
-                result = ""
+                return ""
                 + PreTableCopy + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr><td style=\"padding:10px;\">"
                 + result + "</td></tr></table>"
                 + PostTableCopy + "";
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return string.Empty;
             }
-            return result;
         }
         //
         // ====================================================================================================
@@ -676,7 +663,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
             if (editDate < new DateTime(1990, 1, 1)) {
                 return "unknown date";
             }
-            string result = editDate.ToString( CultureInfo.InvariantCulture ) + ", by ";
+            string result = editDate.ToString(CultureInfo.InvariantCulture) + ", by ";
             if (editor == null) {
                 result += "unknown user";
             } else {
@@ -694,98 +681,14 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         /// <returns></returns>
         public static string getEditForm_TitleBarDetails(CoreController core, RecordEditHeaderInfoClass headerInfo, EditRecordModel editRecord) {
             string result = "";
-            bool alt = true;
-            if (alt) {
-                if (editRecord.id == 0) {
-                    result += HtmlController.div(HtmlController.strong(editRecord.contentControlId_Name) + ":&nbsp;New record", "col-sm-12");
-                } else {
-                    result += HtmlController.div(HtmlController.strong(editRecord.contentControlId_Name + ":&nbsp;#") + headerInfo.recordId + ", " + editRecord.nameLc, "col-sm-4");
-                    result += HtmlController.div(HtmlController.strong("Created:&nbsp;") + getEditForm_TitleBarDetails_EditorString(editRecord.dateAdded, editRecord.createdBy, "unknown"), "col-sm-4");
-                    result += HtmlController.div(HtmlController.strong("Modified:&nbsp;") + getEditForm_TitleBarDetails_EditorString(editRecord.modifiedDate, editRecord.modifiedBy, "not modified"), "col-sm-4");
-                }
-                result = HtmlController.div(result, "row");
+            if (editRecord.id == 0) {
+                result += HtmlController.div(HtmlController.strong(editRecord.contentControlId_Name) + ":&nbsp;New record", "col-sm-12");
             } else {
-                if (headerInfo.recordId == 0) {
-                    result = "<div>New Record</div>";
-                } else {
-                    result = "<table border=0 cellpadding=0 cellspacing=0 style=\"width:90%\">";
-                    result += "<tr><td width=\"50%\">"
-                    + "Name: " + headerInfo.recordName + "<br>Record ID: " + headerInfo.recordId + "</td><td width=\"50%\">";
-                    //
-                    string CreatedCopy = "";
-                    CreatedCopy = CreatedCopy + " " + editRecord.dateAdded.ToString();
-                    //
-                    string CreatedBy = "the system";
-                    if (editRecord.createdBy.id != 0) {
-                        using (var csData = new CsModel(core)) {
-                            if (csData.openSql("select Name,Active from ccMembers where id=" + editRecord.createdBy.id)) {
-                                string Name = csData.getText("name");
-                                bool Active = csData.getBoolean("active");
-                                if (!Active && (!string.IsNullOrEmpty(Name))) {
-                                    CreatedBy = "Inactive user " + Name;
-                                } else if (!Active) {
-                                    CreatedBy = "Inactive user #" + editRecord.createdBy.id;
-                                } else if (string.IsNullOrEmpty(Name)) {
-                                    CreatedBy = "Unnamed user #" + editRecord.createdBy.id;
-                                } else {
-                                    CreatedBy = Name;
-                                }
-                            } else {
-                                CreatedBy = "deleted user #" + editRecord.createdBy.id;
-                            }
-                        }
-                    }
-                    if (!string.IsNullOrEmpty(CreatedBy)) {
-                        CreatedCopy = CreatedCopy + " by " + CreatedBy;
-                    } else {
-                    }
-                    result += "Created:" + CreatedCopy;
-                    //
-                    string ModifiedCopy = "";
-                    if (editRecord.modifiedDate == DateTime.MinValue) {
-                        ModifiedCopy = CreatedCopy;
-                    } else {
-                        ModifiedCopy = ModifiedCopy + " " + editRecord.modifiedDate;
-                        CreatedBy = "the system";
-                        if (editRecord.modifiedBy.id != 0) {
-                            using (var csData = new CsModel(core)) {
-                                if (csData.openSql("select Name,Active from ccMembers where id=" + editRecord.modifiedBy.id)) {
-                                    string Name = csData.getText("name");
-                                    bool Active = csData.getBoolean("active");
-                                    if (!Active && (!string.IsNullOrEmpty(Name))) {
-                                        CreatedBy = "Inactive user " + Name;
-                                    } else if (!Active) {
-                                        CreatedBy = "Inactive user #" + editRecord.modifiedBy.id;
-                                    } else if (string.IsNullOrEmpty(Name)) {
-                                        CreatedBy = "Unnamed user #" + editRecord.modifiedBy.id;
-                                    } else {
-                                        CreatedBy = Name;
-                                    }
-                                } else {
-                                    CreatedBy = "deleted user #" + editRecord.modifiedBy.id;
-                                }
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(CreatedBy)) {
-                            ModifiedCopy = ModifiedCopy + " by " + CreatedBy;
-                        } else {
-                        }
-                    }
-                    result += "<br>Last Modified:" + ModifiedCopy;
-                    if ((headerInfo.recordLockExpiresDate == null) || (headerInfo.recordLockExpiresDate < DateTime.Now)) {
-                        //
-                        // Add Edit Locking to right panel
-                        PersonModel personLock = DbBaseModel.create<PersonModel>(core.cpParent, headerInfo.recordLockById);
-                        if (personLock != null) {
-                            result += "<br><b>Record is locked by " + personLock.name + " until " + headerInfo.recordLockExpiresDate + "</b>";
-                        }
-                    }
-                    //
-                    result += "</td></tr>";
-                    result += "</table>";
-                }
+                result += HtmlController.div(HtmlController.strong(editRecord.contentControlId_Name + ":&nbsp;#") + headerInfo.recordId + ", " + editRecord.nameLc, "col-sm-4");
+                result += HtmlController.div(HtmlController.strong("Created:&nbsp;") + getEditForm_TitleBarDetails_EditorString(editRecord.dateAdded, editRecord.createdBy, "unknown"), "col-sm-4");
+                result += HtmlController.div(HtmlController.strong("Modified:&nbsp;") + getEditForm_TitleBarDetails_EditorString(editRecord.modifiedDate, editRecord.modifiedBy, "not modified"), "col-sm-4");
             }
-            return result;
+            return HtmlController.div(result, "row");
         }
         //
         // ====================================================================================================
@@ -796,7 +699,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         /// <param name="htmlName"></param>
         /// <param name="htmlValue"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_bool(CoreController core, string htmlName, bool htmlValue, bool readOnly = false, string htmlId = "") {
+        public static string getDefaultEditor_bool(CoreController core, string htmlName, bool htmlValue, bool readOnly, string htmlId) {
             string result = HtmlController.div(HtmlController.checkbox(htmlName, htmlValue, htmlId, false, "", readOnly), "checkbox");
             if (readOnly) result += HtmlController.inputHidden(htmlName, htmlValue);
             return result;
@@ -813,14 +716,20 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="isPassword"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_text(CoreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
-            if ((fieldValue.IndexOf("\n") == -1) && (fieldValue.Length < 80)) {
+        public static string getDefaultEditor_text(CoreController core, string fieldName, string fieldValue, bool readOnly, string htmlId) {
+            if ((fieldValue.IndexOf("\n", StringComparison.InvariantCulture) == -1) && (fieldValue.Length < 80)) {
                 //
                 // text field shorter then 40 characters without a CR
                 return HtmlController.inputText_Legacy(core, fieldName, fieldValue, 1, -1, htmlId, false, readOnly, "text form-control", 255);
             }
             return getDefaultEditor_TextArea(core, fieldName, fieldValue, readOnly, htmlId);
         }
+        //
+        public static string getDefaultEditor_text(CoreController core, string fieldName, string fieldValue, bool readOnly)
+            => getDefaultEditor_text(core, fieldName, fieldValue, readOnly, "");
+        //
+        public static string getDefaultEditor_text(CoreController core, string fieldName, string fieldValue)
+            => getDefaultEditor_text(core, fieldName, fieldValue, false, "");
         //
         // ====================================================================================================
         /// <summary>
@@ -833,15 +742,18 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="isPassword"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_TextArea(CoreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
+        public static string getDefaultEditor_TextArea(CoreController core, string fieldName, string fieldValue, bool readOnly, string htmlId) {
             //
             // longer text data, or text that contains a CR
             return HtmlController.inputTextarea(core, fieldName, fieldValue, 10, -1, htmlId, false, readOnly, "text form-control", false);
         }
         //
+        public static string getDefaultEditor_TextArea(CoreController core, string fieldName, string fieldValue, bool readOnly)
+            => getDefaultEditor_TextArea(core, fieldName, fieldValue, readOnly, "");
+        //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_Html(CoreController core, string fieldName, string fieldValue, string editorAddonListJSON, string styleList, string styleOptionList, bool readONly = false, string htmlId = "") {
+        public static string getDefaultEditor_Html(CoreController core, string fieldName, string fieldValue, string editorAddonListJSON, string styleList, string styleOptionList, bool readONly, string htmlId) {
             string result = "";
             if (readONly) {
                 result += HtmlController.inputHidden(fieldName, fieldValue);
@@ -858,6 +770,9 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
             return result;
         }
         //
+        public static string getDefaultEditor_Html(CoreController core, string fieldName, string fieldValue, string editorAddonListJSON, string styleList, string styleOptionList, bool readONly)
+            => getDefaultEditor_Html(core, fieldName, fieldValue, editorAddonListJSON, styleList, styleOptionList, readONly, "");
+        //
         // ====================================================================================================
         /// <summary>
         /// return an admin edit page row for one field in a list of fields within a tab
@@ -868,7 +783,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         /// <param name="readOnly"></param>
         /// <param name="htmlId"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_Password(CoreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
+        public static string getDefaultEditor_Password(CoreController core, string fieldName, string fieldValue, bool readOnly, string htmlId) {
             return HtmlController.inputText_Legacy(core, fieldName, fieldValue, -1, -1, htmlId, true, readOnly, "password form-control", 255);
         }
         //
@@ -886,7 +801,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         /// <param name="fieldRequired"></param>
         /// <param name="IsEmptyList"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_lookupContent(CoreController core, string fieldName, int fieldValue, int lookupContentId, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
+        public static string getDefaultEditor_lookupContent(CoreController core, string fieldName, int fieldValue, int lookupContentId, ref bool IsEmptyList, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired, string sqlFilter) {
             string result = "";
             ContentMetadataModel lookupContentMetacontent = ContentMetadataModel.create(core, lookupContentId);
             if (lookupContentMetacontent == null) {
@@ -944,7 +859,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         /// <param name="WhyReadOnlyMsg"></param>
         /// <param name="fieldRequired"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_lookupList(CoreController core, string htmlName, int defaultLookupIndexBaseOne, string[] lookupArray, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
+        public static string getDefaultEditor_lookupList(CoreController core, string htmlName, int defaultLookupIndexBaseOne, string[] lookupArray, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired) {
             string result = "";
             if (readOnly) {
                 //
@@ -968,7 +883,7 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
             }
             return result;
         }
-        public static string getDefaultEditor_LookupList(CoreController core, string htmlName, string defaultValue, List<NameValueModel> lookupList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
+        public static string getDefaultEditor_LookupList(CoreController core, string htmlName, string defaultValue, List<NameValueModel> lookupList, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired) {
             string result = "";
             if (readOnly) {
                 //
@@ -995,13 +910,13 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_dateTime(CoreController core, string fieldName, DateTime FieldValueDate, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
+        public static string getDefaultEditor_dateTime(CoreController core, string fieldName, DateTime FieldValueDate, bool readOnly, string htmlId, bool fieldRequired, string WhyReadOnlyMsg) {
             string inputDate = "";
             if (FieldValueDate.CompareTo(new DateTime(1900, 1, 1)) > 0) {
                 if (FieldValueDate.Hour.Equals(0) && FieldValueDate.Minute.Equals(0) && FieldValueDate.Second.Equals(0)) {
                     inputDate = FieldValueDate.ToShortDateString();
                 } else {
-                    inputDate = FieldValueDate.ToString();
+                    inputDate = FieldValueDate.ToString(CultureInfo.InvariantCulture);
                 }
             }
             return getDefaultEditor_text(core, fieldName, inputDate, readOnly, htmlId);
@@ -1009,12 +924,13 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_memberSelect(CoreController core, string htmlName, int selectedRecordId, int groupId, string groupName, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
+        public static string getDefaultEditor_memberSelect(CoreController core, string htmlName, int selectedRecordId, int groupId, string groupName, bool readOnly, string htmlId, bool fieldRequired, string WhyReadOnlyMsg) {
             string EditorString = "";
-            if ((groupId > 0) && (string.IsNullOrWhiteSpace(groupName))) {
+            string groupNameWorking = groupName;
+            if ((groupId > 0) && (string.IsNullOrWhiteSpace(groupNameWorking))) {
                 var group = DbBaseModel.create<GroupModel>(core.cpParent, groupId);
                 if (group != null) {
-                    groupName = "Group " + group.id.ToString();
+                    groupNameWorking = "Group " + group.id.ToString();
                     group.save(core.cpParent);
                 }
             }
@@ -1047,14 +963,14 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                         EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlId + "&id=" + selectedRecordId + "\">" + HtmlController.encodeHtml(recordName) + "</a>]";
                     }
                 }
-                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + ContentMetadataModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
+                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + ContentMetadataModel.getContentId(core, "groups") + "\">" + groupNameWorking + "</a>]");
             }
             return EditorString;
         }
         //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_manyToMany(CoreController core, ContentFieldMetadataModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly = false, string WhyReadOnlyMsg = "") {
+        public static string getDefaultEditor_manyToMany(CoreController core, ContentFieldMetadataModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly, string WhyReadOnlyMsg) {
             string result = "";
             //
             string MTMContent0 = MetadataController.getContentNameByID(core, field.contentId);
@@ -1070,114 +986,120 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
         //====================================================================================================
         //
         public static string getDefaultEditor_SelectorString(CoreController core, string SitePropertyName, string SitePropertyValue, string selector) {
-            string result = "";
+            var result = new StringBuilder();
             try {
                 Dictionary<string, string> instanceOptions = new Dictionary<string, string> {
                     { SitePropertyName, SitePropertyValue }
                 };
+                //
+                // -- 
                 string ExpandedSelector = "";
                 Dictionary<string, string> addonInstanceProperties = new Dictionary<string, string>();
                 core.addon.buildAddonOptionLists(ref addonInstanceProperties, ref ExpandedSelector, SitePropertyName + "=" + selector, instanceOptions, "0", true);
                 int Pos = GenericController.strInstr(1, ExpandedSelector, "[");
-                if (Pos != 0) {
+                if (Pos == 0) {
                     //
-                    // List of Options, might be select, radio or checkbox
-                    //
-                    string LCaseOptionDefault = GenericController.toLCase(ExpandedSelector.left(Pos - 1));
-                    int PosEqual = GenericController.strInstr(1, LCaseOptionDefault, "=");
-
-                    if (PosEqual > 0) {
-                        LCaseOptionDefault = LCaseOptionDefault.Substring(PosEqual);
-                    }
-
-                    LCaseOptionDefault = GenericController.decodeNvaArgument(LCaseOptionDefault);
-                    ExpandedSelector = ExpandedSelector.Substring(Pos);
-                    Pos = GenericController.strInstr(1, ExpandedSelector, "]");
-                    string OptionSuffix = "";
-                    if (Pos > 0) {
-                        if (Pos < ExpandedSelector.Length) {
-                            OptionSuffix = GenericController.toLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
-                        }
-                        ExpandedSelector = ExpandedSelector.left(Pos - 1);
-                    }
-                    string[] OptionValues = ExpandedSelector.Split('|');
-                    result = "";
-                    int OptionCnt = OptionValues.GetUpperBound(0) + 1;
-                    int OptionPtr = 0;
-                    for (OptionPtr = 0; OptionPtr < OptionCnt; OptionPtr++) {
-                        string OptionValue_AddonEncoded = OptionValues[OptionPtr].Trim(' ');
-                        if (!string.IsNullOrEmpty(OptionValue_AddonEncoded)) {
-                            Pos = GenericController.strInstr(1, OptionValue_AddonEncoded, ":");
-                            string OptionCaption = null;
-                            string OptionValue = null;
-                            if (Pos == 0) {
-                                OptionValue = GenericController.decodeNvaArgument(OptionValue_AddonEncoded);
-                                OptionCaption = OptionValue;
-                            } else {
-                                OptionCaption = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.left(Pos - 1));
-                                OptionValue = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
-                            }
-                            switch (OptionSuffix) {
-                                case "checkbox":
-                                //
-                                // Create checkbox addon_execute_getFormContent_decodeSelector
-                                //
-                                bool selected = (GenericController.strInstr(1, "," + LCaseOptionDefault + ",", "," + GenericController.toLCase(OptionValue) + ",") != 0);
-                                result = HtmlController.checkbox(SitePropertyName + OptionPtr, selected, "", false, "", false, OptionValue, OptionCaption);
-                                break;
-                                case "radio":
-                                //
-                                // Create Radio addon_execute_getFormContent_decodeSelector
-                                //
-                                if (GenericController.toLCase(OptionValue) == LCaseOptionDefault) {
-                                    result += "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" checked=\"checked\" >" + OptionCaption + "</div>";
-                                } else {
-                                    result += "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
-                                }
-                                break;
-                                default:
-                                //
-                                // Create select addon_execute_result
-                                //
-                                if (GenericController.toLCase(OptionValue) == LCaseOptionDefault) {
-                                    result += "<option value=\"" + OptionValue + "\" selected>" + OptionCaption + "</option>";
-                                } else {
-                                    result += "<option value=\"" + OptionValue + "\">" + OptionCaption + "</option>";
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    string Copy = "";
-                    switch (OptionSuffix) {
-                        case "checkbox":
-                        //
-                        //
-                        Copy += HtmlController.inputHidden(SitePropertyName + "CheckBoxCnt", OptionCnt);
-                        break;
-                        case "radio":
-                        //
-                        // Create Radio addon_execute_result
-                        //
-                        break;
-                        default:
-                        //
-                        // Create select addon_execute_result
-                        //
-                        result = "<select name=\"" + SitePropertyName + "\" class=\"select form-control\">" + result + "</select>";
-                        break;
-                    }
-                } else {
-                    //
-                    // Create Text addon_execute_result
-                    //
+                    // -- EXIT with Text addon_execute_result
                     selector = GenericController.decodeNvaArgument(selector);
-                    result = getDefaultEditor_text(core, SitePropertyName, selector);
+                    return getDefaultEditor_text(core, SitePropertyName, selector);
                 }
+                //
+                // List of Options, might be select, radio or checkbox
+                //
+                string LCaseOptionDefault = GenericController.toLCase(ExpandedSelector.left(Pos - 1));
+                int PosEqual = GenericController.strInstr(1, LCaseOptionDefault, "=");
+                if (PosEqual > 0) {
+                    LCaseOptionDefault = LCaseOptionDefault.Substring(PosEqual);
+                }
+                LCaseOptionDefault = GenericController.decodeNvaArgument(LCaseOptionDefault);
+                ExpandedSelector = ExpandedSelector.Substring(Pos);
+                Pos = GenericController.strInstr(1, ExpandedSelector, "]");
+                string OptionSuffix = "";
+                if (Pos > 0) {
+                    if (Pos < ExpandedSelector.Length) {
+                        OptionSuffix = GenericController.toLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
+                    }
+                    ExpandedSelector = ExpandedSelector.left(Pos - 1);
+                }
+                string[] OptionValues = ExpandedSelector.Split('|');
+                int OptionCnt = OptionValues.GetUpperBound(0) + 1;
+                int OptionPtr = 0;
+                for (OptionPtr = 0; OptionPtr < OptionCnt; OptionPtr++) {
+                    string OptionValue_AddonEncoded = OptionValues[OptionPtr].Trim(' ');
+                    if (!string.IsNullOrEmpty(OptionValue_AddonEncoded)) {
+                        Pos = GenericController.strInstr(1, OptionValue_AddonEncoded, ":");
+                        string OptionCaption = null;
+                        string OptionValue = null;
+                        if (Pos == 0) {
+                            OptionValue = GenericController.decodeNvaArgument(OptionValue_AddonEncoded);
+                            OptionCaption = OptionValue;
+                        } else {
+                            OptionCaption = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.left(Pos - 1));
+                            OptionValue = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
+                        }
+                        switch (OptionSuffix) {
+                            case "checkbox": {
+                                    //
+                                    // Create checkbox addon_execute_getFormContent_decodeSelector
+                                    //
+                                    bool selected = (GenericController.strInstr(1, "," + LCaseOptionDefault + ",", "," + GenericController.toLCase(OptionValue) + ",") != 0);
+                                    result.Append(HtmlController.checkbox(SitePropertyName + OptionPtr, selected, "", false, "", false, OptionValue, OptionCaption));
+                                    break;
+                                }
+                            case "radio": {
+                                    //
+                                    // Create Radio addon_execute_getFormContent_decodeSelector
+                                    //
+                                    if (GenericController.toLCase(OptionValue) == LCaseOptionDefault) {
+                                        result.Append("<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" checked=\"checked\" >" + OptionCaption + "</div>");
+                                    } else {
+                                        result.Append("<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>");
+                                    }
+                                    break;
+                                }
+                            default: {
+                                    //
+                                    // Create select addon_execute_result
+                                    //
+                                    if (GenericController.toLCase(OptionValue) == LCaseOptionDefault) {
+                                        result.Append("<option value=\"" + OptionValue + "\" selected>" + OptionCaption + "</option>");
+                                    } else {
+                                        result.Append("<option value=\"" + OptionValue + "\">" + OptionCaption + "</option>");
+                                    }
+                                    break;
+                                }
+                        }
+                    }
+                }
+                //
+                // -- finish off each type
+                switch (OptionSuffix) {
+                    case "checkbox": {
+                            //
+                            //
+                            result.Append( HtmlController.inputHidden(SitePropertyName + "CheckBoxCnt", OptionCnt));
+                            break;
+
+                        }
+                    case "radio": {
+                            //
+                            // Create Radio addon_execute_result
+                            //
+                            break;
+                        }
+                    default: {
+                            //
+                            // Create select addon_execute_result
+                            //
+                            result.Append("<select name=\"" + SitePropertyName + "\" class=\"select form-control\">" + result + "</select>");
+                            break;
+                        }
+                }
+                return result.ToString();
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return string.Empty;
             }
-            return result;
         }
 
         //
