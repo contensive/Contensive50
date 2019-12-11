@@ -2439,9 +2439,9 @@ namespace Contensive.Processor.Controllers {
             try {
                 using (var csData = new CsModel(core)) {
                     if (SortReverse && (!string.IsNullOrEmpty(SortField))) {
-                        csData.openContentWatchList(core, ListName, SortField + " Desc", true);
+                        csData.openContentWatchList( ListName, SortField + " Desc", true);
                     } else {
-                        csData.openContentWatchList(core, ListName, SortField, true);
+                        csData.openContentWatchList( ListName, SortField, true);
                     }
                     //
                     if (csData.ok()) {
@@ -2616,7 +2616,7 @@ namespace Contensive.Processor.Controllers {
                 string Link = null;
                 //
                 using (var csData = new CsModel(core)) {
-                    csData.openWhatsNew(core, SortFieldList);
+                    csData.openWhatsNew(SortFieldList);
                     //
                     if (csData.ok()) {
                         ContentId = Models.Domain.ContentMetadataModel.getContentId(core, "Content Watch");

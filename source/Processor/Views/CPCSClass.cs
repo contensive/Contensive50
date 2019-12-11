@@ -277,7 +277,7 @@ namespace Contensive.Processor {
         //
         public override string GetAddLink(string presetNameValueList, bool allowPaste) {
             try {
-                return cs.getRecordAddLink(cp.core, presetNameValueList, allowPaste);
+                return cs.getRecordAddLink(presetNameValueList, allowPaste);
             } catch (Exception ex) {
                 LogController.logError( cp.core,ex);
                 throw;
