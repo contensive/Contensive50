@@ -50,14 +50,14 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
             //
             public EditButtonBarInfoClass(CoreController core,AdminDataModel adminData, bool allowDelete, bool allowRefresh, bool allowSave, bool allowAdd) {
                 allowActivate = false;
-                this.allowAdd = (allowAdd && adminData.adminContent.allowAdd && adminData.editRecord.AllowUserAdd);
+                this.allowAdd = (allowAdd && adminData.adminContent.allowAdd && adminData.editRecord.getAllowUserAdd());
                 allowCancel = true;
                 allowCreateDuplicate = allowAdd && (adminData.editRecord.id != 0);
                 allowDeactivate = false;
-                this.allowDelete = allowDelete && adminData.editRecord.AllowUserDelete && core.session.isAuthenticatedDeveloper();
+                this.allowDelete = allowDelete && adminData.editRecord.allowUserDelete && core.session.isAuthenticatedDeveloper();
                 allowMarkReviewed = false;
                 this.allowRefresh = allowRefresh;
-                this.allowSave = (allowSave && adminData.editRecord.AllowUserSave);
+                this.allowSave = (allowSave && adminData.editRecord.allowUserSave);
                 allowSend = false;
                 allowSendTest = false;
                 hasChildRecords = false;

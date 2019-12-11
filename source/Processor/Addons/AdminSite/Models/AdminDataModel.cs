@@ -536,7 +536,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 // editRecord init
                 //
                 editRecord = new EditRecordModel {
-                    Loaded = false
+                    loaded = false
                 };
                 requestedRecordId = core.docProperties.getInteger("id");
                 if ((userAllowContentEdit) && (requestedRecordId != 0) && (adminContent.id > 0)) {
@@ -748,28 +748,28 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // ----- Set the local global copy of Edit Record Locks
                     var table = TableModel.createByContentName(core.cpParent, adminContent.name);
                     WorkflowController.recordWorkflowStatusClass authoringStatus = WorkflowController.getWorkflowStatus(core, adminContent.name, editRecord.id);
-                    editRecord.EditLock = WorkflowController.getEditLock(core, table.id, editRecord.id);
-                    editRecord.SubmitLock = authoringStatus.isWorkflowSubmitted;
-                    editRecord.SubmittedName = authoringStatus.workflowSubmittedMemberName;
-                    editRecord.SubmittedDate = encodeDate(authoringStatus.workflowSubmittedDate);
-                    editRecord.ApproveLock = authoringStatus.isWorkflowApproved;
-                    editRecord.ApprovedName = authoringStatus.workflowApprovedMemberName;
-                    editRecord.ApprovedDate = authoringStatus.workflowApprovedDate;
-                    editRecord.IsInserted = authoringStatus.isWorkflowInserted;
-                    editRecord.IsDeleted = authoringStatus.isWorkflowDeleted;
-                    editRecord.IsModified = authoringStatus.isWorkflowModified;
-                    editRecord.LockModifiedName = authoringStatus.workflowModifiedByMemberName;
-                    editRecord.LockModifiedDate = encodeDate(authoringStatus.workflowModifiedDate);
+                    editRecord.editLock = WorkflowController.getEditLock(core, table.id, editRecord.id);
+                    editRecord.submitLock = authoringStatus.isWorkflowSubmitted;
+                    editRecord.submittedName = authoringStatus.workflowSubmittedMemberName;
+                    editRecord.submittedDate = encodeDate(authoringStatus.workflowSubmittedDate);
+                    editRecord.approveLock = authoringStatus.isWorkflowApproved;
+                    editRecord.approvedName = authoringStatus.workflowApprovedMemberName;
+                    editRecord.approvedDate = authoringStatus.workflowApprovedDate;
+                    editRecord.isInserted = authoringStatus.isWorkflowInserted;
+                    editRecord.isDeleted = authoringStatus.isWorkflowDeleted;
+                    editRecord.isModified = authoringStatus.isWorkflowModified;
+                    editRecord.lockModifiedName = authoringStatus.workflowModifiedByMemberName;
+                    editRecord.lockModifiedDate = encodeDate(authoringStatus.workflowModifiedDate);
                     //
                     // ----- Set flags used to determine the Authoring State
                     PermissionController.UserContentPermissions userPermissions = PermissionController.getUserContentPermissions(core, adminContent);
-                    editRecord.AllowUserAdd = userPermissions.allowAdd;
-                    editRecord.AllowUserSave = userPermissions.allowSave;
-                    editRecord.AllowUserDelete = userPermissions.allowDelete;
+                    editRecord.setAllowUserAdd(userPermissions.allowAdd);
+                    editRecord.allowUserSave = userPermissions.allowSave;
+                    editRecord.allowUserDelete = userPermissions.allowDelete;
                     //
                     // ----- Set Read Only: for edit lock
                     //
-                    editRecord.userReadOnly |= editRecord.EditLock.isEditLocked;
+                    editRecord.userReadOnly |= editRecord.editLock.isEditLocked;
                     //
                     // ----- Set Read Only: if non-developer tries to edit a developer record
                     //
@@ -790,7 +790,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (!(editRecord.userReadOnly)) {
                         WorkflowController.setEditLock(core, table.id, editRecord.id);
                     }
-                    editRecord.Loaded = true;
+                    editRecord.loaded = true;
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -814,9 +814,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                 editRecord.active = true;
                 editRecord.contentControlId = adminContent.id;
                 editRecord.contentControlId_Name = adminContent.name;
-                editRecord.EditLock = new WorkflowController.editLockClass { editLockByMemberId = 0, editLockByMemberName = "", editLockExpiresDate = DateTime.MinValue, isEditLocked = false };
-                editRecord.Loaded = false;
-                editRecord.Saved = false;
+                editRecord.editLock = new WorkflowController.editLockClass { editLockByMemberId = 0, editLockByMemberName = "", editLockExpiresDate = DateTime.MinValue, isEditLocked = false };
+                editRecord.loaded = false;
+                editRecord.saved = false;
                 foreach (var keyValuePair in adminContent.fields) {
                     field = keyValuePair.Value;
                     if (!(editRecord.fieldsLc.ContainsKey(field.nameLc))) {

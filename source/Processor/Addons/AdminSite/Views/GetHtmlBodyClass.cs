@@ -727,7 +727,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     ProcessActionSave(cp, adminData, UseContentWatchLink);
                                     ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
                                     adminData.editRecord.id = 0;
-                                    adminData.editRecord.Loaded = false;
+                                    adminData.editRecord.loaded = false;
                                 }
                                 adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                                                                    //
@@ -1638,7 +1638,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             }
                         }
                     }
-                    editRecord.Saved = true;
+                    editRecord.saved = true;
                 }
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);

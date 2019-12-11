@@ -13,67 +13,121 @@ namespace Contensive.Processor.Addons.AdminSite.Models {
         /// <summary>
         /// ID field of edit record (Record to be edited)
         /// </summary>
-        public int id;
+        public int id { get; set; }
         /// <summary>
         /// ParentID field of edit record (Record to be edited)
         /// </summary>
-        public int parentId;
+        public int parentId { get; set; }
         /// <summary>
         /// name field of edit record
         /// </summary>
-        public string nameLc;
+        public string nameLc { get; set; }
         /// <summary>
         /// active field of the edit record
         /// </summary>
-        public bool active;
+        public bool active { get; set; }
         /// <summary>
         /// ContentControlID of the edit record
         /// </summary>
-        public int contentControlId;
+        public int contentControlId { get; set; }
         /// <summary>
         /// denormalized name from contentControlId property
         /// </summary>
-        public string contentControlId_Name;
+        public string contentControlId_Name { get; set; }
         /// <summary>
         /// Used for Content Watch Link Label if default
         /// </summary>
-        public string menuHeadline;
+        public string menuHeadline { get; set; }
         /// <summary>
         /// Used for control section display
         /// </summary>
-        public DateTime modifiedDate;
-        public PersonModel modifiedBy;
-        public DateTime dateAdded;
-        public PersonModel createdBy;
-        public bool Loaded; // true/false - set true when the field array values are loaded
-        public bool Saved; // true if edit record was saved during this page
-        public bool userReadOnly; // set if this record can not be edited, for various reasons
-        public bool IsDeleted; // true means the edit record has been deleted
-        public bool IsInserted; // set if Workflow authoring insert
-        public bool IsModified; // record has been modified since last published
-        public string LockModifiedName; // member who first edited the record
-        public DateTime LockModifiedDate; // Date when member modified record
-        public bool SubmitLock; // set if a submit Lock, even if the current user is admin
-        public string SubmittedName; // member who submitted the record
-        public DateTime SubmittedDate; // Date when record was submitted
-        public bool ApproveLock; // set if an approve Lock
-        public string ApprovedName; // member who approved the record
-        public DateTime ApprovedDate; // Date when record was approved
-                                      /// <summary>
-                                      /// This user can add records to this content
-                                      /// </summary>
-        public bool AllowUserAdd;
+        public DateTime modifiedDate { get; set; }
+        public PersonModel modifiedBy { get; set; }
+        public DateTime dateAdded { get; set; }
+        public PersonModel createdBy { get; set; }
+        /// <summary>
+        /// true/false - set true when the field array values are loaded
+        /// </summary>
+        public bool loaded { get; set; }
+        /// <summary>
+        /// true if edit record was saved during this page
+        /// </summary>
+        public bool saved { get; set; }
+        /// <summary>
+        /// set if this record can not be edited, for various reasons
+        /// </summary>
+        public bool userReadOnly { get; set; }
+        /// <summary>
+        /// true means the edit record has been deleted
+        /// </summary>
+        public bool isDeleted { get; set; }
+        /// <summary>
+        /// set if Workflow authoring insert
+        /// </summary>
+        public bool isInserted { get; set; }
+        /// <summary>
+        /// record has been modified since last published
+        /// </summary>
+        public bool isModified { get; set; }
+        /// <summary>
+        /// member who first edited the record
+        /// </summary>
+        public string lockModifiedName { get; set; }
+        /// <summary>
+        /// Date when member modified record
+        /// </summary>
+        public DateTime lockModifiedDate { get; set; }
+        /// <summary>
+        /// set if a submit Lock, even if the current user is admin
+        /// </summary>
+        public bool submitLock { get; set; }
+        /// <summary>
+        /// member who submitted the record
+        /// </summary>
+        public string submittedName { get; set; }
+        /// <summary>
+        /// Date when record was submitted
+        /// </summary>
+        public DateTime submittedDate { get; set; }
+        /// <summary>
+        /// set if an approve Lock
+        /// </summary>
+        public bool approveLock { get; set; }
+        /// <summary>
+        /// member who approved the record
+        /// </summary>
+        public string approvedName { get; set; }
+        /// <summary>
+        /// Date when record was approved
+        /// </summary>
+        public DateTime approvedDate { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        private bool allowUserAdd;
+        /// <summary>
+        /// This user can add records to this content
+        /// </summary>
+        public bool getAllowUserAdd() {
+            return allowUserAdd;
+        }
+        /// <summary>
+        /// This user can add records to this content
+        /// </summary>
+        public void setAllowUserAdd(bool value) {
+            allowUserAdd = value;
+        }
         /// <summary>
         /// This user can save the current record
         /// </summary>
-        public bool AllowUserSave;
+        public bool allowUserSave { get; set; }
         /// <summary>
         /// This user can delete the current record
         /// </summary>
-        public bool AllowUserDelete;
+        public bool allowUserDelete { get; set; }
         /// <summary>
         /// set if an edit Lock by anyone else besides the current user
         /// </summary>
-        public WorkflowController.editLockClass EditLock;
+        public WorkflowController.editLockClass editLock { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             string returnHtml = "";
             try {
                 //
-                if ((!core.doc.userErrorList.Count.Equals(0)) && adminData.editRecord.Loaded) {
+                if ((!core.doc.userErrorList.Count.Equals(0)) && adminData.editRecord.loaded) {
                     //
                     // block load if there was a user error and it is already loaded (assume error was from response )
                 } else if (adminData.adminContent.id <= 0) {
@@ -32,7 +32,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // Invalid Content
                     Processor.Controllers.ErrorController.addUserError(core, "There was a problem identifying the content you requested. Please return to the previous form and verify your selection.");
                     return "";
-                } else if (adminData.editRecord.Loaded && !adminData.editRecord.Saved) {
+                } else if (adminData.editRecord.loaded && !adminData.editRecord.saved) {
                     //
                     //   File types need to be reloaded from the Db, because...
                     //       LoadDb - sets them to the path-page
@@ -143,7 +143,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 }
                             }
                         }
-                        editButtonBarInfo.allowSave = (userContentPermissions.allowSave && adminData.editRecord.AllowUserSave && (!emailSubmitted) && (!emailSent));
+                        editButtonBarInfo.allowSave = (userContentPermissions.allowSave && adminData.editRecord.allowUserSave && (!emailSubmitted) && (!emailSent));
                         editButtonBarInfo.allowSendTest = ((!emailSubmitted) && (!emailSent));
                     } else if (adminData.adminContent.id.Equals(ContentMetadataModel.getContentId(core, "Conditional Email"))) {
                         //
@@ -155,7 +155,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                         editButtonBarInfo.allowActivate = !emailSubmitted && ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest);
                         editButtonBarInfo.allowDeactivate = emailSubmitted;
-                        editButtonBarInfo.allowSave = userContentPermissions.allowSave && adminData.editRecord.AllowUserSave && !emailSubmitted;
+                        editButtonBarInfo.allowSave = userContentPermissions.allowSave && adminData.editRecord.allowUserSave && !emailSubmitted;
                     } else {
                         //
                         // Group Email
@@ -163,7 +163,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             emailSubmitted = encodeBoolean(adminData.editRecord.fieldsLc["submitted"].value);
                             emailSent = encodeBoolean(adminData.editRecord.fieldsLc["sent"].value);
                         }
-                        editButtonBarInfo.allowSave = !emailSubmitted && (userContentPermissions.allowSave && adminData.editRecord.AllowUserSave);
+                        editButtonBarInfo.allowSave = !emailSubmitted && (userContentPermissions.allowSave && adminData.editRecord.allowUserSave);
                         editButtonBarInfo.allowSend = !emailSubmitted && ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest);
                         editButtonBarInfo.allowSendTest = !emailSubmitted;
                         editorEnv.record_readOnly = adminData.editRecord.userReadOnly || emailSubmitted || emailSent;
@@ -203,8 +203,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                 Stream.add(editSectionButtonBar);
                 var headerInfo = new RecordEditHeaderInfoClass {
                     recordId = adminData.editRecord.id,
-                    recordLockById = adminData.editRecord.EditLock.editLockByMemberId,
-                    recordLockExpiresDate = encodeDate(adminData.editRecord.EditLock.editLockExpiresDate),
+                    recordLockById = adminData.editRecord.editLock.editLockByMemberId,
+                    recordLockExpiresDate = encodeDate(adminData.editRecord.editLock.editLockExpiresDate),
                     recordName = adminData.editRecord.nameLc
                 };
                 string titleBarDetails = AdminUIController.getEditForm_TitleBarDetails(core, headerInfo, adminData.editRecord);
@@ -216,7 +216,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         FormEditTabs.addCustomTab(core, editTabs, "Groups", GroupRuleEditor.get(core, adminData));
                     }
                     if (allowLinkAlias) {
-                        FormEditTabs.addCustomTab(core, editTabs, "Link Aliases", LinkAliasEditor.GetForm_Edit_LinkAliases(core, adminData, adminData.editRecord.userReadOnly));
+                        FormEditTabs.addCustomTab(core, editTabs, "Link Aliases", LinkAliasEditor.getForm_Edit_LinkAliases(core, adminData, adminData.editRecord.userReadOnly));
                     }
                     FormEditTabs.addCustomTab(core, editTabs, "Control&nbsp;Info", FormEditTabControlInfo.get(core, adminData, editorEnv));
                     Stream.add(editTabs.getTabs(core));
