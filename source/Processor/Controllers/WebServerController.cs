@@ -9,6 +9,7 @@ using Microsoft.Web.Administration;
 using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
 using System.Threading.Tasks;
+using System.Globalization;
 //
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -18,18 +19,18 @@ namespace Contensive.Processor.Controllers {
     public class WebServerController {
         //
         // enum this, not consts --  https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-        public const string httpResponseStatus200_Success = "200 OK";
-        public const string httpResponseStatus401_Unauthorized = "401 Unauthorized";
-        public const string httpResponseStatus403_Forbidden = "403 Forbidden";
-        public const string httpResponseStatus404_NotFound = "404 Not Found";
-        public const string httpResponseStatus500_ServerError = "500 Internal Server Error";
+        public static readonly string httpResponseStatus200_Success = "200 OK";
+        public static readonly string httpResponseStatus401_Unauthorized = "401 Unauthorized";
+        public static readonly string httpResponseStatus403_Forbidden = "403 Forbidden";
+        public static readonly string httpResponseStatus404_NotFound = "404 Not Found";
+        public static readonly string httpResponseStatus500_ServerError = "500 Internal Server Error";
         //
         private readonly CoreController core;
         //
         /// <summary>
         /// if this instance is a webRole, retain pointer for callbacks
         /// </summary>
-        public System.Web.HttpContext iisContext;
+        public System.Web.HttpContext iisContext { get; set; }
         //
         // todo - create request domain model with constructor for both web-driven and non-web-driven environments
         //
@@ -59,7 +60,7 @@ namespace Contensive.Processor.Controllers {
                 return _requestPathPage;
             }
         }
-        private string _requestPathPage = null;
+        private string _requestPathPage;
         //
         // ====================================================================================================
         // todo convert request variables on-demand pattern.
@@ -134,31 +135,31 @@ namespace Contensive.Processor.Controllers {
                 return _requestUrlSource;
             }
         }
-        private string _requestUrlSource = null;
+        private string _requestUrlSource;
         //
         // ====================================================================================================
         //
-        public string linkForwardSource { get; set; } = ""; // main_ServerPathPage -- set during init
+        public string linkForwardSource { get; set; } = "";
         //
         // ====================================================================================================
         //
-        public string linkForwardError { get; set; } = ""; // always 404
+        public string linkForwardError { get; set; } = "";
         //
         // ====================================================================================================
         //
-        public bool pageExcludeFromAnalytics { get; set; } = false; // For this page - true for remote methods and ajax
+        public bool pageExcludeFromAnalytics { get; set; }
         //
         // ====================================================================================================
         //
-        public int memberAction { get; set; } = 0; // action to be performed during init
+        public int memberAction { get; set; }
         //
         // ====================================================================================================
         //
-        public string adminMessage { get; set; } = ""; // For more information message
+        public string adminMessage { get; set; } = "";
         //
         // ====================================================================================================
         //
-        public string requestPageReferer { get; set; } = ""; // replaced by main_ServerReferrer
+        public string requestPageReferer { get; set; } = "";
         //
         // ====================================================================================================
         //
@@ -179,7 +180,7 @@ namespace Contensive.Processor.Controllers {
                 _serverFormActionURL = value;
             }
         }
-        private string _serverFormActionURL = null;
+        private string _serverFormActionURL;
         //
         // ====================================================================================================
         //
@@ -191,8 +192,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestProtocol {
             get {
-                if (requestSecure) return "https://";
-                return "http://";
+                return (requestSecure) ? "https://" : "http://";
             }
         }
         //
@@ -213,7 +213,7 @@ namespace Contensive.Processor.Controllers {
                 return _requestUrl;
             }
         }
-        private string _requestUrl = null;
+        private string _requestUrl;
         //
         // ====================================================================================================
         /// <summary>
@@ -237,7 +237,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// when set, Meta no follow is added
         /// </summary>
-        public bool response_NoFollow { get; set; } = false;
+        public bool response_NoFollow { get; set; }
         //
         // ====================================================================================================
         //
@@ -263,22 +263,22 @@ namespace Contensive.Processor.Controllers {
         //
         //   QueryString, Form and cookie Processing variables
         public class CookieClass {
-            public string name;
-            public string value;
+            public string name { get; set; }
+            public string value { get; set; }
         }
-        public Dictionary<string, CookieClass> requestCookies;
+        public Dictionary<string, CookieClass> requestCookies { get; set; }
         //
         // ====================================================================================================
         /// <summary>
         /// The body of the request
         /// </summary>
-        public string requestBody;
+        public string requestBody { get; set; }
         //
         // ====================================================================================================
         /// <summary>
         /// The content type of the request
         /// </summary>
-        public string requestContentType;
+        public string requestContentType { get; set; }
         //
         // ====================================================================================================
         //
@@ -309,22 +309,18 @@ namespace Contensive.Processor.Controllers {
         //   Must be called from a process running as admin
         //   This can be done using the command queue, which kicks off the ccCmd process from the Server
         //
-        public void reset()  {
+        public void reset() {
             try {
-                string Cmd = null;
-                string arg = null;
-                string LogFilename = null;
-                string Copy = null;
-                //
-                LogFilename = "Temp\\" + GenericController.encodeText(GenericController.getRandomInteger(core)) + ".Log";
-                Cmd = "IISReset.exe";
-                arg = "/restart >> \"" + LogFilename + "\"";
+                string LogFilename = "Temp\\" + GenericController.encodeText(GenericController.getRandomInteger(core)) + ".Log";
+                string Cmd = "IISReset.exe";
+                string arg = "/restart >> \"" + LogFilename + "\"";
                 runProcess(core, Cmd, arg, true);
-                Copy = core.privateFiles.readFileText(LogFilename);
+                string logMessage = core.privateFiles.readFileText(LogFilename);
+                logMessage = strReplace(logMessage, Environment.NewLine, " ");
+                logMessage = strReplace(logMessage, "\r", " ");
+                logMessage = strReplace(logMessage, "\n", " ");
+                LogController.logInfo(core, logMessage);
                 core.privateFiles.deleteFile(LogFilename);
-                Copy = GenericController.strReplace(Copy, Environment.NewLine, "\\n");
-                Copy = GenericController.strReplace(Copy, "\r", "\\n");
-                Copy = GenericController.strReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -337,7 +333,7 @@ namespace Contensive.Processor.Controllers {
         //   Must be called from a process running as admin
         //   This can be done using the command queue, which kicks off the ccCmd process from the Server
         //
-        public void stop()  {
+        public void stop() {
             try {
                 string Cmd = null;
                 string LogFilename = null;
@@ -364,7 +360,7 @@ namespace Contensive.Processor.Controllers {
         //   This can be done using the command queue, which kicks off the ccCmd process from the Server
         //=======================================================================================
         //
-        public void start()  {
+        public void start() {
             try {
                 string Cmd = null;
                 string LogFilename = core.privateFiles.localAbsRootPath + "iisResetPipe.log";
@@ -454,7 +450,7 @@ namespace Contensive.Processor.Controllers {
                     System.Collections.Specialized.NameValueCollection nameValues = iisContext.Request.Headers;
                     for (int i = 0; i < nameValues.Count; i++) {
                         string key = nameValues.GetKey(i);
-                        if (string.IsNullOrWhiteSpace(key)) continue;
+                        if (string.IsNullOrWhiteSpace(key)) { continue; }
                         if (requestHeaders.ContainsKey(key)) { requestForm.Remove(key); }
                         requestHeaders.Add(key, nameValues.Get(i));
                         core.docProperties.setProperty(key, nameValues.Get(i), DocPropertyModel.DocPropertyTypesEnum.header);
@@ -466,7 +462,7 @@ namespace Contensive.Processor.Controllers {
                     if (iisContext.Request.QueryString.Count > 0) {
                         requestQueryString = "";
                         foreach (string key in iisContext.Request.QueryString) {
-                            if (string.IsNullOrWhiteSpace(key)) continue;
+                            if (string.IsNullOrWhiteSpace(key)) { continue; }
                             string keyValue = iisContext.Request.QueryString[key];
                             if (requestQuery.ContainsKey(key)) { requestQuery.Remove(key); }
                             requestQuery.Add(key, keyValue);
@@ -479,7 +475,7 @@ namespace Contensive.Processor.Controllers {
                 // -- form
                 {
                     foreach (string key in iisContext.Request.Form.Keys) {
-                        if (string.IsNullOrWhiteSpace(key)) continue;
+                        if (string.IsNullOrWhiteSpace(key)) { continue; }
                         string keyValue = iisContext.Request.Form[key];
                         if (requestForm.ContainsKey(key)) { requestForm.Remove(key); }
                         requestForm.Add(key, keyValue);
@@ -492,7 +488,7 @@ namespace Contensive.Processor.Controllers {
                     int filePtr = 0;
                     string instanceId = GenericController.getGUIDNaked();
                     foreach (string key in iisContext.Request.Files.AllKeys) {
-                        if (string.IsNullOrWhiteSpace(key)) continue;
+                        if (string.IsNullOrWhiteSpace(key)) { continue; }
                         System.Web.HttpPostedFile file = iisContext.Request.Files[key];
                         if (file != null) {
                             if ((file.ContentLength > 0) && (!string.IsNullOrEmpty(file.FileName))) {
@@ -517,7 +513,7 @@ namespace Contensive.Processor.Controllers {
                 // -- cookies
                 {
                     foreach (string key in iisContext.Request.Cookies) {
-                        if (string.IsNullOrWhiteSpace(key)) continue;
+                        if (string.IsNullOrWhiteSpace(key)) { continue; }
                         string keyValue = iisContext.Request.Cookies[key].Value;
                         keyValue = decodeResponseVariable(keyValue);
                         addRequestCookie(key, keyValue);
@@ -679,9 +675,9 @@ namespace Contensive.Processor.Controllers {
                         //
                         string forwardDomain = MetadataController.getRecordName(core, "domains", core.domain.forwardDomainId);
                         if (!string.IsNullOrEmpty(forwardDomain)) {
-                            int pos = requestUrlSource.ToLowerInvariant().IndexOf(requestDomain.ToLowerInvariant());
+                            int pos = requestUrlSource.IndexOf(requestDomain, StringComparison.InvariantCultureIgnoreCase);
                             if (pos > 0) {
-                                core.domain.forwardUrl = requestUrlSource.ToString().left(pos) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length));
+                                core.domain.forwardUrl = requestUrlSource.left(pos) + forwardDomain + requestUrlSource.Substring((pos + requestDomain.Length));
                                 redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this replacement domain", false, false);
                                 return core.doc.continueProcessing;
                             }
@@ -713,11 +709,11 @@ namespace Contensive.Processor.Controllers {
                         requestPage = core.siteProperties.serverPageDefault;
                     } else {
                         requestPage = requestPathPage;
-                        int slashPtr = requestPathPage.LastIndexOf("/");
+                        int slashPtr = requestPathPage.LastIndexOf("/", StringComparison.InvariantCulture);
                         if (slashPtr >= 0) {
                             requestPage = "";
                             requestPath = requestPathPage.left(slashPtr + 1);
-                            if (requestPathPage.Length > 1) requestPage = requestPathPage.Substring(slashPtr + 1);
+                            if (requestPathPage.Length > 1) { requestPage = requestPathPage.Substring(slashPtr + 1); }
                         }
                     }
                     requestSecureURLRoot = "https://" + requestDomain + "/";
@@ -783,7 +779,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="domain"></param>
         /// <param name="Path"></param>
         /// <param name="Secure"></param>
-        public void addResponseCookie(string cookieName, string iCookieValue, DateTime DateExpires = default(DateTime), string domain = "", string Path = "/", bool Secure = false) {
+        public void addResponseCookie(string cookieName, string iCookieValue, DateTime DateExpires, string domain, string Path, bool Secure) {
             try {
                 string s = null;
                 //
@@ -816,7 +812,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             s = "";
                             if (!isMinDate(DateExpires)) {
-                                s = DateExpires.ToString();
+                                s = DateExpires.ToString(CultureInfo.InvariantCulture);
                             }
                             bufferCookies = bufferCookies + Environment.NewLine + s;
                             //
@@ -900,22 +896,15 @@ namespace Contensive.Processor.Controllers {
         /// <param name="RedirectReason"></param>
         /// <param name="IsPageNotFound"></param>
         /// <param name="allowDebugMessage">If true, when visit property debugging is enabled, the routine returns </param>
-        public string redirect(string NonEncodedLink, string RedirectReason, bool IsPageNotFound = false, bool allowDebugMessage = true) {
+        public string redirect(string NonEncodedLink, string RedirectReason, bool IsPageNotFound, bool allowDebugMessage) {
             string result = HtmlController.div("Redirecting to [" + NonEncodedLink + "], reason [" + RedirectReason + "]", "ccWarningBox");
             try {
-                const string rnRedirectCycleFlag = "cycleFlag";
-                string EncodedLink = null;
-                string ShortLink = "";
-                string FullLink = null;
-                int redirectCycles = 0;
-                //
                 if (core.doc.continueProcessing) {
-                    redirectCycles = core.docProperties.getInteger(rnRedirectCycleFlag);
+                    string FullLink = NonEncodedLink;
+                    string ShortLink = "";
                     //
                     // convert link to a long link on this domain
-                    if (NonEncodedLink.left(4).ToLowerInvariant() == "http") {
-                        FullLink = NonEncodedLink;
-                    } else {
+                    if (NonEncodedLink.left(4).ToLowerInvariant() != "http") {
                         if (NonEncodedLink.left(1).ToLowerInvariant() == "/") {
                             //
                             // -- root relative - url starts with path, let it go
@@ -934,6 +923,7 @@ namespace Contensive.Processor.Controllers {
                         FullLink = requestProtocol + requestDomain + ShortLink;
                     }
 
+                    string EncodedLink = null;
                     if (string.IsNullOrEmpty(NonEncodedLink)) {
                         //
                         // Link is not valid
@@ -965,6 +955,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink;
+                            result = "<div style=\"padding:20px;border:1px dashed black;background-color:white;color:black;\">" + RedirectReason + "<p>Page Not Found. Click to continue the redirect to <a href=" + EncodedLink + ">" + HtmlController.encodeHtml(NonEncodedLink) + "</a>...</p></div>";
                         } else {
                             setResponseStatus(WebServerController.httpResponseStatus404_NotFound);
                         }
@@ -1002,10 +993,20 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-
         //
+        //====================================================================================================
         //
-        public void flushStream()  {
+        public string redirect(string NonEncodedLink, string RedirectReason)
+            => redirect(NonEncodedLink, RedirectReason, false);
+        //
+        //====================================================================================================
+        //
+        public string redirect(string NonEncodedLink, string RedirectReason, bool IsPageNotFound)
+            => redirect(NonEncodedLink, RedirectReason, IsPageNotFound, false);
+        //
+        //====================================================================================================
+        //
+        public void flushStream() {
             if (iisContext != null) {
                 iisContext.Response.Flush();
             }
@@ -1042,7 +1043,6 @@ namespace Contensive.Processor.Controllers {
                     bool poolFound = false;
                     ApplicationPool appPool = null;
                     foreach (ApplicationPool appPoolWithinLoop in serverManager.ApplicationPools) {
-                        appPool = appPoolWithinLoop;
                         if (appPoolWithinLoop.Name == poolName) {
                             poolFound = true;
                             break;
@@ -1076,12 +1076,10 @@ namespace Contensive.Processor.Controllers {
             try {
 
                 using (ServerManager iisManager = new ServerManager()) {
-                    Site site = null;
-                    bool found = false;
                     //
                     // -- verify the site exists
+                    bool found = false;
                     foreach (Site siteWithinLoop in iisManager.Sites) {
-                        site = siteWithinLoop;
                         if (siteWithinLoop.Name.ToLowerInvariant() == appName.ToLowerInvariant()) {
                             found = true;
                             break;
@@ -1090,7 +1088,7 @@ namespace Contensive.Processor.Controllers {
                     if (!found) {
                         iisManager.Sites.Add(appName, "http", "*:80:" + appName, phyPath);
                     }
-                    site = iisManager.Sites[appName];
+                    Site site = iisManager.Sites[appName];
                     //
                     // -- verify the domain binding
                     verifyWebsite_Binding(core, site, "*:80:" + domainName, "http");
@@ -1103,7 +1101,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- verify the cdn virtual directory (if configured)
                     string cdnFilesPrefix = core.appConfig.cdnFileUrl;
-                    if (cdnFilesPrefix.IndexOf("://") < 0) {
+                    if (cdnFilesPrefix.IndexOf("://", StringComparison.InvariantCulture) < 0) {
                         verifyWebsite_VirtualDirectory(core, site, appName, cdnFilesPrefix, core.appConfig.localFilesPath);
                     }
                     //
@@ -1126,18 +1124,15 @@ namespace Contensive.Processor.Controllers {
         private static void verifyWebsite_Binding(CoreController core, Site site, string bindingInformation, string bindingProtocol) {
             try {
                 using (ServerManager iisManager = new ServerManager()) {
-                    Binding binding = null;
                     bool found = false;
-                    found = false;
                     foreach (Binding bindingWithinLoop in site.Bindings) {
-                        binding = bindingWithinLoop;
                         if ((bindingWithinLoop.BindingInformation == bindingInformation) && (bindingWithinLoop.Protocol == bindingProtocol)) {
                             found = true;
                             break;
                         }
                     }
                     if (!found) {
-                        binding = site.Bindings.CreateElement();
+                        Binding binding = site.Bindings.CreateElement();
                         binding.BindingInformation = bindingInformation;
                         binding.Protocol = bindingProtocol;
                         site.Bindings.Add(binding);
@@ -1163,12 +1158,12 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         if (!found) {
-                            List<string> vpList = virtualFolder.Split('/').ToList();
-                            string newDirectoryPath = "";
-
-                            foreach (string newDirectoryFolderName in vpList) {
-                                if (!string.IsNullOrEmpty(newDirectoryFolderName)) {
-                                    newDirectoryPath += "/" + newDirectoryFolderName;
+                            //
+                            // -- create each of the folder segments in the virtualFolder
+                            List<string> appVirtualFolderSegments = virtualFolder.Split('/').ToList();
+                            foreach (string appVirtualFolderSegment in appVirtualFolderSegments) {
+                                if (!string.IsNullOrEmpty(appVirtualFolderSegment)) {
+                                    string newDirectoryPath = "/" + appVirtualFolderSegment;
                                     bool directoryFound = false;
                                     foreach (VirtualDirectory currentDirectory in iisApp.VirtualDirectories) {
                                         if (currentDirectory.Path.ToLowerInvariant() == newDirectoryPath.ToLowerInvariant()) {
@@ -1198,27 +1193,19 @@ namespace Contensive.Processor.Controllers {
         //   returns true if the redirect happened OK
         //========================================================================
         //
-        public static bool redirectByRecord_ReturnStatus(CoreController core, string contentName, int recordId, string fieldName = "") {
+        public static bool redirectByRecord_ReturnStatus(CoreController core, string contentName, int recordId, string fieldName) {
+            string iContentName = GenericController.encodeText(contentName);
+            int iRecordId = GenericController.encodeInteger(recordId);
+            string iFieldName = GenericController.encodeEmpty(fieldName, "link");
             bool result = false;
-            int contentId = 0;
-            int HostRecordId = 0;
-            bool BlockRedirect = false;
-            string iContentName = null;
-            int iRecordId = 0;
-            string iFieldName = null;
-            string LinkPrefix = "";
-            string EncodedLink = null;
-            string NonEncodedLink = "";
-            //
-            iContentName = GenericController.encodeText(contentName);
-            iRecordId = GenericController.encodeInteger(recordId);
-            iFieldName = GenericController.encodeEmpty(fieldName, "link");
-            BlockRedirect = false;
             using (var csData = new CsModel(core)) {
                 if (csData.open(iContentName, "ID=" + iRecordId)) {
                     //
                     // Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
-                    EncodedLink = encodeText(csData.getText(iFieldName)).Trim(' ');
+                    string EncodedLink = encodeText(csData.getText(iFieldName)).Trim(' ');
+                    bool BlockRedirect = false;
+                    string LinkPrefix = "";
+                    string NonEncodedLink = "";
                     if (string.IsNullOrEmpty(EncodedLink)) {
                         BlockRedirect = true;
                     } else {
@@ -1226,56 +1213,50 @@ namespace Contensive.Processor.Controllers {
                         // ----- handle content special cases (prevent redirect to deleted records)
                         //
                         NonEncodedLink = GenericController.decodeResponseVariable(EncodedLink);
-                        switch (GenericController.toUCase(iContentName)) {
-                            case "CONTENT WATCH": {
+                        if(iContentName.ToLowerInvariant()=="content watch") {
+                            //
+                            // ----- special case
+                            //       if this is a content watch record, check the underlying content for
+                            //       inactive or expired before redirecting
+                            //
+                            LinkPrefix = core.webServer.requestContentWatchPrefix;
+                            int contentId = csData.getInteger("ContentID");
+                            var contentMeta = ContentMetadataModel.create(core, contentId);
+                            contentMeta.name = MetadataController.getContentNameByID(core, contentId);
+                            int HostRecordId = 0;
+                            if (string.IsNullOrEmpty(contentMeta.name)) {
+                                //
+                                // ----- Content Watch with a bad ContentID, mark inactive
+                                //
+                                BlockRedirect = true;
+                                csData.set("active", 0);
+                            } else {
+                                HostRecordId = (csData.getInteger("RecordID"));
+                                if (HostRecordId == 0) {
                                     //
-                                    // ----- special case
-                                    //       if this is a content watch record, check the underlying content for
-                                    //       inactive or expired before redirecting
+                                    // ----- Content Watch with a bad iRecordID, mark inactive
                                     //
-                                    LinkPrefix = core.webServer.requestContentWatchPrefix;
-                                    contentId = csData.getInteger("ContentID");
-                                    var contentMeta = ContentMetadataModel.create(core, contentId);
-                                    contentMeta.name = MetadataController.getContentNameByID(core, contentId);
-                                    if (string.IsNullOrEmpty(contentMeta.name)) {
-                                        //
-                                        // ----- Content Watch with a bad ContentID, mark inactive
-                                        //
-                                        BlockRedirect = true;
-                                        csData.set("active", 0);
-                                    } else {
-                                        HostRecordId = (csData.getInteger("RecordID"));
-                                        if (HostRecordId == 0) {
+                                    BlockRedirect = true;
+                                    csData.set("active", 0);
+                                } else {
+                                    using (var CSHost = new CsModel(core)) {
+                                        CSHost.open(contentMeta.name, "ID=" + HostRecordId);
+                                        if (!CSHost.ok()) {
                                             //
-                                            // ----- Content Watch with a bad iRecordID, mark inactive
+                                            // ----- Content Watch host record not found, mark inactive
                                             //
                                             BlockRedirect = true;
                                             csData.set("active", 0);
-                                        } else {
-                                            using (var CSHost = new CsModel(core)) {
-                                                CSHost.open(contentMeta.name, "ID=" + HostRecordId);
-                                                if (!CSHost.ok()) {
-                                                    //
-                                                    // ----- Content Watch host record not found, mark inactive
-                                                    //
-                                                    BlockRedirect = true;
-                                                    csData.set("active", 0);
-                                                }
-                                            }
                                         }
                                     }
-                                    if (BlockRedirect) {
-                                        //
-                                        // ----- if a content watch record is blocked, delete the content tracking
-                                        //
-                                        MetadataController.deleteContentRules(core, contentMeta, HostRecordId);
-                                    }
-                                    break;
                                 }
-                            default: {
-                                    // do nothing
-                                    break;
-                                }
+                            }
+                            if (BlockRedirect) {
+                                //
+                                // ----- if a content watch record is blocked, delete the content tracking
+                                //
+                                MetadataController.deleteContentRules(core, contentMeta, HostRecordId);
+                            }
                         }
                     }
                     if (!BlockRedirect) {
@@ -1320,7 +1301,7 @@ namespace Contensive.Processor.Controllers {
             }
             return "";
         }
-        public void clearResponseBuffer()  {
+        public void clearResponseBuffer() {
             iisContext.Response.ClearHeaders();
             bufferRedirect = "";
             bufferResponseHeader = "";

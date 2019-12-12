@@ -24,7 +24,7 @@ namespace Contensive.Processor.Addons.Primitives {
                 if (core.doc.redirectContentID != 0 && core.doc.redirectRecordID != 0) {
                     string ContentName = MetadataController.getContentNameByID(core, core.doc.redirectContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        WebServerController.redirectByRecord_ReturnStatus(core, ContentName, core.doc.redirectRecordID);
+                        WebServerController.redirectByRecord_ReturnStatus(core, ContentName, core.doc.redirectRecordID,"");
                         result = "";
                         core.doc.continueProcessing = false;
                     }
