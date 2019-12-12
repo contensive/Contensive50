@@ -9,6 +9,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
+using System.Text;
 //
 namespace Contensive.Processor.Models.Domain {
     //
@@ -94,14 +95,14 @@ namespace Contensive.Processor.Models.Domain {
         /// Array of styles for the minicollection
         /// </summary>
         // [Obsolete("Shared styles deprecated")]
-        public StyleType[] styles;
+        private StyleType[] styles;
         //
         //====================================================================================================
         /// <summary>
         /// Model for style array
         /// </summary>
         // [Obsolete("Shared styles deprecated")]
-        public struct StyleType {
+        public class StyleType {
             public string name { get; set; }
             public bool overwrite { get; set; }
             public string copy { get; set; }
@@ -133,13 +134,13 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Array of page templates in collection
         /// </summary>
-        public PageTemplateType[] pageTemplates;
+        private PageTemplateType[] pageTemplates;
         //
         //====================================================================================================
         /// <summary>
         /// Model for page templates
         /// </summary>
-        public struct PageTemplateType {
+        public class PageTemplateType {
             public string name { get; set; }
             public string copy { get; set; }
             public string guid { get; set; }
@@ -148,10 +149,10 @@ namespace Contensive.Processor.Models.Domain {
         //
         //======================================================================================================
         //
-        internal static void installMetaDataMiniCollectionFromXml(bool quick, CoreController core, string srcXml, bool isNewBuild, bool reinstallDependencies, bool isBaseCollection, ref List<string> nonCriticalErrorList, string logPrefix) {
+        internal static void installMetaDataMiniCollectionFromXml(bool quick, CoreController core, string srcXml, bool isNewBuild, bool reinstallDependencies, bool isBaseCollection, string logPrefix) {
             try {
                 MetadataMiniCollectionModel newCollection = loadXML(core, srcXml, isBaseCollection, true, isNewBuild, logPrefix);
-                installMetaDataMiniCollection_BuildDb(core, isBaseCollection, newCollection, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix);
+                installMetaDataMiniCollection_BuildDb(core, isBaseCollection, newCollection, isNewBuild, reinstallDependencies, logPrefix);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -181,7 +182,7 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         // -- xml load error
                         LogController.logError(core, "Upgrademetadata_LoadDataToCollection Error reading xml archive, ex=[" + ex + "]");
-                        throw new Exception("Error in Upgrademetadata_LoadDataToCollection, during doc.loadXml()", ex);
+                        throw new GenericException("Error in Upgrademetadata_LoadDataToCollection, during doc.loadXml()", ex);
                     }
                     if ((srcXmlDom.DocumentElement.Name.ToLowerInvariant() != CollectionFileRootNode) && (srcXmlDom.DocumentElement.Name.ToLowerInvariant() != "contensivecdef")) {
                         //
@@ -200,7 +201,6 @@ namespace Contensive.Processor.Models.Domain {
                         result.name = Collectionname;
                         //
                         foreach (XmlNode metaData_NodeWithinLoop in srcXmlDom.DocumentElement.ChildNodes) {
-                            XmlNode metaData_Node = metaData_NodeWithinLoop;
                             string NodeName = GenericController.toLCase(metaData_NodeWithinLoop.Name);
                             bool IsNavigator = false;
                             string Name = "";
@@ -238,13 +238,6 @@ namespace Contensive.Processor.Models.Domain {
                                                 name = contentName,
                                                 active = true
                                             };
-                                        }
-                                        //
-                                        // These two fields are needed to import the row
-                                        //
-                                        DataSourceName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "dataSource", DefaultMetaData.dataSourceName);
-                                        if (string.IsNullOrEmpty(DataSourceName)) {
-                                            DataSourceName = "Default";
                                         }
                                         //
                                         // ----- Add metadata if not already there
@@ -442,7 +435,6 @@ namespace Contensive.Processor.Models.Domain {
                                         //
                                         // Admin Menus / Navigator Entries
                                         MenuName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
-                                        menuNameSpace = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "NameSpace", "");
                                         MenuGuid = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", "");
                                         IsNavigator = (NodeName == "navigatorentry");
                                         string MenuKey = null;
@@ -564,10 +556,9 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Verify ccContent and ccFields records from the metadata nodes of a a collection file. This is the last step of loading teh metadata nodes of a collection file. ParentId field is set based on ParentName node.
         /// </summary>
-        private static void installMetaDataMiniCollection_BuildDb(CoreController core, bool isBaseCollection, MetadataMiniCollectionModel Collection, bool isNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix) {
+        private static void installMetaDataMiniCollection_BuildDb(CoreController core, bool isBaseCollection, MetadataMiniCollectionModel Collection, bool isNewBuild, bool reinstallDependencies, string logPrefix) {
             try {
                 //
-                logPrefix += ", installCollection_BuildDbFromMiniCollection";
                 LogController.logInfo(core, "Application: " + core.appConfig.name + ", Upgrademetadata_BuildDbFromCollection");
                 //
                 //----------------------------------------------------------------------------------------------------------------------
@@ -652,16 +643,16 @@ namespace Contensive.Processor.Models.Domain {
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 foreach (var keypairvalue in Collection.metaData) {
-                    ContentMetadataModel metaData = keypairvalue.Value;
+                    ContentMetadataModel workingMetaData = keypairvalue.Value;
                     bool fieldChanged = false;
-                    if (!metaData.dataChanged) {
-                        foreach (var field in metaData.fields) {
+                    if (!workingMetaData.dataChanged) {
+                        foreach (var field in workingMetaData.fields) {
                             fieldChanged = field.Value.dataChanged;
-                            if (fieldChanged) break;
+                            if (fieldChanged) { break; }
                         }
                     }
-                    if ((fieldChanged || metaData.dataChanged) && (metaData.name.ToLowerInvariant() != "content")) {
-                        installMetaDataMiniCollection_buildDb_saveMetaDataToDb(core, metaData);
+                    if ((fieldChanged || workingMetaData.dataChanged) && (workingMetaData.name.ToLowerInvariant() != "content")) {
+                        installMetaDataMiniCollection_buildDb_saveMetaDataToDb(core, workingMetaData);
                     }
                 }
                 core.clearMetaData();
@@ -748,7 +739,7 @@ namespace Contensive.Processor.Models.Domain {
                         SiteStyleSplit = (SiteStyles + " ").Split('}');
                         SiteStyleCnt = SiteStyleSplit.GetUpperBound(0) + 1;
                     }
-                    string StyleSheetAdd = "";
+                    var StyleSheetAdd = new StringBuilder();
                     for (var Ptr = 0; Ptr < Collection.styleCnt; Ptr++) {
                         bool Found = false;
                         var tempVar4 = Collection.styles[Ptr];
@@ -761,9 +752,9 @@ namespace Contensive.Processor.Models.Domain {
                                 int SiteStylePtr = 0;
                                 for (SiteStylePtr = 0; SiteStylePtr < SiteStyleCnt; SiteStylePtr++) {
                                     string StyleLine = SiteStyleSplit[SiteStylePtr];
-                                    int PosNameLineEnd = StyleLine.LastIndexOf("{") + 1;
+                                    int PosNameLineEnd = StyleLine.LastIndexOf("{",StringComparison.InvariantCulture) + 1;
                                     if (PosNameLineEnd > 0) {
-                                        int PosNameLineStart = StyleLine.LastIndexOf(Environment.NewLine, PosNameLineEnd - 1) + 1;
+                                        int PosNameLineStart = StyleLine.LastIndexOf(Environment.NewLine, PosNameLineEnd - 1, StringComparison.InvariantCulture) + 1;
                                         if (PosNameLineStart > 0) {
                                             //
                                             // Check this site style for a match with the NewStyleName
@@ -788,12 +779,12 @@ namespace Contensive.Processor.Models.Domain {
                             // Add or update the stylesheet
                             //
                             if (!Found) {
-                                StyleSheetAdd = StyleSheetAdd + Environment.NewLine + NewStyleName + " {" + NewStyleValue + "}";
+                                StyleSheetAdd.Append( Environment.NewLine + NewStyleName + " {" + NewStyleValue + "}");
                             }
                         }
                     }
                     SiteStyles = string.Join("}", SiteStyleSplit);
-                    if (!string.IsNullOrEmpty(StyleSheetAdd)) {
+                    if (!StyleSheetAdd.Length.Equals(0)) {
                         SiteStyles = SiteStyles
                             + Environment.NewLine + "\r\n/*"
                             + Environment.NewLine + "Styles added " + DateTime.Now + Environment.NewLine + "*/"
@@ -809,490 +800,6 @@ namespace Contensive.Processor.Models.Domain {
                 throw;
             }
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Overlay a Src metadata on to the current one (Dst). Any Src metadata entries found in Src are added to Dst.
-        /// if SrcIsUsermetadata is true, then the Src is overlayed on the Dst if there are any changes -- and .metadataChanged flag set
-        /// </summary>
-        private static bool addMiniCollectionSrcToDst(CoreController core, ref MetadataMiniCollectionModel dstCollection, MetadataMiniCollectionModel srcCollection) {
-            bool returnOk = true;
-            try {
-                string SrcFieldName = null;
-                bool updateDst = false;
-                ContentMetadataModel srcMetaData = null;
-                //
-                // If the Src is the BaseCollection, the Dst must be the Application Collectio
-                //   in this case, reset any BaseContent or BaseField attributes in the application that are not in the base
-                //
-                if (srcCollection.isBaseCollection) {
-                    foreach (var dstKeyValuePair in dstCollection.metaData) {
-                        Models.Domain.ContentMetadataModel dstWorkingMetaData = dstKeyValuePair.Value;
-                        string contentName = dstWorkingMetaData.name;
-                        if (dstCollection.metaData[contentName.ToLowerInvariant()].isBaseContent) {
-                            //
-                            // this application collection metadata is marked base, verify it is in the base collection
-                            //
-                            if (!srcCollection.metaData.ContainsKey(contentName.ToLowerInvariant())) {
-                                //
-                                // metadata in dst is marked base, but it is not in the src collection, reset the metadata.isBaseContent and all field.isbasefield
-                                //
-                                var tempVar = dstCollection.metaData[contentName.ToLowerInvariant()];
-                                tempVar.isBaseContent = false;
-                                tempVar.dataChanged = true;
-                                foreach (var dstFieldKeyValuePair in tempVar.fields) {
-                                    Models.Domain.ContentFieldMetadataModel field = dstFieldKeyValuePair.Value;
-                                    if (field.isBaseField) {
-                                        field.isBaseField = false;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                //
-                //
-                // -------------------------------------------------------------------------------------------------
-                // Go through all CollectionSrc and find the CollectionDst match
-                //   if it is an exact match, do nothing
-                //   if the metadata does not match, set metadataext[Ptr].metadataChanged true
-                //   if any field does not match, set metadataext...field...metadataChanged
-                //   if the is no CollectionDst for the CollectionSrc, add it and set okToUpdateDstFromSrc
-                // -------------------------------------------------------------------------------------------------
-                //
-                LogController.logInfo(core, "Application: " + core.appConfig.name + ", Upgrademetadata_AddSrcToDst");
-                string dstName = null;
-                //
-                foreach (var srcKeyValuePair in srcCollection.metaData) {
-                    srcMetaData = srcKeyValuePair.Value;
-                    string srcName = srcMetaData.name;
-                    //
-                    // Search for this metadata in the Dst
-                    //
-                    updateDst = false;
-                    ContentMetadataModel dstMetaData = null;
-                    if (!dstCollection.metaData.ContainsKey(srcName.ToLowerInvariant())) {
-                        //
-                        // add src to dst
-                        //
-                        dstMetaData = new Models.Domain.ContentMetadataModel();
-                        dstCollection.metaData.Add(srcName.ToLowerInvariant(), dstMetaData);
-                        updateDst = true;
-                    } else {
-                        dstMetaData = dstCollection.metaData[srcName.ToLowerInvariant()];
-                        dstName = srcName;
-                        //
-                        // found a match between Src and Dst
-                        //
-                        if (dstMetaData.isBaseContent == srcMetaData.isBaseContent) {
-                            //
-                            // Allow changes to user metadata only from user metadata, changes to base only from base
-                            updateDst |= (dstMetaData.activeOnly != srcMetaData.activeOnly);
-                            updateDst |= (dstMetaData.adminOnly != srcMetaData.adminOnly);
-                            updateDst |= (dstMetaData.developerOnly != srcMetaData.developerOnly);
-                            updateDst |= (dstMetaData.allowAdd != srcMetaData.allowAdd);
-                            updateDst |= (dstMetaData.allowCalendarEvents != srcMetaData.allowCalendarEvents);
-                            updateDst |= (dstMetaData.allowContentTracking != srcMetaData.allowContentTracking);
-                            updateDst |= (dstMetaData.allowDelete != srcMetaData.allowDelete);
-                            updateDst |= (dstMetaData.allowTopicRules != srcMetaData.allowTopicRules);
-                            updateDst |= !textMatch(dstMetaData.dataSourceName, srcMetaData.dataSourceName);
-                            updateDst |= !textMatch(dstMetaData.tableName, srcMetaData.tableName);
-                            updateDst |= !textMatch(dstMetaData.defaultSortMethod, srcMetaData.defaultSortMethod);
-                            updateDst |= !textMatch(dstMetaData.dropDownFieldList, srcMetaData.dropDownFieldList);
-                            updateDst |= !textMatch(dstMetaData.editorGroupName, srcMetaData.editorGroupName);
-                            updateDst |= (dstMetaData.active != srcMetaData.active);
-                            updateDst |= (dstMetaData.allowContentChildTool != srcMetaData.allowContentChildTool);
-                            updateDst |= (dstMetaData.parentId != srcMetaData.parentId);
-                            updateDst |= !textMatch(dstMetaData.iconLink, srcMetaData.iconLink);
-                            updateDst |= (dstMetaData.iconHeight != srcMetaData.iconHeight);
-                            updateDst |= (dstMetaData.iconWidth != srcMetaData.iconWidth);
-                            updateDst |= (dstMetaData.iconSprites != srcMetaData.iconSprites);
-                            updateDst |= !textMatch(dstMetaData.installedByCollectionGuid, srcMetaData.installedByCollectionGuid);
-                            updateDst |= !textMatch(dstMetaData.guid, srcMetaData.guid);
-                            updateDst |= (dstMetaData.isBaseContent != srcMetaData.isBaseContent);
-                        }
-                    }
-                    if (updateDst) {
-                        //
-                        // update the Dst with the Src
-                        dstMetaData.active = srcMetaData.active;
-                        dstMetaData.activeOnly = srcMetaData.activeOnly;
-                        dstMetaData.adminOnly = srcMetaData.adminOnly;
-                        dstMetaData.aliasId = srcMetaData.aliasId;
-                        dstMetaData.aliasName = srcMetaData.aliasName;
-                        dstMetaData.allowAdd = srcMetaData.allowAdd;
-                        dstMetaData.allowCalendarEvents = srcMetaData.allowCalendarEvents;
-                        dstMetaData.allowContentChildTool = srcMetaData.allowContentChildTool;
-                        dstMetaData.allowContentTracking = srcMetaData.allowContentTracking;
-                        dstMetaData.allowDelete = srcMetaData.allowDelete;
-                        dstMetaData.allowTopicRules = srcMetaData.allowTopicRules;
-                        dstMetaData.guid = srcMetaData.guid;
-                        dstMetaData.legacyContentControlCriteria = srcMetaData.legacyContentControlCriteria;
-                        dstMetaData.dataSourceName = srcMetaData.dataSourceName;
-                        dstMetaData.tableName = srcMetaData.tableName;
-                        dstMetaData.dataSourceId = srcMetaData.dataSourceId;
-                        dstMetaData.defaultSortMethod = srcMetaData.defaultSortMethod;
-                        dstMetaData.developerOnly = srcMetaData.developerOnly;
-                        dstMetaData.dropDownFieldList = srcMetaData.dropDownFieldList;
-                        dstMetaData.editorGroupName = srcMetaData.editorGroupName;
-                        dstMetaData.iconHeight = srcMetaData.iconHeight;
-                        dstMetaData.iconLink = srcMetaData.iconLink;
-                        dstMetaData.iconSprites = srcMetaData.iconSprites;
-                        dstMetaData.iconWidth = srcMetaData.iconWidth;
-                        dstMetaData.installedByCollectionGuid = srcMetaData.installedByCollectionGuid;
-                        dstMetaData.isBaseContent = srcMetaData.isBaseContent;
-                        dstMetaData.isModifiedSinceInstalled = srcMetaData.isModifiedSinceInstalled;
-                        dstMetaData.name = srcMetaData.name;
-                        dstMetaData.parentId = srcMetaData.parentId;
-                        dstMetaData.parentName = srcMetaData.parentName;
-                        dstMetaData.selectCommaList = srcMetaData.selectCommaList;
-                        dstMetaData.whereClause = srcMetaData.whereClause;
-                        dstMetaData.includesAFieldChange = true;
-                        dstMetaData.dataChanged = true;
-                    }
-                    //
-                    // Now check each of the field records for an addition, or a change
-                    // DstPtr is still set to the Dst metadata
-                    //
-                    foreach (var srcFieldKeyValuePair in srcMetaData.fields) {
-                        Models.Domain.ContentFieldMetadataModel srcMetaDataField = srcFieldKeyValuePair.Value;
-                        SrcFieldName = srcMetaDataField.nameLc;
-                        updateDst = false;
-                        if (!dstCollection.metaData.ContainsKey(srcName.ToLowerInvariant())) {
-                            //
-                            // should have been the collection
-                            //
-                            throw (new GenericException("ERROR - cannot update destination content because it was not found after being added."));
-                        } else {
-                            dstMetaData = dstCollection.metaData[srcName.ToLowerInvariant()];
-                            bool HelpChanged = false;
-                            Models.Domain.ContentFieldMetadataModel dstMetaDataField = null;
-                            if (dstMetaData.fields.ContainsKey(SrcFieldName.ToLowerInvariant())) {
-                                //
-                                // Src field was found in Dst fields
-                                //
-                                dstMetaDataField = dstMetaData.fields[SrcFieldName.ToLowerInvariant()];
-                                updateDst = false;
-                                if (dstMetaDataField.isBaseField == srcMetaDataField.isBaseField) {
-                                    updateDst |= (srcMetaDataField.active != dstMetaDataField.active);
-                                    updateDst |= (srcMetaDataField.adminOnly != dstMetaDataField.adminOnly);
-                                    updateDst |= (srcMetaDataField.authorable != dstMetaDataField.authorable);
-                                    updateDst |= !textMatch(srcMetaDataField.caption, dstMetaDataField.caption);
-                                    updateDst |= (srcMetaDataField.contentId != dstMetaDataField.contentId);
-                                    updateDst |= (srcMetaDataField.developerOnly != dstMetaDataField.developerOnly);
-                                    updateDst |= (srcMetaDataField.editSortPriority != dstMetaDataField.editSortPriority);
-                                    updateDst |= !textMatch(srcMetaDataField.editTabName, dstMetaDataField.editTabName);
-                                    updateDst |= (srcMetaDataField.fieldTypeId != dstMetaDataField.fieldTypeId);
-                                    updateDst |= (srcMetaDataField.htmlContent != dstMetaDataField.htmlContent);
-                                    updateDst |= (srcMetaDataField.indexColumn != dstMetaDataField.indexColumn);
-                                    updateDst |= (srcMetaDataField.indexSortDirection != dstMetaDataField.indexSortDirection);
-                                    updateDst |= (encodeInteger(srcMetaDataField.indexSortOrder) != GenericController.encodeInteger(dstMetaDataField.indexSortOrder));
-                                    updateDst |= !textMatch(srcMetaDataField.indexWidth, dstMetaDataField.indexWidth);
-                                    updateDst |= (srcMetaDataField.lookupContentId != dstMetaDataField.lookupContentId);
-                                    updateDst |= !textMatch(srcMetaDataField.lookupList, dstMetaDataField.lookupList);
-                                    updateDst |= (srcMetaDataField.manyToManyContentId != dstMetaDataField.manyToManyContentId);
-                                    updateDst |= (srcMetaDataField.manyToManyRuleContentId != dstMetaDataField.manyToManyRuleContentId);
-                                    updateDst |= !textMatch(srcMetaDataField.manyToManyRulePrimaryField, dstMetaDataField.manyToManyRulePrimaryField);
-                                    updateDst |= !textMatch(srcMetaDataField.manyToManyRuleSecondaryField, dstMetaDataField.manyToManyRuleSecondaryField);
-                                    updateDst |= (srcMetaDataField.memberSelectGroupId_get(core) != dstMetaDataField.memberSelectGroupId_get(core));
-                                    updateDst |= (srcMetaDataField.notEditable != dstMetaDataField.notEditable);
-                                    updateDst |= (srcMetaDataField.password != dstMetaDataField.password);
-                                    updateDst |= (srcMetaDataField.readOnly != dstMetaDataField.readOnly);
-                                    updateDst |= (srcMetaDataField.redirectContentId != dstMetaDataField.redirectContentId);
-                                    updateDst |= !textMatch(srcMetaDataField.redirectId, dstMetaDataField.redirectId);
-                                    updateDst |= !textMatch(srcMetaDataField.redirectPath, dstMetaDataField.redirectPath);
-                                    updateDst |= (srcMetaDataField.required != dstMetaDataField.required);
-                                    updateDst |= (srcMetaDataField.rssDescriptionField != dstMetaDataField.rssDescriptionField);
-                                    updateDst |= (srcMetaDataField.rssTitleField != dstMetaDataField.rssTitleField);
-                                    updateDst |= (srcMetaDataField.scramble != dstMetaDataField.scramble);
-                                    updateDst |= (srcMetaDataField.textBuffered != dstMetaDataField.textBuffered);
-                                    updateDst |= (GenericController.encodeText(srcMetaDataField.defaultValue) != GenericController.encodeText(dstMetaDataField.defaultValue));
-                                    updateDst |= (srcMetaDataField.uniqueName != dstMetaDataField.uniqueName);
-                                    updateDst |= (srcMetaDataField.isBaseField != dstMetaDataField.isBaseField);
-                                    updateDst |= !textMatch(srcMetaDataField.get_lookupContentName(core), dstMetaDataField.get_lookupContentName(core));
-                                    updateDst |= !textMatch(srcMetaDataField.get_lookupContentName(core), dstMetaDataField.get_lookupContentName(core));
-                                    updateDst |= !textMatch(srcMetaDataField.get_manyToManyRuleContentName(core), dstMetaDataField.get_manyToManyRuleContentName(core));
-                                    updateDst |= !textMatch(srcMetaDataField.get_redirectContentName(core), dstMetaDataField.get_redirectContentName(core));
-                                    updateDst |= !textMatch(srcMetaDataField.installedByCollectionGuid, dstMetaDataField.installedByCollectionGuid);
-                                }
-                                //
-                                // Check Help fields, track changed independantly so frequent help changes will not force timely metadata loads
-                                //
-                                bool HelpCustomChanged = !textMatch(srcMetaDataField.helpCustom, dstMetaDataField.helpCustom);
-                                bool HelpDefaultChanged = !textMatch(srcMetaDataField.helpDefault, dstMetaDataField.helpDefault);
-                                HelpChanged = HelpDefaultChanged || HelpCustomChanged;
-                            } else {
-                                //
-                                // field was not found in dst, add it and populate
-                                //
-                                dstMetaData.fields.Add(SrcFieldName.ToLowerInvariant(), new Models.Domain.ContentFieldMetadataModel());
-                                dstMetaDataField = dstMetaData.fields[SrcFieldName.ToLowerInvariant()];
-                                updateDst = true;
-                                HelpChanged = true;
-                            }
-                            //
-                            // If okToUpdateDstFromSrc, update the Dst record with the Src record
-                            //
-                            if (updateDst) {
-                                //
-                                // Update Fields
-                                //
-                                dstMetaDataField.active = srcMetaDataField.active;
-                                dstMetaDataField.adminOnly = srcMetaDataField.adminOnly;
-                                dstMetaDataField.authorable = srcMetaDataField.authorable;
-                                dstMetaDataField.caption = srcMetaDataField.caption;
-                                dstMetaDataField.contentId = srcMetaDataField.contentId;
-                                dstMetaDataField.defaultValue = srcMetaDataField.defaultValue;
-                                dstMetaDataField.developerOnly = srcMetaDataField.developerOnly;
-                                dstMetaDataField.editSortPriority = srcMetaDataField.editSortPriority;
-                                dstMetaDataField.editTabName = srcMetaDataField.editTabName;
-                                dstMetaDataField.fieldTypeId = srcMetaDataField.fieldTypeId;
-                                dstMetaDataField.htmlContent = srcMetaDataField.htmlContent;
-                                dstMetaDataField.indexColumn = srcMetaDataField.indexColumn;
-                                dstMetaDataField.indexSortDirection = srcMetaDataField.indexSortDirection;
-                                dstMetaDataField.indexSortOrder = srcMetaDataField.indexSortOrder;
-                                dstMetaDataField.indexWidth = srcMetaDataField.indexWidth;
-                                dstMetaDataField.lookupContentId = srcMetaDataField.lookupContentId;
-                                dstMetaDataField.lookupList = srcMetaDataField.lookupList;
-                                dstMetaDataField.manyToManyContentId = srcMetaDataField.manyToManyContentId;
-                                dstMetaDataField.manyToManyRuleContentId = srcMetaDataField.manyToManyRuleContentId;
-                                dstMetaDataField.manyToManyRulePrimaryField = srcMetaDataField.manyToManyRulePrimaryField;
-                                dstMetaDataField.manyToManyRuleSecondaryField = srcMetaDataField.manyToManyRuleSecondaryField;
-                                dstMetaDataField.memberSelectGroupId_set(core, srcMetaDataField.memberSelectGroupId_get(core));
-                                dstMetaDataField.nameLc = srcMetaDataField.nameLc;
-                                dstMetaDataField.notEditable = srcMetaDataField.notEditable;
-                                dstMetaDataField.password = srcMetaDataField.password;
-                                dstMetaDataField.readOnly = srcMetaDataField.readOnly;
-                                dstMetaDataField.redirectContentId = srcMetaDataField.redirectContentId;
-                                dstMetaDataField.redirectId = srcMetaDataField.redirectId;
-                                dstMetaDataField.redirectPath = srcMetaDataField.redirectPath;
-                                dstMetaDataField.required = srcMetaDataField.required;
-                                dstMetaDataField.rssDescriptionField = srcMetaDataField.rssDescriptionField;
-                                dstMetaDataField.rssTitleField = srcMetaDataField.rssTitleField;
-                                dstMetaDataField.scramble = srcMetaDataField.scramble;
-                                dstMetaDataField.textBuffered = srcMetaDataField.textBuffered;
-                                dstMetaDataField.uniqueName = srcMetaDataField.uniqueName;
-                                dstMetaDataField.isBaseField = srcMetaDataField.isBaseField;
-                                dstMetaDataField.set_lookupContentName(core, srcMetaDataField.get_lookupContentName(core));
-                                dstMetaDataField.set_manyToManyContentName(core, srcMetaDataField.get_manyToManyContentName(core));
-                                dstMetaDataField.set_manyToManyRuleContentName(core, srcMetaDataField.get_manyToManyRuleContentName(core));
-                                dstMetaDataField.set_redirectContentName(core, srcMetaDataField.get_redirectContentName(core));
-                                dstMetaDataField.installedByCollectionGuid = srcMetaDataField.installedByCollectionGuid;
-                                dstMetaDataField.dataChanged = true;
-                                dstMetaData.includesAFieldChange = true;
-                            }
-                            if (HelpChanged) {
-                                dstMetaDataField.helpCustom = srcMetaDataField.helpCustom;
-                                dstMetaDataField.helpDefault = srcMetaDataField.helpDefault;
-                                dstMetaDataField.helpChanged = true;
-                            }
-                        }
-                    }
-                }
-                //
-                // -------------------------------------------------------------------------------------------------
-                // Check SQL Indexes
-                // -------------------------------------------------------------------------------------------------
-                //
-                foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel srcSqlIndex in srcCollection.sqlIndexes) {
-                    string srcName = (srcSqlIndex.dataSourceName + "-" + srcSqlIndex.tableName + "-" + srcSqlIndex.indexName).ToLowerInvariant();
-                    updateDst = false;
-                    //
-                    // Search for this name in the Dst
-                    bool indexFound = false;
-                    bool indexChanged = false;
-                    MetadataMiniCollectionModel.MiniCollectionSQLIndexModel indexToUpdate = new MetadataMiniCollectionModel.MiniCollectionSQLIndexModel();
-                    foreach (MetadataMiniCollectionModel.MiniCollectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
-                        dstName = (dstSqlIndex.dataSourceName + "-" + dstSqlIndex.tableName + "-" + dstSqlIndex.indexName).ToLowerInvariant();
-                        if (textMatch(dstName, srcName)) {
-                            //
-                            // found a match between Src and Dst
-                            indexFound = true;
-                            indexToUpdate = dstSqlIndex;
-                            indexChanged = !textMatch(dstSqlIndex.fieldNameList, srcSqlIndex.fieldNameList);
-                            break;
-                        }
-                    }
-                    if (!indexFound) {
-                        //
-                        // add src to dst
-                        dstCollection.sqlIndexes.Add(srcSqlIndex);
-                    } else if (indexChanged && (indexToUpdate != null)) {
-                        //
-                        // update dst to src
-
-                        indexToUpdate.dataChanged = true;
-                        indexToUpdate.dataSourceName = srcSqlIndex.dataSourceName;
-                        indexToUpdate.fieldNameList = srcSqlIndex.fieldNameList;
-                        indexToUpdate.indexName = srcSqlIndex.indexName;
-                        indexToUpdate.tableName = srcSqlIndex.tableName;
-                    }
-                }
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Check menus
-                //-------------------------------------------------------------------------------------------------
-                //
-                string DataBuildVersion = core.siteProperties.dataBuildVersion;
-                foreach (var srcKvp in srcCollection.menus) {
-                    string srcKey = srcKvp.Key.ToLowerInvariant();
-                    MetadataMiniCollectionModel.MiniCollectionMenuModel srcMenu = srcKvp.Value;
-                    string srcName = srcMenu.name.ToLowerInvariant();
-                    string srcGuid = srcMenu.guid;
-                    string SrcParentName = GenericController.toLCase(srcMenu.parentName);
-                    string SrcNameSpace = GenericController.toLCase(srcMenu.menuNameSpace);
-                    bool SrcIsNavigator = srcMenu.isNavigator;
-                    updateDst = false;
-                    //
-                    // Search for match using guid
-                    MetadataMiniCollectionModel.MiniCollectionMenuModel dstMenuMatch = new MetadataMiniCollectionModel.MiniCollectionMenuModel();
-                    bool IsMatch = false;
-                    string DstKey = null;
-                    bool DstIsNavigator = false;
-                    foreach (var dstKvp in dstCollection.menus) {
-                        string dstKey = dstKvp.Key.ToLowerInvariant();
-                        MetadataMiniCollectionModel.MiniCollectionMenuModel dstMenu = dstKvp.Value;
-                        string dstGuid = dstMenu.guid;
-                        if (dstGuid == srcGuid) {
-                            DstIsNavigator = dstMenu.isNavigator;
-                            DstKey = GenericController.toLCase(dstMenu.key);
-                            string SrcKey = null;
-                            IsMatch = (DstKey == SrcKey) && (SrcIsNavigator == DstIsNavigator);
-                            if (IsMatch) {
-                                dstMenuMatch = dstMenu;
-                                break;
-                            }
-
-                        }
-                    }
-                    if (!IsMatch) {
-                        //
-                        // no match found on guid, try name and ( either namespace or parentname )
-                        foreach (var dstKvp in dstCollection.menus) {
-                            string dstKey = dstKvp.Key.ToLowerInvariant();
-                            MetadataMiniCollectionModel.MiniCollectionMenuModel dstMenu = dstKvp.Value;
-                            dstName = GenericController.toLCase(dstMenu.name);
-                            if ((srcName == dstName) && (SrcIsNavigator == DstIsNavigator)) {
-                                if (SrcIsNavigator) {
-                                    //
-                                    // Navigator - check namespace if Dst.guid is blank (builder to new version of menu)
-                                    IsMatch = (SrcNameSpace == GenericController.toLCase(dstMenu.menuNameSpace)) && (dstMenu.guid == "");
-                                } else {
-                                    //
-                                    // AdminMenu - check parentname
-                                    IsMatch = (SrcParentName == GenericController.toLCase(dstMenu.parentName));
-                                }
-                                if (IsMatch) {
-                                    dstMenuMatch = dstMenu;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    if (IsMatch) {
-                        updateDst |= (dstMenuMatch.active != srcMenu.active);
-                        updateDst |= (dstMenuMatch.adminOnly != srcMenu.adminOnly);
-                        updateDst |= !textMatch(dstMenuMatch.contentName, srcMenu.contentName);
-                        updateDst |= (dstMenuMatch.developerOnly != srcMenu.developerOnly);
-                        updateDst |= !textMatch(dstMenuMatch.linkPage, srcMenu.linkPage);
-                        updateDst |= !textMatch(dstMenuMatch.name, srcMenu.name);
-                        updateDst |= (dstMenuMatch.newWindow != srcMenu.newWindow);
-                        updateDst |= !textMatch(dstMenuMatch.sortOrder, srcMenu.sortOrder);
-                        updateDst |= !textMatch(dstMenuMatch.addonName, srcMenu.addonName);
-                        updateDst |= !textMatch(dstMenuMatch.addonGuid, srcMenu.addonGuid);
-                        updateDst |= !textMatch(dstMenuMatch.navIconType, srcMenu.navIconType);
-                        updateDst |= !textMatch(dstMenuMatch.navIconTitle, srcMenu.navIconTitle);
-                        updateDst |= !textMatch(dstMenuMatch.menuNameSpace, srcMenu.menuNameSpace);
-                        updateDst |= !textMatch(dstMenuMatch.guid, srcMenu.guid);
-                        dstCollection.menus.Remove(DstKey);
-                    }
-                    dstCollection.menus.Add(srcKey, srcMenu);
-                }
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Check styles
-                //-------------------------------------------------------------------------------------------------
-                //
-                int srcStylePtr = 0;
-                int dstStylePtr = 0;
-                for (srcStylePtr = 0; srcStylePtr < srcCollection.styleCnt; srcStylePtr++) {
-                    string srcName = GenericController.toLCase(srcCollection.styles[srcStylePtr].name);
-                    updateDst = false;
-                    //
-                    // Search for this name in the Dst
-                    //
-                    for (dstStylePtr = 0; dstStylePtr < dstCollection.styleCnt; dstStylePtr++) {
-                        dstName = GenericController.toLCase(dstCollection.styles[dstStylePtr].name);
-                        if (dstName == srcName) {
-                            //
-                            // found a match between Src and Dst
-                            updateDst |= !textMatch(dstCollection.styles[dstStylePtr].copy, srcCollection.styles[srcStylePtr].copy);
-                            break;
-                        }
-                    }
-                    if (dstStylePtr == dstCollection.styleCnt) {
-                        //
-                        // metadata was not found, add it
-                        //
-                        Array.Resize(ref dstCollection.styles, dstCollection.styleCnt);
-                        dstCollection.styleCnt = dstStylePtr + 1;
-                        updateDst = true;
-                    }
-                    if (updateDst) {
-                        var tempVar6 = dstCollection.styles[dstStylePtr];
-                        //
-                        // It okToUpdateDstFromSrc, update the Dst with the Src
-                        //
-                        tempVar6.dataChanged = true;
-                        tempVar6.copy = srcCollection.styles[srcStylePtr].copy;
-                        tempVar6.name = srcCollection.styles[srcStylePtr].name;
-                    }
-                }
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Add Collections
-                //-------------------------------------------------------------------------------------------------
-                //
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Page Templates
-                //-------------------------------------------------------------------------------------------------
-                //
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Page Content
-                //-------------------------------------------------------------------------------------------------
-                //
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Copy Content
-                //-------------------------------------------------------------------------------------------------
-                //
-                //
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-            return returnOk;
-        }
-        ////
-        ////====================================================================================================
-        ////
-        //private static MetadataMiniCollectionModel getApplicationMetaDataMiniCollection(CoreController core, bool isNewBuild, string logPrefix) {
-        //    var result = new MetadataMiniCollectionModel();
-        //    try {
-        //        if (!isNewBuild) {
-        //            //
-        //            // if this is not an empty database, get the application collection, else return empty
-        //            string applicationMetaDataMiniCollectionXml = CollectionExportCDefController.get(core, true);
-        //            result = MetadataMiniCollectionModel.loadXML(core, applicationMetaDataMiniCollectionXml, false, false, isNewBuild, logPrefix);
-        //        }
-        //    } catch (Exception ex) {
-        //        LogController.logError(core, ex);
-        //        throw;
-        //    }
-        //    return result;
-        //}
         //
         //====================================================================================================
         /// <summary>

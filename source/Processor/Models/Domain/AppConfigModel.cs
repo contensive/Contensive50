@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using Contensive.Exceptions;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Domain {
@@ -113,7 +114,7 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         // -- application not configured
                         returnModel = null;
-                        throw new Exception("application [" + appName + "] was not found in this server group.");
+                        throw new GenericException("application [" + appName + "] was not found in this server group.");
                     } else {
                         //
                         // -- return config object from serverConfig
