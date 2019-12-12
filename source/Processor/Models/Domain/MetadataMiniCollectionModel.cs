@@ -201,17 +201,8 @@ namespace Contensive.Processor.Models.Domain {
                         result.name = Collectionname;
                         //
                         foreach (XmlNode metaData_NodeWithinLoop in srcXmlDom.DocumentElement.ChildNodes) {
-                            string NodeName = GenericController.toLCase(metaData_NodeWithinLoop.Name);
-                            bool IsNavigator = false;
-                            string Name = "";
-                            string MenuName = null;
-                            string IndexName = null;
-                            string TableName = null;
-                            int Ptr = 0;
-                            string menuNameSpace = null;
-                            string MenuGuid = null;
-                            string DataSourceName = null;
-                            string ActiveText = null;
+                            string NodeName = toLCase(metaData_NodeWithinLoop.Name);
+                            string cdefActiveText = null;
                             switch (NodeName) {
                                 case "cdef": {
                                         //
@@ -253,11 +244,9 @@ namespace Contensive.Processor.Models.Domain {
                                         if (!(DefaultMetaData.active)) {
                                             activeDefaultText = "0";
                                         }
-                                        ActiveText = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Active", activeDefaultText);
-                                        if (string.IsNullOrEmpty(ActiveText)) {
-                                            ActiveText = "1";
-                                        }
-                                        targetMetaData.active = GenericController.encodeBoolean(ActiveText);
+                                        cdefActiveText = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Active", activeDefaultText);
+                                        if (string.IsNullOrEmpty(cdefActiveText)) { cdefActiveText = "1"; }
+                                        targetMetaData.active = GenericController.encodeBoolean(cdefActiveText);
                                         targetMetaData.activeOnly = true;
                                         //.adminColumns = ?
                                         targetMetaData.adminOnly = XmlController.getXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AdminOnly", DefaultMetaData.adminOnly);
@@ -325,15 +314,8 @@ namespace Contensive.Processor.Models.Domain {
                                                 }
                                                 var metaDataField = result.metaData[contentName.ToLowerInvariant()].fields[FieldName.ToLowerInvariant()];
                                                 metaDataField.nameLc = FieldName.ToLowerInvariant();
-                                                ActiveText = "0";
-                                                if (DefaultMetaDataField.active) {
-                                                    ActiveText = "1";
-                                                }
-                                                ActiveText = XmlController.getXMLAttribute(core, Found, MetaDataChildNode, "Active", ActiveText);
-                                                if (string.IsNullOrEmpty(ActiveText)) {
-                                                    ActiveText = "1";
-                                                }
-                                                metaDataField.active = GenericController.encodeBoolean(ActiveText);
+                                                string cdefFieldActiveText = XmlController.getXMLAttribute(core, Found, MetaDataChildNode, "Active", (DefaultMetaDataField.active) ? "1" : "0");
+                                                metaDataField.active = (string.IsNullOrEmpty(cdefFieldActiveText)) ? true : encodeBoolean(cdefFieldActiveText);
                                                 //
                                                 // Convert Field Descriptor (text) to field type (integer)
                                                 //
@@ -402,9 +384,9 @@ namespace Contensive.Processor.Models.Domain {
                                         //
                                         // SQL Indexes
                                         //
-                                        IndexName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "indexname", "");
-                                        TableName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "tableName", "");
-                                        DataSourceName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "DataSourceName", "");
+                                        string IndexName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "indexname", "");
+                                        string TableName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "tableName", "");
+                                        string DataSourceName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "DataSourceName", "");
                                         if (string.IsNullOrEmpty(DataSourceName)) {
                                             DataSourceName = "default";
                                         }
@@ -434,26 +416,26 @@ namespace Contensive.Processor.Models.Domain {
                                 case "navigatorentry": {
                                         //
                                         // Admin Menus / Navigator Entries
-                                        MenuName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
-                                        MenuGuid = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", "");
-                                        IsNavigator = (NodeName == "navigatorentry");
+                                        string MenuName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
+                                        string MenuGuid = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", "");
+                                        bool IsNavigator = (NodeName == "navigatorentry");
                                         string MenuKey = null;
                                         if (!IsNavigator) {
-                                            MenuKey = GenericController.toLCase(MenuName);
+                                            MenuKey = toLCase(MenuName);
                                         } else {
                                             MenuKey = MenuGuid;
                                         }
                                         if (!result.menus.ContainsKey(MenuKey)) {
-                                            ActiveText = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Active", "1");
-                                            if (string.IsNullOrEmpty(ActiveText)) {
-                                                ActiveText = "1";
+                                            cdefActiveText = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Active", "1");
+                                            if (string.IsNullOrEmpty(cdefActiveText)) {
+                                                cdefActiveText = "1";
                                             }
                                             result.menus.Add(MenuKey, new MetadataMiniCollectionModel.MiniCollectionMenuModel {
                                                 dataChanged = setAllDataChanged,
                                                 name = MenuName,
                                                 guid = MenuGuid,
                                                 key = MenuKey,
-                                                active = GenericController.encodeBoolean(ActiveText),
+                                                active = GenericController.encodeBoolean(cdefActiveText),
                                                 menuNameSpace = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "NameSpace", ""),
                                                 parentName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "ParentName", ""),
                                                 contentName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentName", ""),
@@ -480,10 +462,11 @@ namespace Contensive.Processor.Models.Domain {
                                         //
                                         // style sheet entries
                                         //
-                                        Name = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
+                                        string styleName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
+                                        int Ptr = 0;
                                         if (result.styleCnt > 0) {
                                             for (Ptr = 0; Ptr < result.styleCnt; Ptr++) {
-                                                if (textMatch(result.styles[Ptr].name, Name)) {
+                                                if (textMatch(result.styles[Ptr].name, styleName)) {
                                                     break;
                                                 }
                                             }
@@ -492,7 +475,7 @@ namespace Contensive.Processor.Models.Domain {
                                             Ptr = result.styleCnt;
                                             result.styleCnt = result.styleCnt + 1;
                                             Array.Resize(ref result.styles, Ptr);
-                                            result.styles[Ptr].name = Name;
+                                            result.styles[Ptr].name = styleName;
                                         }
                                         var tempVar5 = result.styles[Ptr];
                                         tempVar5.dataChanged = setAllDataChanged;
@@ -509,9 +492,11 @@ namespace Contensive.Processor.Models.Domain {
                                     }
                                 case "pagetemplate": {
                                         //
+                                        string templateName = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
+                                        int Ptr = 0;
                                         if (result.pageTemplateCnt > 0) {
                                             for (Ptr = 0; Ptr < result.pageTemplateCnt; Ptr++) {
-                                                if (textMatch(result.pageTemplates[Ptr].name, Name)) {
+                                                if (textMatch(result.pageTemplates[Ptr].name, templateName)) {
                                                     break;
                                                 }
                                             }
@@ -520,7 +505,7 @@ namespace Contensive.Processor.Models.Domain {
                                             Ptr = result.pageTemplateCnt;
                                             result.pageTemplateCnt = result.pageTemplateCnt + 1;
                                             Array.Resize(ref result.pageTemplates, Ptr);
-                                            result.pageTemplates[Ptr].name = Name;
+                                            result.pageTemplates[Ptr].name = templateName;
                                         }
                                         var tempVar6 = result.pageTemplates[Ptr];
                                         tempVar6.copy = XmlController.getXMLAttribute(core, Found, metaData_NodeWithinLoop, "Copy", "");
@@ -752,7 +737,7 @@ namespace Contensive.Processor.Models.Domain {
                                 int SiteStylePtr = 0;
                                 for (SiteStylePtr = 0; SiteStylePtr < SiteStyleCnt; SiteStylePtr++) {
                                     string StyleLine = SiteStyleSplit[SiteStylePtr];
-                                    int PosNameLineEnd = StyleLine.LastIndexOf("{",StringComparison.InvariantCulture) + 1;
+                                    int PosNameLineEnd = StyleLine.LastIndexOf("{", StringComparison.InvariantCulture) + 1;
                                     if (PosNameLineEnd > 0) {
                                         int PosNameLineStart = StyleLine.LastIndexOf(Environment.NewLine, PosNameLineEnd - 1, StringComparison.InvariantCulture) + 1;
                                         if (PosNameLineStart > 0) {
@@ -779,7 +764,7 @@ namespace Contensive.Processor.Models.Domain {
                             // Add or update the stylesheet
                             //
                             if (!Found) {
-                                StyleSheetAdd.Append( Environment.NewLine + NewStyleName + " {" + NewStyleValue + "}");
+                                StyleSheetAdd.Append(Environment.NewLine + NewStyleName + " {" + NewStyleValue + "}");
                             }
                         }
                     }
@@ -901,7 +886,7 @@ namespace Contensive.Processor.Models.Domain {
         /// clone object
         /// </summary>
         /// <returns></returns>
-        public object Clone()  {
+        public object Clone() {
             return this.MemberwiseClone();
         }
     }

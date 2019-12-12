@@ -34,13 +34,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// An instance of the sessionController, populated for the current session (user state, visit state, etc)
         /// </summary>
-        public SessionController session;
+        public SessionController session { get; set; }
         //
         //===================================================================================================
         /// <summary>
         /// if true, the session model (user, viewing, visit, visitor, properties) will be deleted on dispose)
         /// </summary>
-        public bool deleteSessionOnExit = false;
+        public bool deleteSessionOnExit { get; set; }
         //
         //===================================================================================================
         // todo - this should be a pointer into the serverConfig
@@ -54,19 +54,20 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// rnd resource used during this scope
         /// </summary>
-        public Random random = new Random();
+        public Random random { get; set; } = new Random();
         //
         //===================================================================================================
         /// <summary>
         /// Set true and email send adds all email to mockEmailList
         /// </summary>
-        public bool mockEmail = false;
-        public List<MockEmailClass> mockEmailList = new List<MockEmailClass>();
+        public bool mockEmail { get; set; }
+        //
+        public List<MockEmailClass> mockEmailList { get; set; } = new List<MockEmailClass>();
         //
         /// <summary>
         /// when enable, use MS trace logging. An attempt to stop file append permission issues
         /// </summary>
-        public bool useNlog = true;
+        public bool useNlog { get; set; } = true;
         //
         /// <summary>
         /// Dictionary of cdef, index by name
@@ -89,10 +90,10 @@ namespace Contensive.Processor.Controllers {
                 return _contentNameIdDictionary;
             }
         }
-        internal Dictionary<string, int> _contentNameIdDictionary = null;
+        internal Dictionary<string, int> _contentNameIdDictionary;
         //
         // -- assembly files to skip
-        public readonly List<string> assemblyList_NonAddonsInstalled = new List<string> {
+        internal List<string> assemblyList_NonAddonsInstalled { get; set; } = new List<string> {
             "\\cpbase.dll",
             "\\awssdk.core.dll",
             "\\awssdk.s3.dll",
@@ -155,7 +156,7 @@ namespace Contensive.Processor.Controllers {
                 return _dataSources;
             }
         }
-        private Dictionary<string, DataSourceModel> _dataSources = null;
+        private Dictionary<string, DataSourceModel> _dataSources;
         //
         //===================================================================================================
         //
@@ -239,7 +240,7 @@ namespace Contensive.Processor.Controllers {
                 return _docProperties;
             }
         }
-        private DocPropertiesModel _docProperties = null;
+        private DocPropertiesModel _docProperties;
         //
         //===================================================================================================
         /// <summary>
@@ -256,7 +257,7 @@ namespace Contensive.Processor.Controllers {
                 return _siteProperties;
             }
         }
-        private SitePropertiesController _siteProperties = null;
+        private SitePropertiesController _siteProperties;
         //
         //===================================================================================================
         //
@@ -284,7 +285,7 @@ namespace Contensive.Processor.Controllers {
                 return _appRootFiles;
             }
         }
-        private FileController _appRootFiles = null;
+        private FileController _appRootFiles;
         //
         //===================================================================================================
         //
@@ -298,7 +299,7 @@ namespace Contensive.Processor.Controllers {
                 return _tmpFiles;
             }
         }
-        private FileController _tmpFiles = null;
+        private FileController _tmpFiles;
         //
         //===================================================================================================
         //
@@ -314,7 +315,7 @@ namespace Contensive.Processor.Controllers {
                 return _privateFiles;
             }
         }
-        private FileController _privateFiles = null;
+        private FileController _privateFiles;
         //
         //===================================================================================================
         /// <summary>
@@ -368,7 +369,7 @@ namespace Contensive.Processor.Controllers {
                 return _programDataFiles;
             }
         }
-        private FileController _programDataFiles = null;
+        private FileController _programDataFiles;
         //
         //===================================================================================================
         //
@@ -399,7 +400,7 @@ namespace Contensive.Processor.Controllers {
                 return _programFiles;
             }
         }
-        private FileController _programFiles = null;
+        private FileController _programFiles;
         //
         //===================================================================================================
         //
@@ -415,7 +416,7 @@ namespace Contensive.Processor.Controllers {
                 return _cdnFiles;
             }
         }
-        private FileController _cdnFiles = null;
+        private FileController _cdnFiles;
         //
         //===================================================================================================
         /// <summary>
@@ -434,7 +435,7 @@ namespace Contensive.Processor.Controllers {
                 return _addonCacheNonPersistent;
             }
         }
-        private AddonCacheModel _addonCacheNonPersistent = null;
+        private AddonCacheModel _addonCacheNonPersistent;
         /// <summary>
         /// method to clear the core instance of routeMap. Explained in routeMap.
         /// </summary>
@@ -467,11 +468,11 @@ namespace Contensive.Processor.Controllers {
                 _domains = value;
             }
         }
-        private DomainModel _domains = null;
+        private DomainModel _domains;
         /// <summary>
         /// domains configured for this app. keys are lowercase
         /// </summary>
-        public Dictionary<string, DomainModel> domainDictionary;
+        public Dictionary<string, DomainModel> domainDictionary { get; set; }
         //
         //===================================================================================================
         public Controllers.CacheController cache {
@@ -482,7 +483,7 @@ namespace Contensive.Processor.Controllers {
                 return _cache;
             }
         }
-        private Controllers.CacheController _cache = null;
+        private Controllers.CacheController _cache;
         //
         //===================================================================================================
         /// <summary>
@@ -582,7 +583,7 @@ namespace Contensive.Processor.Controllers {
                 return _routeMap;
             }
         }
-        private RouteMapModel _routeMap = null;
+        private RouteMapModel _routeMap;
         /// <summary>
         /// clear the addon cache, the persistent routeMap, and the non-persistent RouteMap
         /// </summary>
@@ -687,7 +688,6 @@ namespace Contensive.Processor.Controllers {
                     // -- server mode, there is no application
                     session = SessionController.create(this, false);
                 } else if (appConfig.appStatus != AppConfigModel.AppStatusEnum.ok) {
-                    //} else if ((appConfig.appMode != appConfigModel.appModeEnum.normal) || (appConfig.appStatus != appConfigModel.appStatusEnum.OK)) {
                     //
                     // -- application is not ready, might be error, or in maintainence mode
                     session = SessionController.create(this, false);
@@ -700,8 +700,8 @@ namespace Contensive.Processor.Controllers {
                         doc.testPointMessage = "";
                     }
                 }
-            } catch (Exception ex) {
-                throw (ex);
+            } catch (Exception) {
+                throw;
             }
         }
         //
@@ -748,7 +748,7 @@ namespace Contensive.Processor.Controllers {
                 if (_nlogLogger == null) {
                     //
                     // -- if serverconfig not provided, return one-off logger
-                    if (serverConfig == null) return LogManager.GetCurrentClassLogger();
+                    if (serverConfig == null) { return LogManager.GetCurrentClassLogger(); }
                     //
                     // -- serverConfig is valid, initialize one stream for the rest of the document
                     LogController.awsConfigure(this);
@@ -757,7 +757,7 @@ namespace Contensive.Processor.Controllers {
                 return _nlogLogger;
             }
         }
-        private Logger _nlogLogger = null;
+        private Logger _nlogLogger;
 
         #region  IDisposable Support 
         //
@@ -864,45 +864,18 @@ namespace Contensive.Processor.Controllers {
                         _cache = null;
                     }
                     //
-                    if (_siteProperties != null) {
-                        // no dispose
-                        _siteProperties = null;
-                    }
-                    //
-                    if (_domains != null) {
-                        // no dispose
-                        _domains = null;
-                    }
-                    //
-                    if (_docProperties != null) {
-                        // no dispose
-                        _docProperties = null;
-                    }
-                    //
-                    if (_webServer != null) {
-                        // no dispose
-                        _webServer = null;
-                    }
-                    //
-                    if (_visitProperty != null) {
-                        // no dispose
-                        _visitProperty = null;
-                    }
-                    //
-                    if (_visitorProperty != null) {
-                        // no dispose
-                        _visitorProperty = null;
-                    }
-                    //
-                    if (_userProperty != null) {
-                        // no dispose
-                        _userProperty = null;
-                    }
-                    //
                     if (_db != null) {
                         _db.Dispose();
                         _db = null;
                     }
+                    //
+                    _siteProperties = null;
+                    _domains = null;
+                    _docProperties = null;
+                    _webServer = null;
+                    _visitProperty = null;
+                    _visitorProperty = null;
+                    _userProperty = null;
                 }
                 //
                 // cleanup non-managed objects

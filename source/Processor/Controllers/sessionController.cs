@@ -54,7 +54,7 @@ namespace Contensive.Processor.Controllers {
                 user.createdByVisit = true;
                 user.save(core.cpParent);
                 SessionController session = this;
-                recognizeById(core, user.id, ref session);
+                recognizeById(core, user.id, session);
             }
         }
 
@@ -331,7 +331,7 @@ namespace Contensive.Processor.Controllers {
                         if (resultSessionContext.visitor.memberId > 0) {
                             //
                             // -- recognize by the main_VisitorMemberID
-                            if (recognizeById(core, resultSessionContext.visitor.memberId, ref resultSessionContext)) {
+                            if (recognizeById(core, resultSessionContext.visitor.memberId, resultSessionContext)) {
                                 //    //
                                 //    // -- id presented, but did not work. create dummy user
                                 //    resultSessionContext.user = new personModel();
@@ -508,7 +508,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- Link Recognize
                         LogController.logTrace(core, "attempt link Recognize, memberLinkRecognizeId [" + memberLinkRecognizeId + "]");
-                        if (recognizeById(core, memberLinkRecognizeId, ref resultSessionContext)) {
+                        if (recognizeById(core, memberLinkRecognizeId, resultSessionContext)) {
                             LogController.addSiteActivity(core, "Successful link recognize with eid " + memberLinkinEid, resultSessionContext.user.id, resultSessionContext.user.organizationId);
                         } else {
                             LogController.addSiteActivity(core, "Unsuccessful link recognize with eid " + memberLinkinEid, resultSessionContext.user.id, resultSessionContext.user.organizationId);
@@ -976,7 +976,7 @@ namespace Contensive.Processor.Controllers {
         public static bool authenticateById(CoreController core, int userId, SessionController authContext) {
             bool result = false;
             try {
-                result = recognizeById(core, userId, ref authContext);
+                result = recognizeById(core, userId, authContext);
                 if (result) {
                     //
                     // Log them in
@@ -1011,7 +1011,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sessionContext"></param>
         /// <returns></returns>
         //
-        public static bool recognizeById(CoreController core, int userId, ref SessionController sessionContext) {
+        public static bool recognizeById(CoreController core, int userId, SessionController sessionContext) {
             bool result = false;
             try {
                 PersonModel contextUser = DbBaseModel.create<PersonModel>(core.cpParent, userId);
@@ -1057,7 +1057,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sessionContext"></param>
         /// <returns></returns>
         //
-        public bool recognizeById(int userId, ref SessionController sessionContext) => recognizeById(core, userId, ref sessionContext);
+        public bool recognizeById(int userId, ref SessionController sessionContext) => recognizeById(core, userId, sessionContext);
         //========================================================================
         //   IsMember
         //   true if the user is authenticated and is a trusted people (member content)

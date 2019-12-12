@@ -307,7 +307,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool Recognize(int userID) {
-            return SessionController.recognizeById(cp.core, userID, ref cp.core.session);
+            return SessionController.recognizeById(cp.core, userID, cp.core.session);
         }
         //
         //====================================================================================================
