@@ -15,6 +15,7 @@ using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
 using Contensive.Models.Db;
 using System.Globalization;
+using System.Text;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -96,13 +97,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="executeContext"></param>
         /// <returns></returns>
         public string execute(AddonModel addon, CPUtilsBaseClass.addonExecuteContext executeContext) {
-            string result = "";
+            StringBuilder result = new StringBuilder();
+            string resultString = "";
             string hint = "00";
             //
             // -- setup values that have to be in finalize
             bool rootLevelAddon = core.doc.addonRecursionDepth.Count.Equals(0);
             bool save_forceJavascriptToHead = executeContext.forceJavascriptToHead;
-            long addonStart = core.doc.appStopWatch.ElapsedMilliseconds;
             //
             if (addon == null) {
                 //
@@ -131,7 +132,7 @@ namespace Contensive.Processor.Controllers {
                         // -- check for addon recursion beyond limit (addonRecursionLimit)
                         bool blockRecursion = false;
                         bool inRecursionList = core.doc.addonRecursionDepth.ContainsKey(addon.id);
-                        if (inRecursionList) blockRecursion = (core.doc.addonRecursionDepth[addon.id] > addonRecursionLimit);
+                        if (inRecursionList) { blockRecursion = (core.doc.addonRecursionDepth[addon.id] > addonRecursionLimit); }
                         if (blockRecursion) {
                             //
                             // -- cannot call an addon within an addon
@@ -161,7 +162,7 @@ namespace Contensive.Processor.Controllers {
                                     LogController.logError(core, new GenericException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
                                 } else {
                                     executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + executeContext.errorContextMessage + "]";
-                                    result += executeDependency(dependentAddon, executeContext);
+                                    result.Append(executeDependency(dependentAddon, executeContext));
                                 }
                             }
                             hint = "04";
@@ -179,8 +180,8 @@ namespace Contensive.Processor.Controllers {
                                             if (nvp.Length > 1) {
                                                 nvpValue = nvp[1];
                                             }
-                                            if (nvpValue.IndexOf("[") >= 0) {
-                                                nvpValue = nvpValue.left(nvpValue.IndexOf("["));
+                                            if (nvpValue.IndexOf("[", StringComparison.InvariantCulture) >= 0) {
+                                                nvpValue = nvpValue.left(nvpValue.IndexOf("[", StringComparison.InvariantCulture));
                                             }
                                             core.docProperties.setProperty(nvp[0], nvpValue);
                                         }
@@ -194,18 +195,26 @@ namespace Contensive.Processor.Controllers {
                             string ContainerCssClass = "";
                             foreach (var kvp in executeContext.argumentKeyValuePairs) {
                                 switch (kvp.Key.ToLowerInvariant()) {
-                                    case "wrapper":
-                                        executeContext.wrapperID = GenericController.encodeInteger(kvp.Value);
-                                        break;
-                                    case "as ajax":
-                                        addon.asAjax = GenericController.encodeBoolean(kvp.Value);
-                                        break;
-                                    case "css container id":
-                                        containerCssId = kvp.Value;
-                                        break;
-                                    case "css container class":
-                                        ContainerCssClass = kvp.Value;
-                                        break;
+                                    case "wrapper": {
+                                            executeContext.wrapperID = GenericController.encodeInteger(kvp.Value);
+                                            break;
+                                        }
+                                    case "as ajax": {
+                                            addon.asAjax = GenericController.encodeBoolean(kvp.Value);
+                                            break;
+                                        }
+                                    case "css container id": {
+                                            containerCssId = kvp.Value;
+                                            break;
+                                        }
+                                    case "css container class": {
+                                            ContainerCssClass = kvp.Value;
+                                            break;
+                                        }
+                                    default: {
+                                            // do nothing
+                                            break;
+                                        }
                                 }
                                 core.docProperties.setProperty(kvp.Key, kvp.Value);
                             }
@@ -216,13 +225,13 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- inframe execution, deliver iframe with link back to remote method
                                 hint = "07";
-                                result = "TBD - inframe";
+                                result.Append("TBD - inframe");
                             } else if (addon.asAjax && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
                                 //
                                 // -- asajax execution, deliver div with ajax callback
                                 //
                                 hint = "08";
-                                result = "TBD - asajax";
+                                result.Append("TBD - asajax");
                                 //-----------------------------------------------------------------
                                 // AsAjax and this is NOT the callback - setup the ajax callback
                                 // js,styles and other features from the addon record are added to the host page
@@ -242,12 +251,12 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // -- remote method called from inframe execution
                                     hint = "10";
-                                    result = "TBD - remotemethod inframe";
+                                    result.Append("TBD - remotemethod inframe");
                                 } else if (addon.asAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
                                     //
                                     // -- remotemethod called from asajax execution
                                     hint = "11";
-                                    result = "TBD - remotemethod ajax";
+                                    result.Append("TBD - remotemethod ajax");
                                     //
                                     // Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
                                     // restore form values
@@ -285,11 +294,11 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     switch (executeContext.addonType) {
                                         case CPUtilsBaseClass.addonContext.ContextEditor:
-                                            contentParts = ActiveContentController.renderHtmlForWysiwygEditor(core, contentParts);
-                                            break;
+                                        contentParts = ActiveContentController.renderHtmlForWysiwygEditor(core, contentParts);
+                                        break;
                                         case CPUtilsBaseClass.addonContext.ContextEmail:
-                                            contentParts = ActiveContentController.renderHtmlForEmail(core, contentParts, core.session.user.id, "");
-                                            break;
+                                        contentParts = ActiveContentController.renderHtmlForEmail(core, contentParts, core.session.user.id, "");
+                                        break;
                                         case CPUtilsBaseClass.addonContext.ContextFilter:
                                         case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
                                         case CPUtilsBaseClass.addonContext.ContextOnBodyStart:
@@ -299,27 +308,27 @@ namespace Contensive.Processor.Controllers {
                                         case CPUtilsBaseClass.addonContext.ContextTemplate:
                                         case CPUtilsBaseClass.addonContext.ContextAdmin:
                                         case CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml:
-                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, 0, "", 0, executeContext.addonType);
-                                            break;
+                                        contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, 0, "", 0, executeContext.addonType);
+                                        break;
                                         case CPUtilsBaseClass.addonContext.ContextOnContentChange:
                                         case CPUtilsBaseClass.addonContext.ContextSimple:
-                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, 0, "", 0, executeContext.addonType);
-                                            break;
+                                        contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, 0, "", 0, executeContext.addonType);
+                                        break;
                                         case CPUtilsBaseClass.addonContext.ContextRemoteMethodJson:
-                                            contentParts = ActiveContentController.renderJSONForRemoteMethod(core, contentParts, "", 0, 0, "", 0, "", executeContext.addonType);
-                                            break;
+                                        contentParts = ActiveContentController.renderJSONForRemoteMethod(core, contentParts, "", 0, 0, "", 0, "", executeContext.addonType);
+                                        break;
                                         default:
-                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, 0, "", 0, executeContext.addonType);
-                                            break;
+                                        contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, 0, "", 0, executeContext.addonType);
+                                        break;
                                     }
                                 }
-                                result += contentParts;
+                                result.Append(contentParts);
                                 //
                                 // -- RemoteAssetLink
                                 hint = "16";
                                 if (addon.remoteAssetLink != "") {
                                     string RemoteAssetLink = addon.remoteAssetLink;
-                                    if (RemoteAssetLink.IndexOf("://") < 0) {
+                                    if (RemoteAssetLink.IndexOf("://", StringComparison.InvariantCulture) < 0) {
                                         //
                                         // use request object to build link
                                         if (RemoteAssetLink.left(1) == "/") {
@@ -344,14 +353,14 @@ namespace Contensive.Processor.Controllers {
                                             }
                                         }
                                     }
-                                    result += RemoteAssetContent;
+                                    result.Append(RemoteAssetContent);
                                 }
                                 //
                                 // --  FormXML
                                 hint = "17";
                                 if (addon.formXML != "") {
                                     bool ExitAddonWithBlankResponse = false;
-                                    result += execute_formContent(null, addon.formXML, ref ExitAddonWithBlankResponse, "addon [" + addon.name + "]");
+                                    result.Append(execute_formContent(addon.formXML, ref ExitAddonWithBlankResponse, "addon [" + addon.name + "]"));
                                     if (ExitAddonWithBlankResponse) {
                                         return string.Empty;
                                     }
@@ -367,7 +376,7 @@ namespace Contensive.Processor.Controllers {
                                     foreach (var kvp in executeContext.argumentKeyValuePairs) {
                                         callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(kvp.Key), encodeRequestVariable(core.docProperties.getText(kvp.Value)), true);
                                     }
-                                    result += "<SCRIPT LANGUAGE=\"JAVASCRIPT\" SRC=\"" + callBackLink + "\"></SCRIPT>";
+                                    result.Append("<SCRIPT LANGUAGE=\"JAVASCRIPT\" SRC=\"" + callBackLink + "\"></SCRIPT>");
                                 }
                                 string AddedByName = addon.name + " addon";
                                 //
@@ -404,16 +413,6 @@ namespace Contensive.Processor.Controllers {
                                     }
                                 }
                                 //
-                                // -- Add Css containers
-                                hint = "22";
-                                if (!string.IsNullOrEmpty(containerCssId) || !string.IsNullOrEmpty(ContainerCssClass)) {
-                                    if (addon.isInline) {
-                                        result = "\r<span id=\"" + containerCssId + "\" class=\"" + ContainerCssClass + "\" style=\"display:inline;\">" + result + "</span>";
-                                    } else {
-                                        result = "\r<div id=\"" + containerCssId + "\" class=\"" + ContainerCssClass + "\">" + nop(result) + "\r</div>";
-                                    }
-                                }
-                                //
                                 // -- add scripting and dotnet code last, so if the execution adds javascript to the head, the code in the fields is first.
                                 // -- Scripting code
                                 hint = "14";
@@ -425,10 +424,10 @@ namespace Contensive.Processor.Controllers {
                                         hint = "14.2";
                                         if (addon.scriptingLanguageId == (int)ScriptLanguages.Javascript) {
                                             hint = "14.3";
-                                            result += execute_Script_JScript(ref addon);
+                                            result.Append(execute_Script_JScript(ref addon));
                                         } else {
                                             hint = "14.4";
-                                            result += execute_Script_VBScript(ref addon);
+                                            result.Append(execute_Script_VBScript(ref addon));
                                         }
                                     } catch (Exception ex) {
                                         hint = "14.5";
@@ -440,19 +439,20 @@ namespace Contensive.Processor.Controllers {
                                 // -- DotNet
                                 hint = "15";
                                 if (addon.dotNetClass != "") {
-                                    result += execute_dotNetClass(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, addon.collectionId));
+                                    result.Append(execute_dotNetClass(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, addon.collectionId)));
                                 }
 
                             }
                             //
                             //   Add Wrappers to content
+                            resultString = result.ToString();
                             hint = "23";
                             if (addon.inFrame && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
                                 //
                                 // -- iFrame content, framed in content, during the remote method call, add in the rest of the html page
                                 hint = "24";
                                 core.doc.setMetaContent(0, 0);
-                                result = ""
+                                resultString = ""
                                     + core.siteProperties.docTypeDeclaration + Environment.NewLine + "<html>"
                                     + Environment.NewLine + "<head>"
                                     + core.html.getHtmlHead()
@@ -474,7 +474,18 @@ namespace Contensive.Processor.Controllers {
                                 // -- add-on called by another add-on, subroutine style (no wrappers)
                             } else {
                                 //
+                                // -- Add Css containers
+                                hint = "22";
+                                if (!string.IsNullOrEmpty(containerCssId) || !string.IsNullOrEmpty(ContainerCssClass)) {
+                                    if (addon.isInline) {
+                                        resultString = "\r<span id=\"" + containerCssId + "\" class=\"" + ContainerCssClass + "\" style=\"display:inline;\">" + resultString + "</span>";
+                                    } else {
+                                        resultString = "\r<div id=\"" + containerCssId + "\" class=\"" + ContainerCssClass + "\">" + resultString + "\r</div>";
+                                    }
+                                }
+                                //
                                 // -- Return all other types, Enable Edit Wrapper for Page Content edit mode
+
                                 hint = "25";
                                 bool IncludeEditWrapper = (!addon.blockEditTools) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple) && (!executeContext.isIncludeAddon);
                                 if (IncludeEditWrapper) {
@@ -485,8 +496,8 @@ namespace Contensive.Processor.Controllers {
                                         var editSegmentList = new List<string> {
                                             AdminUIController.getAddonEditSegment(core, addon.id, addon.name)
                                         };
-                                        result = AdminUIController.getAddonEditLink(core, editSegmentList) + result;
-                                        result = AdminUIController.getEditWrapper(core, result);
+                                        resultString = AdminUIController.getAddonEditLink(core, editSegmentList) + resultString;
+                                        resultString = AdminUIController.getEditWrapper(core, resultString);
                                     }
                                 }
                                 //
@@ -496,17 +507,17 @@ namespace Contensive.Processor.Controllers {
                                     if (core.visitProperty.getBoolean("AllowDebugging")) {
                                         string AddonCommentName = GenericController.strReplace(addon.name, "-->", "..>");
                                         if (addon.isInline) {
-                                            result = "<!-- Add-on " + AddonCommentName + " -->" + result + "<!-- /Add-on " + AddonCommentName + " -->";
+                                            resultString = "<!-- Add-on " + AddonCommentName + " -->" + resultString + "<!-- /Add-on " + AddonCommentName + " -->";
                                         } else {
-                                            result = "\r<!-- Add-on " + AddonCommentName + " -->" + nop(result) + "\r<!-- /Add-on " + AddonCommentName + " -->";
+                                            resultString = "\r<!-- Add-on " + AddonCommentName + " -->" + resultString + "\r<!-- /Add-on " + AddonCommentName + " -->";
                                         }
                                     }
                                 }
                                 //
                                 // -- Add Design Wrapper
                                 hint = "27";
-                                if ((!string.IsNullOrEmpty(result)) && (!addon.isInline) && (executeContext.wrapperID > 0)) {
-                                    result = addWrapperToResult(result, executeContext.wrapperID, "for Add-on " + addon.name);
+                                if ((!string.IsNullOrEmpty(resultString)) && (!addon.isInline) && (executeContext.wrapperID > 0)) {
+                                    resultString = addWrapperToResult(resultString, executeContext.wrapperID, "for Add-on " + addon.name);
                                 }
                                 // -- restore the parent's instanceId
                                 hint = "28";
@@ -534,9 +545,9 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
                     if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
-                        result = core.html.getHtmlDoc(result, "<body>");
+                        resultString = core.html.getHtmlDoc(resultString, "<body>");
                         if ((!core.doc.visitPropertyAllowDebugging) && (core.siteProperties.getBoolean("Allow Html Minify", true))) {
-                            result = NUglify.Uglify.Html(result).Code;
+                            resultString = NUglify.Uglify.Html(resultString).Code;
                         }
                     }
                     //
@@ -544,7 +555,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.addonModelStack.Pop();
                 }
             }
-            return result;
+            return resultString;
         }
         //
         //====================================================================================================
@@ -555,7 +566,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="FormXML"></param>
         /// <param name="return_ExitAddonBlankWithResponse"></param>
         /// <returns></returns>
-        private string execute_formContent(object nothingObject, string FormXML, ref bool return_ExitAddonBlankWithResponse, string contextErrorMessage) {
+        private string execute_formContent(string FormXML, ref bool return_ExitAddonBlankWithResponse, string contextErrorMessage) {
             string result = "";
             try {
                 string Button = core.docProperties.getText(RequestNameButton);
@@ -613,156 +624,176 @@ namespace Contensive.Processor.Controllers {
                                                 string Filename = null;
                                                 string DefaultFilename = null;
                                                 switch (TabNode.Name.ToLower(CultureInfo.InvariantCulture)) {
-                                                    case "siteproperty":
-                                                        //
-                                                        FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-                                                        FieldValue = core.docProperties.getText(FieldName);
-                                                        fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
-                                                        switch (GenericController.toLCase(fieldType)) {
-                                                            case "integer":
-                                                                //
-                                                                if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                    FieldValue = GenericController.encodeInteger(FieldValue).ToString();
-                                                                }
-                                                                core.siteProperties.setProperty(FieldName, FieldValue);
-                                                                break;
-                                                            case "boolean":
-                                                                //
-                                                                if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                    FieldValue = GenericController.encodeBoolean(FieldValue).ToString();
-                                                                }
-                                                                core.siteProperties.setProperty(FieldName, FieldValue);
-                                                                break;
-                                                            case "float":
-                                                                //
-                                                                if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                    FieldValue = encodeNumber(FieldValue).ToString();
-                                                                }
-                                                                core.siteProperties.setProperty(FieldName, FieldValue);
-                                                                break;
-                                                            case "date":
-                                                                //
-                                                                if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                    FieldValue = GenericController.encodeDate(FieldValue).ToString();
-                                                                }
-                                                                core.siteProperties.setProperty(FieldName, FieldValue);
-                                                                break;
-                                                            case "file":
-                                                            case "imagefile":
-                                                                //
-                                                                if (core.docProperties.getBoolean(FieldName + ".DeleteFlag")) {
-                                                                    core.siteProperties.setProperty(FieldName, "");
-                                                                }
-                                                                if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                    Filename = FieldValue;
-                                                                    string VirtualFilePath = "Settings/" + FieldName + "/";
-                                                                    core.cdnFiles.upload(FieldName, VirtualFilePath, ref Filename);
-                                                                    core.siteProperties.setProperty(FieldName, VirtualFilePath + Filename);
-                                                                }
-                                                                break;
-                                                            case "textfile":
-                                                                //
-                                                                DefaultFilename = "Settings/" + FieldName + ".txt";
-                                                                Filename = core.siteProperties.getText(FieldName, DefaultFilename);
-                                                                if (string.IsNullOrEmpty(Filename)) {
-                                                                    Filename = DefaultFilename;
-                                                                    core.siteProperties.setProperty(FieldName, DefaultFilename);
-                                                                }
-                                                                core.wwwFiles.saveFile(Filename, FieldValue);
-                                                                break;
-                                                            case "cssfile":
-                                                                //
-                                                                DefaultFilename = "Settings/" + FieldName + ".css";
-                                                                Filename = core.siteProperties.getText(FieldName, DefaultFilename);
-                                                                if (string.IsNullOrEmpty(Filename)) {
-                                                                    Filename = DefaultFilename;
-                                                                    core.siteProperties.setProperty(FieldName, DefaultFilename);
-                                                                }
-                                                                core.wwwFiles.saveFile(Filename, FieldValue);
-                                                                break;
-                                                            case "xmlfile":
-                                                                //
-                                                                DefaultFilename = "Settings/" + FieldName + ".xml";
-                                                                Filename = core.siteProperties.getText(FieldName, DefaultFilename);
-                                                                if (string.IsNullOrEmpty(Filename)) {
-                                                                    Filename = DefaultFilename;
-                                                                    core.siteProperties.setProperty(FieldName, DefaultFilename);
-                                                                }
-                                                                core.wwwFiles.saveFile(Filename, FieldValue);
-                                                                break;
-                                                            case "currency":
-                                                                //
-                                                                if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                    FieldValue = encodeNumber(FieldValue).ToString();
-                                                                    FieldValue = String.Format("C", FieldValue);
-                                                                }
-                                                                core.siteProperties.setProperty(FieldName, FieldValue);
-                                                                break;
-                                                            case "link":
-                                                                core.siteProperties.setProperty(FieldName, FieldValue);
-                                                                break;
-                                                            default:
-                                                                core.siteProperties.setProperty(FieldName, FieldValue);
-                                                                break;
-                                                        }
-                                                        break;
-                                                    case "copycontent":
-                                                        //
-                                                        // A Copy Content block
-                                                        //
-                                                        FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-                                                        if (!FieldReadOnly) {
+                                                    case "siteproperty": {
+                                                            //
                                                             FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-                                                            FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", "false"));
-                                                            if (FieldHTML) {
-                                                                //
-                                                                // treat html as active content for now.
-                                                                //
-                                                                FieldValue = core.docProperties.getRenderedActiveContent(FieldName);
-                                                            } else {
-                                                                FieldValue = core.docProperties.getText(FieldName);
+                                                            FieldValue = core.docProperties.getText(FieldName);
+                                                            fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
+                                                            switch (GenericController.toLCase(fieldType)) {
+                                                                case "integer": {
+                                                                        //
+                                                                        if (!string.IsNullOrEmpty(FieldValue)) {
+                                                                            FieldValue = GenericController.encodeInteger(FieldValue).ToString();
+                                                                        }
+                                                                        core.siteProperties.setProperty(FieldName, FieldValue);
+                                                                        break;
+                                                                    }
+                                                                case "boolean": {
+                                                                        //
+                                                                        if (!string.IsNullOrEmpty(FieldValue)) {
+                                                                            FieldValue = GenericController.encodeBoolean(FieldValue).ToString();
+                                                                        }
+                                                                        core.siteProperties.setProperty(FieldName, FieldValue);
+                                                                        break;
+                                                                    }
+                                                                case "float": {
+                                                                        //
+                                                                        if (!string.IsNullOrEmpty(FieldValue)) {
+                                                                            FieldValue = encodeNumber(FieldValue).ToString();
+                                                                        }
+                                                                        core.siteProperties.setProperty(FieldName, FieldValue);
+                                                                        break;
+                                                                    }
+                                                                case "date": {
+                                                                        //
+                                                                        if (!string.IsNullOrEmpty(FieldValue)) {
+                                                                            FieldValue = GenericController.encodeDate(FieldValue).ToString();
+                                                                        }
+                                                                        core.siteProperties.setProperty(FieldName, FieldValue);
+                                                                        break;
+                                                                    }
+                                                                case "file":
+                                                                case "imagefile": {
+                                                                        //
+                                                                        if (core.docProperties.getBoolean(FieldName + ".DeleteFlag")) {
+                                                                            core.siteProperties.setProperty(FieldName, "");
+                                                                        }
+                                                                        if (!string.IsNullOrEmpty(FieldValue)) {
+                                                                            Filename = FieldValue;
+                                                                            string VirtualFilePath = "Settings/" + FieldName + "/";
+                                                                            core.cdnFiles.upload(FieldName, VirtualFilePath, ref Filename);
+                                                                            core.siteProperties.setProperty(FieldName, VirtualFilePath + Filename);
+                                                                        }
+                                                                        break;
+                                                                    }
+                                                                case "textfile": {
+                                                                        //
+                                                                        DefaultFilename = "Settings/" + FieldName + ".txt";
+                                                                        Filename = core.siteProperties.getText(FieldName, DefaultFilename);
+                                                                        if (string.IsNullOrEmpty(Filename)) {
+                                                                            Filename = DefaultFilename;
+                                                                            core.siteProperties.setProperty(FieldName, DefaultFilename);
+                                                                        }
+                                                                        core.wwwFiles.saveFile(Filename, FieldValue);
+                                                                        break;
+                                                                    }
+                                                                case "cssfile": {
+                                                                        //
+                                                                        DefaultFilename = "Settings/" + FieldName + ".css";
+                                                                        Filename = core.siteProperties.getText(FieldName, DefaultFilename);
+                                                                        if (string.IsNullOrEmpty(Filename)) {
+                                                                            Filename = DefaultFilename;
+                                                                            core.siteProperties.setProperty(FieldName, DefaultFilename);
+                                                                        }
+                                                                        core.wwwFiles.saveFile(Filename, FieldValue);
+                                                                        break;
+                                                                    }
+                                                                case "xmlfile": {
+                                                                        //
+                                                                        DefaultFilename = "Settings/" + FieldName + ".xml";
+                                                                        Filename = core.siteProperties.getText(FieldName, DefaultFilename);
+                                                                        if (string.IsNullOrEmpty(Filename)) {
+                                                                            Filename = DefaultFilename;
+                                                                            core.siteProperties.setProperty(FieldName, DefaultFilename);
+                                                                        }
+                                                                        core.wwwFiles.saveFile(Filename, FieldValue);
+                                                                        break;
+                                                                    }
+                                                                case "currency": {
+                                                                        //
+                                                                        if (!string.IsNullOrEmpty(FieldValue)) {
+                                                                            FieldValue = encodeNumber(FieldValue).ToString();
+                                                                            FieldValue = String.Format("C", FieldValue);
+                                                                        }
+                                                                        core.siteProperties.setProperty(FieldName, FieldValue);
+                                                                        break;
+                                                                    }
+                                                                case "link": {
+                                                                        core.siteProperties.setProperty(FieldName, FieldValue);
+                                                                        break;
+                                                                    }
+                                                                default: {
+                                                                        core.siteProperties.setProperty(FieldName, FieldValue);
+                                                                        break;
+                                                                    }
                                                             }
-                                                            using (var csData = new CsModel(core)) {
-                                                                csData.open("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
-                                                                if (!csData.ok()) {
-                                                                    csData.close();
-                                                                    csData.insert("Copy Content");
+                                                            break;
+                                                        }
+                                                    case "copycontent": {
+                                                            //
+                                                            // A Copy Content block
+                                                            //
+                                                            FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            if (!FieldReadOnly) {
+                                                                FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
+                                                                FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", "false"));
+                                                                if (FieldHTML) {
+                                                                    //
+                                                                    // treat html as active content for now.
+                                                                    //
+                                                                    FieldValue = core.docProperties.getRenderedActiveContent(FieldName);
+                                                                } else {
+                                                                    FieldValue = core.docProperties.getText(FieldName);
                                                                 }
-                                                                if (csData.ok()) {
-                                                                    csData.set("name", FieldName);
-                                                                    //
-                                                                    // Set copy
-                                                                    //
-                                                                    csData.set("copy", FieldValue);
-                                                                    //
-                                                                    // delete duplicates
-                                                                    //
-                                                                    csData.goNext();
-                                                                    while (csData.ok()) {
-                                                                        csData.deleteRecord();
+                                                                using (var csData = new CsModel(core)) {
+                                                                    csData.open("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
+                                                                    if (!csData.ok()) {
+                                                                        csData.close();
+                                                                        csData.insert("Copy Content");
+                                                                    }
+                                                                    if (csData.ok()) {
+                                                                        csData.set("name", FieldName);
+                                                                        //
+                                                                        // Set copy
+                                                                        //
+                                                                        csData.set("copy", FieldValue);
+                                                                        //
+                                                                        // delete duplicates
+                                                                        //
                                                                         csData.goNext();
+                                                                        while (csData.ok()) {
+                                                                            csData.deleteRecord();
+                                                                            csData.goNext();
+                                                                        }
                                                                     }
                                                                 }
                                                             }
+                                                            break;
+
                                                         }
-                                                        break;
-                                                    case "filecontent":
-                                                        //
-                                                        // A File Content block
-                                                        //
-                                                        FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-                                                        if (!FieldReadOnly) {
-                                                            FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-                                                            fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
-                                                            FieldValue = core.docProperties.getText(FieldName);
-                                                            core.cdnFiles.saveFile(fieldfilename, FieldValue);
+                                                    case "filecontent": {
+                                                            //
+                                                            // A File Content block
+                                                            //
+                                                            FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            if (!FieldReadOnly) {
+                                                                FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
+                                                                fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
+                                                                FieldValue = core.docProperties.getText(FieldName);
+                                                                core.cdnFiles.saveFile(fieldfilename, FieldValue);
+                                                            }
+                                                            break;
                                                         }
-                                                        break;
-                                                    case "dbquery":
-                                                        //
-                                                        // dbquery has no results to process
-                                                        //
-                                                        break;
+                                                    case "dbquery": {
+                                                            //
+                                                            // dbquery has no results to process
+                                                            //
+                                                            break;
+                                                        }
+                                                    default: {
+                                                            // do nothing
+                                                            break;
+                                                        }
                                                 }
                                             }
                                         }
@@ -788,327 +819,344 @@ namespace Contensive.Processor.Controllers {
                                     string TabHeading = "";
                                     StringBuilderLegacyController TabCell = null;
                                     switch (GenericController.toLCase(SettingNode.Name)) {
-                                        case "description":
-                                            Description = SettingNode.InnerText;
-                                            break;
-                                        case "tab":
-                                            TabCnt += 1;
-                                            TabName = xml_GetAttribute(IsFound, SettingNode, "name", "");
-                                            TabDescription = xml_GetAttribute(IsFound, SettingNode, "description", "");
-                                            TabHeading = xml_GetAttribute(IsFound, SettingNode, "heading", "");
-                                            TabCell = new StringBuilderLegacyController();
-                                            foreach (XmlNode TabNode in SettingNode.ChildNodes) {
-                                                int SQLPageSize = 0;
-                                                int ErrorNumber = 0;
-                                                string FieldDataSource = null;
-                                                string FieldSQL = null;
-                                                string FieldDescription = null;
-                                                string FieldDefaultValue = null;
-                                                string FieldCaption = null;
-                                                switch (GenericController.toLCase(TabNode.Name)) {
-                                                    case "heading":
-                                                        //
-                                                        // Heading
-                                                        FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-                                                        TabCell.add(AdminUIController.getEditSubheadRow(core, FieldCaption));
-                                                        break;
-                                                    case "siteproperty":
-                                                        //
-                                                        // Site property
-                                                        FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-                                                        if (!string.IsNullOrEmpty(FieldName)) {
-                                                            FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-                                                            if (string.IsNullOrEmpty(FieldCaption)) {
-                                                                FieldCaption = FieldName;
-                                                            }
-                                                            FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-                                                            FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
-                                                            fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
-                                                            string FieldSelector = xml_GetAttribute(IsFound, TabNode, "selector", "");
-                                                            FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-                                                            string FieldAddon = xml_GetAttribute(IsFound, TabNode, "EditorAddon", "");
-                                                            FieldDefaultValue = TabNode.InnerText;
-                                                            FieldValue = core.siteProperties.getText(FieldName, FieldDefaultValue);
-                                                            if (!string.IsNullOrEmpty(FieldAddon)) {
+                                        case "description": {
+                                                Description = SettingNode.InnerText;
+                                                break;
+                                            }
+                                        case "tab": {
+                                                TabCnt += 1;
+                                                TabName = xml_GetAttribute(IsFound, SettingNode, "name", "");
+                                                TabDescription = xml_GetAttribute(IsFound, SettingNode, "description", "");
+                                                TabHeading = xml_GetAttribute(IsFound, SettingNode, "heading", "");
+                                                TabCell = new StringBuilderLegacyController();
+                                                foreach (XmlNode TabNode in SettingNode.ChildNodes) {
+                                                    int SQLPageSize = 0;
+                                                    int ErrorNumber = 0;
+                                                    string FieldDataSource = null;
+                                                    string FieldSQL = null;
+                                                    string FieldDescription = null;
+                                                    string FieldDefaultValue = null;
+                                                    string FieldCaption = null;
+                                                    switch (GenericController.toLCase(TabNode.Name)) {
+                                                        case "heading": {
                                                                 //
-                                                                // Use Editor Addon
-                                                                Dictionary<string, string> arguments = new Dictionary<string, string> {
-                                                                    { "FieldName", FieldName },
-                                                                    { "FieldValue", core.siteProperties.getText(FieldName, FieldDefaultValue) }
-                                                                };
-                                                                AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, FieldAddon);
-                                                                Copy = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
-                                                                    addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
-                                                                    argumentKeyValuePairs = arguments,
-                                                                    errorContextMessage = "executing field addon [" + FieldAddon + "] for " + contextErrorMessage
-                                                                });
-                                                            } else if (!string.IsNullOrEmpty(FieldSelector)) {
-                                                                //
-                                                                // Use Selector
-                                                                Copy = AdminUIController.getDefaultEditor_SelectorString(core, FieldName, FieldValue, FieldSelector);
-                                                            } else {
-                                                                //
-                                                                // Use default editor for each field type
-                                                                switch (GenericController.toLCase(fieldType)) {
-                                                                    case "integer":
-                                                                        //
-                                                                        Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
-                                                                        break;
-                                                                    case "boolean":
-                                                                        Copy = AdminUIController.getDefaultEditor_bool(core, FieldName, GenericController.encodeBoolean(FieldValue), FieldReadOnly,"");
-                                                                        break;
-                                                                    case "float":
-                                                                        Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
-                                                                        break;
-                                                                    case "date":
-                                                                        Copy = AdminUIController.getDefaultEditor_dateTime(core, FieldName, encodeDate(FieldValue), FieldReadOnly,"",false,"");
-                                                                        break;
-                                                                    case "file":
-                                                                    case "imagefile":
-                                                                        if (FieldReadOnly) {
-                                                                            Copy = FieldValue + HtmlController.inputHidden(FieldName, FieldValue);
-                                                                        } else {
-                                                                            if (string.IsNullOrEmpty(FieldValue)) {
-                                                                                Copy = core.html.inputFile(FieldName);
-                                                                            } else {
-                                                                                string NonEncodedLink = GenericController.getCdnFileLink(core, FieldValue);
-                                                                                string EncodedLink = encodeURL(NonEncodedLink);
-                                                                                string FieldValuefilename = "";
-                                                                                string FieldValuePath = "";
-                                                                                core.privateFiles.splitDosPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
-                                                                                Copy = ""
-                                                                                + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
-                                                                                + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + HtmlController.checkbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(FieldName);
-                                                                            }
-                                                                        }
-                                                                        break;
-                                                                    case "currency":
-                                                                        //
-                                                                        if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                            FieldValue = String.Format("C", FieldValue);
-                                                                        }
-                                                                        Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
-                                                                        break;
-                                                                    case "textfile":
-                                                                        if (FieldReadOnly) {
-                                                                            Copy = FieldValue + HtmlController.inputHidden(FieldName, FieldValue);
-                                                                        } else {
-                                                                            Copy = AdminUIController.getDefaultEditor_TextArea(core, FieldName, FieldValue, FieldReadOnly);
-                                                                        }
-                                                                        break;
-                                                                    case "cssfile":
-                                                                        Copy = AdminUIController.getDefaultEditor_TextArea(core, FieldName, FieldValue, FieldReadOnly);
-                                                                        break;
-                                                                    case "xmlfile":
-                                                                        if (FieldReadOnly) {
-                                                                            Copy = FieldValue + HtmlController.inputHidden(FieldName, FieldValue);
-                                                                        } else {
-                                                                            Copy = HtmlController.inputTextarea(core, FieldName, FieldValue, 5);
-                                                                        }
-                                                                        break;
-                                                                    case "link":
-                                                                        if (FieldReadOnly) {
-                                                                            Copy = FieldValue + HtmlController.inputHidden(FieldName, FieldValue);
-                                                                        } else {
-                                                                            Copy = HtmlController.inputText_Legacy(core, FieldName, FieldValue);
-                                                                        }
-                                                                        break;
-                                                                    default:
-                                                                        //
-                                                                        // text
-                                                                        if (FieldHTML) {
-                                                                            Copy = AdminUIController.getDefaultEditor_Html(core, FieldName, FieldValue, "", "", "", FieldReadOnly);
-                                                                        } else {
-                                                                            Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
-                                                                        }
-                                                                        break;
-                                                                }
+                                                                // Heading
+                                                                FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
+                                                                TabCell.add(AdminUIController.getEditSubheadRow(core, FieldCaption));
+                                                                break;
                                                             }
-                                                            TabCell.add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
-                                                        }
-                                                        break;
-                                                    case "copycontent":
-                                                        //
-                                                        // Content Copy field
-                                                        FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-                                                        if (!string.IsNullOrEmpty(FieldName)) {
-                                                            FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-                                                            if (string.IsNullOrEmpty(FieldCaption)) {
-                                                                FieldCaption = FieldName;
-                                                            }
-                                                            FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-                                                            FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-                                                            FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
-                                                            //
-                                                            using (var csData = new CsModel(core)) {
-                                                                csData.open("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, "id,name,Copy");
-                                                                if (!csData.ok()) {
-                                                                    csData.close();
-                                                                    csData.insert("Copy Content");
-                                                                    if (csData.ok()) {
-                                                                        int RecordId = csData.getInteger("ID");
-                                                                        csData.set("name", FieldName);
-                                                                        csData.set("copy", GenericController.encodeText(TabNode.InnerText));
-                                                                        csData.save();
+                                                        case "siteproperty": {
+                                                                //
+                                                                // Site property
+                                                                FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
+                                                                if (!string.IsNullOrEmpty(FieldName)) {
+                                                                    FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
+                                                                    if (string.IsNullOrEmpty(FieldCaption)) {
+                                                                        FieldCaption = FieldName;
                                                                     }
-                                                                }
-                                                                if (csData.ok()) {
-                                                                    FieldValue = csData.getText("copy");
-                                                                }
-                                                            }
-                                                            if (FieldHTML) {
-                                                                Copy = AdminUIController.getDefaultEditor_Html(core, FieldName, FieldValue, "", "", "", FieldReadOnly);
-                                                            } else {
-                                                                Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
-                                                            }
-                                                            TabCell.add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
-                                                        }
-                                                        break;
-                                                    case "filecontent":
-                                                        //
-                                                        // Content from a flat file
-                                                        //
-                                                        FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-                                                        FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-                                                        fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
-                                                        FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-                                                        FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-                                                        FieldDefaultValue = TabNode.InnerText;
-                                                        FieldValue = FieldDefaultValue;
-                                                        FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
-                                                        if (!string.IsNullOrEmpty(fieldfilename)) {
-                                                            if (core.cdnFiles.fileExists(fieldfilename)) {
-                                                                FieldValue = core.cdnFiles.readFileText(fieldfilename);
-                                                            }
-                                                        }
-                                                        if (FieldHTML) {
-                                                            Copy = AdminUIController.getDefaultEditor_Html(core, FieldName, FieldValue, "", "", "", FieldReadOnly);
-                                                        } else {
-                                                            Copy = AdminUIController.getDefaultEditor_TextArea(core, FieldName, FieldValue, FieldReadOnly);
-                                                        }
-                                                        TabCell.add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
-                                                        break;
-                                                    case "dbquery":
-                                                    case "querydb":
-                                                    case "query":
-                                                    case "db":
-                                                        //
-                                                        // Display the output of a query
-                                                        //
-                                                        Copy = "";
-                                                        FieldDataSource = xml_GetAttribute(IsFound, TabNode, "DataSourceName", "");
-                                                        FieldSQL = TabNode.InnerText;
-                                                        FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-                                                        FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-                                                        SQLPageSize = GenericController.encodeInteger(xml_GetAttribute(IsFound, TabNode, "rowmax", ""));
-                                                        if (SQLPageSize == 0) {
-                                                            SQLPageSize = 100;
-                                                        }
-                                                        //
-                                                        // Run the SQL
-                                                        //
-                                                        DataTable dt = null;
-                                                        if (!string.IsNullOrEmpty(FieldSQL)) {
-                                                            try {
-                                                                using (var db = new DbController(core, FieldDataSource)) {
-                                                                    dt = core.db.executeQuery(FieldSQL, 0, SQLPageSize);
-                                                                }
-                                                            } catch (Exception) {
-                                                                ErrorNumber = 0;
-                                                                loadOK = false;
-                                                            }
-                                                        }
-                                                        if (dt != null) {
-                                                            if (string.IsNullOrEmpty(FieldSQL)) {
-                                                                //
-                                                                // ----- Error
-                                                                //
-                                                                Copy = "No Result";
-                                                            } else if (ErrorNumber != 0) {
-                                                                //
-                                                                // ----- Error
-                                                                Copy = "Error: ";
-                                                            } else if (!DbController.isDataTableOk(dt)) {
-                                                                //
-                                                                // ----- no result
-                                                                //
-                                                                Copy = "No Results";
-                                                            } else if (dt.Rows.Count == 0) {
-                                                                //
-                                                                // ----- no result
-                                                                //
-                                                                Copy = "No Results";
-                                                            } else {
-                                                                //
-                                                                // ----- print results
-                                                                //
-                                                                if (dt.Rows.Count > 0) {
-                                                                    object[,] something = { { } };
-                                                                    if (dt.Rows.Count == 1 && dt.Columns.Count == 1) {
-                                                                        Copy = HtmlController.inputText_Legacy(core, "result", GenericController.encodeText(something[0, 0]), 0, 0, "", false, true);
+                                                                    FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                                    FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
+                                                                    fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
+                                                                    string FieldSelector = xml_GetAttribute(IsFound, TabNode, "selector", "");
+                                                                    FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
+                                                                    string FieldAddon = xml_GetAttribute(IsFound, TabNode, "EditorAddon", "");
+                                                                    FieldDefaultValue = TabNode.InnerText;
+                                                                    FieldValue = core.siteProperties.getText(FieldName, FieldDefaultValue);
+                                                                    if (!string.IsNullOrEmpty(FieldAddon)) {
+                                                                        //
+                                                                        // Use Editor Addon
+                                                                        Dictionary<string, string> arguments = new Dictionary<string, string> {
+                                                                            { "FieldName", FieldName },
+                                                                            { "FieldValue", core.siteProperties.getText(FieldName, FieldDefaultValue) }
+                                                                        };
+                                                                        AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, FieldAddon);
+                                                                        Copy = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
+                                                                            addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
+                                                                            argumentKeyValuePairs = arguments,
+                                                                            errorContextMessage = "executing field addon [" + FieldAddon + "] for " + contextErrorMessage
+                                                                        });
+                                                                    } else if (!string.IsNullOrEmpty(FieldSelector)) {
+                                                                        //
+                                                                        // Use Selector
+                                                                        Copy = AdminUIController.getDefaultEditor_SelectorString(core, FieldName, FieldValue, FieldSelector);
                                                                     } else {
-                                                                        foreach (DataRow dr in dt.Rows) {
-                                                                            //
-                                                                            // Build headers
-                                                                            //
-                                                                            int FieldCount = dr.ItemArray.Length;
-                                                                            Copy += ("\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;\">");
-                                                                            Copy += ("\r\t<tr>");
-                                                                            foreach (DataColumn dc in dr.ItemArray) {
-                                                                                Copy += ("\r\t\t<td class=\"ccadminsmall\" style=\"border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;\">" + dr[dc] + "</td>");
-                                                                            }
-                                                                            Copy += ("\r\t</tr>");
-                                                                            //
-                                                                            // Build output table
-                                                                            //
-                                                                            string RowStart = null;
-                                                                            string RowEnd = null;
-                                                                            string ColumnStart = null;
-                                                                            string ColumnEnd = null;
-                                                                            RowStart = "\r\t<tr>";
-                                                                            RowEnd = "\r\t</tr>";
-                                                                            ColumnStart = "\r\t\t<td class=\"ccadminnormal\" style=\"border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px\">";
-                                                                            ColumnEnd = "</td>";
-                                                                            int RowPointer = 0;
-                                                                            int RowMax = 0;
-                                                                            for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                                                                                Copy += (RowStart);
-                                                                                int ColumnPointer = 0;
-                                                                                int ColumnMax = 0;
-                                                                                for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
-                                                                                    object CellData = something[ColumnPointer, RowPointer];
-                                                                                    if (isNull(CellData)) {
-                                                                                        Copy += (ColumnStart + "[null]" + ColumnEnd);
-                                                                                    } else if ((CellData == null)) {
-                                                                                        Copy += (ColumnStart + "[empty]" + ColumnEnd);
-                                                                                    } else if (Microsoft.VisualBasic.Information.IsArray(CellData)) {
-                                                                                        Copy += ColumnStart + "[array]";
-                                                                                    } else if (GenericController.encodeText(CellData) == "") {
-                                                                                        Copy += (ColumnStart + "[empty]" + ColumnEnd);
-                                                                                    } else {
-                                                                                        Copy += (ColumnStart + HtmlController.encodeHtml(GenericController.encodeText(CellData)) + ColumnEnd);
-                                                                                    }
+                                                                        //
+                                                                        // Use default editor for each field type
+                                                                        switch (GenericController.toLCase(fieldType)) {
+                                                                            case "integer": {
+                                                                                    //
+                                                                                    Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
+                                                                                    break;
                                                                                 }
-                                                                                Copy += (RowEnd);
+                                                                            case "boolean": {
+                                                                                    Copy = AdminUIController.getDefaultEditor_bool(core, FieldName, GenericController.encodeBoolean(FieldValue), FieldReadOnly, "");
+                                                                                    break;
+                                                                                }
+                                                                            case "float": {
+                                                                                    Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
+                                                                                    break;
+                                                                                }
+                                                                            case "date": {
+                                                                                    Copy = AdminUIController.getDefaultEditor_dateTime(core, FieldName, encodeDate(FieldValue), FieldReadOnly, "", false, "");
+                                                                                    break;
+                                                                                }
+                                                                            case "file":
+                                                                            case "imagefile": {
+                                                                                    if (FieldReadOnly) {
+                                                                                        Copy = FieldValue + HtmlController.inputHidden(FieldName, FieldValue);
+                                                                                    } else {
+                                                                                        if (string.IsNullOrEmpty(FieldValue)) {
+                                                                                            Copy = core.html.inputFile(FieldName);
+                                                                                        } else {
+                                                                                            string NonEncodedLink = GenericController.getCdnFileLink(core, FieldValue);
+                                                                                            string EncodedLink = encodeURL(NonEncodedLink);
+                                                                                            string FieldValuefilename = "";
+                                                                                            string FieldValuePath = "";
+                                                                                            core.privateFiles.splitDosPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
+                                                                                            Copy = ""
+                                                                                            + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
+                                                                                            + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + HtmlController.checkbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(FieldName);
+                                                                                        }
+                                                                                    }
+                                                                                    break;
+                                                                                }
+                                                                            case "currency": {
+                                                                                    //
+                                                                                    if (!string.IsNullOrEmpty(FieldValue)) {
+                                                                                        FieldValue = String.Format("C", FieldValue);
+                                                                                    }
+                                                                                    Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
+                                                                                    break;
+                                                                                }
+                                                                            case "textfile": {
+                                                                                    if (FieldReadOnly) {
+                                                                                        Copy = FieldValue + HtmlController.inputHidden(FieldName, FieldValue);
+                                                                                    } else {
+                                                                                        Copy = AdminUIController.getDefaultEditor_TextArea(core, FieldName, FieldValue, FieldReadOnly);
+                                                                                    }
+                                                                                    break;
+                                                                                }
+                                                                            case "cssfile": {
+                                                                                    Copy = AdminUIController.getDefaultEditor_TextArea(core, FieldName, FieldValue, FieldReadOnly);
+                                                                                    break;
+                                                                                }
+                                                                            case "xmlfile": {
+                                                                                    if (FieldReadOnly) {
+                                                                                        Copy = FieldValue + HtmlController.inputHidden(FieldName, FieldValue);
+                                                                                    } else {
+                                                                                        Copy = HtmlController.inputTextarea(core, FieldName, FieldValue, 5);
+                                                                                    }
+                                                                                    break;
+                                                                                }
+                                                                            case "link": {
+                                                                                    if (FieldReadOnly) {
+                                                                                        Copy = FieldValue + HtmlController.inputHidden(FieldName, FieldValue);
+                                                                                    } else {
+                                                                                        Copy = HtmlController.inputText_Legacy(core, FieldName, FieldValue);
+                                                                                    }
+                                                                                    break;
+                                                                                }
+                                                                            default: {
+                                                                                    //
+                                                                                    // text
+                                                                                    if (FieldHTML) {
+                                                                                        Copy = AdminUIController.getDefaultEditor_Html(core, FieldName, FieldValue, "", "", "", FieldReadOnly);
+                                                                                    } else {
+                                                                                        Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
+                                                                                    }
+                                                                                    break;
+                                                                                }
+                                                                        }
+                                                                    }
+                                                                    TabCell.add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                                }
+                                                                break;
+                                                            }
+                                                        case "copycontent": {
+                                                                //
+                                                                // Content Copy field
+                                                                FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
+                                                                if (!string.IsNullOrEmpty(FieldName)) {
+                                                                    FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
+                                                                    if (string.IsNullOrEmpty(FieldCaption)) {
+                                                                        FieldCaption = FieldName;
+                                                                    }
+                                                                    FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                                    FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
+                                                                    FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
+                                                                    //
+                                                                    using (var csData = new CsModel(core)) {
+                                                                        csData.open("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, "id,name,Copy");
+                                                                        if (!csData.ok()) {
+                                                                            csData.close();
+                                                                            csData.insert("Copy Content");
+                                                                            if (csData.ok()) {
+                                                                                int RecordId = csData.getInteger("ID");
+                                                                                csData.set("name", FieldName);
+                                                                                csData.set("copy", GenericController.encodeText(TabNode.InnerText));
+                                                                                csData.save();
                                                                             }
-                                                                            Copy += ("\r</table>");
+                                                                        }
+                                                                        if (csData.ok()) {
+                                                                            FieldValue = csData.getText("copy");
+                                                                        }
+                                                                    }
+                                                                    if (FieldHTML) {
+                                                                        Copy = AdminUIController.getDefaultEditor_Html(core, FieldName, FieldValue, "", "", "", FieldReadOnly);
+                                                                    } else {
+                                                                        Copy = AdminUIController.getDefaultEditor_text(core, FieldName, FieldValue, FieldReadOnly);
+                                                                    }
+                                                                    TabCell.add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                                }
+                                                                break;
+                                                            }
+                                                        case "filecontent": {
+                                                                //
+                                                                // Content from a flat file
+                                                                //
+                                                                FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
+                                                                FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
+                                                                fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
+                                                                FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                                FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
+                                                                FieldDefaultValue = TabNode.InnerText;
+                                                                FieldValue = FieldDefaultValue;
+                                                                FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
+                                                                if (!string.IsNullOrEmpty(fieldfilename)) {
+                                                                    if (core.cdnFiles.fileExists(fieldfilename)) {
+                                                                        FieldValue = core.cdnFiles.readFileText(fieldfilename);
+                                                                    }
+                                                                }
+                                                                if (FieldHTML) {
+                                                                    Copy = AdminUIController.getDefaultEditor_Html(core, FieldName, FieldValue, "", "", "", FieldReadOnly);
+                                                                } else {
+                                                                    Copy = AdminUIController.getDefaultEditor_TextArea(core, FieldName, FieldValue, FieldReadOnly);
+                                                                }
+                                                                TabCell.add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                                break;
+                                                            }
+                                                        case "dbquery":
+                                                        case "querydb":
+                                                        case "query":
+                                                        case "db": {
+                                                                //
+                                                                // Display the output of a query
+                                                                //
+                                                                Copy = "";
+                                                                FieldDataSource = xml_GetAttribute(IsFound, TabNode, "DataSourceName", "");
+                                                                FieldSQL = TabNode.InnerText;
+                                                                FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
+                                                                FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
+                                                                SQLPageSize = GenericController.encodeInteger(xml_GetAttribute(IsFound, TabNode, "rowmax", ""));
+                                                                if (SQLPageSize == 0) {
+                                                                    SQLPageSize = 100;
+                                                                }
+                                                                //
+                                                                // Run the SQL
+                                                                //
+                                                                DataTable dt = null;
+                                                                if (!string.IsNullOrEmpty(FieldSQL)) {
+                                                                    try {
+                                                                        using (var db = new DbController(core, FieldDataSource)) {
+                                                                            dt = core.db.executeQuery(FieldSQL, 0, SQLPageSize);
+                                                                        }
+                                                                    } catch (Exception) {
+                                                                        ErrorNumber = 0;
+                                                                        loadOK = false;
+                                                                    }
+                                                                }
+                                                                if (dt != null) {
+                                                                    if (string.IsNullOrEmpty(FieldSQL)) {
+                                                                        //
+                                                                        // ----- Error
+                                                                        //
+                                                                        Copy = "No Result";
+                                                                    } else if (ErrorNumber != 0) {
+                                                                        //
+                                                                        // ----- Error
+                                                                        Copy = "Error: ";
+                                                                    } else if (!DbController.isDataTableOk(dt)) {
+                                                                        //
+                                                                        // ----- no result
+                                                                        //
+                                                                        Copy = "No Results";
+                                                                    } else if (dt.Rows.Count == 0) {
+                                                                        //
+                                                                        // ----- no result
+                                                                        //
+                                                                        Copy = "No Results";
+                                                                    } else {
+                                                                        //
+                                                                        // ----- print results
+                                                                        //
+                                                                        if (dt.Rows.Count > 0) {
+                                                                            object[,] something = { { } };
+                                                                            if (dt.Rows.Count == 1 && dt.Columns.Count == 1) {
+                                                                                Copy = HtmlController.inputText_Legacy(core, "result", GenericController.encodeText(something[0, 0]), 0, 0, "", false, true);
+                                                                            } else {
+                                                                                foreach (DataRow dr in dt.Rows) {
+                                                                                    //
+                                                                                    // Build headers
+                                                                                    //
+                                                                                    int FieldCount = dr.ItemArray.Length;
+                                                                                    Copy += ("\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;\">");
+                                                                                    Copy += ("\r\t<tr>");
+                                                                                    foreach (DataColumn dc in dr.ItemArray) {
+                                                                                        Copy += ("\r\t\t<td class=\"ccadminsmall\" style=\"border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;\">" + dr[dc] + "</td>");
+                                                                                    }
+                                                                                    Copy += ("\r\t</tr>");
+                                                                                    //
+                                                                                    // Build output table
+                                                                                    //
+                                                                                    string RowStart = "\r\t<tr>";
+                                                                                    string RowEnd = "\r\t</tr>";
+                                                                                    string ColumnStart = "\r\t\t<td class=\"ccadminnormal\" style=\"border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px\">";
+                                                                                    string ColumnEnd = "</td>";
+                                                                                    int RowMax = 0;
+                                                                                    for (int RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
+                                                                                        Copy += (RowStart);
+                                                                                        int ColumnPointer = 0;
+                                                                                        int ColumnMax = 0;
+                                                                                        for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
+                                                                                            object CellData = something[ColumnPointer, RowPointer];
+                                                                                            if (isNull(CellData)) {
+                                                                                                Copy += (ColumnStart + "[null]" + ColumnEnd);
+                                                                                            } else if ((CellData == null)) {
+                                                                                                Copy += (ColumnStart + "[empty]" + ColumnEnd);
+                                                                                            } else if (Microsoft.VisualBasic.Information.IsArray(CellData)) {
+                                                                                                Copy += ColumnStart + "[array]";
+                                                                                            } else if (GenericController.encodeText(CellData) == "") {
+                                                                                                Copy += (ColumnStart + "[empty]" + ColumnEnd);
+                                                                                            } else {
+                                                                                                Copy += (ColumnStart + HtmlController.encodeHtml(GenericController.encodeText(CellData)) + ColumnEnd);
+                                                                                            }
+                                                                                        }
+                                                                                        Copy += (RowEnd);
+                                                                                    }
+                                                                                    Copy += ("\r</table>");
+                                                                                }
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
+                                                                TabCell.add(AdminUIController.getEditRow(core, Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                                break;
                                                             }
-                                                        }
-                                                        TabCell.add(AdminUIController.getEditRow(core, Copy, FieldCaption, FieldDescription, false, false, ""));
-                                                        break;
+                                                        default: {
+                                                                break;
+                                                            }
+                                                    }
                                                 }
+                                                Copy = AdminUIController.getEditPanel(core, true, TabHeading, TabDescription, AdminUIController.editTable(TabCell.text));
+                                                if (!string.IsNullOrEmpty(Copy)) {
+                                                    adminMenu.addEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
+                                                }
+                                                TabCell = null;
+                                                break;
                                             }
-                                            Copy = AdminUIController.getEditPanel(core, true, TabHeading, TabDescription, AdminUIController.editTable(TabCell.text));
-                                            if (!string.IsNullOrEmpty(Copy)) {
-                                                adminMenu.addEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
+                                        default: {
+                                                break;
                                             }
-                                            TabCell = null;
-                                            break;
-                                        default:
-                                            break;
                                     }
                                 }
                                 //
@@ -1702,7 +1750,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string getPrivateFilesAddonPath()  {
+        public static string getPrivateFilesAddonPath() {
             return "addons\\";
         }
         //
@@ -2125,13 +2173,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose()  {
+        public void Dispose() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~AddonController()  {
+        ~AddonController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }
