@@ -181,40 +181,40 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        // todo implement wysiwyg features
+        // todo implement wysiwyg features 1
         public override string InputHtml(string htmlName, int maxLength) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
             return cp.core.html.getFormInputHTML(htmlName, "", "", "", false, true, addonListJSON, "", "", false);
         }
-        // todo implement wysiwyg features
+        // todo implement wysiwyg features 2
         public override string InputHtml(string htmlName, int maxLength, string htmlValue) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
             return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
         }
-        // todo implement wysiwyg features
+        // todo implement wysiwyg features 3
         public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
+            return cp.Html.div( cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false),"",htmlClass);
         }
-        // todo implement wysiwyg features
+        // todo implement wysiwyg features 4
         public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
+            return cp.Html.div(cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false), "", htmlClass, htmlId);
         }
-        // todo implement wysiwyg features
+        // todo implement wysiwyg features 5
         public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId, bool viewAsHtmlCode) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
+            return cp.Html.div(cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false), "", htmlClass, htmlId);
         }
-        // todo implement wysiwyg features
+        // todo implement wysiwyg features 6
         public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId, EditorContentType contentType) {
-            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
+            string addonListJSON = cp.core.html.getWysiwygAddonList(contentType);
+            return cp.Html.div(cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false), "", htmlClass, htmlId);
         }
-        // todo implement wysiwyg features
+        // todo implement wysiwyg features 7
         public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId, List<SimplestDataBaseModel> addonList) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtml5BaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
+            return cp.Html.div(cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false), "", htmlClass, htmlId);
         }
         //
         // ====================================================================================================
