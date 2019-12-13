@@ -24,7 +24,8 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     + " and(v.CookieSupport=0)and(v.LastVisitTime<" + env.sqlDateMidnightTwoDaysAgo + ")";
                 try {
                     core.db.executeNonQuery(sql);
-                } catch (Exception) {
+                } catch (Exception ex) {
+                    LogController.logError(core, ex);
                 }
                 //
                 // -- Remove old guest records

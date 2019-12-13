@@ -702,7 +702,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 LogController.logError(this, ex);
-                throw ex;
+                throw;
             }
         }
         //

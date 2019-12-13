@@ -302,7 +302,8 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                         bool parseError = false;
                         try {
                             LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&includeSystem=1&includeNonPublic=1");
-                        } catch (Exception) {
+                        } catch (Exception ex) {
+                            LogController.logError(core, ex);
                             UserError = "There was an error reading the Collection Library. The site may be unavailable.";
                             HandleClassAppendLog("AddonManager", UserError);
                             status += "<br>" + UserError;

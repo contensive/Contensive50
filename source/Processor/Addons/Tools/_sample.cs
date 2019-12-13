@@ -92,7 +92,8 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 // -- assemble form
                 result = AdminUIController.getToolForm(core, resultForm.ToString(), String.Join(",", buttonList));
-            } catch (Exception) {
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
                 throw;
             }
             return result;

@@ -210,7 +210,8 @@ namespace Contensive.Processor.Controllers {
                             LogController.logError(core, "executeQuery SqlException, retries left [" + retryCnt.ToString() + "], ex [" + exSql.ToString() + "]");
                             if (retryCnt <= 0) { throw; }
                             retryCnt--;
-                        } catch (Exception) {
+                        } catch (Exception ex) {
+                            LogController.logError(core, ex);
                             throw;
                         }
                     } while (!success && (retryCnt >= 0));
@@ -846,7 +847,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DataSourceName"></param>
         /// <returns></returns>
         //
-        public int getDataSourceType()  {
+        public int getDataSourceType() {
             return Constants.DataSourceTypeODBCSQLServer;
         }
         //
@@ -1069,13 +1070,9 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         //
         public static string encodeSQLDate(DateTime expressionDate) {
-            try {
-                if (Convert.IsDBNull(expressionDate)) { return "null"; }
-                if (expressionDate == DateTime.MinValue) { return "null"; }
-                return "'" + expressionDate.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'";
-            } catch (Exception) {
-                throw;
-            }
+            if (Convert.IsDBNull(expressionDate)) { return "null"; }
+            if (expressionDate == DateTime.MinValue) { return "null"; }
+            return "'" + expressionDate.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'";
         }
         //
         //========================================================================
@@ -1465,7 +1462,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                // shared method, rethrow error
+                // shared method, rethrow;rror
                 throw new GenericException("Exception in encodeSqlTableName(" + sourceName + ")", ex);
             }
             return returnName;
@@ -1596,11 +1593,11 @@ namespace Contensive.Processor.Controllers {
         }
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose()  {
+        public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~DbController()  {
+        ~DbController() {
             Dispose(false);
         }
         #endregion

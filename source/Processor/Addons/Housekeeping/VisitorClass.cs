@@ -20,10 +20,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                         + " from ccvisitors r,ccvisits v"
                         + " where r.id=v.visitorid"
                         + " and(v.CookieSupport=0)and(v.LastVisitTime<" + env.sqlDateMidnightTwoDaysAgo + ")";
-                    try {
-                        core.db.executeNonQuery(sql);
-                    } catch (Exception) {
-                    }
+                    core.db.executeNonQuery(sql);
                 }
 
             } catch (Exception ex) {

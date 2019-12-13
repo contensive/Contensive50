@@ -294,7 +294,7 @@ namespace Contensive.Processor.Controllers {
                         // no errors, but xml file not found. Make an error
                         return_ErrorMessage = "<p>There was a problem with the installation. The collection zip was not downloaded successfully.</p>";
                     }
-                } catch (Exception) {
+                } catch (Exception ex) {
 
                     throw;
 
@@ -322,10 +322,10 @@ namespace Contensive.Processor.Controllers {
                 XmlDocument Doc = new XmlDocument();
                 try {
                     Doc.LoadXml(CollectionFolderModel.getCollectionFolderConfigXml(core));
-                } catch (Exception) {
+                } catch (Exception ex) {
                     //
                     // -- exit, error loading file
-                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", UpdateConfig, Error loading Collections.xml file.");
+                    LogController.logError(core, MethodInfo.GetCurrentMethod().Name + ", UpdateConfig, Error loading Collections.xml file." + ex);
                     return;
                 }
                 if (!Doc.DocumentElement.Name.ToLower(CultureInfo.InvariantCulture).Equals("collectionlist")) {

@@ -112,7 +112,7 @@ namespace Contensive.Processor.Models.Domain {
                                     CollectionGuid = "{" + CollectionGuid + "}";
                                     if (collectionsFound.Contains(CollectionGuid)) {
                                         //
-                                        // -- folder with duplicate Guid not allowed. throw exception and block the folder
+                                        // -- folder with duplicate Guid not allowed. throw;ception and block the folder
                                         LogController.logError(core, new GenericException("Add-on Collection Folder contains a mulitple collection folders with the same guid, [" + CollectionGuid + "], duplicate folder ignored [" + folder.Name + "]. Remove or Combine the mulitple instances. Then delete the collections.xml file and it will regenerate without the duplicate."));
                                     } else {
                                         collectionsFound.Add(CollectionGuid);

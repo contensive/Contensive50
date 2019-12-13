@@ -88,7 +88,8 @@ namespace Contensive.Processor.Controllers {
                         if (!installCollectionFromPrivateFile(core, contextLog, installPrivatePath + baseCollectionFilename, ref installErrorMessage, ref installedCollectionGuid, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList)) {
                             throw new GenericException(installErrorMessage);
                         }
-                    } catch (Exception) {
+                    } catch (Exception ex) {
+                        LogController.logError(core, ex);
                         throw;
                     } finally {
                         //
@@ -181,11 +182,11 @@ namespace Contensive.Processor.Controllers {
                                 string collectionFileContent = core.privateFiles.readFileText(CollectionVersionFolder + file.Name);
                                 try {
                                     Doc.LoadXml(collectionFileContent);
-                                } catch (Exception) {
+                                } catch (Exception ex) {
                                     //
                                     // error - Need a way to reach the user that submitted the file
                                     //
-                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder, skipping xml file, not valid collection metadata, [" + core.privateFiles.localAbsRootPath + CollectionVersionFolder + file.Name + "].");
+                                    LogController.logError(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder, skipping xml file, not valid collection metadata, [" + core.privateFiles.localAbsRootPath + CollectionVersionFolder + file.Name + "]. " + ex);
                                     loadOK = false;
                                 }
                                 if (loadOK) {
@@ -495,11 +496,11 @@ namespace Contensive.Processor.Controllers {
                                                             loadOK = true;
                                                             try {
                                                                 NavDoc.LoadXml(metaDataMiniCollection);
-                                                            } catch (Exception) {
+                                                            } catch (Exception ex) {
                                                                 //
                                                                 // error - Need a way to reach the user that submitted the file
                                                                 //
-                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], creating navigator entries, there was an error parsing the portion of the collection that contains metadata. Navigator entry creation was aborted. [There was an error reading the Meta data file.]");
+                                                                LogController.logError(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], creating navigator entries, there was an error parsing the portion of the collection that contains metadata. Navigator entry creation was aborted. [There was an error reading the Meta data file.] " + ex);
                                                                 result = false;
                                                                 return_ErrorMessage += "<P>The collection was not installed because the xml collection file has an error.</P>";
                                                                 return false;

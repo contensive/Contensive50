@@ -590,7 +590,8 @@ namespace Contensive.Processor.Controllers {
                         XmlDocument Doc = new XmlDocument();
                         try {
                             Doc.LoadXml(FormXML);
-                        } catch (Exception) {
+                        } catch (Exception ex) {
+                            LogController.logError(core, ex);
                             ButtonList = ButtonCancel;
                             Content.add("<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">There was a problem with the Setting Page you requested.</div>");
                             loadOK = false;
@@ -1060,7 +1061,8 @@ namespace Contensive.Processor.Controllers {
                                                                         using (var db = new DbController(core, FieldDataSource)) {
                                                                             dt = core.db.executeQuery(FieldSQL, 0, SQLPageSize);
                                                                         }
-                                                                    } catch (Exception) {
+                                                                    } catch (Exception ex) {
+                                                                        LogController.logError(core, ex);
                                                                         ErrorNumber = 0;
                                                                         loadOK = false;
                                                                     }
@@ -1225,12 +1227,14 @@ namespace Contensive.Processor.Controllers {
                 try {
                     MainCsvScriptCompatibilityClass mainCsv = new MainCsvScriptCompatibilityClass(core);
                     engine.AddHostObject("ccLib", mainCsv);
-                } catch (Exception) {
+                } catch (Exception ex) {
+                    LogController.logError(core, ex);
                     throw;
                 }
                 try {
                     engine.AddHostObject("cp", core.cpParent);
-                } catch (Exception) {
+                } catch (Exception ex) {
+                    LogController.logError(core, ex);
                     throw;
                 }
                 try {
@@ -1301,12 +1305,14 @@ namespace Contensive.Processor.Controllers {
                 try {
                     MainCsvScriptCompatibilityClass mainCsv = new MainCsvScriptCompatibilityClass(core);
                     engine.AddHostObject("ccLib", mainCsv);
-                } catch (Exception) {
+                } catch (Exception ex) {
+                    LogController.logError(core, ex);
                     throw;
                 }
                 try {
                     engine.AddHostObject("cp", core.cpParent);
-                } catch (Exception) {
+                } catch (Exception ex) {
+                    LogController.logError(core, ex);
                     throw;
                 }
                 try {
@@ -1482,7 +1488,8 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     }
-                } catch (Exception) {
+                } catch (Exception ex) {
+                    LogController.logError(core, ex);
                     addonFound = false;
                     return string.Empty;
                 }
@@ -2055,66 +2062,62 @@ namespace Contensive.Processor.Controllers {
         /// <param name="IconSpriteColumn"></param>
         /// <returns></returns>
         public static string getAddonIconImg(string AdminURL, int IconWidth, int IconHeight, int IconSprites, bool IconIsInline, string IconImgID, string IconFilename, string serverFilePath, string IconAlt, string IconTitle, string ACInstanceID, int IconSpriteColumn) {
-            string tempGetAddonIconImg = "";
-            try {
-                if (string.IsNullOrEmpty(IconAlt)) { IconAlt = "Add-on"; }
-                if (string.IsNullOrEmpty(IconTitle)) { IconTitle = "Rendered as Add-on"; }
-                if (string.IsNullOrEmpty(IconFilename)) {
-                    //
-                    // No icon given, use the default
-                    if (IconIsInline) {
-                        IconFilename = "" + cdnPrefix + "images/IconAddonInlineDefault.png";
-                        IconWidth = 62;
-                        IconHeight = 17;
-                        IconSprites = 0;
-                    } else {
-                        IconFilename = "" + cdnPrefix + "images/IconAddonBlockDefault.png";
-                        IconWidth = 57;
-                        IconHeight = 59;
-                        IconSprites = 4;
-                    }
-                } else if (strInstr(1, IconFilename, "://") != 0) {
-                    //
-                    // icon is an Absolute URL - leave it
-                    //
-                } else if (IconFilename.left(1) == "/") {
-                    //
-                    // icon is Root Relative, leave it
-                    //
+            string result = "";
+            if (string.IsNullOrEmpty(IconAlt)) { IconAlt = "Add-on"; }
+            if (string.IsNullOrEmpty(IconTitle)) { IconTitle = "Rendered as Add-on"; }
+            if (string.IsNullOrEmpty(IconFilename)) {
+                //
+                // No icon given, use the default
+                if (IconIsInline) {
+                    IconFilename = "" + cdnPrefix + "images/IconAddonInlineDefault.png";
+                    IconWidth = 62;
+                    IconHeight = 17;
+                    IconSprites = 0;
                 } else {
-                    //
-                    // icon is a virtual file, add the serverfilepath
-                    //
-                    IconFilename = serverFilePath + IconFilename;
+                    IconFilename = "" + cdnPrefix + "images/IconAddonBlockDefault.png";
+                    IconWidth = 57;
+                    IconHeight = 59;
+                    IconSprites = 4;
                 }
-                if ((IconWidth == 0) || (IconHeight == 0)) { IconSprites = 0; }
-                if (IconSprites == 0) {
-                    //
-                    // just the icon
-                    tempGetAddonIconImg = "<img"
-                        + " border=0"
-                        + " id=\"" + IconImgID + "\""
-                        + " alt=\"" + IconAlt + "\""
-                        + " title=\"" + IconTitle + "\""
-                        + " src=\"" + IconFilename + "\"";
-                    if (IconWidth != 0) { tempGetAddonIconImg += " width=\"" + IconWidth + "px\""; }
-                    if (IconHeight != 0) { tempGetAddonIconImg += " height=\"" + IconHeight + "px\""; }
-                    if (IconIsInline) {
-                        tempGetAddonIconImg += " style=\"vertical-align:middle;display:inline;\" ";
-                    } else {
-                        tempGetAddonIconImg += " style=\"display:block\" ";
-                    }
-                    if (!string.IsNullOrEmpty(ACInstanceID)) { tempGetAddonIconImg += " ACInstanceID=\"" + ACInstanceID + "\""; }
-                    tempGetAddonIconImg += ">";
-                } else {
-                    //
-                    // Sprite Icon
-                    tempGetAddonIconImg = getIconSprite(IconImgID, IconSpriteColumn, IconFilename, IconWidth, IconHeight, IconAlt, IconTitle, "", IconIsInline, ACInstanceID);
-                }
-            } catch (Exception) {
-                throw;
+            } else if (strInstr(1, IconFilename, "://") != 0) {
+                //
+                // icon is an Absolute URL - leave it
+                //
+            } else if (IconFilename.left(1) == "/") {
+                //
+                // icon is Root Relative, leave it
+                //
+            } else {
+                //
+                // icon is a virtual file, add the serverfilepath
+                //
+                IconFilename = serverFilePath + IconFilename;
             }
-            return tempGetAddonIconImg;
+            if ((IconWidth == 0) || (IconHeight == 0)) { IconSprites = 0; }
+            if (IconSprites == 0) {
+                //
+                // just the icon
+                result = "<img"
+                    + " border=0"
+                    + " id=\"" + IconImgID + "\""
+                    + " alt=\"" + IconAlt + "\""
+                    + " title=\"" + IconTitle + "\""
+                    + " src=\"" + IconFilename + "\"";
+                if (IconWidth != 0) { result += " width=\"" + IconWidth + "px\""; }
+                if (IconHeight != 0) { result += " height=\"" + IconHeight + "px\""; }
+                if (IconIsInline) {
+                    result += " style=\"vertical-align:middle;display:inline;\" ";
+                } else {
+                    result += " style=\"display:block\" ";
+                }
+                if (!string.IsNullOrEmpty(ACInstanceID)) { result += " ACInstanceID=\"" + ACInstanceID + "\""; }
+                result += ">";
+            } else {
+                //
+                // Sprite Icon
+                result = getIconSprite(IconImgID, IconSpriteColumn, IconFilename, IconWidth, IconHeight, IconAlt, IconTitle, "", IconIsInline, ACInstanceID);
+            }
+            return result;
         }
         //
         //========================================================================================================
@@ -2133,9 +2136,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ACInstanceID"></param>
         /// <returns></returns>
         public static string getIconSprite(string TagID, int SpriteColumn, string IconSrc, int IconWidth, int IconHeight, string IconAlt, string IconTitle, string onDblClick, bool IconIsInline, string ACInstanceID) {
-            string tempGetIconSprite = "";
-            try {
-                tempGetIconSprite = "<img"
+            string result = "";
+                result = "<img"
                     + " border=0"
                     + " id=\"" + TagID + "\""
                     + " onMouseOver=\"this.style.backgroundPosition='" + (-1 * SpriteColumn * IconWidth) + "px -" + (2 * IconHeight) + "px';\""
@@ -2153,13 +2155,10 @@ namespace Contensive.Processor.Controllers {
                     ImgStyle += "display:block;";
                 }
                 if (!string.IsNullOrEmpty(ACInstanceID)) {
-                    tempGetIconSprite += " ACInstanceID=\"" + ACInstanceID + "\"";
+                    result += " ACInstanceID=\"" + ACInstanceID + "\"";
                 }
-                tempGetIconSprite += " style=\"" + ImgStyle + "\">";
-            } catch (Exception) {
-                throw;
-            }
-            return tempGetIconSprite;
+                result += " style=\"" + ImgStyle + "\">";
+            return result;
         }
         //====================================================================================================
         #region  IDisposable Support 

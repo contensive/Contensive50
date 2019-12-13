@@ -342,36 +342,32 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string convertLinksToAbsolute(string htmlContent, string urlProtocolDomainSlash) {
             string result = htmlContent;
-            try {
-                result = result.Replace(" href=\"", " href=\"/");
-                result = result.Replace(" href=\"/http", " href=\"http");
-                result = result.Replace(" href=\"/mailto", " href=\"mailto");
-                result = result.Replace(" href=\"//", " href=\"" + urlProtocolDomainSlash);
-                result = result.Replace(" href=\"/?", " href=\"" + urlProtocolDomainSlash + "?");
-                result = result.Replace(" href=\"/", " href=\"" + urlProtocolDomainSlash);
-                //
-                result = result.Replace(" href=", " href=/");
-                result = result.Replace(" href=/\"", " href=\"");
-                result = result.Replace(" href=/http", " href=http");
-                result = result.Replace(" href=//", " href=" + urlProtocolDomainSlash);
-                result = result.Replace(" href=/?", " href=" + urlProtocolDomainSlash + "?");
-                result = result.Replace(" href=/", " href=" + urlProtocolDomainSlash);
-                //
-                result = result.Replace(" src=\"", " src=\"/");
-                result = result.Replace(" src=\"/http", " src=\"http");
-                result = result.Replace(" src=\"//", " src=\"" + urlProtocolDomainSlash);
-                result = result.Replace(" src=\"/?", " src=\"" + urlProtocolDomainSlash + "?");
-                result = result.Replace(" src=\"/", " src=\"" + urlProtocolDomainSlash);
-                //
-                result = result.Replace(" src=", " src=/");
-                result = result.Replace(" src=/\"", " src=\"");
-                result = result.Replace(" src=/http", " src=http");
-                result = result.Replace(" src=//", " src=" + urlProtocolDomainSlash);
-                result = result.Replace(" src=/?", " src=" + urlProtocolDomainSlash + "?");
-                result = result.Replace(" src=/", " src=" + urlProtocolDomainSlash);
-            } catch (Exception) {
-                throw new GenericException("Error in ConvertLinksToAbsolute");
-            }
+            result = result.Replace(" href=\"", " href=\"/");
+            result = result.Replace(" href=\"/http", " href=\"http");
+            result = result.Replace(" href=\"/mailto", " href=\"mailto");
+            result = result.Replace(" href=\"//", " href=\"" + urlProtocolDomainSlash);
+            result = result.Replace(" href=\"/?", " href=\"" + urlProtocolDomainSlash + "?");
+            result = result.Replace(" href=\"/", " href=\"" + urlProtocolDomainSlash);
+            //
+            result = result.Replace(" href=", " href=/");
+            result = result.Replace(" href=/\"", " href=\"");
+            result = result.Replace(" href=/http", " href=http");
+            result = result.Replace(" href=//", " href=" + urlProtocolDomainSlash);
+            result = result.Replace(" href=/?", " href=" + urlProtocolDomainSlash + "?");
+            result = result.Replace(" href=/", " href=" + urlProtocolDomainSlash);
+            //
+            result = result.Replace(" src=\"", " src=\"/");
+            result = result.Replace(" src=\"/http", " src=\"http");
+            result = result.Replace(" src=\"//", " src=\"" + urlProtocolDomainSlash);
+            result = result.Replace(" src=\"/?", " src=\"" + urlProtocolDomainSlash + "?");
+            result = result.Replace(" src=\"/", " src=\"" + urlProtocolDomainSlash);
+            //
+            result = result.Replace(" src=", " src=/");
+            result = result.Replace(" src=/\"", " src=\"");
+            result = result.Replace(" src=/http", " src=http");
+            result = result.Replace(" src=//", " src=" + urlProtocolDomainSlash);
+            result = result.Replace(" src=/?", " src=" + urlProtocolDomainSlash + "?");
+            result = result.Replace(" src=/", " src=" + urlProtocolDomainSlash);
             return result;
         }
         //
@@ -445,7 +441,7 @@ namespace Contensive.Processor.Controllers {
         /// return argument for separateUrl
         /// </summary>
         public class UrlDetailsClass {
-            public UrlDetailsClass()  {
+            public UrlDetailsClass() {
                 pathSegments = new List<string>();
             }
             public string protocol { get; set; }
@@ -454,8 +450,8 @@ namespace Contensive.Processor.Controllers {
             public List<String> pathSegments { get; set; }
             public string filename { get; set; }
             public string queryString { get; set; }
-            public string unixPath()  { return String.Join("/", pathSegments); }
-            public string dosPath()  { return String.Join("\\", pathSegments); }
+            public string unixPath() { return String.Join("/", pathSegments); }
+            public string dosPath() { return String.Join("\\", pathSegments); }
         }
         //
         // ====================================================================================================
@@ -549,16 +545,12 @@ namespace Contensive.Processor.Controllers {
         /// <param name="GMTDate"></param>
         /// <returns></returns>
         public static DateTime deprecatedDecodeGMTDate(string GMTDate) {
-            try {
-                if (string.IsNullOrEmpty(GMTDate)) { return default(DateTime); }
-                double HourPart = encodeNumber(GMTDate.Substring(5, 11));
-                if (!isDate(HourPart)) { return default(DateTime); }
-                double YearPart = encodeNumber(GMTDate.Substring(17, 8));
-                if (!isDate(YearPart)) { return DateTime.FromOADate(YearPart + (HourPart + 4) / 24); }
-                return default(DateTime);
-            } catch (Exception) {
-                throw;
-            }
+            if (string.IsNullOrEmpty(GMTDate)) { return default(DateTime); }
+            double HourPart = encodeNumber(GMTDate.Substring(5, 11));
+            if (!isDate(HourPart)) { return default(DateTime); }
+            double YearPart = encodeNumber(GMTDate.Substring(17, 8));
+            if (!isDate(YearPart)) { return DateTime.FromOADate(YearPart + (HourPart + 4) / 24); }
+            return default(DateTime);
         }
         // 
         //=================================================================================
@@ -1346,7 +1338,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public static string getIpAddressList()  {
+        public static string getIpAddressList() {
             IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
             string ipAddressList = "";
             foreach (IPAddress ip in host.AddressList) {
@@ -1399,7 +1391,7 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         // the the name of the current executable
         //
-        public static string getAppExeName()  {
+        public static string getAppExeName() {
             return Path.GetFileName(System.Windows.Forms.Application.ExecutablePath);
         }
         //
@@ -2136,7 +2128,7 @@ namespace Contensive.Processor.Controllers {
         /// Return a string with class.method() > class.method() > etc.
         /// </summary>
         /// <returns></returns>
-        public static string getCallStack()  {
+        public static string getCallStack() {
             string callStack = "";
             StackTrace stackTrace = new StackTrace();
             foreach (var stackFrame in stackTrace.GetFrames()) {

@@ -111,8 +111,8 @@ namespace Contensive.Processor.Controllers {
                             group.ccguid = defaultSiteManagerGuid;
                             try {
                                 group.save(core.cpParent);
-                            } catch (Exception) {
-                                LogController.logInfo(core, logPrefix + ", error creating site managers group");
+                            } catch (Exception ex) {
+                                LogController.logInfo(core, logPrefix + ", error creating site managers group. " + ex);
                             }
                         }
                         if ((root != null) && (group != null)) {

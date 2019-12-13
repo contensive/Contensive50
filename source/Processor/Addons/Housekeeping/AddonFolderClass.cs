@@ -24,8 +24,8 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     string collectionFileFilename = AddonController.getPrivateFilesAddonPath() + "Collections.xml";
                     string collectionFileContent = core.privateFiles.readFileText(collectionFileFilename);
                     Doc.LoadXml(collectionFileContent);
-                } catch (Exception) {
-                    LogController.logInfo(core, "RegisterAddonFolder, Hint=[" + hint + "], Error loading Collections.xml file.");
+                } catch (Exception ex) {
+                    LogController.logInfo(core, "RegisterAddonFolder, Hint=[" + hint + "], Error loading Collections.xml file, ex [" + ex + "]");
                     loadOK = false;
                 }
                 if (loadOK) {
