@@ -700,8 +700,9 @@ namespace Contensive.Processor.Controllers {
                         doc.testPointMessage = "";
                     }
                 }
-            } catch (Exception) {
-                throw;
+            } catch (Exception ex) {
+                LogController.logError(this, ex);
+                throw ex;
             }
         }
         //

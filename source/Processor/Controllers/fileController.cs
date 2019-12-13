@@ -59,11 +59,11 @@ namespace Contensive.Processor.Controllers {
                 return _s3Client;
             }
         }
-        private AmazonS3Client _s3Client { get; set; } = null;
+        private AmazonS3Client _s3Client { get; set; }
         /// <summary>
         /// list of paths verified during the scope of this execution. If a path is deleted, it must be removed from this list
         /// </summary>
-        private List<string> verifiedRemotePathList = new List<string>();
+        private readonly List<string> verifiedRemotePathList = new List<string>();
         //
         //==============================================================================================================
         /// <summary>
@@ -102,45 +102,6 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
             return returnPath;
-        }
-        //
-        //==============================================================================================================
-        /// <summary>
-        /// return a path and a filename from a pathFilename
-        /// </summary>
-        /// <param name="pathFilename"></param>
-        /// <param name="path"></param>
-        /// <param name="filename"></param>
-        public void splitDosPathFilename(string pathFilename, ref string path, ref string filename) {
-            try {
-                path = "";
-                filename = "";
-                if (!string.IsNullOrWhiteSpace(pathFilename)) {
-                    pathFilename = normalizeDosPathFilename(pathFilename);
-                    int lastSlashPos = pathFilename.LastIndexOf("\\");
-                    if (lastSlashPos >= 0) {
-                        path = pathFilename.left(lastSlashPos + 1);
-                        filename = pathFilename.Substring(lastSlashPos + 1);
-                    } else {
-                        filename = pathFilename;
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-        }
-        //
-        //==============================================================================================================
-        /// <summary>
-        /// return the path and filename with unix slashes
-        /// </summary>
-        /// <param name="pathFilename"></param>
-        /// <param name="path"></param>
-        /// <param name="filename"></param>
-        public void splitUnixPathFilename(string pathFilename, ref string path, ref string filename) {
-            splitDosPathFilename(pathFilename, ref path, ref filename);
-            path = convertToUnixSlash(path);
         }
         //
         // ====================================================================================================
@@ -860,7 +821,7 @@ namespace Contensive.Processor.Controllers {
                 if (!isLocal) {
                     //
                     // -- remote
-                    if ( !pathExists_remote(path)) { return false;  }
+                    if (!pathExists_remote(path)) { return false; }
                     //
                     // -- if path exists remote, verify local path is a copy of remote (use case is someone deleting local folder)
                     if (!pathExists_local(path)) {
@@ -975,7 +936,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// getDriveFreeSpace
         /// </summary>
-        public double getDriveFreeSpace()  {
+        public double getDriveFreeSpace() {
             double returnSize = 0;
             try {
                 if (!isLocal) {
@@ -1264,7 +1225,7 @@ namespace Contensive.Processor.Controllers {
         public static string normalizeDosPathFilename(string pathFilename) {
             //
             // -- protect against argument issue
-            if(string.IsNullOrWhiteSpace(pathFilename)) {
+            if (string.IsNullOrWhiteSpace(pathFilename)) {
                 return string.Empty;
             }
             //
@@ -1410,20 +1371,20 @@ namespace Contensive.Processor.Controllers {
             }
             switch (fieldType) {
                 case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
-                    result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".css";
-                    break;
+                result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".css";
+                break;
                 case CPContentBaseClass.FieldTypeIdEnum.FileXML:
-                    result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".xml";
-                    break;
+                result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".xml";
+                break;
                 case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                    result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".js";
-                    break;
+                result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".js";
+                break;
                 case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                    result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".html";
-                    break;
+                result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".html";
+                break;
                 default:
-                    result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".txt";
-                    break;
+                result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".txt";
+                break;
             }
             return result;
         }
@@ -1852,37 +1813,50 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
+        //==============================================================================================================
+        /// <summary>
+        /// return a path and a filename from a pathFilename
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="path"></param>
+        /// <param name="filename"></param>
+        public void splitDosPathFilename(string pathFilename, ref string path, ref string filename) {
+            try {
+                filename = Path.GetFileName(pathFilename);
+                path = getPath(pathFilename);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
+        }
+        //
+        //==============================================================================================================
+        /// <summary>
+        /// return the path and filename with unix slashes
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="path"></param>
+        /// <param name="filename"></param>
+        public void splitUnixPathFilename(string pathFilename, ref string path, ref string filename) {
+            splitDosPathFilename(pathFilename, ref path, ref filename);
+            path = convertToUnixSlash(path);
+        }
+        //
         //====================================================================================================
         /// <summary>
         /// return the path of a pathFilename.
         /// myfilename.txt returns empty
         /// mypath\ returns mypath\
-        /// mypath\myfilename returns mypath
+        /// mypath\myfilename returns mypath\
         /// mypath\more\myfilename returns mypath\more\
         /// </summary>
         /// <param name="pathFilename"></param>
         /// <returns></returns>
         public static string getPath(string pathFilename) {
-            string result = pathFilename;
-            if (string.IsNullOrEmpty(result)) {
-                return "";
-            } else {
-                int slashpos = convertToDosSlash(pathFilename).LastIndexOf("\\");
-                if (slashpos < 0) {
-                    //
-                    // -- pathFilename is all filename
-                    return "";
-                }
-                if (slashpos == pathFilename.Length) {
-                    //
-                    // -- pathfilename is all path
-                    return pathFilename;
-                } else {
-                    //
-                    // -- divide path and filename and return just path
-                    return pathFilename.left(slashpos + 1);
-                }
-            }
+            string path = Path.GetDirectoryName(pathFilename);
+            if (string.IsNullOrEmpty(path)) { return pathFilename; }
+            if (path.right(1).Equals(@"\")) { return path; }
+            return path + @"\";
         }
         //
         //====================================================================================================
@@ -1896,26 +1870,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="pathFilename"></param>
         /// <returns></returns>
         public static string getFilename(string pathFilename) {
-            string result = pathFilename;
-            if (string.IsNullOrEmpty(result)) {
-                return string.Empty;
-            } else {
-                int slashpos = convertToDosSlash(pathFilename).LastIndexOf("\\");
-                if (slashpos < 0) {
-                    //
-                    // -- pathFilename is all filename
-                    return result;
-                }
-                if (slashpos == pathFilename.Length) {
-                    //
-                    // -- pathfilename is all path
-                    return string.Empty;
-                } else {
-                    //
-                    // -- divide path and filename and return just path
-                    return pathFilename.Substring(slashpos + 1);
-                }
-            }
+            return Path.GetFileName(pathFilename);
         }
         //
         //====================================================================================================
@@ -1959,11 +1914,11 @@ namespace Contensive.Processor.Controllers {
         }
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose()  {
+        public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~FileController()  {
+        ~FileController() {
             Dispose(false);
 
 

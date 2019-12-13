@@ -134,10 +134,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string GetFilename(string PathFilename) {
-            string filename = "";
-            string path = "";
-            cp.core.privateFiles.splitDosPathFilename(PathFilename, ref path, ref filename);
-            return filename;
+            return FileController.getFilename(PathFilename);
         }
         //
         // ====================================================================================================

@@ -1561,20 +1561,19 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- addon not found
                     LogController.logError(core, "executeAsync called with null addon model.");
-                } else {
-                    //
-                    // -- build arguments from the execute context on top of docProperties
-                    var compositeArgs = new Dictionary<string, string>(arguments);
-                    foreach (var key in core.docProperties.getKeyList()) {
-                        if (!compositeArgs.ContainsKey(key)) { compositeArgs.Add(key, core.docProperties.getText(key)); }
-                    }
-                    var cmdDetail = new TaskModel.CmdDetailClass {
-                        addonId = addon.id,
-                        addonName = addon.name,
-                        args = compositeArgs
-                    };
-                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false);
+                    return;
                 }
+                //
+                // -- build arguments from the execute context on top of docProperties
+                var compositeArgs = new Dictionary<string, string>(arguments);
+                foreach (var key in core.docProperties.getKeyList()) {
+                    if (!compositeArgs.ContainsKey(key)) { compositeArgs.Add(key, core.docProperties.getText(key)); }
+                }
+                TaskSchedulerController.addTaskToQueue(core, new TaskModel.CmdDetailClass {
+                    addonId = addon.id,
+                    addonName = addon.name,
+                    args = compositeArgs
+                }, false);
             } catch (Exception ex) {
                 LogController.logError(core, ex, "executeAsync");
             }
