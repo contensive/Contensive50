@@ -870,7 +870,7 @@ namespace Contensive.Processor.Controllers {
                                                                             { "FieldName", FieldName },
                                                                             { "FieldValue", core.siteProperties.getText(FieldName, FieldDefaultValue) }
                                                                         };
-                                                                        AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, FieldAddon);
+                                                                        AddonModel addon = AddonModel.createByUniqueName(core.cpParent, FieldAddon);
                                                                         Copy = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                                                                             addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
                                                                             argumentKeyValuePairs = arguments,
@@ -1606,7 +1606,7 @@ namespace Contensive.Processor.Controllers {
         //
         public void executeAsyncByName(string name, string OptionString = "") {
             if (string.IsNullOrEmpty(name)) { throw new ArgumentException("executeAsyncByName called with invalid name [" + name + "]"); }
-            var addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, name);
+            var addon = AddonModel.createByUniqueName(core.cpParent, name);
             if (addon == null) { throw new ArgumentException("executeAsyncByName cannot find Addon for name [" + name + "]"); }
             executeAsync(addon, convertQSNVAArgumentstoDocPropertiesList(core, OptionString));
         }

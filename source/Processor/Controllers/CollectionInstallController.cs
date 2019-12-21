@@ -501,7 +501,6 @@ namespace Contensive.Processor.Controllers {
                                                                 // error - Need a way to reach the user that submitted the file
                                                                 //
                                                                 LogController.logError(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], creating navigator entries, there was an error parsing the portion of the collection that contains metadata. Navigator entry creation was aborted. [There was an error reading the Meta data file.] " + ex);
-                                                                result = false;
                                                                 return_ErrorMessage += "<P>The collection was not installed because the xml collection file has an error.</P>";
                                                                 return false;
                                                             }

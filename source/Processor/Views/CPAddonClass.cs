@@ -80,13 +80,13 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string ExecuteByUniqueName(string addonName) {
-            return cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, addonName), new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
+            return cp.core.addon.execute(AddonModel.createByUniqueName(cp, addonName), new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
         }
         //
         //====================================================================================================
         //
         public override string ExecuteByUniqueName(string addonName, Dictionary<string, string> argumentKeyValuePairs) {
-            return cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, addonName), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+            return cp.core.addon.execute(AddonModel.createByUniqueName(cp, addonName), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                 argumentKeyValuePairs = argumentKeyValuePairs
             });
         }
@@ -94,7 +94,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string ExecuteByUniqueName(string addonName, CPUtilsBaseClass.addonExecuteContext executeContext) {
-            return cp.core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(cp, addonName), executeContext);
+            return cp.core.addon.execute(AddonModel.createByUniqueName(cp, addonName), executeContext);
         }
         //
         //====================================================================================================
@@ -131,7 +131,7 @@ namespace Contensive.Processor {
         //
         public override void ExecuteAsyncByUniqueName(string name, Dictionary<string, string> keyValuePairs) {
             if (string.IsNullOrEmpty(name)) { throw new ArgumentException("ExecuteAsyncByUniqueName called with invalid name [" + name + "]"); }
-            var addon = DbBaseModel.createByUniqueName<AddonModel>(cp, name);
+            var addon = AddonModel.createByUniqueName(cp, name);
             if (addon == null) { throw new ArgumentException("ExecuteAsyncByUniqueName cannot find Addon for name [" + name + "]"); }
             cp.core.addon.executeAsync(addon, keyValuePairs);
         }

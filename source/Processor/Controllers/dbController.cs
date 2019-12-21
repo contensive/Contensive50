@@ -1044,11 +1044,8 @@ namespace Contensive.Processor.Controllers {
         public static string encodeSQLText(string expression) {
             if (expression == null) { return "null"; }
             string returnResult = GenericController.encodeText(expression);
-            if (string.IsNullOrEmpty(returnResult)) {
-                return "null";
-            } else {
-                return "'" + GenericController.strReplace(returnResult, "'", "''") + "'";
-            }
+            if (string.IsNullOrEmpty(returnResult)) { return "null"; }
+            return "'" + GenericController.strReplace(returnResult, "'", "''") + "'";
         }
         //
         // ====================================================================================================

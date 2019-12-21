@@ -1094,9 +1094,40 @@ namespace Contensive.Processor.Controllers {
         /// true if editing any content
         /// </summary>
         /// <returns></returns>
-        public bool isEditing()  {
+        public bool isEditing() {
             return isEditing("");
         }
+        //
+        //========================================================================
+        /// <summary>
+        /// true if editing templates or advanced editing
+        /// </summary>
+        /// <returns></returns>
+        public bool isTemplateEditing() {
+            if (!isAuthenticatedAdmin()) { return false; }
+            return core.visitProperty.getBoolean("AllowTemplateEditing", false) || core.visitProperty.getBoolean("AllowAdvancedEditor", false);
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// true if editing templates
+        /// </summary>
+        /// <returns></returns>
+        public bool IsPageBuilderEditing() {
+            if (!isAuthenticatedAdmin()) { return false; }
+            return core.visitProperty.getBoolean("AllowPageBuilder", false);
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// true if developer and debugging
+        /// </summary>
+        /// <returns></returns>
+        public bool IsDebugging() {
+            if (!isAuthenticatedDeveloper()) { return false; }
+            return core.visitProperty.getBoolean("AllowDebugging", false);
+        }
+        //
         //
         //========================================================================
         /// <summary>
@@ -1107,24 +1138,23 @@ namespace Contensive.Processor.Controllers {
         public bool isEditing(string contentNameOrId) {
             bool result = false;
             try {
-                if (isAuthenticated) {
-                    //
-                    // -- if empty contentid or contentName, return true if admin and editing is turned on
-                    if (string.IsNullOrWhiteSpace(contentNameOrId)) { return ((core.session.user.admin) || (core.session.user.developer)) && (core.visitProperty.getBoolean("AllowEditing") || core.visitProperty.getBoolean("AllowAdvancedEditor")); }
-                    string cacheTestName = contentNameOrId.ToLowerInvariant();
-                    if (core.doc.contentIsEditingList.Contains(cacheTestName)) { return true; }
-                    if (core.doc.contentNotEditingList.Contains(cacheTestName)) { return false; }
-                    if (core.visitProperty.getBoolean("AllowEditing") || core.visitProperty.getBoolean("AllowAdvancedEditor")) {
-                        if (contentNameOrId.isNumeric()) {
-                            contentNameOrId = MetadataController.getContentNameByID(core, encodeInteger(contentNameOrId));
-                        }
-                        result = isAuthenticatedContentManager(contentNameOrId);
+                if (!isAuthenticated) { return false; }
+                //
+                // -- if empty contentid or contentName, return true if admin and editing is turned on
+                if (string.IsNullOrWhiteSpace(contentNameOrId)) { return ((core.session.user.admin) || (core.session.user.developer)) && (core.visitProperty.getBoolean("AllowEditing") || core.visitProperty.getBoolean("AllowAdvancedEditor")); }
+                string cacheTestName = contentNameOrId.ToLowerInvariant();
+                if (core.doc.contentIsEditingList.Contains(cacheTestName)) { return true; }
+                if (core.doc.contentNotEditingList.Contains(cacheTestName)) { return false; }
+                if (core.visitProperty.getBoolean("AllowEditing") || core.visitProperty.getBoolean("AllowAdvancedEditor")) {
+                    if (contentNameOrId.isNumeric()) {
+                        contentNameOrId = MetadataController.getContentNameByID(core, encodeInteger(contentNameOrId));
                     }
-                    if (result) {
-                        core.doc.contentIsEditingList.Add(cacheTestName);
-                    } else {
-                        core.doc.contentNotEditingList.Add(cacheTestName);
-                    }
+                    result = isAuthenticatedContentManager(contentNameOrId);
+                }
+                if (result) {
+                    core.doc.contentIsEditingList.Add(cacheTestName);
+                } else {
+                    core.doc.contentNotEditingList.Add(cacheTestName);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);

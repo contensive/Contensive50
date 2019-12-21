@@ -239,7 +239,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 instanceGuid = ACInstanceId,
                                                                                 errorContextMessage = "rendering addon found in active content within an email"
                                                                             };
-                                                                            AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, ACName);
+                                                                            AddonModel addon = AddonModel.createByUniqueName(core.cpParent, ACName);
                                                                             Copy = core.addon.execute(addon, executeContext);
                                                                             break;
                                                                         }
@@ -1117,7 +1117,7 @@ namespace Contensive.Processor.Controllers {
                                             if (!string.IsNullOrEmpty(AddonGuid)) {
                                                 Copy = core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, AddonGuid), executeContext);
                                             } else {
-                                                Copy = core.addon.execute(DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, AddonName), executeContext);
+                                                Copy = core.addon.execute(AddonModel.createByUniqueName(core.cpParent, AddonName), executeContext);
                                             }
                                         }
                                     }

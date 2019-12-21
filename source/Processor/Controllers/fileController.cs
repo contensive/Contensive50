@@ -1214,6 +1214,20 @@ namespace Contensive.Processor.Controllers {
             if (pathFilename.ToLower(CultureInfo.InvariantCulture).IndexOf(localAbsRootPath.ToLower(CultureInfo.InvariantCulture)).Equals(0)) { return pathFilename.Substring(localAbsRootPath.Length); }
             return pathFilename;
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Remove characters not valid in a filename. NOT for PathFilename. This will remote the path delimiters (slashes)
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static string normalizeDosFilename( string filename) {
+            string invalid = new string(Path.GetInvalidFileNameChars());
+            foreach (char c in invalid) {
+                filename = filename.Replace(c.ToString(), "_");
+            }
+            return filename;
+        }
 
         //
         //====================================================================================================

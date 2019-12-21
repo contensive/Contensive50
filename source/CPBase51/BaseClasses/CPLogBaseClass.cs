@@ -40,7 +40,7 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Log a message at the info level.
+        /// Log a message at the info level. (same a Info(logMessage))
         /// </summary>
         /// <param name="logMessage"></param>
         public abstract void Add(string logMessage);
@@ -51,6 +51,48 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="logMessage"></param>
         public abstract void Add(LogLevel level, string logMessage);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Log a message
+        /// </summary>
+        /// <param name="logMessage"></param>
+        public abstract void Trace(string logMessage);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Log a message
+        /// </summary>
+        /// <param name="logMessage"></param>
+        public abstract void Debug(string logMessage);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Log a message
+        /// </summary>
+        /// <param name="logMessage"></param>
+        public abstract void Info(string logMessage);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Log a message
+        /// </summary>
+        /// <param name="logMessage"></param>
+        public abstract void Warn(string logMessage);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Log a message
+        /// </summary>
+        /// <param name="logMessage"></param>
+        public abstract void Error(string logMessage);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Log a message
+        /// </summary>
+        /// <param name="logMessage"></param>
+        public abstract void Fatal(string logMessage);
         //
         //====================================================================================================
         /// <summary>

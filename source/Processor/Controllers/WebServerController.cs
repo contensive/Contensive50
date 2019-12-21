@@ -491,11 +491,12 @@ namespace Contensive.Processor.Controllers {
                         if (string.IsNullOrWhiteSpace(key)) { continue; }
                         System.Web.HttpPostedFile file = iisContext.Request.Files[key];
                         if (file != null) {
-                            if ((file.ContentLength > 0) && (!string.IsNullOrEmpty(file.FileName))) {
+                            string normalizedFilename = FileController.normalizeDosFilename(file.FileName);
+                            if ((file.ContentLength > 0) && (!string.IsNullOrWhiteSpace(normalizedFilename))) {
                                 DocPropertyModel prop = new DocPropertyModel {
                                     name = key,
-                                    value = file.FileName,
-                                    nameValue = encodeRequestVariable(key) + "=" + encodeRequestVariable(file.FileName),
+                                    value = normalizedFilename,
+                                    nameValue = encodeRequestVariable(key) + "=" + encodeRequestVariable(normalizedFilename),
                                     tempfilename = instanceId + "-" + filePtr.ToString() + ".bin",
                                     propertyType = DocPropertyModel.DocPropertyTypesEnum.file
                                 };

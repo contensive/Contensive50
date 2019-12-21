@@ -19,6 +19,27 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
+        public void Controllers_CdnFiles_NormalizeFilenameTest_1() {
+            using (CPClass cp = new CPClass(testAppName)) {
+                // arrange
+                string okFilename1 = "abcdefghijklmnopqrstuvwxyz0123456789.abc";
+                string okFilename2 = okFilename1.ToUpperInvariant();
+                string okFilename3 = "a:*?\\b/><\"c";
+                string okFilename3_fixed = "a____b____c";
+                // act
+                string okResult1 = FileController.normalizeDosFilename(okFilename1);
+                string okResult2 = FileController.normalizeDosFilename(okFilename2);
+                string okResult3 = FileController.normalizeDosFilename(okFilename3);
+                // assert
+                Assert.AreEqual(okFilename1, okResult1);
+                Assert.AreEqual(okFilename2, okResult2);
+                Assert.AreEqual(okFilename3_fixed, okResult3);
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        [TestMethod]
         public void Controllers_CdnFiles_AppendTest() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange

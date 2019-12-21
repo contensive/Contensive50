@@ -26,6 +26,60 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         /// <summary>
+        /// add a log message at the trace level (trace, debug, info, warn, error, fatal)
+        /// </summary>
+        /// <param name="logMessage"></param>
+        public override void Trace(string logMessage) {
+            LogController.log(cp.core, logMessage, LogLevel.Trace);
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// add a log message at the debug level (trace, debug, info, warn, error, fatal)
+        /// </summary>
+        /// <param name="logMessage"></param>
+        public override void Debug(string logMessage) {
+            LogController.log(cp.core, logMessage, LogLevel.Debug);
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// add a log message at the info level (trace, debug, info, warn, error, fatal)
+        /// </summary>
+        /// <param name="logMessage"></param>
+        public override void Info(string logMessage) {
+            LogController.log(cp.core, logMessage, LogLevel.Info);
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// add a log message at the warn level (trace, debug, info, warn, error, fatal)
+        /// </summary>
+        /// <param name="logMessage"></param>
+        public override void Warn(string logMessage) {
+            LogController.log(cp.core, logMessage, LogLevel.Warn);
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// add a log message at the error level (trace, debug, info, warn, error, fatal)
+        /// </summary>
+        /// <param name="logMessage"></param>
+        public override void Error(string logMessage) {
+            LogController.log(cp.core, logMessage, LogLevel.Error);
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// add a log message at the fatal level (trace, debug, info, warn, error, fatal)
+        /// </summary>
+        /// <param name="logMessage"></param>
+        public override void Fatal(string logMessage) {
+            LogController.log(cp.core, logMessage, LogLevel.Fatal);
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
         /// add a log message at the debug level
         /// </summary>
         /// <param name="logMessage"></param>
@@ -70,7 +124,6 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
         //
         ~CPLogClass()  {
             Dispose(false);

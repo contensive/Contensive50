@@ -59,6 +59,24 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// true if the current user is editing the template
+        /// </summary>
+        public abstract bool IsTemplateEditing { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// true if the current user is an administrator and editing with Page Builder (creating addon lists for pages)
+        /// </summary>
+        public abstract bool IsPageBuilderEditing { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// true if the current user is a developer and has turned on debugging
+        /// </summary>
+        public abstract bool IsDebugging { get; }
+        //
+        //====================================================================================================
+        /// <summary>
         /// true if the current user is not authenticated and not recognized. 
         /// </summary>
         public abstract bool IsGuest { get; }

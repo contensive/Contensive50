@@ -94,8 +94,8 @@ namespace Contensive.Processor.Controllers {
                             root.contentControlId = ContentMetadataModel.getContentId(core, "people");
                             try {
                                 root.save(core.cpParent);
-                            } catch (Exception) {
-                                LogController.logInfo(core, logPrefix + ", error prevented root user update");
+                            } catch (Exception ex) {
+                                LogController.logError(core, logPrefix + ", error prevented root user update. " + ex);
                             }
                         }
                         //
@@ -803,7 +803,7 @@ namespace Contensive.Processor.Controllers {
                         returnEntry = 0;
                     }
                     AddonModel addon = ((!string.IsNullOrWhiteSpace(menu.addonGuid)) ? DbBaseModel.create<AddonModel>(core.cpParent, menu.addonGuid) : null);
-                    addon = addon ?? ((!string.IsNullOrWhiteSpace(menu.addonName)) ? DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, menu.addonName) : null);
+                    addon = addon ?? ((!string.IsNullOrWhiteSpace(menu.addonName)) ? AddonModel.createByUniqueName(core.cpParent, menu.addonName) : null);
                     int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menu.menuNameSpace);
                     int contentId = ContentMetadataModel.getContentId(core, menu.contentName);
                     string listCriteria = "(name=" + DbController.encodeSQLText(menu.name) + ")and(Parentid=" + parentId + ")";

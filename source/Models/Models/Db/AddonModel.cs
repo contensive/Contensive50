@@ -2,6 +2,7 @@
 using Contensive.BaseClasses;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Contensive.Models.Db {
     [Serializable]
@@ -19,6 +20,7 @@ namespace Contensive.Models.Db {
         /// </summary>
         public bool admin { get; set; }
         public string argumentList { get; set; }
+        public string aliasList { get; set; }
         public bool asAjax { get; set; }
         public bool blockEditTools { get; set; }
         public int collectionId { get; set; }
@@ -129,6 +131,25 @@ namespace Contensive.Models.Db {
             }
             return result;
         }
-
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Create model for Addons. This method allows for the alias field if the name does not match
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="recordName"></param>
+        /// <returns></returns>
+        public static AddonModel createByUniqueName(CPBaseClass cp, string recordName) {
+            try {
+                AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(cp, recordName);
+                if (addon != null) { return addon; }
+                List<AddonModel> addonList = createList<AddonModel>(cp, "(','+aliasList+',' like '%,'+" + cp.Db.EncodeSQLText(recordName) + "',%')");
+                if(addonList.Count>0) { addonList.First(); }
+                return null;
+            } catch (Exception ex) {
+                cp.Site.ErrorReport(ex);
+                throw;
+            }
+        }
     }
 }

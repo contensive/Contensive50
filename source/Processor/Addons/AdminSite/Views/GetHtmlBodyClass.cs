@@ -391,7 +391,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             } else if (!string.IsNullOrEmpty(AddonName)) {
                                 executeContextErrorCaption = "addon name:" + AddonName + " for Admin";
                                 cp.core.doc.addRefreshQueryString("addonname", AddonName);
-                                addon = DbBaseModel.createByUniqueName<AddonModel>(cp, AddonName);
+                                addon = AddonModel.createByUniqueName(cp, AddonName);
                             }
                             if (addon != null) {
                                 addonId = addon.id;

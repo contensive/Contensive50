@@ -168,7 +168,7 @@ namespace Contensive.Processor {
                         });
                     }
                 } else {
-                    AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(core.cpParent, addonNameOrGuid);
+                    AddonModel addon = AddonModel.createByUniqueName(core.cpParent, addonNameOrGuid);
                     if ( addon != null ) {
                         //
                         // -- call by name

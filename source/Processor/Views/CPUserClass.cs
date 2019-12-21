@@ -125,6 +125,31 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        public override bool IsTemplateEditing {
+            get {
+                return cp.core.session.isTemplateEditing();
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public override bool IsPageBuilderEditing {
+            get {
+                return cp.core.session.IsPageBuilderEditing();
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public override bool IsDebugging {
+            get {
+                return cp.core.session.IsDebugging();
+            }
+        }
+        //
+        //
+        //====================================================================================================
+        //
         public override bool IsGuest {
             get {
                 return cp.core.session.isGuest();
