@@ -143,8 +143,8 @@ namespace Contensive.Models.Db {
             try {
                 AddonModel addon = DbBaseModel.createByUniqueName<AddonModel>(cp, recordName);
                 if (addon != null) { return addon; }
-                List<AddonModel> addonList = createList<AddonModel>(cp, "(','+aliasList+',' like '%,'+" + cp.Db.EncodeSQLText(recordName) + "',%')");
-                if(addonList.Count>0) { addonList.First(); }
+                List<AddonModel> addonList = createList<AddonModel>(cp, "(','+aliasList+',' like " + cp.Db.EncodeSQLTextLike("," + recordName + ",") + ")");
+                if(addonList.Count>0) { return addonList.First(); }
                 return null;
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

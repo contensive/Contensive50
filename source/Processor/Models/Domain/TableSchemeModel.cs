@@ -96,10 +96,19 @@ namespace Contensive.Processor.Models.Domain {
                                 }
                             }
                             if (!isInDb && isInCache) {
+                                //
+                                // -- not in db but in cache -- remove from cache
                                 core.tableSchemaDictionary.Remove(lowerTablename);
-                            } else if (isInDb && (!isInCache)) {
+                            } else if (!isInDb && !isInCache) {
+                                //
+                                // -- not in Db, not in cache -- do nothing
+                            } else if (isInDb && !isInCache) {
+                                //
+                                // -- in Db but not in cache -- add it to cache
                                 core.tableSchemaDictionary.Add(lowerTablename, tableSchema);
                             } else {
+                                //
+                                // -- in Db and in cache -- update cache because this was a .dirty cache problem
                                 core.tableSchemaDictionary[lowerTablename] = tableSchema;
                             }
                         }

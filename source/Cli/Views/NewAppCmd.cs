@@ -63,7 +63,7 @@ namespace Contensive.CLI {
                             Assembly myAssembly = Assembly.GetAssembly(myType);
                             AssemblyName myAssemblyname = myAssembly.GetName();
                             Version myVersion = myAssemblyname.Version;
-                            string appNameDefault = "app" + Contensive.Processor.Controllers.GenericController.getDateNumberString(rightNow) + "v" + myVersion.Major.ToString("0") + myVersion.Minor.ToString("0");
+                            string appNameDefault = "app" + Contensive.Processor.Controllers.GenericController.getDateTimeNumberString(rightNow);
                             Console.Write("\n\nEnter your application name. It must start with a letter and contain only letters and numbers.");
                             appName = GenericController.promptForReply("\nApplication Name:", appNameDefault).ToLowerInvariant();
                             if ( string.IsNullOrWhiteSpace( appName )) {

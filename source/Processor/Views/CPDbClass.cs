@@ -126,6 +126,15 @@ namespace Contensive.Processor {
         public override string EncodeSQLText(string SourceText) {
             return DbController.encodeSQLText(SourceText);
         }
+        //
+        //====================================================================================================
+        //
+        public override string EncodeSQLTextLike(string SourceText) {
+            return DbController.encodeSqlTextLike(SourceText);
+        }
+        //
+        //====================================================================================================
+        //
         public override string GetRemoteQueryKey(string sql)
             => GetRemoteQueryKey(sql, Constants.sqlPageSizeDefault);
         //

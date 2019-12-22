@@ -197,6 +197,9 @@ namespace Contensive.Processor.Controllers {
                     core.siteProperties.getText("TrapEmail", "");
                     core.siteProperties.getText("TrapErrors", "0");
                     core.siteProperties.getBoolean("AllowLinkAlias", true);
+                    // -- initialize for Page Builder for new sites
+                    core.siteProperties.getBoolean("ALLOW ADDONLIST EDITOR FOR QUICK EDITOR", true);
+                    //
                     AddonModel defaultRouteAddon = DbBaseModel.create<AddonModel>(core.cpParent, core.siteProperties.defaultRouteId);
                     if (defaultRouteAddon == null) {
                         defaultRouteAddon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidPageManager);

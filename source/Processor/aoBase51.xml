@@ -2755,7 +2755,8 @@
     <RemoteMethod>Yes</RemoteMethod>
     <BlockEditTools>Yes</BlockEditTools>
   </Addon>
-  <Addon name="Personalization-Company" guid="{7A5C87F7-5684-4B7B-93F6-640C9B3DA4F0}" type="Add-on">
+  <Addon name="Company" guid="{7A5C87F7-5684-4B7B-93F6-640C9B3DA4F0}" type="Add-on">
+    <AliasList>Personalization-Company</AliasList>
     <Category>Personalization</Category>
     <DotNetClass>Contensive.Processor.Addons.Personalization.CompanyClass</DotNetClass>
     <ArgumentList></ArgumentList>
@@ -2764,7 +2765,8 @@
     <Email>Yes</Email>
     <IsInline>Yes</IsInline>
   </Addon>
-  <Addon name="Personalization-Email" guid="{E50A7370-83AD-4C4E-8E28-D6394097599B}" type="Add-on">
+  <Addon name="Email" guid="{E50A7370-83AD-4C4E-8E28-D6394097599B}" type="Add-on">
+    <AliasList>Personalization-Email</AliasList>
     <Category>Personalization</Category>
     <DotNetClass>Contensive.Processor.Addons.Personalization.EmailClass</DotNetClass>
     <ArgumentList></ArgumentList>
@@ -2773,7 +2775,8 @@
     <Email>Yes</Email>
     <IsInline>Yes</IsInline>
   </Addon>
-  <Addon name="Personalization-FirstName" guid="{41772430-FB1A-49F7-BD17-38B7EF280915}" type="Add-on">
+  <Addon name="FirstName" guid="{41772430-FB1A-49F7-BD17-38B7EF280915}" type="Add-on">
+    <AliasList>Personalization-FirstName</AliasList>
     <Category>Personalization</Category>
     <DotNetClass>Contensive.Processor.Addons.Personalization.FirstNameClass</DotNetClass>
     <ArgumentList></ArgumentList>
@@ -2782,7 +2785,8 @@
     <Email>Yes</Email>
     <IsInline>Yes</IsInline>
   </Addon>
-  <Addon name="Personalization-LastName" guid="{2D8A086D-C437-4227-B242-5F262ECE9A5E}" type="Add-on">
+  <Addon name="LastName" guid="{2D8A086D-C437-4227-B242-5F262ECE9A5E}" type="Add-on">
+    <AliasList>Personalization-LastName</AliasList>
     <Category>Personalization</Category>
     <DotNetClass>Contensive.Processor.Addons.Personalization.LastNameClass</DotNetClass>
     <ArgumentList></ArgumentList>
@@ -2791,7 +2795,8 @@
     <Email>Yes</Email>
 		<IsInline>Yes</IsInline>
   </Addon>
-  <Addon name="Personalization-Name" guid="{429AF6F8-8C19-4BEA-8D5B-152B2910D4C4}" type="Add-on">
+  <Addon name="FullName" guid="{429AF6F8-8C19-4BEA-8D5B-152B2910D4C4}" type="Add-on">
+    <AliasList>Personalization-Name</AliasList>
     <Category>Personalization</Category>
     <DotNetClass>Contensive.Processor.Addons.Personalization.NameClass</DotNetClass>
     <ArgumentList></ArgumentList>
@@ -2800,7 +2805,8 @@
     <Email>Yes</Email>
     <IsInline>Yes</IsInline>
   </Addon>
-  <Addon name="Personalization-Password" guid="{077D1E52-9A06-4578-81FF-1C6F7B4E4F38}" type="Add-on">
+  <Addon name="Password" guid="{077D1E52-9A06-4578-81FF-1C6F7B4E4F38}" type="Add-on">
+    <AliasList>Personalization-Password</AliasList>
     <Category>Personalization</Category>
     <DotNetClass>Contensive.Processor.Addons.Personalization.NameClass</DotNetClass>
     <ArgumentList></ArgumentList>
@@ -2809,7 +2815,8 @@
     <Email>Yes</Email>
     <IsInline>Yes</IsInline>
   </Addon>
-  <Addon name="Personalization-Username" guid="{D90FC3E7-F483-4723-A3A4-ED8C3251D3FF}" type="Add-on">
+  <Addon name="Username" guid="{D90FC3E7-F483-4723-A3A4-ED8C3251D3FF}" type="Add-on">
+    <AliasList>Personalization-Username</AliasList>
     <Category>Personalization</Category>
     <DotNetClass>Contensive.Processor.Addons.Personalization.UsernameClass</DotNetClass>
     <ArgumentList></ArgumentList>
@@ -3130,6 +3137,7 @@
   <ImportCollection name="Reporting Basics">{d5b7ba7f-6b78-4625-8b23-232ac6574130}</ImportCollection>
   <ImportCollection name="Page Builder">{1dcce948-64a0-4baf-abcd-395ca3d8959a}</ImportCollection>
   <ImportCollection name="Theme, Bootstrap Basic">{280F865E-7AB6-4955-99CF-8B930E4ABF53}</ImportCollection>
+  <ImportCollection name="Design Blocks">{fd1685af-bc66-4649-a8f1-1b3c18d59d24}</ImportCollection>
   <!-- blocked until upgrade
   <ImportCollection name="Visit Charts">{D5B7BA7F-6B78-4625-8B23-232AC6574130}</ImportCollection>
   <ImportCollection name="File Manager">{0A080FBC-2814-407F-8F8C-CD06F422789D}</ImportCollection>

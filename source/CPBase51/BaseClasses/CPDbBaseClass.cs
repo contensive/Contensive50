@@ -141,6 +141,14 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Encode a text string value to be used in an sql Query for this application. Example 'select id where name like '+EncodeSqlText( 'bob' )
+        /// </summary>
+        /// <param name="sourceText"></param>
+        /// <returns></returns>
+        public abstract string EncodeSQLTextLike(string sourceText);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Execute a query and return a datatable.
         /// </summary>
         /// <param name="sql"></param>

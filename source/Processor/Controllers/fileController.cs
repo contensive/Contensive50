@@ -1868,7 +1868,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getPath(string pathFilename) {
             string path = Path.GetDirectoryName(pathFilename);
-            if (string.IsNullOrEmpty(path)) { return pathFilename; }
+            if (string.IsNullOrEmpty(path)) { return string.Empty; }
             if (path.right(1).Equals(@"\")) { return path; }
             return path + @"\";
         }
