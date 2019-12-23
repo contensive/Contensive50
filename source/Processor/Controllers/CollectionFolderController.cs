@@ -294,10 +294,8 @@ namespace Contensive.Processor.Controllers {
                         // no errors, but xml file not found. Make an error
                         return_ErrorMessage = "<p>There was a problem with the installation. The collection zip was not downloaded successfully.</p>";
                     }
-                } catch (Exception ex) {
-
+                } catch (Exception) {
                     throw;
-
                 } finally {
                     //
                     // delete the tmp working folder

@@ -3137,6 +3137,7 @@
   <ImportCollection name="Reporting Basics">{d5b7ba7f-6b78-4625-8b23-232ac6574130}</ImportCollection>
   <ImportCollection name="Page Builder">{1dcce948-64a0-4baf-abcd-395ca3d8959a}</ImportCollection>
   <ImportCollection name="Theme, Bootstrap Basic">{280F865E-7AB6-4955-99CF-8B930E4ABF53}</ImportCollection>
+  <ImportCollection name="Design Blocks">{fd1685af-bc66-4649-a8f1-1b3c18d59d24}</ImportCollection>
   <!-- blocked until upgrade
   <ImportCollection name="Visit Charts">{D5B7BA7F-6B78-4625-8B23-232AC6574130}</ImportCollection>
   <ImportCollection name="File Manager">{0A080FBC-2814-407F-8F8C-CD06F422789D}</ImportCollection>

@@ -16,7 +16,11 @@ namespace Contensive.Processor.Addons.PageManager {
             string result = "";
             try {
                 CoreController core = ((CPClass)cp).core;
-                result = PageContentController.getChildPageList(core, cp.Doc.GetText("List Name"), PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id, true);
+                string listName = cp.Doc.GetText("instanceId");
+                if ( string.IsNullOrWhiteSpace(listName)) {
+                    listName = cp.Doc.GetText("List Name");
+                }
+                result = PageContentController.getChildPageList(core, listName, PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id, true);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

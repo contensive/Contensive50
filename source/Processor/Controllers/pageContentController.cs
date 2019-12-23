@@ -23,7 +23,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Constructor
         /// </summary>
-        public PageContentController()  {
+        public PageContentController() {
             page = new PageContentModel();
             pageToRootList = new List<PageContentModel>();
             template = new PageTemplateModel();
@@ -144,7 +144,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.doc.redirectRecordID != 0) {
                             string contentName = MetadataController.getContentNameByID(core, core.doc.redirectContentID);
                             if (!string.IsNullOrEmpty(contentName)) {
-                                if (WebServerController.redirectByRecord_ReturnStatus(core, contentName, core.doc.redirectRecordID,"")) {
+                                if (WebServerController.redirectByRecord_ReturnStatus(core, contentName, core.doc.redirectRecordID, "")) {
                                     core.doc.continueProcessing = false;
                                     return string.Empty;
                                 } else {
@@ -1704,7 +1704,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        internal static string getDefaultScript()  { return "default.aspx"; }
+        internal static string getDefaultScript() { return "default.aspx"; }
         //
         //
         //
@@ -2252,6 +2252,7 @@ namespace Contensive.Processor.Controllers {
         //
         //   RequestedListName is the name of the ChildList (ActiveContent Child Page List)
         //       ----- New
+        //       {CHILDPAGELIST} = the listname for the orphan list at the bottom of all page content, same as "", "ORPHAN", "NONE"
         //       RequestedListName = "", same as "ORPHAN", same as "NONE"
         //           prints orphan list (child pages that have not printed so far (orphan list))
         //       AllowChildListDisplay - if false, no Child Page List is displayed, but authoring tags are still there
@@ -2263,29 +2264,23 @@ namespace Contensive.Processor.Controllers {
         //           - uses ChildPageListTracking to track what has been seen
         //=============================================================================
         //
-        public static string getChildPageList(CoreController core, string RequestedListName, string ContentName, int parentPageID, bool allowChildListDisplay, bool ArchivePages = false) {
-            string result = "";
+        public static string getChildPageList(CoreController core, string RequestedListName, string contentName, int parentPageID, bool allowChildListDisplay, bool ArchivePages = false) {
             try {
-                if (string.IsNullOrEmpty(ContentName)) {
-                    ContentName = PageContentModel.tableMetadata.contentName;
-                }
-                bool isAuthoring = core.session.isEditing(ContentName);
-                //
-                int ChildListCount = 0;
-                string UcaseRequestedListName = GenericController.toUCase(RequestedListName);
-                if ((UcaseRequestedListName == "NONE") || (UcaseRequestedListName == "ORPHAN")) {
+                if (string.IsNullOrEmpty(contentName)) { contentName = PageContentModel.tableMetadata.contentName; }
+                string UcaseRequestedListName = toUCase(RequestedListName);
+                if ((UcaseRequestedListName == "NONE") || (UcaseRequestedListName == "ORPHAN") || (UcaseRequestedListName == "{CHILDPAGELIST}")) {
                     UcaseRequestedListName = "";
                 }
-                //
                 string archiveLink = core.webServer.requestPathPage;
-                archiveLink = GenericController.convertLinkToShortLink(archiveLink, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
-                archiveLink = GenericController.encodeVirtualPath(archiveLink, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
-                //
+                archiveLink = convertLinkToShortLink(archiveLink, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
+                archiveLink = encodeVirtualPath(archiveLink, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 List<PageContentModel> childPageList = DbBaseModel.createList<PageContentModel>(core.cpParent, "(parentId=" + parentPageID + ")", "sortOrder");
-                string inactiveList = "";
-                string activeList = "";
+                var inactiveList = new StringBuilder();
+                var activeList = new StringBuilder();
+                bool isAuthoring = core.session.isEditing(contentName);
+                int ChildListCount = 0;
                 foreach (PageContentModel childPage in childPageList) {
-                    string PageLink = PageContentController.getPageLink(core, childPage.id, "", true, false);
+                    string PageLink = getPageLink(core, childPage.id, "", true, false);
                     string pageMenuHeadline = childPage.menuHeadline;
                     if (string.IsNullOrEmpty(pageMenuHeadline)) {
                         pageMenuHeadline = childPage.name.Trim(' ');
@@ -2294,8 +2289,8 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     string pageEditLink = "";
-                    if (core.session.isEditing(ContentName)) {
-                        pageEditLink = AdminUIController.getRecordEditAndCutLink(core, ContentName, childPage.id, true, childPage.name);
+                    if (core.session.isEditing(contentName)) {
+                        pageEditLink = AdminUIController.getRecordEditAndCutLink(core, contentName, childPage.id, true, childPage.name);
                     }
                     //
                     string link = PageLink;
@@ -2318,10 +2313,10 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- child page has not yet displays, if editing show it as an orphan page
                             if (isAuthoring) {
-                                inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\" name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">";
-                                inactiveList = inactiveList + pageEditLink;
-                                inactiveList = inactiveList + "[from missing child page list '" + childPage.parentListName + "': " + LinkedText + "]";
-                                inactiveList = inactiveList + "</li>";
+                                inactiveList.Append("\r<li name=\"page" + childPage.id + "\" name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
+                                inactiveList.Append(pageEditLink);
+                                inactiveList.Append("[from missing child page list '" + childPage.parentListName + "': " + LinkedText + "]");
+                                inactiveList.Append("</li>");
                             }
                         }
                     } else if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (!allowChildListDisplay) && (!isAuthoring)) {
@@ -2337,58 +2332,58 @@ namespace Contensive.Processor.Controllers {
                         // ----- Allow in Child Page Lists is false, display hint to authors
                         //
                         if (isAuthoring) {
-                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">";
-                            inactiveList = inactiveList + pageEditLink;
-                            inactiveList = inactiveList + "[Hidden (Allow in Child Lists is not checked): " + LinkedText + "]";
-                            inactiveList = inactiveList + "</li>";
+                            inactiveList.Append( "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
+                            inactiveList.Append(pageEditLink);
+                            inactiveList.Append( "[Hidden (Allow in Child Lists is not checked): " + LinkedText + "]");
+                            inactiveList.Append( "</li>");
                         }
                     } else if (!childPage.active) {
                         //
                         // ----- Not active record, display hint if authoring
                         //
                         if (isAuthoring) {
-                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">";
-                            inactiveList = inactiveList + pageEditLink;
-                            inactiveList = inactiveList + "[Hidden (Inactive): " + LinkedText + "]";
-                            inactiveList = inactiveList + "</li>";
+                            inactiveList.Append( "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
+                            inactiveList.Append( pageEditLink);
+                            inactiveList.Append( "[Hidden (Inactive): " + LinkedText + "]");
+                            inactiveList.Append( "</li>");
                         }
                     } else if ((childPage.pubDate != DateTime.MinValue) && (childPage.pubDate > core.doc.profileStartTime)) {
                         //
                         // ----- Child page has not been published
                         //
                         if (isAuthoring) {
-                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">";
-                            inactiveList = inactiveList + pageEditLink;
-                            inactiveList = inactiveList + "[Hidden (To be published " + childPage.pubDate + "): " + LinkedText + "]";
-                            inactiveList = inactiveList + "</li>";
+                            inactiveList.Append( "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
+                            inactiveList.Append( pageEditLink);
+                            inactiveList.Append( "[Hidden (To be published " + childPage.pubDate + "): " + LinkedText + "]");
+                            inactiveList.Append( "</li>");
                         }
                     } else if ((childPage.dateExpires != DateTime.MinValue) && (childPage.dateExpires < core.doc.profileStartTime)) {
                         //
                         // ----- Child page has expired
                         //
                         if (isAuthoring) {
-                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">";
-                            inactiveList = inactiveList + pageEditLink;
-                            inactiveList = inactiveList + "[Hidden (Expired " + childPage.dateExpires + "): " + LinkedText + "]";
-                            inactiveList = inactiveList + "</li>";
+                            inactiveList.Append( "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
+                            inactiveList.Append( pageEditLink);
+                            inactiveList.Append( "[Hidden (Expired " + childPage.dateExpires + "): " + LinkedText + "]");
+                            inactiveList.Append( "</li>");
                         }
                     } else {
                         //
                         // ----- display list (and authoring links)
                         //
-                        activeList += "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem allowSort\">";
+                        activeList.Append("\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem allowSort\">");
                         // activeList += HtmlController.div(iconGrip, "ccListItemDragHandle");
-                        if (!string.IsNullOrEmpty(pageEditLink)) { activeList += HtmlController.div(iconGrip, "ccListItemDragHandle") + pageEditLink + "&nbsp;"; }
-                        activeList += LinkedText;
+                        if (!string.IsNullOrEmpty(pageEditLink)) { activeList.Append(HtmlController.div(iconGrip, "ccListItemDragHandle") + pageEditLink + "&nbsp;"); }
+                        activeList.Append(LinkedText);
                         //
                         // include authoring mark for content block
                         //
                         if (isAuthoring) {
                             if (childPage.blockContent) {
-                                activeList += "&nbsp;[Content Blocked]";
+                                activeList.Append("&nbsp;[Content Blocked]");
                             }
                             if (childPage.blockPage) {
-                                activeList += "&nbsp;[Page Blocked]";
+                                activeList.Append("&nbsp;[Page Blocked]");
                             }
                         }
                         //
@@ -2398,10 +2393,10 @@ namespace Contensive.Processor.Controllers {
                         if ((childPage.briefFilename != "") && (childPage.allowBrief)) {
                             string Brief = encodeText(core.cdnFiles.readFileText(childPage.briefFilename)).Trim(' ');
                             if (!string.IsNullOrEmpty(Brief)) {
-                                activeList += "<div class=\"ccListCopy\">" + Brief + "</div>";
+                                activeList.Append("<div class=\"ccListCopy\">" + Brief + "</div>");
                             }
                         }
-                        activeList += "</li>";
+                        activeList.Append("</li>");
                         //
                         // -- add child page to childPagesListed list
                         if (!core.doc.pageController.childPageIdsListed.Contains(childPage.id)) { core.doc.pageController.childPageIdsListed.Add(childPage.id); }
@@ -2412,24 +2407,25 @@ namespace Contensive.Processor.Controllers {
                 // ----- Add Link
                 //
                 if (!ArchivePages) {
-                    foreach (var AddLink in AdminUIController.getRecordAddLink(core, ContentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true)) {
-                        if (!string.IsNullOrEmpty(AddLink)) { inactiveList = inactiveList + "\r<li class=\"ccListItemNoBullet\">" + AddLink + "</LI>"; }
+                    foreach (var AddLink in AdminUIController.getRecordAddLink(core, contentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true)) {
+                        if (!string.IsNullOrEmpty(AddLink)) { inactiveList.Append( "\r<li class=\"ccListItemNoBullet\">" + AddLink + "</LI>"); }
                     }
                 }
                 //
                 // ----- If there is a list, add the list start and list end
                 //
-                result = "";
-                if (!string.IsNullOrEmpty(activeList + inactiveList)) {
-                    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + activeList + inactiveList + "\r</ul>";
+                string result = activeList.ToString() + inactiveList.ToString();
+                if (!string.IsNullOrEmpty(result)) {
+                    result = "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + result + "\r</ul>";
                 }
                 if ((!string.IsNullOrEmpty(UcaseRequestedListName)) && (ChildListCount == 0) && isAuthoring) {
                     result = "[Child Page List with no pages]</p><p>" + result;
                 }
+                return result;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return string.Empty;
             }
-            return result;
         }
         //
         //====================================================================================================
@@ -2439,9 +2435,9 @@ namespace Contensive.Processor.Controllers {
             try {
                 using (var csData = new CsModel(core)) {
                     if (SortReverse && (!string.IsNullOrEmpty(SortField))) {
-                        csData.openContentWatchList( ListName, SortField + " Desc", true);
+                        csData.openContentWatchList(ListName, SortField + " Desc", true);
                     } else {
-                        csData.openContentWatchList( ListName, SortField, true);
+                        csData.openContentWatchList(ListName, SortField, true);
                     }
                     //
                     if (csData.ok()) {
@@ -2808,13 +2804,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose()  {
+        public void Dispose() {
             // do not add code  here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~PageContentController()  {
+        ~PageContentController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
 
