@@ -912,7 +912,9 @@ namespace Contensive.Processor {
                             }
                         }
                     }
-                    return result.ToString().Substring(1);
+                    string resultStr = result.ToString();
+                    if (string.IsNullOrWhiteSpace(resultStr)) { return string.Empty; }
+                    return resultStr.Substring(1);
                 }
                 //
                 // -- redirect field, special case, no data

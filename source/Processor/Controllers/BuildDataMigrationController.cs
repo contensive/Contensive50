@@ -1,5 +1,6 @@
 ﻿
 using Contensive.Models.Db;
+using Contensive.Processor.Properties;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -35,7 +36,7 @@ namespace Contensive.Processor.Controllers {
                             // -- verify table as an id field
                             string sql = "SELECT name FROM sys.columns WHERE Name = N'ID' AND Object_ID = Object_ID(N'ccmembers')";
                             DataTable dt = cp.Db.ExecuteQuery(sql);
-                            if(dt!=null) {
+                            if (dt != null) {
                                 tableHasId = !dt.Rows.Equals(0);
                             }
                         }
@@ -48,7 +49,7 @@ namespace Contensive.Processor.Controllers {
                                 + " where (Col.Constraint_Name = Tab.Constraint_Name) AND (Col.Table_Name = Tab.Table_Name) AND (Constraint_Type = 'PRIMARY KEY') AND (Col.Table_Name = '" + table.name + "')";
                             bool idPrimaryKeyFound = false;
                             foreach (DataRow dr in core.db.executeQuery(sql).Rows) {
-                                 if (GenericController.encodeText(dr["Column_Name"]).ToLower().Equals("id")) {
+                                if (GenericController.encodeText(dr["Column_Name"]).ToLower().Equals("id")) {
                                     idPrimaryKeyFound = true;
                                     break;
                                 }
@@ -64,7 +65,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 //
-                // -- 4.1 to 5.1 conversions
+                // -- 4.1 to 5 conversions
                 if (DataBuildVersion.Substring(0, 3) == "4.1") {
                     //
                     // -- create Data Migration Assets collection
@@ -272,6 +273,32 @@ namespace Contensive.Processor.Controllers {
                     // -- end of 4.1 to 5 conversion
                 }
                 //
+                // -- 5.19.1223 conversion -- render AddonList no copyFilename
+                if (DataBuildVersion.Substring(0, 9).CompareTo("5.19.1223")<1) {
+                    //
+                    // -- verify design block installation
+                    string returnUserError = "";
+                    if (!cp.Addon.InstallCollectionFromLibrary(Constants.designBlockCollectionGuid, ref returnUserError)) { throw new Exception("Error installing Design Blocks, required for data upgrade. " + returnUserError); }
+                    //
+                    // -- add a text block and childPageList to every page without an addonlist
+                    foreach (var page in DbBaseModel.createList<PageContentModel>(cp, "(addonList is null)")) {
+                        // 
+                        // -- save copyFilename copy to new Text Block record
+                        string textBlockInstanceGuid = GenericController.createGuid();
+                        cp.Db.ExecuteNonQuery("insert into dbText (active,name,text,ccguid) values (1,'Text Block'," + cp.Db.EncodeSQLText(page.copyfilename.content) + "," + cp.Db.EncodeSQLText(textBlockInstanceGuid) + ")");
+                        // 
+                        // -- assign all child pages without a childpageListname to this new childpageList addon
+                        string childListInstanceGuid = GenericController.createGuid();
+                        cp.Db.ExecuteNonQuery("update ccpagecontent set parentListName=" + core.cpParent.Db.EncodeSQLText(childListInstanceGuid) + " where (parentId=" + page.id + ")and((parentListName='')or(parentListName is null))");
+                        //
+                        // -- set defaultAddonList.json into page.addonList
+                        page.addonList = Resources.defaultAddonListJson.replace("textBlockInstanceGuid", textBlockInstanceGuid, StringComparison.InvariantCulture).replace("childListInstanceGuid", childListInstanceGuid, StringComparison.InvariantCulture);
+                        page.save(cp);
+
+                    }
+                    core.siteProperties.setProperty("PageController Render Legacy Copy", false);
+                }
+                //
                 // -- Reload
                 core.cache.invalidateAll();
                 core.clearMetaData();
@@ -292,13 +319,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose()  {
+        public void Dispose() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~BuildDataMigrationController()  {
+        ~BuildDataMigrationController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
 

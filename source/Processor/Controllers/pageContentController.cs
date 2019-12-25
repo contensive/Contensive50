@@ -387,7 +387,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- build body content
-                    string htmlDocBody = getHtmlBody_BodyTagInner(core);
+                    string htmlDocBody = getHtmlBody_BodyTag(core);
                     //
                     // -- check secure certificate required
                     bool SecureLink_Template_Required = core.doc.pageController.template.isSecure;
@@ -476,7 +476,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string getHtmlBody_BodyTagInner(CoreController core) {
+        public static string getHtmlBody_BodyTag(CoreController core) {
             string result = "";
             try {
                 //
@@ -491,38 +491,44 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- get content
                 bool blockSiteWithLogin = false;
-                string PageContent = getHtmlBody_ContentBox(core, ref blockSiteWithLogin);
-                if (!core.doc.continueProcessing) { return string.Empty; }
+                string PageContent = getHtmlBody_BodyTag_ContentBox(core, ref blockSiteWithLogin);
+                if (!core.doc.continueProcessing) {
+                    //
+                    // -- contentbox may include exit
+                    return string.Empty;
+                }
                 if (blockSiteWithLogin) { return "<div class=\"ccLoginPageCon\">" + PageContent + "\r</div>"; }
                 //
                 // -- get template
-                string LocalTemplateBody = core.doc.pageController.template.bodyHTML;
-                if (string.IsNullOrEmpty(LocalTemplateBody)) { LocalTemplateBody = Properties.Resources.DefaultTemplateHtml; }
-                int LocalTemplateId = core.doc.pageController.template.id;
-                string LocalTemplateName = core.doc.pageController.template.name;
-                if (string.IsNullOrEmpty(LocalTemplateName)) { LocalTemplateName = "Template " + LocalTemplateId; }
-                //
-                // -- Encode Template
-                result += ActiveContentController.renderHtmlForWeb(core, LocalTemplateBody, "Page Templates", LocalTemplateId, 0, core.webServer.requestProtocol + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate);
-                //
-                // -- add content into template
-                if (result.IndexOf(fpoContentBox) != -1) {
+                {
+                    string templateHtml = core.doc.pageController.template.bodyHTML;
+                    if (string.IsNullOrEmpty(templateHtml)) { templateHtml = Properties.Resources.DefaultTemplateHtml; }
+                    int templateId = core.doc.pageController.template.id;
+                    string templateName = core.doc.pageController.template.name;
+                    if (string.IsNullOrEmpty(templateName)) { templateName = "Template " + templateId; }
                     //
-                    // -- replace page content into templatecontent
-                    result = GenericController.strReplace(result, fpoContentBox, PageContent);
-                } else {
+                    // -- Encode Template
+                    result += ActiveContentController.renderHtmlForWeb(core, templateHtml, "Page Templates", templateId, 0, core.webServer.requestProtocol + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate);
                     //
-                    // If Content was not found, add it to the end
-                    result += PageContent;
+                    // -- add content into template
+                    if (result.IndexOf(fpoContentBox) != -1) {
+                        //
+                        // -- replace page content into templatecontent
+                        result = strReplace(result, fpoContentBox, PageContent);
+                    } else {
+                        //
+                        // If Content was not found, add it to the end
+                        result += PageContent;
+                    }
+                    //
+                    // -- add template edit link
+                    if (core.session.isTemplateEditing()) {
+                        result = AdminUIController.getRecordEditAndCutLink(core, "Page Templates", templateId, false, templateName) + result;
+                        result = AdminUIController.getEditWrapper(core, result);
+                    }
                 }
                 //
-                // -- add template edit link
-                if (core.session.isAuthenticated && core.visitProperty.getBoolean("AllowAdvancedEditor") && core.session.isEditing("Page Templates")) {
-                    result = AdminUIController.getRecordEditAndCutLink(core, "Page Templates", LocalTemplateId, false, LocalTemplateName) + result;
-                    result = AdminUIController.getEditWrapper(core, result);
-                }
-                //
-                // ----- OnBodyEnd add-ons
+                // -- OnBodyEnd add-ons
                 foreach (var addon in core.addonCache.getOnBodyEndAddonList()) {
                     CPUtilsBaseClass.addonExecuteContext bodyEndContext = new CPUtilsBaseClass.addonExecuteContext {
                         addonType = CPUtilsBaseClass.addonContext.ContextFilter,
@@ -541,7 +547,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string getHtmlBody_ContentBox(CoreController core, ref bool return_blockSiteWithLogin) {
+        public static string getHtmlBody_BodyTag_ContentBox(CoreController core, ref bool return_blockSiteWithLogin) {
             string result = "";
             try {
                 //
@@ -563,21 +569,6 @@ namespace Contensive.Processor.Controllers {
                     core.doc.redirectLink = PageContentController.getPageNotFoundRedirectLink(core, core.doc.redirectReason, "", "", 0);
                     return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
                 }
-                //
-                // -- OnPageStart Event
-                Dictionary<string, string> instanceArguments = new Dictionary<string, string> { { "CSPage", "-1" } };
-                foreach (var addon in core.addonCache.getOnPageStartAddonList()) {
-                    CPUtilsBaseClass.addonExecuteContext pageStartContext = new CPUtilsBaseClass.addonExecuteContext {
-                        instanceGuid = "-1",
-                        argumentKeyValuePairs = instanceArguments,
-                        addonType = CPUtilsBaseClass.addonContext.ContextOnPageStart,
-                        errorContextMessage = "calling start page addon [" + addon.name + "]"
-                    };
-                    result += core.addon.execute(addon, pageStartContext);
-                }
-                //
-                // -- Render the Body
-                result += getHtmlBody_ContentBox_Content(core);
                 //
                 // -- If Link field populated, do redirect
                 if (core.doc.pageController.page.link != "") {
@@ -804,7 +795,22 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- Encoding, Tracking and Triggers
                 if (!ContentBlocked) {
-                    if (core.visitProperty.getBoolean("AllowQuickEditor")) {
+                    //
+                    // -- OnPageStart Event
+                    Dictionary<string, string> instanceArguments = new Dictionary<string, string> { { "CSPage", "-1" } };
+                    foreach (var addon in core.addonCache.getOnPageStartAddonList()) {
+                        CPUtilsBaseClass.addonExecuteContext pageStartContext = new CPUtilsBaseClass.addonExecuteContext {
+                            instanceGuid = "-1",
+                            argumentKeyValuePairs = instanceArguments,
+                            addonType = CPUtilsBaseClass.addonContext.ContextOnPageStart,
+                            errorContextMessage = "calling start page addon [" + addon.name + "]"
+                        };
+                        result += core.addon.execute(addon, pageStartContext);
+                    }
+                    //
+                    // -- Render the content for the contentbox
+                    result += getHtmlBody_BodyTag_ContentBox_Content(core);
+                    if (core.session.isQuickEditing("")) {
                         //
                         // Quick Editor, no encoding or tracking
                         //
@@ -820,28 +826,6 @@ namespace Contensive.Processor.Controllers {
                             // Live content
                             result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.tableMetadata.contentName, PageRecordId, core.doc.pageController.page.contactMemberId, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                             core.db.executeNonQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + core.doc.pageController.page.id);
-                        }
-                        //
-                        // ----- Child pages
-                        bool allowChildListComposite = core.doc.pageController.page.allowChildListDisplay;
-                        if (allowChildListComposite || core.session.isEditing()) {
-                            if (!allowChildListComposite) {
-                                result = result + core.html.getAdminHintWrapper("<p>Child page list display is disabled for this page. To enable the child page list, edit this page and check 'Display Child Pages' in the navigation tab.</p>");
-                            }
-                            AddonModel addon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidChildList);
-                            CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
-                                addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                                hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext {
-                                    contentName = PageContentModel.tableMetadata.contentName,
-                                    fieldName = "",
-                                    recordId = core.doc.pageController.page.id
-                                },
-                                argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, core.doc.pageController.page.childListInstanceOptions),
-                                instanceGuid = PageChildListInstanceId,
-                                wrapperID = core.siteProperties.defaultWrapperID,
-                                errorContextMessage = "executing child list addon for page [" + core.doc.pageController.page.id + "]"
-                            };
-                            result += core.addon.execute(addon, executeContext);
                         }
                         //
                         // Page Hit Notification
@@ -970,7 +954,6 @@ namespace Contensive.Processor.Controllers {
                             addonType = CPUtilsBaseClass.addonContext.ContextOnPageEnd,
                             errorContextMessage = "calling start page addon [" + addon.name + "]"
                         };
-
                         core.doc.bodyContent += core.addon.execute(addon, pageEndContext);
                     }
                     result = core.doc.bodyContent;
@@ -1039,7 +1022,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// render the page content
         /// </summary>
-        internal static string getHtmlBody_ContentBox_Content(CoreController core) {
+        internal static string getHtmlBody_BodyTag_ContentBox_Content(CoreController core) {
             StringBuilder result = new StringBuilder();
             try {
                 bool isRootPage = core.doc.pageController.pageToRootList.Count.Equals(1);
@@ -1055,35 +1038,47 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- add Page Content
-                var resultContent = new StringBuilder();
-                //
+                var resultInnerContent = new StringBuilder();
                 // -- Headline
                 if (!string.IsNullOrWhiteSpace(core.doc.pageController.page.headline)) {
-                    resultContent.Append("\r<h1>").Append(HtmlController.encodeHtml(core.doc.pageController.page.headline)).Append("</h1>");
+                    resultInnerContent.Append("\r<h1>").Append(HtmlController.encodeHtml(core.doc.pageController.page.headline)).Append("</h1>");
                 }
-                bool renderContent = true;
-                bool isQuickEditing = core.session.isQuickEditing(PageContentModel.tableMetadata.contentName);
-                if (isQuickEditing) {
+                bool useLegacyPageCopy = core.siteProperties.getBoolean("PageController Render Legacy Copy", false);
+                if(useLegacyPageCopy) {
                     //
-                    // -- drag-drop editor for addonList, then include rendered content after it
-                    if (core.siteProperties.getBoolean("Allow AddonList Editor For Quick Editor")) {
+                    // -- legacy deprecated mode -- display copyFilename field as contnet
+                    bool userLegacyQuickEditing = core.session.isQuickEditing(PageContentModel.tableMetadata.contentName);
+                    if (userLegacyQuickEditing) {
+                        //
+                        // -- quick editor for wysiwyg content instead of rendered content
+                        resultInnerContent.Append(QuickEditController.getQuickEditing(core));
+                    } else {
+                        //
+                        // -- Render the legacy content for the page (copyFilename field)
+                        string htmlPageContent = core.doc.pageController.page.copyfilename.content;
+                        if (string.IsNullOrEmpty(htmlPageContent)) {
+                            //
+                            // Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
+                            if (core.session.isEditing(PageContentModel.tableMetadata.contentName)) {
+                                htmlPageContent = "\r<p><!-- Empty Content Placeholder --></p>";
+                            }
+                        }
+                        resultInnerContent.Append(htmlPageContent);
+                    }
+                } else {
+                    //
+                    // -- addonList mode
+                    if (core.cpParent.User.IsPageBuilderEditing) {
+                        //
+                        // -- drag-drop editor for addonList, then include rendered content after it
                         core.docProperties.setProperty("contentid", ContentMetadataModel.getContentId(core, PageContentModel.tableMetadata.contentName));
                         core.docProperties.setProperty("recordid", core.doc.pageController.page.id);
-                        resultContent.Append(core.addon.execute("{92B75A6A-E84B-4551-BBF3-849E91D084BC}", new CPUtilsBaseClass.addonExecuteContext {
+                        resultInnerContent.Append(core.addon.execute("{92B75A6A-E84B-4551-BBF3-849E91D084BC}", new CPUtilsBaseClass.addonExecuteContext {
                             addonType = CPUtilsBaseClass.addonContext.ContextSimple
                         }));
                     } else {
                         //
-                        // -- quick editor for wysiwyg content instead of rendered content
-                        renderContent = false;
-                        resultContent.Append(QuickEditController.getQuickEditing(core));
-                    }
-                }
-                if (renderContent) {
-                    //
-                    // -- render page content
-                    string htmlPageContent = "";
-                    if (!isQuickEditing) {
+                        // -- render addonList
                         if (!string.IsNullOrWhiteSpace(core.doc.pageController.page.addonList)) {
                             //
                             // -- addonList only if not editing it
@@ -1092,37 +1087,36 @@ namespace Contensive.Processor.Controllers {
                                 if (addonListRender == null) {
                                     //
                                     // -- not installed
-                                    htmlPageContent += "<!-- Page Builder AddonList Render not available -->";
+                                    resultInnerContent.Append("<!-- Page Builder AddonList Render not available -->");
                                 } else {
                                     //
                                     // -- execute PageBuilder RenderAddonList
                                     core.docProperties.setProperty("addonList", core.doc.pageController.page.addonList);
-                                    htmlPageContent += core.addon.execute(addonListRender, new CPUtilsBaseClass.addonExecuteContext {
+                                    resultInnerContent.Append( core.addon.execute(addonListRender, new CPUtilsBaseClass.addonExecuteContext {
                                         addonType = CPUtilsBaseClass.addonContext.ContextPage
-                                    });
+                                    }));
                                 }
                             } catch (Exception) {
                                 LogController.logWarn(core, "The addonList for page [" + core.doc.pageController.page.id + ", " + core.doc.pageController.page.name + "] was not empty, but deserialized to null, addonList '" + core.doc.pageController.page.addonList + "'");
                             }
                         }
                     }
-                    //
-                    // -- Render the content for the page
-                    htmlPageContent += core.doc.pageController.page.copyfilename.content;
-                    if (string.IsNullOrEmpty(htmlPageContent)) {
-                        //
-                        // Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
-                        if (core.session.isEditing(PageContentModel.tableMetadata.contentName)) {
-                            htmlPageContent = "\r<p><!-- Empty Content Placeholder --></p>";
-                        }
-                    }
-                    //
-                    // -- add content into page with comment wrapper
-                    resultContent.Append("\r<!-- ContentBoxBodyStart -->" + htmlPageContent + "\r<!-- ContentBoxBodyEnd -->");
                 }
-                //
                 // -- End Text Search
-                result.Append("\r<!-- TextSearchStart -->" + resultContent.ToString() + "\r<!-- TextSearchEnd -->");
+                result.Append("\r<!-- TextSearchStart -->" + resultInnerContent.ToString() + "\r<!-- TextSearchEnd -->");
+                //
+                // ----- Orphan Child pages. Pages in this list do not appear on the page. This is an admin editing tool to let admins see all pages not associated to a list.
+                if (core.session.isEditing()) {
+                    var pageList = new List<string>();
+                    foreach( var page in DbBaseModel.createList<PageContentModel>(core.cpParent,"(parentid=" + core.doc.pageController.page.id + ")")) {
+                        pageList.Add(HtmlController.li(page.name));
+                    }
+                    if (!pageList.Count.Equals(0)) {
+                        //
+                        // -- build orphan list admin tool here
+                        result.Append(HtmlController.ul(string.Join("",pageList)));
+                    }
+                }
                 //
                 // -- Page See Also
                 if (core.doc.pageController.page.allowSeeAlso) {
@@ -2332,40 +2326,40 @@ namespace Contensive.Processor.Controllers {
                         // ----- Allow in Child Page Lists is false, display hint to authors
                         //
                         if (isAuthoring) {
-                            inactiveList.Append( "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
+                            inactiveList.Append("\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
                             inactiveList.Append(pageEditLink);
-                            inactiveList.Append( "[Hidden (Allow in Child Lists is not checked): " + LinkedText + "]");
-                            inactiveList.Append( "</li>");
+                            inactiveList.Append("[Hidden (Allow in Child Lists is not checked): " + LinkedText + "]");
+                            inactiveList.Append("</li>");
                         }
                     } else if (!childPage.active) {
                         //
                         // ----- Not active record, display hint if authoring
                         //
                         if (isAuthoring) {
-                            inactiveList.Append( "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
-                            inactiveList.Append( pageEditLink);
-                            inactiveList.Append( "[Hidden (Inactive): " + LinkedText + "]");
-                            inactiveList.Append( "</li>");
+                            inactiveList.Append("\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
+                            inactiveList.Append(pageEditLink);
+                            inactiveList.Append("[Hidden (Inactive): " + LinkedText + "]");
+                            inactiveList.Append("</li>");
                         }
                     } else if ((childPage.pubDate != DateTime.MinValue) && (childPage.pubDate > core.doc.profileStartTime)) {
                         //
                         // ----- Child page has not been published
                         //
                         if (isAuthoring) {
-                            inactiveList.Append( "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
-                            inactiveList.Append( pageEditLink);
-                            inactiveList.Append( "[Hidden (To be published " + childPage.pubDate + "): " + LinkedText + "]");
-                            inactiveList.Append( "</li>");
+                            inactiveList.Append("\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
+                            inactiveList.Append(pageEditLink);
+                            inactiveList.Append("[Hidden (To be published " + childPage.pubDate + "): " + LinkedText + "]");
+                            inactiveList.Append("</li>");
                         }
                     } else if ((childPage.dateExpires != DateTime.MinValue) && (childPage.dateExpires < core.doc.profileStartTime)) {
                         //
                         // ----- Child page has expired
                         //
                         if (isAuthoring) {
-                            inactiveList.Append( "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
-                            inactiveList.Append( pageEditLink);
-                            inactiveList.Append( "[Hidden (Expired " + childPage.dateExpires + "): " + LinkedText + "]");
-                            inactiveList.Append( "</li>");
+                            inactiveList.Append("\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItemNoBullet\">");
+                            inactiveList.Append(pageEditLink);
+                            inactiveList.Append("[Hidden (Expired " + childPage.dateExpires + "): " + LinkedText + "]");
+                            inactiveList.Append("</li>");
                         }
                     } else {
                         //
@@ -2408,7 +2402,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (!ArchivePages) {
                     foreach (var AddLink in AdminUIController.getRecordAddLink(core, contentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true)) {
-                        if (!string.IsNullOrEmpty(AddLink)) { inactiveList.Append( "\r<li class=\"ccListItemNoBullet\">" + AddLink + "</LI>"); }
+                        if (!string.IsNullOrEmpty(AddLink)) { inactiveList.Append("\r<li class=\"ccListItemNoBullet\">" + AddLink + "</LI>"); }
                     }
                 }
                 //
@@ -2593,7 +2587,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- Turn off Quick Editor if not save or add child
                     //
-                    core.visitProperty.setProperty("AllowQuickEditor", "0");
+                    core.visitProperty.setProperty("AllowQuickEditor", false);
                 }
             }
         }

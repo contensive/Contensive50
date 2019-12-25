@@ -2608,7 +2608,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // Quick Edit
                             helpLink = "";
-                            iValueBoolean = core.visitProperty.getBoolean("AllowQuickEditor");
+                            iValueBoolean = core.session.isQuickEditing("");
                             Tag = HtmlController.checkbox(QuickEditTagId, iValueBoolean, QuickEditTagId);
                             Tag = GenericController.strReplace(Tag, ">", " onClick=\"document.getElementById('" + EditTagID + "').checked=false;document.getElementById('" + AdvancedEditTagId + "').checked=false;\">");
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"

@@ -1110,12 +1110,12 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// true if editing templates
+        /// true if editing page addon lists
         /// </summary>
         /// <returns></returns>
         public bool IsPageBuilderEditing() {
             if (!isAuthenticatedAdmin()) { return false; }
-            return core.visitProperty.getBoolean("AllowPageBuilder", false);
+            return core.visitProperty.getBoolean("AllowQuickEditor", false);
         }
         //
         //========================================================================

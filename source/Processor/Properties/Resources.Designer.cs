@@ -29,7 +29,7 @@ namespace Contensive.Processor.Properties {
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources()  {
+        internal Resources() {
         }
         
         /// <summary>
@@ -75,13 +75,29 @@ namespace Contensive.Processor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to [
+        ///  {
+        ///    &quot;designBlockTypeGuid&quot;: &quot;{4F7FADCB-7B0B-4E4B-BBE4-CFAF4E49D548}&quot;,
+        ///    &quot;designBlockTypeName&quot;: &quot;Text Block&quot;,
+        ///    &quot;instanceGuid&quot;: &quot;{instanceGuid}&quot;,
+        ///    &quot;columns&quot;: null
+        ///  }
+        ///].
+        /// </summary>
+        public static string defaultAddonListJson {
+            get {
+                return ResourceManager.GetString("defaultAddonListJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 
         ///&lt;html&gt;
         ///&lt;head&gt;
         ///    &lt;title&gt;Future emails have been blocked&lt;/title&gt;
         ///&lt;/head&gt;
         ///&lt;body&gt;
-        ///    &lt;div styles=&quot;width:400px;margin:100px auto&quot;&gt;&lt;p&gt;You have blocked all future emails from our site.&lt;/p&gt;&lt;/div&gt;
+        ///    &lt;div style=&quot;width:400px;margin:100px auto&quot;&gt;&lt;p&gt;You have blocked all future emails from our site.&lt;/p&gt;&lt;/div&gt;
         ///&lt;/body&gt;
         ///&lt;/html&gt;
         ///.
@@ -100,8 +116,7 @@ namespace Contensive.Processor.Properties {
         ///		&lt;label for=&quot;inputEmail&quot; class=&quot;sr-only pt-2&quot;&gt;Email address&lt;/label&gt;
         ///		&lt;input type=&quot;email&quot; name=&quot;username&quot; id=&quot;inputEmail&quot; class=&quot;form-control pt-2&quot; placeholder=&quot;Username&quot; required autofocus&gt;
         ///	&lt;/div&gt;
-        ///	&lt;div class=&quot;pt-2&quot;&gt;
-        /// [rest of string was truncated]&quot;;.
+        ///	&lt;div class=&quot;pt-2&quot;&gt;        /// [rest of string was truncated]&quot;;.
         /// </summary>
         public static string defaultForgetPassword_html {
             get {
@@ -183,11 +198,7 @@ namespace Contensive.Processor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;nav class=&quot;navbar navbar-expand-md navbar-dark bg-dark&quot;&gt;
-        ///	&lt;a class=&quot;navbar-brand&quot; href=&quot;#&quot;&gt;Brand&lt;/a&gt;
-        ///	{% {&quot;addon&quot;:{&quot;addon&quot;:&quot;Bootstrap Nav 40&quot;,&quot;instanceId&quot;:&quot;Header Nav Menu&quot;}} %}
-        ///&lt;/nav&gt;
-        ///&lt;div class=&quot;container&quot;&gt;
+        ///   Looks up a localized string similar to &lt;div class=&quot;container&quot;&gt;
         ///    &lt;div class=&quot;row&quot;&gt;
         ///        &lt;div class=&quot;col-lg-12 mt-2&quot;&gt;
         ///            {% &quot;Content Box&quot; %}
@@ -214,8 +225,7 @@ namespace Contensive.Processor.Properties {
         ///                &lt;/tr&gt;
         ///            &lt;/tbody&gt;
         ///        &lt;/table&gt;
-        ///    &lt;/td&gt;
-        /// [rest of string was truncated]&quot;;.
+        ///    &lt;/td&gt;        /// [rest of string was truncated]&quot;;.
         /// </summary>
         public static string GroupRuleEditorRow {
             get {
@@ -256,7 +266,7 @@ namespace Contensive.Processor.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;form class=&quot;form-inline&quot; method=&quot;post&quot; action=&quot;?method=logout&quot;&gt;
-        ///{{personName}}&amp;nbsp;&lt;button class=&quot;btn btn-warning btn-sm ml-2&quot; type=&quot;submit&quot;&gt;Logout&lt;/button&gt;
+        ///&lt;a href=&quot;/my-account&quot; class=&quot;text-light&quot;&gt;{{personName}}&lt;/a&gt;&amp;nbsp;&lt;button class=&quot;btn btn-warning btn-sm ml-2&quot; type=&quot;submit&quot;&gt;Logout&lt;/button&gt;
         ///&lt;/form&gt;.
         /// </summary>
         public static string LogoutButtonFormHtml {
@@ -265,6 +275,23 @@ namespace Contensive.Processor.Properties {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to IF EXISTS (SELECT * FROM sys.objects WHERE [name] = N&apos;ccManyManyRuleDelete_{ruleTable}_{ruleField}&apos; AND [type] = &apos;TR&apos;)
+        ///BEGIN
+        ///      DROP TRIGGER [dbo].[ccManyManyRuleDelete_{ruleTable}_{ruleField}];
+        ///END
+        ///GO
+        ///DROP TRIGGER IF EXISTS ccManyManyRuleDelete_{ruleTable}_{ruleField}
+        ///CREATE TRIGGER ccManyManyRuleDelete_{ruleTable}_{ruleField}
+        ///ON {joinTable}
+        ///AFTER UPDATE,DELETE
+        ///AS
+        ///delete from {ruleTable} 
+        ///from {ruleTable} r 
+        ///left join {joinTable} a on a.{joinField}=r.{ruleField} where a.id is null
+        ///
+        ///--sampl [rest of string was truncated]&quot;;.
+        /// </summary>
         public static string sqlTriggerManyManyRule {
             get {
                 return ResourceManager.GetString("sqlTriggerManyManyRule", resourceCulture);

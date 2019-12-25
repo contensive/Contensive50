@@ -121,6 +121,7 @@ namespace Contensive.Processor {
         internal const string AdminNavigatorGuid = "{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}";
         internal const string fontAwesomeCollectionGuid = "{3db6a433-59ca-43d1-9fb6-a539b6b947f2}";
         internal const string redactorCollectionGuid = "{E87AFAFF-2503-44DE-A343-EFF8C64B652D}";
+        internal const string designBlockCollectionGuid = "{fd1685af-bc66-4649-a8f1-1b3c18d59d24}";
         //
         // -- navigator entries
         internal const string addonGuidManageAddon = "{DBA354AB-5D3E-4882-8718-CF23CAAB7927}";
