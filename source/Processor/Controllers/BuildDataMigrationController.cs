@@ -292,9 +292,8 @@ namespace Contensive.Processor.Controllers {
                         cp.Db.ExecuteNonQuery("update ccpagecontent set parentListName=" + core.cpParent.Db.EncodeSQLText(childListInstanceGuid) + " where (parentId=" + page.id + ")and((parentListName='')or(parentListName is null))");
                         //
                         // -- set defaultAddonList.json into page.addonList
-                        page.addonList = Resources.defaultAddonListJson.replace("textBlockInstanceGuid", textBlockInstanceGuid, StringComparison.InvariantCulture).replace("childListInstanceGuid", childListInstanceGuid, StringComparison.InvariantCulture);
-                        page.save(cp);
-
+                        string addonList = Resources.defaultAddonListJson.replace("{textBlockInstanceGuid}", textBlockInstanceGuid, StringComparison.InvariantCulture).replace("{childListInstanceGuid}", childListInstanceGuid, StringComparison.InvariantCulture);
+                        cp.Db.ExecuteNonQuery("update ccpagecontent set addonList=" + core.cpParent.Db.EncodeSQLText(addonList) + " where (id=" + page.id + ")");
                     }
                     core.siteProperties.setProperty("PageController Render Legacy Copy", false);
                 }
