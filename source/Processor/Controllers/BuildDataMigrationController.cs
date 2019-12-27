@@ -66,7 +66,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- 4.1 to 5 conversions
-                if (DataBuildVersion.Substring(0, 3) == "4.1") {
+                if (DataBuildVersion.Substring(0, 3).CompareTo("4.1")<1) {
                     //
                     // -- create Data Migration Assets collection
                     var migrationCollection = DbBaseModel.createByUniqueName<AddonCollectionModel>(cp, "Data Migration Assets");

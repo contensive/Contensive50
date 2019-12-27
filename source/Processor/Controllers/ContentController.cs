@@ -14,6 +14,11 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class ContentController : IDisposable {
         //
+        public static string pluralToSingular( string pluralContentName ) {
+            var pluralization = System.Data.Entity.Design.PluralizationServices.PluralizationService.CreateService(CultureInfo.GetCultureInfo("en-us"));
+            return pluralization.Singularize(pluralContentName);
+        }
+        //
         //====================================================================================================
         //
         public static void processAfterSave_AddonCollection(CoreController core, bool isDelete, string contentName, int recordID, string recordName, int recordParentID, bool useContentWatchLink) {

@@ -4,7 +4,7 @@ using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Addons.PageManager {
     //
-    public class getHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
+    public class GetHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>

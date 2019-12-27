@@ -1347,20 +1347,28 @@ namespace Contensive.Models.Db {
         /// <param name="parentRecordId"></param>
         /// <param name="childRecordId"></param>
         /// <param name="parentIdList"></param>
-        public static bool isChildOf<T>(CPBaseClass cp, int parentRecordId, int childRecordId, List<int> parentIdList) {
-            if (!containsField<T>("parentid")) { return false; }
+        public static bool isChildOf<T>(CPBaseClass cp, int parentRecordId, int childRecordId, List<int> parentIdList, bool parentIdFieldVerified) {
+            if ((!parentIdFieldVerified) && (!containsField<T>("parentid"))) { return false; }
+            if ((childRecordId < 1) || (parentRecordId<1)) { return false; }
             if (parentIdList.Contains(childRecordId)) { return false; }
             if (parentRecordId == childRecordId) return true;
             using (DataTable dt = cp.Db.ExecuteQuery("select id from " + derivedTableName(typeof(T)) + " where parentId=" + parentRecordId)) {
                 if (dt != null) {
                     if (dt.Rows.Count > 0) {
                         parentIdList.Add(parentRecordId);
-                        return isChildOf<T>(cp, parentRecordId, cp.Utils.EncodeInteger(dt.Rows[0]["parentid"]), parentIdList);
+                        foreach (DataRow row in dt.Rows) {
+                            if(isChildOf<T>(cp, cp.Utils.EncodeInteger(row["id"]), childRecordId, parentIdList,true)) {
+                                return true;
+                            }
+                        }
                     }
                 }
                 return false;
             }
         }
+        //
+        public static bool isChildOf<T>(CPBaseClass cp, int parentRecordId, int childRecordId, List<int> parentIdList)
+            => isChildOf<T>(cp, parentRecordId, childRecordId, parentIdList);
         //
         //====================================================================================================
         /// <summary>

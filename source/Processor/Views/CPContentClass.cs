@@ -53,7 +53,7 @@ namespace Contensive.Processor {
         //
         public override string GetAddLink(string contentName, string presetNameValueList, bool allowPaste, bool isEditing) {
             string result = "";
-            foreach (var link in AdminUIController.getRecordAddLink(cp.core, contentName, presetNameValueList, allowPaste, isEditing)) {
+            foreach (var link in AdminUIController.getRecordAddAnchorTag(cp.core, contentName, presetNameValueList, allowPaste, isEditing)) {
                 result += link;
             }
             return result;
@@ -85,7 +85,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetEditLink(string contentName, string recordID, bool allowCut, string recordName, bool isEditing) {
-            return AdminUIController.getRecordEditAndCutLink(cp.core, contentName, GenericController.encodeInteger(recordID), allowCut, recordName);
+            return AdminUIController.getRecordEditAndCutAnchorTag(cp.core, contentName, GenericController.encodeInteger(recordID), allowCut, recordName);
         }
         //
         //====================================================================================================
@@ -266,7 +266,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetListLink(string contentName) {
-            return AdminUIController.getRecordEditLink(cp.core, Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, contentName));
+            return AdminUIController.getRecordEditAnchorTag(cp.core, Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, contentName));
         }
         //
         //====================================================================================================

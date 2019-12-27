@@ -337,7 +337,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                 URI = URI + "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[1, WhereCount]);
                                             }
                                         }
-                                        DataTableRows.Append(AdminUIController.getRecordEditLink(URI));
+                                        DataTableRows.Append(AdminUIController.getRecordEditAnchorTag(URI));
                                         DataTableRows.Append(("</td>"));
                                         //
                                         // --- Delete Checkbox Columns

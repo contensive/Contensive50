@@ -496,7 +496,7 @@ namespace Contensive.Processor.Controllers {
                                         var editSegmentList = new List<string> {
                                             AdminUIController.getAddonEditSegment(core, addon.id, addon.name)
                                         };
-                                        resultString = AdminUIController.getAddonEditLink(core, editSegmentList) + resultString;
+                                        resultString = AdminUIController.getAddonEditAnchorTag(core, editSegmentList) + resultString;
                                         resultString = AdminUIController.getEditWrapper(core, resultString);
                                     }
                                 }

@@ -65,12 +65,12 @@
       <HintPath>..\packages\Microsoft.ClearScript.6.0.0\lib\net45\ClearScript.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ContensiveDbModels, Version=5.19.1225.1, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.5.19.1225.1\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.19.1227.1, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.5.19.1227.1\lib\net461\ContensiveDbModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1225.1\lib\net472\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.19.1227.1\lib\net472\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -104,8 +104,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Data.OracleClient" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
@@ -182,6 +184,7 @@
     <Compile Include="Addons\Personalization\LastName.cs" />
     <Compile Include="Addons\Personalization\FirstName.cs" />
     <Compile Include="Addons\Email\Download.cs" />
+    <Compile Include="Addons\SeeAlso\SeeAlsoClass.cs" />
     <Compile Include="Addons\Tools\manualQueryClass.cs" />
     <Compile Include="Addons\Tools\CreateGUIDToolClass.cs" />
     <Compile Include="Addons\Tools\IISResetToolClass.cs" />
@@ -233,7 +236,7 @@
     <Compile Include="Addons\AdminSite\Views\FormIndex.cs" />
     <Compile Include="Addons\AdminSite\Views\FormIndexSetColumns.cs" />
     <Compile Include="Addons\ExportSql\ExportCsvClass.cs" />
-    <Compile Include="Addons\PageManager\getChildPageList.cs" />
+    <Compile Include="Addons\PageManager\GetChildPageList.cs" />
     <Compile Include="Addons\Tools\DefineContentFieldsFromTable.cs" />
     <Compile Include="Addons\Tools\_sample.cs" />
     <Compile Include="Addons\Tools\CacheToolClass.cs" />
@@ -279,7 +282,7 @@
     <Compile Include="Addons\Authentication\GetLoginFormClass.cs" />
     <Compile Include="Addons\Authentication\GetLoginPageClass.cs" />
     <Compile Include="Addons\PageManager\saveChildPageListDraggableClass.cs" />
-    <Compile Include="Addons\PageManager\getHtmlBodyClass.cs" />
+    <Compile Include="Addons\PageManager\GetHtmlBodyClass.cs" />
     <Compile Include="Addons\Tools\ConfigureEditClass.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Controllers\AddonController.cs" />

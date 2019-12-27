@@ -333,7 +333,7 @@ namespace Contensive.Processor.Addons.Tools {
                             //
                             // edit button
                             //
-                            streamRow.add("<td class=\"ccPanelInput\" align=\"left\">" + AdminUIController.getRecordEditLink(core, contentFieldsCdef, formFieldId) + "</td>");
+                            streamRow.add("<td class=\"ccPanelInput\" align=\"left\">" + AdminUIController.getRecordEditAnchorTag(core, contentFieldsCdef, formFieldId) + "</td>");
                             //
                             // Inherited
                             //

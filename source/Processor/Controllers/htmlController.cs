@@ -752,17 +752,6 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// Wrap the content in a common wrapper if authoring is enabled
-        /// </summary>
-        /// <param name="content"></param>
-        /// <returns></returns>
-        public string getAdminHintWrapper(string content) {
-            string msg = "<div class=\"ccHintWrapperContent\"><h4>Administrator</h4>" + content + "</div>";
-            return ((core.session.isEditing("") || core.session.isAuthenticatedAdmin())) ? msg : string.Empty;
-        }
-        //
-        //====================================================================================================
         //
         public void enableOutputBuffer(bool BufferOn) {
             try {
