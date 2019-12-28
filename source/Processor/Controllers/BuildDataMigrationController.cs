@@ -278,22 +278,13 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- verify design block installation
                     string returnUserError = "";
-                    if (!cp.Addon.InstallCollectionFromLibrary(Constants.designBlockCollectionGuid, ref returnUserError)) { throw new Exception("Error installing Design Blocks, required for data upgrade. " + returnUserError); }
+                    if (!cp.Db.IsTable("dbtext")){
+                        if (!cp.Addon.InstallCollectionFromLibrary(Constants.designBlockCollectionGuid, ref returnUserError)) { throw new Exception("Error installing Design Blocks, required for data upgrade. " + returnUserError); }
+                    }
                     //
                     // -- add a text block and childPageList to every page without an addonlist
                     foreach (var page in DbBaseModel.createList<PageContentModel>(cp, "(addonList is null)")) {
-                        // 
-                        // -- save copyFilename copy to new Text Block record
-                        string textBlockInstanceGuid = GenericController.createGuid();
-                        cp.Db.ExecuteNonQuery("insert into dbText (active,name,text,ccguid) values (1,'Text Block'," + cp.Db.EncodeSQLText(page.copyfilename.content) + "," + cp.Db.EncodeSQLText(textBlockInstanceGuid) + ")");
-                        // 
-                        // -- assign all child pages without a childpageListname to this new childpageList addon
-                        string childListInstanceGuid = GenericController.createGuid();
-                        cp.Db.ExecuteNonQuery("update ccpagecontent set parentListName=" + core.cpParent.Db.EncodeSQLText(childListInstanceGuid) + " where (parentId=" + page.id + ")and((parentListName='')or(parentListName is null))");
-                        //
-                        // -- set defaultAddonList.json into page.addonList
-                        string addonList = Resources.defaultAddonListJson.replace("{textBlockInstanceGuid}", textBlockInstanceGuid, StringComparison.InvariantCulture).replace("{childListInstanceGuid}", childListInstanceGuid, StringComparison.InvariantCulture);
-                        cp.Db.ExecuteNonQuery("update ccpagecontent set addonList=" + core.cpParent.Db.EncodeSQLText(addonList) + " where (id=" + page.id + ")");
+                        convertPageContentToAddonList(core, page);
                     }
                     core.siteProperties.setProperty("PageController Render Legacy Copy", false);
                 }
@@ -305,6 +296,22 @@ namespace Contensive.Processor.Controllers {
                 LogController.logError(core, ex);
                 throw;
             }
+        }
+        //
+        public static void convertPageContentToAddonList( CoreController core, PageContentModel page) {
+            // 
+            // -- save copyFilename copy to new Text Block record
+            string textBlockInstanceGuid = GenericController.createGuid();
+            core.cpParent.Db.ExecuteNonQuery("insert into dbText (active,name,text,ccguid) values (1,'Text Block'," + core.cpParent.Db.EncodeSQLText(page.copyfilename.content) + "," + core.cpParent.Db.EncodeSQLText(textBlockInstanceGuid) + ")");
+            // 
+            // -- assign all child pages without a childpageListname to this new childpageList addon
+            string childListInstanceGuid = GenericController.createGuid();
+            core.cpParent.Db.ExecuteNonQuery("update ccpagecontent set parentListName=" + core.cpParent.Db.EncodeSQLText(childListInstanceGuid) + " where (parentId=" + page.id + ")and((parentListName='')or(parentListName is null))");
+            //
+            // -- set defaultAddonList.json into page.addonList
+            string addonList = Resources.defaultAddonListJson.replace("{textBlockInstanceGuid}", textBlockInstanceGuid, StringComparison.InvariantCulture).replace("{childListInstanceGuid}", childListInstanceGuid, StringComparison.InvariantCulture);
+            core.cpParent.Db.ExecuteNonQuery("update ccpagecontent set addonList=" + core.cpParent.Db.EncodeSQLText(addonList) + " where (id=" + page.id + ")");
+
         }
         //
         //====================================================================================================

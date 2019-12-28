@@ -754,12 +754,16 @@ namespace Contensive.Processor.Controllers {
                                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
                                                                                 result = false;
                                                                                 return_ErrorMessage += "<P>Collection file contains a data.record node with a blank content attribute.</P>";
-                                                                                return false;
+                                                                                break;
                                                                             } else {
                                                                                 string ContentRecordGuid = XmlController.getXMLAttribute(core, IsFound, ContentNode, "guid", "");
                                                                                 string ContentRecordName = XmlController.getXMLAttribute(core, IsFound, ContentNode, "name", "");
                                                                                 if ((!string.IsNullOrEmpty(ContentRecordGuid)) || (!string.IsNullOrEmpty(ContentRecordName))) {
                                                                                     ContentMetadataModel metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
+                                                                                    bool isPageContent = metaData.name.ToLower().Equals("page content");
+                                                                                    bool pageCopyFilenameNotNull = false;
+                                                                                    bool pageAddonListNotNull = false;
+                                                                                    int recordId = 0;
                                                                                     using (var csData = new CsModel(core)) {
                                                                                         if (!string.IsNullOrEmpty(ContentRecordGuid)) {
                                                                                             csData.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
@@ -769,15 +773,17 @@ namespace Contensive.Processor.Controllers {
                                                                                         if (csData.ok()) {
                                                                                             //
                                                                                             // Update the record
+                                                                                            recordId = csData.getInteger("id");
                                                                                             foreach (XmlNode FieldNode in ContentNode.ChildNodes) {
                                                                                                 if (FieldNode.Name.ToLowerInvariant() == "field") {
+                                                                                                    // todo optimize 
                                                                                                     bool IsFieldFound = false;
-                                                                                                    string FieldName = XmlController.getXMLAttribute(core, IsFound, FieldNode, "name", "").ToLowerInvariant();
+                                                                                                    string FieldNameLc = XmlController.getXMLAttribute(core, IsFound, FieldNode, "name", "").ToLowerInvariant();
                                                                                                     CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
                                                                                                     int FieldLookupContentId = -1;
                                                                                                     foreach (var keyValuePair in metaData.fields) {
-                                                                                                        Models.Domain.ContentFieldMetadataModel field = keyValuePair.Value;
-                                                                                                        if (GenericController.toLCase(field.nameLc) == FieldName) {
+                                                                                                        ContentFieldMetadataModel field = keyValuePair.Value;
+                                                                                                        if (field.nameLc == FieldNameLc) {
                                                                                                             fieldTypeId = field.fieldTypeId;
                                                                                                             FieldLookupContentId = field.lookupContentId;
                                                                                                             IsFieldFound = true;
@@ -786,6 +792,8 @@ namespace Contensive.Processor.Controllers {
                                                                                                     }
                                                                                                     if (IsFieldFound) {
                                                                                                         string fieldValue = FieldNode.InnerText;
+                                                                                                        pageCopyFilenameNotNull |= isPageContent && FieldNameLc.Equals("copyfilename") && !string.IsNullOrWhiteSpace(fieldValue);
+                                                                                                        pageAddonListNotNull |= isPageContent && FieldNameLc.Equals("addonlist") && !string.IsNullOrWhiteSpace(fieldValue);
                                                                                                         switch (fieldTypeId) {
                                                                                                             case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
                                                                                                             case CPContentBaseClass.FieldTypeIdEnum.Redirect: {
@@ -796,29 +804,24 @@ namespace Contensive.Processor.Controllers {
                                                                                                             case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
                                                                                                                     //
                                                                                                                     // read in text value, if a guid, use it, otherwise assume name
-                                                                                                                    if (!string.IsNullOrWhiteSpace(fieldValue)) {
-                                                                                                                        if (FieldLookupContentId != 0) {
-                                                                                                                            var lookupContentMetadata = ContentMetadataModel.create(core, FieldLookupContentId);
-                                                                                                                            if (lookupContentMetadata != null) {
-                                                                                                                                int fieldLookupId = lookupContentMetadata.getRecordId(core, fieldValue);
-                                                                                                                                if (fieldLookupId <= 0) {
-                                                                                                                                    return_ErrorMessage += "<P>Warning: In collection [" + CollectionName + "], data section, record number [" + recordPtr + "], the lookup field [" + FieldName + "], value [" + fieldValue + "] was not found in lookup content [" + lookupContentMetadata.name + "].</P>";
-                                                                                                                                    return false;
-                                                                                                                                } else {
-                                                                                                                                    csData.set(FieldName, fieldLookupId);
-                                                                                                                                }
-                                                                                                                            }
-                                                                                                                        } else if (fieldValue.isNumeric()) {
-                                                                                                                            //
-                                                                                                                            // must be lookup list
-                                                                                                                            csData.set(FieldName, fieldValue);
-                                                                                                                        }
-
+                                                                                                                    if ((string.IsNullOrWhiteSpace(fieldValue)) || (FieldLookupContentId == 0)) {
+                                                                                                                        //
+                                                                                                                        // value empty or field not configured, just clear the field
+                                                                                                                        csData.set(FieldNameLc, 0);
+                                                                                                                        break;
                                                                                                                     }
+                                                                                                                    var lookupContentMetadata = ContentMetadataModel.create(core, FieldLookupContentId);
+                                                                                                                    if (lookupContentMetadata == null) {
+                                                                                                                        //
+                                                                                                                        // field not configured correctly, clear field
+                                                                                                                        csData.set(FieldNameLc, 0);
+                                                                                                                        break;
+                                                                                                                    }
+                                                                                                                    csData.set(FieldNameLc, lookupContentMetadata.getRecordId(core, fieldValue));
                                                                                                                     break;
                                                                                                                 }
                                                                                                             default: {
-                                                                                                                    csData.set(FieldName, fieldValue);
+                                                                                                                    csData.set(FieldNameLc, fieldValue);
                                                                                                                     break;
                                                                                                                 }
                                                                                                         }
@@ -826,6 +829,10 @@ namespace Contensive.Processor.Controllers {
                                                                                                 }
                                                                                             }
                                                                                         }
+                                                                                    }
+                                                                                    if (isPageContent && pageCopyFilenameNotNull && !pageAddonListNotNull) {
+                                                                                        PageContentModel page = DbBaseModel.create<PageContentModel>(core.cpParent, recordId);
+                                                                                        BuildDataMigrationController.convertPageContentToAddonList(core, page);
                                                                                     }
                                                                                 }
                                                                             }
