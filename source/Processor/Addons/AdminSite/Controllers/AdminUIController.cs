@@ -1078,24 +1078,21 @@ namespace Contensive.Processor.Addons.AdminSite.Controllers {
                             //
                             //
                             result.Append(HtmlController.inputHidden(SitePropertyName + "CheckBoxCnt", OptionCnt));
-                            break;
-
+                            return result.ToString();
                         }
                     case "radio": {
                             //
                             // Create Radio addon_execute_result
                             //
-                            break;
+                            return result.ToString();
                         }
                     default: {
                             //
                             // Create select addon_execute_result
                             //
-                            result.Append("<select name=\"" + SitePropertyName + "\" class=\"select form-control\">" + result + "</select>");
-                            break;
+                            return "<select name=\"" + SitePropertyName + "\" class=\"select form-control\">" + result + "</select>";
                         }
                 }
-                return result.ToString();
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 return string.Empty;
