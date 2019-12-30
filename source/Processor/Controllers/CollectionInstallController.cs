@@ -883,12 +883,6 @@ namespace Contensive.Processor.Controllers {
                                                     case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
                                                             //
                                                             // lookup
-                                                            if (string.IsNullOrWhiteSpace(fieldValue) || !fieldValue.isNumeric()) {
-                                                                //
-                                                                // value empty or not numeric, just clear the field
-                                                                csData.set(FieldNameLc, 0);
-                                                                break;
-                                                            }
                                                             if ((FieldLookupContentId != 0)) {
                                                                 //
                                                                 // content lookup
