@@ -26,5 +26,6 @@ namespace Contensive.Models.Db {
         public bool system { get; set; }
         public bool updatable { get; set; }
         public string wwwFileList { get; set; }
+        public int oninstalladdonid { get; set; }
     }
 }

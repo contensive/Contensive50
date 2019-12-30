@@ -197,7 +197,7 @@ namespace Contensive.Processor.Controllers {
                                         //------------------------------------------------------------------------------------------------------
                                         //
                                         bool IsFound = false;
-                                        string CollectionName = XmlController.getXMLAttribute(core, IsFound, Doc.DocumentElement, "name", "");
+                                        string CollectionName = XmlController.getXMLAttribute(core, ref IsFound, Doc.DocumentElement, "name", "");
                                         if (string.IsNullOrEmpty(CollectionName)) {
                                             //
                                             // ----- Error condition -- it must have a collection name
@@ -208,8 +208,10 @@ namespace Contensive.Processor.Controllers {
                                         } else {
                                             bool CollectionSystem_fileValueOK = false;
                                             bool CollectionUpdatable_fileValueOK = false;
-                                            //												Dim CollectionblockNavigatorNode_fileValueOK As Boolean
-                                            bool CollectionSystem = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
+                                            //
+                                            bool CollectionSystem = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
+                                            string collectionOninstalladdonGuid = XmlController.getXMLAttribute(core, ref CollectionSystem_fileValueOK, Doc.DocumentElement, "onInstallAddonGuid", "");
+                                            string dataRecordList = XmlController.getXMLAttribute(core, ref CollectionSystem_fileValueOK, Doc.DocumentElement, "DataRecordList", "");
                                             int Parent_NavId = BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel {
                                                 guid = addonGuidManageAddon,
                                                 name = "Manage Add-ons",
@@ -218,10 +220,10 @@ namespace Contensive.Processor.Controllers {
                                                 newWindow = false,
                                                 active = true,
                                             }, 0);
-                                            bool CollectionUpdatable = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""));
-                                            string onInstallAddonGuid = XmlController.getXMLAttribute(core, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "OnInstallAddonGuid", "");
-                                            bool CollectionblockNavigatorNode = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""));
-                                            string FileGuid = XmlController.getXMLAttribute(core, IsFound, Doc.DocumentElement, "guid", CollectionName);
+                                            bool CollectionUpdatable = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""));
+                                            string onInstallAddonGuid = XmlController.getXMLAttribute(core, ref CollectionUpdatable_fileValueOK, Doc.DocumentElement, "OnInstallAddonGuid", "");
+                                            bool CollectionblockNavigatorNode = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""));
+                                            string FileGuid = XmlController.getXMLAttribute(core, ref IsFound, Doc.DocumentElement, "guid", CollectionName);
                                             if (string.IsNullOrEmpty(FileGuid)) {
                                                 FileGuid = CollectionName;
                                             }
@@ -258,9 +260,9 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 // set wwwfilelist, contentfilelist, execfilelist
                                                                 //
-                                                                string resourceType = XmlController.getXMLAttribute(core, IsFound, MetaDataSection, "type", "");
-                                                                string resourcePath = XmlController.getXMLAttribute(core, IsFound, MetaDataSection, "path", "");
-                                                                string filename = XmlController.getXMLAttribute(core, IsFound, MetaDataSection, "name", "");
+                                                                string resourceType = XmlController.getXMLAttribute(core, ref IsFound, MetaDataSection, "type", "");
+                                                                string resourcePath = XmlController.getXMLAttribute(core, ref IsFound, MetaDataSection, "path", "");
+                                                                string filename = XmlController.getXMLAttribute(core, ref IsFound, MetaDataSection, "name", "");
                                                                 //
                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], resource found, name [" + filename + "], type [" + resourceType + "], path [" + resourcePath + "]");
                                                                 //
@@ -330,8 +332,8 @@ namespace Contensive.Processor.Controllers {
                                                                 // Get path to this collection and call into it
                                                                 //
                                                                 bool Found = false;
-                                                                string ChildCollectionName = XmlController.getXMLAttribute(core, Found, MetaDataSection, "name", "");
-                                                                string ChildCollectionGUId = XmlController.getXMLAttribute(core, Found, MetaDataSection, "guid", MetaDataSection.InnerText);
+                                                                string ChildCollectionName = XmlController.getXMLAttribute(core, ref Found, MetaDataSection, "name", "");
+                                                                string ChildCollectionGUId = XmlController.getXMLAttribute(core, ref Found, MetaDataSection, "guid", MetaDataSection.InnerText);
                                                                 if (string.IsNullOrEmpty(ChildCollectionGUId)) {
                                                                     ChildCollectionGUId = MetaDataSection.InnerText;
                                                                 }
@@ -390,7 +392,6 @@ namespace Contensive.Processor.Controllers {
                                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], App does not have this collection so it will be installed.");
                                                     OKToInstall = true;
                                                 }
-                                                string DataRecordList = "";
                                                 if (!OKToInstall) {
                                                     //
                                                     // Do not install, but still check all imported collections to see if they need to be installed
@@ -508,7 +509,7 @@ namespace Contensive.Processor.Controllers {
                                                                 foreach (XmlNode metaDataNode in NavDoc.DocumentElement.ChildNodes) {
                                                                     switch (GenericController.toLCase(metaDataNode.Name)) {
                                                                         case "cdef": {
-                                                                                string ContentName = XmlController.getXMLAttribute(core, IsFound, metaDataNode, "name", "");
+                                                                                string ContentName = XmlController.getXMLAttribute(core, ref IsFound, metaDataNode, "name", "");
                                                                                 //
                                                                                 // setup metadata rule
                                                                                 //
@@ -551,15 +552,15 @@ namespace Contensive.Processor.Controllers {
                                                                                 //
                                                                                 // Data.Record node
                                                                                 //
-                                                                                string ContentName = XmlController.getXMLAttribute(core, IsFound, ContentNode, "content", "");
+                                                                                string ContentName = XmlController.getXMLAttribute(core, ref IsFound, ContentNode, "content", "");
                                                                                 if (string.IsNullOrEmpty(ContentName)) {
                                                                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
                                                                                     result = false;
                                                                                     return_ErrorMessage += "<P>Collection file [" + CollectionName + "] contains a data.record node with a blank content attribute.</P>";
                                                                                     return false;
                                                                                 } else {
-                                                                                    string ContentRecordGuid = XmlController.getXMLAttribute(core, IsFound, ContentNode, "guid", "");
-                                                                                    string ContentRecordName = XmlController.getXMLAttribute(core, IsFound, ContentNode, "name", "");
+                                                                                    string ContentRecordGuid = XmlController.getXMLAttribute(core, ref IsFound, ContentNode, "guid", "");
+                                                                                    string ContentRecordName = XmlController.getXMLAttribute(core, ref IsFound, ContentNode, "name", "");
                                                                                     if ((string.IsNullOrEmpty(ContentRecordGuid)) && (string.IsNullOrEmpty(ContentRecordName))) {
                                                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" + ContentName + "]");
                                                                                         result = false;
@@ -594,19 +595,16 @@ namespace Contensive.Processor.Controllers {
                                                                                                     // found by guid, use guid in list and save name
                                                                                                     //
                                                                                                     csData.set("name", ContentRecordName);
-                                                                                                    DataRecordList = DataRecordList + Environment.NewLine + ContentName + "," + ContentRecordGuid;
                                                                                                 } else if (recordfound) {
                                                                                                     //
                                                                                                     // record found by name, use name is list but do not add guid
                                                                                                     //
-                                                                                                    DataRecordList = DataRecordList + Environment.NewLine + ContentName + "," + ContentRecordName;
                                                                                                 } else {
                                                                                                     //
                                                                                                     // record was created
                                                                                                     //
                                                                                                     csData.set("ccguid", ContentRecordGuid);
                                                                                                     csData.set("name", ContentRecordName);
-                                                                                                    DataRecordList = DataRecordList + Environment.NewLine + ContentName + "," + ContentRecordGuid;
                                                                                                 }
                                                                                             }
                                                                                         }
@@ -644,8 +642,8 @@ namespace Contensive.Processor.Controllers {
                                                                     //
                                                                     // processed, but add rule for collection record
                                                                     bool Found = false;
-                                                                    string ChildCollectionName = XmlController.getXMLAttribute(core, Found, metaDataSection, "name", "");
-                                                                    string ChildCollectionGUId = XmlController.getXMLAttribute(core, Found, metaDataSection, "guid", metaDataSection.InnerText);
+                                                                    string ChildCollectionName = XmlController.getXMLAttribute(core, ref Found, metaDataSection, "name", "");
+                                                                    string ChildCollectionGUId = XmlController.getXMLAttribute(core, ref Found, metaDataSection, "guid", metaDataSection.InnerText);
                                                                     if (string.IsNullOrEmpty(ChildCollectionGUId)) {
                                                                         ChildCollectionGUId = metaDataSection.InnerText;
                                                                     }
@@ -743,107 +741,8 @@ namespace Contensive.Processor.Controllers {
                                                     //-------------------------------------------------------------------------------
                                                     //
                                                     foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                        switch (GenericController.toLCase(metaDataSection.Name)) {
-                                                            case "data": {
-                                                                    int recordPtr = 0;
-                                                                    foreach (XmlNode ContentNode in metaDataSection.ChildNodes) {
-                                                                        if (ContentNode.Name.ToLowerInvariant() == "record") {
-                                                                            recordPtr += 1;
-                                                                            string ContentName = XmlController.getXMLAttribute(core, IsFound, ContentNode, "content", "");
-                                                                            if (string.IsNullOrEmpty(ContentName)) {
-                                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
-                                                                                result = false;
-                                                                                return_ErrorMessage += "<P>Collection file contains a data.record node with a blank content attribute.</P>";
-                                                                                break;
-                                                                            } else {
-                                                                                string ContentRecordGuid = XmlController.getXMLAttribute(core, IsFound, ContentNode, "guid", "");
-                                                                                string ContentRecordName = XmlController.getXMLAttribute(core, IsFound, ContentNode, "name", "");
-                                                                                if ((!string.IsNullOrEmpty(ContentRecordGuid)) || (!string.IsNullOrEmpty(ContentRecordName))) {
-                                                                                    ContentMetadataModel metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
-                                                                                    bool isPageContent = metaData.name.ToLower().Equals("page content");
-                                                                                    bool pageCopyFilenameNotNull = false;
-                                                                                    bool pageAddonListNotNull = false;
-                                                                                    int recordId = 0;
-                                                                                    using (var csData = new CsModel(core)) {
-                                                                                        if (!string.IsNullOrEmpty(ContentRecordGuid)) {
-                                                                                            csData.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
-                                                                                        } else {
-                                                                                            csData.open(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
-                                                                                        }
-                                                                                        if (csData.ok()) {
-                                                                                            //
-                                                                                            // Update the record
-                                                                                            recordId = csData.getInteger("id");
-                                                                                            foreach (XmlNode FieldNode in ContentNode.ChildNodes) {
-                                                                                                if (FieldNode.Name.ToLowerInvariant() == "field") {
-                                                                                                    // todo optimize 
-                                                                                                    bool IsFieldFound = false;
-                                                                                                    string FieldNameLc = XmlController.getXMLAttribute(core, IsFound, FieldNode, "name", "").ToLowerInvariant();
-                                                                                                    CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
-                                                                                                    int FieldLookupContentId = -1;
-                                                                                                    foreach (var keyValuePair in metaData.fields) {
-                                                                                                        ContentFieldMetadataModel field = keyValuePair.Value;
-                                                                                                        if (field.nameLc == FieldNameLc) {
-                                                                                                            fieldTypeId = field.fieldTypeId;
-                                                                                                            FieldLookupContentId = field.lookupContentId;
-                                                                                                            IsFieldFound = true;
-                                                                                                            break;
-                                                                                                        }
-                                                                                                    }
-                                                                                                    if (IsFieldFound) {
-                                                                                                        string fieldValue = FieldNode.InnerText;
-                                                                                                        pageCopyFilenameNotNull |= isPageContent && FieldNameLc.Equals("copyfilename") && !string.IsNullOrWhiteSpace(fieldValue);
-                                                                                                        pageAddonListNotNull |= isPageContent && FieldNameLc.Equals("addonlist") && !string.IsNullOrWhiteSpace(fieldValue);
-                                                                                                        switch (fieldTypeId) {
-                                                                                                            case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
-                                                                                                            case CPContentBaseClass.FieldTypeIdEnum.Redirect: {
-                                                                                                                    //
-                                                                                                                    // not supported
-                                                                                                                    break;
-                                                                                                                }
-                                                                                                            case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
-                                                                                                                    //
-                                                                                                                    // read in text value, if a guid, use it, otherwise assume name
-                                                                                                                    if ((string.IsNullOrWhiteSpace(fieldValue)) || (FieldLookupContentId == 0)) {
-                                                                                                                        //
-                                                                                                                        // value empty or field not configured, just clear the field
-                                                                                                                        csData.set(FieldNameLc, 0);
-                                                                                                                        break;
-                                                                                                                    }
-                                                                                                                    var lookupContentMetadata = ContentMetadataModel.create(core, FieldLookupContentId);
-                                                                                                                    if (lookupContentMetadata == null) {
-                                                                                                                        //
-                                                                                                                        // field not configured correctly, clear field
-                                                                                                                        csData.set(FieldNameLc, 0);
-                                                                                                                        break;
-                                                                                                                    }
-                                                                                                                    csData.set(FieldNameLc, lookupContentMetadata.getRecordId(core, fieldValue));
-                                                                                                                    break;
-                                                                                                                }
-                                                                                                            default: {
-                                                                                                                    csData.set(FieldNameLc, fieldValue);
-                                                                                                                    break;
-                                                                                                                }
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                    if (isPageContent && pageCopyFilenameNotNull && !pageAddonListNotNull) {
-                                                                                        PageContentModel page = DbBaseModel.create<PageContentModel>(core.cpParent, recordId);
-                                                                                        BuildDataMigrationController.convertPageContentToAddonList(core, page);
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    break;
-                                                                }
-                                                            default: {
-                                                                    // do nothing
-                                                                    break;
-                                                                }
+                                                        if(metaDataSection.Name.ToLower().Equals("data")) {
+                                                            installDataNode(core, metaDataSection, ref return_ErrorMessage);
                                                         }
                                                     }
                                                     //
@@ -858,21 +757,31 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // --- end of pass
                                                 }
-                                                collection.dataRecordList = DataRecordList;
+                                                //
+                                                // -- setup onInstall if included
+                                                int collectionOninstalladdonid = 0;
+                                                if (!string.IsNullOrWhiteSpace(collectionOninstalladdonGuid)) {
+                                                    var addon = DbBaseModel.create<AddonModel>(core.cpParent, collectionOninstalladdonGuid);
+                                                    if (addon != null) {
+                                                        collection.oninstalladdonid = collectionOninstalladdonid;
+                                                        collection.save(core.cpParent);
+                                                    }
+                                                }
+                                                collection.dataRecordList = dataRecordList;
                                                 collection.save(core.cpParent);
                                                 //
                                                 // -- test for diagnostic addon, warn if missing
                                                 if (!collectionIncludesDiagnosticAddon) {
                                                     //
                                                     // -- log warning. This collection does not have an install addon
-                                                    LogController.logWarn(core, "Collection does not include a Diagnostic addon, [" + collection.name + "]");
+                                                    LogController.logDebug(core, "Collection does not include a Diagnostic addon, [" + collection.name + "]");
                                                 }
                                                 //
                                                 // -- execute onInstall addon if found
                                                 if (string.IsNullOrEmpty(onInstallAddonGuid)) {
                                                     //
                                                     // -- log warning. This collection does not have an install addon
-                                                    LogController.logWarn(core, "Collection does not include an install addon, [" + collection.name + "]");
+                                                    LogController.logDebug(core, "Collection does not include an install addon, [" + collection.name + "]");
                                                 } else {
                                                     //
                                                     // -- install the install addon
@@ -911,6 +820,115 @@ namespace Contensive.Processor.Controllers {
                 contextLog.Pop();
             }
             return result;
+        }
+        //
+        //======================================================================================================
+        //
+        public static void installDataNode( CoreController core, XmlNode dataNode, ref string return_ErrorMessage) {
+            foreach (XmlNode ContentNode in dataNode.ChildNodes) {
+                if (ContentNode.Name.ToLowerInvariant() == "record") {
+                    bool isFound = false;
+                    string ContentName = XmlController.getXMLAttribute(core, ref isFound, ContentNode, "content", "");
+                    if (string.IsNullOrEmpty(ContentName)) {
+                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder, install collection file contains a data.record node with a blank content attribute.");
+                        return_ErrorMessage += "<P>Collection file contains a data.record node with a blank content attribute.</P>";
+                        break;
+                    } else {
+                        string ContentRecordGuid = XmlController.getXMLAttribute(core, ref isFound, ContentNode, "guid", "");
+                        string ContentRecordName = XmlController.getXMLAttribute(core, ref isFound, ContentNode, "name", "");
+                        if ((!string.IsNullOrEmpty(ContentRecordGuid)) || (!string.IsNullOrEmpty(ContentRecordName))) {
+                            ContentMetadataModel metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
+                            bool isPageContent = metaData.name.ToLower().Equals("page content");
+                            bool pageCopyFilenameNotNull = false;
+                            bool pageAddonListNotNull = false;
+                            int recordId = 0;
+                            using (var csData = new CsModel(core)) {
+                                if (!string.IsNullOrEmpty(ContentRecordGuid)) {
+                                    csData.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
+                                } else {
+                                    csData.open(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
+                                }
+                                if (csData.ok()) {
+                                    //
+                                    // Update the record
+                                    recordId = csData.getInteger("id");
+                                    foreach (XmlNode FieldNode in ContentNode.ChildNodes) {
+                                        if (FieldNode.Name.ToLowerInvariant() == "field") {
+                                            // todo optimize 
+                                            bool IsFieldFound = false;
+                                            string FieldNameLc = XmlController.getXMLAttribute(core, ref isFound, FieldNode, "name", "").ToLowerInvariant();
+                                            CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
+                                            int FieldLookupContentId = -1;
+                                            ContentFieldMetadataModel field = null;
+                                            foreach (var keyValuePair in metaData.fields) {
+                                                field = keyValuePair.Value;
+                                                if (field.nameLc == FieldNameLc) {
+                                                    fieldTypeId = field.fieldTypeId;
+                                                    FieldLookupContentId = field.lookupContentId;
+                                                    IsFieldFound = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (IsFieldFound) {
+                                                string fieldValue = FieldNode.InnerText;
+                                                pageCopyFilenameNotNull |= isPageContent && FieldNameLc.Equals("copyfilename") && !string.IsNullOrWhiteSpace(fieldValue);
+                                                pageAddonListNotNull |= isPageContent && FieldNameLc.Equals("addonlist") && !string.IsNullOrWhiteSpace(fieldValue);
+                                                switch (fieldTypeId) {
+                                                    case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
+                                                    case CPContentBaseClass.FieldTypeIdEnum.Redirect: {
+                                                            //
+                                                            // not supported
+                                                            break;
+                                                        }
+                                                    case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
+                                                            //
+                                                            // lookup
+                                                            if (string.IsNullOrWhiteSpace(fieldValue) || !fieldValue.isNumeric()) {
+                                                                //
+                                                                // value empty or not numeric, just clear the field
+                                                                csData.set(FieldNameLc, 0);
+                                                                break;
+                                                            }
+                                                            if ((FieldLookupContentId != 0)) {
+                                                                //
+                                                                // content lookup
+                                                                var lookupContentMetadata = ContentMetadataModel.create(core, FieldLookupContentId);
+                                                                if (lookupContentMetadata == null) {
+                                                                    //
+                                                                    // lookup not configured
+                                                                    csData.set(FieldNameLc, 0);
+                                                                    break;
+                                                                }
+                                                                csData.set(FieldNameLc, lookupContentMetadata.getRecordId(core, fieldValue));
+                                                                break;
+                                                            }
+                                                            if (!string.IsNullOrEmpty(field.lookupList)) {
+                                                                //
+                                                                // Lookup list
+                                                                csData.set(FieldNameLc, fieldValue);
+                                                                break;
+                                                            }
+                                                            csData.set(FieldNameLc, 0);
+                                                            break;
+                                                        }
+                                                    default: {
+                                                            csData.set(FieldNameLc, fieldValue);
+                                                            break;
+                                                        }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (isPageContent && pageCopyFilenameNotNull && !pageAddonListNotNull) {
+                                PageContentModel page = DbBaseModel.create<PageContentModel>(core.cpParent, recordId);
+                                BuildDataMigrationController.convertPageContentToAddonList(core, page);
+                            }
+                        }
+                    }
+                }
+            }
         }
         //
         //======================================================================================================
@@ -1120,15 +1138,15 @@ namespace Contensive.Processor.Controllers {
                 string Basename = GenericController.toLCase(AddonNode.Name);
                 if ((Basename == "page") || (Basename == "process") || (Basename == "addon") || (Basename == "add-on")) {
                     bool IsFound = false;
-                    string addonName = XmlController.getXMLAttribute(core, IsFound, AddonNode, "name", "No Name");
+                    string addonName = XmlController.getXMLAttribute(core, ref IsFound, AddonNode, "name", "No Name");
                     if (string.IsNullOrEmpty(addonName)) {
                         addonName = "No Name";
                     }
-                    string addonGuid = XmlController.getXMLAttribute(core, IsFound, AddonNode, "guid", addonName);
+                    string addonGuid = XmlController.getXMLAttribute(core, ref IsFound, AddonNode, "guid", addonName);
                     if (string.IsNullOrEmpty(addonGuid)) {
                         addonGuid = addonName;
                     }
-                    string navTypeName = XmlController.getXMLAttribute(core, IsFound, AddonNode, "type", "");
+                    string navTypeName = XmlController.getXMLAttribute(core, ref IsFound, AddonNode, "type", "");
                     int navTypeId = getListIndex(navTypeName, navTypeIDList);
                     if (navTypeId == 0) {
                         navTypeId = NavTypeIDAddon;
@@ -1245,9 +1263,9 @@ namespace Contensive.Processor.Controllers {
                                                                     int TriggerContentId = 0;
                                                                     string ContentNameorGuid = TriggerNode.InnerText;
                                                                     if (string.IsNullOrEmpty(ContentNameorGuid)) {
-                                                                        ContentNameorGuid = XmlController.getXMLAttribute(core, IsFound, TriggerNode, "guid", "");
+                                                                        ContentNameorGuid = XmlController.getXMLAttribute(core, ref IsFound, TriggerNode, "guid", "");
                                                                         if (string.IsNullOrEmpty(ContentNameorGuid)) {
-                                                                            ContentNameorGuid = XmlController.getXMLAttribute(core, IsFound, TriggerNode, "name", "");
+                                                                            ContentNameorGuid = XmlController.getXMLAttribute(core, ref IsFound, TriggerNode, "name", "");
                                                                         }
                                                                     }
                                                                     using (var CS2 = new CsModel(core)) {
@@ -1290,16 +1308,16 @@ namespace Contensive.Processor.Controllers {
                                                     // include add-ons - NOTE - import collections must be run before interfaces
                                                     // when importing a collectin that will be used for an include
                                                     //
-                                                    ScriptingLanguage = XmlController.getXMLAttribute(core, IsFound, Addonfield, "language", "");
+                                                    ScriptingLanguage = XmlController.getXMLAttribute(core, ref IsFound, Addonfield, "language", "");
                                                     if (ScriptingLanguage.ToLower(CultureInfo.InvariantCulture) == "jscript") {
                                                         scriptinglanguageid = (int)AddonController.ScriptLanguages.Javascript;
                                                     } else {
                                                         scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
                                                     }
                                                     cs.set("scriptinglanguageid", scriptinglanguageid);
-                                                    ScriptingEntryPoint = XmlController.getXMLAttribute(core, IsFound, Addonfield, "entrypoint", "");
+                                                    ScriptingEntryPoint = XmlController.getXMLAttribute(core, ref IsFound, Addonfield, "entrypoint", "");
                                                     cs.set("ScriptingEntryPoint", ScriptingEntryPoint);
-                                                    ScriptingTimeout = GenericController.encodeInteger(XmlController.getXMLAttribute(core, IsFound, Addonfield, "timeout", "5000"));
+                                                    ScriptingTimeout = GenericController.encodeInteger(XmlController.getXMLAttribute(core, ref IsFound, Addonfield, "timeout", "5000"));
                                                     cs.set("ScriptingTimeout", ScriptingTimeout);
                                                     ScriptingCode = "";
                                                     foreach (XmlNode ScriptingNode in Addonfield.ChildNodes) {
@@ -1330,9 +1348,9 @@ namespace Contensive.Processor.Controllers {
                                                     // create a navigator entry with a parent set to this
                                                     //
                                                     cs.save();
-                                                    menuNameSpace = XmlController.getXMLAttribute(core, IsFound, Addonfield, "NameSpace", "");
+                                                    menuNameSpace = XmlController.getXMLAttribute(core, ref IsFound, Addonfield, "NameSpace", "");
                                                     if (!string.IsNullOrEmpty(menuNameSpace)) {
-                                                        string NavIconTypeString = XmlController.getXMLAttribute(core, IsFound, Addonfield, "type", "");
+                                                        string NavIconTypeString = XmlController.getXMLAttribute(core, ref IsFound, Addonfield, "type", "");
                                                         if (string.IsNullOrEmpty(NavIconTypeString)) {
                                                             NavIconTypeString = "Addon";
                                                         }
@@ -1361,7 +1379,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // import exclusive style
                                                     //
-                                                    NodeName = XmlController.getXMLAttribute(core, IsFound, Addonfield, "name", "");
+                                                    NodeName = XmlController.getXMLAttribute(core, ref IsFound, Addonfield, "name", "");
                                                     NewValue = encodeText(Addonfield.InnerText).Trim(' ');
                                                     if (NewValue.left(1) != "{") {
                                                         NewValue = "{" + NewValue;
@@ -1413,7 +1431,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // icon
                                                     //
-                                                    FieldValue = XmlController.getXMLAttribute(core, IsFound, Addonfield, "link", "");
+                                                    FieldValue = XmlController.getXMLAttribute(core, ref IsFound, Addonfield, "link", "");
                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                         //
                                                         // Icons can be either in the root of the website or in content files
@@ -1439,9 +1457,9 @@ namespace Contensive.Processor.Controllers {
                                                         }
                                                         cs.set("IconFilename", FieldValue);
                                                         {
-                                                            cs.set("IconWidth", GenericController.encodeInteger(XmlController.getXMLAttribute(core, IsFound, Addonfield, "width", "0")));
-                                                            cs.set("IconHeight", GenericController.encodeInteger(XmlController.getXMLAttribute(core, IsFound, Addonfield, "height", "0")));
-                                                            cs.set("IconSprites", GenericController.encodeInteger(XmlController.getXMLAttribute(core, IsFound, Addonfield, "sprites", "0")));
+                                                            cs.set("IconWidth", GenericController.encodeInteger(XmlController.getXMLAttribute(core, ref IsFound, Addonfield, "width", "0")));
+                                                            cs.set("IconHeight", GenericController.encodeInteger(XmlController.getXMLAttribute(core, ref IsFound, Addonfield, "height", "0")));
+                                                            cs.set("IconSprites", GenericController.encodeInteger(XmlController.getXMLAttribute(core, ref IsFound, Addonfield, "sprites", "0")));
                                                         }
                                                     }
                                                     break;
@@ -1548,11 +1566,11 @@ namespace Contensive.Processor.Controllers {
                 string Basename = GenericController.toLCase(AddonNode.Name);
                 if ((Basename == "page") || (Basename == "process") || (Basename == "addon") || (Basename == "add-on")) {
                     bool IsFound = false;
-                    string AOName = XmlController.getXMLAttribute(core, IsFound, AddonNode, "name", "No Name");
+                    string AOName = XmlController.getXMLAttribute(core, ref IsFound, AddonNode, "name", "No Name");
                     if (string.IsNullOrEmpty(AOName)) { AOName = "No Name"; }
-                    string AOGuid = XmlController.getXMLAttribute(core, IsFound, AddonNode, "guid", AOName);
+                    string AOGuid = XmlController.getXMLAttribute(core, ref IsFound, AddonNode, "guid", AOName);
                     if (string.IsNullOrEmpty(AOGuid)) { AOGuid = AOName; }
-                    string AddOnType = XmlController.getXMLAttribute(core, IsFound, AddonNode, "type", "");
+                    string AddOnType = XmlController.getXMLAttribute(core, ref IsFound, AddonNode, "type", "");
                     string Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(AOGuid) + ")";
                     using (var csData = new CsModel(core)) {
                         if (csData.open(AddonModel.tableMetadata.contentName, Criteria, "", false)) {
@@ -1581,8 +1599,8 @@ namespace Contensive.Processor.Controllers {
                                                 // include add-ons - NOTE - import collections must be run before interfaces
                                                 // when importing a collectin that will be used for an include
                                                 //
-                                                string IncludeAddonName = XmlController.getXMLAttribute(core, IsFound, PageInterface, "name", "");
-                                                string IncludeAddonGuid = XmlController.getXMLAttribute(core, IsFound, PageInterface, "guid", IncludeAddonName);
+                                                string IncludeAddonName = XmlController.getXMLAttribute(core, ref IsFound, PageInterface, "name", "");
+                                                string IncludeAddonGuid = XmlController.getXMLAttribute(core, ref IsFound, PageInterface, "guid", IncludeAddonName);
                                                 int IncludeAddonId = 0;
                                                 Criteria = "";
                                                 if (!string.IsNullOrEmpty(IncludeAddonGuid)) {

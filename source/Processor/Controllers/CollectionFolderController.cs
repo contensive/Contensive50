@@ -132,8 +132,8 @@ namespace Contensive.Processor.Controllers {
                             //
                             // Collection File
                             //
-                            string Collectionname = XmlController.getXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "name", "");
-                            string collectionGuid = XmlController.getXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "guid", Collectionname);
+                            string Collectionname = XmlController.getXMLAttribute(core, ref IsFound, CollectionFile.DocumentElement, "name", "");
+                            string collectionGuid = XmlController.getXMLAttribute(core, ref IsFound, CollectionFile.DocumentElement, "guid", Collectionname);
                             if ((!collectionsInstalledList.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture))) && (!collectionsDownloaded.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture)))) {
                                 if (string.IsNullOrEmpty(Collectionname)) {
                                     //
@@ -174,8 +174,8 @@ namespace Contensive.Processor.Controllers {
                                         case "importcollection":
                                             //
                                             // -- Download Collection file into install folder
-                                            ChildCollectionName = XmlController.getXMLAttribute(core, Found, metaDataSection, "name", "");
-                                            ChildCollectionGUID = XmlController.getXMLAttribute(core, Found, metaDataSection, "guid", metaDataSection.InnerText);
+                                            ChildCollectionName = XmlController.getXMLAttribute(core, ref Found, metaDataSection, "name", "");
+                                            ChildCollectionGUID = XmlController.getXMLAttribute(core, ref Found, metaDataSection, "guid", metaDataSection.InnerText);
                                             if (string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                 ChildCollectionGUID = metaDataSection.InnerText;
                                             }

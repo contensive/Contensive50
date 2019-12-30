@@ -223,6 +223,22 @@ namespace Contensive.BaseClasses {
         public abstract bool SaveUpload(string htmlFormName, string folderPath, ref string returnFilename);
         //
         //==========================================================================================
+        /// <summary>
+        /// Returns the path of a pathFilename argument. For example "folder1/folder2/file.txt" returns "folder1/folder2/"
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <returns></returns>
+        public abstract string GetPath(string pathFilename);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Returns the path of a pathFilename argument. For example "folder1/folder2/file.txt" returns "file.txt"
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <returns></returns>
+        public abstract string GetFilename(string pathFilename);
+        //
+        //==========================================================================================
         // deprecated
         //
     }

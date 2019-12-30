@@ -149,6 +149,27 @@ namespace Contensive.Processor {
         public override bool SaveUpload(string htmlformName, string folderpath, ref string returnFilename) {
             return fileSystemController.upload(htmlformName, folderpath, ref  returnFilename);
         }
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Returns the path of a pathFilename argument. For example "folder1/folder2/file.txt" returns "folder1/folder2/"
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <returns></returns>
+        public override string GetPath(string pathFilename) {
+            return FileController.getPath(pathFilename);
+        }
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Returns the path of a pathFilename argument. For example "folder1/folder2/file.txt" returns "file.txt"
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <returns></returns>
+        public override string GetFilename(string pathFilename) {
+            return FileController.getFilename(pathFilename);
+        }
+
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
