@@ -1279,10 +1279,10 @@ namespace Contensive.Processor.Controllers {
         //
         public static string inputHidden(string htmlName, string htmlValue, string htmlClass, string htmlId) {
             string attrList = "<input type=hidden";
-            attrList += (string.IsNullOrEmpty(htmlName)) ? "" : " name=\"" + htmlName + "\"";
-            attrList += (string.IsNullOrEmpty(htmlValue)) ? "" : " value=\"" + htmlValue + "\"";
-            attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
-            attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+            attrList += (string.IsNullOrEmpty(htmlName)) ? "" : " name=\"" + encodeHtml( htmlName ) + "\"";
+            attrList += (string.IsNullOrEmpty(htmlValue)) ? "" : " value=\"" + encodeHtml(htmlValue) + "\"";
+            attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + encodeHtml(htmlId) + "\"";
+            attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + encodeHtml(htmlClass) + "\"";
             return attrList + ">";
         }
         public static string inputHidden(string name, string value) => inputHidden(name, value, "", "");
