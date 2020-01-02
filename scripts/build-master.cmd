@@ -13,13 +13,15 @@ set NuGetLocalPackagesFolder=C:\NuGetLocalPackages\
 set year=%date:~12,4%
 set month=%date:~4,2%
 set day=%date:~7,2%
-set versionMinor=%year%
-set versionBuild=%month%%day%
+if %day% GEQ 10 goto dateOk
+set day=%date:~8,1%
+:dateOk
+set versionMinor=%year%%month%
+set versionBuild=%day%
 set versionRevision=1
 rem
 rem if deployment folder exists, delete it and make directory
 rem
-
 :tryagain
 set versionNumber=%versionMajor%.%versionMinor%.%versionBuild%.%versionRevision%
 if not exist "%deploymentFolderRoot%%versionNumber%" goto :makefolder
@@ -27,7 +29,6 @@ set /a versionRevision=%versionRevision%+1
 goto tryagain
 :makefolder
 md "%deploymentFolderRoot%%versionNumber%"
-
 rem ==============================================================
 rem
 rem clean build folders
@@ -89,7 +90,7 @@ cd ..\source\cpbase51
 IF EXIST "Contensive.CPBaseClass.%versionNumber%.nupkg" (
 	del "Contensive.CPBaseClass.%versionNumber%.nupkg" /Q
 )
-"nuget.exe" pack "Contensive.CPBaseClass.nuspec" -version %versionNumber%
+"nuget.exe" pack "Contensive.CPBaseClass.nuspec" -version "%versionNumber%"
 if errorlevel 1 (
    echo failure in nuget CPBase
    pause
