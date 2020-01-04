@@ -311,7 +311,6 @@ namespace Contensive.Processor.Controllers {
             // -- set defaultAddonList.json into page.addonList
             string addonList = Resources.defaultAddonListJson.replace("{textBlockInstanceGuid}", textBlockInstanceGuid, StringComparison.InvariantCulture).replace("{childListInstanceGuid}", childListInstanceGuid, StringComparison.InvariantCulture);
             core.cpParent.Db.ExecuteNonQuery("update ccpagecontent set addonList=" + core.cpParent.Db.EncodeSQLText(addonList) + " where (id=" + page.id + ")");
-
         }
         //
         //====================================================================================================

@@ -34,19 +34,19 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// true if the filesystem is local, false if files transfered through the local system to the remote system
         /// </summary>
-        private bool isLocal { get; set; }
+        private bool isLocal { get; }
         /// <summary>
         /// local location for files accessed by this filesystem, starts with drive-letter, ends with dos slash \
         /// </summary>
-        public string localAbsRootPath { get; set; }
+        public string localAbsRootPath { get; }
         /// <summary>
         /// For remote files, this path is prefixed to the content. starts with subfolder name, ends in uniz slash /
         /// </summary>
-        private string remotePathPrefix { get; set; }
+        private string remotePathPrefix { get; }
         /// <summary>
         /// list of files to delete when this object is disposed
         /// </summary>
-        public List<string> deleteOnDisposeFileList { get; set; } = new List<string>();
+        public List<string> deleteOnDisposeFileList { get; } = new List<string>();
         /// <summary>
         /// for remote filesystem, a lazy created s3 client
         /// </summary>
@@ -82,6 +82,41 @@ namespace Contensive.Processor.Controllers {
                 this.localAbsRootPath = normalizeDosPath(rootLocalPath);
                 this.remotePathPrefix = normalizeDosPath(remotePathPrefix);
             }
+        }
+        //
+        //==============================================================================================================
+        /// <summary>
+        /// Create a remote filesystem
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="rootLocalPath"></param>
+        /// <param name="remotePathPrefix">If not isLocal, this is added to the remote content path. Ex a\ with content b\c.txt = a\b\c.txt</param>
+        public FileController(CoreController core, string rootLocalPath, string remotePathPrefix) {
+            if (string.IsNullOrEmpty(rootLocalPath)) {
+                LogController.logError(core, new ArgumentException("Attempt to create a FileController with blank rootLocalpath."));
+                throw new GenericException("Attempt to create a FileController with blank rootLocalpath");
+            }
+            this.core = core;
+            this.isLocal = false;
+            this.localAbsRootPath = normalizeDosPath(rootLocalPath);
+            this.remotePathPrefix = normalizeDosPath(remotePathPrefix);
+        }
+        //
+        //==============================================================================================================
+        /// <summary>
+        /// Create a local filesystem
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="rootLocalPath"></param>
+        public FileController(CoreController core, string rootLocalPath) {
+            if (string.IsNullOrEmpty(rootLocalPath)) {
+                LogController.logError(core, new ArgumentException("Attempt to create a FileController with blank rootLocalpath."));
+                throw new GenericException("Attempt to create a FileController with blank rootLocalpath.");
+            }
+            this.core = core;
+            this.isLocal = true;
+            this.localAbsRootPath = normalizeDosPath(rootLocalPath);
+            this.remotePathPrefix = "";
         }
         //
         //==============================================================================================================
@@ -1058,7 +1093,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="srcPath"></param>
         /// <param name="dstPath"></param>
         /// <param name="dstFileSystem"></param>
-        public void copyFolder(string srcPath, string dstPath, FileController dstFileSystem = null) {
+        public void copyPath(string srcPath, string dstPath, FileController dstFileSystem = null) {
             try {
                 srcPath = normalizeDosPath(srcPath);
                 dstPath = normalizeDosPath(dstPath);
@@ -1152,11 +1187,15 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //==============================================================================================================
-        //
-        public void zipFile(string archivePathFilename, string addPathFilename) {
+        /// <summary>
+        /// Zip a folder and add to a zip file
+        /// </summary>
+        /// <param name="archivePathFilename"></param>
+        /// <param name="path"></param>
+        public void zipPath(string archivePathFilename, string path) {
             try {
                 archivePathFilename = normalizeDosPathFilename(archivePathFilename);
-                addPathFilename = normalizeDosPathFilename(addPathFilename);
+                path = normalizeDosPath(path);
                 //
                 string archivepath = "";
                 string archiveFilename = "";
@@ -1164,7 +1203,7 @@ namespace Contensive.Processor.Controllers {
                 FastZip fastZip = new FastZip();
                 string fileFilter = null;
                 bool recurse = true;
-                fastZip.CreateZip(convertRelativeToLocalAbsPath(archivePathFilename), convertRelativeToLocalAbsPath(addPathFilename), recurse, fileFilter);
+                fastZip.CreateZip(convertRelativeToLocalAbsPath(archivePathFilename), convertRelativeToLocalAbsPath(path), recurse, fileFilter);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

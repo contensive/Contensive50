@@ -62,11 +62,11 @@ namespace Contensive.Processor.Controllers {
                 // -- body Javascript
                 bool allowDebugging = core.visitProperty.getBoolean("AllowDebugging");
                 var scriptOnLoad = new List<string>();
-                foreach (var asset in core.doc.htmlAssetList.FindAll((a) => ((a.assetType == HtmlAssetTypeEnum.script) || (a.assetType == HtmlAssetTypeEnum.scriptOnLoad)) && (!a.inHead) && (!string.IsNullOrEmpty(a.content)))) {
+                foreach (var asset in core.doc.htmlAssetList.FindAll((a) => ((a.assetType == CPDocBaseClass.HtmlAssetTypeEnum.script) || (a.assetType == CPDocBaseClass.HtmlAssetTypeEnum.scriptOnLoad)) && (!a.inHead) && (!string.IsNullOrEmpty(a.content)))) {
                     if ((asset.addedByMessage != "") && allowDebugging) {
                         result.Add(Environment.NewLine + "<!-- from " + asset.addedByMessage + " -->\r\n");
                     }
-                    if (asset.assetType == HtmlAssetTypeEnum.scriptOnLoad) {
+                    if (asset.assetType == CPDocBaseClass.HtmlAssetTypeEnum.scriptOnLoad) {
                         scriptOnLoad.Add(asset.content + ";");
                     }
                     if (!asset.isLink) {
@@ -2859,19 +2859,19 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.htmlAssetList.Count > 0) {
                     List<string> headScriptList = new List<string>();
                     List<string> styleList = new List<string>();
-                    foreach (var asset in core.doc.htmlAssetList.FindAll((HtmlAssetClass item) => (item.inHead))) {
+                    foreach (var asset in core.doc.htmlAssetList.FindAll((CPDocBaseClass.HtmlAssetClass item) => (item.inHead))) {
                         string debugComment = "";
                         if ((core.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
                             debugComment = Environment.NewLine + "<!-- added by " + HtmlController.encodeHtml(asset.addedByMessage) + " -->";
                         }
-                        if (asset.assetType.Equals(HtmlAssetTypeEnum.style)) {
+                        if (asset.assetType.Equals(CPDocBaseClass.HtmlAssetTypeEnum.style)) {
                             styleList.Add(debugComment);
                             if (asset.isLink) {
                                 styleList.Add(Environment.NewLine + "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + asset.content + "\" >");
                             } else {
                                 styleList.Add(Environment.NewLine + "<style>" + asset.content + "</style>");
                             }
-                        } else if (asset.assetType.Equals(HtmlAssetTypeEnum.script)) {
+                        } else if (asset.assetType.Equals(CPDocBaseClass.HtmlAssetTypeEnum.script)) {
                             headScriptList.Add(debugComment);
                             if (asset.isLink) {
                                 headScriptList.Add(Environment.NewLine + "<script type=\"text/javascript\" src=\"" + asset.content + "\"></script>");
@@ -2902,8 +2902,8 @@ namespace Contensive.Processor.Controllers {
         public void addScriptCode_onLoad(string code, string addedByMessage) {
             try {
                 if (!string.IsNullOrEmpty(code)) {
-                    core.doc.htmlAssetList.Add(new HtmlAssetClass {
-                        assetType = HtmlAssetTypeEnum.scriptOnLoad,
+                    core.doc.htmlAssetList.Add(new CPDocBaseClass.HtmlAssetClass {
+                        assetType = CPDocBaseClass.HtmlAssetTypeEnum.scriptOnLoad,
                         addedByMessage = addedByMessage,
                         isLink = false,
                         content = code
@@ -2919,7 +2919,7 @@ namespace Contensive.Processor.Controllers {
         public void addScriptCode(string code, string addedByMessage, bool forceHead = false, int sourceAddonId = 0) {
             try {
                 if (!string.IsNullOrWhiteSpace(code)) {
-                    HtmlAssetClass asset = null;
+                    CPDocBaseClass.HtmlAssetClass asset = null;
                     if (sourceAddonId != 0) {
                         asset = core.doc.htmlAssetList.Find(t => ((t.sourceAddonId == sourceAddonId) && (!t.isLink)));
                     }
@@ -2930,8 +2930,8 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // add to list
-                        core.doc.htmlAssetList.Add(new HtmlAssetClass {
-                            assetType = HtmlAssetTypeEnum.script,
+                        core.doc.htmlAssetList.Add(new CPDocBaseClass.HtmlAssetClass {
+                            assetType = CPDocBaseClass.HtmlAssetTypeEnum.script,
                             inHead = forceHead,
                             addedByMessage = addedByMessage,
                             isLink = false,
@@ -2950,7 +2950,7 @@ namespace Contensive.Processor.Controllers {
         public void addScriptLinkSrc(string scriptLinkSrc, string addedByMessage, bool forceHead = false, int sourceAddonId = 0) {
             try {
                 if (!string.IsNullOrWhiteSpace(scriptLinkSrc)) {
-                    HtmlAssetClass asset = null;
+                    CPDocBaseClass.HtmlAssetClass asset = null;
                     if (sourceAddonId != 0) {
                         asset = core.doc.htmlAssetList.Find(t => ((t.content == scriptLinkSrc) && (t.isLink)));
                     }
@@ -2961,8 +2961,8 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // add to list
-                        core.doc.htmlAssetList.Add(new HtmlAssetClass {
-                            assetType = HtmlAssetTypeEnum.script,
+                        core.doc.htmlAssetList.Add(new CPDocBaseClass.HtmlAssetClass {
+                            assetType = CPDocBaseClass.HtmlAssetTypeEnum.script,
                             addedByMessage = addedByMessage,
                             isLink = true,
                             inHead = forceHead,
@@ -3019,9 +3019,9 @@ namespace Contensive.Processor.Controllers {
         public void addStyleLink(string StyleSheetLink, string addedByMessage) {
             try {
                 if (!string.IsNullOrEmpty(StyleSheetLink.Trim())) {
-                    core.doc.htmlAssetList.Add(new HtmlAssetClass {
+                    core.doc.htmlAssetList.Add(new CPDocBaseClass.HtmlAssetClass {
                         addedByMessage = addedByMessage,
-                        assetType = HtmlAssetTypeEnum.style,
+                        assetType = CPDocBaseClass.HtmlAssetTypeEnum.style,
                         inHead = true,
                         isLink = true,
                         content = StyleSheetLink

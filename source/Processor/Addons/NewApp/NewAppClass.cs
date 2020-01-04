@@ -23,20 +23,21 @@ namespace Contensive.Processor.Addons.NewApp {
                 DateTime rightNow = DateTime.Now;
                 //
                 using (CPClass cpServer = new CPClass()) {
-                    AppConfigModel appConfig = new AppConfigModel();
-                    //
-                    // -- enable it
-                    appConfig.enabled = true;
-                    //
-                    // -- private key
-                    appConfig.privateKey = Processor.Controllers.GenericController.getGUIDNaked();
-                    //
-                    // -- allow site monitor
-                    appConfig.allowSiteMonitor = false;
-                    appConfig.name = appName;
-                    //
-                    // -- admin route
-                    appConfig.adminRoute = "admin";
+                    AppConfigModel appConfig = new AppConfigModel {
+                        //
+                        // -- enable it
+                        enabled = true,
+                        //
+                        // -- private key
+                        privateKey = Processor.Controllers.GenericController.getGUIDNaked(),
+                        //
+                        // -- allow site monitor
+                        allowSiteMonitor = false,
+                        name = appName,
+                        //
+                        // -- admin route
+                        adminRoute = "admin"
+                    };
                     //
                     // -- domain
                     domainName = "www." + appConfig.name + ".com";

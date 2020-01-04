@@ -87,18 +87,35 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Copy a file within the same filesystem (TempFiles, cndFiles, wwwFiles, privateFiles)
         /// </summary>
-        /// <param name="sourceFilename"></param>
-        /// <param name="destinationFilename"></param>
-        public abstract void Copy(string sourceFilename, string destinationFilename);
+        /// <param name="sourcePathFilename"></param>
+        /// <param name="destinationPathFilename"></param>
+        public abstract void Copy(string sourcePathFilename, string destinationPathFilename);
         //
         //==========================================================================================
         /// <summary>
         /// Copy a file to a different filesystem (TempFiles, cndFiles, wwwFiles, privateFiles)
         /// </summary>
-        /// <param name="sourceFilename"></param>
-        /// <param name="destinationFilename"></param>
+        /// <param name="sourcePathFilename"></param>
+        /// <param name="destinationPathFilename"></param>
         /// <param name="destinationFileSystem"></param>
-        public abstract void Copy(string sourceFilename, string destinationFilename, CPFileSystemBaseClass destinationFileSystem);
+        public abstract void Copy(string sourcePathFilename, string destinationPathFilename, CPFileSystemBaseClass destinationFileSystem);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Recursively copy all files in a path to a path the same filesystem (TempFiles, cndFiles, wwwFiles, privateFiles). A path is either blank or begins with a folder name and ends with '\'. Valid sample paths are '', 'MyFolder\SubFolder\'
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="destinationPath"></param>
+        public abstract void CopyPath(string sourcePath, string destinationPath);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Recursively copy all files in a path to a path in a different filesystem (TempFiles, cndFiles, wwwFiles, privateFiles). A path is either blank or begins with a folder name and ends with '\'. Valid sample paths are '', 'MyFolder\SubFolder\'
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="destinationPath"></param>
+        /// <param name="destinationFileSystem"></param>
+        public abstract void CopyPath(string sourcePath, string destinationPath, CPFileSystemBaseClass destinationFileSystem);
         //
         //==========================================================================================
         /// <summary>
@@ -237,6 +254,21 @@ namespace Contensive.BaseClasses {
         /// <param name="pathFilename"></param>
         /// <returns></returns>
         public abstract string GetFilename(string pathFilename);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Create a zip file and add all the files in a path recursively
+        /// </summary>
+        /// <param name="archivePathFilename"></param>
+        /// <param name="path"></param>
+        public abstract void ZipPath(string archivePathFilename, string path);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// unzip a zip file to a folder with the same name
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        public abstract void UnzipFile(string pathFilename);
         //
         //==========================================================================================
         // deprecated

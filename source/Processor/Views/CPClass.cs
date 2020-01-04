@@ -554,7 +554,7 @@ namespace Contensive.Processor {
         public override CPFileSystemBaseClass TempFiles {
             get {
                 if (_FileTemp == null) {
-                    _FileTemp = new CPFileSystemClass(this, core.tempFiles);
+                    _FileTemp = new CPFileSystemClass(core.tempFiles);
                 }
                 return _FileTemp;
             }
@@ -568,7 +568,7 @@ namespace Contensive.Processor {
         public override CPFileSystemBaseClass WwwFiles {
             get {
                 if (_FileAppRoot == null) {
-                    _FileAppRoot = new CPFileSystemClass(this, core.wwwFiles);
+                    _FileAppRoot = new CPFileSystemClass(core.wwwFiles);
                 }
                 return _FileAppRoot;
             }
@@ -582,7 +582,7 @@ namespace Contensive.Processor {
         public override CPFileSystemBaseClass PrivateFiles {
             get {
                 if (_PrivateFiles == null) {
-                    _PrivateFiles = new CPFileSystemClass(this, core.privateFiles);
+                    _PrivateFiles = new CPFileSystemClass(core.privateFiles);
                 }
                 return _PrivateFiles;
             }
@@ -596,7 +596,7 @@ namespace Contensive.Processor {
         public override CPFileSystemBaseClass CdnFiles {
             get {
                 if (_CdnFiles == null) {
-                    _CdnFiles = new CPFileSystemClass(this, core.cdnFiles);
+                    _CdnFiles = new CPFileSystemClass(core.cdnFiles);
                 }
                 return _CdnFiles;
             }

@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using Contensive.BaseClasses;
 using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor {
@@ -16,7 +17,7 @@ namespace Contensive.Processor {
         /// Constructor
         /// </summary>
         /// <param name="core"></param>
-        public CPFileSystemClass(CPClass cp, FileController fileSystemController) {
+        public CPFileSystemClass(FileController fileSystemController) {
             this.fileSystemController = fileSystemController;
         }
         //
@@ -60,6 +61,19 @@ namespace Contensive.Processor {
         }
         //
         //==========================================================================================
+        //
+        public override void CopyPath(string sourcePath, string destinationPath) {
+            fileSystemController.copyPath(sourcePath, destinationPath);
+        }
+        //
+        //==========================================================================================
+        //
+        public override void CopyPath(string sourcePath, string destinationPath, CPFileSystemBaseClass destinationFileSystem) {
+            fileSystemController.copyPath(sourcePath, destinationPath, ((CPFileSystemClass)destinationFileSystem).fileSystemController);
+        }
+        //
+        //==========================================================================================
+        //
         public override void CopyLocalToRemote(string pathFilename) {
             fileSystemController.copyFileLocalToRemote(pathFilename);
         }
@@ -147,7 +161,7 @@ namespace Contensive.Processor {
         //==========================================================================================
         //
         public override bool SaveUpload(string htmlformName, string folderpath, ref string returnFilename) {
-            return fileSystemController.upload(htmlformName, folderpath, ref  returnFilename);
+            return fileSystemController.upload(htmlformName, folderpath, ref returnFilename);
         }
         //
         //==========================================================================================
@@ -169,7 +183,21 @@ namespace Contensive.Processor {
         public override string GetFilename(string pathFilename) {
             return FileController.getFilename(pathFilename);
         }
-
+        //
+        //==========================================================================================
+        //
+        public override void ZipPath(string archivePathFilename, string path) {
+            fileSystemController.zipPath(archivePathFilename, path);
+        }
+        //
+        //==========================================================================================
+        //
+        public override void UnzipFile(string pathFilename) {
+            fileSystemController.unzipFile(pathFilename);
+        }
+        //
+        //==========================================================================================
+        //
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
@@ -193,12 +221,11 @@ namespace Contensive.Processor {
             }
             disposed_filesystem = true;
         }
-        public void Dispose()   {
+        public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-        ~CPFileSystemClass()  { 
+        ~CPFileSystemClass() {
             Dispose(false);
         }
         #endregion

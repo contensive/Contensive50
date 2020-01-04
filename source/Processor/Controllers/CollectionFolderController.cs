@@ -160,7 +160,7 @@ namespace Contensive.Processor.Controllers {
                                 CollectionVersionFolderName = verifyCollectionVersionFolderName(core, collectionGuid, Collectionname);
                                 string CollectionVersionFolder = AddonController.getPrivateFilesAddonPath() + CollectionVersionFolderName;
                                 //
-                                core.privateFiles.copyFolder(tmpInstallPath, CollectionVersionFolder);
+                                core.privateFiles.copyPath(tmpInstallPath, CollectionVersionFolder);
                                 //
                                 // -- iterate through all nodes of this collection xml file and install all dependencies
                                 foreach (XmlNode metaDataSection in CollectionFile.DocumentElement.ChildNodes) {

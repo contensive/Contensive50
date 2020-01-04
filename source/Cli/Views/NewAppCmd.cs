@@ -27,15 +27,10 @@ namespace Contensive.CLI {
         /// <param name="appName"></param>
         public static void execute(string appName) {
             try {
-                //
-                // -- if you get a cluster object from cp with a key, and the key gives you access, you have a cluster object to create an app
-                bool promptForArguments = string.IsNullOrWhiteSpace(appName);
-                string domainName = "";
                 const string iisDefaultDoc = "default.aspx";
-                string authToken;
                 string authTokenDefault = "909903";
-                DateTime rightNow = DateTime.Now;
-                authToken = authTokenDefault;
+                string authToken = authTokenDefault;
+                string domainName = "";
                 //
                 using (CPClass cp = new CPClass()) {
                     if (!cp.serverOk) {
@@ -43,16 +38,20 @@ namespace Contensive.CLI {
                         return;
                     }
                     Console.Write("\n\nCreate an application within the server group [" + cp.core.serverConfig.name + "]. The application name can contain upper and lower case alpha numeric characters with no spaces or special characters. This name will be used to create and identity resources and should not be changed later.");
-                    AppConfigModel appConfig = new AppConfigModel();
+                    AppConfigModel appConfig = new AppConfigModel {
+                        //
+                        // -- enable it
+                        enabled = true,
+                        //
+                        // -- private key
+                        privateKey = Processor.Controllers.GenericController.getGUIDNaked(),
+                        //
+                        // -- allow site monitor
+                        allowSiteMonitor = false
+                    };
                     //
-                    // -- enable it
-                    appConfig.enabled = true;
-                    //
-                    // -- private key
-                    appConfig.privateKey = Processor.Controllers.GenericController.getGUIDNaked();
-                    //
-                    // -- allow site monitor
-                    appConfig.allowSiteMonitor = false;
+                    // -- if you get a cluster object from cp with a key, and the key gives you access, you have a cluster object to create an app
+                    bool promptForArguments = string.IsNullOrWhiteSpace(appName);
                     //
                     // -- create app
                     if (promptForArguments) {
@@ -63,14 +62,15 @@ namespace Contensive.CLI {
                             Assembly myAssembly = Assembly.GetAssembly(myType);
                             AssemblyName myAssemblyname = myAssembly.GetName();
                             Version myVersion = myAssemblyname.Version;
+                            DateTime rightNow = DateTime.Now;
                             string appNameDefault = "app" + Contensive.Processor.Controllers.GenericController.getDateTimeNumberString(rightNow);
                             Console.Write("\n\nEnter your application name. It must start with a letter and contain only letters and numbers.");
                             appName = GenericController.promptForReply("\nApplication Name:", appNameDefault).ToLowerInvariant();
-                            if ( string.IsNullOrWhiteSpace( appName )) {
+                            if (string.IsNullOrWhiteSpace(appName)) {
                                 Console.Write("\nThis application name is not valid because it cannot be blank.");
                                 continue;
                             }
-                            if (!char.IsLetter(appName,0)) {
+                            if (!char.IsLetter(appName, 0)) {
                                 Console.Write("\nThis application name is not valid because it must start with a letter.");
                                 continue;
                             }
@@ -135,7 +135,7 @@ namespace Contensive.CLI {
                             appConfig.cdnFileUrl = "https://s3.amazonaws.com/" + cp.core.serverConfig.awsBucketName + "/" + appConfig.name + "/files/";
                         }
                     } else {
-                        if(cp.core.serverConfig.isLocalFileSystem) {
+                        if (cp.core.serverConfig.isLocalFileSystem) {
                             //
                             // Server is local file Mode, compatible with v4.1, cdn in appRoot folder as /" + appConfig.name + "/files/
                             //
@@ -208,6 +208,19 @@ namespace Contensive.CLI {
                     Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Verify website.");
                     Processor.Controllers.WebServerController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
                     //
+                    Processor.Controllers.LogController.logInfo(cp.core, "Install iisDefaultSite.");
+                    var tempFiles = new Processor.Controllers.FileController(cp.core,cp.TempFiles.PhysicalFilePath);
+                    cp.core.programFiles.copyFile( @"\defaultaspxsite.zip", @"\defaultaspxsite.zip", tempFiles);
+                    cp.TempFiles.UnzipFile(@"\defaultaspxsite.zip");
+                    string srcPath = getZipSrcTempPath(cp,"Content", "Web.config");
+                    if (string.IsNullOrWhiteSpace(srcPath)) {
+                        Console.WriteLine("The installation on this server does not include a valid DefaultAspxSite.zip file.");
+                        return;
+                    }
+                    cp.TempFiles.CopyPath(srcPath, @"", cp.WwwFiles);
+                    cp.TempFiles.DeleteFile(@"\defaultaspxsite.zip");
+                    cp.TempFiles.DeleteFolder(@"content");
+                    //
                     Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Run db upgrade.");
                     Processor.Controllers.BuildController.upgrade(cp.core, true, true);
                     //
@@ -235,6 +248,36 @@ namespace Contensive.CLI {
             DirectorySecurity dSecurity = dInfo.GetAccessControl();
             dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.None, AccessControlType.Allow));
             dInfo.SetAccessControl(dSecurity);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// recursively search a folder for a target file. If found return its path, else return empty
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="startPath"></param>
+        /// <param name="targetFilename"></param>
+        /// <returns></returns>
+        public static string getZipSrcTempPath(CPClass cp, string startPath, string targetFilename) {
+            if(!string.IsNullOrWhiteSpace(startPath)) {
+                startPath += (startPath.right(1).Equals(@"/")) ? "" : "/";
+            }
+            foreach( var file in cp.TempFiles.FileList(startPath)) {
+                if(file.Name.Equals(targetFilename,StringComparison.InvariantCultureIgnoreCase)) { 
+                    //
+                    // -- target file found, return this path
+                    return startPath; 
+                }
+            }
+            foreach( var folder in cp.TempFiles.FolderList(startPath)) {
+                string targetPath = getZipSrcTempPath(cp, startPath + folder.Name + @"/", targetFilename);
+                if (!string.IsNullOrEmpty(targetPath)) {
+                    //
+                    // -- target file found in this folder, return this path
+                    return targetPath;
+                }
+            }
+            return string.Empty;
         }
     }
 }

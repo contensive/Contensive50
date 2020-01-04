@@ -294,7 +294,7 @@ namespace Contensive.Processor.Controllers {
                 if (_tmpFiles == null) {
                     //
                     // local server -- everything is ephemeral
-                    _tmpFiles = new FileController(this, true, appConfig.localTempPath, "");
+                    _tmpFiles = new FileController(this, appConfig.localTempPath);
                 }
                 return _tmpFiles;
             }
@@ -332,7 +332,7 @@ namespace Contensive.Processor.Controllers {
                 if (System.IO.File.Exists("D:\\Contensive\\config.json")) {
                     //
                     // -- prefer D:\contensive
-                    _programDataFiles = new FileController(this, true, "D:\\Contensive\\", "");
+                    _programDataFiles = new FileController(this, "D:\\Contensive\\");
                     return _programDataFiles;
                 }
                 var driveNameList = new List<string>();
@@ -343,7 +343,7 @@ namespace Contensive.Processor.Controllers {
                         // drive.name looks like "C:\\"
                         driveNameList.Add(drive.Name);
                         if (!System.IO.File.Exists(drive.Name + "Contensive\\config.json")) { continue; }
-                        _programDataFiles = new FileController(this, true, drive.Name + "Contensive\\", "");
+                        _programDataFiles = new FileController(this, drive.Name + "Contensive\\");
                         return _programDataFiles;
                     }
                 }
@@ -351,7 +351,7 @@ namespace Contensive.Processor.Controllers {
                 // -- legacy, use c:\program data\contensive, deprecated because all application data should be stored on one drive for portability, and decrease backup costs
                 string legacyProgramFilesFolder = FileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\";
                 if (System.IO.Directory.Exists(legacyProgramFilesFolder)) {
-                    _programDataFiles = new FileController(this, true, legacyProgramFilesFolder, "");
+                    _programDataFiles = new FileController(this, legacyProgramFilesFolder);
                     return _programDataFiles;
                 }
                 //
@@ -359,13 +359,13 @@ namespace Contensive.Processor.Controllers {
                 if ( driveNameList.Contains("D:\\")) {
                     //
                     // -- d-drive exists, create a new folder in d:\contensive
-                    _programDataFiles = new FileController(this, true, FileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\", "");
+                    _programDataFiles = new FileController(this,  FileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\");
                     return _programDataFiles;
                 }
                 //
                 // -- no d-drive exists, create a new folder in c:\contensive
                 System.IO.Directory.CreateDirectory("C:\\");
-                _programDataFiles = new FileController(this, true, FileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\", "");
+                _programDataFiles = new FileController(this, FileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\");
                 return _programDataFiles;
             }
         }
@@ -395,7 +395,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- always local
-                    _programFiles = new FileController(this, true, serverConfig.programFilesPath, "");
+                    _programFiles = new FileController(this, serverConfig.programFilesPath);
                 }
                 return _programFiles;
             }
@@ -717,7 +717,7 @@ namespace Contensive.Processor.Controllers {
             Assembly myAssembly = Assembly.GetAssembly(myType);
             AssemblyName myAssemblyname = myAssembly.GetName();
             Version myVersion = myAssemblyname.Version;
-            return myVersion.Major.ToString("0") + "." + myVersion.Minor.ToString("00") + "." + myVersion.Build.ToString("0000") + "." + myVersion.Revision.ToString("00");
+            return myVersion.Major.ToString("0") + "." + myVersion.Minor.ToString("00") + "." + myVersion.Build.ToString("0") + "." + myVersion.Revision.ToString("0");
         }
         //
         //====================================================================================================

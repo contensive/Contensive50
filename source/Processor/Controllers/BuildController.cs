@@ -1099,7 +1099,9 @@ namespace Contensive.Processor.Controllers {
             if (core.siteProperties.getInteger("LandingPageID", landingPage.id) == 0) {
                 core.siteProperties.setProperty("LandingPageID", landingPage.id);
             }
-
+            //
+            // -- convert the data to textblock and addonlist
+            BuildDataMigrationController.convertPageContentToAddonList(core, landingPage);
         }
     }
 }

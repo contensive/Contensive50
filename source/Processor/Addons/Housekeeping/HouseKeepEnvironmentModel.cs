@@ -23,7 +23,14 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public DateTime visitArchiveDate { get; set; }
         public string defaultMemberName { get; set; }
         public int guestArchiveAgeDays { get; set; }
+        /// <summary>
+        /// how many days the email drop and email log data are kept
+        /// </summary>
         public int emailDropArchiveAgeDays { get; set; }
+        /// <summary>
+        /// How many days the email log stores the email body (large data)
+        /// </summary>
+        public int emailLogBodyRetainDays { get; set; }
         public bool archiveDeleteNoCookie { get; set; }
         public string sqlDateMidnightTwoDaysAgo { get; set; }
         public DateTime midnightTwoDaysAgo { get; set; }
@@ -74,6 +81,10 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     emailDropArchiveAgeDays = 2;
                     core.siteProperties.setProperty("ArchiveEmailDropAgeDays", emailDropArchiveAgeDays.ToString());
                 }
+                //
+                // -- Get emailLogBodyRetainDays -- 
+                emailLogBodyRetainDays = GenericController.encodeInteger(core.siteProperties.getText("EmailLogBodyRetainDays", "7"));
+                //
                 defaultMemberName = ContentFieldMetadataModel.getDefaultValue(core, "people", "name");
                 //
                 // Check for site's archive time of day

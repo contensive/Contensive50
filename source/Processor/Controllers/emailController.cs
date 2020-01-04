@@ -925,13 +925,15 @@ namespace Contensive.Processor.Controllers {
                         if (emailData.attempts >= 3) {
                             //
                             // -- too many retries, log error
+                            string sendStatus = "Failed after 3 retries, reason [" + reasonForFail + "]";
+                            sendStatus = sendStatus.Substring(0, (sendStatus.Length > 254) ? 254 : sendStatus.Length);
                             var log = EmailLogModel.addDefault<EmailLogModel>(core.cpParent);
                             log.name = "Aborting unsuccessful send: " + queueRecord.name;
                             log.toAddress = emailData.toAddress;
                             log.fromAddress = emailData.fromAddress;
                             log.subject = emailData.subject;
                             log.body = emailData.htmlBody;
-                            log.sendStatus = "failed after 3 retries, reason [" + reasonForFail + "]";
+                            log.sendStatus = sendStatus;
                             log.logType = EmailLogTypeImmediateSend;
                             log.emailId = emailData.emailId;
                             log.memberId = emailData.toMemberId;

@@ -1268,25 +1268,15 @@ namespace Contensive.Processor.Controllers {
         //========================================================================
         //
         public DataTable getIndexSchemaData(string tableName) {
-            DataTable returnDt = new DataTable();
             try {
-                if (string.IsNullOrEmpty(tableName.Trim())) {
+                if (string.IsNullOrWhiteSpace(tableName)) {
                     throw new ArgumentException("tablename cannot be blank");
-                } else {
-                    string connString = getConnectionStringADONET(core.appConfig.name);
-                    using (SqlConnection connSQL = new SqlConnection(connString)) {
-                        connSQL.Open();
-                        returnDt = connSQL.GetSchema("Indexes", new[] { core.appConfig.name, null, tableName, null });
-                    }
                 }
-                //
-                returnDt = executeQuery("sys.sp_helpindex @objname = N'" + tableName + "'");
-                // EXEC sys.sp_helpindex @objname = N'cccontent' returns index_name, index_keys (comma delimited field list)
+                return executeQuery("sys.sp_helpindex @objname = N'" + tableName + "'");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnDt;
         }
         //
         //=============================================================================

@@ -21,14 +21,11 @@ namespace Contensive.Processor {
         }
         //
         public override List<HtmlAssetClass> HtmlAssetList {
+
             get{
-                if (_htmlAssetList == null) {
-                    _htmlAssetList = new List<HtmlAssetClass>();
-                }
-                return _htmlAssetList;
+                return cp.core.doc.htmlAssetList;
             }
         }
-        private List<HtmlAssetClass> _htmlAssetList = null;
         //
         //====================================================================================================
         /// <summary>

@@ -302,6 +302,7 @@ namespace Contensive.Processor.Controllers {
                                                                             if (GenericController.toLCase(filename.Substring(filename.Length - 4)) == ".zip") {
                                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping www file [" + core.appConfig.localWwwPath + dstDosPath + filename + "].");
                                                                                 core.wwwFiles.unzipFile(dstDosPath + filename);
+                                                                                core.wwwFiles.deleteFile(dstDosPath + filename);
                                                                             }
                                                                             break;
                                                                         }
@@ -313,6 +314,7 @@ namespace Contensive.Processor.Controllers {
                                                                             if (GenericController.toLCase(filename.Substring(filename.Length - 4)) == ".zip") {
                                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping content file [" + dstDosPath + filename + "].");
                                                                                 core.cdnFiles.unzipFile(dstDosPath + filename);
+                                                                                core.cdnFiles.deleteFile(dstDosPath + filename);
                                                                             }
                                                                             break;
                                                                         }
