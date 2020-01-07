@@ -18,31 +18,18 @@ namespace Contensive.CLI {
                     return;
                 }
                 //
-                // -- create an instance of cp to execute commands
-                using (Processor.CPClass cpServer = new Processor.CPClass()) {
-                    ////
-                    //// -- for dev environment, fix programfiles path 
-                    //if (String.IsNullOrEmpty(cpServer.core.serverConfig.programFilesPath)) {
-                    //    string executePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
-                    //    if (executePath.ToLowerInvariant().IndexOf("\\git\\") == 0) {
-                    //        //  -- save if not in developer execution path
-                    //        cpServer.core.serverConfig.programFilesPath = executePath;
-                    //    } else {
-                    //        //  -- developer, fake a path
-                    //        cpServer.core.serverConfig.programFilesPath = "c:\\Program Files (x86)\\kma\\Contensive5\\";
-                    //    }
-                    //    cpServer.core.serverConfig.save(cpServer.core);
-                    //}
+                // -- loop through arguments and execute each command
+                string appName = "";
+                argPtr = 0;
+                while (true) {
+
                     //
-                    if (!cpServer.serverOk) {
-                        Console.WriteLine("Server Configuration not loaded correctly. Please run --configure");
-                        return;
-                    }
-                    //
-                    // -- loop through arguments and execute each command
-                    string appName = "";
-                    argPtr = 0;
-                    while (true) {
+                    // -- create an instance of cp to execute commands
+                    using (Processor.CPClass cpServer = new Processor.CPClass()) {
+                        if (!cpServer.serverOk) {
+                            Console.WriteLine("Server Configuration not loaded correctly. Please run --configure");
+                            return;
+                        }
                         string cmd = getNextCmd(args, ref argPtr);
                         switch (cmd.ToLowerInvariant()) {
                             case "--pause":
@@ -70,7 +57,7 @@ namespace Contensive.CLI {
                                 }
                             case "--getcache": {
                                     string key = getNextCmdArg(args, ref argPtr);
-                                    GetCacheCmd.execute(cpServer, appName, key );
+                                    GetCacheCmd.execute(cpServer, appName, key);
                                     break;
                                 }
                             case "-i":
@@ -89,7 +76,7 @@ namespace Contensive.CLI {
                                 }
                                 string testFilename = argumentFilename;
                                 if (!System.IO.File.Exists(testFilename)) {
-                                    testFilename = System.IO.Directory.GetCurrentDirectory() + ((argumentFilename.Substring(0,1)=="\\") ? "" : "\\") + argumentFilename;
+                                    testFilename = System.IO.Directory.GetCurrentDirectory() + ((argumentFilename.Substring(0, 1) == "\\") ? "" : "\\") + argumentFilename;
                                     if (!System.IO.File.Exists(argumentFilename)) {
                                         Console.WriteLine("The filename argument could not be found [" + argumentFilename + "].");
                                         return;
@@ -222,8 +209,8 @@ namespace Contensive.CLI {
                                 Console.WriteLine("Command not recognized [" + cmd + "]. Run cc.exe with no arguments for help.");
                                 break;
                         }
-                    }
-                };
+                    };
+                }
             } catch (Exception ex) {
                 Console.WriteLine("There was an error that forced the program to close. Details follow.\n\n" + ex);
             }
