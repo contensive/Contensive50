@@ -314,7 +314,7 @@ namespace Contensive.Processor {
                             { "filename", filename }
                         }
                     };
-                    TaskSchedulerController.addTaskToQueue(cp.core, cmdDetail, false);
+                    TaskSchedulerController.addTaskToQueue(cp.core, cmdDetail, false, exportName, filename );
                 }
             } catch (Exception) {
                 throw;
