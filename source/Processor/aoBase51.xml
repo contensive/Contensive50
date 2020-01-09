@@ -2679,6 +2679,7 @@
     <ArgumentList><![CDATA[List Name]]></ArgumentList>
     <IncludeAddon name="JQuery UI" guid="{840B9AEF-9470-4599-BD47-7EC0C9298614}"/>
     <Content>Yes</Content>
+	<Category>Extras.Navigation</Category>
   </Addon>
   <Addon name="Page Manager" guid="{3a01572e-0f08-4feb-b189-18371752a3c3}" type="Add-on">
     <Category>System</Category>
@@ -2925,6 +2926,7 @@
     <DotNetClass><![CDATA[Contensive.Processor.Addons.PageManager.SeeAlsoClass]]></DotNetClass>
     <Content>Yes</Content>
     <Template>Yes</Template>
+	<Category>Extras.Feeds/Lists</Category>
   </Addon>
   <Addon name="Whats Related" guid="{42B8FE19-051B-4E83-8F9A-6BE01AB9A650}" type="Add-on">
     <Category>Navigation</Category>
@@ -2932,6 +2934,7 @@
     <DotNetClass><![CDATA[Contensive.Processor.Addons.PageManager.WhatsRelatedClass]]></DotNetClass>
     <Content>Yes</Content>
     <Template>Yes</Template>
+	<Category>Extras.Advertisements</Category>
   </Addon>
   
   <SQLIndex IndexName="ccContentContentTableID" DataSourceName="Default" TableName="ccContent" FieldNameList="ContentTableID"  />
