@@ -660,9 +660,17 @@ namespace Contensive.Processor {
         internal const int AdminMenuModeHidden = 0; // menu is hidden
         internal const int AdminMenuModeLeft = 1; // menu on the left
         internal const int AdminMenuModeTop = 2; // menu as dropdowns from the top
-        //
-        internal const int AdminFormRoot = 0; // intro page
+        /// <summary>
+        /// dashboard page
+        /// </summary>
+        internal const int AdminFormRoot = 0;
+        /// <summary>
+        /// list of records
+        /// </summary>
         internal const int AdminFormIndex = 1; // record list page
+        /// <summary>
+        /// edit a record
+        /// </summary>
         internal const int AdminFormEdit = 4; // Edit form for system format records
         internal const int AdminFormClose = 10; // Special Case - do a window close instead of displaying a form
         internal const int AdminFormReports = 12; // Call Reports form (admin only)

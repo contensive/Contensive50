@@ -19,7 +19,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 // Page View Summary
                 //
                 {
-                    DateTime datePtr = default(DateTime);
+                    DateTime datePtr = default;
                     using (var csData = new CsModel(core)) {
                         if (!csData.openSql(core.db.getSQLSelect("ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + env.oldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
                             datePtr = env.oldestVisitSummaryWeCareAbout;

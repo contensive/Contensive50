@@ -309,7 +309,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 }
                             case AdminFormClearCache: {
-                                    adminBody = ToolClearCache.get(cp.core);
+                                    adminBody = cp.core.addon.execute("{7B5B8150-62BE-40F4-A66A-7CC74D99BA76}",new CPUtilsBaseClass.addonExecuteContext() { 
+                                         addonType = CPUtilsBaseClass.addonContext.ContextAdmin
+                                    });
                                     break;
                                 }
                             case AdminFormResourceLibrary: {
