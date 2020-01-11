@@ -296,6 +296,7 @@
     <Compile Include="Controllers\BuildController.cs" />
     <Compile Include="Controllers\CacheController.cs" />
     <Compile Include="Controllers\ContentCmdController.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Models\Domain\DocPropertyModel.cs" />
     <Compile Include="Models\Domain\CsModel.cs" />
     <Compile Include="Controllers\DbController.cs" />

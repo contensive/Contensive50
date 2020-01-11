@@ -1035,12 +1035,12 @@ namespace Contensive.Processor {
         public void set(string fieldName, string fieldValue) {
             try {
                 if (!ok()) { throw new ArgumentException("dataset is not valid or End-Of-file."); }
-                if (string.IsNullOrEmpty(fieldName.Trim())) { throw new ArgumentException("fieldName cannnot be blank"); }
+                if (string.IsNullOrWhiteSpace(fieldName)) { throw new ArgumentException("fieldName cannnot be blank"); }
                 if (!this.createdWithMetaData) { throw new GenericException("Cannot update a contentset created from a sql query."); }
                 if (this.contentMeta == null) { throw new GenericException("Cannot update a contentset created with meta data."); }
                 if (string.IsNullOrEmpty(this.contentMeta.name)) { throw new GenericException("Cannot update a contentset created with invalid meta data."); }
                 string FieldNameLc = fieldName.Trim(' ').ToLowerInvariant();
-                if (!this.contentMeta.fields.ContainsKey(FieldNameLc)) { throw new ArgumentException("The field [" + fieldName + "] could Not be found In content [" + this.contentMeta.name + "]"); }
+                if (!this.contentMeta.fields.ContainsKey(FieldNameLc)) { throw new ArgumentException("The field [" + FieldNameLc + "] could not be found In content [" + this.contentMeta.name + "]"); }
                 ContentFieldMetadataModel field = this.contentMeta.fields[FieldNameLc];
                 string rawValueForDb = fieldValue ?? string.Empty;
                 bool SetNeeded = false;
