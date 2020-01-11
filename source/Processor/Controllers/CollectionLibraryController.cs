@@ -33,7 +33,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// class logger initialization
         /// </summary>
-        private static Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = NLog.LogManager.GetCurrentClassLogger();
         //
         //====================================================================================================
         /// <summary>
@@ -226,7 +226,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="logPrefix"></param>
         /// <param name="collectionsInstalledList"></param>
         /// <returns></returns>
-        public static bool installCollectionFromLibrary(CoreController core, Stack<string> contextLog, string collectionGuid, ref string return_ErrorMessage, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList) {
+        public static bool installCollectionFromLibrary(CoreController core, bool isDependency, Stack<string> contextLog, string collectionGuid, ref string return_ErrorMessage, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList) {
             bool UpgradeOK = true;
             try {
                 //
@@ -242,12 +242,12 @@ namespace Contensive.Processor.Controllers {
                     core.privateFiles.createPath(privateFilesDownloadPath);
                     //
                     // -- download the collection file into the download path from the collectionGuid provided
-                    DateTime CollectionLastModifiedDate = default(DateTime);
+                    DateTime CollectionLastModifiedDate = default;
                     if (CollectionLibraryController.downloadCollectionFromLibrary(core, privateFilesDownloadPath, collectionGuid, ref CollectionLastModifiedDate, ref return_ErrorMessage)) {
                         //
                         // -- build the collection folders for all collection files in the download path and created a list of collection Guids that need to be installed
                         var collectionsDownloaded = new List<string>();
-                        CollectionInstallController.installCollectionsFromPrivateFolder(core, contextLog, privateFilesDownloadPath, ref return_ErrorMessage, ref collectionsInstalledList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
+                        CollectionInstallController.installCollectionsFromPrivateFolder(core, isDependency, contextLog, privateFilesDownloadPath, ref return_ErrorMessage, ref collectionsInstalledList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
                     }
                     //
                     // -- delete the temporary install folder

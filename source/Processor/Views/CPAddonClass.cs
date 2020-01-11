@@ -157,7 +157,7 @@ namespace Contensive.Processor {
                 var installedCollections = new List<string>();
                 var context = new Stack<string>();
                 context.Push("Api call cp.addon.InstallCollectionFile [" + privatePathFilename + "]");
-                returnOk = Controllers.CollectionInstallController.installCollectionFromPrivateFile(cp.core, context, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
+                returnOk = Controllers.CollectionInstallController.installCollectionFromPrivateFile(cp.core, false, context, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
             } catch (Exception ex) {
                 Controllers.LogController.logError(cp.core, ex);
                 if (!cp.core.siteProperties.trapErrors) {
@@ -187,7 +187,8 @@ namespace Contensive.Processor {
             var collectionsDownloaded = new List<string>();
             var context = new Stack<string>();
             context.Push("Api call cp.addon.InstallCollectionFromFolder [" + privateFolder + "]");
-            return CollectionInstallController.installCollectionsFromPrivateFolder(cp.core, context, privateFolder, ref ignoreUserMessage, ref collectionsInstalledList, false, false, ref ignoreList2, logPrefix, true, ref collectionsDownloaded);
+            bool isDependency = false;
+            return CollectionInstallController.installCollectionsFromPrivateFolder(cp.core, isDependency, context, privateFolder, ref ignoreUserMessage, ref collectionsInstalledList, false, false, ref ignoreList2, logPrefix, true, ref collectionsDownloaded);
         }
         //
         public override int InstallCollectionsFromFolderAsync(string privateFolder, bool deleteFolderWhenDone) {
@@ -205,7 +206,7 @@ namespace Contensive.Processor {
             var nonCriticalErrorList = new List<string>();
             var context = new Stack<string>();
             context.Push("Api call cp.addon.InstallCollectionFromLibrary [" + collectionGuid + "]");
-            return CollectionLibraryController.installCollectionFromLibrary(cp.core, context, collectionGuid, ref ignoreUserMessage, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+            return CollectionLibraryController.installCollectionFromLibrary(cp.core, false, context, collectionGuid, ref ignoreUserMessage, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
         }
         //
         public override int InstallCollectionFromLibraryAsync(string collectionGuid) {

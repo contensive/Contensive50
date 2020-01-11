@@ -81,7 +81,7 @@ namespace Contensive.CLI {
                 var nonCriticalErrorList = new List<string>();
                 var collectionsInstalled = new List<string>();
                 string collectionGuidsInstalled = "";
-                CollectionInstallController.installCollectionFromPrivateFile(cpApp.core, contextLog, privatePathFilename, ref return_ErrorMessage, ref collectionGuidsInstalled, false, false, ref nonCriticalErrorList, logPrefix, ref collectionsInstalled);
+                CollectionInstallController.installCollectionFromPrivateFile(cpApp.core, false, contextLog, privatePathFilename, ref return_ErrorMessage, ref collectionGuidsInstalled, false, false, ref nonCriticalErrorList, logPrefix, ref collectionsInstalled);
                 if (!string.IsNullOrEmpty(returnErrorMessage)) {
                     Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                 } else {
