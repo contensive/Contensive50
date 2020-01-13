@@ -2650,206 +2650,333 @@
   </CDef>
 
   <Addon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}" type="Add-on">
-    <Category>System</Category>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
     <BlockEditTools>Yes</BlockEditTools>
     <jsheadscriptsrc>https://s3.amazonaws.com/cdn.contensive.com/assets/20191130/adminUI.js</jsheadscriptsrc>
     <styleslinkhref>https://s3.amazonaws.com/cdn.contensive.com/assets/20191130/adminUI.css</styleslinkhref>
     <IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-    <IncludeAddon name="Bootstrap Styles" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
-    <IncludeAddon name="Bootstrap Javascript" guid="{0D898BA4-E5FC-474A-82A3-E52DEFC307E5}"/>
+    <IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
   </Addon>
   <Addon name="Admin Site" guid="{c2de2acf-ca39-4668-b417-aa491e7d8460}" type="Add-on">
-    <Category>System</Category>
-    <DotNetClass><![CDATA[Contensive.Processor.Addons.AdminSite.GetHtmlBodyClass]]></DotNetClass>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
     <BlockEditTools>Yes</BlockEditTools>
+    <DotNetClass><![CDATA[Contensive.Processor.Addons.AdminSite.GetHtmlBodyClass]]></DotNetClass>
     <jsheadscriptsrc></jsheadscriptsrc>
     <styleslinkhref></styleslinkhref>
     <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
     <htmlDocument>Yes</htmlDocument>
   </Addon>
   <Addon name="setAdminSiteFieldHelp" guid="{a89a0a11-cbdd-4bb5-995e-0dfaaf3e3111}" type="Add-on">
-    <Category>System</Category>
-    <DotNetClass><![CDATA[Contensive.Processor.Addons.AdminSite.setAdminSiteFieldHelpClass]]></DotNetClass>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
     <BlockEditTools>Yes</BlockEditTools>
+    <DotNetClass><![CDATA[Contensive.Processor.Addons.AdminSite.setAdminSiteFieldHelpClass]]></DotNetClass>
     <RemoteMethod>Yes</RemoteMethod>
   </Addon>
   <Addon name="Child Page List" guid="{D291F133-AB50-4640-9A9A-18DB68FF363B}" type="Add-on">
-    <Category>Navigation</Category>
+    <Category>Extras.Navigation</Category>
+    <Admin>No</Admin>
+    <Content>Yes</Content>
+    <Template>Yes</Template>
+    <Email>No</Email>
+    <BlockEditTools>No</BlockEditTools>
     <DotNetClass><![CDATA[Contensive.Processor.Addons.PageManager.getChildPageList]]></DotNetClass>
+    <copytext></copytext>
     <ArgumentList><![CDATA[List Name]]></ArgumentList>
     <IncludeAddon name="JQuery UI" guid="{840B9AEF-9470-4599-BD47-7EC0C9298614}"/>
-    <Content>Yes</Content>
-	<Category>Extras.Navigation</Category>
   </Addon>
   <Addon name="Page Manager" guid="{3a01572e-0f08-4feb-b189-18371752a3c3}" type="Add-on">
-    <Category>System</Category>
-    <DotNetClass><![CDATA[Contensive.Processor.Addons.PageManager.getHtmlBodyClass]]></DotNetClass>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
     <BlockEditTools>Yes</BlockEditTools>
+    <DotNetClass><![CDATA[Contensive.Processor.Addons.PageManager.getHtmlBodyClass]]></DotNetClass>
     <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
     <htmlDocument>Yes</htmlDocument>
   </Addon>
   <Addon name="savePageManagerChildListSort" guid="{8429641A-03C9-4CD1-9369-5B9F2FA509E9}" type="Add-on">
-    <Category>System</Category>
-    <DotNetClass><![CDATA[Contensive.Processor.Addons.PageManager.saveChildPageListDraggableClass]]></DotNetClass>
-    <BlockEditTools>Yes</BlockEditTools>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
     <RemoteMethod>Yes</RemoteMethod>
+    <BlockEditTools>Yes</BlockEditTools>
+    <DotNetClass><![CDATA[Contensive.Processor.Addons.PageManager.saveChildPageListDraggableClass]]></DotNetClass>
   </Addon>
   <Addon name="Login Page" guid="{288a7ee1-9d93-4058-bcd9-c9cd29d25ec8}" type="Add-on">
-    <Category>Login</Category>
-    <DotNetClass><![CDATA[Contensive.Processor.Addons.Login.getLoginPageClass]]></DotNetClass>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
     <BlockEditTools>Yes</BlockEditTools>
+    <DotNetClass><![CDATA[Contensive.Processor.Addons.Login.getLoginPageClass]]></DotNetClass>
     <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
   </Addon>
   <Addon name="Login Form" guid="{E23C5941-19C2-4164-BCFD-83D6DD42F651}" type="Add-on">
-    <Category>Login</Category>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <BlockEditTools>Yes</BlockEditTools>
     <DotNetClass><![CDATA[Contensive.Processor.Addons.Login.getLoginFormClass]]></DotNetClass>
     <ArgumentList>Force Default Login=false</ArgumentList>
-    <BlockEditTools>Yes</BlockEditTools>
     <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
   </Addon>
   <Addon name="Login Button Form" guid="{04aeaacb-4322-4ad2-9817-17439681f8ee}" type="Add-on">
-    <Category>Login</Category>
-    <DotNetClass><![CDATA[Contensive.Processor.Addons.Login.GetLoginButtonFormClass]]></DotNetClass>
+    <Category>Applications.Basic Forms</Category>
+    <Admin>No</Admin>
+    <Content>Yes</Content>
+    <Template>Yes</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
     <BlockEditTools>Yes</BlockEditTools>
+    <DotNetClass><![CDATA[Contensive.Processor.Addons.Login.GetLoginButtonFormClass]]></DotNetClass>
     <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
   </Addon>
   <Addon name="Authenticate" guid="{C560E9CB-24F3-4746-8C08-C960554D4F0F}" type="Add-on">
-    <Category>Login</Category>
-    <DotNetClass><![CDATA[Contensive.Processor.Addons.Primitives.AuthenticateClass]]></DotNetClass>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
     <RemoteMethod>Yes</RemoteMethod>
+    <BlockEditTools>Yes</BlockEditTools>
+    <DotNetClass><![CDATA[Contensive.Processor.Addons.Primitives.AuthenticateClass]]></DotNetClass>
   </Addon>
   <Addon name="Housekeep" guid="{7208D069-8FE3-4BD1-AB76-B25C40C89A45}" type="Add-on">
-    <Category>System</Category>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <BlockEditTools>Yes</BlockEditTools>
     <DotNetClass><![CDATA[Contensive.Processor.Addons.Housekeeping.houseKeepClass]]></DotNetClass>
     <ProcessInterval>60</ProcessInterval>
   </Addon>
   <Addon name="Email Process" guid="{E6C14E81-EFC9-4BC0-ADB2-BDFF043A0800}" type="Add-on">
-    <Category>System</Category>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <BlockEditTools>Yes</BlockEditTools>
     <DotNetClass><![CDATA[Contensive.Processor.Addons.Email.processEmailClass]]></DotNetClass>
     <ProcessInterval>1</ProcessInterval>
   </Addon>
   <Addon name="Export SQL To Csv" guid="{5C25F35D-A2A8-4791-B510-B1FFE0645004}" type="Add-on">
-    <Category>System</Category>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <BlockEditTools>Yes</BlockEditTools>
     <DotNetClass><![CDATA[Contensive.Processor.Addons.ExportSql.exportCsvClass]]></DotNetClass>
   </Addon>
   <Addon name="Export SQL To Xml" guid="{DC7EF1EE-20EE-4468-BEB1-0DC30AC8DAD6}" type="Add-on">
-    <Category>System</Category>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <BlockEditTools>Yes</BlockEditTools>
     <DotNetClass><![CDATA[Contensive.Processor.Addons.ExportSql.exportXmlClass]]></DotNetClass>
   </Addon>
   <Addon name="robots.txt" guid="{717B61FD-4E51-46EC-A95A-1575D1D74963}" type="Add-on">
-      <Category>System</Category>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>Yes</RemoteMethod>
+    <BlockEditTools>Yes</BlockEditTools>
     <DotNetClass><![CDATA[Contensive.Processor.Addons.RobotsTxt.RobotsTxtClass]]></DotNetClass>
     <BlockEditTools>Yes</BlockEditTools>
-    <RemoteMethod>Yes</RemoteMethod>
   </Addon>
   <Addon name="favicon Meta Tag Template Dependency" guid="{37FA12EE-89C8-4D42-A05D-1C4CA6B0EC2C}" type="Add-on">
-    <Category>System</Category>
-    <DotNetClass><![CDATA[Contensive.Processor.Addons.FaviconIco.FaviconIcoClass]]></DotNetClass>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
     <BlockEditTools>Yes</BlockEditTools>
+    <DotNetClass><![CDATA[Contensive.Processor.Addons.FaviconIco.FaviconIcoClass]]></DotNetClass>
   </Addon>
   <Addon name="downloadLibraryFile" guid="{C95A019A-70FD-4B03-9080-7106B27ED2D7}" type="Add-on">
-    <Category>System</Category>
-    <DotNetClass><![CDATA[Contensive.Processor.Addons.Primitives.DownloadClass]]></DotNetClass>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
     <RemoteMethod>Yes</RemoteMethod>
     <BlockEditTools>Yes</BlockEditTools>
+    <DotNetClass><![CDATA[Contensive.Processor.Addons.Primitives.DownloadClass]]></DotNetClass>
   </Addon>
   <Addon name="Company" guid="{7A5C87F7-5684-4B7B-93F6-640C9B3DA4F0}" type="Add-on">
-    <AliasList>Personalization-Company</AliasList>
-    <Category>Personalization</Category>
-    <DotNetClass>Contensive.Processor.Addons.Personalization.CompanyClass</DotNetClass>
-    <ArgumentList></ArgumentList>
+    <Category></Category>
+    <Admin>No</Admin>
     <Content>Yes</Content>
     <Template>Yes</Template>
     <Email>Yes</Email>
+    <RemoteMethod>No</RemoteMethod>
     <IsInline>Yes</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <AliasList>Personalization-Company</AliasList>
+    <DotNetClass>Contensive.Processor.Addons.Personalization.CompanyClass</DotNetClass>
   </Addon>
   <Addon name="Email" guid="{E50A7370-83AD-4C4E-8E28-D6394097599B}" type="Add-on">
-    <AliasList>Personalization-Email</AliasList>
-    <Category>Personalization</Category>
-    <DotNetClass>Contensive.Processor.Addons.Personalization.EmailClass</DotNetClass>
-    <ArgumentList></ArgumentList>
+    <Category></Category>
+    <Admin>No</Admin>
     <Content>Yes</Content>
     <Template>Yes</Template>
     <Email>Yes</Email>
+    <RemoteMethod>No</RemoteMethod>
     <IsInline>Yes</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <AliasList>Personalization-Email</AliasList>
+    <DotNetClass>Contensive.Processor.Addons.Personalization.EmailClass</DotNetClass>
   </Addon>
   <Addon name="FirstName" guid="{41772430-FB1A-49F7-BD17-38B7EF280915}" type="Add-on">
-    <AliasList>Personalization-FirstName</AliasList>
-    <Category>Personalization</Category>
-    <DotNetClass>Contensive.Processor.Addons.Personalization.FirstNameClass</DotNetClass>
-    <ArgumentList></ArgumentList>
+    <Category></Category>
+    <Admin>No</Admin>
     <Content>Yes</Content>
     <Template>Yes</Template>
     <Email>Yes</Email>
+    <RemoteMethod>No</RemoteMethod>
     <IsInline>Yes</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <AliasList>Personalization-FirstName</AliasList>
+    <DotNetClass>Contensive.Processor.Addons.Personalization.FirstNameClass</DotNetClass>
   </Addon>
   <Addon name="LastName" guid="{2D8A086D-C437-4227-B242-5F262ECE9A5E}" type="Add-on">
-    <AliasList>Personalization-LastName</AliasList>
-    <Category>Personalization</Category>
-    <DotNetClass>Contensive.Processor.Addons.Personalization.LastNameClass</DotNetClass>
-    <ArgumentList></ArgumentList>
+    <Category></Category>
+    <Admin>No</Admin>
     <Content>Yes</Content>
     <Template>Yes</Template>
     <Email>Yes</Email>
-		<IsInline>Yes</IsInline>
+    <RemoteMethod>No</RemoteMethod>
+    <IsInline>Yes</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <AliasList>Personalization-LastName</AliasList>
+    <DotNetClass>Contensive.Processor.Addons.Personalization.LastNameClass</DotNetClass>
   </Addon>
   <Addon name="FullName" guid="{429AF6F8-8C19-4BEA-8D5B-152B2910D4C4}" type="Add-on">
-    <AliasList>Personalization-Name</AliasList>
-    <Category>Personalization</Category>
-    <DotNetClass>Contensive.Processor.Addons.Personalization.NameClass</DotNetClass>
-    <ArgumentList></ArgumentList>
+    <Category></Category>
+    <Admin>No</Admin>
     <Content>Yes</Content>
     <Template>Yes</Template>
     <Email>Yes</Email>
+    <RemoteMethod>No</RemoteMethod>
     <IsInline>Yes</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <AliasList>Personalization-Name</AliasList>
+    <DotNetClass>Contensive.Processor.Addons.Personalization.NameClass</DotNetClass>
   </Addon>
   <Addon name="Password" guid="{077D1E52-9A06-4578-81FF-1C6F7B4E4F38}" type="Add-on">
-    <AliasList>Personalization-Password</AliasList>
-    <Category>Personalization</Category>
-    <DotNetClass>Contensive.Processor.Addons.Personalization.NameClass</DotNetClass>
-    <ArgumentList></ArgumentList>
+    <Category></Category>
+    <Admin>No</Admin>
     <Content>No</Content>
     <Template>No</Template>
     <Email>Yes</Email>
+    <RemoteMethod>No</RemoteMethod>
     <IsInline>Yes</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <AliasList>Personalization-Password</AliasList>
+    <DotNetClass>Contensive.Processor.Addons.Personalization.NameClass</DotNetClass>
   </Addon>
   <Addon name="Username" guid="{D90FC3E7-F483-4723-A3A4-ED8C3251D3FF}" type="Add-on">
-    <AliasList>Personalization-Username</AliasList>
-    <Category>Personalization</Category>
-    <DotNetClass>Contensive.Processor.Addons.Personalization.UsernameClass</DotNetClass>
-    <ArgumentList></ArgumentList>
+    <Category></Category>
+    <Admin>No</Admin>
     <Content>Yes</Content>
     <Template>Yes</Template>
     <Email>Yes</Email>
+    <RemoteMethod>No</RemoteMethod>
     <IsInline>Yes</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <AliasList>Personalization-Username</AliasList>
+    <DotNetClass>Contensive.Processor.Addons.Personalization.UsernameClass</DotNetClass>
   </Addon>
   <Addon name="Status" guid="{6444B5C9-36DD-43FF-978C-26650EB2333F}" type="Add-on">
-    <Category>Diagnostic</Category>
-    <DotNetClass>Contensive.Processor.Addons.Diagnostics.StatusClass</DotNetClass>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
     <RemoteMethod>Yes</RemoteMethod>
+    <IsInline>Yes</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <DotNetClass>Contensive.Processor.Addons.Diagnostics.StatusClass</DotNetClass>
   </Addon>
   <Addon name="Server Diagnostic" guid="{58239C18-1B40-4401-9E6F-25E057327393}" type="Add-on">
-    <Category>Diagnostic</Category>
-    <DotNetClass>Contensive.Processor.Addons.Diagnostics.ServerDiagnosticClass</DotNetClass>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <IsInline>No</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
     <Diagnostic>Yes</Diagnostic>
+    <DotNetClass>Contensive.Processor.Addons.Diagnostics.ServerDiagnosticClass</DotNetClass>
   </Addon>
   <Addon name="OnInstallBase" guid="{86739518-9D46-470F-8C76-195D1A19CEDD}" type="Add-on">
-    <Category>System</Category>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <IsInline>No</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <Diagnostic>No</Diagnostic>
     <DotNetClass>Contensive.Processor.Addons.Base.OnInstallClass</DotNetClass>
-    <RemoteMethod>Yes</RemoteMethod>
   </Addon>
   <Addon name="NewApp" guid="{DFE6FD4B-B361-4F9C-BA52-18F6DCFABF56}" type="Add-on">
-    <Category>System</Category>
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <IsInline>No</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <Diagnostic>No</Diagnostic>
     <DotNetClass>Contensive.Processor.Addons.NewApp.NewAppClass</DotNetClass>
   </Addon>
   <Addon name="Page Content Review" guid="{6A54A051-6CF6-4D8C-823D-C37741DD072A}" type="Tool">
-    <Category>System</Category>
-    <ArgumentList>
-      <![CDATA[
-      Review after this many days=90
-      Rows per page=50]]>
-    </ArgumentList>
+    <Category></Category>
     <Admin>Yes</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <IsInline>No</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <Diagnostic>No</Diagnostic>
+    <ArgumentList><![CDATA[Review after this many days=90
+      Rows per page=50]]></ArgumentList>
     <Styles>
       <![CDATA[.pageReview { margin:0; padding:20px; background-color: white; }
       .pageReview .prTable{ border:1px solid #e0e0e0;width:100%}
@@ -2917,26 +3044,54 @@
     </Scripting>
   </Addon>
   <Addon name="Cache Tool" guid="{7B5B8150-62BE-40F4-A66A-7CC74D99BA76}" type="Tool">
-    <Category>Tool</Category>
-    <DotNetClass>Contensive.Processor.Addons.Tools.CacheToolClass</DotNetClass>
+    <Category></Category>
     <Admin>Yes</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <IsInline>No</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <Diagnostic>No</Diagnostic>
+    <DotNetClass>Contensive.Processor.Addons.Tools.CacheToolClass</DotNetClass>
   </Addon>
   <Addon name="See Also" guid="{C4198871-A848-4B0F-95D4-ADDE08A5620D}" type="Add-on">
-    <Category>Navigation</Category>
-    <DotNetClass><![CDATA[Contensive.Processor.Addons.PageManager.SeeAlsoClass]]></DotNetClass>
+    <Category>Extras.Navigation</Category>
+    <Admin>No</Admin>
     <Content>Yes</Content>
     <Template>Yes</Template>
-	<Category>Extras.Feeds/Lists</Category>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <IsInline>No</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <Diagnostic>No</Diagnostic>
+    <DotNetClass><![CDATA[Contensive.Processor.Addons.PageManager.SeeAlsoClass]]></DotNetClass>
   </Addon>
   <Addon name="Whats Related" guid="{42B8FE19-051B-4E83-8F9A-6BE01AB9A650}" type="Add-on">
-    <Category>Navigation</Category>
-    <ActiveXProgramID></ActiveXProgramID>
-    <DotNetClass><![CDATA[Contensive.Processor.Addons.PageManager.WhatsRelatedClass]]></DotNetClass>
+    <Category>Extras.Navigation</Category>
+    <Admin>No</Admin>
     <Content>Yes</Content>
     <Template>Yes</Template>
-	<Category>Extras.Advertisements</Category>
+    <Email>No</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <IsInline>No</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <Diagnostic>No</Diagnostic>
+    <DotNetClass><![CDATA[Contensive.Processor.Addons.PageManager.WhatsRelatedClass]]></DotNetClass>
   </Addon>
-  
+  <Addon name="Content Box" guid="{E341695F-C444-4E10-9295-9BEEC41874D8}" type="Add-on">
+    <Category>Content.Content Box</Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>Yes</Template>
+    <Email>Yes</Email>
+    <RemoteMethod>No</RemoteMethod>
+    <IsInline>No</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <Diagnostic>No</Diagnostic>
+    <CopyText><![CDATA[<AC type="Content" Name="Content" QueryString=""> ]]></CopyText>
+  </Addon>
+
   <SQLIndex IndexName="ccContentContentTableID" DataSourceName="Default" TableName="ccContent" FieldNameList="ContentTableID"  />
   <SQLIndex IndexName="ccGroupRulesGroupID" DataSourceName="Default" TableName="ccGroupRules" FieldNameList="GroupID"  />
   <SQLIndex IndexName="ccGroupRulesContentID" DataSourceName="Default" TableName="ccGroupRules" FieldNameList="ContentID"  />
@@ -3124,11 +3279,22 @@
     <record content="groups" guid="{0685bd36-fe24-4542-be42-27337af50da8}" name="Site Managers">
       <field name="caption">Site Managers</field>
     </record>
+    <record content="add-on categories" guid="{3e6055bf-7e7c-41fc-94b1-1d1a81c2842b}" name="Applications">
+      <field name="iconhtml"><![CDATA[<div class="fas fa-cogs"></div>]]></field>
+    </record>
+    <record content="add-on categories" guid="{bc311ad8-fcae-4228-800d-e432733fdf3e}" name="Containers">
+      <field name="iconhtml"><![CDATA[<div class="fas fa-columns"></div>]]></field>
+    </record>
+    <record content="add-on categories" guid="{03b8f353-788c-4bdc-a30d-d2051b59d851}" name="Content">
+      <field name="iconhtml"><![CDATA[<p><i class="fas fa-file-alt"></i></p>]]></field>
+    </record>
+    <record content="add-on categories" guid="{63973d69-1d50-41ba-9986-c421db10a04d}" name="Extras">
+      <field name="iconhtml"><![CDATA[<div class="fas fa-cog"></div>]]></field>
+    </record>
   </data>
   <ImportCollection name="Add-on Manager">{A3E58089-74FC-4FB3-B847-0AD22B51AA72}</ImportCollection>
   <ImportCollection name="Admin Navigator">{0AB76B52-2C9E-4339-B4DB-902AF42B57EB}</ImportCollection>
   <ImportCollection name="Bootstrap">{2d3f9a21-9602-4549-b5df-5e09a9dae57e}</ImportCollection>
-  <ImportCollection name="Content Box">{6A681E1F-ABCC-4E28-AAB4-79264DA18B91}</ImportCollection>
   <ImportCollection name="Contensive Patch5">{C7308F43-F810-4266-91E0-D4B1F5637BD6}</ImportCollection>
   <ImportCollection name="Contact Manager">{51A67CB6-EA94-497C-896A-979A851BE3DB}</ImportCollection>
   <ImportCollection name="Content Watch List">{3C5C2B2C-CAA5-46DC-92ED-A21DD23DF597}</ImportCollection>
