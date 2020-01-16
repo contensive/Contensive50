@@ -1116,7 +1116,8 @@ namespace Contensive.Processor.Controllers {
                     // -- build orphan list admin tool here
                     string RequestedListName = "";
                     string hintHtml = ""
-                        + HtmlController.p("All child pages not displayed in Child Page Lists are listed here. These pages do not display on the public website. To display any or all of these, add a Child Page List block(s) to the page and drag these where needed. Pages in this section will still appear in page navigation. ")
+                        + HtmlController.h4("Orphan Child Pages")
+                        + HtmlController.p("All child pages not assigned to a Child Page List within this page. These pages may display in menuing but do not display on this page. To display any or all of these, add a Child Page List to the page and drag these where needed.")
                         + HtmlController.ul(editItemList.ToString() + addItemList.ToString(), "ccChildList", "childPageList_" + core.doc.pageController.page.id + "_" + RequestedListName);
                     result.Append(AdminUIController.getAdminHintWrapper(core, hintHtml));
                 }

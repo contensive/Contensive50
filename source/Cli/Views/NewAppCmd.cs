@@ -74,7 +74,8 @@ namespace Contensive.CLI {
                                 Console.Write("\nThis application name is not valid because it must start with a letter.");
                                 continue;
                             }
-                            if (!appName.All(x => char.IsLetterOrDigit(x))) {
+                            string allowableLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                            if(!appName.All(x => allowableLetters.Contains(x))) {
                                 Console.Write("\nThis application name is not valid because it must contain only letters and numbers.");
                                 continue;
                             }

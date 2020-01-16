@@ -8,6 +8,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
+                // email log for only 365 days
+                core.db.executeNonQuery("delete from ccemaillog where (dateadded < DATEADD(day,-365,CAST(GETDATE() AS DATE)))");
+                //
                 // delete email log entries not realted to a drop, older than archive.
                 //
                 LogController.logInfo(core, "Deleting non-drop email logs older then " + env.emailDropArchiveAgeDays + " days");

@@ -8,6 +8,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
+                // activity log for only 30 days
+                core.db.executeNonQuery("delete from abaccountinglog where (dateadded < DATEADD(day,-30,CAST(GETDATE() AS DATE)))");
+                //
                 // Activities with no Member
                 //
                 LogController.logInfo(core, "Deleting activities with no member record.");

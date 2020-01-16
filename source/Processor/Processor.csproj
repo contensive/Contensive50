@@ -159,7 +159,6 @@
     <Compile Include="Addons\Housekeeping\HourlyTasksClass.cs" />
     <Compile Include="Addons\Housekeeping\DailyTasksClass.cs" />
     <Compile Include="Addons\Housekeeping\RemoteQueryClass.cs" />
-    <Compile Include="Addons\Housekeeping\RemoveVisitsClass.cs" />
     <Compile Include="Addons\Housekeeping\PersonClass.cs" />
     <Compile Include="Addons\Housekeeping\ViewingsClass.cs" />
     <Compile Include="Addons\Housekeeping\EmailDropClass.cs" />
