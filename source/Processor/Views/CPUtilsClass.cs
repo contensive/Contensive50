@@ -364,17 +364,14 @@ namespace Contensive.Processor {
             }
         }
         //
-        [Obsolete("deprecated", false)]
         public override string DecodeUrl(string Url) {
             return GenericController.decodeURL(Url);
         }
         //
-        [Obsolete("deprecated", false)]
         public override string DecodeHTML(string Source) {
             return HtmlController.decodeHtml(Source);
         }
         //
-        [Obsolete("deprecated", false)]
         public override string EncodeHTML(string Source) {
             string returnValue = "";
             //
@@ -384,7 +381,6 @@ namespace Contensive.Processor {
             return returnValue;
         }
         //
-        [Obsolete("deprecated", false)]
         public override string EncodeUrl(string Source) {
             return GenericController.encodeURL(Source);
         }

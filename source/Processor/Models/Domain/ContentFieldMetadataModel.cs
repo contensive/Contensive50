@@ -749,8 +749,14 @@ namespace Contensive.Processor.Models.Domain {
                     case CPContentBaseClass.FieldTypeIdEnum.HTML:
                         returnFieldTypeName = FieldTypeNameHTML;
                         break;
+                    case CPContentBaseClass.FieldTypeIdEnum.HTMLCode:
+                        returnFieldTypeName = FieldTypeNameHTMLCode;
+                        break;
                     case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                         returnFieldTypeName = FieldTypeNameHTMLFile;
+                        break;
+                    case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode:
+                        returnFieldTypeName = FieldTypeNameHTMLCodeFile;
                         break;
                     default:
                         if (fieldType == CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement) {

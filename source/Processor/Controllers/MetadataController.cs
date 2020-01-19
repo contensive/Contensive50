@@ -181,6 +181,7 @@ namespace Contensive.Processor.Controllers {
                         return DbController.encodeSQLDate(GenericController.encodeDate(expression));
                     case CPContentBaseClass.FieldTypeIdEnum.LongText:
                     case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.HTMLCode:
                         return DbController.encodeSQLText(GenericController.encodeText(expression));
                     case CPContentBaseClass.FieldTypeIdEnum.File:
                     case CPContentBaseClass.FieldTypeIdEnum.FileImage:
@@ -194,6 +195,7 @@ namespace Contensive.Processor.Controllers {
                     case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                     case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                     case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode:
                         return DbController.encodeSQLText(GenericController.encodeText(expression));
                     default:
                         throw new GenericException("Unknown Field Type [" + fieldType + "");

@@ -1120,6 +1120,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         switch (fieldTypeId) {
                             case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                            case CPContentBaseClass.FieldTypeIdEnum.HTMLCode:
                                 FieldValueText = GenericController.encodeText(FieldValueVariant);
                                 if (FieldReadOnly) {
                                     returnResult = FieldValueText;
@@ -1128,6 +1129,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 break;
                             case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                            case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode:
                                 //
                                 // html files, read from cdnFiles and use html editor
                                 //
@@ -2050,7 +2052,9 @@ namespace Contensive.Processor.Controllers {
                                     case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                                     case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
                                     case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                                    case CPContentBaseClass.FieldTypeIdEnum.HTMLCode:
                                     case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode:
                                         Copy = csData.getText(FieldName);
                                         PosACInstanceId = GenericController.strInstr(1, Copy, "ACInstanceID=\"" + ACInstanceId + "\"", 1);
                                         if (PosACInstanceId != 0) {

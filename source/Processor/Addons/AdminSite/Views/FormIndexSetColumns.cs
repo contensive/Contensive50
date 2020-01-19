@@ -367,6 +367,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     //
                                     // filename can not be search
                                     Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (html file field)"));
+                                } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode) {
+                                    //
+                                    // filename can not be search
+                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (html code file field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileCSS) {
                                     //
                                     // css filename can not be search

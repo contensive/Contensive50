@@ -773,12 +773,14 @@ namespace Contensive.Processor.Controllers {
                     case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
                     case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                     case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
-                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode: {
                             returnType = "VarChar(255) NULL";
                             break;
                         }
                     case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                    case CPContentBaseClass.FieldTypeIdEnum.HTML: {
+                    case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.HTMLCode: {
                             //
                             // ----- Longtext, depends on datasource
                             returnType = "varchar(max) Null";
@@ -970,9 +972,16 @@ namespace Contensive.Processor.Controllers {
                     case Constants.FieldTypeNameLcaseHTML: {
                             return CPContentBaseClass.FieldTypeIdEnum.HTML;
                         }
+                    case Constants.FieldTypeNameLcaseHTMLCode: {
+                            return CPContentBaseClass.FieldTypeIdEnum.HTMLCode;
+                        }
                     case Constants.FieldTypeNameLcaseHTMLFile:
                     case "html file": {
                             return CPContentBaseClass.FieldTypeIdEnum.FileHTML;
+                        }
+                    case Constants.FieldTypeNameLcaseHTMLCodeFile:
+                    case "html file code": {
+                            return CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode;
                         }
                     default: {
                             //

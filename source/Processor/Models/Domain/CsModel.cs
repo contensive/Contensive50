@@ -171,7 +171,8 @@ namespace Contensive.Processor {
                                     break;
                                 }
                             case CPContentBaseClass.FieldTypeIdEnum.FileText:
-                            case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                            case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                            case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode: {
                                     //
                                     // ----- private file
                                     string SourceFilename = getFieldFilename(field.nameLc, "", contentMeta.name, field.fieldTypeId);
@@ -226,7 +227,8 @@ namespace Contensive.Processor {
                                     break;
                                 }
                             case CPContentBaseClass.FieldTypeIdEnum.FileText:
-                            case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                            case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                            case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode: {
                                     //
                                     // private file
                                     string Filename = getRawData(field.nameLc);
@@ -980,6 +982,7 @@ namespace Contensive.Processor {
                         }
                     case CPContentBaseClass.FieldTypeIdEnum.FileText:
                     case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode:
                     case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                     case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                     case CPContentBaseClass.FieldTypeIdEnum.FileJavascript: {
@@ -989,7 +992,8 @@ namespace Contensive.Processor {
                         }
                     case CPContentBaseClass.FieldTypeIdEnum.Text:
                     case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                    case CPContentBaseClass.FieldTypeIdEnum.HTML: {
+                    case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.HTMLCode: {
                             //
                             // -- text saved in database
                             return rawData;
@@ -1063,6 +1067,7 @@ namespace Contensive.Processor {
                         }
                     case CPContentBaseClass.FieldTypeIdEnum.FileText:
                     case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode:
                     case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                     case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                     case CPContentBaseClass.FieldTypeIdEnum.FileJavascript: {
@@ -1153,7 +1158,8 @@ namespace Contensive.Processor {
                             break;
                         }
                     case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                    case CPContentBaseClass.FieldTypeIdEnum.HTML: {
+                    case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                    case CPContentBaseClass.FieldTypeIdEnum.HTMLCode: {
                             //
                             // Set if text of value changes
                             //
@@ -1338,7 +1344,8 @@ namespace Contensive.Processor {
                                 case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                                 case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                                 case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                                case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                                case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                                case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode: {
                                         string filename = encodeText(writeCacheValue);
                                         if (filename.Length > 255) {
                                             filename = filename.left(255);
@@ -1347,7 +1354,8 @@ namespace Contensive.Processor {
                                         break;
                                     }
                                 case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                                case CPContentBaseClass.FieldTypeIdEnum.HTML: {
+                                case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                                case CPContentBaseClass.FieldTypeIdEnum.HTMLCode: {
                                         SQLSetPair = fieldName + "=" + DbController.encodeSQLText(GenericController.encodeText(writeCacheValue));
                                         break;
                                     }

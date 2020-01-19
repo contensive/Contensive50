@@ -449,6 +449,38 @@ namespace Contensive.BaseClasses {
         public abstract string Upgrade51ConvertFileInfoArrayToParseString(List<CPFileSystemBaseClass.FileDetail> DirectoryInfo);
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapped dotnet namespace for use in scripting
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public abstract string EncodeUrl(string source);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// wrapped dotnet namespace for use in scripting
+        /// </summary>
+        /// <param name="Url"></param>
+        /// <returns></returns>
+        public abstract string DecodeUrl(string Url);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// wrapped dotnet namespace for use in scripting
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public abstract string EncodeHTML(string source);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// wrapped dotnet namespace for use in scripting
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public abstract string DecodeHTML(string source);
+        //
+        //====================================================================================================
         // deprecated
         //
         [Obsolete("Deprecated, use AppendLog", false)]
@@ -480,18 +512,6 @@ namespace Contensive.BaseClasses {
         //
         [Obsolete("Installation upgrade through the cp interface is deprecated. Please use the command line tool.", false)]
         public abstract void Upgrade(bool isNewApp);
-        //
-        [Obsolete("Use System.Net.WebUtility.UrlDecode()", false)]
-        public abstract string DecodeUrl(string Url);
-        //
-        [Obsolete("Use System.Net.WebUtility.HtmlDecode()", false)]
-        public abstract string DecodeHTML(string source);
-        //
-        [Obsolete("Use System.Net.WebUtility.HtmlEncode()", false)]
-        public abstract string EncodeHTML(string source);
-        //
-        [Obsolete("Use System.Net.WebUtility.UrlEncode()", false)]
-        public abstract string EncodeUrl(string source);
         //
         [Obsolete("Deprecated", false)]
         public abstract string GetPleaseWaitEnd();

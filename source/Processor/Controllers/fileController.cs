@@ -1260,7 +1260,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
-        public static string normalizeDosFilename( string filename) {
+        public static string normalizeDosFilename(string filename) {
             string invalid = new string(Path.GetInvalidFileNameChars());
             foreach (char c in invalid) {
                 filename = filename.Replace(c.ToString(), "_");
@@ -1423,21 +1423,30 @@ namespace Contensive.Processor.Controllers {
                 idFilename = recordId.ToString().PadLeft(12, '0');
             }
             switch (fieldType) {
-                case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
-                result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".css";
-                break;
-                case CPContentBaseClass.FieldTypeIdEnum.FileXML:
-                result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".xml";
-                break;
-                case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".js";
-                break;
-                case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".html";
-                break;
-                default:
-                result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".txt";
-                break;
+                case CPContentBaseClass.FieldTypeIdEnum.FileCSS: {
+                        result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".css";
+                        break;
+                    }
+                case CPContentBaseClass.FieldTypeIdEnum.FileXML: {
+                        result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".xml";
+                        break;
+                    }
+                case CPContentBaseClass.FieldTypeIdEnum.FileJavascript: {
+                        result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".js";
+                        break;
+                    }
+                case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                        result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".html";
+                        break;
+                    }
+                case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode: {
+                        result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".html";
+                        break;
+                    }
+                default: {
+                        result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".txt";
+                        break;
+                    }
             }
             return result;
         }

@@ -216,7 +216,7 @@ namespace Contensive.BaseClasses
 		/// <param name="ContentName"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		[Obsolete("Please use AddRecord(ContentName as String)", true)]
+		[Obsolete("Please use AddRecord(String ContentName)", true)]
 		public abstract int AddRecord(object ContentName);
 		public abstract int AddRecord(string ContentName);
 		public abstract int AddRecord(string ContentName, string recordName);

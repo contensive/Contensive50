@@ -1027,6 +1027,8 @@ namespace Contensive.Processor.Controllers {
                 core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='Resource Link' where ID=20;");
                 core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='HTML' where ID=21;");
                 core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='HTML File' where ID=22;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='HTML Code' where ID=23;");
+                core.db.executeNonQuery("Update ccFieldTypes Set active=1,Name='HTML Code File' where ID=24;");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

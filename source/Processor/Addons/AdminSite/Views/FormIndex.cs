@@ -931,8 +931,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                         case CPContentBaseClass.FieldTypeIdEnum.FileText:
                         case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                         case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                        case CPContentBaseClass.FieldTypeIdEnum.HTMLCode:
                         case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                        IncludedInColumns = false;
+                        case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode:
+                            IncludedInColumns = false;
                         break;
                     }
                     if ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.MemberSelect) || ((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Lookup) && (field.lookupContentId != 0))) {
@@ -1764,7 +1766,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                        case CPContentBaseClass.FieldTypeIdEnum.HTML: {
+                        case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                        case CPContentBaseClass.FieldTypeIdEnum.HTMLCode: {
                                 string fieldValueText = csData.getText(field.nameLc);
                                 if (fieldValueText.Length > 50) {
                                     fieldValueText = fieldValueText.left(50) + "[more]";
@@ -1776,7 +1779,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                         case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                         case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                         case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                        case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                        case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode: {
                                 string filename = csData.getText(field.nameLc);
                                 if (!string.IsNullOrEmpty(filename)) {
                                     string Copy = core.cdnFiles.readFileText(filename);

@@ -505,9 +505,9 @@ namespace Contensive.Processor.Models.Domain {
                                             bool fieldHtmlContent = GenericController.encodeBoolean(fieldRow[25]);
                                             if (fieldHtmlContent) {
                                                 if (fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.LongText) {
-                                                    fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.HTML;
+                                                    fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.HTMLCode;
                                                 } else if (fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileText) {
-                                                    fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileHTML;
+                                                    fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode;
                                                 }
                                             }
                                             field.active = GenericController.encodeBoolean(fieldRow[24]);

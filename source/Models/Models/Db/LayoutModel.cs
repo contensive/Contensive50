@@ -10,7 +10,17 @@ namespace Contensive.Models.Db {
         public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("layouts", "cclayouts", "default", true);
         //
         //====================================================================================================
+        /// <summary>
+        /// 
+        /// </summary>
         public DbBaseModel.FieldTypeTextFile layout { get; set; }
+        /// <summary>
+        /// the addon collection that installed this record
+        /// </summary>
+        public int installedByCollectionId { get; set; }
+        /// <summary>
+        /// deprecated. styles are implemented only through addons
+        /// </summary>
         public string stylesFilename { get; set; }
     }
 }

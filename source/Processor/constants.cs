@@ -497,7 +497,9 @@ namespace Contensive.Processor {
         internal const string FieldTypeNameResourceLink = "ResourceLink";
         internal const string FieldTypeNameMemberSelect = "MemberSelect";
         internal const string FieldTypeNameHTML = "HTML";
+        internal const string FieldTypeNameHTMLCode = "HTMLCode";
         internal const string FieldTypeNameHTMLFile = "HTMLFile";
+        internal const string FieldTypeNameHTMLCodeFile = "HTMLCodeFile";
         //
         internal const string FieldTypeNameLcaseInteger = "integer";
         internal const string FieldTypeNameLcaseText = "text";
@@ -519,7 +521,9 @@ namespace Contensive.Processor {
         internal const string FieldTypeNameLcaseResourceLink = "resourcelink";
         internal const string FieldTypeNameLcaseMemberSelect = "memberselect";
         internal const string FieldTypeNameLcaseHTML = "html";
+        internal const string FieldTypeNameLcaseHTMLCode = "htmlcode";
         internal const string FieldTypeNameLcaseHTMLFile = "htmlfile";
+        internal const string FieldTypeNameLcaseHTMLCodeFile = "htmlcodefile";
         //
         //------------------------------------------------------------------------
         // ----- Payment Options

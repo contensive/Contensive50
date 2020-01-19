@@ -16,6 +16,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 // -- Addons
                 AddonFolderClass.housekeep(core);
                 //
+                // -- metadata
+                ContentFieldClass.housekeep(core, env);
+                //
                 // -- content
                 PageContentClass.housekeep(core, env);
                 AddonContentFieldTypeRuleClass.housekeep(core, env);

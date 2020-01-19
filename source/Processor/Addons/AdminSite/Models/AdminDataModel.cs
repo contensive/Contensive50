@@ -1074,7 +1074,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                                     case CPContentBaseClass.FieldTypeIdEnum.FileXML:
                                     case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                                    case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode: {
                                             DBValueVariant = csData.getText(adminContentcontent.nameLc);
                                             break;
                                         }
@@ -1469,9 +1470,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         ResponseFieldValueText = "http//" + ResponseFieldValueText;
                                     }
                                     break;
-                                }
-                            case CPContentBaseClass.FieldTypeIdEnum.HTML:
-                            case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                                    }
+                                case CPContentBaseClass.FieldTypeIdEnum.HTML:
+                                case CPContentBaseClass.FieldTypeIdEnum.HTMLCode:
+                                case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                                case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode: {
                                     //
                                     // ----- Html fields
                                     //

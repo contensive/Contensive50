@@ -97,7 +97,15 @@ namespace Contensive.BaseClasses {
             /// <summary>
             /// (string, varchar(255)), holds a path and filename to a content file with html content
             /// </summary>
-            FileHTML = 22
+            FileHTML = 22,
+            /// <summary>
+            /// (string, varchar(max)), holds text content that represents html and edited as html code
+            /// </summary>
+            HTMLCode = 23,
+            /// <summary>
+            /// (string, varchar(255)), holds a path and filename to a content file with html content and edited as html code
+            /// </summary>
+            FileHTMLCode = 24
         }
         //
         //====================================================================================================
